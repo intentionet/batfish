@@ -629,7 +629,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _authenticationKeyChains;
   }
 
-  public final Map<String, CommunityList> getCommunityLists() {
+  public Map<String, CommunityList> getCommunityLists() {
     return _communityLists;
   }
 
@@ -637,7 +637,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _defaultCrossZoneAction;
   }
 
-  public final RoutingInstance getDefaultRoutingInstance() {
+  public RoutingInstance getDefaultRoutingInstance() {
     return _defaultRoutingInstance;
   }
 
@@ -645,7 +645,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _dnsServers;
   }
 
-  public final Map<String, FirewallFilter> getFirewallFilters() {
+  public Map<String, FirewallFilter> getFirewallFilters() {
     return _filters;
   }
 
@@ -658,7 +658,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
   }
 
   @Override
-  public final String getHostname() {
+  public String getHostname() {
     return _defaultRoutingInstance.getHostname();
   }
 
@@ -666,15 +666,15 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _ignoredPrefixLists;
   }
 
-  public final Map<String, IkeGateway> getIkeGateways() {
+  public Map<String, IkeGateway> getIkeGateways() {
     return _ikeGateways;
   }
 
-  public final Map<String, IkePolicy> getIkePolicies() {
+  public Map<String, IkePolicy> getIkePolicies() {
     return _ikePolicies;
   }
 
-  public final Map<String, IkeProposal> getIkeProposals() {
+  public Map<String, IkeProposal> getIkeProposals() {
     return _ikeProposals;
   }
 
@@ -682,15 +682,15 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _interfaces;
   }
 
-  public final Map<String, IpsecPolicy> getIpsecPolicies() {
+  public Map<String, IpsecPolicy> getIpsecPolicies() {
     return _ipsecPolicies;
   }
 
-  public final Map<String, IpsecProposal> getIpsecProposals() {
+  public Map<String, IpsecProposal> getIpsecProposals() {
     return _ipsecProposals;
   }
 
-  public final Map<String, IpsecVpn> getIpsecVpns() {
+  public Map<String, IpsecVpn> getIpsecVpns() {
     return _ipsecVpns;
   }
 
@@ -706,11 +706,11 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _ntpServers;
   }
 
-  public final Map<String, PolicyStatement> getPolicyStatements() {
+  public Map<String, PolicyStatement> getPolicyStatements() {
     return _policyStatements;
   }
 
-  public final Map<String, PrefixList> getPrefixLists() {
+  public Map<String, PrefixList> getPrefixLists() {
     return _prefixLists;
   }
 
@@ -719,11 +719,11 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _roles;
   }
 
-  public final Map<String, RouteFilter> getRouteFilters() {
+  public Map<String, RouteFilter> getRouteFilters() {
     return _routeFilters;
   }
 
-  public final Map<String, RoutingInstance> getRoutingInstances() {
+  public Map<String, RoutingInstance> getRoutingInstances() {
     return _routingInstances;
   }
 
@@ -878,7 +878,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
   }
 
   @Override
-  public final void setHostname(String hostname) {
+  public void setHostname(String hostname) {
     _defaultRoutingInstance.setHostname(hostname);
   }
 

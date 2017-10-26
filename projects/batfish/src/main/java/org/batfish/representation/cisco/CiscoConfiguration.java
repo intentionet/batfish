@@ -608,11 +608,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _dnsSourceInterface;
   }
 
-  public final Map<String, ExpandedCommunityList> getExpandedCommunityLists() {
+  public Map<String, ExpandedCommunityList> getExpandedCommunityLists() {
     return _expandedCommunityLists;
   }
 
-  public final Map<String, ExtendedAccessList> getExtendedAcls() {
+  public Map<String, ExtendedAccessList> getExtendedAcls() {
     return _extendedAccessLists;
   }
 
@@ -657,7 +657,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
   }
 
   @Override
-  public final String getHostname() {
+  public String getHostname() {
     return _hostname;
   }
 
@@ -665,7 +665,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _igmpAcls;
   }
 
-  public final Map<String, Interface> getInterfaces() {
+  public Map<String, Interface> getInterfaces() {
     return _interfaces;
   }
 
@@ -721,7 +721,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _prefix6Lists;
   }
 
-  public final Map<String, PrefixList> getPrefixLists() {
+  public Map<String, PrefixList> getPrefixLists() {
     return _prefixLists;
   }
 
@@ -734,11 +734,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _roles;
   }
 
-  public final Map<String, RouteMap> getRouteMaps() {
+  public Map<String, RouteMap> getRouteMaps() {
     return _routeMaps;
   }
 
-  public final Map<String, RoutePolicy> getRoutePolicies() {
+  public Map<String, RoutePolicy> getRoutePolicies() {
     return _routePolicies;
   }
 
@@ -838,11 +838,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _sshIpv6Acls;
   }
 
-  public final Map<String, StandardAccessList> getStandardAcls() {
+  public Map<String, StandardAccessList> getStandardAcls() {
     return _standardAccessLists;
   }
 
-  public final Map<String, StandardCommunityList> getStandardCommunityLists() {
+  public Map<String, StandardCommunityList> getStandardCommunityLists() {
     return _standardCommunityLists;
   }
 
@@ -1280,7 +1280,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
   }
 
   @Override
-  public final void setHostname(String hostname) {
+  public void setHostname(String hostname) {
     _hostname = hostname;
   }
 

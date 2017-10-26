@@ -28,7 +28,7 @@ public abstract class Question implements IQuestion {
 
     public static class Variable {
 
-      public static enum Type {
+      public enum Type {
         BOOLEAN("boolean", false),
         COMPARATOR("comparator", true),
         DOUBLE("double", false),

@@ -203,7 +203,7 @@ public final class GeneratedRoute extends AbstractRoute {
   }
 
   @Override
-  protected final String protocolRouteString() {
+  protected String protocolRouteString() {
     return " asPath:"
         + _asPath
         + " attributePolicy:"
