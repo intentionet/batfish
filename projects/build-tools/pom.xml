@@ -1,0 +1,8 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.batfish</groupId>
+  <artifactId>build-tools</artifactId>
+  <version>1.0</version>
+  <name>Build Tools</name>
+</project>
+

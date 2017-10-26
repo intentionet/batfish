@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<ruleset name="whizbang PMD ruleset"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+  <description>
+    This ruleset defines the PMD rules for project "batfish".
+  </description>
+
+  <rule ref="rulesets/java/basic.xml">
+     <exclude name="CheckResultSet"/>
+  </rule>
+  <rule ref="rulesets/java/imports.xml"/>
+  <rule ref="rulesets/java/unnecessary.xml">
+     <exclude name="UselessParentheses"/>
+  </rule>
+  <rule ref="rulesets/java/unusedcode.xml">
+     <exclude name="UnusedFormalParameter"/>
+     <exclude name="UnusedPrivateMethod"/>
+  </rule>
+</ruleset>
+

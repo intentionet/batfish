@@ -62,6 +62,9 @@
     <jackson-jsonschema.version>1.0.11-batfish-internal</jackson-jsonschema.version>
     <puppycrawl.version>8.0</puppycrawl.version>
     <maven-artifact.version>3.5.0</maven-artifact.version>
+    <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
+    <maven-pmd-plugin.version>3.8</maven-pmd-plugin.version>
+    <maven-project-info-reports-plugin.version>2.9</maven-project-info-reports-plugin.version>
     <slf4j.version>1.7.25</slf4j.version>
     <xstream.version>1.4.7</xstream.version>
   </properties>
@@ -272,6 +275,50 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>${maven-pmd-plugin.version}</version>
+        <configuration>
+          <excludeRoots>
+            <excludeRoot>target/generated-sources</excludeRoot>
+            <excludeRoot>target/generated-test-sources</excludeRoot>
+          </excludeRoots>
+          <rulesets>
+             <ruleset>org/batfish/pmd/pmd-ruleset.xml</ruleset>
+          </rulesets>
+          <printFailingErrors>true</printFailingErrors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+               <failOnViolation>false</failOnViolation>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>cpd-check</id>
+            <goals>
+              <goal>cpd-check</goal>
+            </goals>
+            <configuration>
+               <failOnViolation>false</failOnViolation>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+           <dependency>
+              <groupId>org.batfish</groupId>
+              <artifactId>build-tools</artifactId>
+              <version>1.0</version>
+           </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
         <executions>
@@ -282,6 +329,33 @@
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>${maven-jxr-plugin.version}</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>${maven-pmd-plugin.version}</version>
+        <configuration>
+          <rulesets>
+            <ruleset>org/batfish/pmd/pmd-ruleset.xml</ruleset>
+          </rulesets>
+        </configuration>
+      </plugin>
+
+      <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-project-info-reports-plugin</artifactId>
+         <version>${maven-project-info-reports-plugin.version}</version>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <dependencyManagement>
     <dependencies>
@@ -587,6 +661,12 @@
         <artifactId>slf4j-jdk14</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
+      <dependency>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-project-info-reports-plugin</artifactId>
+         <!--<version>${maven-project-info-reports-plugin.version}</version>-->
+         <version>2.9</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -595,6 +675,7 @@
     <module>batfish</module>
     <module>batfish-client</module>
     <module>batfish-common-protocol</module>
+    <module>build-tools</module>
     <module>coordinator</module>
     <module>question</module>
   </modules>
