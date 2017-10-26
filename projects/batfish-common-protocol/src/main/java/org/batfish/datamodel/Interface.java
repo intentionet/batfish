@@ -760,6 +760,28 @@ public final class Interface extends ComparableStructure<String> {
     }
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        _key,
+        _accessVlan,
+        _active,
+        _allowedVlans,
+        _allPrefixes,
+        _autoState,
+        _bandwidth,
+        _inboundFilter != null ? _inboundFilter.getName() : null,
+        _incomingFilter != null ? _incomingFilter.getName() : null,
+        _interfaceType,
+        _mtu,
+        _nativeVlan,
+        _outgoingFilter != null ? _outgoingFilter.getName() : null,
+        _prefix,
+        _routingPolicy,
+        _switchportMode,
+        _zone);
+  }
+
   public boolean isLoopback(ConfigurationFormat vendor) {
     String name = _key.toLowerCase();
     if (vendor == ConfigurationFormat.JUNIPER || vendor == ConfigurationFormat.FLAT_JUNIPER) {

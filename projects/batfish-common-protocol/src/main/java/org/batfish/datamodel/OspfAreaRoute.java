@@ -15,6 +15,33 @@ public abstract class OspfAreaRoute extends OspfRoute {
     _area = area;
   }
 
+  @Override
+  public final boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    } else if (!getClass().equals(o.getClass())) {
+      return false;
+    }
+    OspfAreaRoute other = (OspfAreaRoute) o;
+    if (_nextHopIp == null) {
+      if (other._nextHopIp != null) {
+        return false;
+      }
+    } else if (!_nextHopIp.equals(other._nextHopIp)) {
+      return false;
+    }
+    if (_admin != other._admin) {
+      return false;
+    }
+    if (_area != other._area) {
+      return false;
+    }
+    if (_metric != other._metric) {
+      return false;
+    }
+    return _network.equals(other._network);
+  }
+
   @JsonProperty(PROP_AREA)
   public long getArea() {
     return _area;
@@ -35,7 +62,7 @@ public abstract class OspfAreaRoute extends OspfRoute {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + _admin;

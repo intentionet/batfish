@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AbstractRouteBuilder;
@@ -65,6 +66,11 @@ public class RoutingPolicy extends ComparableStructure<String> {
     }
     RoutingPolicy other = (RoutingPolicy) o;
     return _statements.equals(other._statements);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_key, _statements);
   }
 
   @JsonIgnore

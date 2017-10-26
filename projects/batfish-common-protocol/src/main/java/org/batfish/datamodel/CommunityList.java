@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -76,6 +77,11 @@ public class CommunityList extends ComparableStructure<String> {
           + "advertisement")
   public List<CommunityListLine> getLines() {
     return _lines;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_key, _lines);
   }
 
   private boolean newPermits(long community) {

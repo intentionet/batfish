@@ -53,11 +53,7 @@ public class Pair<T1 extends Comparable<? super T1>, T2 extends Comparable<? sup
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((_first == null) ? 0 : _first.hashCode());
-    result = prime * result + ((_second == null) ? 0 : _second.hashCode());
-    return result;
+    return Objects.hash(_first, _second);
   }
 
   @Override

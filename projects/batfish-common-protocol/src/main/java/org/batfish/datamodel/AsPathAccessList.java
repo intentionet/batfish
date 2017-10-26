@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -80,6 +81,11 @@ public final class AsPathAccessList extends ComparableStructure<String> implemen
       _deniedCache.add(asPath);
     }
     return accept;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_key, _lines);
   }
 
   public boolean permits(AsPath asPath) {

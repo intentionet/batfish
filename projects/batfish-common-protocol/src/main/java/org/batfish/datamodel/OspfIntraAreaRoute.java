@@ -23,33 +23,6 @@ public class OspfIntraAreaRoute extends OspfAreaRoute {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    } else if (!(o instanceof OspfIntraAreaRoute)) {
-      return false;
-    }
-    OspfIntraAreaRoute other = (OspfIntraAreaRoute) o;
-    if (_nextHopIp == null) {
-      if (other._nextHopIp != null) {
-        return false;
-      }
-    } else if (!_nextHopIp.equals(other._nextHopIp)) {
-      return false;
-    }
-    if (_admin != other._admin) {
-      return false;
-    }
-    if (_area != other._area) {
-      return false;
-    }
-    if (_metric != other._metric) {
-      return false;
-    }
-    return _network.equals(other._network);
-  }
-
-  @Override
   public int routeCompare(AbstractRoute rhs) {
     if (getClass() != rhs.getClass()) {
       return 0;

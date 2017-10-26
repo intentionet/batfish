@@ -83,21 +83,6 @@ public class Ip6Wildcard extends Pair<Ip6, Ip6> {
     return maskedIpAsBigInteger.equals(maskedWildcard);
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    } else if (!(o instanceof Ip6Wildcard)) {
-      return false;
-    }
-    Ip6Wildcard other = (Ip6Wildcard) o;
-    if (other.getFirst().equals(this.getFirst()) && other.getSecond().equals(this.getSecond())) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   public Ip6 getIp() {
     return _first;
   }

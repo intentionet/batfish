@@ -3,6 +3,7 @@ package org.batfish.datamodel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import java.util.Objects;
 import org.batfish.common.util.ComparableStructure;
 
 public class IkeGateway extends ComparableStructure<String> {
@@ -100,6 +101,12 @@ public class IkeGateway extends ComparableStructure<String> {
   @JsonPropertyDescription("Remote IKE ID of IKE gateway.")
   public String getRemoteId() {
     return _remoteId;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        _address, _externalInterface, _ikePolicy, _localAddress, _localId, _remoteId);
   }
 
   public void resolveReferences(Configuration owner) {

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.batfish.common.util.ComparableStructure;
@@ -183,6 +184,17 @@ public final class Zone extends ComparableStructure<String> {
     } else {
       return _toZonePoliciesNames;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        _key,
+        _fromHostFilter,
+        _inboundFilter,
+        _inboundInterfaceFilters,
+        _toHostFilter,
+        _toZonePolicies);
   }
 
   @JsonIgnore

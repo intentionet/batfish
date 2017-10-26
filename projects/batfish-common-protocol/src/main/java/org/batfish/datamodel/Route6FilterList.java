@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.batfish.common.util.ComparableStructure;
@@ -52,6 +53,11 @@ public class Route6FilterList extends ComparableStructure<String> {
   @JsonPropertyDescription("The lines against which to check an IPV6 route")
   public List<Route6FilterLine> getLines() {
     return _lines;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_key, _lines);
   }
 
   private boolean newPermits(Prefix6 prefix) {

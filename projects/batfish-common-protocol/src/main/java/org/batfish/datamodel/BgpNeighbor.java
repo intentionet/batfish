@@ -541,6 +541,28 @@ public final class BgpNeighbor extends ComparableStructure<Prefix> {
     return _vrf;
   }
 
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        _key,
+        _advertiseExternal,
+        _advertiseInactive,
+        _allowLocalAsIn,
+        _allowRemoteAsOut,
+        _authenticationSettings,
+        _clusterId,
+        _defaultMetric,
+        _ebgpMultihop,
+        _exportPolicy,
+        _group,
+        _importPolicy,
+        _localAs,
+        _localIp,
+        _remoteAs,
+        _routeReflectorClient,
+        _sendCommunity);
+  }
+
   public void initCandidateRemoteBgpNeighbors() {
     _candidateRemoteBgpNeighbors = new LinkedHashSet<>();
   }

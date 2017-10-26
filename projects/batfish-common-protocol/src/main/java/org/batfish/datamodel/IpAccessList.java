@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.util.List;
+import java.util.Objects;
 import org.batfish.common.util.ComparableStructure;
 
 @JsonSchemaDescription("An access-list used to filter IPV4 packets")
@@ -71,6 +72,11 @@ public class IpAccessList extends ComparableStructure<String> {
   @JsonPropertyDescription("The lines against which to check an IPV4 packet")
   public List<IpAccessListLine> getLines() {
     return _lines;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_key, _lines);
   }
 
   private boolean noDenyOrLastDeny(IpAccessList acl) {
