@@ -204,8 +204,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   private static final String DIFFERENTIAL_FLOW_TAG = "DIFFERENTIAL";
 
-  private static final String GEN_OSPF_STARTING_IP = "10.0.0.0";
-
   /** The name of the [optional] topology file within a test-rig */
   private static final String TOPOLOGY_FILENAME = "topology.net";
 
@@ -1441,7 +1439,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
     }
     // Now we create interfaces for each edge and record the number of
     // neighbors so we know how large to make the subnet
-    long currentStartingIpAsLong = new Ip(GEN_OSPF_STARTING_IP).asLong();
+    long currentStartingIpAsLong = Ip.FIRST_CLASS_A_PRIVATE_IP.asLong();
     Set<Set<NodeInterfacePair>> interfaceSets = new HashSet<>();
     interfaceSets.addAll(interfaceMap.values());
     for (Set<NodeInterfacePair> interfaceSet : interfaceSets) {

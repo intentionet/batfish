@@ -20,7 +20,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 public class AwsVpcConfiguration implements Serializable, GenericConfigObject {
 
-  private static final long INITIAL_GENERATED_IP = new Ip("240.0.0.0").asLong();
+  private static final long INITIAL_GENERATED_IP = Ip.FIRST_CLASS_E_EXPERIMENTAL_IP.asLong();
 
   private static final long serialVersionUID = 1L;
 

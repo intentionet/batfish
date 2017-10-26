@@ -11,6 +11,7 @@ import org.batfish.common.PedanticBatfishException;
 import org.batfish.common.RedFlagBatfishException;
 import org.batfish.common.UnimplementedBatfishException;
 import org.batfish.common.util.CommonUtil;
+import org.batfish.datamodel.Ip;
 import org.batfish.grammar.GrammarSettings;
 
 public final class Settings extends BaseSettings implements BdpSettings, GrammarSettings {
@@ -1120,7 +1121,7 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     setDefaultProperty(BfConsts.ARG_RED_FLAG_SUPPRESS, false);
     setDefaultProperty(ARG_SEQUENTIAL, false);
     setDefaultProperty(ARG_SERIALIZE_TO_TEXT, false);
-    setDefaultProperty(ARG_SERVICE_BIND_HOST, "0.0.0.0");
+    setDefaultProperty(ARG_SERVICE_BIND_HOST, Ip.ZERO.toString());
     setDefaultProperty(ARG_SERVICE_HOST, "localhost");
     setDefaultProperty(ARG_SERVICE_MODE, false);
     setDefaultProperty(ARG_SERVICE_PORT, BfConsts.SVC_PORT);
