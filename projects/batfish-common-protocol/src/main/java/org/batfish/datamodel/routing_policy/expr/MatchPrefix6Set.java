@@ -54,7 +54,7 @@ public class MatchPrefix6Set extends BooleanExpr {
   @Override
   public Result evaluate(Environment environment) {
     Prefix6 prefix = _prefix.evaluate(environment);
-    boolean match = prefix != null ? _prefixSet.matches(prefix, environment) : false;
+    boolean match = prefix != null && _prefixSet.matches(prefix, environment);
     Result result = new Result();
     result.setBooleanValue(match);
     return result;

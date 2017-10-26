@@ -1335,7 +1335,7 @@ public class WorkMgrService {
       checkClientVersion(clientVersion);
       checkContainerAccessibility(apiKey, containerName);
 
-      boolean force = Strings.isNullOrEmpty(forceStr) ? false : Boolean.parseBoolean(forceStr);
+      boolean force = !Strings.isNullOrEmpty(forceStr) && Boolean.parseBoolean(forceStr);
 
       int numCommits = Main.getWorkMgr().syncTestrigsSyncNow(containerName, pluginId, force);
 
