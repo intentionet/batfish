@@ -171,7 +171,7 @@ public class Task {
   }
 
   @JsonProperty(PROP_OBTAINED)
-  private void setObtained(Date obtained) {
+  public void setObtained(Date obtained) {
     _obtained = obtained;
   }
 
