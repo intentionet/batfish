@@ -226,7 +226,7 @@ public class HostConfiguration extends VendorConfiguration {
         .forEach(
             hostInterface -> {
               String canonicalName = hostInterface.getCanonicalName();
-              org.batfish.datamodel.Interface newIface = hostInterface.toInterface(_c, _w);
+              Interface newIface = hostInterface.toInterface(_c, _w);
               _c.getInterfaces().put(canonicalName, newIface);
               _c.getDefaultVrf().getInterfaces().put(canonicalName, newIface);
             });

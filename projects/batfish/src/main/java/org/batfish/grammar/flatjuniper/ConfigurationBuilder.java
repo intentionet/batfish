@@ -2984,11 +2984,11 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     } else if (ctx.standard_community() != null) {
       long communityVal = toCommunityLong(ctx.standard_community());
       _configuration.getAllStandardCommunities().add(communityVal);
-      String communityStr = org.batfish.common.util.CommonUtil.longToCommunity(communityVal);
+      String communityStr = CommonUtil.longToCommunity(communityVal);
       _currentCommunityList.getLines().add(new CommunityListLine(communityStr));
     } else if (ctx.extended_community() != null) {
       long communityVal = toCommunityLong(ctx.extended_community());
-      String communityStr = org.batfish.common.util.CommonUtil.longToCommunity(communityVal);
+      String communityStr = CommonUtil.longToCommunity(communityVal);
       _currentCommunityList.getLines().add(new CommunityListLine(communityStr));
     } else if (ctx.invalid_community_regex() != null) {
       String text = ctx.invalid_community_regex().getText();

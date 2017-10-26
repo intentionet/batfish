@@ -1757,7 +1757,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
       unitIface.inheritUnsetFields();
       org.batfish.datamodel.Interface newUnitIface = toInterface(unitIface);
       _c.getInterfaces().put(unitName, newUnitIface);
-      org.batfish.datamodel.Vrf vrf = newUnitIface.getVrf();
+      Vrf vrf = newUnitIface.getVrf();
       String vrfName = vrf.getName();
       vrf.getInterfaces().put(unitName, newUnitIface);
       _routingInstances.get(vrfName).getInterfaces().put(unitName, unitIface);

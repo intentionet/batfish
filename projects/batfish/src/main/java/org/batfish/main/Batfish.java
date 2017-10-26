@@ -2747,13 +2747,12 @@ public class Batfish extends PluginConsumer implements IBatfish {
                   errors.computeIfAbsent(hostname, k -> new ArrayList<>()).add(initStepErrors);
                 });
       }
-      SortedMap<String, org.batfish.common.Warnings> warnings = initInfoAnswerElement.getWarnings();
+      SortedMap<String, Warnings> warnings = initInfoAnswerElement.getWarnings();
       initStepAnswerElement
           .getWarnings()
           .forEach(
               (hostname, initStepWarnings) -> {
-                org.batfish.common.Warnings combined =
-                    warnings.computeIfAbsent(hostname, h -> buildWarnings());
+                Warnings combined = warnings.computeIfAbsent(hostname, h -> buildWarnings());
                 combined.getPedanticWarnings().addAll(initStepWarnings.getPedanticWarnings());
                 combined.getRedFlagWarnings().addAll(initStepWarnings.getRedFlagWarnings());
                 combined
