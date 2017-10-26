@@ -437,7 +437,7 @@ public class TracerouteQuestionPlugin extends QuestionPlugin {
 
     @Override
     public String getName() {
-      return NAME;
+      return "traceroute";
     }
 
     @JsonProperty(PROP_PACKET_LENGTH)

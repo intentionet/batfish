@@ -287,7 +287,7 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
 
     @Override
     public String getName() {
-      return NAME;
+      return "reachability";
     }
 
     @JsonProperty(PROP_NEGATE_HEADER)

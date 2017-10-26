@@ -7,8 +7,6 @@ import org.batfish.datamodel.Protocol;
 
 public interface IReachabilityQuestion extends IQuestion {
 
-  static final String NAME = "reachability";
-
   void setActions(SortedSet<ForwardingAction> actionSet);
 
   void setDstIps(SortedSet<IpWildcard> singleton);
