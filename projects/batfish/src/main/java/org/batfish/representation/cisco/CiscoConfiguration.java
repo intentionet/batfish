@@ -1177,28 +1177,26 @@ public final class CiscoConfiguration extends VendorConfiguration {
   private void markServiceClasses(CiscoStructureUsage usage, Configuration c) {
     SortedMap<String, SortedMap<StructureUsage, SortedSet<Integer>>> byName =
         _structureReferences.get(CiscoStructureType.ROUTE_MAP);
-    if (_cf.getCable() != null) {
-      if (byName != null) {
-        byName.forEach(
-            (serviceClassName, byUsage) -> {
-              SortedSet<Integer> lines = byUsage.get(usage);
-              if (lines != null) {
-                ServiceClass serviceClass;
-                serviceClass = _cf.getCable().getServiceClasses().get(serviceClassName);
-                if (serviceClass == null) {
-                  serviceClass = _cf.getCable().getServiceClassesByName().get(serviceClassName);
-                }
-                if (serviceClass != null) {
-                  String msg = usage.getDescription();
-                  serviceClass.getReferers().put(this, msg);
-                } else {
-                  for (int line : lines) {
-                    undefined(CiscoStructureType.SERVICE_CLASS, serviceClassName, usage, line);
-                  }
+    if (_cf.getCable() != null && byName != null) {
+      byName.forEach(
+          (serviceClassName, byUsage) -> {
+            SortedSet<Integer> lines = byUsage.get(usage);
+            if (lines != null) {
+              ServiceClass serviceClass;
+              serviceClass = _cf.getCable().getServiceClasses().get(serviceClassName);
+              if (serviceClass == null) {
+                serviceClass = _cf.getCable().getServiceClassesByName().get(serviceClassName);
+              }
+              if (serviceClass != null) {
+                String msg = usage.getDescription();
+                serviceClass.getReferers().put(this, msg);
+              } else {
+                for (int line : lines) {
+                  undefined(CiscoStructureType.SERVICE_CLASS, serviceClassName, usage, line);
                 }
               }
-            });
-      }
+            }
+          });
     }
   }
 
@@ -1232,19 +1230,18 @@ public final class CiscoConfiguration extends VendorConfiguration {
   private void processLines() {
     // nxos does not have 'login authentication' for lines, so just have it
     // use default list if one exists
-    if (_vendor == ConfigurationFormat.CISCO_NX) {
-      if (_cf.getAaa() != null
-          && _cf.getAaa().getAuthentication() != null
-          && _cf.getAaa().getAuthentication().getLogin() != null
-          && _cf.getAaa()
-                  .getAuthentication()
-                  .getLogin()
-                  .getLists()
-                  .get(AaaAuthenticationLogin.DEFAULT_LIST_NAME)
-              != null) {
-        for (Line line : _cf.getLines().values()) {
-          line.setLoginAuthentication(AaaAuthenticationLogin.DEFAULT_LIST_NAME);
-        }
+    if (_vendor == ConfigurationFormat.CISCO_NX
+        && _cf.getAaa() != null
+        && _cf.getAaa().getAuthentication() != null
+        && _cf.getAaa().getAuthentication().getLogin() != null
+        && _cf.getAaa()
+                .getAuthentication()
+                .getLogin()
+                .getLists()
+                .get(AaaAuthenticationLogin.DEFAULT_LIST_NAME)
+            != null) {
+      for (Line line : _cf.getLines().values()) {
+        line.setLoginAuthentication(AaaAuthenticationLogin.DEFAULT_LIST_NAME);
       }
     }
   }
@@ -3522,10 +3519,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
         AaaAuthentication authentication = aaa.getAuthentication();
         if (authentication != null) {
           AaaAuthenticationLogin login = authentication.getLogin();
-          if (login != null) {
-            if (login.getLists().containsKey(list)) {
-              found = true;
-            }
+          if (login != null && login.getLists().containsKey(list)) {
+            found = true;
           }
         }
       }

@@ -1609,18 +1609,16 @@ public class BdpDataPlanePlugin extends DataPlanePlugin {
       collectFlowTraces(
           dp, nextNodeName, newVisitedEdges, newHops, flowTraces, originalFlow, transformedFlow);
     }
-    if (arp) {
-      if (unreachableNeighbors > 0 && unreachableNeighbors == potentialNeighbors) {
-        FlowTrace trace =
-            neighborUnreachableTrace(
-                hopsSoFar,
-                nextHopInterface,
-                routesForThisNextHopInterface,
-                originalFlow,
-                transformedFlow);
-        flowTraces.add(trace);
-        continueToNextNextHopInterface = true;
-      }
+    if (arp && unreachableNeighbors > 0 && unreachableNeighbors == potentialNeighbors) {
+      FlowTrace trace =
+          neighborUnreachableTrace(
+              hopsSoFar,
+              nextHopInterface,
+              routesForThisNextHopInterface,
+              originalFlow,
+              transformedFlow);
+      flowTraces.add(trace);
+      continueToNextNextHopInterface = true;
     }
     return continueToNextNextHopInterface;
   }

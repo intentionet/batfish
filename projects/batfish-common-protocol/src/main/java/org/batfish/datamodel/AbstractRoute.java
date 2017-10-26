@@ -135,11 +135,10 @@ public abstract class AbstractRoute implements Serializable, Comparable<Abstract
       tag = Integer.toString(tagInt);
     }
     String nhint = getNextHopInterface();
-    if (!nhint.equals(Route.UNSET_NEXT_HOP_INTERFACE)) {
-      // static interface
-      if (nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
-        nhnode = "N/A";
-      }
+    if (!nhint.equals(Route.UNSET_NEXT_HOP_INTERFACE)
+        && nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
+      // static interface with no next hop ip
+      nhnode = "N/A";
     }
     nhip = !Route.UNSET_ROUTE_NEXT_HOP_IP.equals(nextHopIp) ? nextHopIp.toString() : "N/A";
     String net = getNetwork().toString();

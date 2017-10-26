@@ -181,10 +181,8 @@ public class UniqueIpAssignmentsQuestionPlugin extends QuestionPlugin {
             if (allIps.count(ip) != 1) {
               answerElement.add(answerElement.getAllIps(), ip, hostname, interfaceName);
             }
-            if (iface.getActive()) {
-              if (enabledIps.count(ip) != 1) {
-                answerElement.add(answerElement.getEnabledIps(), ip, hostname, interfaceName);
-              }
+            if (iface.getActive() && enabledIps.count(ip) != 1) {
+              answerElement.add(answerElement.getEnabledIps(), ip, hostname, interfaceName);
             }
           }
         }

@@ -113,11 +113,9 @@ public class UniqueBgpPrefixOriginationQuestionPlugin extends QuestionPlugin {
                 space2.addSpace(proc2.getOriginationSpace());
               }
             }
-            if (!empty2) {
-              if (space1.overlaps(space2)) {
-                PrefixSpace intersection = space1.intersection(space2);
-                answerElement.addIntersection(node1, node2, intersection);
-              }
+            if (!empty2 && space1.overlaps(space2)) {
+              PrefixSpace intersection = space1.intersection(space2);
+              answerElement.addIntersection(node1, node2, intersection);
             }
           }
         }

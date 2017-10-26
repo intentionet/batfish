@@ -238,12 +238,11 @@ public class Route implements Comparable<Route>, Serializable {
       tag = Integer.toString(tagInt);
     }
     String nhint = getNextHopInterface();
-    if (!nhint.equals(Route.UNSET_NEXT_HOP_INTERFACE)) {
-      // static interface
-      if (nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
-        nhnode = "N/A";
-        nhip = "N/A";
-      }
+    if (!nhint.equals(Route.UNSET_NEXT_HOP_INTERFACE)
+        && nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
+      // static interface without next hop ip
+      nhnode = "N/A";
+      nhip = "N/A";
     }
     nhip = nextHopIp != null ? nextHopIp.toString() : "N/A";
     String vrf = getVrf();

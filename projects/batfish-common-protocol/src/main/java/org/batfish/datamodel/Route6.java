@@ -244,12 +244,11 @@ public class Route6 implements Comparable<Route6>, Serializable {
       tag = Integer.toString(tagInt);
     }
     String nhint = getNextHopInterface();
-    if (!nhint.equals(Route6.UNSET_NEXT_HOP_INTERFACE)) {
-      // static interface
-      if (nextHopIp.equals(Route6.UNSET_ROUTE_NEXT_HOP_IP)) {
-        nhnode = "N/A";
-        nhip = "N/A";
-      }
+    if (!nhint.equals(Route6.UNSET_NEXT_HOP_INTERFACE)
+        && nextHopIp.equals(Route6.UNSET_ROUTE_NEXT_HOP_IP)) {
+      // static interface without next hop ip
+      nhnode = "N/A";
+      nhip = "N/A";
     }
     nhip = nextHopIp != null ? nextHopIp.toString() : "N/A";
     String vrf = getVrf();
@@ -276,12 +275,11 @@ public class Route6 implements Comparable<Route6>, Serializable {
     String nextHopIp = _nextHopIp.toString();
     String tag = Integer.toString(_tag);
     // extra formatting
-    if (!_nextHopInterface.equals(UNSET_NEXT_HOP_INTERFACE)) {
-      // static interface
-      if (_nextHopIp.equals(UNSET_ROUTE_NEXT_HOP_IP)) {
-        nextHop = "N/A";
-        nextHopIp = "N/A";
-      }
+    if (!_nextHopInterface.equals(UNSET_NEXT_HOP_INTERFACE)
+        && _nextHopIp.equals(UNSET_ROUTE_NEXT_HOP_IP)) {
+      // static interface without next hop ip
+      nextHop = "N/A";
+      nextHopIp = "N/A";
     }
     if (_tag == UNSET_ROUTE_TAG) {
       tag = "none";

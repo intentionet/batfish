@@ -61,13 +61,15 @@ public final class IpsecVpn extends ComparableStructure<String> {
       if (activeProposal == null) {
         return false;
       }
-      if (!remoteIpsecVpn.getIpsecPolicy().getPfsKeyGroupDynamicIke()) {
-        // remote vpn uses static pfs key group.
-        if (!activeProposal
-            .getDiffieHellmanGroup()
-            .equals(remoteIpsecVpn.getIpsecPolicy().getPfsKeyGroup())) {
-          return false;
-        }
+      if (!remoteIpsecVpn.getIpsecPolicy().getPfsKeyGroupDynamicIke()
+          && !activeProposal
+              .getDiffieHellmanGroup()
+              .equals(remoteIpsecVpn.getIpsecPolicy().getPfsKeyGroup())) {
+        /*
+         * Remote vpn uses static pfs key group, but active proposal's dh group does not match
+         * remote's pfsKeyGroup.
+         */
+        return false;
       }
       // else remote vpn also uses dynamic pfs key group. They must agree as
       // long as a compatible proposal is selected, which has already

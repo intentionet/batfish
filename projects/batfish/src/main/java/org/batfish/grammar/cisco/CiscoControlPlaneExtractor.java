@@ -3419,11 +3419,9 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitIp_dhcp_relay_server(Ip_dhcp_relay_serverContext ctx) {
-    if (!_no) {
-      if (ctx.ip != null) {
-        Ip ip = toIp(ctx.ip);
-        _configuration.getDhcpRelayServers().add(ip);
-      }
+    if (!_no && ctx.ip != null) {
+      Ip ip = toIp(ctx.ip);
+      _configuration.getDhcpRelayServers().add(ip);
     }
   }
 
@@ -4242,15 +4240,13 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitPim_rp_address(Pim_rp_addressContext ctx) {
-    if (!_no) {
-      if (ctx.name != null) {
-        String name = ctx.name.getText();
-        int line = ctx.name.getStart().getLine();
-        _configuration.getPimAcls().add(name);
-        _configuration.referenceStructure(
-            CiscoStructureType.IPV4_ACCESS_LIST, name,
-            CiscoStructureUsage.PIM_RP_ADDRESS_ACL, line);
-      }
+    if (!_no && ctx.name != null) {
+      String name = ctx.name.getText();
+      int line = ctx.name.getStart().getLine();
+      _configuration.getPimAcls().add(name);
+      _configuration.referenceStructure(
+          CiscoStructureType.IPV4_ACCESS_LIST, name,
+          CiscoStructureUsage.PIM_RP_ADDRESS_ACL, line);
     }
   }
 

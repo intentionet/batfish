@@ -909,10 +909,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
       popEnvironment();
     }
     NodeSet blacklistNodes = getNodeBlacklist();
-    if (blacklistNodes != null) {
-      if (differentialContext) {
-        flowSinks.removeNodes(blacklistNodes);
-      }
+    if (blacklistNodes != null && differentialContext) {
+      flowSinks.removeNodes(blacklistNodes);
     }
     Set<NodeInterfacePair> blacklistInterfaces = getInterfaceBlacklist();
     if (blacklistInterfaces != null) {
@@ -1725,10 +1723,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
   public EdgeSet getEdgeBlacklist() {
     EdgeSet blacklistEdges = null;
     Path edgeBlacklistPath = _testrigSettings.getEnvironmentSettings().getEdgeBlacklistPath();
-    if (edgeBlacklistPath != null) {
-      if (Files.exists(edgeBlacklistPath)) {
-        blacklistEdges = parseEdgeBlacklist(edgeBlacklistPath);
-      }
+    if (edgeBlacklistPath != null && Files.exists(edgeBlacklistPath)) {
+      blacklistEdges = parseEdgeBlacklist(edgeBlacklistPath);
     }
     return blacklistEdges;
   }
@@ -1839,10 +1835,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
     SortedSet<NodeInterfacePair> blacklistInterfaces = null;
     Path interfaceBlacklistPath =
         _testrigSettings.getEnvironmentSettings().getInterfaceBlacklistPath();
-    if (interfaceBlacklistPath != null) {
-      if (Files.exists(interfaceBlacklistPath)) {
-        blacklistInterfaces = parseInterfaceBlacklist(interfaceBlacklistPath);
-      }
+    if (interfaceBlacklistPath != null && Files.exists(interfaceBlacklistPath)) {
+      blacklistInterfaces = parseInterfaceBlacklist(interfaceBlacklistPath);
     }
     return blacklistInterfaces;
   }
@@ -1855,10 +1849,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
   public NodeSet getNodeBlacklist() {
     NodeSet blacklistNodes = null;
     Path nodeBlacklistPath = _testrigSettings.getEnvironmentSettings().getNodeBlacklistPath();
-    if (nodeBlacklistPath != null) {
-      if (Files.exists(nodeBlacklistPath)) {
-        blacklistNodes = parseNodeBlacklist(nodeBlacklistPath);
-      }
+    if (nodeBlacklistPath != null && Files.exists(nodeBlacklistPath)) {
+      blacklistNodes = parseNodeBlacklist(nodeBlacklistPath);
     }
     return blacklistNodes;
   }

@@ -1129,11 +1129,9 @@ public class Client extends AbstractClient implements IClient {
 
     File questionsDir = Paths.get(_settings.getQuestionsDir()).toFile();
 
-    if (!questionsDir.exists()) {
-      if (!questionsDir.mkdirs()) {
-        _logger.errorf("Could not create questions dir %s\n", _settings.getQuestionsDir());
-        System.exit(1);
-      }
+    if (!questionsDir.exists() && !questionsDir.mkdirs()) {
+      _logger.errorf("Could not create questions dir %s\n", _settings.getQuestionsDir());
+      System.exit(1);
     }
 
     _questions.forEach(
@@ -2274,10 +2272,8 @@ public class Client extends AbstractClient implements IClient {
     }
     _logger.debug("Doing command: " + line + "\n");
     String[] words = line.split("\\s+");
-    if (words.length > 0) {
-      if (!validCommandUsage(words)) {
-        return false;
-      }
+    if (words.length > 0 && !validCommandUsage(words)) {
+      return false;
     }
     return processCommand(words, null);
   }
@@ -2533,11 +2529,10 @@ public class Client extends AbstractClient implements IClient {
     }
 
     // set container if specified
-    if (_settings.getContainerId() != null) {
-      if (!processCommand(
-          Command.SET_CONTAINER.commandName() + "  " + _settings.getContainerId())) {
-        return;
-      }
+    if (_settings.getContainerId() != null
+        && !processCommand(
+            Command.SET_CONTAINER.commandName() + "  " + _settings.getContainerId())) {
+      return;
     }
 
     // set testrig if dir or id is specified
@@ -2550,10 +2545,9 @@ public class Client extends AbstractClient implements IClient {
         return;
       }
     }
-    if (_settings.getTestrigId() != null) {
-      if (!processCommand(Command.SET_TESTRIG.commandName() + "  " + _settings.getTestrigId())) {
-        return;
-      }
+    if (_settings.getTestrigId() != null
+        && !processCommand(Command.SET_TESTRIG.commandName() + "  " + _settings.getTestrigId())) {
+      return;
     }
 
     switch (_settings.getRunMode()) {
@@ -3013,15 +3007,13 @@ public class Client extends AbstractClient implements IClient {
             + (testPassed ? ": Pass\n" : ": Fail\n");
 
     _logger.output(message);
-    if (!failingTest) {
-      if (!testPassed) {
-        String outFileName = referenceFile + ".testout";
-        Files.move(
-            Paths.get(testoutFile.getAbsolutePath()),
-            Paths.get(referenceFile + ".testout"),
-            StandardCopyOption.REPLACE_EXISTING);
-        _logger.outputf("Copied output to %s\n", outFileName);
-      }
+    if (!failingTest && !testPassed) {
+      String outFileName = referenceFile + ".testout";
+      Files.move(
+          Paths.get(testoutFile.getAbsolutePath()),
+          Paths.get(referenceFile + ".testout"),
+          StandardCopyOption.REPLACE_EXISTING);
+      _logger.outputf("Copied output to %s\n", outFileName);
     }
     return true;
   }

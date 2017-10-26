@@ -533,18 +533,15 @@ public class BgpSessionCheckQuestionPlugin extends QuestionPlugin {
       Map<Ip, Set<String>> ipOwners = new HashMap<>();
       for (Configuration c : configurations.values()) {
         for (Interface i : c.getInterfaces().values()) {
-          if (i.getActive()) {
-            if (i.getPrefix() != null) {
-              for (Prefix prefix : i.getAllPrefixes()) {
-                Ip address = prefix.getAddress();
-                if (i.isLoopback(c.getConfigurationFormat())) {
-                  loopbackIps.add(address);
-                }
-                allInterfaceIps.add(address);
-                Set<String> currentIpOwners =
-                    ipOwners.computeIfAbsent(address, k -> new HashSet<>());
-                currentIpOwners.add(c.getHostname());
+          if (i.getActive() && i.getPrefix() != null) {
+            for (Prefix prefix : i.getAllPrefixes()) {
+              Ip address = prefix.getAddress();
+              if (i.isLoopback(c.getConfigurationFormat())) {
+                loopbackIps.add(address);
               }
+              allInterfaceIps.add(address);
+              Set<String> currentIpOwners = ipOwners.computeIfAbsent(address, k -> new HashSet<>());
+              currentIpOwners.add(c.getHostname());
             }
           }
         }
