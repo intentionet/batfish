@@ -212,9 +212,8 @@ public class ClusterNodesQuestionPlugin extends QuestionPlugin {
     private List<Set<String>> kModes(int k, Set<String> vectors) {
 
       int vecLen = 0;
-      for (String vector : vectors) {
-        vecLen = vector.length();
-        break;
+      if (!vectors.isEmpty()) {
+        vecLen = vectors.iterator().next().length();
       }
 
       String[] centers = new String[k];

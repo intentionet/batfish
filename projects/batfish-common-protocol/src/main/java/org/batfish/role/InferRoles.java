@@ -256,16 +256,8 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
       SortedSet<String> roles1 = nodeRolesMap.get(n1);
       SortedSet<String> roles2 = nodeRolesMap.get(n2);
       if (roles1 != null && roles2 != null && roles1.size() == 1 && roles2.size() == 1) {
-        String role1 = null;
-        String role2 = null;
-        for (String role : roles1) {
-          role1 = role;
-          break;
-        }
-        for (String role : roles2) {
-          role2 = role;
-          break;
-        }
+        String role1 = roles1.first();
+        String role2 = roles2.first();
         // ignore self-edges
         if (role1.equals(role2)) {
           continue;

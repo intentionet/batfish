@@ -155,6 +155,28 @@ public final class TcpFlags implements Serializable {
     return 0;
   }
 
+  public boolean match(Flow flow) {
+    return !(_useAck && _ack ^ (flow.getTcpFlagsAck() == 1))
+        && !(_useCwr && _cwr ^ (flow.getTcpFlagsCwr() == 1))
+        && !(_useEce && _ece ^ (flow.getTcpFlagsEce() == 1))
+        && !(_useFin && _fin ^ (flow.getTcpFlagsFin() == 1))
+        && !(_usePsh && _psh ^ (flow.getTcpFlagsPsh() == 1))
+        && !(_useRst && _rst ^ (flow.getTcpFlagsRst() == 1))
+        && !(_useSyn && _syn ^ (flow.getTcpFlagsSyn() == 1))
+        && !(_useUrg && _urg ^ (flow.getTcpFlagsUrg() == 1));
+  }
+
+  public boolean match(Flow6 flow6) {
+    return !(_useAck && _ack ^ (flow6.getTcpFlagsAck() == 1))
+        && !(_useCwr && _cwr ^ (flow6.getTcpFlagsCwr() == 1))
+        && !(_useEce && _ece ^ (flow6.getTcpFlagsEce() == 1))
+        && !(_useFin && _fin ^ (flow6.getTcpFlagsFin() == 1))
+        && !(_usePsh && _psh ^ (flow6.getTcpFlagsPsh() == 1))
+        && !(_useRst && _rst ^ (flow6.getTcpFlagsRst() == 1))
+        && !(_useSyn && _syn ^ (flow6.getTcpFlagsSyn() == 1))
+        && !(_useUrg && _urg ^ (flow6.getTcpFlagsUrg() == 1));
+  }
+
   public void setAck(boolean ack) {
     _ack = ack;
   }
