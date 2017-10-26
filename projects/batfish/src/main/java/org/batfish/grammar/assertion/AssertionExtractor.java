@@ -53,7 +53,11 @@ public class AssertionExtractor extends AssertionParserBaseListener {
 
   private String _text;
 
-  public AssertionExtractor(String fileText, AssertionParser assertionParser) {
+  @SuppressWarnings("unused")
+  private AssertionParser _parser;
+
+  public AssertionExtractor(String fileText, AssertionParser parser) {
+    _parser = parser;
     _text = fileText;
   }
 

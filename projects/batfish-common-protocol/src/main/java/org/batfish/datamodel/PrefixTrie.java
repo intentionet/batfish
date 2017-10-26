@@ -99,7 +99,7 @@ public class PrefixTrie implements Serializable {
     }
 
     @Nullable
-    private Prefix getLongestPrefixMatch(Ip address, BitSet bits) {
+    private Prefix getLongestPrefixMatch(Ip address) {
       if (_prefix != null && _prefix.contains(address)) {
         return _prefix;
       } else {
@@ -108,7 +108,7 @@ public class PrefixTrie implements Serializable {
     }
 
     public Prefix getLongestPrefixMatch(Ip address, BitSet bits, int index) {
-      Prefix longestPrefixMatch = getLongestPrefixMatch(address, bits);
+      Prefix longestPrefixMatch = getLongestPrefixMatch(address);
       if (index == Prefix.MAX_PREFIX_LENGTH) {
         return longestPrefixMatch;
       }
