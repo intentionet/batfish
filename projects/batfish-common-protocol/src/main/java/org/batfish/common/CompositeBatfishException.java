@@ -55,6 +55,10 @@ public class CompositeBatfishException extends RuntimeException implements Answe
     _answerElement = new CompositeBatfishExceptionAnswerElement(cause, contributingCauses);
   }
 
+  public BatfishException asSingleException() {
+    return new BatfishException(getMessage() + _answerElement.prettyPrint(), this);
+  }
+
   public CompositeBatfishExceptionAnswerElement getAnswerElement() {
     return _answerElement;
   }

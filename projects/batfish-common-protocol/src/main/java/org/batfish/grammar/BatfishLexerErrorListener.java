@@ -21,9 +21,7 @@ public class BatfishLexerErrorListener extends BatfishGrammarErrorListener {
       int charPositionInLine,
       String msg,
       RecognitionException e) {
-    if (_syntaxErrorHandler != null
-        && _syntaxErrorHandler.handle(
-            recognizer, offendingSymbol, line, charPositionInLine, msg, e)) {
+    if (!_settings.getDisableUnrecognized()) {
       return;
     }
     StringBuilder sb = new StringBuilder();

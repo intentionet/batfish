@@ -1675,6 +1675,10 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     _throwOnParserError = throwOnParserError;
   }
 
+  public void setUnrecognizedAsRedFlag(boolean unrecognizedAsRedFlag) {
+    _unrecognizedAsRedFlag = unrecognizedAsRedFlag;
+  }
+
   public void setValidateEnvironment(boolean validateEnvironment) {
     _validateEnvironment = validateEnvironment;
   }

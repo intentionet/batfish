@@ -2,10 +2,17 @@ package org.batfish.grammar;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
+import org.antlr.v4.runtime.LexerNoViableAltException;
 
 public abstract class BatfishLexer extends Lexer {
 
+  public static final int UNMATCHABLE_TOKEN = Integer.MAX_VALUE;
+
+  public static final int UNRECOGNIZED_LINE_TOKEN = Integer.MAX_VALUE - 1;
+
   private BatfishCombinedParser<?, ?> _parser;
+
+  private BatfishLexerRecoveryStrategy _recoveryStrategy;
 
   public BatfishLexer(CharStream input) {
     super(input);
@@ -13,6 +20,10 @@ public abstract class BatfishLexer extends Lexer {
 
   public String getMode() {
     return this.getModeNames()[_mode];
+  }
+
+  public BatfishLexerRecoveryStrategy getRecoveryStrategy() {
+    return _recoveryStrategy;
   }
 
   public void initErrorListener(BatfishCombinedParser<?, ?> parser) {
@@ -37,5 +48,18 @@ public abstract class BatfishLexer extends Lexer {
    */
   public String printStateVariables() {
     return "";
+  }
+
+  @Override
+  public void recover(LexerNoViableAltException e) {
+    if (_recoveryStrategy != null) {
+      _recoveryStrategy.recover(e);
+    } else {
+      super.recover(e);
+    }
+  }
+
+  public void setRecoveryStrategy(BatfishLexerRecoveryStrategy recoveryStrategy) {
+    _recoveryStrategy = recoveryStrategy;
   }
 }
