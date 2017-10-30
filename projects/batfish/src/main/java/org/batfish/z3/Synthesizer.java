@@ -6,6 +6,7 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Z3Exception;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -38,7 +39,6 @@ import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.Zone;
 import org.batfish.datamodel.collections.EdgeSet;
-import org.batfish.datamodel.collections.FibMap;
 import org.batfish.datamodel.collections.FibRow;
 import org.batfish.datamodel.collections.InterfaceSet;
 import org.batfish.datamodel.collections.NodeInterfacePair;
@@ -870,7 +870,7 @@ public class Synthesizer {
 
   private final Map<String, Configuration> _configurations;
 
-  private final FibMap _fibs;
+  private final HashMap<String, Map<String, SortedSet<FibRow>>> _fibs;
 
   private InterfaceSet _flowSinks;
 
