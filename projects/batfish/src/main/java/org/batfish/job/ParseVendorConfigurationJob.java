@@ -303,6 +303,18 @@ public class ParseVendorConfigurationJob extends BatfishJob<ParseVendorConfigura
       }
       _logger.info("\tPost-processing...");
       extractor.processParseTree(tree);
+      if (!combinedParser.getErrors().isEmpty()) {
+        elapsedTime = System.currentTimeMillis() - startTime;
+        return new ParseVendorConfigurationResult(
+            elapsedTime,
+            _logger.getHistory(),
+            _file,
+            new BatfishException(
+                String.format(
+                    "Configuration file: '%s' contains unrecognized lines:\n%s",
+                    _file.getFileName().toString(),
+                    String.join("\n", combinedParser.getErrors()))));
+      }
       _logger.info("OK\n");
     } catch (ParserBatfishException e) {
       String error = "Error parsing configuration file: '" + currentPath + "'";
