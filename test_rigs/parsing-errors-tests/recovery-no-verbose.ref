@@ -1,0 +1,35 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.datamodel.answers.InitInfoAnswerElement",
+      "parseStatus" : {
+        "as1r1" : "PARTIALLY_UNRECOGNIZED",
+        "as1r2" : "PASSED",
+        "as2r1" : "PASSED"
+      },
+      "warnings" : {
+        "as1r1" : {
+          "Red flags" : {
+            "1" : "MISCELLANEOUS: Unrecognized Line: 4:  ip address 10.12.11.1 255.255.255.0aaaaa:wq\nLINES BELOW LINE  ip address 10.12.11.1 255.255.255.0aaaaa:wq ARE UNLIKELY TO BE PROCESSED CORRECTLY",
+            "2" : "MISCELLANEOUS: Unrecognized Line: 6: interface Loopback0\nLINES BELOW LINE interface Loopback0 ARE UNLIKELY TO BE PROCESSED CORRECTLY",
+            "3" : "MISCELLANEOUS: Could not determine update source for BGP neighbor: '10.12.11.2'"
+          }
+        }
+      }
+    }
+  ],
+  "question" : {
+    "class" : "org.batfish.question.InitInfoQuestionPlugin$InitInfoQuestion",
+    "differential" : false,
+    "environmentBgpTables" : false,
+    "environmentRoutes" : false,
+    "summary" : false,
+    "verboseError" : false
+  },
+  "status" : "SUCCESS",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}

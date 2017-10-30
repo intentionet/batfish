@@ -1,3 +1,34 @@
+### DEFAULT BEHAVIOR: RECOVER FROM AND IGNORE UNRECOGNIZED LINES
+#parsing error
+test test_rigs/parsing-errors-tests/recovery-parsing-error.ref init-testrig test_rigs/example-parsing-error
+test test_rigs/parsing-errors-tests/recovery-no-verbose.ref get initinfo verboseError=false
+#test test_rigs/parsing-errors-tests/verbose.ref get initinfo verboseError=true
+
+#parsing Iptables error
+test test_rigs/parsing-errors-tests/recovery-init-invalid-iptables.ref init-testrig test_rigs/example-parsing-error/invalid-iptables
+test test_rigs/parsing-errors-tests/recovery-invalid-ip-no-verbose.ref get initinfo
+
+#all config files failed in parsing step
+test test_rigs/parsing-errors-tests/recovery-all-parsing-failed.ref init-testrig test_rigs/example-parsing-error/all-fail
+
+### ALLOW RECOVERY DURING PARSING, BUT CRASH AFTER POST-PROCESSING IN PRESENCE OF UNRECOGNIZED LINES
+add-batfish-option urf false
+
+#parsing error
+test test_rigs/parsing-errors-tests/nourf-parsing-error.ref init-testrig test_rigs/example-parsing-error
+test test_rigs/parsing-errors-tests/nourf-no-verbose.ref get initinfo verboseError=false
+#test test_rigs/parsing-errors-tests/verbose.ref get initinfo verboseError=true
+
+#parsing Iptables error
+test test_rigs/parsing-errors-tests/nourf-init-invalid-iptables.ref init-testrig test_rigs/example-parsing-error/invalid-iptables
+test test_rigs/parsing-errors-tests/nourf-invalid-ip-no-verbose.ref get initinfo
+
+#all config files failed in parsing step
+test test_rigs/parsing-errors-tests/nourf-all-parsing-failed.ref init-testrig test_rigs/example-parsing-error/all-fail
+
+### DISABLE RECOVERY ALTOGETHER SO THAT UNRECOGNIZED LINES CAUSE PARSING FAILURE
+add-batfish-option disableunrecognized
+
 #parsing error
 test test_rigs/parsing-errors-tests/parsing-error.ref init-testrig test_rigs/example-parsing-error
 test test_rigs/parsing-errors-tests/no-verbose.ref get initinfo verboseError=false
@@ -9,3 +40,4 @@ test test_rigs/parsing-errors-tests/invalid-ip-no-verbose.ref get initinfo
 
 #all config files failed in parsing step
 test test_rigs/parsing-errors-tests/all-parsing-failed.ref init-testrig test_rigs/example-parsing-error/all-fail
+

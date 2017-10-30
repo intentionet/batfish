@@ -1,0 +1,18 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.datamodel.answers.InitInfoAnswerElement",
+      "parseStatus" : {
+        "as1r1.cfg" : "FAILED",
+        "as1r2.cfg" : "FAILED",
+        "as2r1.cfg" : "FAILED"
+      }
+    }
+  ],
+  "status" : "SUCCESS",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}
