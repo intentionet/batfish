@@ -1,0 +1,35 @@
+!
+hostname ios-recovery
+!
+! Invalid word at the top level
+invalid-word invalid-word
+!
+! Should succeed
+interface Loopback0
+!
+! Invalid line with valid first word
+aaa invalid-word
+!
+! Should succeed
+interface Loopback1
+!
+! Invalid line with valid first word that might otherwise introduce new context
+interface Loopback2 series of invalid words
+ ! should be treated as top level and therefore invalid
+ ip address 10.0.0.0/32
+!
+! Should succeed
+interface Loopback3
+ ! Invalid line at both subcontext and top level
+ ip address 10.0.0.1/32 series of invalid words
+ ! Should succeed; after recovery, either interface-level or top-level stanzas are allowed
+ ip address 10.0.0.2/32 secondary
+!
+! Should succeed
+interface Loopback4
+ ! Should succeed
+ ip address 10.0.0.3/32
+ ! Should succeed
+ ip address 10.0.0.4/32
+!
+invalid-word at end

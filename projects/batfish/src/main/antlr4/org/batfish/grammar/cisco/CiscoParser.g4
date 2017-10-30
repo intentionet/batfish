@@ -11,16 +11,10 @@ options {
 @members {
    private boolean _cadant;
 
-   private boolean _disableUnrecognized;
-
    private boolean _multilineBgpNeighbors;
 
    public void setCadant(boolean b) {
       _cadant = b;
-   }
-
-   public void setDisableUnrecognized(boolean b) {
-     _disableUnrecognized = b;
    }
 
    public void setMultilineBgpNeighbors(boolean multilineBgpNeighbors) {
@@ -29,9 +23,8 @@ options {
    
    @Override
    public String getStateInfo() {
-      return String.format("_cadant: %s\n_disableUnrecognized: %s\n_multilineBgpNeighbors: %s\n",
+      return String.format("_cadant: %s\n_multilineBgpNeighbors: %s\n",
          _cadant,
-         _disableUnrecognized,
          _multilineBgpNeighbors
       );
    }
@@ -3459,10 +3452,6 @@ stanza
    | standard_access_list_stanza
    | standard_ipv6_access_list_stanza
    | switching_mode_stanza
-   |
-   { !_disableUnrecognized }?
-
-   unrecognized_block_stanza
 ;
 
 statistics_null

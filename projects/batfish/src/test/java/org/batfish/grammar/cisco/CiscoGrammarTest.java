@@ -1,8 +1,10 @@
 package org.batfish.grammar.cisco;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.isIn;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -16,11 +18,13 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.batfish.bdp.BdpDataPlanePlugin;
+import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AsPath;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.Prefix;
@@ -190,6 +194,42 @@ public class CiscoGrammarTest {
             .flatMap(asSet -> asSet.stream())
             .anyMatch(AsPath::isPrivateAs);
     assertFalse(r3HasPrivate);
+  }
+
+  @Test
+  public void testParsingRecovery() throws IOException {
+    String testrigName = "parsing-recovery";
+    String iosRecoveryName = "ios-recovery";
+    String[] configurationNames = new String[] {iosRecoveryName};
+    Batfish batfish =
+        BatfishTestUtils.getBatfishFromTestrigResource(
+            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+    batfish.getSettings().setDisableUnrecognized(false);
+    SortedMap<String, Configuration> configurations;
+    try {
+      configurations = batfish.loadConfigurations();
+    } catch (CompositeBatfishException e) {
+      throw e.asSingleException();
+    }
+    Configuration iosRecovery = configurations.get(iosRecoveryName);
+    SortedMap<String, Interface> iosRecoveryInterfaces = iosRecovery.getInterfaces();
+    Set<String> iosRecoveryInterfaceNames = iosRecoveryInterfaces.keySet();
+    Set<Prefix> l3Prefixes = iosRecoveryInterfaces.get("Loopback3").getAllPrefixes();
+    Set<Prefix> l4Prefixes = iosRecoveryInterfaces.get("Loopback4").getAllPrefixes();
+
+    assertThat("Loopback0", isIn(iosRecoveryInterfaceNames));
+    assertThat("Loopback1", isIn(iosRecoveryInterfaceNames));
+    assertThat("Loopback2", not(isIn(iosRecoveryInterfaceNames)));
+    assertThat("Loopback3", isIn(iosRecoveryInterfaceNames));
+    assertThat(new Prefix("10.0.0.1/32"), not(isIn(l3Prefixes)));
+    assertThat(new Prefix("10.0.0.2/32"), isIn(l3Prefixes));
+    assertThat("Loopback4", isIn(iosRecoveryInterfaceNames));
+    assertThat(new Prefix("10.0.0.3/32"), not(isIn(l4Prefixes)));
+    assertThat(new Prefix("10.0.0.4/32"), isIn(l4Prefixes));
+  }
+
+  public String readTestConfig(String name) {
+    return CommonUtil.readResource(TESTCONFIGS_PREFIX + "/" + name);
   }
 
   @Test

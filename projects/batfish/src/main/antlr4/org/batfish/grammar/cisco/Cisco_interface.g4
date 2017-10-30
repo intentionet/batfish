@@ -1082,9 +1082,5 @@ s_interface
 
       | if_null_single
       | if_null_block
-      |
-      { !_disableUnrecognized }?
-
-      unrecognized_line
    )*
 ;

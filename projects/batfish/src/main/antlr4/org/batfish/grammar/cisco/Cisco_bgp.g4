@@ -852,10 +852,6 @@ router_bgp_stanza_tail
    | template_peer_policy_rb_stanza
    | template_peer_session_rb_stanza
    | vrf_block_rb_stanza
-   |
-   { !_disableUnrecognized }?
-
-   unrecognized_line
 ;
 
 router_id_bgp_tail

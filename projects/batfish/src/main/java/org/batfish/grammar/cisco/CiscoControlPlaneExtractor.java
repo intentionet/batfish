@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.batfish.common.BatfishException;
@@ -512,7 +513,6 @@ import org.batfish.grammar.cisco.CiscoParser.Template_peer_session_rb_stanzaCont
 import org.batfish.grammar.cisco.CiscoParser.Ts_hostContext;
 import org.batfish.grammar.cisco.CiscoParser.U_passwordContext;
 import org.batfish.grammar.cisco.CiscoParser.U_roleContext;
-import org.batfish.grammar.cisco.CiscoParser.Unrecognized_lineContext;
 import org.batfish.grammar.cisco.CiscoParser.Update_source_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Use_af_group_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Use_neighbor_group_bgp_tailContext;
@@ -1774,11 +1774,6 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     MacAccessList list =
         _configuration.getMacAccessLists().computeIfAbsent(name, n -> new MacAccessList(n, line));
     _currentMacAccessList = list;
-  }
-
-  @Override
-  public void exitRo_rfc1583_compatibility(Ro_rfc1583_compatibilityContext ctx) {
-    currentVrf().getOspfProcess().setRfc1583Compatible(ctx.NO() == null);
   }
 
   @Override
@@ -4758,6 +4753,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void exitRo_rfc1583_compatibility(Ro_rfc1583_compatibilityContext ctx) {
+    currentVrf().getOspfProcess().setRfc1583Compatible(ctx.NO() == null);
+  }
+
+  @Override
   public void exitRo_router_id(Ro_router_idContext ctx) {
     Ip routerId = toIp(ctx.ip);
     _currentOspfProcess.setRouterId(routerId);
@@ -5633,26 +5633,6 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   public void exitU_role(U_roleContext ctx) {
     String role = ctx.role.getText();
     _currentUser.setRole(role);
-  }
-
-  @Override
-  public void exitUnrecognized_line(Unrecognized_lineContext ctx) {
-    String line = _text.substring(ctx.start.getStartIndex(), ctx.stop.getStopIndex());
-    String msg = String.format("Line %d unrecognized: %s", ctx.start.getLine(), line);
-    if (_unrecognizedAsRedFlag) {
-      msg += "\nLINES BELOW LINE " + line + " ARE UNLIKELY TO BE PROCESSED CORRECTLY";
-      _w.redFlag(msg);
-      _configuration.setUnrecognized(true);
-    } else {
-      _parser
-          .getParserErrorListener()
-          .syntaxError(
-              ctx,
-              ctx.getStart(),
-              ctx.getStart().getLine(),
-              ctx.getStart().getCharPositionInLine(),
-              msg);
-    }
   }
 
   @Override
@@ -7156,6 +7136,21 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       return new VarInt(var);
     } else {
       throw convError(IntExpr.class, ctx);
+    }
+  }
+
+  @Override
+  public void visitErrorNode(ErrorNode errorNode) {
+    Token token = errorNode.getSymbol();
+    String lineText = errorNode.getText().replace("\n", "").replace("\r", "");
+    int line = token.getLine();
+    String msg = String.format("Unrecognized Line: %d: %s", line, lineText);
+    if (_unrecognizedAsRedFlag) {
+      msg += "\nLINES BELOW LINE " + lineText + " ARE UNLIKELY TO BE PROCESSED CORRECTLY";
+      _w.redFlag(msg);
+      _configuration.setUnrecognized(true);
+    } else {
+      _parser.getErrors().add(msg);
     }
   }
 }

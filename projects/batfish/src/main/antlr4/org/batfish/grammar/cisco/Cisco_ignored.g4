@@ -275,287 +275,279 @@ null_block
 
 null_inner
 :
+   NO?
    (
-      NO?
+      ACCEPT_DIALIN
+      | ACCOUNTING
+      | ACTIVE
+      | ADD_VLAN
+      | ADDRESS
+      | ADDRESS_POOLS
+      | ADDRESS_RANGE
+      | ADMINISTRATIVE_WEIGHT
+      | ADVERTISE
+      | AESA
+      | ALLOCATE
+      | ALWAYS_ON_VPN
+      | APPLICATION
+      | ARCHIVE_LENGTH
+      | ARCHIVE_SIZE
+      | AUTHORIZATION_REQUIRED
+      | AUTHORIZATION_SERVER_GROUP
+      | AUTO_RECOVERY
+      | BACK_UP
+      | BACKGROUND_ROUTES_ENABLE
+      | BANDWIDTH_PERCENTAGE
+      |
       (
-         ACCEPT_DIALIN
-         | ACCOUNTING
-         | ACTIVE
-         | ADD_VLAN
-         | ADDRESS
-         | ADDRESS_POOLS
-         | ADDRESS_RANGE
-         | ADMINISTRATIVE_WEIGHT
-         | ADVERTISE
-         | AESA
-         | ALLOCATE
-         | ALWAYS_ON_VPN
-         | APPLICATION
-         | ARCHIVE_LENGTH
-         | ARCHIVE_SIZE
-         | AUTHORIZATION_REQUIRED
-         | AUTHORIZATION_SERVER_GROUP
-         | AUTO_RECOVERY
-         | BACK_UP
-         | BACKGROUND_ROUTES_ENABLE
-         | BANDWIDTH_PERCENTAGE
-         |
+         BANNER
          (
-            BANNER
-            (
-               NONE
-               | VALUE
-            )
+            NONE
+            | VALUE
          )
-         | BRIDGE_PRIORITY
-         | CACHE_TIMEOUT
-         | CALL
-         | CAS_CUSTOM
-         | CERTIFICATE
-         | CHANNEL_GROUP
-         | CHANNELIZED
-         | CLIENT_GROUP
-         | CLOCK
-         | COMMAND
-         | CONNECT_SOURCE
-         | CONTEXT
-         | CONTROL_WORD
-         | CPU_SHARE
-         | CREDENTIALS
-         | DEADTIME
-         | DEFAULT_DOMAIN
-         | DEFAULT_ROUTER
-         | DENY
-         | DEPLOY
-         | DESTINATION_PATTERN
-         | DESTINATION_SLOT
-         | DIAGNOSTIC
-         | DISTRIBUTION
-         | DNS_SERVER
-         | DOMAIN_ID
-         | DROP
-         | DS0_GROUP
-         | DUAL_ACTIVE
-         | ECHO
-         | EGRESS
-         | ENABLED
-         | ENCAPSULATION
-         | ESCAPE_CHARACTER
-         | EXIT
-         | EXPECT
-         | EXPORT
-         | FABRIC
-         | FAILED
-         | FAIR_QUEUE
-         | FALLBACK_DN
-         | FIELDS
-         | FILE_BROWSING
-         | FILE_ENTRY
-         | FILE_SIZE
-         | FLUSH_AT_ACTIVATION
-         | FORWARD_DIGITS
-         | FRAMING
-         | FT
-         | GATEWAY
-         | GID
-         | GROUP
-         | GROUP_ALIAS
-         | GROUP_LOCK
-         | GROUP_POLICY
-         | HA_POLICY
-         |
+      )
+      | BRIDGE_PRIORITY
+      | CACHE_TIMEOUT
+      | CALL
+      | CAS_CUSTOM
+      | CERTIFICATE
+      | CHANNEL_GROUP
+      | CHANNELIZED
+      | CLIENT_GROUP
+      | CLOCK
+      | COMMAND
+      | CONNECT_SOURCE
+      | CONTEXT
+      | CONTROL_WORD
+      | CPU_SHARE
+      | CREDENTIALS
+      | DEADTIME
+      | DEFAULT_DOMAIN
+      | DEFAULT_ROUTER
+      | DENY
+      | DEPLOY
+      | DESTINATION_PATTERN
+      | DESTINATION_SLOT
+      | DIAGNOSTIC
+      | DISTRIBUTION
+      | DNS_SERVER
+      | DOMAIN_ID
+      | DROP
+      | DS0_GROUP
+      | DUAL_ACTIVE
+      | ECHO
+      | EGRESS
+      | ENABLED
+      | ENCAPSULATION
+      | ESCAPE_CHARACTER
+      | EXIT
+      | EXPECT
+      | EXPORT
+      | FABRIC
+      | FAILED
+      | FAIR_QUEUE
+      | FALLBACK_DN
+      | FIELDS
+      | FILE_BROWSING
+      | FILE_ENTRY
+      | FILE_SIZE
+      | FLUSH_AT_ACTIVATION
+      | FORWARD_DIGITS
+      | FRAMING
+      | FT
+      | GATEWAY
+      | GID
+      | GROUP
+      | GROUP_ALIAS
+      | GROUP_LOCK
+      | GROUP_POLICY
+      | HA_POLICY
+      |
+      (
+         HASH SYMMETRIC
+      )
+      | HEARTBEAT_INTERVAL
+      | HEARTBEAT_TIME
+      | HELPER_ADDRESS
+      | HIDDEN_LITERAL
+      | HIDDEN_SHARES
+      | HIDEKEYS
+      | HIGH_AVAILABILITY
+      | HOMEDIR
+      | ICMP_ECHO
+      | IDLE
+      | IDLE_TIMEOUT
+      | IMPORT
+      | INCOMING
+      | INGRESS
+      | INHERIT
+      | INSERVICE
+      | INSTANCE
+      |
+      (
+         INTERFACE POLICY
+      )
+      | INTERVAL
+      | INTERWORKING
+      |
+      (
          (
-            HASH SYMMETRIC
+            IP
+            | IPV6
          )
-         | HEARTBEAT_INTERVAL
-         | HEARTBEAT_TIME
-         | HELPER_ADDRESS
-         | HIDDEN_LITERAL
-         | HIDDEN_SHARES
-         | HIDEKEYS
-         | HIGH_AVAILABILITY
-         | HOMEDIR
-         | ICMP_ECHO
-         | IDLE
-         | IDLE_TIMEOUT
-         | IMPORT
-         | INCOMING
-         | INGRESS
-         | INHERIT
-         | INSERVICE
-         | INSTANCE
-         |
          (
-            INTERFACE POLICY
+            ACCESS_GROUP
+            | ADDRESS
+            | ARP
+            | FLOW
          )
-         | INTERVAL
-         | INTERWORKING
-         |
-         (
-            (
-               IP
-               | IPV6
-            )
-            (
-               ACCESS_GROUP
-               | ADDRESS
-               | ARP
-               | FLOW
-            )
-         )
-         | IPSEC_UDP
-         | IPX
-         | KEYPATH
-         | LACP_TIMEOUT
-         | LEASE
-         | LENGTH
-         | LIMIT_RESOURCE
-         | LINECODE
-         | LLDP
-         | LOCAL_INTERFACE
-         | LOG
-         | LPTS
-         | MAC_ADDRESS
-         | MEDIA
-         | MEMBER
-         | MESH_GROUP
-         | MODE
-         | MONITORING
-         | MSDP_PEER
-         | MSIE_PROXY
-         | NAMESPACE
-         | NEGOTIATE
-         | NETWORK
-         | NODE
-         | NOTIFY
-         | OPEN
-         | OPTION
-         | OPS
-         | ORIGINATOR_ID
-         | OUI
-         | PARAMETERS
-         | PARITY
-         | PASSWORD
-         | PASSWORD_STORAGE
-         | PATH_JITTER
-         | PEER_ADDRESS
-         | PEER_CONFIG_CHECK_BYPASS
-         | PEER_ID_VALIDATE
-         | PEER_LINK
-         | PERIODIC
-         | PERMIT
-         | PERSISTENT
-         | PHYSICAL_PORT
-         | PICKUP
-         | PINNING
-         | POLICY
-         | POLICY_LIST
-         | PORT_NAME
-         | PORTS
-         | PREDICTOR
-         | PREEMPT
-         | PREFERRED_PATH
-         | PREFIX
-         | PRIMARY_PORT
-         | PRIMARY_PRIORITY
-         | PROBE
-         | PROPOSAL
-         | PROVISION
-         | RANDOM
-         | RANDOM_DETECT
-         | RD
-         | REACT
-         | REAL
-         | RECEIVE
-         | REDISTRIBUTE
-         | RELOAD
-         | RELOAD_DELAY
-         | REMARK
-         | REMOTE_AS
-         | REQUEST
-         | RESOURCES
-         | RESPONDER
-         | RETRIES
-         | REVISION
-         | RING
-         | ROUTE
-         | ROUTE_TARGET
-         | RP_ADDRESS
-         | SA_FILTER
-         | SATELLITE
-         | SECRET
-         | SEQUENCE
-         | SERVER
-         | SERVERFARM
-         | SERVER_PRIVATE
-         | SERVICE_POLICY
-         | SERVICE_QUEUE
-         | SERVICE_TYPE
-         | SESSION
-         | SEVERITY
-         | SIGNING
-         | SINGLE_CONNECTION
-         | SINGLE_ROUTER_MODE
-         | SLOT
-         | SORT_BY
-         | SPEED
-         | SPLIT_TUNNEL_NETWORK_LIST
-         | SPLIT_TUNNEL_POLICY
-         | SSH_KEYDIR
-         | STICKY
-         | SWITCHPORT
-         | SYNC
-         | TAG
-         | TAGGED
-         | TASK
-         | TASK_SPACE_EXECUTE
-         | TASKGROUP
-         | TCP_CONNECT
-         | TIMEOUT
-         | TIMER
-         | TOP
-         | TRACKING_PRIORITY_INCREMENT
-         | TRANSLATION_PROFILE
-         | TRUNK
-         | TRUNK_THRESHOLD
-         | TRUST
-         | TTL_THRESHOLD
-         | TUNNEL
-         | TUNNEL_GROUP
-         | TYPE
-         | UDP_JITTER
-         | UID
-         | USE_VRF
-         | USERS
-         | VERSION
-         | VIRTUAL
-         | VIRTUAL_ROUTER
-         | VM_CPU
-         | VM_MEMORY
-         | VPN_FILTER
-         | VPN_GROUP_POLICY
-         | VPN_IDLE_TIMEOUT
-         | VPN_SESSION_TIMEOUT
-         | VPN_SIMULTANEOUS_LOGINS
-         | VPN_TUNNEL_PROTOCOL
-         | VSERVER
-         | WINS_SERVER
-         | WITHOUT_CSD
-         | WRED
-         | XML_CONFIG
-      ) ~NEWLINE* NEWLINE
-   )
-   |
-   {!_disableUnrecognized}?
-
-   unrecognized_line
+      )
+      | IPSEC_UDP
+      | IPX
+      | KEYPATH
+      | LACP_TIMEOUT
+      | LEASE
+      | LENGTH
+      | LIMIT_RESOURCE
+      | LINECODE
+      | LLDP
+      | LOCAL_INTERFACE
+      | LOG
+      | LPTS
+      | MAC_ADDRESS
+      | MEDIA
+      | MEMBER
+      | MESH_GROUP
+      | MODE
+      | MONITORING
+      | MSDP_PEER
+      | MSIE_PROXY
+      | NAMESPACE
+      | NEGOTIATE
+      | NETWORK
+      | NODE
+      | NOTIFY
+      | OPEN
+      | OPTION
+      | OPS
+      | ORIGINATOR_ID
+      | OUI
+      | PARAMETERS
+      | PARITY
+      | PASSWORD
+      | PASSWORD_STORAGE
+      | PATH_JITTER
+      | PEER_ADDRESS
+      | PEER_CONFIG_CHECK_BYPASS
+      | PEER_ID_VALIDATE
+      | PEER_LINK
+      | PERIODIC
+      | PERMIT
+      | PERSISTENT
+      | PHYSICAL_PORT
+      | PICKUP
+      | PINNING
+      | POLICY
+      | POLICY_LIST
+      | PORT_NAME
+      | PORTS
+      | PREDICTOR
+      | PREEMPT
+      | PREFERRED_PATH
+      | PREFIX
+      | PRIMARY_PORT
+      | PRIMARY_PRIORITY
+      | PROBE
+      | PROPOSAL
+      | PROVISION
+      | RANDOM
+      | RANDOM_DETECT
+      | RD
+      | REACT
+      | REAL
+      | RECEIVE
+      | REDISTRIBUTE
+      | RELOAD
+      | RELOAD_DELAY
+      | REMARK
+      | REMOTE_AS
+      | REQUEST
+      | RESOURCES
+      | RESPONDER
+      | RETRIES
+      | REVISION
+      | RING
+      | ROUTE
+      | ROUTE_TARGET
+      | RP_ADDRESS
+      | SA_FILTER
+      | SATELLITE
+      | SECRET
+      | SEQUENCE
+      | SERVER
+      | SERVERFARM
+      | SERVER_PRIVATE
+      | SERVICE_POLICY
+      | SERVICE_QUEUE
+      | SERVICE_TYPE
+      | SESSION
+      | SEVERITY
+      | SIGNING
+      | SINGLE_CONNECTION
+      | SINGLE_ROUTER_MODE
+      | SLOT
+      | SORT_BY
+      | SPEED
+      | SPLIT_TUNNEL_NETWORK_LIST
+      | SPLIT_TUNNEL_POLICY
+      | SSH_KEYDIR
+      | STICKY
+      | SWITCHPORT
+      | SYNC
+      | TAG
+      | TAGGED
+      | TASK
+      | TASK_SPACE_EXECUTE
+      | TASKGROUP
+      | TCP_CONNECT
+      | TIMEOUT
+      | TIMER
+      | TOP
+      | TRACKING_PRIORITY_INCREMENT
+      | TRANSLATION_PROFILE
+      | TRUNK
+      | TRUNK_THRESHOLD
+      | TRUST
+      | TTL_THRESHOLD
+      | TUNNEL
+      | TUNNEL_GROUP
+      | TYPE
+      | UDP_JITTER
+      | UID
+      | USE_VRF
+      | USERS
+      | VERSION
+      | VIRTUAL
+      | VIRTUAL_ROUTER
+      | VM_CPU
+      | VM_MEMORY
+      | VPN_FILTER
+      | VPN_GROUP_POLICY
+      | VPN_IDLE_TIMEOUT
+      | VPN_SESSION_TIMEOUT
+      | VPN_SIMULTANEOUS_LOGINS
+      | VPN_TUNNEL_PROTOCOL
+      | VSERVER
+      | WINS_SERVER
+      | WITHOUT_CSD
+      | WRED
+      | XML_CONFIG
+   ) ~NEWLINE* NEWLINE
 ;
 
 null_single
 :
-   (
-      NO
-   )?
+   NO?
    (
       ABSOLUTE_TIMEOUT
       |
@@ -958,9 +950,4 @@ s_null
 :
    null_block
    | null_single
-;
-
-unrecognized_block_stanza
-:
-   unrecognized_line null_inner*
 ;
