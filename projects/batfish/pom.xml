@@ -107,6 +107,19 @@
               <excludes>**/cisco/*.g4,**/flatjuniper/*.g4,**/flatvyos/*.g4,**/mrv/*.g4</excludes>
             </configuration>
           </execution>
+
+          <!-- Test grammars -->
+          <execution>
+            <id>antlr4-test-simple</id>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${basedir}/src/test/antlr4</sourceDirectory>
+              <outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
+              <includes>**/*.g4</includes>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
 

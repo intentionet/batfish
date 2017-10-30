@@ -44,6 +44,7 @@
     <autoservice.version>1.0-rc3</autoservice.version>
     <azure.version>2.0.0</azure.version>
     <beanutils.version>1.9.3</beanutils.version>
+    <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
     <commons-cli.version>1.3.1</commons-cli.version>
     <commons-collections4.version>4.1</commons-collections4.version>
     <commons-configuration2.version>2.0</commons-configuration2.version>
@@ -105,6 +106,7 @@
             <failOnViolation>true</failOnViolation>
             <includeResources>false</includeResources>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
+            <suppressionsLocation>suppressions.xml</suppressionsLocation>
             <violationSeverity>warning</violationSeverity>
           </configuration>
         </plugin>
@@ -183,6 +185,22 @@
           <groupId>org.antlr</groupId>
           <artifactId>antlr4-maven-plugin</artifactId>
           <version>${antlr4-maven-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${build-helper-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>add-test-sources</id>
+              <phase>generate-test-sources</phase>
+              <goals><goal>add-test-source</goal></goals>
+              <configuration>
+                <sources><source>${project.build.directory}/generated-test-sources/antlr4</source> </sources>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
 
         <plugin>
@@ -341,6 +359,11 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
       </plugin>
 
       <plugin>
