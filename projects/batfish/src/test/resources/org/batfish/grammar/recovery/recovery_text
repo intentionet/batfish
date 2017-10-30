@@ -1,0 +1,47 @@
+### Unrecognized
+error
+### Valid: statement->simple_statement
+simple simple simple
+### Unrecognized
+simple error
+### Unrecognized
+simple error simple
+### Unrecognized
+simple simple error
+### Unrecognized
+error simple
+### Valid: statement->simple_statement
+simple
+### Unrecognized
+error simple
+### Valid: statement->simple_statement
+simple simple
+### Unrecognized
+error #comment should be included in error
+
+### Valid: statement->block_statement
+block #comment should be ignored
+### Valid: statement->simple_statement
+simple
+ ### Unrecognized
+ inner
+ ### Unrecognized
+ inner inner
+ ### Unrecognized
+ inner error
+ ### Unrecognized
+ inner
+### Unrecognized
+block error
+ ### Unrecognized
+ inner
+### Valid: statement->block_statement->[inner_statement]
+block
+ ### Unrecognized
+ inner error
+ ### Valid: inner_statement (counted above)
+ inner simple
+### Valid: statement->simple_statement
+simple block
+ ### Unrecognized
+ inner
