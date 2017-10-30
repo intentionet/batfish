@@ -1,0 +1,32 @@
+#
+set system host-name recovery
+#
+# Valid
+set system domain-name example.1
+# Invalid
+set system domain-name example.2 error
+set system domain-name example.3 error
+# Valid
+set system domain-name example.4
+# Invalid
+set system domain-name
+# Valid 
+set system domain-name example.5
+# Invalid
+set system error
+# Valid
+set system domain-name example.6
+# Invalid
+set system
+# Valid
+set system domain-name example.7
+# Invalid
+set error
+# Valid
+set system domain-name example.8
+# Invalid
+set
+# Valid
+set system domain-name example.9
+# Invalid
+error

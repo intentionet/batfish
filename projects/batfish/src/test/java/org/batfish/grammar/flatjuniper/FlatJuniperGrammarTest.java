@@ -5,8 +5,12 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.SortedMap;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.batfish.common.util.CommonUtil;
+import org.batfish.config.Settings;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Flat_juniper_configurationContext;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.junit.Rule;
@@ -57,5 +61,20 @@ public class FlatJuniperGrammarTest {
     assertThat(multipleAsDisabled, equalTo(MultipathEquivalentAsPathMatchMode.FIRST_AS));
     assertThat(multipleAsEnabled, equalTo(MultipathEquivalentAsPathMatchMode.PATH_LENGTH));
     assertThat(multipleAsMixed, equalTo(MultipathEquivalentAsPathMatchMode.FIRST_AS));
+  }
+
+  @Test
+  public void testParsingRecovery() throws IOException {
+    String recoveryText =
+        CommonUtil.readResource("org/batfish/grammar/juniper/testconfigs/recovery");
+    Settings settings = new Settings();
+    FlatJuniperCombinedParser cp = new FlatJuniperCombinedParser(recoveryText, settings);
+    Flat_juniper_configurationContext ctx = cp.parse();
+    FlatJuniperRecoveryExtractor extractor = new FlatJuniperRecoveryExtractor();
+    ParseTreeWalker walker = new ParseTreeWalker();
+    walker.walk(extractor, ctx);
+
+    assertThat(extractor.getNumSets(), equalTo(8));
+    assertThat(extractor.getNumErrorNodes(), equalTo(8));
   }
 }
