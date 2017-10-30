@@ -117,9 +117,11 @@ s_version
 
 s_vlans
 :
-// intentional blank
-
-   | VLANS s_vlans_named
+   VLANS
+   (
+      apply
+      | s_vlans_named
+   )
 ;
 
 s_vlans_named
