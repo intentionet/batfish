@@ -331,8 +331,13 @@ public class CommonUtil {
     }
   }
 
-  public static <S extends Set<T>, T> S difference(
-      Set<T> minuendSet, Set<T> subtrahendSet, Supplier<S> setConstructor) {
+  public static <E, T extends E, E1 extends T, E2 extends T, S extends Set<E>>
+      Set<E> immutableDifference(Set<E1> set1, Set<E2> set2, Supplier<S> setConstructor) {
+    return Collections.unmodifiableSet(difference(set1, set2, setConstructor));
+  }
+
+  public static <T, E1 extends T, E2 extends T, S extends Set<? super T>> S difference(
+      Set<E1> minuendSet, Set<E2> subtrahendSet, Supplier<S> setConstructor) {
     S differenceSet = setConstructor.get();
     differenceSet.addAll(minuendSet);
     differenceSet.removeAll(subtrahendSet);
@@ -471,8 +476,13 @@ public class CommonUtil {
     return time;
   }
 
-  public static <S extends Set<T>, T> S intersection(
-      Set<T> set1, Set<T> set2, Supplier<S> setConstructor) {
+  public static <E, T extends E, E1 extends T, E2 extends T, S extends Set<E>>
+      Set<E> immutableIntersection(Set<E1> set1, Set<E2> set2, Supplier<S> setConstructor) {
+    return Collections.unmodifiableSet(intersection(set1, set2, setConstructor));
+  }
+
+  public static <T, E1 extends T, E2 extends T, S extends Set<? super T>> S intersection(
+      Set<E1> set1, Set<E2> set2, Supplier<S> setConstructor) {
     S intersectionSet = setConstructor.get();
     intersectionSet.addAll(set1);
     intersectionSet.retainAll(set2);
@@ -625,8 +635,13 @@ public class CommonUtil {
         new SSLEngineConfigurator(sslCon, false, verifyClient, false));
   }
 
-  public static <S extends Set<T>, T> S symmetricDifference(
-      Set<T> set1, Set<T> set2, Supplier<S> constructor) {
+  public static <E, T extends E, E1 extends T, E2 extends T, S extends Set<E>>
+      Set<E> immutableSymmetricDifference(Set<E1> set1, Set<E2> set2, Supplier<S> setConstructor) {
+    return Collections.unmodifiableSet(symmetricDifference(set1, set2, setConstructor));
+  }
+
+  public static <T, E1 extends T, E2 extends T, S extends Set<? super T>> S symmetricDifference(
+      Set<E1> set1, Set<E2> set2, Supplier<S> constructor) {
     S differenceSet = constructor.get();
     differenceSet.addAll(set1);
     differenceSet.addAll(set2);
@@ -645,8 +660,13 @@ public class CommonUtil {
     return map;
   }
 
-  public static <S extends Set<T>, T> S union(
-      Set<T> set1, Set<T> set2, Supplier<S> setConstructor) {
+  public static <E, T extends E, E1 extends T, E2 extends T, S extends Set<E>>
+      Set<E> immutableUnion(Set<E1> set1, Set<E2> set2, Supplier<S> setConstructor) {
+    return Collections.unmodifiableSet(union(set1, set2, setConstructor));
+  }
+
+  public static <T, E1 extends T, E2 extends T, S extends Set<? super T>> S union(
+      Set<E1> set1, Set<E2> set2, Supplier<S> setConstructor) {
     S unionSet = setConstructor.get();
     unionSet.addAll(set1);
     unionSet.addAll(set2);
