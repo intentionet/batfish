@@ -919,6 +919,11 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     return _predicates;
   }
 
+  @Override
+  public boolean getPrintParseTree() {
+    return _printParseTree;
+  }
+
   public boolean getPrintSymmetricEdgePairs() {
     return _printSymmetricEdges;
   }
@@ -1527,11 +1532,6 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     return _prettyPrintAnswer;
   }
 
-  @Override
-  public boolean printParseTree() {
-    return _printParseTree;
-  }
-
   public boolean runInServiceMode() {
     return _runInServiceMode;
   }
@@ -1619,6 +1619,11 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
   public void setMaxRuntimeMs(int runtimeMs) {
     _maxRuntimeMs = runtimeMs;
+  }
+
+  @Override
+  public void setPrintParseTree(boolean printParseTree) {
+    _printParseTree = printParseTree;
   }
 
   public void setQuestionPath(@Nullable Path questionPath) {

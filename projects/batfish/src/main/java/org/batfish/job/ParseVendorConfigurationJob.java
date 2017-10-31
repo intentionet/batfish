@@ -298,7 +298,7 @@ public class ParseVendorConfigurationJob extends BatfishJob<ParseVendorConfigura
     try {
       _logger.info("\tParsing...");
       tree = Batfish.parse(combinedParser, _logger, _settings);
-      if (_settings.printParseTree()) {
+      if (_settings.getPrintParseTree()) {
         _ptSentences = ParseTreePrettyPrinter.getParseTreeSentences(tree, combinedParser);
       }
       _logger.info("\tPost-processing...");

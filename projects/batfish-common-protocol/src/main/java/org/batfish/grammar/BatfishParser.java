@@ -45,6 +45,6 @@ public abstract class BatfishParser extends Parser {
   }
 
   public void createErrorNodeLine() {
-    ((BatfishANTRLErrorStrategy) _errHandler).recoverInCurrentNode(this);
+    ((BatfishANTLRErrorStrategy) _errHandler).recoverInCurrentNode(this);
   }
 }

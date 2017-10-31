@@ -70,11 +70,6 @@ public abstract class BatfishCombinedParser<P extends BatfishParser, L extends B
     }
     _parser.initErrorListener(this);
     _parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
-    if (!settings.getDisableUnrecognized()) {
-      _parser.setInterpreter(
-          new BatfishParserATNSimulator(
-              _parser.getInterpreter()));
-    }
   }
 
   public BatfishCombinedParser(
@@ -82,13 +77,18 @@ public abstract class BatfishCombinedParser<P extends BatfishParser, L extends B
       Class<L> lClass,
       String input,
       GrammarSettings settings,
-      String minSeparatorText,
-      int separatorToken,
+      BatfishANTLRErrorStrategy.BatfishANTLRErrorStrategyFactory batfishANTLRErrorStrategyFactor,
       Set<Integer> separatorChars) {
     this(pClass, lClass, input, settings);
-    _parser.setErrorHandler(
-        new BatfishANTRLErrorStrategy(separatorToken, minSeparatorText, _input));
-    _lexer.setRecoveryStrategy(new BatfishLexerRecoveryStrategy(_lexer, separatorChars));
+    /*
+     * Do not supply recovery infrastructure with associated overhead unless recovery is actually
+     * enabled.
+     */
+    if (!settings.getDisableUnrecognized()) {
+      _parser.setInterpreter(new BatfishParserATNSimulator(_parser.getInterpreter()));
+      _parser.setErrorHandler(batfishANTLRErrorStrategyFactor.build(_input));
+      _lexer.setRecoveryStrategy(new BatfishLexerRecoveryStrategy(_lexer, separatorChars));
+    }
   }
 
   public List<String> getErrors() {

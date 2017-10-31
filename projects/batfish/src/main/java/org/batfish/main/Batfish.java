@@ -420,7 +420,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
         logger.error(prefixedMsg + "\n");
       }
       throw new ParserBatfishException("Parser error(s)");
-    } else if (!settings.printParseTree()) {
+    } else if (!settings.getPrintParseTree()) {
       logger.info("OK\n");
     } else {
       logger.info("OK, PRINTING PARSE TREE:\n");
@@ -772,7 +772,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
         _settings.getRedFlagRecord() && _logger.isActive(BatfishLogger.LEVEL_REDFLAG),
         _settings.getUnimplementedAsError(),
         _settings.getUnimplementedRecord() && _logger.isActive(BatfishLogger.LEVEL_UNIMPLEMENTED),
-        _settings.printParseTree());
+        _settings.getPrintParseTree());
   }
 
   private void checkBaseDirExists() {

@@ -1,5 +1,6 @@
 package org.batfish.grammar;
 
+import javax.annotation.Nullable;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.LexerNoViableAltException;
@@ -12,7 +13,7 @@ public abstract class BatfishLexer extends Lexer {
 
   private BatfishCombinedParser<?, ?> _parser;
 
-  private BatfishLexerRecoveryStrategy _recoveryStrategy;
+  @Nullable private BatfishLexerRecoveryStrategy _recoveryStrategy;
 
   public BatfishLexer(CharStream input) {
     super(input);
@@ -22,6 +23,7 @@ public abstract class BatfishLexer extends Lexer {
     return this.getModeNames()[_mode];
   }
 
+  @Nullable
   public BatfishLexerRecoveryStrategy getRecoveryStrategy() {
     return _recoveryStrategy;
   }
@@ -53,13 +55,13 @@ public abstract class BatfishLexer extends Lexer {
   @Override
   public void recover(LexerNoViableAltException e) {
     if (_recoveryStrategy != null) {
-      _recoveryStrategy.recover(e);
+      _recoveryStrategy.recover();
     } else {
       super.recover(e);
     }
   }
 
-  public void setRecoveryStrategy(BatfishLexerRecoveryStrategy recoveryStrategy) {
+  public void setRecoveryStrategy(@Nullable BatfishLexerRecoveryStrategy recoveryStrategy) {
     _recoveryStrategy = recoveryStrategy;
   }
 }

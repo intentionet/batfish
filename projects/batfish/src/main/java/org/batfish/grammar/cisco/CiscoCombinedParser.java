@@ -3,11 +3,16 @@ package org.batfish.grammar.cisco;
 import org.batfish.common.BatfishException;
 import org.batfish.config.Settings;
 import org.batfish.datamodel.ConfigurationFormat;
+import org.batfish.grammar.BatfishANTLRErrorStrategy;
+import org.batfish.grammar.BatfishANTLRErrorStrategy.BatfishANTLRErrorStrategyFactory;
 import org.batfish.grammar.BatfishCombinedParser;
 import org.batfish.grammar.BatfishLexerRecoveryStrategy;
 import org.batfish.grammar.cisco.CiscoParser.Cisco_configurationContext;
 
 public class CiscoCombinedParser extends BatfishCombinedParser<CiscoParser, CiscoLexer> {
+
+  private static final BatfishANTLRErrorStrategyFactory NEWLINE_BASED_RECOVERY =
+      new BatfishANTLRErrorStrategy.BatfishANTLRErrorStrategyFactory(CiscoLexer.NEWLINE, "\n");
 
   public CiscoCombinedParser(String input, Settings settings, ConfigurationFormat format) {
     super(
@@ -15,8 +20,7 @@ public class CiscoCombinedParser extends BatfishCombinedParser<CiscoParser, Cisc
         CiscoLexer.class,
         input,
         settings,
-        "\n",
-        CiscoLexer.NEWLINE,
+        NEWLINE_BASED_RECOVERY,
         BatfishLexerRecoveryStrategy.WHITESPACE_AND_NEWLINES);
     boolean multilineBgpNeighbors;
     switch (format) {

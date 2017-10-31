@@ -42,9 +42,6 @@
       <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <configuration>
-          <treatWarningsAsErrors>true</treatWarningsAsErrors>
-        </configuration>
         <executions>
           <!--
           Some of the more complex grammars are broken up into main files and imports. Since the
@@ -105,19 +102,6 @@
             <configuration>
               <includes>**/*.g4</includes>
               <excludes>**/cisco/*.g4,**/flatjuniper/*.g4,**/flatvyos/*.g4,**/mrv/*.g4</excludes>
-            </configuration>
-          </execution>
-
-          <!-- Test grammars -->
-          <execution>
-            <id>antlr4-test-simple</id>
-            <goals>
-              <goal>antlr4</goal>
-            </goals>
-            <configuration>
-              <sourceDirectory>${basedir}/src/test/antlr4</sourceDirectory>
-              <outputDirectory>${project.build.directory}/generated-test-sources/antlr4</outputDirectory>
-              <includes>**/*.g4</includes>
             </configuration>
           </execution>
         </executions>
@@ -206,7 +190,7 @@
       <groupId>com.google.auto.service</groupId>
       <artifactId>auto-service</artifactId>
 		<optional>true</optional>
-    </dependency>                                                                                                                                                                                               
+    </dependency>
 
     <dependency>
       <groupId>com.google.code.findbugs</groupId>

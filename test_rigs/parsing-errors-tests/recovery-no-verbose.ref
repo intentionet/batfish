@@ -10,8 +10,8 @@
       "warnings" : {
         "as1r1" : {
           "Red flags" : {
-            "1" : "MISCELLANEOUS: Unrecognized Line: 4:  ip address 10.12.11.1 255.255.255.0aaaaa:wq\nLINES BELOW LINE  ip address 10.12.11.1 255.255.255.0aaaaa:wq ARE UNLIKELY TO BE PROCESSED CORRECTLY",
-            "2" : "MISCELLANEOUS: Unrecognized Line: 6: interface Loopback0\nLINES BELOW LINE interface Loopback0 ARE UNLIKELY TO BE PROCESSED CORRECTLY",
+            "1" : "MISCELLANEOUS: Unrecognized Line: 4:  ip address 10.12.11.1 255.255.255.0aaaaa:wq\nLINES BELOW LINE  ip address 10.12.11.1 255.255.255.0aaaaa:wq MAY NOT BE PROCESSED CORRECTLY",
+            "2" : "MISCELLANEOUS: Unrecognized Line: 6: interface Loopback0\nLINES BELOW LINE interface Loopback0 MAY NOT BE PROCESSED CORRECTLY",
             "3" : "MISCELLANEOUS: Could not determine update source for BGP neighbor: '10.12.11.2'"
           }
         }

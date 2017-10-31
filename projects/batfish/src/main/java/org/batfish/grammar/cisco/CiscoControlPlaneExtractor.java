@@ -7146,7 +7146,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     int line = token.getLine();
     String msg = String.format("Unrecognized Line: %d: %s", line, lineText);
     if (_unrecognizedAsRedFlag) {
-      msg += "\nLINES BELOW LINE " + lineText + " ARE UNLIKELY TO BE PROCESSED CORRECTLY";
+      msg += "\nLINES BELOW LINE " + lineText + " MAY NOT BE PROCESSED CORRECTLY";
       _w.redFlag(msg);
       _configuration.setUnrecognized(true);
     } else {

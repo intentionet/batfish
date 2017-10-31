@@ -106,7 +106,8 @@
             <failOnViolation>true</failOnViolation>
             <includeResources>false</includeResources>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
-            <suppressionsLocation>suppressions.xml</suppressionsLocation>
+            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
             <violationSeverity>warning</violationSeverity>
           </configuration>
         </plugin>
@@ -185,6 +186,9 @@
           <groupId>org.antlr</groupId>
           <artifactId>antlr4-maven-plugin</artifactId>
           <version>${antlr4-maven-plugin.version}</version>
+          <configuration>
+            <treatWarningsAsErrors>true</treatWarningsAsErrors>
+          </configuration>
         </plugin>
 
         <plugin>
@@ -233,9 +237,6 @@
         <executions>
           <execution><goals><goal>check</goal></goals></execution>
         </executions>
-        <configuration>
-          <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-        </configuration>
       </plugin>
 
       <plugin>
@@ -359,11 +360,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
       </plugin>
 
       <plugin>
