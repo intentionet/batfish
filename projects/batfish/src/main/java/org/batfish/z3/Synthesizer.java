@@ -42,7 +42,6 @@ import org.batfish.datamodel.collections.FibMap;
 import org.batfish.datamodel.collections.FibRow;
 import org.batfish.datamodel.collections.InterfaceSet;
 import org.batfish.datamodel.collections.NodeInterfacePair;
-import org.batfish.datamodel.collections.NodeSet;
 import org.batfish.z3.node.AcceptExpr;
 import org.batfish.z3.node.AclDenyExpr;
 import org.batfish.z3.node.AclMatchExpr;
@@ -1534,8 +1533,8 @@ public class Synthesizer {
     return statements;
   }
 
-  public NodeSet getNodeSet() {
-    NodeSet nodes = new NodeSet();
+  public SortedSet<String> getNodeSet() {
+    SortedSet<String> nodes = new TreeSet<>();
     nodes.addAll(_configurations.keySet());
     return nodes;
   }
