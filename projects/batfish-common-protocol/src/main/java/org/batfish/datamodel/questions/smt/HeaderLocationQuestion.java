@@ -223,5 +223,4 @@ public class HeaderLocationQuestion extends HeaderQuestion {
   public void setNotFailNode2Regex(String regex) {
     _notFailNode2Regex = regex;
   }
-
 }

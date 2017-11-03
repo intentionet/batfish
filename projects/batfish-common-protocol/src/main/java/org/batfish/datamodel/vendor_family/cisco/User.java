@@ -1,7 +1,6 @@
 package org.batfish.datamodel.vendor_family.cisco;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.batfish.common.util.ComparableStructure;
 
 public class User extends ComparableStructure<String> {

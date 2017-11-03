@@ -42,7 +42,6 @@ import org.batfish.symbolic.GraphEdge;
 import org.batfish.symbolic.Protocol;
 import org.batfish.symbolic.utils.Tuple;
 
-
 class CounterExample {
 
   private Model _model;
@@ -75,7 +74,6 @@ class CounterExample {
   Ip ipVal(Expr e) {
     return new Ip(Long.parseLong(evaluate(e)));
   }
-
 
   Flow buildFlow(SymbolicPacket pkt, String router) {
     Ip srcIp = ipVal(pkt.getSrcIp());
@@ -424,8 +422,7 @@ class CounterExample {
         SortedSet<Edge> failedLinks = buildFailedLinks(enc);
         SortedSet<BgpAdvertisement> envRoutes = buildEnvRoutingTable(enc);
         Environment baseEnv =
-            new Environment(
-                "BASE", testrigName, failedLinks, null, null, null, null, envRoutes);
+            new Environment("BASE", testrigName, failedLinks, null, null, null, null, envRoutes);
         fh.addFlowTrace(tup.getFirst(), "BASE", baseEnv, tup.getSecond());
       }
     }
@@ -460,30 +457,14 @@ class CounterExample {
         SortedSet<BgpAdvertisement> envRoutesBase = buildEnvRoutingTable(enc2);
         Environment baseEnv =
             new Environment(
-                "BASE",
-                testRigName,
-                failedLinksBase,
-                null,
-                null,
-                null,
-                null,
-                envRoutesBase);
+                "BASE", testRigName, failedLinksBase, null, null, null, null, envRoutesBase);
         Environment failedEnv =
             new Environment(
-                "DELTA",
-                testRigName,
-                failedLinksDiff,
-                null,
-                null,
-                null,
-                null,
-                envRoutesDiff);
+                "DELTA", testRigName, failedLinksDiff, null, null, null, null, envRoutesDiff);
         fh.addFlowTrace(base.getFirst(), "BASE", baseEnv, base.getSecond());
         fh.addFlowTrace(diff.getFirst(), "DELTA", failedEnv, diff.getSecond());
       }
     }
     return fh;
   }
-
-
 }

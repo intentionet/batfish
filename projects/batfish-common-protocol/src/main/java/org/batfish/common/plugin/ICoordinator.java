@@ -2,7 +2,6 @@ package org.batfish.common.plugin;
 
 import java.nio.file.Path;
 import java.util.Set;
-
 import org.batfish.common.BatfishLogger;
 
 public interface ICoordinator {

@@ -101,7 +101,7 @@ public class BatfishJobExecutor {
           boolean haltOnProcessingError,
           String description) {
 
-    //Initializing executors
+    // Initializing executors
     ExecutorService pool = createExecutorService();
     ExecutorCompletionService<JobResultT> completionService = new ExecutorCompletionService<>(pool);
 

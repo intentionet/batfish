@@ -12,7 +12,7 @@ public class AnswerSummary {
 
   private int _numResults;
 
-  public AnswerSummary() { }
+  public AnswerSummary() {}
 
   public AnswerSummary(String notes, int numFailed, int numPassed, int numResults) {
     _notes = notes;
@@ -23,8 +23,8 @@ public class AnswerSummary {
 
   public void combine(AnswerSummary other) {
     if (other != null) {
-      _notes = (Strings.isNullOrEmpty(_notes)) ? other.getNotes()
-          : _notes + "; " + other.getNotes();
+      _notes =
+          (Strings.isNullOrEmpty(_notes)) ? other.getNotes() : _notes + "; " + other.getNotes();
       _numFailed += other.getNumFailed();
       _numPassed += other.getNumPassed();
       _numResults += other.getNumResults();

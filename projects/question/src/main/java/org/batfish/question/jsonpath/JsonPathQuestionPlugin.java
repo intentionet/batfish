@@ -201,7 +201,7 @@ public class JsonPathQuestionPlugin extends QuestionPlugin {
 
     @Override
     public AnswerElement answerDiff() {
-      //if the inner question is differential, use answer() (so we are not taking diff of diff)
+      // if the inner question is differential, use answer() (so we are not taking diff of diff)
       JsonPathQuestion question = (JsonPathQuestion) _question;
       Question innerQuestion = question._innerQuestion;
       if (innerQuestion.getDifferential()) {

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 
 import org.batfish.datamodel.answers.AnswerSummary;
 import org.batfish.question.jsonpath.JsonPathQuestionPlugin.JsonPathAnswerElement;
-import org.batfish.question.jsonpath.JsonPathResult;
 import org.junit.Test;
 
 public class JsonPathQuestionPluginTest {

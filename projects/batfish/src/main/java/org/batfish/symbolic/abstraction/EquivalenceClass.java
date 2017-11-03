@@ -4,7 +4,6 @@ import javax.annotation.Nullable;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.symbolic.Graph;
 
-
 public class EquivalenceClass {
 
   private Graph _graph;

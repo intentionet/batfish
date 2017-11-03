@@ -25,8 +25,7 @@ import org.junit.rules.ExpectedException;
 
 public class JsonPathDisplayHintsTest {
 
-  @Rule
-  public ExpectedException _thrown = ExpectedException.none();
+  @Rule public ExpectedException _thrown = ExpectedException.none();
 
   DisplayHints _displayHints;
 
@@ -63,7 +62,7 @@ public class JsonPathDisplayHintsTest {
     compositions.put(displayVariable, composition);
     displayHints.setCompositions(compositions);
 
-    Map<String,Extraction> extractions = new HashMap<>();
+    Map<String, Extraction> extractions = new HashMap<>();
     for (String varName : composition.getDictionary().values()) {
       extractions.put(varName, _displayHints.getExtractions().get(varName));
     }
@@ -73,7 +72,7 @@ public class JsonPathDisplayHintsTest {
 
   private DisplayHints getExtraction(String displayVariable) {
     DisplayHints displayHints = new DisplayHints();
-    Map<String,Extraction> extractions = new HashMap<>();
+    Map<String, Extraction> extractions = new HashMap<>();
     extractions.put(displayVariable, _displayHints.getExtractions().get(displayVariable));
     displayHints.setExtractions(extractions);
     return displayHints;
@@ -85,7 +84,8 @@ public class JsonPathDisplayHintsTest {
     JsonPathResult result =
         computeJsonPathResult(
             "org/batfish/question/jsonpath/jsonPathDisplayHintsTestObject.json",
-            "$.nodes[*].interfaces[*][?(@.mtu < 1600)]", true);
+            "$.nodes[*].interfaces[*][?(@.mtu < 1600)]",
+            true);
 
     Map<String, Map<String, JsonNode>> displayValues =
         result.computeDisplayValues(getExtraction(displayVariable));
@@ -107,7 +107,8 @@ public class JsonPathDisplayHintsTest {
     JsonPathResult result =
         computeJsonPathResult(
             "org/batfish/question/jsonpath/jsonPathDisplayHintsTestObject.json",
-            "$.nodes[*].interfaces", true);
+            "$.nodes[*].interfaces",
+            true);
 
     Map<String, Map<String, JsonNode>> displayValues =
         result.computeDisplayValues(getExtraction(displayVariable));
@@ -138,10 +139,12 @@ public class JsonPathDisplayHintsTest {
     JsonPathResult result =
         computeJsonPathResult(
             "org/batfish/question/jsonpath/jsonPathDisplayHintsTestObject.json",
-            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu", false);
+            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu",
+            false);
 
-    String errorMessage = "Cannot compute suffix-based display values with null suffix. "
-        + "(Was suffix set to True in the original JsonPath Query?)";
+    String errorMessage =
+        "Cannot compute suffix-based display values with null suffix. "
+            + "(Was suffix set to True in the original JsonPath Query?)";
     _thrown.expect(BatfishException.class);
     _thrown.expectMessage(errorMessage);
 
@@ -154,7 +157,8 @@ public class JsonPathDisplayHintsTest {
     JsonPathResult result =
         computeJsonPathResult(
             "org/batfish/question/jsonpath/jsonPathDisplayHintsTestObject.json",
-            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu", true);
+            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu",
+            true);
 
     Map<String, Map<String, JsonNode>> displayValues =
         result.computeDisplayValues(getExtraction(displayVariable));
@@ -176,7 +180,8 @@ public class JsonPathDisplayHintsTest {
     JsonPathResult result =
         computeJsonPathResult(
             "org/batfish/question/jsonpath/jsonPathDisplayHintsTestObject.json",
-            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu", false);
+            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu",
+            false);
 
     Map<String, Map<String, JsonNode>> displayValues =
         result.computeDisplayValues(getExtraction(displayVariable));
@@ -198,7 +203,8 @@ public class JsonPathDisplayHintsTest {
     JsonPathResult result =
         computeJsonPathResult(
             "org/batfish/question/jsonpath/jsonPathDisplayHintsTestObject.json",
-            "$.nodes[*].interfaces", true);
+            "$.nodes[*].interfaces",
+            true);
 
     Map<String, Map<String, JsonNode>> displayValues =
         result.computeDisplayValues(getComposition(displayVariable));
@@ -227,7 +233,8 @@ public class JsonPathDisplayHintsTest {
     JsonPathResult result =
         computeJsonPathResult(
             "org/batfish/question/jsonpath/jsonPathDisplayHintsTestObject.json",
-            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu", false);
+            "$.nodes[*].interfaces[*][?(@.mtu < 1600)].mtu",
+            false);
 
     Map<String, Map<String, JsonNode>> displayValues =
         result.computeDisplayValues(getComposition(displayVariable));
@@ -245,5 +252,4 @@ public class JsonPathDisplayHintsTest {
     JsonNode node2 = displayValues.get(key2).get(displayVariable);
     assertThat(node2.get("name").asText(), equalTo("node2"));
   }
-
 }

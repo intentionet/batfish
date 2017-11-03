@@ -62,9 +62,10 @@ public class NodeRoleSpecifier {
         int numGroups = matcher.groupCount();
         if (matcher.matches()) {
           try {
-            List<String> roleParts = IntStream.range(1, numGroups + 1)
-                .mapToObj(matcher::group)
-                .collect(Collectors.toList());
+            List<String> roleParts =
+                IntStream.range(1, numGroups + 1)
+                    .mapToObj(matcher::group)
+                    .collect(Collectors.toList());
             String role = String.join("-", roleParts);
 
             SortedSet<String> currNodes = roleNodesMap.computeIfAbsent(role, k -> new TreeSet<>());

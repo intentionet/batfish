@@ -40,8 +40,7 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
 
     private int _matchingNodesCount;
 
-    public InferRolesAnswerElement() {
-    }
+    public InferRolesAnswerElement() {}
 
     @JsonProperty(PROP_ROLE_SPECIFIER)
     public NodeRoleSpecifier getRoleSpecifier() {
@@ -52,8 +51,7 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
     public String prettyPrint() {
 
       StringBuilder sb;
-      sb = new StringBuilder(
-          "Results for infer roles\n");
+      sb = new StringBuilder("Results for infer roles\n");
 
       if (_roleSpecifier == null) {
         return sb.toString();
@@ -61,8 +59,7 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
 
       for (String regex : _roleSpecifier.getRoleRegexes()) {
         sb.append("Role regex inferred:  " + regex + "\n");
-        sb.append("Matches " + _matchingNodesCount + " out of "
-            + _allNodesCount + " nodes\n");
+        sb.append("Matches " + _matchingNodesCount + " out of " + _allNodesCount + " nodes\n");
       }
 
       SortedMap<String, SortedSet<String>> roleNodesMap =
@@ -91,13 +88,11 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
       _allNodesCount = allNodesCount;
     }
 
-
     @JsonProperty(PROP_MATCHING_NODES_COUNT)
     public void setMatchingNodesCount(int matchingNodesCount) {
       _matchingNodesCount = matchingNodesCount;
     }
   }
-
 
   // Node names are parsed into a sequence of alphanumeric strings and
   // delimiters (strings of non-alphanumeric characters).
@@ -115,12 +110,12 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
 
     public String tokenToRegex(String s) {
       switch (this) {
-      case ALPHANUMERIC:
-        return "\\p{Alnum}+";
-      case DELIMITER:
-        return Pattern.quote(s);
-      default:
-        throw new BatfishException("this case should be unreachable");
+        case ALPHANUMERIC:
+          return "\\p{Alnum}+";
+        case DELIMITER:
+          return Pattern.quote(s);
+        default:
+          throw new BatfishException("this case should be unreachable");
       }
     }
   }
@@ -137,19 +132,17 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
       InferRolesQuestion question = (InferRolesQuestion) _question;
       InferRolesAnswerElement answerElement = new InferRolesAnswerElement();
 
-      Map<String,Configuration> configurations = _batfish.loadConfigurations();
+      Map<String, Configuration> configurations = _batfish.loadConfigurations();
       // collect relevant nodes in a list.
-      List<String> nodes = CommonUtil.getMatchingStrings(
-          question.getNodeRegex(),
-          configurations.keySet());
+      List<String> nodes =
+          CommonUtil.getMatchingStrings(question.getNodeRegex(), configurations.keySet());
 
       int allNodesCount = nodes.size();
 
       answerElement.setAllNodes(nodes);
       answerElement.setAllNodesCount(allNodesCount);
 
-      NodeRoleSpecifier roleSpecifier =
-          new InferRoles(nodes, configurations, _batfish).call();
+      NodeRoleSpecifier roleSpecifier = new InferRoles(nodes, configurations, _batfish).call();
       answerElement.setRoleSpecifier(roleSpecifier);
 
       SortedMap<String, SortedSet<String>> roleNodesMap =
@@ -161,8 +154,8 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
 
       answerElement.setMatchingNodesCount(matchingNodes.size());
       return answerElement;
-      }
     }
+  }
 
   // <question_page_comment>
   /**
@@ -171,10 +164,8 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
    * <p>Uses heuristics to identify a part of a node's name that represents its role.
    *
    * @type InferRoles multifile
-   *
-   * @param nodeRegex
-   *           Regular expression for names of nodes to include. Default value
-   *           is '.*' (all nodes).
+   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
+   *     nodes).
    */
   public static final class InferRolesQuestion extends Question {
 
@@ -210,7 +201,6 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
     public void setNodeRegex(String regex) {
       _nodeRegex = regex;
     }
-
   }
 
   @Override
@@ -222,5 +212,4 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
   protected Question createQuestion() {
     return new InferRolesQuestion();
   }
-
 }

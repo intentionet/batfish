@@ -2,7 +2,6 @@ package org.batfish.symbolic.smt;
 
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BoolExpr;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

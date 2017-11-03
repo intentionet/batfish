@@ -57,5 +57,4 @@ public class AuthenticationKeyChain extends ComparableStructure<String> {
   public void setTolerance(int tolerance) {
     _tolerance = tolerance;
   }
-
 }

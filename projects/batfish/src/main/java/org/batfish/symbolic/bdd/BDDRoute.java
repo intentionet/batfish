@@ -39,7 +39,6 @@ public class BDDRoute {
 
   private static final int prefixIndex = 135;
 
-
   static {
     allMetricTypes = new ArrayList<>();
     allMetricTypes.add(OspfType.O);
@@ -59,9 +58,9 @@ public class BDDRoute {
       factory = JFactory.init(100000, 10000);
       factory.disableReorder();
       // Disables printing
-      //factory.registerGCCallback(handler, m);
-      //factory.registerResizeCallback(handler, m);
-      //factory.registerReorderCallback(handler, m);
+      // factory.registerGCCallback(handler, m);
+      // factory.registerResizeCallback(handler, m);
+      // factory.registerReorderCallback(handler, m);
       pairing = factory.makePair();
     } catch (NoSuchMethodException e) {
       e.printStackTrace();
@@ -280,7 +279,6 @@ public class BDDRoute {
     return _protocolHistory;
   }
 
-
   @Override
   public int hashCode() {
     int result = _adminDist != null ? _adminDist.hashCode() : 0;
@@ -332,10 +330,12 @@ public class BDDRoute {
     for (int i = 0; i < ospfMet.length; i++) {
       ospfMet[i].orWith(ospfMet2[i]);
     }
-    getCommunities().forEach((cvar, bdd1) -> {
-      BDD bdd2 = other.getCommunities().get(cvar);
-      bdd1.orWith(bdd2);
-    });
+    getCommunities()
+        .forEach(
+            (cvar, bdd1) -> {
+              BDD bdd2 = other.getCommunities().get(cvar);
+              bdd1.orWith(bdd2);
+            });
   }
 
   public BDDRoute restrict(Prefix pfx) {
@@ -369,7 +369,7 @@ public class BDDRoute {
     for (int i = 0; i < ospfMet.length; i++) {
       ospfMet[i] = ospfMet[i].veccompose(pairing);
     }
-    rec.getCommunities().replaceAll((k,v) -> v.veccompose(pairing));
+    rec.getCommunities().replaceAll((k, v) -> v.veccompose(pairing));
     return rec;
   }
 

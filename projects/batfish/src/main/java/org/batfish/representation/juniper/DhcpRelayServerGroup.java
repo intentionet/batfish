@@ -2,7 +2,6 @@ package org.batfish.representation.juniper;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.Ip;
 

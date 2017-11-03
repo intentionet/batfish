@@ -67,9 +67,9 @@ public class DisplayHints {
       baseTypeName = baseTypeName.replaceFirst("class:", "");
 
       try {
-      _baseType = Class.forName(baseTypeName);
+        _baseType = Class.forName(baseTypeName);
       } catch (ClassNotFoundException e) {
-          throw new BatfishException("Could not get a class from " + baseTypeName);
+        throw new BatfishException("Could not get a class from " + baseTypeName);
       }
     }
 

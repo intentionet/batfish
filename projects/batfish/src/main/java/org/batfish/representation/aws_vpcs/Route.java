@@ -66,7 +66,7 @@ public class Route implements Serializable {
       @Nullable Ip vgwAddress,
       Subnet subnet,
       Configuration subnetCfgNode) {
-    //setting the common properties
+    // setting the common properties
     StaticRoute.Builder srBuilder =
         StaticRoute.builder()
             .setNetwork(_destinationCidrBlock)

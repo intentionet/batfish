@@ -26,7 +26,7 @@ public class JsonPathQuery {
 
   private String _description;
 
-  private DisplayHints  _displayHints;
+  private DisplayHints _displayHints;
 
   private Set<JsonPathResultEntry> _exceptions;
 

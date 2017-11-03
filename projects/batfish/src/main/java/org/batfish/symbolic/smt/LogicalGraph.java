@@ -11,7 +11,6 @@ import org.batfish.symbolic.GraphEdge;
 import org.batfish.symbolic.Protocol;
 import org.batfish.symbolic.collections.Table2;
 
-
 /**
  * A logical graph that wraps the network graph and adds additional information about the routing
  * protocols actually using the underlying network graph.

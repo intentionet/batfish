@@ -42,7 +42,6 @@ public class WorkMgrServiceTest {
   @Rule public TemporaryFolder _containersFolder = new TemporaryFolder();
   @Rule public TemporaryFolder _questionsTemplatesFolder = new TemporaryFolder();
 
-
   private WorkMgrService _service;
 
   private String _containerName = "myContainer";
@@ -55,7 +54,7 @@ public class WorkMgrServiceTest {
           "-containerslocation",
           _containersFolder.getRoot().toString(),
           "-templatedirs",
-            _questionsTemplatesFolder.getRoot().toString()
+          _questionsTemplatesFolder.getRoot().toString()
         });
     Main.initAuthorizer();
     Main.setLogger(logger);
@@ -221,18 +220,16 @@ public class WorkMgrServiceTest {
     initContainerEnvironment();
     Question testQuestion = createTestQuestion("testquestion", "test description");
     BatfishObjectMapper objectMapper = new BatfishObjectMapper();
-    //serializing the question in the temp questions folder
+    // serializing the question in the temp questions folder
     String questionJsonString = objectMapper.writeValueAsString(testQuestion);
     CommonUtil.writeFile(
         _questionsTemplatesFolder.newFile("testQuestion.json").toPath(), questionJsonString);
-    JSONArray questionsResponse =
-        _service.getQuestionTemplates(CoordConsts.DEFAULT_API_KEY);
+    JSONArray questionsResponse = _service.getQuestionTemplates(CoordConsts.DEFAULT_API_KEY);
 
-    //testting if the response is valid and contains testquestion
+    // testting if the response is valid and contains testquestion
     if (questionsResponse.get(0).equals(CoordConsts.SVC_KEY_SUCCESS)) {
       JSONObject questionsJsonObject = (JSONObject) questionsResponse.get(1);
-      String questionsJsonString =
-          questionsJsonObject.getString(CoordConsts.SVC_KEY_QUESTION_LIST);
+      String questionsJsonString = questionsJsonObject.getString(CoordConsts.SVC_KEY_QUESTION_LIST);
       Map<String, String> questionsMap =
           objectMapper.readValue(questionsJsonString, new TypeReference<Map<String, String>>() {});
       if (questionsMap.containsKey("testquestion")) {

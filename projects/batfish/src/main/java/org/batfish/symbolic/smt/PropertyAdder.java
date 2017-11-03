@@ -29,7 +29,6 @@ class PropertyAdder {
     _encoderSlice = encoderSlice;
   }
 
-
   static BoolExpr allEqual(Context ctx, List<Expr> exprs) {
     BoolExpr acc = ctx.mkBool(true);
     if (exprs.size() > 1) {
@@ -372,11 +371,9 @@ class PropertyAdder {
             BoolExpr dataFwd = _encoderSlice.getForwardsAcross().get(router, edge);
             assert (dataFwd != null);
             ArithExpr peerLen = lenVars.get(edge.getPeer());
-            accNone =
-                ctx.mkAnd(accNone, ctx.mkOr(ctx.mkLt(peerLen, zero), ctx.mkNot(dataFwd)));
+            accNone = ctx.mkAnd(accNone, ctx.mkOr(ctx.mkLt(peerLen, zero), ctx.mkNot(dataFwd)));
             ArithExpr newVal = ctx.mkAdd(peerLen, one);
-            BoolExpr fwd =
-                ctx.mkAnd(ctx.mkGe(peerLen, zero), dataFwd, ctx.mkEq(length, newVal));
+            BoolExpr fwd = ctx.mkAnd(ctx.mkGe(peerLen, zero), dataFwd, ctx.mkEq(length, newVal));
             accSome = ctx.mkOr(accSome, fwd);
           }
         }
@@ -478,13 +475,7 @@ class PropertyAdder {
 
     for (String r : graph.getRouters()) {
       String name =
-          _encoderSlice.getEncoder().getId()
-              + "_"
-              + sliceName
-              + "_on-loop_"
-              + router
-              + "_"
-              + r;
+          _encoderSlice.getEncoder().getId() + "_" + sliceName + "_on-loop_" + router + "_" + r;
       BoolExpr var = ctx.mkBoolConst(name);
       onLoop.put(r, var);
       _encoderSlice.getAllVariables().put(var.toString(), var);

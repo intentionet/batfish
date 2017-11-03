@@ -27,7 +27,8 @@ public class EnvironmentTest {
 
   @Rule public ExpectedException _thrown = ExpectedException.none();
 
-  @Test public void testConstructorAndGetter() {
+  @Test
+  public void testConstructorAndGetter() {
     SortedSet<String> nodeBlacklist = Sets.newTreeSet();
     nodeBlacklist.add("node1");
     SortedMap<String, String> bgpTables = Maps.newTreeMap();
@@ -55,15 +56,16 @@ public class EnvironmentTest {
             null,
             null,
             10));
-    Environment e = new Environment(
-        "environment",
-        "testrig",
-        Sets.newTreeSet(),
-        Sets.newTreeSet(),
-        nodeBlacklist,
-        bgpTables,
-        routingTables,
-        bgpAdvertisements);
+    Environment e =
+        new Environment(
+            "environment",
+            "testrig",
+            Sets.newTreeSet(),
+            Sets.newTreeSet(),
+            nodeBlacklist,
+            bgpTables,
+            routingTables,
+            bgpAdvertisements);
     assertThat(e.getEnvName(), equalTo("environment"));
     assertThat(e.getTestrigName(), equalTo("testrig"));
     assertThat(e.getEdgeBlacklist(), equalTo(Sets.newHashSet()));
@@ -74,24 +76,24 @@ public class EnvironmentTest {
     assertThat(e.getExternalBgpAnnouncements(), equalTo(bgpAdvertisements));
   }
 
-    @Test
-    public void testToString() {
-      Environment e =
-          new Environment(
-              "environment",
-              "testrig",
-              Sets.newTreeSet(),
-              Sets.newTreeSet(),
-              Sets.newTreeSet(),
-              Maps.newTreeMap(),
-              Maps.newTreeMap(),
-              Sets.newTreeSet());
-      assertThat(
-          e.toString(),
-          equalTo(
-              "Environment{envName=environment, testrigName=testrig, "
-                  + "edgeBlacklist=[], interfaceBlacklist=[], "
-                  + "nodeBlacklist=[], bgpTables={}, routingTables={}, "
-                  + "externalBgpAnnouncements=[]}"));
-    }
+  @Test
+  public void testToString() {
+    Environment e =
+        new Environment(
+            "environment",
+            "testrig",
+            Sets.newTreeSet(),
+            Sets.newTreeSet(),
+            Sets.newTreeSet(),
+            Maps.newTreeMap(),
+            Maps.newTreeMap(),
+            Sets.newTreeSet());
+    assertThat(
+        e.toString(),
+        equalTo(
+            "Environment{envName=environment, testrigName=testrig, "
+                + "edgeBlacklist=[], interfaceBlacklist=[], "
+                + "nodeBlacklist=[], bgpTables={}, routingTables={}, "
+                + "externalBgpAnnouncements=[]}"));
+  }
 }

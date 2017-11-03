@@ -247,7 +247,7 @@ public class Graph {
         v.visit(
             conf,
             defaultPol.getStatements(),
-            stmt -> { },
+            stmt -> {},
             expr -> {
               if (expr instanceof Conjunction) {
                 Conjunction c = (Conjunction) expr;
@@ -915,7 +915,7 @@ public class Graph {
   public Map<String, String> findNamedCommunities() {
     Map<String, String> comms = new HashMap<>();
     for (Configuration conf : getConfigurations().values()) {
-      for (Entry<String,CommunityList> entry : conf.getCommunityLists().entrySet()) {
+      for (Entry<String, CommunityList> entry : conf.getCommunityLists().entrySet()) {
         String name = entry.getKey();
         CommunityList cl = entry.getValue();
         if (cl != null && cl.getLines().size() == 1) {
@@ -939,7 +939,7 @@ public class Graph {
     v.visit(
         conf,
         pol.getStatements(),
-        stmt -> { },
+        stmt -> {},
         expr -> {
           if (expr instanceof MatchProtocol) {
             MatchProtocol mp = (MatchProtocol) expr;
@@ -969,8 +969,8 @@ public class Graph {
   }
 
   /*
- * Find the router Id for the neighbor corresponding to a logical edge.
- */
+   * Find the router Id for the neighbor corresponding to a logical edge.
+   */
   public long findRouterId(GraphEdge ge, Protocol proto) {
     GraphEdge eOther = _otherEnd.get(ge);
 
@@ -1185,25 +1185,27 @@ public class Graph {
 
     sb.append("---------- Static Routes by Interface ----------\n");
     _staticRoutes.forEach(
-        (router, map) -> map.forEach(
-            (iface, srs) -> {
-              for (StaticRoute sr : srs) {
-                sb.append("Router: ")
-                    .append(router)
-                    .append(", Interface: ")
-                    .append(iface)
-                    .append(" --> ")
-                    .append(sr.getNetwork())
-                    .append("\n");
-              }
-            }));
+        (router, map) ->
+            map.forEach(
+                (iface, srs) -> {
+                  for (StaticRoute sr : srs) {
+                    sb.append("Router: ")
+                        .append(router)
+                        .append(", Interface: ")
+                        .append(iface)
+                        .append(" --> ")
+                        .append(sr.getNetwork())
+                        .append("\n");
+                  }
+                }));
 
     sb.append("---------- Area ids ----------\n");
-    _areaIds.forEach((router, ids) -> {
-      if (!ids.isEmpty()) {
-        sb.append("Router: ").append(router).append("=").append(ids).append("\n");
-      }
-    });
+    _areaIds.forEach(
+        (router, ids) -> {
+          if (!ids.isEmpty()) {
+            sb.append("Router: ").append(router).append("=").append(ids).append("\n");
+          }
+        });
 
     sb.append("=======================================================\n");
     return sb.toString();

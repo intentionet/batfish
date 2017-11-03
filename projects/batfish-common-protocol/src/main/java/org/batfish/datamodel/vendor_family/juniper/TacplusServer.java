@@ -2,7 +2,6 @@ package org.batfish.datamodel.vendor_family.juniper;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.Ip;
 

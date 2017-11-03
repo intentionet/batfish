@@ -27,13 +27,13 @@ import org.batfish.datamodel.Topology;
 public class InferRoles implements Callable<NodeRoleSpecifier> {
 
   private IBatfish _batfish;
-  private Map<String,Configuration> _configurations;
+  private Map<String, Configuration> _configurations;
   private List<String> _nodes;
 
   // the node name that is used to infer a regex
   private String _chosenNode;
   // a tokenized version of _chosenNode
-  private List<Pair<String,InferRolesCharClass>> _tokens;
+  private List<Pair<String, InferRolesCharClass>> _tokens;
   // the regex produced by generalizing from _tokens
   private List<String> _regex;
   // the list of nodes that match _regex
@@ -50,8 +50,8 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
 
   private static final String ALPHANUMERIC_REGEX = "\\p{Alnum}+";
 
-  public InferRoles(List<String> nodes, Map<String, Configuration> configurations,
-      IBatfish batfish) {
+  public InferRoles(
+      List<String> nodes, Map<String, Configuration> configurations, IBatfish batfish) {
     _nodes = nodes;
     _configurations = configurations;
     _batfish = batfish;
@@ -73,12 +73,12 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
 
     public String tokenToRegex(String s) {
       switch (this) {
-      case ALPHANUMERIC:
-        return ALPHANUMERIC_REGEX;
-      case DELIMITER:
-        return Pattern.quote(s);
-      default:
-        throw new BatfishException("this case should be unreachable");
+        case ALPHANUMERIC:
+          return ALPHANUMERIC_REGEX;
+        case DELIMITER:
+          return Pattern.quote(s);
+        default:
+          throw new BatfishException("this case should be unreachable");
       }
     }
   }
@@ -100,7 +100,6 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
       return emptySpecifier;
     }
 
-
     // find the possible candidates that have a single role group
     List<List<String>> candidateRegexes = possibleRoleGroups();
 
@@ -108,11 +107,11 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
       return emptySpecifier;
     }
 
-    Pair<Integer,Double> bestRegexAndScore = findBestRegex(candidateRegexes);
+    Pair<Integer, Double> bestRegexAndScore = findBestRegex(candidateRegexes);
 
     // select the regex of maximum score, if that score is above threshold
-    Optional<NodeRoleSpecifier> optResult = toRoleSpecifierIfAboveThreshold(
-        bestRegexAndScore, candidateRegexes);
+    Optional<NodeRoleSpecifier> optResult =
+        toRoleSpecifierIfAboveThreshold(bestRegexAndScore, candidateRegexes);
     if (optResult.isPresent()) {
       return optResult.get();
     }
@@ -127,40 +126,35 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
     // sequence as the second group, which would result in less specific groups and could
     // be appropriate for some naming schemes.
 
-    candidateRegexes = possibleSecondRoleGroups(
-        candidateRegexes.get(bestRegexAndScore.getFirst()));
+    candidateRegexes = possibleSecondRoleGroups(candidateRegexes.get(bestRegexAndScore.getFirst()));
 
     if (candidateRegexes.size() == 0) {
       return emptySpecifier;
     }
 
-    optResult = toRoleSpecifierIfAboveThreshold(
-        findBestRegex(candidateRegexes), candidateRegexes);
+    optResult = toRoleSpecifierIfAboveThreshold(findBestRegex(candidateRegexes), candidateRegexes);
     if (optResult.isPresent()) {
       return optResult.get();
     } else {
       // give up and don't infer any roles if the best one is still below threshold
       return emptySpecifier;
     }
-
-
   }
 
   // try to identify a regex that most node names match
   private boolean inferCommonRegex(List<String> nodes) {
-    for (int attempts = 0 ; attempts < 10; attempts++) {
+    for (int attempts = 0; attempts < 10; attempts++) {
       // pick a random node name, in order to find one with a common pattern
       _chosenNode = nodes.get(new Random().nextInt(nodes.size()));
       _tokens = tokenizeName(_chosenNode);
-      _regex = _tokens
-          .stream()
-          .map((p) -> p.getSecond().tokenToRegex(p.getFirst()))
-          .collect(Collectors.toList());
+      _regex =
+          _tokens
+              .stream()
+              .map((p) -> p.getSecond().tokenToRegex(p.getFirst()))
+              .collect(Collectors.toList());
       Pattern p = Pattern.compile(String.join("", _regex));
-      _matchingNodes = nodes
-          .stream()
-          .filter((node) -> p.matcher(node).matches())
-          .collect(Collectors.toList());
+      _matchingNodes =
+          nodes.stream().filter((node) -> p.matcher(node).matches()).collect(Collectors.toList());
       // keep this regex if it matches more than half of the node names; otherwise try again
       if ((double) _matchingNodes.size() / nodes.size() >= REGEX_THRESHOLD) {
         return true;
@@ -171,8 +165,8 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
 
   // a very simple lexer that tokenizes a name into a sequence of
   // alphanumeric and non-alphanumeric strings
-  private List<Pair<String,InferRolesCharClass>> tokenizeName(String name) {
-    List<Pair<String,InferRolesCharClass>> pattern = new ArrayList<>();
+  private List<Pair<String, InferRolesCharClass>> tokenizeName(String name) {
+    List<Pair<String, InferRolesCharClass>> pattern = new ArrayList<>();
     char c = name.charAt(0);
     InferRolesCharClass cc = InferRolesCharClass.charToCharClass(c);
     StringBuffer curr = new StringBuffer();
@@ -263,9 +257,7 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
           continue;
         }
         RoleEdge redge = new RoleEdge(role1, role2);
-        SortedSet<String> roleEdgeNodes = roleEdges.getOrDefault(
-            redge, new TreeSet<>()
-        );
+        SortedSet<String> roleEdgeNodes = roleEdges.getOrDefault(redge, new TreeSet<>());
         roleEdgeNodes.add(n1);
         roleEdges.put(redge, roleEdgeNodes);
       }
@@ -292,9 +284,8 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
     return supportSum / numEdges;
   }
 
-
   // the list of candidates must have at least one element
-  private Pair<Integer,Double> findBestRegex(final List<List<String>> candidates) {
+  private Pair<Integer, Double> findBestRegex(final List<List<String>> candidates) {
     // choose the candidate role regex with the maximal "role score"
     return IntStream.range(0, candidates.size())
         .mapToObj(i -> new Pair<>(i, computeRoleScore(regexTokensToRegex(candidates.get(i)))))
@@ -304,7 +295,7 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
 
   // the list of candidates must have at least one element
   private Optional<NodeRoleSpecifier> toRoleSpecifierIfAboveThreshold(
-      Pair<Integer,Double> bestRegexAndScore, List<List<String>> candidates) {
+      Pair<Integer, Double> bestRegexAndScore, List<List<String>> candidates) {
     List<String> bestRegexTokens = candidates.get(bestRegexAndScore.getFirst());
     String bestRegex = regexTokensToRegex(bestRegexTokens);
     // if the score is high enough, we're done
@@ -322,5 +313,4 @@ public class InferRoles implements Callable<NodeRoleSpecifier> {
     result.setRoleRegexes(regexes);
     return result;
   }
-
 }

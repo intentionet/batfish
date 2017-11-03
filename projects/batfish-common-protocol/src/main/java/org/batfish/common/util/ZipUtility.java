@@ -8,9 +8,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.batfish.common.BatfishException;
 
-//code from
-//http://stackoverflow.com/questions/740375/directories-in-a-zip-file-when-using-java-util-zip-zipoutputstream
-//minor local changes -- search for ratul
+// code from
+// http://stackoverflow.com/questions/740375/directories-in-a-zip-file-when-using-java-util-zip-zipoutputstream
+// minor local changes -- search for ratul
 
 public class ZipUtility {
   /*

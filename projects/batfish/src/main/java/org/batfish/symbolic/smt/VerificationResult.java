@@ -3,7 +3,6 @@ package org.batfish.symbolic.smt;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.microsoft.z3.BoolExpr;
-
 import java.util.SortedMap;
 import java.util.SortedSet;
 import javax.annotation.Nullable;

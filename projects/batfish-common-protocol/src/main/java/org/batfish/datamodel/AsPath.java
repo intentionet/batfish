@@ -32,8 +32,7 @@ public class AsPath implements Serializable, Comparable<AsPath> {
   }
 
   public static AsPath ofSingletonAsSets(List<Integer> asNums) {
-    return new AsPath(
-        asNums.stream().map(ImmutableSortedSet::of).collect(Collectors.toList()));
+    return new AsPath(asNums.stream().map(ImmutableSortedSet::of).collect(Collectors.toList()));
   }
 
   public static List<SortedSet<Integer>> removePrivateAs(List<SortedSet<Integer>> asPath) {

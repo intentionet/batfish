@@ -90,9 +90,9 @@ import org.batfish.symbolic.collections.PList;
  * declarative symbolic encoding of the network, we convert this stateful representation into a
  * stateless representation
  *
- * <p>The TransferSSA class makes policies stateless by converting the vendor-independent
- * format to a Static Single Assignment (SSA) form where all updates are reflected in new variables.
- * Rather than create a full control flow graph (CFG) as is typically done in SSA, we use a simple
+ * <p>The TransferSSA class makes policies stateless by converting the vendor-independent format to
+ * a Static Single Assignment (SSA) form where all updates are reflected in new variables. Rather
+ * than create a full control flow graph (CFG) as is typically done in SSA, we use a simple
  * conversion based on adding join points for every variable modified in an if statement.
  *
  * <p>The joint point defined as the [phi] function from SSA merges variables that may differ across
@@ -1289,8 +1289,7 @@ class TransferSSA {
     return x;
   }
 
-  private BoolExpr createBoolVariableWith(
-      TransferParam<SymbolicRoute> p, String name, BoolExpr e) {
+  private BoolExpr createBoolVariableWith(TransferParam<SymbolicRoute> p, String name, BoolExpr e) {
     e = (BoolExpr) e.simplify();
     if (canInline(e)) {
       p.debug(name + "=" + e);

@@ -19,8 +19,7 @@ public class Route6FilterLineOrLonger extends Route6FilterLine {
     int prefixLength = _prefix6.getPrefixLength();
     org.batfish.datamodel.Route6FilterLine line =
         new org.batfish.datamodel.Route6FilterLine(
-            LineAction.ACCEPT, _prefix6, new SubRange(
-                prefixLength, Prefix6.MAX_PREFIX_LENGTH));
+            LineAction.ACCEPT, _prefix6, new SubRange(prefixLength, Prefix6.MAX_PREFIX_LENGTH));
     rfl.addLine(line);
   }
 

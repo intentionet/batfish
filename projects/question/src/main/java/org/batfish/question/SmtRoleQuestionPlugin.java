@@ -85,5 +85,4 @@ public class SmtRoleQuestionPlugin extends QuestionPlugin {
   protected Question createQuestion() {
     return new RoleQuestion();
   }
-
 }

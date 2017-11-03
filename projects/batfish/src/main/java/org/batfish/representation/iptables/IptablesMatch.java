@@ -104,6 +104,6 @@ public class IptablesMatch implements Serializable {
       // _warnings.redFlag("Inversion of interface matching is not supported.");
       throw new BatfishException("Unknown matchdata type");
     }
-    return (String)_matchData;
+    return (String) _matchData;
   }
 }

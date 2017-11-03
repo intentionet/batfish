@@ -18,7 +18,6 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.TcpFlags;
 
-
 public class BDDAcl {
 
   private IpAccessList _acl;
@@ -356,8 +355,8 @@ public class BDDAcl {
   }
 
   /*
- * Create a new version of the BDD restricted to a list of prefixes
- */
+   * Create a new version of the BDD restricted to a list of prefixes
+   */
   public BDDAcl restrict(List<Prefix> prefixes) {
     BDDAcl other = new BDDAcl(this);
     other._bdd = this._pkt.restrict(this._bdd, prefixes);

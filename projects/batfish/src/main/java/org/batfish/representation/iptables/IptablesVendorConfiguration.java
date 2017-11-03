@@ -75,10 +75,11 @@ public class IptablesVendorConfiguration extends IptablesConfiguration {
             prerouting
                 .getLines()
                 .stream()
-                .filter(l -> {
-                 String iface = _lineInInterfaces.get(l);
-                 return iface == null || i.getName().equals(iface);
-                })
+                .filter(
+                    l -> {
+                      String iface = _lineInInterfaces.get(l);
+                      return iface == null || i.getName().equals(iface);
+                    })
                 .collect(Collectors.toList());
 
         // TODO: ipv6
@@ -107,10 +108,11 @@ public class IptablesVendorConfiguration extends IptablesConfiguration {
             postrouting
                 .getLines()
                 .stream()
-                .filter(l -> {
-                  String iface = _lineOutInterfaces.get(l);
-                  return iface == null || i.getName().equals(iface);
-                 })
+                .filter(
+                    l -> {
+                      String iface = _lineOutInterfaces.get(l);
+                      return iface == null || i.getName().equals(iface);
+                    })
                 .collect(Collectors.toList());
 
         // TODO: ipv6

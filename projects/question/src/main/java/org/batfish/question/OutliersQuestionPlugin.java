@@ -2,7 +2,6 @@ package org.batfish.question;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.service.AutoService;
-
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import java.util.function.Function;
 import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
@@ -76,22 +74,30 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
 
       for (NamedStructureOutlierSet<?> outlier : _namedStructureOutliers) {
         switch (outlier.getHypothesis()) {
-        case SAME_DEFINITION:
-          sb.append("  Hypothesis: every " + outlier.getStructType()
-              + " named " + outlier.getName() + " has the same definition\n");
-          break;
-        case SAME_NAME:
-          sb.append("  Hypothesis:");
-          if (outlier.getNamedStructure() != null) {
-            sb.append(" every ");
-          } else {
-            sb.append(" no ");
-          }
-          sb.append("node should define a " + outlier.getStructType()
-                + " named " + outlier.getName() + "\n");
-          break;
-        default:
-          throw new BatfishException("Unexpected hypothesis" + outlier.getHypothesis());
+          case SAME_DEFINITION:
+            sb.append(
+                "  Hypothesis: every "
+                    + outlier.getStructType()
+                    + " named "
+                    + outlier.getName()
+                    + " has the same definition\n");
+            break;
+          case SAME_NAME:
+            sb.append("  Hypothesis:");
+            if (outlier.getNamedStructure() != null) {
+              sb.append(" every ");
+            } else {
+              sb.append(" no ");
+            }
+            sb.append(
+                "node should define a "
+                    + outlier.getStructType()
+                    + " named "
+                    + outlier.getName()
+                    + "\n");
+            break;
+          default:
+            throw new BatfishException("Unexpected hypothesis" + outlier.getHypothesis());
         }
         sb.append("  Outliers: ");
         sb.append(outlier.getOutliers() + "\n");
@@ -108,8 +114,7 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
     }
 
     @JsonProperty(PROP_SERVER_OUTLIERS)
-    public void setServerOutliers(
-        SortedSet<OutlierSet<NavigableSet<String>>> serverOutliers) {
+    public void setServerOutliers(SortedSet<OutlierSet<NavigableSet<String>>> serverOutliers) {
       _serverOutliers = serverOutliers;
     }
   }
@@ -131,7 +136,6 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
       super(question, batfish);
     }
 
-
     private <T> void addNamedStructureOutliers(
         OutliersHypothesis hypothesis,
         NamedStructureEquivalenceSets<T> equivSet,
@@ -145,8 +149,10 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
             eClasses
                 .stream()
                 .max(Comparator.comparingInt(es -> es.getNodes().size()))
-                .orElseThrow(() -> new BatfishException(
-                    "Named structure " + name + " has no equivalence classes"));
+                .orElseThrow(
+                    () ->
+                        new BatfishException(
+                            "Named structure " + name + " has no equivalence classes"));
         SortedSet<String> conformers = max.getNodes();
         eClasses.remove(max);
         SortedSet<String> outliers = new TreeSet<>();
@@ -174,10 +180,13 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
 
       // the equivalence class of the largest size is treated as the one whose value is
       // hypothesized to be the correct one
-      Map.Entry<T, SortedSet<String>> max = equivSets.entrySet()
-          .stream()
-          .max(Comparator.comparingInt(e -> e.getValue().size()))
-          .orElseThrow(() -> new BatfishException("Set " + name + " has no equivalence classes"));
+      Map.Entry<T, SortedSet<String>> max =
+          equivSets
+              .entrySet()
+              .stream()
+              .max(Comparator.comparingInt(e -> e.getValue().size()))
+              .orElseThrow(
+                  () -> new BatfishException("Set " + name + " has no equivalence classes"));
       SortedSet<String> conformers = max.getValue();
       T definition = max.getKey();
       equivSets.remove(definition);
@@ -200,17 +209,17 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
       _nodes = CommonUtil.getMatchingStrings(question.getNodeRegex(), _configurations.keySet());
 
       switch (question.getHypothesis()) {
-      case SAME_DEFINITION:
-      case SAME_NAME:
-        SortedSet<NamedStructureOutlierSet<?>> outliers = namedStructureOutliers(question);
-        _answerElement.setNamedStructureOutliers(outliers);
-        break;
-      case SAME_SERVERS:
-        _answerElement.setServerOutliers(serverOutliers());
-        break;
-      default:
-        throw new BatfishException(
-            "Unexpected outlier detection hypothesis " + question.getHypothesis());
+        case SAME_DEFINITION:
+        case SAME_NAME:
+          SortedSet<NamedStructureOutlierSet<?>> outliers = namedStructureOutliers(question);
+          _answerElement.setNamedStructureOutliers(outliers);
+          break;
+        case SAME_SERVERS:
+          _answerElement.setServerOutliers(serverOutliers());
+          break;
+        default:
+          throw new BatfishException(
+              "Unexpected outlier detection hypothesis " + question.getHypothesis());
       }
 
       return _answerElement;
@@ -246,16 +255,16 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
         case SAME_DEFINITION:
           // nothing to do before ranking outliers
           break;
-      case SAME_NAME:
-        // create at most two equivalence classes for each name:
-        // one containing the nodes that have a structure of that name,
-        // and one containing the nodes that don't have a structure of that name
-        for (NamedStructureEquivalenceSets<?> eSets : equivalenceSets.values()) {
-          toNameOnlyEquivalenceSets(eSets, innerAnswer.getNodes());
-        }
-        break;
-      default:
-        throw new BatfishException("Default case of switch should be unreachable");
+        case SAME_NAME:
+          // create at most two equivalence classes for each name:
+          // one containing the nodes that have a structure of that name,
+          // and one containing the nodes that don't have a structure of that name
+          for (NamedStructureEquivalenceSets<?> eSets : equivalenceSets.values()) {
+            toNameOnlyEquivalenceSets(eSets, innerAnswer.getNodes());
+          }
+          break;
+        default:
+          throw new BatfishException("Default case of switch should be unreachable");
       }
 
       for (NamedStructureEquivalenceSets<?> eSets : equivalenceSets.values()) {
@@ -266,31 +275,24 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
           rankNamedStructureOutliers(hypothesis, equivalenceSets);
 
       // remove outlier sets that don't meet our threshold
-      outliers.removeIf(
-          oset -> !isWithinThreshold(oset.getConformers(), oset.getOutliers())
-      );
+      outliers.removeIf(oset -> !isWithinThreshold(oset.getConformers(), oset.getOutliers()));
       return outliers;
     }
-
 
     private SortedSet<OutlierSet<NavigableSet<String>>> serverOutliers() {
       SortedSet<OutlierSet<NavigableSet<String>>> rankedOutliers = new TreeSet<>();
       addPropertyOutliers("DnsServers", Configuration::getDnsServers, rankedOutliers);
       addPropertyOutliers("LoggingServers", Configuration::getLoggingServers, rankedOutliers);
       addPropertyOutliers("NtpServers", Configuration::getNtpServers, rankedOutliers);
-      addPropertyOutliers("SnmpTrapServers", Configuration::getSnmpTrapServers,
-          rankedOutliers);
+      addPropertyOutliers("SnmpTrapServers", Configuration::getSnmpTrapServers, rankedOutliers);
       addPropertyOutliers("TacacsServers", Configuration::getTacacsServers, rankedOutliers);
 
       return rankedOutliers;
-
     }
 
-
-    private <T> void toNameOnlyEquivalenceSets(NamedStructureEquivalenceSets<T> eSets,
-        List<String> nodes) {
-      SortedMap<String, SortedSet<NamedStructureEquivalenceSet<T>>> newESetsMap =
-          new TreeMap<>();
+    private <T> void toNameOnlyEquivalenceSets(
+        NamedStructureEquivalenceSets<T> eSets, List<String> nodes) {
+      SortedMap<String, SortedSet<NamedStructureEquivalenceSet<T>>> newESetsMap = new TreeMap<>();
       for (Map.Entry<String, SortedSet<NamedStructureEquivalenceSet<T>>> entry :
           eSets.getSameNamedStructures().entrySet()) {
         SortedSet<String> presentNodes = new TreeSet<>();
@@ -345,16 +347,16 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
    * @type InferRoles multifile
    * @param namedStructTypes Set of structure types to analyze drawn from ( AsPathAccessList,
    *     AuthenticationKeyChain, CommunityList, IkeGateway, IkePolicies, IkeProposal, IpAccessList,
-   *     IpsecPolicy, IpsecProposal, IpsecVpn, RouteFilterList, RoutingPolicy) Default value is
-   *     '[]' (which denotes all structure types).  This option is applicable to the "sameName"
-   *     and "sameDefinition" hypotheses.
+   *     IpsecPolicy, IpsecProposal, IpsecVpn, RouteFilterList, RoutingPolicy) Default value is '[]'
+   *     (which denotes all structure types). This option is applicable to the "sameName" and
+   *     "sameDefinition" hypotheses.
    * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
    *     nodes).
    * @param hypothesis A string that indicates the hypothesis being used to identify outliers.
    *     "sameDefinition" indicates a hypothesis that same-named structures should have identical
-   *     definitions.  "sameName" indicates a hypothesis that all nodes should have structures of
-   *     the same names.  "sameServers" indicates a hypothesis that all nodes should have the same
-   *     set of protocol-specific servers (e.g., DNS servers).  Default is "sameDefinition".
+   *     definitions. "sameName" indicates a hypothesis that all nodes should have structures of the
+   *     same names. "sameServers" indicates a hypothesis that all nodes should have the same set of
+   *     protocol-specific servers (e.g., DNS servers). Default is "sameDefinition".
    */
   public static final class OutliersQuestion extends Question implements INodeRegexQuestion {
 

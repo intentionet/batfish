@@ -8,8 +8,8 @@ import org.batfish.datamodel.Prefix;
 public class PrefixUtils {
 
   /*
- * Checks if a prefix overlaps with the destination in a headerspace
- */
+   * Checks if a prefix overlaps with the destination in a headerspace
+   */
   public static boolean overlap(HeaderSpace h, Prefix p) {
     if (h.getDstIps().isEmpty()) {
       return true;
@@ -54,5 +54,4 @@ public class PrefixUtils {
     }
     return false;
   }
-
 }

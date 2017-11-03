@@ -14,7 +14,6 @@ import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.questions.IQuestion;
 import org.batfish.datamodel.questions.Question;
 
-
 public class HeaderQuestion extends Question implements IQuestion {
 
   private static final String PROP_DST_IPS = "dstIps";
@@ -292,18 +291,15 @@ public class HeaderQuestion extends Question implements IQuestion {
 
   protected String prettyPrintParams() {
     try {
-      String retString = String.format("%sactions=%s",
-          prettyPrintBase(), _actions.toString());
+      String retString = String.format("%sactions=%s", prettyPrintBase(), _actions.toString());
       if (getDstPorts() != null && getDstPorts().size() != 0) {
         retString += String.format(", dstPorts=%s", getDstPorts());
       }
       if (getDstIps() != null && getDstIps().size() != 0) {
         retString += String.format(", dstIps=%s", getDstIps());
       }
-      if (getFragmentOffsets() != null
-          && getFragmentOffsets().size() != 0) {
-        retString += String.format(", fragmentOffsets=%s",
-            getFragmentOffsets());
+      if (getFragmentOffsets() != null && getFragmentOffsets().size() != 0) {
+        retString += String.format(", fragmentOffsets=%s", getFragmentOffsets());
       }
       if (getIcmpCodes() != null && getIcmpCodes().size() != 0) {
         retString += String.format(", icmpCodes=%s", getIcmpCodes());
@@ -312,16 +308,13 @@ public class HeaderQuestion extends Question implements IQuestion {
         retString += String.format(", icmpTypes=%s", getIcmpTypes());
       }
       if (getIpProtocols() != null && getIpProtocols().size() != 0) {
-        retString += String.format(", ipProtocols=%s",
-            getIpProtocols().toString());
+        retString += String.format(", ipProtocols=%s", getIpProtocols().toString());
       }
       if (getSrcOrDstPorts() != null && getSrcOrDstPorts().size() != 0) {
-        retString += String.format(", srcOrDstPorts=%s",
-            getSrcOrDstPorts());
+        retString += String.format(", srcOrDstPorts=%s", getSrcOrDstPorts());
       }
       if (getSrcOrDstIps() != null && getSrcOrDstIps().size() != 0) {
-        retString += String.format(", srcOrDstIps=%s",
-            getSrcOrDstIps());
+        retString += String.format(", srcOrDstIps=%s", getSrcOrDstIps());
       }
       if (getSrcIps() != null && getSrcIps().size() != 0) {
         retString += String.format(", srcIps=%s", getSrcIps());
@@ -330,36 +323,28 @@ public class HeaderQuestion extends Question implements IQuestion {
         retString += String.format(", srcPorts=%s", getSrcPorts());
       }
       if (getNotDstPorts() != null && getNotDstPorts().size() != 0) {
-        retString += String.format(", notDstPorts=%s",
-            getNotDstPorts());
+        retString += String.format(", notDstPorts=%s", getNotDstPorts());
       }
       if (getNotDstIps() != null && getNotDstIps().size() != 0) {
         retString += String.format(", notDstIps=%s", getNotDstIps());
       }
-      if (getNotFragmentOffsets() != null
-          && getNotFragmentOffsets().size() != 0) {
-        retString += String.format(", notFragmentOffsets=%s",
-            getNotFragmentOffsets());
+      if (getNotFragmentOffsets() != null && getNotFragmentOffsets().size() != 0) {
+        retString += String.format(", notFragmentOffsets=%s", getNotFragmentOffsets());
       }
       if (getNotIcmpCodes() != null && getNotIcmpCodes().size() != 0) {
-        retString += String.format(", notIcmpCodes=%s",
-            getNotIcmpCodes());
+        retString += String.format(", notIcmpCodes=%s", getNotIcmpCodes());
       }
       if (getNotIcmpTypes() != null && getNotIcmpTypes().size() != 0) {
-        retString += String.format(", notIcmpTypes=%s",
-            getNotIcmpTypes());
+        retString += String.format(", notIcmpTypes=%s", getNotIcmpTypes());
       }
-      if (getNotIpProtocols() != null
-          && getNotIpProtocols().size() != 0) {
-        retString += String.format(", notIpProtocols=%s",
-            getNotIpProtocols().toString());
+      if (getNotIpProtocols() != null && getNotIpProtocols().size() != 0) {
+        retString += String.format(", notIpProtocols=%s", getNotIpProtocols().toString());
       }
       if (getNotSrcIps() != null && getNotSrcIps().size() != 0) {
         retString += String.format(", notSrcIps=%s", getNotSrcIps());
       }
       if (getNotSrcPorts() != null && getNotSrcPorts().size() != 0) {
-        retString += String.format(", notSrcPorts=%s",
-            getNotSrcPorts());
+        retString += String.format(", notSrcPorts=%s", getNotSrcPorts());
       }
       return retString;
     } catch (Exception e) {

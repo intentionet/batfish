@@ -2,7 +2,6 @@ package org.batfish.symbolic.utils;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import org.batfish.common.BatfishException;
 import org.batfish.datamodel.questions.smt.HeaderLocationQuestion;
 

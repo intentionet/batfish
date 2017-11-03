@@ -7,10 +7,11 @@ public abstract class OspfAreaRoute extends OspfRoute {
   protected static final String PROP_AREA = "area";
   /** */
   private static final long serialVersionUID = 1L;
+
   protected final long _area;
 
-  public OspfAreaRoute(Prefix network, Ip nextHopIp, int admin, long metric,
-      @JsonProperty(PROP_AREA) long area) {
+  public OspfAreaRoute(
+      Prefix network, Ip nextHopIp, int admin, long metric, @JsonProperty(PROP_AREA) long area) {
     super(network, nextHopIp, admin, metric);
     _area = area;
   }

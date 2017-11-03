@@ -44,4 +44,3 @@ public enum DiffType {
     return _name;
   }
 }
-

@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import org.batfish.common.Pair;
 import org.batfish.symbolic.collections.PList;
 
-public class TransferResult<U,T> {
+public class TransferResult<U, T> {
 
   private PList<Pair<String, Expr>> _changedVariables; // should be a map
 
@@ -24,7 +24,7 @@ public class TransferResult<U,T> {
     this._returnAssignedValue = null;
   }
 
-  private TransferResult(TransferResult<U,T> other) {
+  private TransferResult(TransferResult<U, T> other) {
     this._changedVariables = other._changedVariables;
     this._returnValue = other._returnValue;
     this._fallthroughValue = other._fallthroughValue;
@@ -42,8 +42,7 @@ public class TransferResult<U,T> {
   }
 
   // TODO: this really needs to use persistent set data types
-  public PList<Pair<String, Pair<Expr, Expr>>> mergeChangedVariables(
-      TransferResult<U,T> other) {
+  public PList<Pair<String, Pair<Expr, Expr>>> mergeChangedVariables(TransferResult<U, T> other) {
     Set<String> seen = new HashSet<>();
     PList<Pair<String, Pair<Expr, Expr>>> vars = PList.empty();
 
@@ -89,14 +88,14 @@ public class TransferResult<U,T> {
     return _returnAssignedValue;
   }
 
-  public TransferResult<U,T> addChangedVariable(String s, Expr x) {
-    TransferResult<U,T> ret = new TransferResult<>(this);
+  public TransferResult<U, T> addChangedVariable(String s, Expr x) {
+    TransferResult<U, T> ret = new TransferResult<>(this);
     ret._changedVariables = ret._changedVariables.plus(new Pair<>(s, x));
     return ret;
   }
 
-  public TransferResult<U,T> addChangedVariables(TransferResult<U,T> other) {
-    TransferResult<U,T> ret = new TransferResult<>(this);
+  public TransferResult<U, T> addChangedVariables(TransferResult<U, T> other) {
+    TransferResult<U, T> ret = new TransferResult<>(this);
     ret._changedVariables = ret._changedVariables.plusAll(other._changedVariables);
     return ret;
   }
@@ -110,26 +109,26 @@ public class TransferResult<U,T> {
     return false;
   }
 
-  public TransferResult<U,T> clearChanged() {
-    TransferResult<U,T> ret = new TransferResult<>(this);
+  public TransferResult<U, T> clearChanged() {
+    TransferResult<U, T> ret = new TransferResult<>(this);
     ret._changedVariables = PList.empty();
     return ret;
   }
 
-  public TransferResult<U,T> setReturnValue(U x) {
-    TransferResult<U,T> ret = new TransferResult<>(this);
+  public TransferResult<U, T> setReturnValue(U x) {
+    TransferResult<U, T> ret = new TransferResult<>(this);
     ret._returnValue = x;
     return ret;
   }
 
-  public TransferResult<U,T> setFallthroughValue(T x) {
-    TransferResult<U,T> ret = new TransferResult<>(this);
+  public TransferResult<U, T> setFallthroughValue(T x) {
+    TransferResult<U, T> ret = new TransferResult<>(this);
     ret._fallthroughValue = x;
     return ret;
   }
 
-  public TransferResult<U,T> setReturnAssignedValue(T x) {
-    TransferResult<U,T> ret = new TransferResult<>(this);
+  public TransferResult<U, T> setReturnAssignedValue(T x) {
+    TransferResult<U, T> ret = new TransferResult<>(this);
     ret._returnAssignedValue = x;
     return ret;
   }

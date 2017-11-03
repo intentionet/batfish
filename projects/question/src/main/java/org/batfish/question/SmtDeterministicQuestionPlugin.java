@@ -51,5 +51,4 @@ public class SmtDeterministicQuestionPlugin extends QuestionPlugin {
   protected Question createQuestion() {
     return new DeterministicQuestion();
   }
-
 }

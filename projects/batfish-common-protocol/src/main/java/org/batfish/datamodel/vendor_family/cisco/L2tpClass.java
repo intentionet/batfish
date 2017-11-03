@@ -27,5 +27,4 @@ public class L2tpClass extends ComparableStructure<String> {
   public int getDefinitionLine() {
     return _definitionLine;
   }
-
 }

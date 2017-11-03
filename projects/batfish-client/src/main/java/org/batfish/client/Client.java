@@ -1671,7 +1671,7 @@ public class Client extends AbstractClient implements IClient {
     LoadQuestionAnswerElement ae = new LoadQuestionAnswerElement();
 
     try {
-      //loading questions for the analysis
+      // loading questions for the analysis
       Multimap<String, String> analysisQuestions = loadQuestionsFromDir(questionsPathStr);
       Answer answer = new Answer();
       answer.addAnswerElement(ae);
@@ -1690,7 +1690,7 @@ public class Client extends AbstractClient implements IClient {
       }
       _logger.output(answerStringToPrint);
     } catch (BatfishException e) {
-      //failure in loading the questions results in failure of loading of analysis
+      // failure in loading the questions results in failure of loading of analysis
       return false;
     }
 
@@ -1995,7 +1995,7 @@ public class Client extends AbstractClient implements IClient {
       List<String> parameters,
       Map<String, String> bfq) {
 
-    //checking the arguments and options
+    // checking the arguments and options
     if (!isValidArgument(options, parameters, 1, 0, 1, Command.LOAD_QUESTIONS)) {
       return false;
     }
@@ -2010,27 +2010,27 @@ public class Client extends AbstractClient implements IClient {
       }
     }
 
-    //init answer and answer element
+    // init answer and answer element
     Answer answer = new Answer();
     LoadQuestionAnswerElement ae = new LoadQuestionAnswerElement();
     answer.addAnswerElement(ae);
 
-    //try to load remote questions if no local disk path is passed or loadremote is forced
+    // try to load remote questions if no local disk path is passed or loadremote is forced
     if ((parameters.isEmpty() || loadRemote) && _workHelper != null) {
       JSONObject remoteQuestionsJson = _workHelper.getQuestionTemplates();
       Multimap<String, String> remoteQuestions = loadQuestionsFromServer(remoteQuestionsJson);
-      //merging remote questions to bfq and updating answer element
+      // merging remote questions to bfq and updating answer element
       mergeQuestions(remoteQuestions, bfq, ae);
     }
 
-    //try to load local questions whenever local disk path is provided
+    // try to load local questions whenever local disk path is provided
     if (!parameters.isEmpty()) {
       Multimap<String, String> localQuestions = loadQuestionsFromDir(parameters.get(0));
-      //merging local questions to bfq and updating answer element
+      // merging local questions to bfq and updating answer element
       mergeQuestions(localQuestions, bfq, ae);
     }
 
-    //outputting the final answer
+    // outputting the final answer
     ObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
     String answerStringToPrint;
     if (outWriter == null && _settings.getPrettyPrintAnswers()) {
@@ -2141,7 +2141,7 @@ public class Client extends AbstractClient implements IClient {
       Multimap<String, String> sourceMap,
       Map<String, String> destinationMap,
       LoadQuestionAnswerElement ae) {
-    //merging remote questions
+    // merging remote questions
     for (String questionName : sourceMap.keySet()) {
       sourceMap
           .get(questionName)
@@ -2166,7 +2166,7 @@ public class Client extends AbstractClient implements IClient {
       String questionContent,
       Map<String, String> loadedQuestions,
       LoadQuestionAnswerElement ae) {
-    //adding question name in added list if not present else add in replaced list
+    // adding question name in added list if not present else add in replaced list
     if (loadedQuestions.containsKey(questionName.toLowerCase())) {
       ae.getReplaced().add(questionName);
     } else {

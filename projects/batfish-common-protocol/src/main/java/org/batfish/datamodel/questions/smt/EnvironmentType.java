@@ -44,4 +44,3 @@ public enum EnvironmentType {
     return _name;
   }
 }
-

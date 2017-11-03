@@ -3,10 +3,8 @@ package org.batfish.datamodel.collections;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Objects;
 import java.util.SortedSet;
-
 import org.batfish.role.OutliersHypothesis;
 
 public class NamedStructureOutlierSet<T> implements Comparable<NamedStructureOutlierSet<T>> {
@@ -26,8 +24,10 @@ public class NamedStructureOutlierSet<T> implements Comparable<NamedStructureOut
   // the hypothesis used to identify outliers
   private OutliersHypothesis _hypothesis;
 
-  /** The name of the structure type (e.g., CommunityList, IpAccessList)
-   * for which we are performing outlier detection */
+  /**
+   * The name of the structure type (e.g., CommunityList, IpAccessList) for which we are performing
+   * outlier detection
+   */
   private String _structType;
 
   /** The name of the structure for which we are performing outlier detection */
@@ -35,9 +35,9 @@ public class NamedStructureOutlierSet<T> implements Comparable<NamedStructureOut
 
   /**
    * If the hypothesis is SAME_DEFINITION, this field contains the structure definition that is
-   * hypothesized to be the correct one.  If the hypothesis is SAME_NAME, this field is non-null
-   * if the hypothesis is that a structure of this name should exist and null if the hypothesis
-   * is that a structure of this name should not exist.
+   * hypothesized to be the correct one. If the hypothesis is SAME_NAME, this field is non-null if
+   * the hypothesis is that a structure of this name should exist and null if the hypothesis is that
+   * a structure of this name should not exist.
    */
   private T _namedStructure;
 
@@ -49,7 +49,6 @@ public class NamedStructureOutlierSet<T> implements Comparable<NamedStructureOut
 
   /** The nodes that violate the hypothesis */
   private SortedSet<String> _outliers;
-
 
   @JsonCreator
   public NamedStructureOutlierSet(

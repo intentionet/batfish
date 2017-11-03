@@ -17,8 +17,8 @@ import org.batfish.common.BatfishLogger;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.coordinator.Main;
 
-//An authorizer that is backed by a file
-//Useful for testing
+// An authorizer that is backed by a file
+// Useful for testing
 public class DbAuthorizer implements Authorizer {
 
   private static final String COLUMN_APIKEY = "APIKey";

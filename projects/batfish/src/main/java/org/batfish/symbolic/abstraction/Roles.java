@@ -115,8 +115,7 @@ public class Roles {
         if (x1 == null) {
           importBgpNull.add(s);
         } else {
-          SortedSet<String> ec =
-              importBgpEcs.computeIfAbsent(x1, k -> new TreeSet<>());
+          SortedSet<String> ec = importBgpEcs.computeIfAbsent(x1, k -> new TreeSet<>());
           ec.add(s);
         }
 
@@ -124,8 +123,7 @@ public class Roles {
         if (x2 == null) {
           exportBgpNull.add(s);
         } else {
-          SortedSet<String> ec =
-              exportBgpEcs.computeIfAbsent(x2, k -> new TreeSet<>());
+          SortedSet<String> ec = exportBgpEcs.computeIfAbsent(x2, k -> new TreeSet<>());
           ec.add(s);
         }
 
@@ -133,8 +131,7 @@ public class Roles {
         if (x4 == null) {
           incomingAclNull.add(s);
         } else {
-          SortedSet<String> ec =
-              incomingAclEcs.computeIfAbsent(x4.getBdd(), k -> new TreeSet<>());
+          SortedSet<String> ec = incomingAclEcs.computeIfAbsent(x4.getBdd(), k -> new TreeSet<>());
           ec.add(s);
         }
 
@@ -142,8 +139,7 @@ public class Roles {
         if (x5 == null) {
           outgoingAclNull.add(s);
         } else {
-          SortedSet<String> ec =
-              outgoingAclEcs.computeIfAbsent(x5.getBdd(), k -> new TreeSet<>());
+          SortedSet<String> ec = outgoingAclEcs.computeIfAbsent(x5.getBdd(), k -> new TreeSet<>());
           ec.add(s);
         }
 
@@ -193,7 +189,6 @@ public class Roles {
     _nodeEcs.sort(c);
   }
 
-
   private Comparator<SortedSet<String>> comparator() {
     return (o1, o2) -> {
       String min1 = min(o1);
@@ -214,5 +209,4 @@ public class Roles {
     }
     return x;
   }
-
 }

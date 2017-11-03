@@ -13,13 +13,13 @@ public abstract class CoordinatorPlugin extends Plugin {
   @Override
   protected final void pluginInitialize() {
     switch (_pluginConsumer.getType()) {
-    case COORDINATOR:
-      _coordinator = (ICoordinator) _pluginConsumer;
-      _logger = _coordinator.getLogger();
-      coordinatorPluginInitialize();
-      break;
-    default:
-      break;
+      case COORDINATOR:
+        _coordinator = (ICoordinator) _pluginConsumer;
+        _logger = _coordinator.getLogger();
+        coordinatorPluginInitialize();
+        break;
+      default:
+        break;
     }
   }
 }

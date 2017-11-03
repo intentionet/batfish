@@ -67,7 +67,7 @@ public class CompositeQuestionPlugin extends QuestionPlugin {
 
     @Override
     public boolean getDataPlane() {
-      for (Question question: _questions) {
+      for (Question question : _questions) {
         if (question.getDataPlane()) {
           return true;
         }

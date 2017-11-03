@@ -2,7 +2,6 @@ package org.batfish.datamodel.collections;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Objects;
 import java.util.SortedSet;
 
@@ -30,7 +29,6 @@ public class OutlierSet<T> implements Comparable<OutlierSet<T>> {
 
   /** The nodes that violate the hypothesis */
   private SortedSet<String> _outliers;
-
 
   @JsonCreator
   public OutlierSet(
@@ -85,7 +83,6 @@ public class OutlierSet<T> implements Comparable<OutlierSet<T>> {
   public SortedSet<String> getOutliers() {
     return _outliers;
   }
-
 
   @Override
   public int hashCode() {

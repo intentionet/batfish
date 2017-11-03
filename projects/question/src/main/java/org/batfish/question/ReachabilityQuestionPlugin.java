@@ -490,8 +490,7 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
           retString += String.format(", %s=%s", PROP_NOT_FINAL_NODE_REGEX, _notFinalNodeRegex);
         }
         if (getNotFragmentOffsets() != null && !getNotFragmentOffsets().isEmpty()) {
-          retString +=
-              String.format(", %s=%s", PROP_NOT_FRAGMENT_OFFSETS, getNotFragmentOffsets());
+          retString += String.format(", %s=%s", PROP_NOT_FRAGMENT_OFFSETS, getNotFragmentOffsets());
         }
         if (getNotIcmpCodes() != null && !getNotIcmpCodes().isEmpty()) {
           retString += String.format(", %s=%s", PROP_NOT_ICMP_CODES, getNotIcmpCodes());

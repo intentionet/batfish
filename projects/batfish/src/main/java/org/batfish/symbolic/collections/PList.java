@@ -35,7 +35,7 @@ public final class PList<E> extends AbstractSequentialList<E> {
   @SuppressWarnings("unchecked")
   public static <E> PList<E> from(final Collection<? extends E> list) {
     if (list instanceof PList) {
-      return (PList<E>) list; //(actually we only know it's ConsPStack<? extends E>)
+      return (PList<E>) list; // (actually we only know it's ConsPStack<? extends E>)
     }
     // but that's good enough for an immutable
     // (i.e. we can't mess someone else up by adding the wrong type to it)

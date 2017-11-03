@@ -2,7 +2,6 @@ package org.batfish.common.plugin;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.batfish.common.BatfishException;
 
 public abstract class AbstractCoordinator extends PluginConsumer implements ICoordinator {

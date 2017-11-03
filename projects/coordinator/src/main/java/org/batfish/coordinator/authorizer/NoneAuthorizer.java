@@ -1,7 +1,7 @@
 package org.batfish.coordinator.authorizer;
 
-//a pass through authorizer that answers yes to everything
-//useful for testing and private deployments
+// a pass through authorizer that answers yes to everything
+// useful for testing and private deployments
 public class NoneAuthorizer implements Authorizer {
 
   @Override

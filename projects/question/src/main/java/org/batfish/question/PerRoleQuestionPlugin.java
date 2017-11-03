@@ -120,10 +120,7 @@ public class PerRoleQuestionPlugin extends QuestionPlugin {
 
     // create a regex that matches exactly the given set of names
     String namesToRegex(Set<String> names) {
-      return names
-          .stream()
-          .map(Pattern::quote)
-          .collect(Collectors.joining("|"));
+      return names.stream().map(Pattern::quote).collect(Collectors.joining("|"));
     }
   }
 

@@ -2,7 +2,6 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
-
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;

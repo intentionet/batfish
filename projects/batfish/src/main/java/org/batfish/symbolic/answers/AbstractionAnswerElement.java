@@ -8,5 +8,4 @@ public class AbstractionAnswerElement implements AnswerElement {
   public String prettyPrint() {
     return "";
   }
-
 }

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
 import org.batfish.common.plugin.IBatfish;
@@ -310,12 +309,7 @@ class EncoderSlice {
           String inName =
               String.format(
                   "%d_%s_%s_%s_%s_%s",
-                  _encoder.getId(),
-                  _sliceName,
-                  router,
-                  i.getName(),
-                  "INBOUND",
-                  inbound.getName());
+                  _encoder.getId(), _sliceName, router, i.getName(), "INBOUND", inbound.getName());
 
           BoolExpr inAcl = getCtx().mkBoolConst(inName);
           BoolExpr inAclFunc = computeACL(inbound);
@@ -488,7 +482,8 @@ class EncoderSlice {
     return firstBitsEqual(be, pfx, p.getPrefixLength());
   }
 
-  @Nullable SymbolicRoute getBestNeighborPerProtocol(String router, Protocol proto) {
+  @Nullable
+  SymbolicRoute getBestNeighborPerProtocol(String router, Protocol proto) {
     if (_optimizations.getSliceHasSingleProtocol().contains(router)) {
       return getSymbolicDecisions().getBestNeighbor().get(router);
     } else {
@@ -541,13 +536,7 @@ class EncoderSlice {
       for (GraphEdge edge : edges) {
         String iface = edge.getStart().getName();
         String cName =
-            _encoder.getId()
-                + "_"
-                + _sliceName
-                + "CONTROL-FORWARDING_"
-                + router
-                + "_"
-                + iface;
+            _encoder.getId() + "_" + _sliceName + "CONTROL-FORWARDING_" + router + "_" + iface;
         BoolExpr cForward = getCtx().mkBoolConst(cName);
         getAllVariables().put(cForward.toString(), cForward);
         _symbolicDecisions.getControlForwarding().put(router, edge, cForward);
@@ -555,13 +544,7 @@ class EncoderSlice {
         // Don't add data forwarding variable for abstract edge
         if (!edge.isAbstract()) {
           String dName =
-              _encoder.getId()
-                  + "_"
-                  + _sliceName
-                  + "DATA-FORWARDING_"
-                  + router
-                  + "_"
-                  + iface;
+              _encoder.getId() + "_" + _sliceName + "DATA-FORWARDING_" + router + "_" + iface;
           BoolExpr dForward = getCtx().mkBoolConst(dName);
           getAllVariables().put(dForward.toString(), dForward);
           _symbolicDecisions.getDataForwarding().put(router, edge, dForward);
@@ -700,13 +683,7 @@ class EncoderSlice {
                             "");
                     ev1 =
                         new SymbolicRoute(
-                            this,
-                            name,
-                            router,
-                            proto,
-                            _optimizations,
-                            null,
-                            e.isAbstract());
+                            this, name, router, proto, _optimizations, null, e.isAbstract());
                     singleProtoMap.put(proto, ev1);
                     getAllSymbolicRecords().add(ev1);
 
@@ -720,12 +697,7 @@ class EncoderSlice {
                   String name =
                       String.format(
                           "%d_%s%s_%s_%s_%s",
-                          _encoder.getId(),
-                          _sliceName,
-                          router,
-                          proto.name(),
-                          "EXPORT",
-                          ifaceName);
+                          _encoder.getId(), _sliceName, router, proto.name(), "EXPORT", ifaceName);
 
                   SymbolicRoute ev1 =
                       new SymbolicRoute(
@@ -753,12 +725,7 @@ class EncoderSlice {
                   String name =
                       String.format(
                           "%d_%s%s_%s_%s_%s",
-                          _encoder.getId(),
-                          _sliceName,
-                          router,
-                          proto.name(),
-                          "IMPORT",
-                          ifaceName);
+                          _encoder.getId(), _sliceName, router, proto.name(), "IMPORT", ifaceName);
                   SymbolicRoute ev2 = new SymbolicRoute(name, proto);
                   LogicalEdge eImport = new LogicalEdge(e, EdgeType.IMPORT, ev2);
                   importEdgeList.add(eImport);
@@ -766,12 +733,7 @@ class EncoderSlice {
                   String name =
                       String.format(
                           "%d_%s%s_%s_%s_%s",
-                          _encoder.getId(),
-                          _sliceName,
-                          router,
-                          proto.name(),
-                          "IMPORT",
-                          ifaceName);
+                          _encoder.getId(), _sliceName, router, proto.name(), "IMPORT", ifaceName);
                   SymbolicRoute ev2 =
                       new SymbolicRoute(
                           this, name, router, proto, _optimizations, null, e.isAbstract());
@@ -782,8 +744,7 @@ class EncoderSlice {
               }
             }
 
-            List<ArrayList<LogicalEdge>> es =
-                _logicalGraph.getLogicalEdges().get(router, proto);
+            List<ArrayList<LogicalEdge>> es = _logicalGraph.getLogicalEdges().get(router, proto);
             assert (es != null);
 
             ArrayList<LogicalEdge> allEdges = new ArrayList<>();
@@ -915,13 +876,7 @@ class EncoderSlice {
                             ifaceName);
                     SymbolicRoute vars =
                         new SymbolicRoute(
-                            this,
-                            name,
-                            router,
-                            proto,
-                            _optimizations,
-                            null,
-                            ge.isAbstract());
+                            this, name, router, proto, _optimizations, null, ge.isAbstract());
                     getAllSymbolicRecords().add(vars);
                     _logicalGraph.getEnvironmentVars().put(e, vars);
                   }
@@ -1505,8 +1460,7 @@ class EncoderSlice {
         for (Protocol proto : getProtocols().get(router)) {
           someProto = true;
 
-          SymbolicRoute bestVars =
-              _symbolicDecisions.getBestVars(_optimizations, router, proto);
+          SymbolicRoute bestVars = _symbolicDecisions.getBestVars(_optimizations, router, proto);
           assert (bestVars != null);
 
           if (somePermitted == null) {
@@ -1516,8 +1470,7 @@ class EncoderSlice {
           }
 
           BoolExpr val =
-              mkAnd(
-                  bestVars.getPermitted(), equal(conf, proto, best, bestVars, null, true));
+              mkAnd(bestVars.getPermitted(), equal(conf, proto, best, bestVars, null, true));
           if (acc == null) {
             acc = val;
           } else {
@@ -1525,8 +1478,7 @@ class EncoderSlice {
           }
           add(
               mkImplies(
-                  bestVars.getPermitted(),
-                  greaterOrEqual(conf, proto, best, bestVars, null)));
+                  bestVars.getPermitted(), greaterOrEqual(conf, proto, best, bestVars, null)));
         }
 
         if (someProto) {
@@ -1553,8 +1505,7 @@ class EncoderSlice {
 
       for (Protocol proto : getProtocols().get(router)) {
 
-        SymbolicRoute bestVars =
-            _symbolicDecisions.getBestVars(_optimizations, router, proto);
+        SymbolicRoute bestVars = _symbolicDecisions.getBestVars(_optimizations, router, proto);
         assert (bestVars != null);
 
         BoolExpr acc = null;
@@ -1570,16 +1521,13 @@ class EncoderSlice {
             somePermitted = mkOr(somePermitted, vars.getPermitted());
           }
 
-          BoolExpr v =
-              mkAnd(vars.getPermitted(), equal(conf, proto, bestVars, vars, e, true));
+          BoolExpr v = mkAnd(vars.getPermitted(), equal(conf, proto, bestVars, vars, e, true));
           if (acc == null) {
             acc = v;
           } else {
             acc = mkOr(acc, v);
           }
-          add(
-              mkImplies(
-                  vars.getPermitted(), greaterOrEqual(conf, proto, bestVars, vars, e)));
+          add(mkImplies(vars.getPermitted(), greaterOrEqual(conf, proto, bestVars, vars, e)));
         }
 
         if (acc != null) {
@@ -1602,8 +1550,7 @@ class EncoderSlice {
       String router = entry.getKey();
       Configuration conf = entry.getValue();
       for (Protocol proto : getProtocols().get(router)) {
-        SymbolicRoute bestVars =
-            _symbolicDecisions.getBestVars(_optimizations, router, proto);
+        SymbolicRoute bestVars = _symbolicDecisions.getBestVars(_optimizations, router, proto);
         assert (bestVars != null);
         for (LogicalEdge e : collectAllImportLogicalEdges(router, conf, proto)) {
           SymbolicRoute vars = correctVars(e);
@@ -1711,11 +1658,9 @@ class EncoderSlice {
               }
             }
           }
-
         }
       }
     }
-
   }
 
   /*
@@ -1978,8 +1923,7 @@ class EncoderSlice {
           // out the current edge ge, the we use ge.
           for (GraphEdge ge2 : getGraph().getEdgeMap().get(router)) {
             if (ge2.isAbstract()) {
-              BoolExpr ctrlFwd =
-                  getSymbolicDecisions().getControlForwarding().get(router, ge2);
+              BoolExpr ctrlFwd = getSymbolicDecisions().getControlForwarding().get(router, ge2);
               Graph.BgpSendType st = getGraph().peerType(ge2);
               // If Route reflectors, then next hop based on ID
               if (st == Graph.BgpSendType.TO_RR) {
@@ -1995,8 +1939,7 @@ class EncoderSlice {
                     if (otherSliceHasEdge(s, router, ge)) {
                       BoolExpr outEdge =
                           s.getSymbolicDecisions().getDataForwarding().get(router, ge);
-                      acc =
-                          mkOr(acc, mkAnd(record.getClientId().checkIfValue(id), outEdge));
+                      acc = mkOr(acc, mkAnd(record.getClientId().checkIfValue(id), outEdge));
                     }
                   }
                 }
@@ -2008,8 +1951,7 @@ class EncoderSlice {
                 if (isMainSlice()) {
                   EncoderSlice s = _encoder.getSlice(ge2.getPeer());
                   if (otherSliceHasEdge(s, router, ge)) {
-                    BoolExpr outEdge =
-                        s.getSymbolicDecisions().getDataForwarding().get(router, ge);
+                    BoolExpr outEdge = s.getSymbolicDecisions().getDataForwarding().get(router, ge);
                     fwd = mkOr(fwd, mkAnd(ctrlFwd, outEdge));
                   }
                 }
@@ -2095,7 +2037,7 @@ class EncoderSlice {
 
         if (varsOther != null) {
 
-          //BoolExpr isRoot = relevantOrigination(originations);
+          // BoolExpr isRoot = relevantOrigination(originations);
           BoolExpr active = interfaceActive(iface, proto);
 
           // Handle iBGP by checking reachability to the next hop to send messages
@@ -2326,15 +2268,7 @@ class EncoderSlice {
           assert overallBest != null;
           f =
               new TransferSSA(
-                  this,
-                  conf,
-                  overallBest,
-                  ospfRedistribVars,
-                  proto,
-                  statements,
-                  cost,
-                  ge,
-                  true);
+                  this, conf, overallBest, ospfRedistribVars, proto, statements, cost, ge, true);
           BoolExpr acc2 = f.compute();
           // System.out.println("ADDING: \n" + acc2.simplify());
           add(acc2);
@@ -2430,48 +2364,48 @@ class EncoderSlice {
             SymbolicRoute varsOther;
 
             switch (e.getEdgeType()) {
-            case IMPORT:
-              varsOther = _logicalGraph.findOtherVars(e);
-              addImportConstraint(e, varsOther, conf, proto, ge, router);
-              break;
+              case IMPORT:
+                varsOther = _logicalGraph.findOtherVars(e);
+                addImportConstraint(e, varsOther, conf, proto, ge, router);
+                break;
 
-            case EXPORT:
-              // OSPF export is tricky because it does not depend on being
-              // in the FIB. So it can come from either a redistributed route
-              // or another OSPF route. We always take the direct OSPF
-              SymbolicRoute ospfRedistribVars = null;
-              SymbolicRoute overallBest = null;
-              if (proto.isOspf()) {
-                varsOther = getBestNeighborPerProtocol(router, proto);
-                if (_ospfRedistributed.containsKey(router)) {
-                  ospfRedistribVars = _ospfRedistributed.get(router);
-                  overallBest = _symbolicDecisions.getBestNeighbor().get(router);
+              case EXPORT:
+                // OSPF export is tricky because it does not depend on being
+                // in the FIB. So it can come from either a redistributed route
+                // or another OSPF route. We always take the direct OSPF
+                SymbolicRoute ospfRedistribVars = null;
+                SymbolicRoute overallBest = null;
+                if (proto.isOspf()) {
+                  varsOther = getBestNeighborPerProtocol(router, proto);
+                  if (_ospfRedistributed.containsKey(router)) {
+                    ospfRedistribVars = _ospfRedistributed.get(router);
+                    overallBest = _symbolicDecisions.getBestNeighbor().get(router);
+                  }
+                } else {
+                  varsOther = _symbolicDecisions.getBestNeighbor().get(router);
                 }
-              } else {
-                varsOther = _symbolicDecisions.getBestNeighbor().get(router);
-              }
-              Set<Prefix> originations = _originatedNetworks.get(router, proto);
-              assert varsOther != null;
-              assert originations != null;
+                Set<Prefix> originations = _originatedNetworks.get(router, proto);
+                assert varsOther != null;
+                assert originations != null;
 
-              addExportConstraint(e,
-                  varsOther,
-                  ospfRedistribVars,
-                  overallBest,
-                  conf,
-                  proto,
-                  ge,
-                  router,
-                  usedExport,
-                  originations);
+                addExportConstraint(
+                    e,
+                    varsOther,
+                    ospfRedistribVars,
+                    overallBest,
+                    conf,
+                    proto,
+                    ge,
+                    router,
+                    usedExport,
+                    originations);
 
-              usedExport = true;
-              break;
+                usedExport = true;
+                break;
 
-            default:
-              break;
+              default:
+                break;
             }
-
           }
         }
         // If no edge used, then just set the best record to be false for that protocol

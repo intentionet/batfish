@@ -144,7 +144,7 @@ class Optimizations {
                                   val[0] = true;
                                 }
                               },
-                              expr -> { });
+                              expr -> {});
                         }));
     return val[0];
   }
@@ -178,7 +178,7 @@ class Optimizations {
                                     val[0] = true;
                                   }
                                 },
-                                expr -> { })));
+                                expr -> {})));
     return val[0];
   }
 
@@ -223,7 +223,7 @@ class Optimizations {
                                     val[0] = true;
                                   }
                                 },
-                                expr -> { })));
+                                expr -> {})));
     if (val[0]) {
       return true;
     }

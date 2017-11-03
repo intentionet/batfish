@@ -100,7 +100,7 @@ public class BatfishJobExecutorTest {
     executor.markJobCompleted();
     executor.handleJobResult(bfTestResult, output, ae, failureCauses, false);
 
-    //checking that correct failure message is written in the log
+    // checking that correct failure message is written in the log
     assertEquals(failureCauses.get(0).getMessage(), executor.getFailureMessage(bfTestResult));
   }
 

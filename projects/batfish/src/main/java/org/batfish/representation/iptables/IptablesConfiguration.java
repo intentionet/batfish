@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.batfish.representation.iptables.IptablesChain.ChainPolicy;
 import org.batfish.vendor.VendorConfiguration;
 

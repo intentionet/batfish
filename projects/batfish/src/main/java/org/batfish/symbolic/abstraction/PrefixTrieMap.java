@@ -133,7 +133,7 @@ public class PrefixTrieMap implements Serializable {
             addEntry(map, devices, right);
           }
         } else {
-         addEntry(map, devices, prefix);
+          addEntry(map, devices, prefix);
         }
       }
     }

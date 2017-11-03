@@ -27,5 +27,4 @@ public class DepiTunnel extends ComparableStructure<String> {
   public int getDefinitionLine() {
     return _definitionLine;
   }
-
 }

@@ -24,7 +24,7 @@ public class Tuple<T1, T2> {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Tuple<?,?>)) {
+    if (!(o instanceof Tuple<?, ?>)) {
       return false;
     }
     Tuple<?, ?> other = (Tuple<?, ?>) o;

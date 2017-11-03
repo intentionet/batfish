@@ -6,7 +6,7 @@ import org.batfish.symbolic.utils.Tuple;
 public class TransferReturn extends Tuple<BDDRoute, BDD> {
 
   TransferReturn(BDDRoute r, BDD b) {
-    super(r,b);
+    super(r, b);
   }
 
   public String debug() {

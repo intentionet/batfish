@@ -11,8 +11,8 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-//An authorizer that is backed by a file
-//Useful for testing
+// An authorizer that is backed by a file
+// Useful for testing
 public class FileAuthorizer implements Authorizer {
 
   private static final String APIKEY_KEY = "apikey";

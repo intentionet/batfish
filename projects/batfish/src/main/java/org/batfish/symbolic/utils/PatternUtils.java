@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.batfish.datamodel.Interface;
 import org.batfish.symbolic.Graph;
 import org.batfish.symbolic.GraphEdge;

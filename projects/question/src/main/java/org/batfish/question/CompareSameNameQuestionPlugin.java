@@ -123,8 +123,7 @@ public class CompareSameNameQuestionPlugin extends QuestionPlugin {
     private <T> void add(
         Class<T> structureClass, Function<Configuration, Map<String, T>> structureMapRetriever) {
       String structType = structureClass.getSimpleName().toLowerCase();
-      if ((_namedStructTypes.isEmpty()
-              && !(_excludedNamedStructTypes.contains(structType)))
+      if ((_namedStructTypes.isEmpty() && !(_excludedNamedStructTypes.contains(structType)))
           || _namedStructTypes.contains(structType)) {
         _answerElement.add(
             structureClass.getSimpleName(),
@@ -177,7 +176,6 @@ public class CompareSameNameQuestionPlugin extends QuestionPlugin {
 
       return _answerElement;
     }
-
 
     private <T> NamedStructureEquivalenceSets<T> processStructures(
         Class<T> structureClass,
@@ -232,7 +230,7 @@ public class CompareSameNameQuestionPlugin extends QuestionPlugin {
    *     Ip6AccessList, IpAccessList, IpsecPolicy, IpsecProposal, IpsecVpn, Route6FilterList,
    *     RouteFilterList, RoutingPolicy, Vrf, Zone ) Default value is '[]', which denotes all types
    *     except those in excludedNamedStructTypes.
-   * @param excludedNamedStructTypes Set of structure types to omit from the analysis.  Default is
+   * @param excludedNamedStructTypes Set of structure types to omit from the analysis. Default is
    *     [Interface, Vrf].
    * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
    *     nodes).
@@ -267,7 +265,6 @@ public class CompareSameNameQuestionPlugin extends QuestionPlugin {
       _namedStructTypes = new TreeSet<>();
       initExcludedNamedStructTypes();
       _nodeRegex = ".*";
-
     }
 
     // These named structure types seem to be less useful and have many entries

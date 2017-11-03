@@ -71,8 +71,7 @@ public class FlattenVendorConfigurationJob extends BatfishJob<FlattenVendorConfi
           elapsedTime,
           _logger.getHistory(),
           _outputFile,
-          new BatfishException(
-              "Unknown configuration format for: \"" + _inputFile + "\""));
+          new BatfishException("Unknown configuration format for: \"" + _inputFile + "\""));
     } else {
       _logger.debug("Skipping: \"" + _inputFile + "\"\n");
       String flatConfigText = _fileText;

@@ -39,8 +39,7 @@ public class VersionCompatibilityFilterTest extends JerseyTest {
     assertThat(response.getStatus(), equalTo(BAD_REQUEST.getStatusCode()));
     String expectMessage =
         String.format(
-            "HTTP header %s should contain a client version",
-            CoordConsts.SVC_KEY_VERSION);
+            "HTTP header %s should contain a client version", CoordConsts.SVC_KEY_VERSION);
     assertThat(response.readEntity(String.class), equalTo(expectMessage));
   }
 
@@ -50,8 +49,7 @@ public class VersionCompatibilityFilterTest extends JerseyTest {
     assertThat(response.getStatus(), equalTo(BAD_REQUEST.getStatusCode()));
     String expectMessage =
         String.format(
-            "HTTP header %s should contain a client version",
-            CoordConsts.SVC_KEY_VERSION);
+            "HTTP header %s should contain a client version", CoordConsts.SVC_KEY_VERSION);
     assertThat(response.readEntity(String.class), equalTo(expectMessage));
   }
 

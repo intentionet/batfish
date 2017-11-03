@@ -173,7 +173,10 @@ public class JsonPathResult {
     }
   }
 
-  private void doCompositionList(String resultKey, String compositionName, Composition composition,
+  private void doCompositionList(
+      String resultKey,
+      String compositionName,
+      Composition composition,
       Map<String, Extraction> extractions) {
     // check if we have any list type extraction variables and listLengths agree
     int listLen = 0;
@@ -181,19 +184,17 @@ public class JsonPathResult {
       String propertyName = pEntry.getKey();
       String varName = pEntry.getValue();
       if (!extractions.containsKey(varName)) {
-        throw new BatfishException(String.format(
-            "varName '%s' for '%s' of '%s' is not in extractions",
-            varName,
-            composition.getDictionary().get(varName),
-            compositionName));
+        throw new BatfishException(
+            String.format(
+                "varName '%s' for '%s' of '%s' is not in extractions",
+                varName, composition.getDictionary().get(varName), compositionName));
       }
       if (extractions.get(varName).getSchemaAsObject().isList()) {
         if (!_displayValues.get(resultKey).containsKey(varName)) {
-          throw new BatfishException(String.format(
-              "varName '%s' for '%s' of '%s' is not in display values",
-              varName,
-              propertyName,
-              compositionName));
+          throw new BatfishException(
+              String.format(
+                  "varName '%s' for '%s' of '%s' is not in display values",
+                  varName, propertyName, compositionName));
         }
         ArrayNode varNode = (ArrayNode) _displayValues.get(resultKey).get(varName);
         if (listLen != 0 && listLen != varNode.size()) {

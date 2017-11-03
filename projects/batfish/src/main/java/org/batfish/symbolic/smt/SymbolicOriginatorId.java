@@ -1,7 +1,6 @@
 package org.batfish.symbolic.smt;
 
 import com.microsoft.z3.BoolExpr;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,5 +33,4 @@ public class SymbolicOriginatorId extends SymbolicEnum<Integer> {
     }
     return _enc.getCtx().mkEq(_bitvec, _enc.getCtx().mkBV(0, _numBits));
   }
-
 }

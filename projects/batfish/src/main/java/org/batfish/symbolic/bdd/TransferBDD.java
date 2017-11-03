@@ -167,8 +167,7 @@ class TransferBDD {
    * Convert a Batfish AST boolean expression to a symbolic Z3 boolean expression
    * by performing inlining of stateful side effects.
    */
-  private TransferResult<TransferReturn, BDD> compute(
-      BooleanExpr expr, TransferParam<BDDRoute> p) {
+  private TransferResult<TransferReturn, BDD> compute(BooleanExpr expr, TransferParam<BDDRoute> p) {
 
     // TODO: right now everything is IPV4
     if (expr instanceof MatchIpv4) {
@@ -731,9 +730,9 @@ class TransferBDD {
               ret.getCommunities().put(c, ite(guard, var1, var2));
             });
 
-    //BDDInteger i =
+    // BDDInteger i =
     //    ite(guard, r1.getProtocolHistory().getInteger(), r2.getProtocolHistory().getInteger());
-    //ret.getProtocolHistory().setInteger(i);
+    // ret.getProtocolHistory().setInteger(i);
 
     return ret;
   }

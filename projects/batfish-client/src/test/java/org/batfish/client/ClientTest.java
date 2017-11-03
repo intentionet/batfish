@@ -462,7 +462,7 @@ public class ClientTest {
             .put("instanceName", "testQuestionName")
             .put("description", "test question description"));
 
-    //test if question name is correct
+    // test if question name is correct
     assertEquals("testQuestionName", Client.getQuestionName(testQuestion, "testquestion"));
   }
 
@@ -473,7 +473,7 @@ public class ClientTest {
     _thrown.expect(BatfishException.class);
     _thrown.expectMessage("question testquestion does not have instanceName field in instance");
 
-    //check exception when no instanceName is present
+    // check exception when no instanceName is present
     Client.getQuestionName(testQuestion, "testquestion");
   }
 
@@ -483,7 +483,7 @@ public class ClientTest {
     _thrown.expect(BatfishException.class);
     _thrown.expectMessage("question testquestion does not have instance field");
 
-    //check exception when instance itself is not present
+    // check exception when instance itself is not present
     Client.getQuestionName(testQuestion, "testquestion");
   }
 
@@ -855,7 +855,7 @@ public class ClientTest {
     CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
     JSONObject question = Client.loadQuestionFromFile(questionJsonPath);
 
-    //checking if actual and loaded JSONs are same
+    // checking if actual and loaded JSONs are same
     assertEquals(
         "testQuestionName",
         question.getJSONObject(BfConsts.PROP_INSTANCE).getString(BfConsts.PROP_INSTANCE_NAME));
@@ -874,7 +874,7 @@ public class ClientTest {
             .put("description", "test question description"));
     JSONObject question = Client.loadQuestionFromText(testQuestion.toString(), "testquestion");
 
-    //checking if actual and loaded JSONs are same
+    // checking if actual and loaded JSONs are same
     assertEquals(
         "testQuestionName",
         question.getJSONObject(BfConsts.PROP_INSTANCE).getString(BfConsts.PROP_INSTANCE_NAME));
@@ -887,7 +887,7 @@ public class ClientTest {
   public void testLoadQuestionFromTextInvalid() throws Exception {
     JSONObject testQuestion = new JSONObject();
 
-    //checking if exception thrown for instance missing
+    // checking if exception thrown for instance missing
     _thrown.expect(BatfishException.class);
     _thrown.expectMessage("Question in questionSource has no instance data");
     Client.loadQuestionFromText(testQuestion.toString(), "questionSource");
@@ -936,7 +936,7 @@ public class ClientTest {
     Multimap<String, String> expectedMap = HashMultimap.create();
     expectedMap.put("testQuestionName", testQuestion.toString());
 
-    //checking if questions are loaded from disk correctly
+    // checking if questions are loaded from disk correctly
     assertEquals(expectedMap, loadedQuestions);
   }
 
@@ -953,7 +953,7 @@ public class ClientTest {
     Multimap<String, String> expectedMap = HashMultimap.create();
     expectedMap.put("testQuestionName", testQuestion.toString());
 
-    //checking if questions are loaded from json correctly
+    // checking if questions are loaded from json correctly
     assertEquals(expectedMap, loadedQuestions);
   }
 
@@ -1009,7 +1009,7 @@ public class ClientTest {
     expectedMap.put("sourcequestion", "sourcequestionvalue");
     expectedMap.put("destinationquestion", "destinationquestionvalue");
 
-    //Test the merging populates ae and destinationquestion get replaced
+    // Test the merging populates ae and destinationquestion get replaced
     assertThat(expectedMap.entrySet(), equalTo(destMap.entrySet()));
     assertEquals(new TreeSet<>(Arrays.asList("destinationQuestion")), ae.getReplaced());
     assertEquals(new TreeSet<>(Arrays.asList("sourceQuestion")), ae.getAdded());
@@ -1025,7 +1025,7 @@ public class ClientTest {
     LoadQuestionAnswerElement ae = new LoadQuestionAnswerElement();
     Client.mergeQuestions(sourceMap, destMap, ae);
 
-    //Test the merging populates ae and sourcequestion get replaced
+    // Test the merging populates ae and sourcequestion get replaced
     assertEquals(new TreeSet<>(Arrays.asList("sourceQuestion")), ae.getReplaced());
     assertEquals(new TreeSet<>(Arrays.asList("sourceQuestion")), ae.getAdded());
     assertEquals(2, ae.getNumLoaded());

@@ -48,9 +48,8 @@ public class SmtReachabilityQuestionPlugin extends QuestionPlugin {
 
     @Override
     public String prettyPrint() {
-        String retString =
-            String.format("smt-reachability %s", super.prettyPrintParams());
-        return retString;
+      String retString = String.format("smt-reachability %s", super.prettyPrintParams());
+      return retString;
     }
   }
 }
