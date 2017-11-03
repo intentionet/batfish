@@ -16,7 +16,8 @@ matrix:
                  - oracle-java8-installer
         sudo: true
         install: ./.travis/install.sh
-        script: ./.travis/build.sh
+        script:
+          - .travis/check_java_format.sh && .travis/build.sh
 
 # Delete the batfish jars, which change every build, from the cache.
 # Also delete the locally-built jars, which are installed every build.
