@@ -1,5 +1,6 @@
 package org.batfish.datamodel;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -26,7 +27,8 @@ public class IkeGateway extends ComparableStructure<String> {
 
   private String _remoteId;
 
-  public IkeGateway(String name) {
+  @JsonCreator
+  public IkeGateway(@JsonProperty(PROP_NAME) String name) {
     super(name);
   }
 
