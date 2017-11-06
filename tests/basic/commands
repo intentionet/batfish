@@ -50,6 +50,10 @@ test tests/basic/init-example2.ref init-testrig test_rigs/example2 basic-example
 test tests/basic/inferRoles.ref get inferRoles
 test tests/basic/roleNeighbors2.ref get neighbors neighborTypes=["ebgp","ibgp","ospf","lan"], style="role"
 
+# example-aws testrig
+test tests/basic/init-example-aws.ref init-testrig test_rigs/example-aws basic-example-aws
+test tests/basic/nodes-example-aws.ref get nodes summary=false
+
 # disable-as-reuse
 test tests/basic/init-dc-as-reuse.ref init-testrig test_rigs/dc-as-reuse basic-dc-as-reuse
 test tests/basic/routes-dc-as-reuse.ref get routes

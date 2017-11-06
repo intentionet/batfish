@@ -470,6 +470,10 @@ public final class Configuration extends ComparableStructure<String> {
     }
   }
 
+  public Vrf initDefaultVrf() {
+    return _vrfs.computeIfAbsent(DEFAULT_VRF_NAME, Vrf::new);
+  }
+
   public void initRoutes() {
     _routes = new TreeSet<>();
     for (Vrf vrf : _vrfs.values()) {

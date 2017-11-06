@@ -1,0 +1,22 @@
+{
+ "VpnGateways": [
+  {
+   "AmazonSideAsn": 65401, 
+   "State": "available", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "lhr-aws-01"
+    }
+   ], 
+   "Type": "ipsec.1", 
+   "VpcAttachments": [
+    {
+     "State": "attached", 
+     "VpcId": "vpc-815775e7"
+    }
+   ], 
+   "VpnGatewayId": "vgw-81fd279f"
+  }
+ ]
+}

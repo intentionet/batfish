@@ -1,0 +1,166 @@
+{
+ "Subnets": [
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 251, 
+   "CidrBlock": "10.0.1.0/24", 
+   "DefaultForAz": false, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": false, 
+   "State": "available", 
+   "SubnetId": "subnet-8d0cbdeb", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "Private subnet"
+    }
+   ], 
+   "VpcId": "vpc-925131f4"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 9, 
+   "CidrBlock": "192.168.2.16/28", 
+   "DefaultForAz": false, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": false, 
+   "State": "available", 
+   "SubnetId": "subnet-073b8061", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "border_01-core_01"
+    }
+   ], 
+   "VpcId": "vpc-b390fad5"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2c", 
+   "AvailableIpAddressCount": 4091, 
+   "CidrBlock": "172.31.0.0/20", 
+   "DefaultForAz": true, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": true, 
+   "State": "available", 
+   "SubnetId": "subnet-1f315846", 
+   "VpcId": "vpc-f8fad69d"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 11, 
+   "CidrBlock": "192.168.2.0/28", 
+   "DefaultForAz": false, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": false, 
+   "State": "available", 
+   "SubnetId": "subnet-7044ff16", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "border_01-core_02"
+    }
+   ], 
+   "VpcId": "vpc-b390fad5"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2b", 
+   "AvailableIpAddressCount": 4091, 
+   "CidrBlock": "172.31.32.0/20", 
+   "DefaultForAz": true, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": true, 
+   "State": "available", 
+   "SubnetId": "subnet-9c8adceb", 
+   "VpcId": "vpc-f8fad69d"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 247, 
+   "CidrBlock": "192.168.1.0/24", 
+   "DefaultForAz": false, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": false, 
+   "State": "available", 
+   "SubnetId": "subnet-1641fa70", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "Management"
+    }
+   ], 
+   "VpcId": "vpc-b390fad5"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 10, 
+   "CidrBlock": "192.168.2.48/28", 
+   "DefaultForAz": false, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": false, 
+   "State": "available", 
+   "SubnetId": "subnet-f73a8191", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "border_02-core_01"
+    }
+   ], 
+   "VpcId": "vpc-b390fad5"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 249, 
+   "CidrBlock": "10.0.0.0/24", 
+   "DefaultForAz": false, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": false, 
+   "State": "available", 
+   "SubnetId": "subnet-62f14104", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "Public subnet"
+    }
+   ], 
+   "VpcId": "vpc-925131f4"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 4091, 
+   "CidrBlock": "172.31.16.0/20", 
+   "DefaultForAz": true, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": true, 
+   "State": "available", 
+   "SubnetId": "subnet-d9cafabc", 
+   "VpcId": "vpc-f8fad69d"
+  }, 
+  {
+   "AssignIpv6AddressOnCreation": false, 
+   "AvailabilityZone": "us-west-2a", 
+   "AvailableIpAddressCount": 11, 
+   "CidrBlock": "192.168.2.32/28", 
+   "DefaultForAz": false, 
+   "Ipv6CidrBlockAssociationSet": [], 
+   "MapPublicIpOnLaunch": false, 
+   "State": "available", 
+   "SubnetId": "subnet-30398256", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "border_02-core_02"
+    }
+   ], 
+   "VpcId": "vpc-b390fad5"
+  }
+ ]
+}

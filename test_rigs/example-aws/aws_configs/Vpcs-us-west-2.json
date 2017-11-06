@@ -1,0 +1,90 @@
+{
+ "Vpcs": [
+  {
+   "CidrBlock": "192.168.0.0/16", 
+   "CidrBlockAssociationSet": [
+    {
+     "AssociationId": "vpc-cidr-assoc-c32b03ab", 
+     "CidrBlock": "192.168.0.0/16", 
+     "CidrBlockState": {
+      "State": "associated"
+     }
+    }
+   ], 
+   "DhcpOptionsId": "dopt-5870b93d", 
+   "InstanceTenancy": "default", 
+   "IsDefault": false, 
+   "State": "available", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "Arista Demo"
+    }
+   ], 
+   "VpcId": "vpc-b390fad5"
+  }, 
+  {
+   "CidrBlock": "10.0.0.0/16", 
+   "CidrBlockAssociationSet": [
+    {
+     "AssociationId": "vpc-cidr-assoc-6cfcdb04", 
+     "CidrBlock": "10.0.0.0/16", 
+     "CidrBlockState": {
+      "State": "associated"
+     }
+    }
+   ], 
+   "DhcpOptionsId": "dopt-5870b93d", 
+   "InstanceTenancy": "default", 
+   "IsDefault": false, 
+   "State": "available", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "Demo-Test2"
+    }
+   ], 
+   "VpcId": "vpc-925131f4"
+  }, 
+  {
+   "CidrBlock": "172.31.0.0/16", 
+   "CidrBlockAssociationSet": [
+    {
+     "AssociationId": "vpc-cidr-assoc-67602a0e", 
+     "CidrBlock": "172.31.0.0/16", 
+     "CidrBlockState": {
+      "State": "associated"
+     }
+    }
+   ], 
+   "DhcpOptionsId": "dopt-5870b93d", 
+   "InstanceTenancy": "default", 
+   "IsDefault": true, 
+   "State": "available", 
+   "VpcId": "vpc-f8fad69d"
+  }, 
+  {
+   "CidrBlock": "10.100.0.0/16", 
+   "CidrBlockAssociationSet": [
+    {
+     "AssociationId": "vpc-cidr-assoc-222ecd49", 
+     "CidrBlock": "10.100.0.0/16", 
+     "CidrBlockState": {
+      "State": "associated"
+     }
+    }
+   ], 
+   "DhcpOptionsId": "dopt-5870b93d", 
+   "InstanceTenancy": "default", 
+   "IsDefault": false, 
+   "State": "available", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "GNS3-BGP-Test"
+    }
+   ], 
+   "VpcId": "vpc-815775e7"
+  }
+ ]
+}

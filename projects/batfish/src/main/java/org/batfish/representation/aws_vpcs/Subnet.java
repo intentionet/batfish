@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
@@ -61,12 +61,17 @@ public class Subnet implements AwsVpcEntity, Serializable {
 
   private RouteTable findMyRouteTable(Map<String, RouteTable> routeTables) {
     // All route tables for this VPC.
-    Stream<RouteTable> sameVpcTables =
-        routeTables.values().stream().filter((RouteTable rt) -> rt.getVpcId().equals(_vpcId));
+    List<RouteTable> sameVpcTables =
+        routeTables
+            .values()
+            .stream()
+            .filter((RouteTable rt) -> rt.getVpcId().equals(_vpcId))
+            .collect(Collectors.toList());
 
     // First we look for the unique route table with an association for this subnet.
     List<RouteTable> matchingRouteTables =
         sameVpcTables
+            .stream()
             .filter(
                 (RouteTable rt) ->
                     rt.getAssociations()
@@ -90,6 +95,7 @@ public class Subnet implements AwsVpcEntity, Serializable {
     // If no route table has an association with this subnet, find the unique main routing table.
     List<RouteTable> mainRouteTables =
         sameVpcTables
+            .stream()
             .filter(
                 (RouteTable rt) ->
                     rt.getAssociations().stream().anyMatch(RouteTableAssociation::isMain))
@@ -132,12 +138,13 @@ public class Subnet implements AwsVpcEntity, Serializable {
 
   public Configuration toConfigurationNode(AwsVpcConfiguration awsVpcConfiguration) {
     Configuration cfgNode = new Configuration(_subnetId);
+    cfgNode.setConfigurationFormat(ConfigurationFormat.AWS_VPC);
 
     // add one interface that faces the instances
     String instancesIfaceName = _subnetId;
     Interface instancesIface = new Interface(instancesIfaceName, cfgNode);
     cfgNode.getInterfaces().put(instancesIfaceName, instancesIface);
-    cfgNode.getDefaultVrf().getInterfaces().put(instancesIfaceName, instancesIface);
+    cfgNode.initDefaultVrf().getInterfaces().put(instancesIfaceName, instancesIface);
     Prefix instancesIfacePrefix =
         new Prefix(_cidrBlock.getEndAddress(), _cidrBlock.getPrefixLength());
     instancesIface.setPrefix(instancesIfacePrefix);
@@ -159,10 +166,11 @@ public class Subnet implements AwsVpcEntity, Serializable {
 
     // add the interface to the vpc router
     Configuration vpcConfigNode = awsVpcConfiguration.getConfigurationNodes().get(_vpcId);
+    vpcConfigNode.setConfigurationFormat(ConfigurationFormat.AWS_VPC);
     String vpcIfaceName = _subnetId;
     Interface vpcIface = new Interface(vpcIfaceName, vpcConfigNode);
     vpcConfigNode.getInterfaces().put(vpcIfaceName, vpcIface);
-    vpcConfigNode.getDefaultVrf().getInterfaces().put(vpcIfaceName, vpcIface);
+    vpcConfigNode.initDefaultVrf().getInterfaces().put(vpcIfaceName, vpcIface);
     vpcIface.getAllPrefixes().add(vpcIfacePrefix);
     vpcIface.setPrefix(vpcIfacePrefix);
     // add a static route on the vpc router for this subnet

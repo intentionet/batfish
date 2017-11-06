@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
@@ -108,6 +109,7 @@ public class Instance implements AwsVpcEntity, Serializable {
     String sgIngressAclName = "~SECURITY_GROUP_INGRESS_ACL~";
     String sgEgressAclName = "~SECURITY_GROUP_EGRESS_ACL~";
     Configuration cfgNode = new Configuration(_instanceId);
+    cfgNode.setConfigurationFormat(ConfigurationFormat.AWS_VPC);
 
     List<IpAccessListLine> inboundRules = new LinkedList<>();
     List<IpAccessListLine> outboundRules = new LinkedList<>();
@@ -164,7 +166,7 @@ public class Instance implements AwsVpcEntity, Serializable {
       iface.setIncomingFilter(inAcl);
       iface.setOutgoingFilter(outAcl);
       cfgNode.getInterfaces().put(interfaceId, iface);
-      cfgNode.getDefaultVrf().getInterfaces().put(interfaceId, iface);
+      cfgNode.initDefaultVrf().getInterfaces().put(interfaceId, iface);
     }
 
     return cfgNode;

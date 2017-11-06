@@ -211,7 +211,7 @@ public class BdpDataPlanePluginTest {
     Configuration c =
         BatfishTestUtils.createTestConfiguration(hostname, ConfigurationFormat.CISCO_IOS);
     BgpProcess proc = new BgpProcess();
-    c.getVrfs().computeIfAbsent(Configuration.DEFAULT_VRF_NAME, Vrf::new).setBgpProcess(proc);
+    c.initDefaultVrf().setBgpProcess(proc);
     Map<String, Node> nodes = new HashMap<String, Node>();
     Node node = new Node(c, nodes);
     nodes.put(hostname, node);

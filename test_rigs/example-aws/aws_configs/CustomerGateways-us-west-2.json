@@ -1,0 +1,17 @@
+{
+ "CustomerGateways": [
+  {
+   "BgpAsn": "65301", 
+   "CustomerGatewayId": "cgw-fb76ace5", 
+   "IpAddress": "147.75.69.27", 
+   "State": "available", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "lhr-border-02"
+    }
+   ], 
+   "Type": "ipsec.1"
+  }
+ ]
+}

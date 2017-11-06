@@ -1,0 +1,21 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.datamodel.answers.ParseVendorConfigurationAnswerElement",
+      "version" : "0.32.0"
+    },
+    {
+      "class" : "org.batfish.datamodel.answers.ConvertConfigurationAnswerElement",
+      "version" : "0.32.0"
+    },
+    {
+      "class" : "org.batfish.datamodel.answers.InitInfoAnswerElement"
+    }
+  ],
+  "status" : "SUCCESS",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}

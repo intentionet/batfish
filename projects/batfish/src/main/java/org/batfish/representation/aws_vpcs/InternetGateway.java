@@ -48,17 +48,18 @@ public class InternetGateway implements AwsVpcEntity, Serializable {
       Prefix igwIfacePrefix = awsVpcConfiguration.getNextGeneratedLinkSubnet();
       igwIface.setPrefix(igwIfacePrefix);
       cfgNode.getInterfaces().put(igwIfaceName, igwIface);
-      cfgNode.getDefaultVrf().getInterfaces().put(igwIfaceName, igwIface);
+      cfgNode.initDefaultVrf().getInterfaces().put(igwIfaceName, igwIface);
 
       // add the interface to the vpc router
       Configuration vpcConfigNode = awsVpcConfiguration.getConfigurationNodes().get(vpcId);
+      vpcConfigNode.setConfigurationFormat(ConfigurationFormat.AWS_VPC);
       String vpcIfaceName = _internetGatewayId;
       Interface vpcIface = new Interface(vpcIfaceName, vpcConfigNode);
       Ip vpcIfaceIp = igwIfacePrefix.getEndAddress();
       Prefix vpcIfacePrefix = new Prefix(vpcIfaceIp, igwIfacePrefix.getPrefixLength());
       vpcIface.setPrefix(vpcIfacePrefix);
       vpcConfigNode.getInterfaces().put(vpcIfaceName, vpcIface);
-      vpcConfigNode.getDefaultVrf().getInterfaces().put(vpcIfaceName, vpcIface);
+      vpcConfigNode.initDefaultVrf().getInterfaces().put(vpcIfaceName, vpcIface);
 
       // associate this gateway with the vpc
       awsVpcConfiguration.getVpcs().get(vpcId).setInternetGatewayId(_internetGatewayId);

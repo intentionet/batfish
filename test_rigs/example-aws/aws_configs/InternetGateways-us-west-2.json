@@ -1,0 +1,39 @@
+{
+ "InternetGateways": [
+  {
+   "Attachments": [
+    {
+     "State": "available", 
+     "VpcId": "vpc-925131f4"
+    }
+   ], 
+   "InternetGatewayId": "igw-fac5839d", 
+   "Tags": []
+  }, 
+  {
+   "Attachments": [
+    {
+     "State": "available", 
+     "VpcId": "vpc-f8fad69d"
+    }
+   ], 
+   "InternetGatewayId": "igw-068fee63", 
+   "Tags": []
+  }, 
+  {
+   "Attachments": [
+    {
+     "State": "available", 
+     "VpcId": "vpc-b390fad5"
+    }
+   ], 
+   "InternetGatewayId": "igw-9b93ddfc", 
+   "Tags": [
+    {
+     "Key": "Name", 
+     "Value": "Arista Demo"
+    }
+   ]
+  }
+ ]
+}

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.batfish.common.BatfishLogger;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
@@ -42,6 +43,7 @@ public class VpnGateway implements AwsVpcEntity, Serializable {
 
   public Configuration toConfigurationNode(AwsVpcConfiguration awsVpcConfiguration) {
     Configuration cfgNode = new Configuration(_vpnGatewayId);
+    cfgNode.setConfigurationFormat(ConfigurationFormat.AWS_VPC);
 
     for (String vpcId : _attachmentVpcIds) {
 
@@ -50,17 +52,18 @@ public class VpnGateway implements AwsVpcEntity, Serializable {
       Prefix vgwIfacePrefix = awsVpcConfiguration.getNextGeneratedLinkSubnet();
       vgwIface.setPrefix(vgwIfacePrefix);
       cfgNode.getInterfaces().put(vgwIfaceName, vgwIface);
-      cfgNode.getDefaultVrf().getInterfaces().put(vgwIfaceName, vgwIface);
+      cfgNode.initDefaultVrf().getInterfaces().put(vgwIfaceName, vgwIface);
 
       // add the interface to the vpc router
       Configuration vpcConfigNode = awsVpcConfiguration.getConfigurationNodes().get(vpcId);
+      vpcConfigNode.setConfigurationFormat(ConfigurationFormat.AWS_VPC);
       String vpcIfaceName = _vpnGatewayId;
       Interface vpcIface = new Interface(vpcIfaceName, vpcConfigNode);
       Ip vpcIfaceIp = vgwIfacePrefix.getEndAddress();
       Prefix vpcIfacePrefix = new Prefix(vpcIfaceIp, vgwIfacePrefix.getPrefixLength());
       vpcIface.setPrefix(vpcIfacePrefix);
       vpcConfigNode.getInterfaces().put(vpcIfaceName, vpcIface);
-      vpcConfigNode.getDefaultVrf().getInterfaces().put(vpcIfaceName, vpcIface);
+      vpcConfigNode.initDefaultVrf().getInterfaces().put(vpcIfaceName, vpcIface);
 
       // associate this gateway with the vpc
       awsVpcConfiguration.getVpcs().get(vpcId).setVpnGatewayId(_vpnGatewayId);
