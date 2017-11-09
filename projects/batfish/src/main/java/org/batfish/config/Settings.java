@@ -457,6 +457,12 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
   private static final String ARG_SERVICE_PORT = "serviceport";
 
+  private static final String ARG_TRACING_AGENT_HOST = "tracingagenthost";
+
+  private static final String ARG_TRACING_AGENT_PORT = "tracingagentport";
+
+  public static final String ARG_TRACING_ENABLE = "tracingenable";
+
   private static final String ARG_THROW_ON_LEXER_ERROR = "throwlexer";
 
   private static final String ARG_THROW_ON_PARSER_ERROR = "throwparser";
@@ -664,6 +670,12 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
   private boolean _throwOnParserError;
 
   private boolean _timestamp;
+
+  private String _tracingAgentHost;
+
+  private Integer _tracingAgentPort;
+
+  private boolean _tracingEnable;
 
   private boolean _unimplementedAsError;
 
@@ -1038,6 +1050,18 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     return _timestamp;
   }
 
+  public Integer getTracingAgentPort() {
+    return _tracingAgentPort;
+  }
+
+  public String getTracingAgentHost() {
+    return _tracingAgentHost;
+  }
+
+  public boolean getTracingEnable() {
+    return _tracingEnable;
+  }
+
   public boolean getUnimplementedAsError() {
     return _unimplementedAsError;
   }
@@ -1141,6 +1165,9 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     setDefaultProperty(ARG_THROW_ON_LEXER_ERROR, true);
     setDefaultProperty(ARG_THROW_ON_PARSER_ERROR, true);
     setDefaultProperty(ARG_TIMESTAMP, false);
+    setDefaultProperty(ARG_TRACING_AGENT_HOST, "localhost");
+    setDefaultProperty(ARG_TRACING_AGENT_PORT, 5775);
+    setDefaultProperty(ARG_TRACING_ENABLE, false);
     setDefaultProperty(BfConsts.ARG_UNRECOGNIZED_AS_RED_FLAG, true);
     setDefaultProperty(BfConsts.ARG_UNIMPLEMENTED_AS_ERROR, false);
     setDefaultProperty(BfConsts.ARG_UNIMPLEMENTED_SUPPRESS, true);
@@ -1385,6 +1412,11 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
     addBooleanOption(ARG_TIMESTAMP, "print timestamps in log messages");
 
+    addOption(ARG_TRACING_AGENT_HOST, "jaeger agent host", "jaeger_agent_host");
+
+    addOption(ARG_TRACING_AGENT_PORT, "jaeger agent port", "jaeger_agent_port");
+
+    addBooleanOption(ARG_TRACING_ENABLE, "enable tracing");
     addBooleanOption(
         BfConsts.ARG_UNIMPLEMENTED_AS_ERROR,
         "throws "
@@ -1521,6 +1553,9 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     _throwOnLexerError = getBooleanOptionValue(ARG_THROW_ON_LEXER_ERROR);
     _throwOnParserError = getBooleanOptionValue(ARG_THROW_ON_PARSER_ERROR);
     _timestamp = getBooleanOptionValue(ARG_TIMESTAMP);
+    _tracingAgentHost = getStringOptionValue(ARG_TRACING_AGENT_HOST);
+    _tracingAgentPort = getIntegerOptionValue(ARG_TRACING_AGENT_PORT);
+    _tracingEnable = getBooleanOptionValue(ARG_TRACING_ENABLE);
     _unimplementedAsError = getBooleanOptionValue(BfConsts.ARG_UNIMPLEMENTED_AS_ERROR);
     _unimplementedRecord = !getBooleanOptionValue(BfConsts.ARG_UNIMPLEMENTED_SUPPRESS);
     _unrecognizedAsRedFlag = getBooleanOptionValue(BfConsts.ARG_UNRECOGNIZED_AS_RED_FLAG);

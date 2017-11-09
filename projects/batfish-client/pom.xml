@@ -23,7 +23,12 @@
               <goals><goal>analyze-only</goal></goals>
               <configuration>
                 <ignoredUnusedDeclaredDependencies>
-                  org.slf4j:slf4j-jdk14
+                  <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-jdk14
+                  </ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>io.opentracing:opentracing-api
+                  </ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>io.opentracing:opentracing-util
+                  </ignoredUnusedDeclaredDependency>
                 </ignoredUnusedDeclaredDependencies>
               </configuration>
             </execution>
@@ -73,6 +78,26 @@
     <dependency>
       <groupId>com.kjetland</groupId>
       <artifactId>mbknor-jackson-jsonschema_2.12</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.uber.jaeger</groupId>
+      <artifactId>jaeger-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentracing.contrib</groupId>
+      <artifactId>opentracing-jaxrs2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentracing</groupId>
+      <artifactId>opentracing-util</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentracing</groupId>
+      <artifactId>opentracing-api</artifactId>
     </dependency>
 
     <dependency>

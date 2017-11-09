@@ -26,8 +26,15 @@
               </goals>
               <configuration>
                 <ignoredUnusedDeclaredDependencies>
-                  <ignoredUnusedDeclaredDependency>org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2</ignoredUnusedDeclaredDependency>
-                  <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-jdk14</ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>
+                    org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2
+                  </ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-jdk14
+                  </ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>io.opentracing:opentracing-api
+                  </ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>io.opentracing:opentracing-util
+                  </ignoredUnusedDeclaredDependency>
                 </ignoredUnusedDeclaredDependencies>
               </configuration>
             </execution>
@@ -96,6 +103,26 @@
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.uber.jaeger</groupId>
+      <artifactId>jaeger-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentracing.contrib</groupId>
+      <artifactId>opentracing-jaxrs2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentracing</groupId>
+      <artifactId>opentracing-util</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.opentracing</groupId>
+      <artifactId>opentracing-api</artifactId>
     </dependency>
 
     <dependency>

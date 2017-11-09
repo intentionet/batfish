@@ -2,6 +2,11 @@ package org.batfish.main;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.uber.jaeger.Configuration.ReporterConfiguration;
+import com.uber.jaeger.Configuration.SamplerConfiguration;
+import com.uber.jaeger.samplers.ProbabilisticSampler;
+import io.opentracing.contrib.jaxrs2.server.ServerTracingDynamicFeature;
+import io.opentracing.util.GlobalTracer;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,47 +59,30 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 public class Driver {
 
-  private static boolean _idle = true;
-
-  private static Date _lastPollFromCoordinator = new Date();
-
-  private static BatfishLogger _mainLogger = null;
-
-  private static Settings _mainSettings = null;
-
-  private static ConcurrentMap<String, Task> _taskLog;
-
+  private static final int COORDINATOR_POLL_CHECK_INTERVAL_MS = 1 * 60 * 1000;
+  private static final int COORDINATOR_POLL_TIMEOUT_MS = 30 * 1000;
+  private static final int COORDINATOR_REGISTRATION_RETRY_INTERVAL_MS = 1 * 1000; // 1
+  private static final int MAX_CACHED_DATA_PLANES = 2;
   private static final Cache<TestrigSettings, DataPlane> CACHED_DATA_PLANES = buildDataPlaneCache();
-
+  private static final int MAX_CACHED_ENVIRONMENT_BGP_TABLES = 4;
   private static final Map<EnvironmentSettings, SortedMap<String, BgpAdvertisementsByVrf>>
       CACHED_ENVIRONMENT_BGP_TABLES = buildEnvironmentBgpTablesCache();
-
+  private static final int MAX_CACHED_ENVIRONMENT_ROUTING_TABLES = 4;
   private static final Map<EnvironmentSettings, SortedMap<String, RoutesByVrf>>
       CACHED_ENVIRONMENT_ROUTING_TABLES = buildEnvironmentRoutingTablesCache();
-
+  private static final int MAX_CACHED_TESTRIGS = 5;
   private static final Cache<TestrigSettings, SortedMap<String, Configuration>> CACHED_TESTRIGS =
       buildTestrigCache();
-
-  private static final int COORDINATOR_POLL_CHECK_INTERVAL_MS = 1 * 60 * 1000;
-
-  private static final int COORDINATOR_POLL_TIMEOUT_MS = 30 * 1000;
-
-  private static final int COORDINATOR_REGISTRATION_RETRY_INTERVAL_MS = 1 * 1000; // 1
-  // second
-
   static Logger httpServerLogger =
       Logger.getLogger(org.glassfish.grizzly.http.server.HttpServer.class.getName());
-
-  private static final int MAX_CACHED_DATA_PLANES = 2;
-
-  private static final int MAX_CACHED_ENVIRONMENT_BGP_TABLES = 4;
-
-  private static final int MAX_CACHED_ENVIRONMENT_ROUTING_TABLES = 4;
-
-  private static final int MAX_CACHED_TESTRIGS = 5;
-
+  // second
   static Logger networkListenerLogger =
       Logger.getLogger("org.glassfish.grizzly.http.server.NetworkListener");
+  private static boolean _idle = true;
+  private static Date _lastPollFromCoordinator = new Date();
+  private static BatfishLogger _mainLogger = null;
+  private static Settings _mainSettings = null;
+  private static ConcurrentMap<String, Task> _taskLog;
 
   private static synchronized Cache<TestrigSettings, DataPlane> buildDataPlaneCache() {
     return CacheBuilder.newBuilder().maximumSize(MAX_CACHED_DATA_PLANES).weakValues().build();
@@ -160,6 +148,23 @@ public class Driver {
     }
   }
 
+  private static void initTracer() {
+    GlobalTracer.register(
+        new com.uber.jaeger.Configuration(
+                BfConsts.PROP_WORKER_SERVICE,
+                new SamplerConfiguration(ProbabilisticSampler.TYPE, 1),
+                new ReporterConfiguration(
+                    false,
+                    _mainSettings.getTracingAgentHost(),
+                    _mainSettings.getTracingAgentPort(),
+                    1000,
+                    // flush internal in ms
+                    10000)
+                // max buffered Spans
+                )
+            .getTracer());
+  }
+
   public static void main(String[] args) {
     mainInit(args);
     _mainLogger =
@@ -197,12 +202,17 @@ public class Driver {
     System.setOut(_mainLogger.getPrintStream());
     _mainSettings.setLogger(_mainLogger);
     if (_mainSettings.runInServiceMode()) {
-
+      if (_mainSettings.getTracingEnable() && !GlobalTracer.isRegistered()) {
+        initTracer();
+      }
       String protocol = _mainSettings.getSslDisable() ? "http" : "https";
       String baseUrl = String.format("%s://%s", protocol, _mainSettings.getServiceBindHost());
       URI baseUri = UriBuilder.fromUri(baseUrl).port(_mainSettings.getServicePort()).build();
       _mainLogger.debug(String.format("Starting server at %s\n", baseUri));
       ResourceConfig rc = new ResourceConfig(Service.class).register(new JettisonFeature());
+      if (_mainSettings.getTracingEnable()) {
+        rc.register(ServerTracingDynamicFeature.class);
+      }
       try {
         if (_mainSettings.getSslDisable()) {
           GrizzlyHttpServerFactory.createHttpServer(baseUri, rc);

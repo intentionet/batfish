@@ -173,4 +173,9 @@ public class BfConsts {
   public static final String SVC_SUCCESS_KEY = "success";
   public static final String SVC_TASK_KEY = "task";
   public static final String SVC_TASKID_KEY = "taskid";
+
+  public static final String PROP_ALLINONE_SERVICE = "batfish-allinone";
+  public static final String PROP_CLIENT_SERVICE = "batfish-client";
+  public static final String PROP_COORDINATOR_SERVICE = "batfish-coordinator";
+  public static final String PROP_WORKER_SERVICE = "batfish-worker";
 }

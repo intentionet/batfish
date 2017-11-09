@@ -19,6 +19,9 @@ public class Settings extends BaseSettings {
   private static final String ARG_RUN_CLIENT = "runclient";
   private static final String ARG_RUN_MODE = org.batfish.client.config.Settings.ARG_RUN_MODE;
   private static final String ARG_TESTRIG_DIR = org.batfish.client.config.Settings.ARG_TESTRIG_DIR;
+  private static final String ARG_TRACING_AGENT_HOST = "tracingagenthost";
+  private static final String ARG_TRACING_AGENT_PORT = "tracingagentport";
+  private static final String ARG_TRACING_ENABLE = "tracingenable";
   private static final String ARG_VERSION = "version";
 
   private static final String EXECUTABLE_NAME = "allinone";
@@ -32,6 +35,9 @@ public class Settings extends BaseSettings {
   private boolean _runClient;
   private String _runMode;
   private String _testrigDir;
+  private String _tracingAgentHost;
+  private Integer _tracingAgentPort;
+  private boolean _tracingEnable;
 
   public Settings(String[] args) throws Exception {
     super(
@@ -82,6 +88,18 @@ public class Settings extends BaseSettings {
     return _testrigDir;
   }
 
+  public Integer getTracingAgentPort() {
+    return _tracingAgentPort;
+  }
+
+  public String getTracingAgentHost() {
+    return _tracingAgentHost;
+  }
+
+  public boolean getTracingEnable() {
+    return _tracingEnable;
+  }
+
   private void initConfigDefaults() {
     // setDefaultProperty(ARG_COMMAND_FILE,
     // Paths.get(org.batfish.common.Util.getJarOrClassDir(
@@ -95,6 +113,9 @@ public class Settings extends BaseSettings {
     setDefaultProperty(ARG_COORDINATOR_ARGS, "");
     setDefaultProperty(ARG_RUN_CLIENT, true);
     setDefaultProperty(ARG_RUN_MODE, "batch");
+    setDefaultProperty(ARG_TRACING_AGENT_HOST, "localhost");
+    setDefaultProperty(ARG_TRACING_AGENT_PORT, 5775);
+    setDefaultProperty(ARG_TRACING_ENABLE, false);
     setDefaultProperty(ARG_VERSION, false);
   }
 
@@ -121,6 +142,12 @@ public class Settings extends BaseSettings {
 
     addOption(ARG_TESTRIG_DIR, "where the testrig sits", "testrig_dir");
 
+    addOption(ARG_TRACING_AGENT_HOST, "jaeger agent host", "jaeger_agent_host");
+
+    addOption(ARG_TRACING_AGENT_PORT, "jaeger agent port", "jaeger_agent_port");
+
+    addBooleanOption(ARG_TRACING_ENABLE, "enable tracing");
+
     addBooleanOption(ARG_VERSION, "print the version number of the code and exit");
   }
 
@@ -146,5 +173,8 @@ public class Settings extends BaseSettings {
     _runClient = getBooleanOptionValue(ARG_RUN_CLIENT);
     _runMode = getStringOptionValue(ARG_RUN_MODE);
     _testrigDir = getStringOptionValue(ARG_TESTRIG_DIR);
+    _tracingAgentHost = getStringOptionValue(ARG_TRACING_AGENT_HOST);
+    _tracingAgentPort = getIntegerOptionValue(ARG_TRACING_AGENT_PORT);
+    _tracingEnable = getBooleanOptionValue(ARG_TRACING_ENABLE);
   }
 }

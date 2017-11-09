@@ -61,6 +61,10 @@ public class Settings extends BaseSettings {
   private static final String ARG_STORAGE_ACCOUNT_NAME = "storageaccountname";
   private static final String ARG_STORAGE_PROTOCOL = "storageprotocol";
 
+  private static final String ARG_TRACING_AGENT_HOST = "tracingagenthost";
+  private static final String ARG_TRACING_AGENT_PORT = "tracingagentport";
+  public static final String ARG_TRACING_ENABLE = "tracingenable";
+
   private static final String ARG_WORK_BIND_HOST = "workbindhost";
 
   private static final String ARGNAME_PATHS = "path..";
@@ -104,6 +108,9 @@ public class Settings extends BaseSettings {
   private String _storageAccountKey;
   private String _storageAccountName;
   private String _storageProtocol;
+  private String _tracingAgentHost;
+  private Integer _tracingAgentPort;
+  private boolean _tracingEnable;
   private String _workBindHost;
 
   public Settings(String[] args) throws Exception {
@@ -267,6 +274,18 @@ public class Settings extends BaseSettings {
     return _storageProtocol;
   }
 
+  public Integer getTracingAgentPort() {
+    return _tracingAgentPort;
+  }
+
+  public String getTracingAgentHost() {
+    return _tracingAgentHost;
+  }
+
+  public boolean getTracingEnable() {
+    return _tracingEnable;
+  }
+
   public String getWorkBindHost() {
     return _workBindHost;
   }
@@ -311,6 +330,9 @@ public class Settings extends BaseSettings {
     setDefaultProperty(ARG_SSL_WORK_TRUST_ALL_CERTS, true);
     setDefaultProperty(ARG_SSL_WORK_TRUSTSTORE_FILE, null);
     setDefaultProperty(ARG_SSL_WORK_TRUSTSTORE_PASSWORD, null);
+    setDefaultProperty(ARG_TRACING_AGENT_HOST, "localhost");
+    setDefaultProperty(ARG_TRACING_AGENT_PORT, 5775);
+    setDefaultProperty(ARG_TRACING_ENABLE, false);
     // setDefaultProperty(ARG_SSL_KEYSTORE_FILE, "selfsigned.jks");
     // setDefaultProperty(ARG_SSL_KEYSTORE_PASSWORD, "batfish");
     setDefaultProperty(
@@ -389,6 +411,12 @@ public class Settings extends BaseSettings {
     addBooleanOption(
         ARG_SSL_WORK_TRUST_ALL_CERTS,
         "trust all SSL certs for outgoing connections from work manager");
+
+    addOption(ARG_TRACING_AGENT_HOST, "jaeger agent host", "jaeger_agent_host");
+
+    addOption(ARG_TRACING_AGENT_PORT, "jaeger agent port", "jaeger_agent_port");
+
+    addBooleanOption(ARG_TRACING_ENABLE, "enable tracing");
   }
 
   private void parseCommandLine(String[] args) {
@@ -431,6 +459,9 @@ public class Settings extends BaseSettings {
     _storageAccountKey = getStringOptionValue(ARG_STORAGE_ACCOUNT_KEY);
     _storageAccountName = getStringOptionValue(ARG_STORAGE_ACCOUNT_NAME);
     _storageProtocol = getStringOptionValue(ARG_STORAGE_PROTOCOL);
+    _tracingAgentHost = getStringOptionValue(ARG_TRACING_AGENT_HOST);
+    _tracingAgentPort = getIntegerOptionValue(ARG_TRACING_AGENT_PORT);
+    _tracingEnable = getBooleanOptionValue(ARG_TRACING_ENABLE);
     _containersLocation = getPathOptionValue(ARG_CONTAINERS_LOCATION);
     _periodWorkerStatusRefreshMs = getLongOptionValue(ARG_PERIOD_WORKER_STATUS_REFRESH_MS);
     _periodAssignWorkMs = getLongOptionValue(ARG_PERIOD_ASSIGN_WORK_MS);

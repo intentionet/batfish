@@ -9,34 +9,28 @@ import org.batfish.common.util.CommonUtil;
 
 public class Settings extends BaseSettings {
 
-  public enum RunMode {
-    batch,
-    gendatamodel,
-    genquestions,
-    interactive
-  }
-
-  private static final String ARG_API_KEY = "apikey";
   public static final String ARG_BATFISH_LOG_LEVEL = "batfishloglevel";
   public static final String ARG_COMMAND_FILE = "cmdfile";
   public static final String ARG_CONTAINER_ID = "containerid";
   public static final String ARG_COORDINATOR_HOST = "coordinatorhost";
   public static final String ARG_DATAMODEL_DIR = "datamodeldir";
-  private static final String ARG_HELP = "help";
   public static final String ARG_LOG_FILE = "logfile";
   public static final String ARG_LOG_LEVEL = "loglevel";
+  public static final String ARG_QUESTIONS_DIR = "questionsdir";
+  public static final String ARG_RUN_MODE = "runmode";
+  public static final String ARG_TESTRIG_DIR = "testrigdir";
+  public static final String ARG_TESTRIG_ID = "testrigid";
+  public static final String ARG_TRACING_ENABLE = "tracingenable";
+  private static final String ARG_API_KEY = "apikey";
+  private static final String ARG_HELP = "help";
   private static final String ARG_NO_SANITY_CHECK = "nosanitycheck";
   private static final String ARG_PERIOD_CHECK_WORK = "periodcheckworkms";
   private static final String ARG_PRETTY_PRINT_ANSWERS = "prettyanswers";
-  public static final String ARG_QUESTIONS_DIR = "questionsdir";
-  public static final String ARG_RUN_MODE = "runmode";
   private static final String ARG_SERVICE_POOL_PORT = "coordinatorpoolport";
   private static final String ARG_SERVICE_WORK_PORT = "coordinatorworkport";
-  public static final String ARG_TESTRIG_DIR = "testrigdir";
-  public static final String ARG_TESTRIG_ID = "testrigid";
-
+  private static final String ARG_TRACING_AGENT_HOST = "tracingagenthost";
+  private static final String ARG_TRACING_AGENT_PORT = "tracingagentport";
   private static final String EXECUTABLE_NAME = "batfish_client";
-
   private String _apiKey;
   private String _batchCommandFile;
   private String _batfishLogLevel;
@@ -50,7 +44,6 @@ public class Settings extends BaseSettings {
   private long _periodCheckWorkMs;
   private boolean _prettyPrintAnswers;
   private String _questionsDir;
-
   private RunMode _runMode;
   private boolean _sanityCheck;
   private boolean _sslDisable;
@@ -61,6 +54,9 @@ public class Settings extends BaseSettings {
   private String _sslTruststorePassword;
   private String _testrigDir;
   private String _testrigId;
+  private String _tracingAgentHost;
+  private Integer _tracingAgentPort;
+  private boolean _tracingEnable;
 
   public Settings(String[] args) throws Exception {
     super(
@@ -85,6 +81,10 @@ public class Settings extends BaseSettings {
 
   public String getBatfishLogLevel() {
     return _batfishLogLevel;
+  }
+
+  public void setBatfishLogLevel(String logLevel) {
+    _batfishLogLevel = logLevel;
   }
 
   public String getContainerId() {
@@ -115,12 +115,20 @@ public class Settings extends BaseSettings {
     return _logLevel;
   }
 
+  public void setLogLevel(String logLevel) {
+    _logLevel = logLevel;
+  }
+
   public long getPeriodCheckWorkMs() {
     return _periodCheckWorkMs;
   }
 
   public boolean getPrettyPrintAnswers() {
     return _prettyPrintAnswers;
+  }
+
+  public void setPrettyPrintAnswers(boolean prettyPrint) {
+    _prettyPrintAnswers = prettyPrint;
   }
 
   public String getQuestionsDir() {
@@ -139,24 +147,48 @@ public class Settings extends BaseSettings {
     return _sslDisable;
   }
 
+  public void setSslDisable(boolean sslDisable) {
+    _sslDisable = sslDisable;
+  }
+
   public Path getSslKeystoreFile() {
     return _sslKeystoreFile;
+  }
+
+  public void setSslKeystoreFile(Path sslKeystoreFile) {
+    _sslKeystoreFile = sslKeystoreFile;
   }
 
   public String getSslKeystorePassword() {
     return _sslKeystorePassword;
   }
 
+  public void setSslKeystorePassword(String sslKeystorePassword) {
+    _sslKeystorePassword = sslKeystorePassword;
+  }
+
   public boolean getSslTrustAllCerts() {
     return _sslTrustAllCerts;
+  }
+
+  public void setSslTrustAllCerts(boolean sslTrustAllCerts) {
+    _sslTrustAllCerts = sslTrustAllCerts;
   }
 
   public Path getSslTruststoreFile() {
     return _sslTruststoreFile;
   }
 
+  public void setSslTruststoreFile(Path sslTruststoreFile) {
+    _sslTruststoreFile = sslTruststoreFile;
+  }
+
   public String getSslTruststorePassword() {
     return _sslTruststorePassword;
+  }
+
+  public void setSslTruststorePassword(String sslTruststorePassword) {
+    _sslTruststorePassword = sslTruststorePassword;
   }
 
   public String getTestrigDir() {
@@ -165,6 +197,18 @@ public class Settings extends BaseSettings {
 
   public String getTestrigId() {
     return _testrigId;
+  }
+
+  public Integer getTracingAgentPort() {
+    return _tracingAgentPort;
+  }
+
+  public String getTracingAgentHost() {
+    return _tracingAgentHost;
+  }
+
+  public boolean getTracingEnable() {
+    return _tracingEnable;
   }
 
   private void initConfigDefaults() {
@@ -190,6 +234,9 @@ public class Settings extends BaseSettings {
     setDefaultProperty(BfConsts.ARG_SSL_TRUST_ALL_CERTS, false);
     setDefaultProperty(BfConsts.ARG_SSL_TRUSTSTORE_FILE, null);
     setDefaultProperty(BfConsts.ARG_SSL_TRUSTSTORE_PASSWORD, null);
+    setDefaultProperty(ARG_TRACING_AGENT_HOST, "localhost");
+    setDefaultProperty(ARG_TRACING_AGENT_PORT, 5775);
+    setDefaultProperty(ARG_TRACING_ENABLE, false);
   }
 
   private void initOptions() {
@@ -239,6 +286,12 @@ public class Settings extends BaseSettings {
     addOption(ARG_TESTRIG_DIR, "where the testrig sits", "testrig_dir");
 
     addOption(ARG_TESTRIG_ID, "testrig to attach to", "testrig_id");
+
+    addOption(ARG_TRACING_AGENT_HOST, "jaeger agent host", "jaeger_agent_host");
+
+    addOption(ARG_TRACING_AGENT_PORT, "jaeger agent port", "jaeger_agent_port");
+
+    addBooleanOption(ARG_TRACING_ENABLE, "enable tracing");
   }
 
   private void parseCommandLine(String[] args) {
@@ -253,6 +306,9 @@ public class Settings extends BaseSettings {
     _batchCommandFile = getStringOptionValue(ARG_COMMAND_FILE);
     _batfishLogLevel = getStringOptionValue(ARG_BATFISH_LOG_LEVEL);
     _containerId = getStringOptionValue(ARG_CONTAINER_ID);
+    _coordinatorHost = getStringOptionValue(ARG_COORDINATOR_HOST);
+    _coordinatorPoolPort = getIntegerOptionValue(ARG_SERVICE_POOL_PORT);
+    _coordinatorWorkPort = getIntegerOptionValue(ARG_SERVICE_WORK_PORT);
     _datamodelDir = getStringOptionValue(ARG_DATAMODEL_DIR);
     _logFile = getStringOptionValue(ARG_LOG_FILE);
     _logLevel = getStringOptionValue(ARG_LOG_LEVEL);
@@ -270,45 +326,15 @@ public class Settings extends BaseSettings {
 
     _testrigDir = getStringOptionValue(ARG_TESTRIG_DIR);
     _testrigId = getStringOptionValue(ARG_TESTRIG_ID);
-
-    _coordinatorHost = getStringOptionValue(ARG_COORDINATOR_HOST);
-    _coordinatorPoolPort = getIntegerOptionValue(ARG_SERVICE_POOL_PORT);
-    _coordinatorWorkPort = getIntegerOptionValue(ARG_SERVICE_WORK_PORT);
+    _tracingAgentHost = getStringOptionValue(ARG_TRACING_AGENT_HOST);
+    _tracingAgentPort = getIntegerOptionValue(ARG_TRACING_AGENT_PORT);
+    _tracingEnable = getBooleanOptionValue(ARG_TRACING_ENABLE);
   }
 
-  public void setBatfishLogLevel(String logLevel) {
-    _batfishLogLevel = logLevel;
-  }
-
-  public void setLogLevel(String logLevel) {
-    _logLevel = logLevel;
-  }
-
-  public void setPrettyPrintAnswers(boolean prettyPrint) {
-    _prettyPrintAnswers = prettyPrint;
-  }
-
-  public void setSslDisable(boolean sslDisable) {
-    _sslDisable = sslDisable;
-  }
-
-  public void setSslKeystoreFile(Path sslKeystoreFile) {
-    _sslKeystoreFile = sslKeystoreFile;
-  }
-
-  public void setSslKeystorePassword(String sslKeystorePassword) {
-    _sslKeystorePassword = sslKeystorePassword;
-  }
-
-  public void setSslTrustAllCerts(boolean sslTrustAllCerts) {
-    _sslTrustAllCerts = sslTrustAllCerts;
-  }
-
-  public void setSslTruststoreFile(Path sslTruststoreFile) {
-    _sslTruststoreFile = sslTruststoreFile;
-  }
-
-  public void setSslTruststorePassword(String sslTruststorePassword) {
-    _sslTruststorePassword = sslTruststorePassword;
+  public enum RunMode {
+    batch,
+    gendatamodel,
+    genquestions,
+    interactive
   }
 }

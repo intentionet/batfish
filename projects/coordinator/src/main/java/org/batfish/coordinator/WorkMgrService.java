@@ -680,7 +680,6 @@ public class WorkMgrService {
       @FormDataParam(CoordConsts.SVC_KEY_CONTAINER_NAME) String containerName) {
     try {
       _logger.info("WMS:getContainer " + containerName + "\n");
-
       checkStringParam(apiKey, "API key");
       checkStringParam(clientVersion, "Client version");
       checkStringParam(containerName, "Container name");
@@ -698,12 +697,11 @@ public class WorkMgrService {
       }
 
       checkContainerAccessibility(apiKey, containerName);
-
       Container container = Main.getWorkMgr().getContainer(containerDir);
       BatfishObjectMapper mapper = new BatfishObjectMapper();
       String containerString = mapper.writeValueAsString(container);
-
       return Response.ok(containerString).build();
+
     } catch (AccessControlException e) {
       return Response.status(Status.FORBIDDEN)
           .entity(e.getMessage())

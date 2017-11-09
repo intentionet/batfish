@@ -4,6 +4,12 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.nio.file.FileVisitOption.FOLLOW_LINKS;
 
 import com.google.common.collect.Lists;
+import com.uber.jaeger.Configuration;
+import com.uber.jaeger.Configuration.ReporterConfiguration;
+import com.uber.jaeger.Configuration.SamplerConfiguration;
+import com.uber.jaeger.samplers.ProbabilisticSampler;
+import io.opentracing.contrib.jaxrs2.server.ServerTracingDynamicFeature;
+import io.opentracing.util.GlobalTracer;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileVisitResult;
@@ -42,6 +48,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 public class Main {
 
+  static Logger httpServerLogger =
+      Logger.getLogger(org.glassfish.grizzly.http.server.HttpServer.class.getName());
+  static Logger networkListenerLogger =
+      Logger.getLogger("org.glassfish.grizzly.http.server.NetworkListener");
   // These are all @Nullable because they are static and may not be initialized if Main() has not
   // been called.
   private static @Nullable Authorizer _authorizer;
@@ -50,14 +60,13 @@ public class Main {
   private static @Nullable Settings _settings;
   private static @Nullable WorkMgr _workManager;
 
-  static Logger httpServerLogger =
-      Logger.getLogger(org.glassfish.grizzly.http.server.HttpServer.class.getName());
-  static Logger networkListenerLogger =
-      Logger.getLogger("org.glassfish.grizzly.http.server.NetworkListener");
-
   public static Authorizer getAuthorizer() {
     checkState(_authorizer != null, "Error: Authorizer has not been configured");
     return _authorizer;
+  }
+
+  public static void setAuthorizer(Authorizer authorizer) {
+    _authorizer = authorizer;
   }
 
   public static BatfishLogger getLogger() {
@@ -65,9 +74,30 @@ public class Main {
     return _logger;
   }
 
+  public static void setLogger(BatfishLogger logger) {
+    _logger = logger;
+  }
+
   public static PoolMgr getPoolMgr() {
     checkState(_poolManager != null, "Error: Pool Manager has not been configured");
     return _poolManager;
+  }
+
+  private static void initTracer() {
+    GlobalTracer.register(
+        new Configuration(
+                BfConsts.PROP_COORDINATOR_SERVICE,
+                new SamplerConfiguration(ProbabilisticSampler.TYPE, 1),
+                new ReporterConfiguration(
+                    false,
+                    _settings.getTracingAgentHost(),
+                    _settings.getTracingAgentPort(),
+                    1000,
+                    // flush internal in ms
+                    10000)
+                // max buffered Spans
+                )
+            .getTracer());
   }
 
   public static Map<String, String> getQuestionTemplates() {
@@ -145,16 +175,8 @@ public class Main {
     return _workManager;
   }
 
-  public static void setLogger(BatfishLogger logger) {
-    _logger = logger;
-  }
-
   public static void setWorkMgr(WorkMgr workManager) {
     _workManager = workManager;
-  }
-
-  public static void setAuthorizer(Authorizer authorizer) {
-    _authorizer = authorizer;
   }
 
   static void initAuthorizer() throws Exception {
@@ -223,6 +245,9 @@ public class Main {
         new ResourceConfig(serviceClass)
             .register(ExceptionMapper.class)
             .register(CrossDomainFilter.class);
+    if (_settings.getTracingEnable()) {
+      rcWork.register(ServerTracingDynamicFeature.class);
+    }
     for (Class<?> feature : features) {
       rcWork.register(feature);
     }
@@ -301,6 +326,9 @@ public class Main {
     try {
       initAuthorizer();
       initPoolManager();
+      if (_settings.getTracingEnable() && !GlobalTracer.isRegistered()) {
+        initTracer();
+      }
       initWorkManager();
     } catch (Exception e) {
       System.err.println(
