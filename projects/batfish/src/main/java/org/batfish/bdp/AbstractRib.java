@@ -1,10 +1,8 @@
 package org.batfish.bdp;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -211,6 +209,17 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
     }
 
     /**
+     * Adds a route to the collection of routes stored at this node, and the collection of all
+     * routes available in the parent RIB.
+     *
+     * @param route the route to add
+     */
+    private void addRoute(R route) {
+      _routes.add(route);
+      _allRoutes.add(route);
+    }
+
+    /**
      * Takes care of adding new nodes to the tree and maintaining correct pointers.
      *
      * @param parent node that we are trying to merge a route into
@@ -242,7 +251,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
       // for the given route
       if (node == null) {
         node = new RibTreeNode(route.getNetwork());
-        node._routes.add(route);
+        node.addRoute(route);
         // don't forget to assign new node object to parent node
         assignChild(parent, node, rightBranch);
         return true;
@@ -292,7 +301,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
         currentNodeAddressBit = nodeAddressBits.get(nextUnmatchedBit);
         RibTreeNode oldNode = node;
         node = new RibTreeNode(route.getNetwork());
-        node._routes.add(route);
+        node.addRoute(route);
         assignChild(parent, node, rightBranch);
         assignChild(node, oldNode, currentNodeAddressBit);
         return true;
@@ -313,7 +322,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
           new Prefix(route.getNetwork().getAddress(), nextUnmatchedBit).getNetworkPrefix();
       node = new RibTreeNode(newNetwork); // node is the node we are inserting in the middle
       RibTreeNode child = new RibTreeNode(route.getNetwork());
-      child._routes.add(route);
+      child.addRoute(route);
       assignChild(parent, node, rightBranch);
       // child and old node become siblings, children of the newly inserted node
       assignChild(node, child, currentAddressBit);
@@ -332,7 +341,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
 
         // No routes with this prefix, so just add it. No comparison necessary
         if (_routes.isEmpty()) {
-          _routes.add(route);
+          addRoute(route);
           return true;
         }
 
@@ -353,16 +362,17 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
             return false;
           }
           // Otherwise add the route
-          _routes.add(route);
+          addRoute(route);
           return true;
         }
         // Last case, preferenceComparison > 0
         /*
          * Better than all pre-existing routes for this prefix, so
-         * replace them with this one
+         * replace them with this one. Also remove existing routes from allRoutes
          */
+        _allRoutes.removeAll(_routes);
         _routes.clear();
-        _routes.add(route);
+        addRoute(route);
         return true;
       }
       /*
@@ -396,12 +406,12 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
 
   private RibTree _tree;
 
-  @VisibleForTesting Set<R> _finalRoutes;
+  private Set<R> _allRoutes;
 
   public AbstractRib(VirtualRouter owner) {
     _tree = new RibTree();
     _owner = owner;
-    _finalRoutes = null;
+    _allRoutes = new TreeSet<>();
   }
 
   final boolean containsRoute(R route) {
@@ -430,18 +440,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
 
   @Override
   public final Set<R> getRoutes() {
-    if (_finalRoutes != null) {
-      return _finalRoutes;
-    }
-    return _tree.getRoutes();
-  }
-
-  /**
-   * Freeze the RIB. Prevents addition (merging) of new routes. Also computes and caches the set of
-   * all routes for quick subsequent access.
-   */
-  public void freeze() {
-    _finalRoutes = Collections.unmodifiableSet(getRoutes());
+    return _allRoutes;
   }
 
   @Override
@@ -475,9 +474,6 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
    */
   @Override
   public boolean mergeRoute(R route) {
-    if (_finalRoutes != null) {
-      throw new UnmodifiableRibException("Cannot modify frozen RIB");
-    }
     return _tree.mergeRoute(route);
   }
 

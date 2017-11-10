@@ -7,14 +7,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.OspfIntraAreaRoute;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.StaticRoute;
 import org.junit.Before;
@@ -191,16 +190,25 @@ public class AbstractRibTest {
     assertThat(rib2, equalTo(_rib));
   }
 
-  @Test()
-  public void testRibFreeze() {
-    setupOverlappingRoutes();
+  /**
+   * Check that getRoutes works as expected even when routes replace other routes based on
+   * preference
+   */
+  @Test
+  public void testGetRoutesWithReplacement() {
+    // Use OSPF RIBs for this, as routes with better metric can replace other routes
+    OspfIntraAreaRib rib = new OspfIntraAreaRib(null);
+    Prefix prefix = new Prefix("1.1.1.1/32");
+    rib.mergeRoute(new OspfIntraAreaRoute(prefix, null, 100, 30, 1));
 
-    assertThat(_rib._finalRoutes, is(nullValue()));
+    assertThat(rib.getRoutes(), hasSize(1));
+    // This new route replaces old route
+    OspfIntraAreaRoute newRoute = new OspfIntraAreaRoute(prefix, null, 100, 10, 1);
+    rib.mergeRoute(newRoute);
+    assertThat(rib.getRoutes(), contains(newRoute));
 
-    _rib.freeze();
-
-    assertThat(_rib._finalRoutes, is(notNullValue()));
-    _expectedException.expect(UnmodifiableRibException.class);
-    _rib.mergeRoute(_mostGeneralRoute);
+    // Add completely new route and check that the size increases
+    rib.mergeRoute(new OspfIntraAreaRoute(new Prefix("2.2.2.2/32"), null, 100, 30, 1));
+    assertThat(rib.getRoutes(), hasSize(2));
   }
 }

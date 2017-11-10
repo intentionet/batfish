@@ -705,8 +705,6 @@ public class VirtualRouter extends ComparableStructure<String> {
         }
       }
     }
-    // Connected routes will not change
-    _connectedRib.freeze();
   }
 
   private void initEbgpTopology(Map<Ip, Set<String>> ipOwners) {
@@ -858,9 +856,6 @@ public class VirtualRouter extends ComparableStructure<String> {
         _staticRib.mergeRoute(sr);
       }
     }
-    // Given instance of static RIBs should not be changed past this point
-    _staticRib.freeze();
-    _staticInterfaceRib.freeze();
   }
 
   int computeBgpAdvertisementsToOutside(Map<Ip, Set<String>> ipOwners) {
@@ -2001,42 +1996,33 @@ public class VirtualRouter extends ComparableStructure<String> {
    */
   void moveRibs() {
     _prevMainRib = _mainRib;
-    _prevMainRib.freeze();
     _mainRib = new Rib(this);
 
     _prevOspfExternalType1Rib = _ospfExternalType1Rib;
-    _prevOspfExternalType1Rib.freeze();
     _ospfExternalType1Rib = new OspfExternalType1Rib(this);
 
     _prevOspfExternalType2Rib = _ospfExternalType2Rib;
-    _prevOspfExternalType2Rib.freeze();
     _ospfExternalType2Rib = new OspfExternalType2Rib(this);
 
     _prevBgpMultipathRib = _bgpMultipathRib;
-    _prevBgpMultipathRib.freeze();
     _bgpMultipathRib = new BgpMultipathRib(this);
 
     _prevBgpBestPathRib = _bgpBestPathRib;
-    _prevBgpBestPathRib.freeze();
     _bgpBestPathRib = new BgpBestPathRib(this, _prevBgpBestPathRib, true);
 
     _prevEbgpMultipathRib = _ebgpMultipathRib;
-    _prevEbgpMultipathRib.freeze();
     _ebgpMultipathRib = new BgpMultipathRib(this);
     importRib(_ebgpMultipathRib, _baseEbgpRib);
 
     _prevEbgpBestPathRib = _ebgpBestPathRib;
-    _prevEbgpBestPathRib.freeze();
     _ebgpBestPathRib = new BgpBestPathRib(this, _prevEbgpBestPathRib, true);
     importRib(_ebgpBestPathRib, _baseEbgpRib);
 
     _prevIbgpBestPathRib = _ibgpBestPathRib;
-    _prevIbgpBestPathRib.freeze();
     _ibgpBestPathRib = new BgpBestPathRib(this, _prevIbgpBestPathRib, true);
     importRib(_ibgpBestPathRib, _baseIbgpRib);
 
     _prevIbgpMultipathRib = _ibgpMultipathRib;
-    _prevIbgpMultipathRib.freeze();
     _ibgpMultipathRib = new BgpMultipathRib(this);
     importRib(_ibgpMultipathRib, _baseIbgpRib);
   }

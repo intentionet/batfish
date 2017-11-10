@@ -8,7 +8,6 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsEmptyIterable.emptyIterableOf;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -233,9 +232,6 @@ public class VirtualRouterTest {
             new ConnectedRoute(new Prefix("10.1.0.0/16"), "Eth1"),
             new ConnectedRoute(new Prefix("10.2.0.0/16"), "Eth2"),
             new ConnectedRoute(new Prefix("10.3.0.0/16"), "Eth3")));
-
-    // Check that the RIB is frozen
-    assertThat(r._connectedRib._finalRoutes, is(notNullValue()));
   }
 
   /** Check that initialization of RIP internal routes happens correctly */
@@ -289,7 +285,6 @@ public class VirtualRouterTest {
     // Test
     vr.initStaticRib();
 
-    assertThat(vr._staticRib._finalRoutes, is(notNullValue()));
     assertThat(vr._staticRib.getRoutes(), equalTo(routeSet));
   }
 
