@@ -9,6 +9,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import org.batfish.common.CoordConstsV2;
 
 /** Allow the system to serve xhr level 2 from all cross domain site */
 @Provider
@@ -41,9 +42,23 @@ public class CrossDomainFilter implements ContainerRequestFilter, ContainerRespo
     cres.getHeaders()
         .add(
             "Access-Control-Allow-Headers",
-            "Host, User-Agent, Accept, Authorization, Accept-Language, Accept-Encoding, "
-                + "Content-Type, Referer, Content-Length, Origin, DNT, Connection, "
-                + "version, apikey");
+            String.join(
+                /* delimiter */ ", ",
+                "Host",
+                "User-Agent",
+                "Accept",
+                "Authorization",
+                "Accept-Language",
+                "Accept-Encoding",
+                "Content-Type",
+                "Referer",
+                "Content-Length",
+                "Origin",
+                "DNT",
+                "Connection",
+                CoordConstsV2.HTTP_HEADER_BATFISH_APIKEY,
+                CoordConstsV2.HTTP_HEADER_BATFISH_VERSION));
+
     cres.getHeaders().add("Access-Control-Allow-Credentials", "true");
     cres.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
     cres.getHeaders().add("Access-Control-Max-Age", "3600");

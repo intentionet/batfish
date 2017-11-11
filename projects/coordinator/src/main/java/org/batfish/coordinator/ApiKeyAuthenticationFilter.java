@@ -1,6 +1,7 @@
 package org.batfish.coordinator;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.batfish.common.CoordConstsV2.HTTP_HEADER_BATFISH_APIKEY;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -17,12 +18,14 @@ public class ApiKeyAuthenticationFilter implements ContainerRequestFilter {
   public void filter(ContainerRequestContext requestContext) {
     String apiKey =
         firstNonNull(
-            requestContext.getHeaderString(CoordConsts.SVC_KEY_API_KEY),
+            requestContext.getHeaderString(HTTP_HEADER_BATFISH_APIKEY),
             CoordConsts.DEFAULT_API_KEY);
     if (apiKey.isEmpty()) {
       requestContext.abortWith(
           Response.status(Status.UNAUTHORIZED)
-              .entity("ApiKey is empty")
+              .entity(
+                  String.format(
+                      "HTTP header %s should contain an API key", HTTP_HEADER_BATFISH_APIKEY))
               .type(MediaType.APPLICATION_JSON)
               .build());
     } else if (!Main.getAuthorizer().isValidWorkApiKey(apiKey)) {

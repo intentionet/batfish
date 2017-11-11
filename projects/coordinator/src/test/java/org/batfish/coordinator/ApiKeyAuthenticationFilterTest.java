@@ -2,6 +2,7 @@ package org.batfish.coordinator;
 
 import static javax.ws.rs.core.Response.Status.OK;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import static org.batfish.common.CoordConstsV2.HTTP_HEADER_BATFISH_APIKEY;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -57,9 +58,11 @@ public class ApiKeyAuthenticationFilterTest extends JerseyTest {
 
   @Test
   public void testEmptyApiKey() {
-    Response response = target("/test").request().header(CoordConsts.SVC_KEY_API_KEY, "").get();
+    Response response = target("/test").request().header(HTTP_HEADER_BATFISH_APIKEY, "").get();
     assertThat(response.getStatus(), equalTo(UNAUTHORIZED.getStatusCode()));
-    assertThat(response.readEntity(String.class), equalTo("ApiKey is empty"));
+    assertThat(
+        response.readEntity(String.class),
+        equalTo("HTTP header " + HTTP_HEADER_BATFISH_APIKEY + " should contain an API key"));
   }
 
   @Test
@@ -70,7 +73,7 @@ public class ApiKeyAuthenticationFilterTest extends JerseyTest {
 
   @Test
   public void testUnauthorizedApiKey() {
-    Response response = target("/test").request().header(CoordConsts.SVC_KEY_API_KEY, "100").get();
+    Response response = target("/test").request().header(HTTP_HEADER_BATFISH_APIKEY, "100").get();
     assertThat(response.getStatus(), equalTo(UNAUTHORIZED.getStatusCode()));
     String expectMessage = "Authorizer: '100' is NOT a valid key";
     assertThat(response.readEntity(String.class), equalTo(expectMessage));
@@ -81,7 +84,7 @@ public class ApiKeyAuthenticationFilterTest extends JerseyTest {
     Response response =
         target("/test")
             .request()
-            .header(CoordConsts.SVC_KEY_API_KEY, CoordConsts.DEFAULT_API_KEY)
+            .header(HTTP_HEADER_BATFISH_APIKEY, CoordConsts.DEFAULT_API_KEY)
             .get();
     assertThat(response.getStatus(), equalTo(OK.getStatusCode()));
   }
