@@ -409,7 +409,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
   public AbstractRib(VirtualRouter owner) {
     _tree = new RibTree();
     _owner = owner;
-    _allRoutes = new TreeSet<>();
+    _allRoutes = ImmutableSet.of();
   }
 
   final boolean containsRoute(R route) {
