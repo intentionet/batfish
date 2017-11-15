@@ -64,12 +64,15 @@ public class Ip implements Comparable<Ip>, Serializable {
     return num;
   }
 
-  private static long numSubnetBitsToSubnetLong(int numBits) {
-    long val = 0;
-    for (int i = 31; i > 31 - numBits; i--) {
-      val |= ((long) 1 << i);
-    }
-    return val;
+  /**
+   * Return a {@code long} that represents the {@code /numBits} network mask in a IPv4 subnet.
+   *
+   * <p>For example, for {@code numBits = 8}, should return {@code 0xFF000000L} representing a mask
+   * of the top 8 bits.
+   */
+  // Visible for testing only.
+  static long numSubnetBitsToSubnetLong(int numBits) {
+    return ~(0xFFFFFFFFL >> numBits) & 0xFFFFFFFFL;
   }
 
   public static Ip numSubnetBitsToSubnetMask(int numBits) {
