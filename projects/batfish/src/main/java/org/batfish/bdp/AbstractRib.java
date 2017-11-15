@@ -1,5 +1,6 @@
 package org.batfish.bdp;
 
+import com.google.common.collect.ImmutableSet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -209,14 +210,12 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
     }
 
     /**
-     * Adds a route to the collection of routes stored at this node, and the collection of all
-     * routes available in the parent RIB.
+     * Add the route to the set of routes at this node
      *
      * @param route the route to add
      */
     private void addRoute(R route) {
       _routes.add(route);
-      _allRoutes.add(route);
     }
 
     /**
@@ -368,9 +367,8 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
         // Last case, preferenceComparison > 0
         /*
          * Better than all pre-existing routes for this prefix, so
-         * replace them with this one. Also remove existing routes from allRoutes
+         * replace them with this one.
          */
-        _allRoutes.removeAll(_routes);
         _routes.clear();
         addRoute(route);
         return true;
@@ -440,6 +438,9 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
 
   @Override
   public final Set<R> getRoutes() {
+    if (_allRoutes == null) {
+      _allRoutes = ImmutableSet.copyOf(_tree.getRoutes());
+    }
     return _allRoutes;
   }
 
@@ -470,10 +471,10 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
    * @param route the route to add
    * @return true if the route was added. False if the route already existed or was discarded due to
    *     preference comparisons.
-   * @throws UnmodifiableRibException if the RIB is "frozen" and cannot be modified
    */
   @Override
   public boolean mergeRoute(R route) {
+    _allRoutes = null;
     return _tree.mergeRoute(route);
   }
 
