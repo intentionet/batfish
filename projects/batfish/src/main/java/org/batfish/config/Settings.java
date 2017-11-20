@@ -1351,7 +1351,8 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
     addOption(
         ARG_MAX_PARSE_TREE_PRINT_LENGTH,
-        "max number of characters to print for parsetree pretty print (<= 0 is treated as no limit)",
+        "max number of characters to print for parsetree pretty print " +
+            "(<= 0 is treated as no limit)",
         ARGNAME_NUMBER);
 
     addOption(ARG_MAX_RUNTIME_MS, "maximum time (in ms) to allow a task to run", ARGNAME_NUMBER);
