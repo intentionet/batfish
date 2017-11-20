@@ -19,7 +19,7 @@ public class ParseTreePrettyPrintTest {
     assertThat(string, equalTo("1234"));
 
     string = ParseTreePrettyPrinter.printWithCharacterLimit(strings, 3);
-    assertThat(string, equalTo("123..."));
+    assertThat(string, equalTo("1234"));
 
     string = ParseTreePrettyPrinter.printWithCharacterLimit(strings, 4);
     assertThat(string, equalTo("1234"));
@@ -29,12 +29,12 @@ public class ParseTreePrettyPrintTest {
     assertThat(string, equalTo("1234\n5678"));
 
     string = ParseTreePrettyPrinter.printWithCharacterLimit(strings, 1);
-    assertThat(string, equalTo("1...and 1 more line"));
+    assertThat(string, equalTo("1234\nand 1 more line(s)"));
 
     string = ParseTreePrettyPrinter.printWithCharacterLimit(strings, 5);
-    assertThat(string, equalTo("1234\n...and 1 more line"));
+    assertThat(string, equalTo("1234\nand 1 more line(s)"));
 
     string = ParseTreePrettyPrinter.printWithCharacterLimit(strings, 6);
-    assertThat(string, equalTo("1234\n5..."));
+    assertThat(string, equalTo("1234\n5678"));
   }
 }

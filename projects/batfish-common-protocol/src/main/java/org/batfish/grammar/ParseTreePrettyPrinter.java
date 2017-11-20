@@ -2,6 +2,7 @@ package org.batfish.grammar;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -45,39 +46,27 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
 
   public static String printWithCharacterLimit(List<String> strings, int maxStringLength) {
     StringBuilder sb = new StringBuilder();
-    // Keep track of how many string we have used from the list to display how many we omit
-    int usedStringCount = 0;
+    // Handle base case by modifying maxStringLength
+    if (maxStringLength <= 0) {
+      maxStringLength = Integer.MAX_VALUE;
+    }
 
-    // Only add the strings we can without exceeding the maxStringLength specified
-    for (String string : strings) {
-      // Add a newline before strings after the first
-      if (usedStringCount > 0) {
+    ListIterator<String> iter = strings.listIterator();
+    // Keep going while there are more strings and we have not exceeded the max length
+    while (maxStringLength > sb.length() && iter.hasNext()) {
+      String string = iter.next();
+
+      // Assume we're okay adding the whole string even if it pushes us over the maxStringLength
+      sb.append(string);
+      if (iter.hasNext()) {
         sb.append("\n");
       }
+    }
 
-      // Append the full string if we won't exceed maxStringLength doing so, otherwise append part
-      // Or just keep appending if we are not limiting the string length (max <= 0)
-      if (maxStringLength <= 0 || sb.length() + string.length() <= maxStringLength) {
-        usedStringCount++;
-        sb.append(string);
-      } else {
-        // Only count this string as used if we can append something to the stringbuilder
-        if (maxStringLength > sb.length()) {
-          usedStringCount++;
-        }
-        sb.append(string.substring(0, maxStringLength - sb.length()));
-
-        int numOfAdditionalLines = strings.size() - usedStringCount;
-        sb.append("...");
-        if (numOfAdditionalLines == 1) {
-          sb.append("and 1 more line");
-        } else if (numOfAdditionalLines > 1) {
-          sb.append("and ");
-          sb.append(numOfAdditionalLines);
-          sb.append(" more lines");
-        }
-        break;
-      }
+    if (iter.hasNext()) {
+      sb.append("and ");
+      sb.append(strings.size() - iter.nextIndex());
+      sb.append(" more line(s)");
     }
     return sb.toString();
   }
