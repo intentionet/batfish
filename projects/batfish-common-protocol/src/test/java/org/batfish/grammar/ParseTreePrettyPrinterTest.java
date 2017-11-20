@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 
-public class ParseTreePrettyPrintTest {
+public class ParseTreePrettyPrinterTest {
 
   @Test
   public void testParseTreePrettyPrintWithCharacterLimit() throws IOException {
