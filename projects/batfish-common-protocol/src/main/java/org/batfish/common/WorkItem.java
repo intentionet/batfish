@@ -5,37 +5,18 @@ import io.opentracing.NoopActiveSpanSource.NoopActiveSpan;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.propagation.Format.Builtin;
-import io.opentracing.propagation.TextMap;
 import io.opentracing.propagation.TextMapExtractAdapter;
+import io.opentracing.propagation.TextMapInjectAdapter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 public class WorkItem {
-
-  static final class WorkItemCarrier implements TextMap {
-    private final Map<String, String> _mapCarrier;
-
-    public WorkItemCarrier(Map<String, String> mapCarrier) {
-      _mapCarrier = mapCarrier;
-    }
-
-    @Override
-    public Iterator<Entry<String, String>> iterator() {
-      throw new UnsupportedOperationException("carrier is write-only");
-    }
-
-    @Override
-    public void put(String key, String value) {
-      _mapCarrier.put(key, value);
-    }
-  }
 
   public static WorkItem fromJsonString(String jsonString) throws JSONException {
 
@@ -74,7 +55,7 @@ public class WorkItem {
   private HashMap<String, String> _requestParams;
   private HashMap<String, String> _responseParams;
   private String _testrigName;
-  private Map<String, String> _spanData;
+  private Map<String, String> _spanData; /* Map used by the TextMap carrier for SpanContext */
 
   public WorkItem(String containerName, String testrigName) {
     _id = UUID.randomUUID();
@@ -82,6 +63,7 @@ public class WorkItem {
     _testrigName = testrigName;
     _requestParams = new HashMap<>();
     _responseParams = new HashMap<>();
+    _spanData = new HashMap<>();
   }
 
   public WorkItem(
@@ -110,6 +92,12 @@ public class WorkItem {
     return _id;
   }
 
+  /**
+   * Retrieves a {@link SpanContext} which was serialized earlier in the {@link WorkItem}
+   *
+   * @return {@link SpanContext} or null if no {@link SpanContext} was serialized in the {@link
+   *     WorkItem}
+   */
   public SpanContext getSourceSpan(Tracer tracer) {
     return tracer.extract(Builtin.TEXT_MAP, new TextMapExtractAdapter(_spanData));
   }
@@ -122,9 +110,13 @@ public class WorkItem {
     return _testrigName;
   }
 
+  /**
+   * Gets the {@link ActiveSpan} from the current {@link Thread} and attaches it to the {@link
+   * WorkItem} which can be fetched later using {@link WorkItem#getSourceSpan(Tracer)}
+   */
   public void setSourceSpan(Tracer tracer, boolean isRegistered) {
     ActiveSpan sourceSpan = isRegistered ? tracer.activeSpan() : NoopActiveSpan.INSTANCE;
-    tracer.inject(sourceSpan.context(), Builtin.TEXT_MAP, new WorkItemCarrier(_spanData));
+    tracer.inject(sourceSpan.context(), Builtin.TEXT_MAP, new TextMapInjectAdapter(_spanData));
   }
 
   public void setId(String idString) {

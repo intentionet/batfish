@@ -467,7 +467,7 @@ public class Driver {
                   try (ActiveSpan runBatfishSpan =
                       GlobalTracer.get()
                           .buildSpan("Run Batfish Service")
-                          .asChildOf(runTaskSpanContext)
+                          .addReference("follows_from", runTaskSpanContext)
                           .startActive()) {
                     assert runBatfishSpan != null; // avoid unused warning
                     task.setStatus(TaskStatus.InProgress);

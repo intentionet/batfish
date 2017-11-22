@@ -137,8 +137,11 @@ public class WorkMgr extends AbstractCoordinator {
     Client client = null;
     SpanContext queueWorkSpan = work.getWorkItem().getSourceSpan(GlobalTracer.get());
     try (ActiveSpan assignWorkSpan =
-        GlobalTracer.get().buildSpan("Assign Work").asChildOf(queueWorkSpan).startActive()) {
-      assert assignWorkSpan != null;
+        GlobalTracer.get()
+            .buildSpan("Assign Work")
+            .addReference("follows_from", queueWorkSpan)
+            .startActive()) {
+      assert assignWorkSpan != null; // avoid unused warning
       // get the task and add other standard stuff
       JSONObject task = work.getWorkItem().toTask();
       Path containerDir =
