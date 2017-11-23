@@ -394,6 +394,11 @@ ADVERTISE_INACTIVE
    'advertise-inactive'
 ;
 
+AES
+:
+   'aes'
+;
+
 AES128_SHA1
 :
    'aes128-sha1'
@@ -6188,6 +6193,11 @@ MCAST_RATE_OPT
    'mcast-rate-opt'
 ;
 
+MD5
+:
+   'md5'
+;
+
 MDIX
 :
    'mdix'
@@ -7941,6 +7951,11 @@ PRC_INTERVAL
 PRE_EQUALIZATION
 :
    'pre-equalization'
+;
+
+PRE_SHARE
+:
+   'pre-share'
 ;
 
 PRE_SHARED_KEY
