@@ -720,15 +720,6 @@
             }
           }
         },
-        "cisco_crypto" : {
-          "ipv4/6 acl" : {
-            "myvpnacl" : {
-              "crypto map ipsec-isakmp acl" : [
-                194
-              ]
-            }
-          }
-        },
         "cisco_interface" : {
           "ipv4 acl" : {
             "167" : {
