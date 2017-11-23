@@ -297,7 +297,7 @@ cis_policy
 :
    POLICY name = variable NEWLINE
    (
-      cispol_null
+      cis_proposal
    )*
 ;
 
@@ -309,16 +309,53 @@ cis_profile
    )*
 ;
 
-cispol_null
+cis_proposal
+:
+   (
+      cispro_authentication
+      | cispro_encr
+      | cispro_group
+      | cispro_hash
+      | cispro_lifetime
+      | cispro_null
+   )
+;
+
+cispro_authentication
+:
+   AUTHENTICATION PRE_SHARE NEWLINE
+;
+
+cispro_encr
+:
+   ENCR
+   (
+      AES
+      | THREE_DES
+   ) NEWLINE
+;
+
+cispro_group
+:
+   GROUP DEC NEWLINE
+;
+
+cispro_hash
+:
+   GROUP MD5 NEWLINE
+;
+
+cispro_lifetime
+:
+    LIFETIME DEC NEWLINE
+;
+
+cispro_null
 :
    NO?
    (
-      AUTHENTICATION
-      | ENCR
       | ENCRYPTION
-      | GROUP
       | HASH
-      | LIFETIME
       | PRF
       | VERSION
    ) ~NEWLINE* NEWLINE

@@ -286,6 +286,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private final Set<String> _igmpAcls;
 
+  private final Map<String, IkePolicy> _ikePolicies;
+
   private final Map<String, Interface> _interfaces;
 
   private final Set<String> _ipNatDestinationAccessLists;
@@ -381,6 +383,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     _failoverPrimaryPrefixes = new TreeMap<>();
     _failoverStandbyPrefixes = new TreeMap<>();
     _igmpAcls = new TreeSet<>();
+    _ikePolicies = new TreeMap<>();
     _interfaces = new TreeMap<>();
     _ipNatDestinationAccessLists = new TreeSet<>();
     _ipPimNeighborFilters = new TreeSet<>();
@@ -663,6 +666,10 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   public Set<String> getIgmpAcls() {
     return _igmpAcls;
+  }
+
+  public Map<String, IkePolicy> getIkePolicies() {
+    return _ikePolicies;
   }
 
   public Map<String, Interface> getInterfaces() {
@@ -3670,6 +3677,14 @@ public final class CiscoConfiguration extends VendorConfiguration {
     // apply vrrp settings to interfaces
     applyVrrp(c);
 
+    // convert ike policies
+    for (Entry<String, org.batfish.representation.cisco.IkePolicy> e : _ikePolicies.entrySet()) {
+      String name = e.getKey();
+      org.batfish.representation.cisco.IkePolicy oldIkePolicy = e.getValue();
+      org.batfish.datamodel.IkePolicy newPolicy = toIkePolicy(oldIkePolicy);
+      c.getIkePolicies().put(name, newPolicy);
+    }
+
     // convert routing processes
     _vrfs.forEach(
         (vrfName, vrf) -> {
@@ -3806,6 +3821,17 @@ public final class CiscoConfiguration extends VendorConfiguration {
     warnUnusedServiceClasses();
     c.simplifyRoutingPolicies();
     return c;
+  }
+
+  private org.batfish.datamodel.IkePolicy toIkePolicy(IkePolicy oldIkePolicy) {
+    String name = oldIkePolicy.getName();
+    org.batfish.datamodel.IkePolicy newIkePolicy = new org.batfish.datamodel.IkePolicy(name);
+
+    newIkePolicy
+        .getProposals()
+        .put(oldIkePolicy.getProposal().getName(), oldIkePolicy.getProposal());
+
+    return newIkePolicy;
   }
 
   private boolean usedForRouting(ExtendedAccessList eaList) {
