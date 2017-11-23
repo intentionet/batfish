@@ -17,6 +17,7 @@ public class IkePolicy extends ComparableStructure<String> {
   public IkePolicy(String name, int definitionLine) {
     super(name);
     _definitionLine = definitionLine;
+    _proposal = new IkeProposal(name, definitionLine);
   }
 
   public int getDefinitionLine() {

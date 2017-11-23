@@ -35,12 +35,13 @@ import org.batfish.datamodel.IcmpCode;
 import org.batfish.datamodel.IcmpType;
 import org.batfish.datamodel.IkeAuthenticationAlgorithm;
 import org.batfish.datamodel.IkeAuthenticationMethod;
-import org.batfish.datamodel.IkeProposal;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.Ip6Wildcard;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
+import org.batfish.datamodel.IpsecAuthenticationAlgorithm;
+import org.batfish.datamodel.IpsecProposal;
 import org.batfish.datamodel.IsisInterfaceMode;
 import org.batfish.datamodel.IsisLevel;
 import org.batfish.datamodel.IsisMetricType;
@@ -185,13 +186,24 @@ import org.batfish.grammar.cisco.CiscoParser.Boolean_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Boolean_simple_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Boolean_tag_is_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Cadant_stdacl_nameContext;
+import org.batfish.grammar.cisco.CiscoParser.Cip_profileContext;
+import org.batfish.grammar.cisco.CiscoParser.Cip_transform_setContext;
+import org.batfish.grammar.cisco.CiscoParser.Cipprf_set_pfsContext;
+import org.batfish.grammar.cisco.CiscoParser.Cipprf_set_transform_setContext;
+import org.batfish.grammar.cisco.CiscoParser.Cipt_modeContext;
 import org.batfish.grammar.cisco.CiscoParser.Cis_policyContext;
+import org.batfish.grammar.cisco.CiscoParser.Cis_profileContext;
 import org.batfish.grammar.cisco.CiscoParser.Cisco_configurationContext;
-import org.batfish.grammar.cisco.CiscoParser.Cispro_authenticationContext;
-import org.batfish.grammar.cisco.CiscoParser.Cispro_encrContext;
-import org.batfish.grammar.cisco.CiscoParser.Cispro_groupContext;
-import org.batfish.grammar.cisco.CiscoParser.Cispro_hashContext;
-import org.batfish.grammar.cisco.CiscoParser.Cispro_lifetimeContext;
+import org.batfish.grammar.cisco.CiscoParser.Cispol_authenticationContext;
+import org.batfish.grammar.cisco.CiscoParser.Cispol_encrContext;
+import org.batfish.grammar.cisco.CiscoParser.Cispol_groupContext;
+import org.batfish.grammar.cisco.CiscoParser.Cispol_hashContext;
+import org.batfish.grammar.cisco.CiscoParser.Cispol_lifetimeContext;
+import org.batfish.grammar.cisco.CiscoParser.Cisprf_keyringContext;
+import org.batfish.grammar.cisco.CiscoParser.Cisprf_local_addressContext;
+import org.batfish.grammar.cisco.CiscoParser.Cisprf_matchContext;
+import org.batfish.grammar.cisco.CiscoParser.Ckr_local_addressContext;
+import org.batfish.grammar.cisco.CiscoParser.Ckr_pskContext;
 import org.batfish.grammar.cisco.CiscoParser.Clb_docsis_policyContext;
 import org.batfish.grammar.cisco.CiscoParser.Clb_ruleContext;
 import org.batfish.grammar.cisco.CiscoParser.Clbdg_docsis_policyContext;
@@ -205,6 +217,7 @@ import org.batfish.grammar.cisco.CiscoParser.Continue_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Copsl_access_listContext;
 import org.batfish.grammar.cisco.CiscoParser.Cp_ip_access_groupContext;
 import org.batfish.grammar.cisco.CiscoParser.Cqer_service_classContext;
+import org.batfish.grammar.cisco.CiscoParser.Crypto_keyringContext;
 import org.batfish.grammar.cisco.CiscoParser.Crypto_map_ii_match_addressContext;
 import org.batfish.grammar.cisco.CiscoParser.Cs_classContext;
 import org.batfish.grammar.cisco.CiscoParser.Csc_nameContext;
@@ -559,13 +572,17 @@ import org.batfish.representation.cisco.ExtendedAccessListLine;
 import org.batfish.representation.cisco.ExtendedIpv6AccessList;
 import org.batfish.representation.cisco.ExtendedIpv6AccessListLine;
 import org.batfish.representation.cisco.IkePolicy;
+import org.batfish.representation.cisco.IkeProfile;
 import org.batfish.representation.cisco.Interface;
 import org.batfish.representation.cisco.IpAsPathAccessList;
 import org.batfish.representation.cisco.IpAsPathAccessListLine;
 import org.batfish.representation.cisco.IpBgpPeerGroup;
+import org.batfish.representation.cisco.IpsecPolicy;
+import org.batfish.representation.cisco.IpsecProfile;
 import org.batfish.representation.cisco.Ipv6BgpPeerGroup;
 import org.batfish.representation.cisco.IsisProcess;
 import org.batfish.representation.cisco.IsisRedistributionPolicy;
+import org.batfish.representation.cisco.Keyring;
 import org.batfish.representation.cisco.MacAccessList;
 import org.batfish.representation.cisco.MasterBgpPeerGroup;
 import org.batfish.representation.cisco.NamedBgpPeerGroup;
@@ -842,15 +859,21 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   private IkePolicy _currentIkePolicy;
 
-  private IkeProposal _currentIkeProposal;
+  private IkeProfile _currentIkeProfile;
 
   private IpBgpPeerGroup _currentIpPeerGroup;
+
+  private IpsecPolicy _currentIpsecPolicy;
+
+  private IpsecProfile _currentIpsecProfile;
 
   private Ipv6BgpPeerGroup _currentIpv6PeerGroup;
 
   private Interface _currentIsisInterface;
 
   private IsisProcess _currentIsisProcess;
+
+  private Keyring _currentKeyring;
 
   private List<String> _currentLineNames;
 
@@ -1087,12 +1110,89 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void enterCip_profile(Cip_profileContext ctx) {
+    if (_currentIpsecProfile != null) {
+      throw new BatfishException("IpsecProfile should be null!");
+    }
+    _currentIpsecProfile = new IpsecProfile(ctx.name.getText(), ctx.getStart().getLine());
+  }
+
+  @Override
+  public void enterCip_transform_set(Cip_transform_setContext ctx) {
+    if (_currentIpsecPolicy != null) {
+      throw new BatfishException("IpsecPolicy should be null!");
+    }
+    _currentIpsecPolicy = new IpsecPolicy(ctx.name.getText(), ctx.getStart().getLine());
+    IpsecProposal proposal = _currentIpsecPolicy.getProposal();
+    // set encryption algorithm
+    if (ctx.ESP_AES() != null) {
+      if (ctx.bits == null) {
+        proposal.setEncryptionAlgorithm(EncryptionAlgorithm.AES_128_CBC);
+      } else {
+        int bits = toInteger(ctx.bits);
+        if (bits == 192) {
+          proposal.setEncryptionAlgorithm(EncryptionAlgorithm.AES_192_CBC);
+        } else if (bits == 256) {
+          proposal.setEncryptionAlgorithm(EncryptionAlgorithm.AES_256_CBC);
+        } else {
+          throw new BatfishException("Unknown encryption algo bits " + bits);
+        }
+      }
+    }
+    // set authentication algorithm
+    if (ctx.ESP_SHA_HMAC() != null) {
+      proposal.setAuthenticationAlgorithm(IpsecAuthenticationAlgorithm.HMAC_SHA1_96);
+    } else if (ctx.ESP_SHA256_HMAC() != null) {
+      proposal.setAuthenticationAlgorithm(IpsecAuthenticationAlgorithm.HMAC_SHA_256_128);
+    }
+  }
+
+  @Override
+  public void enterCipprf_set_pfs(Cipprf_set_pfsContext ctx) {
+    if (_currentIpsecProfile == null) {
+      throw new BatfishException("_currentIkeProfile shouldn't be null!");
+    }
+    if (ctx.GROUP2() != null) {
+      _currentIpsecProfile.setPfs(ctx.GROUP2().getText());
+    } else {
+      throw new BatfishException("Unsupported pfs variable " + ctx.getText());
+    }
+  }
+
+  @Override
+  public void enterCipprf_set_transform_set(Cipprf_set_transform_setContext ctx) {
+    if (_currentIpsecProfile == null) {
+      throw new BatfishException("_currentIkeProfile shouldn't be null!");
+    }
+    _currentIpsecProfile.setPfs(ctx.variable().getText());
+  }
+
+  @Override
+  public void enterCipt_mode(Cipt_modeContext ctx) {
+    if (_currentIpsecPolicy == null) {
+      throw new BatfishException("_currentIkePolicy shouldn't be null!");
+    }
+    if (ctx.TUNNEL() != null) {
+      _currentIpsecPolicy.setMode(ctx.TUNNEL().getText());
+    } else {
+      throw new BatfishException("Unsupported mode " + ctx.getText());
+    }
+  }
+
+  @Override
   public void enterCis_policy(Cis_policyContext ctx) {
-    if (_currentIkePolicy != null || _currentIkeProposal != null) {
-      throw new BatfishException("These should be null!");
+    if (_currentIkePolicy != null) {
+      throw new BatfishException("IkePolicy should be null!");
     }
     _currentIkePolicy = new IkePolicy(ctx.name.getText(), ctx.getStart().getLine());
-    _currentIkeProposal = new IkeProposal(ctx.name.getText(), ctx.getStart().getLine());
+  }
+
+  @Override
+  public void enterCis_profile(Cis_profileContext ctx) {
+    if (_currentIkeProfile != null) {
+      throw new BatfishException("IkeProfile should be null!");
+    }
+    _currentIkeProfile = new IkeProfile(ctx.name.getText(), ctx.getStart().getLine());
   }
 
   @Override
@@ -1103,61 +1203,103 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void enterCispro_authentication(Cispro_authenticationContext ctx) {
-    if (_currentIkeProposal == null) {
+  public void enterCispol_authentication(Cispol_authenticationContext ctx) {
+    if (_currentIkePolicy == null) {
       throw new BatfishException("_currentIkeProposal shouldn't be null!");
     }
     if (ctx.PRE_SHARE() != null) {
-      _currentIkeProposal.setAuthenticationMethod(IkeAuthenticationMethod.PRE_SHARED_KEYS);
+      _currentIkePolicy
+          .getProposal()
+          .setAuthenticationMethod(IkeAuthenticationMethod.PRE_SHARED_KEYS);
     } else {
-      throw new BatfishException("Unsupported authentication method in "
-          + ctx.getText());
+      throw new BatfishException("Unsupported authentication method in " + ctx.getText());
     }
   }
 
   @Override
-  public void enterCispro_encr(Cispro_encrContext ctx) {
-    if (_currentIkeProposal == null) {
-      throw new BatfishException("_currentIkeProposal shouldn't be null!");
+  public void enterCispol_encr(Cispol_encrContext ctx) {
+    if (_currentIkePolicy == null) {
+      throw new BatfishException("IkePolicy shouldn't be null!");
     }
     if (ctx.AES() != null) {
-      _currentIkeProposal.setEncryptionAlgorithm(EncryptionAlgorithm.AES_128_CBC);
+      _currentIkePolicy.getProposal().setEncryptionAlgorithm(EncryptionAlgorithm.AES_128_CBC);
     } else if (ctx.THREE_DES() != null) {
-      _currentIkeProposal.setEncryptionAlgorithm(EncryptionAlgorithm.THREEDES_CBC);
+      _currentIkePolicy.getProposal().setEncryptionAlgorithm(EncryptionAlgorithm.THREEDES_CBC);
     } else {
-      throw new BatfishException("Unsupported encryption algorithm "
-          + ctx.getText());
+      throw new BatfishException("Unsupported encryption algorithm " + ctx.getText());
     }
   }
 
   @Override
-  public void enterCispro_group(Cispro_groupContext ctx) {
-    if (_currentIkeProposal == null) {
-      throw new BatfishException("_currentIkeProposal shouldn't be null!");
+  public void enterCispol_group(Cispol_groupContext ctx) {
+    if (_currentIkePolicy == null) {
+      throw new BatfishException("IkePolicy shouldn't be null!");
     }
     int group = Integer.parseInt(ctx.DEC().getText());
-    _currentIkeProposal.setDiffieHellmanGroup(DiffieHellmanGroup.fromGroupNumber(group));
+    _currentIkePolicy
+        .getProposal()
+        .setDiffieHellmanGroup(DiffieHellmanGroup.fromGroupNumber(group));
   }
 
   @Override
-  public void enterCispro_hash(Cispro_hashContext ctx) {
-    if (_currentIkeProposal == null) {
-      throw new BatfishException("_currentIkeProposal shouldn't be null!");
+  public void enterCispol_hash(Cispol_hashContext ctx) {
+    if (_currentIkePolicy == null) {
+      throw new BatfishException("IkePolicy shouldn't be null!");
     }
     if (ctx.MD5() != null) {
-      _currentIkeProposal.setAuthenticationAlgorithm(IkeAuthenticationAlgorithm.MD5);
+      _currentIkePolicy.getProposal().setAuthenticationAlgorithm(IkeAuthenticationAlgorithm.MD5);
     } else {
-      throw new BatfishException("Unsupported authentication method in "
-          + ctx.getText());
+      throw new BatfishException("Unsupported authentication method in " + ctx.getText());
     }
   }
 
   @Override
-  public void enterCispro_lifetime(Cispro_lifetimeContext ctx) {
-    if (_currentIkeProposal == null) {
-      throw new BatfishException("_currentIkeProposal shouldn't be null!");
+  public void enterCispol_lifetime(Cispol_lifetimeContext ctx) {
+    if (_currentIkePolicy == null) {
+      throw new BatfishException("IkePolicy shouldn't be null!");
     }
-    _currentIkeProposal.setLifetimeSeconds(Integer.parseInt(ctx.DEC().getText()));
+    _currentIkePolicy.getProposal().setLifetimeSeconds(Integer.parseInt(ctx.DEC().getText()));
+  }
+
+  @Override
+  public void enterCisprf_keyring(Cisprf_keyringContext ctx) {
+    if (_currentIkeProfile == null) {
+      throw new BatfishException("IkeProfile shouldn't be null!");
+    }
+    _currentIkeProfile.setKeyring(ctx.name.getText());
+  }
+
+  @Override
+  public void enterCisprf_match(Cisprf_matchContext ctx) {
+    if (_currentIkeProfile == null) {
+      throw new BatfishException("IkeProfile shouldn't be null!");
+    }
+    _currentIkeProfile.setMatchIdentityAddress(toIp(ctx.address), toIp(ctx.mask));
+  }
+
+  @Override
+  public void enterCisprf_local_address(Cisprf_local_addressContext ctx) {
+    if (_currentIkeProfile == null) {
+      throw new BatfishException("IkeProfile shouldn't be null!");
+    }
+    _currentIkeProfile.setLocalAddress(toIp(ctx.IP_ADDRESS()));
+  }
+
+  @Override
+  public void enterCkr_local_address(Ckr_local_addressContext ctx) {
+    if (_currentKeyring == null) {
+      throw new BatfishException("Keyrin shouldn't be null!");
+    }
+    _currentKeyring.setLocalAddress(toIp(ctx.IP_ADDRESS()));
+  }
+
+  @Override
+  public void enterCkr_psk(Ckr_pskContext ctx) {
+    if (_currentKeyring == null) {
+      throw new BatfishException("Keyrin shouldn't be null!");
+    }
+    _currentKeyring.setKey(ctx.variable().getText());
+    _currentKeyring.setRemoteAddress(toIp(ctx.IP_ADDRESS()));
   }
 
   @Override
@@ -1193,6 +1335,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void enterCntlr_rf_channel(Cntlr_rf_channelContext ctx) {
     _no = (ctx.NO() != null);
+  }
+
+  @Override
+  public void enterCrypto_keyring(Crypto_keyringContext ctx) {
+    if (_currentKeyring != null) {
+      throw new BatfishException("Keyring should be null!");
+    }
+    _currentKeyring = new Keyring(ctx.name.getText(), ctx.getStart().getLine());
   }
 
   @Override
@@ -2298,15 +2448,40 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void exitCis_policy(Cis_policyContext ctx) {
-    if (_currentIkePolicy == null || _currentIkeProposal == null) {
-      throw new BatfishException("These shouldn't be null!");
+  public void exitCip_profile(Cip_profileContext ctx) {
+    if (_currentIpsecProfile == null) {
+      throw new BatfishException("IpsecProfile shouldn't be null!");
     }
-    _currentIkePolicy.setProposal(_currentIkeProposal);
-    _currentIkePolicy = null;
-    _currentIkeProposal = null;
+    _configuration.getIpsecProfiles().put(_currentIpsecProfile.getName(), _currentIpsecProfile);
+    _currentIpsecProfile = null;
   }
 
+  @Override
+  public void exitCip_transform_set(Cip_transform_setContext ctx) {
+    if (_currentIpsecPolicy == null) {
+      throw new BatfishException("IpsecPolicy shouldn't be null!");
+    }
+    _configuration.getIpsecPolicies().put(_currentIpsecPolicy.getName(), _currentIpsecPolicy);
+    _currentIpsecPolicy = null;
+  }
+
+  @Override
+  public void exitCis_policy(Cis_policyContext ctx) {
+    if (_currentIkePolicy == null) {
+      throw new BatfishException("IkePolicy shouldn't be null!");
+    }
+    _configuration.getIkePolicies().put(_currentIkePolicy.getName(), _currentIkePolicy);
+    _currentIkePolicy = null;
+  }
+
+  @Override
+  public void exitCis_profile(Cis_profileContext ctx) {
+    if (_currentIkeProfile == null) {
+      throw new BatfishException("IkeProfile shouldn't be null!");
+    }
+    _configuration.getIkeProfiles().put(_currentIkeProfile.getName(), _currentIkeProfile);
+    _currentIkeProfile = null;
+  }
 
   @Override
   public void exitClbdg_docsis_policy(Clbdg_docsis_policyContext ctx) {
@@ -2410,6 +2585,15 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
         name,
         CiscoStructureUsage.QOS_ENFORCE_RULE_SERVICE_CLASS,
         line);
+  }
+
+  @Override
+  public void exitCrypto_keyring(Crypto_keyringContext ctx) {
+    if (_currentKeyring == null) {
+      throw new BatfishException("CurrentKeyring shouldn't be null!");
+    }
+    _configuration.getKeyrings().put(_currentKeyring.getName(), _currentKeyring);
+    _currentKeyring = null;
   }
 
   @Override

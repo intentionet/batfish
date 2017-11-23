@@ -236,15 +236,23 @@ cip_profile
 :
    PROFILE name = variable_permissive NEWLINE
    (
-      cipprf_null
+      cipprf_set
    )*
 ;
 
 cip_transform_set
 :
-   TRANSFORM_SET ~NEWLINE* NEWLINE
+   TRANSFORM_SET name = variable
    (
-      cipt_null
+      ESP_AES (bits = DEC)?
+   )
+   (
+      ESP_SHA_HMAC
+      | ESP_SHA256_HMAC
+   )
+   NEWLINE
+   (
+      cipt_line
    )*
 ;
 
@@ -264,20 +272,35 @@ cipi2ip_null
    ) ~NEWLINE* NEWLINE
 ;
 
-cipprf_null
+cipprf_set
 :
-   NO?
+   SET
    (
-      SET
-   ) ~NEWLINE* NEWLINE
+      cipprf_set_pfs
+      | cipprf_set_transform_set
+   ) NEWLINE
 ;
 
-cipt_null
+cipprf_set_pfs
 :
-   NO?
+   PFS GROUP2
+;
+
+cipprf_set_transform_set
+:
+   TRANSFORM_SET variable
+;
+
+cipt_line
+:
    (
-      MODE
-   ) ~NEWLINE* NEWLINE
+      cipt_mode
+   )
+;
+
+cipt_mode
+:
+   MODE TUNNEL NEWLINE
 ;
 
 cis_null
@@ -297,7 +320,7 @@ cis_policy
 :
    POLICY name = variable NEWLINE
    (
-      cis_proposal
+      cispol_line
    )*
 ;
 
@@ -305,28 +328,28 @@ cis_profile
 :
    PROFILE name = variable NEWLINE
    (
-      cisprf_null
+      cisprf_line
    )*
 ;
 
-cis_proposal
+cispol_line
 :
    (
-      cispro_authentication
-      | cispro_encr
-      | cispro_group
-      | cispro_hash
-      | cispro_lifetime
-      | cispro_null
+      cispol_authentication
+      | cispol_encr
+      | cispol_group
+      | cispol_hash
+      | cispol_lifetime
+      | cispol_line_null
    )
 ;
 
-cispro_authentication
+cispol_authentication
 :
    AUTHENTICATION PRE_SHARE NEWLINE
 ;
 
-cispro_encr
+cispol_encr
 :
    ENCR
    (
@@ -335,41 +358,63 @@ cispro_encr
    ) NEWLINE
 ;
 
-cispro_group
+cispol_group
 :
    GROUP DEC NEWLINE
 ;
 
-cispro_hash
+cispol_hash
 :
-   GROUP MD5 NEWLINE
+   HASH MD5 NEWLINE
 ;
 
-cispro_lifetime
+cispol_lifetime
 :
     LIFETIME DEC NEWLINE
 ;
 
-cispro_null
+cispol_line_null
 :
    NO?
    (
-      | ENCRYPTION
-      | HASH
+      ENCRYPTION
       | PRF
       | VERSION
    ) ~NEWLINE* NEWLINE
 ;
 
-cisprf_null
+cisprf_line
+:
+   (
+      cisprf_keyring
+      | cisprf_line_null
+      | cisprf_local_address
+      | cisprf_match
+   )
+;
+
+cisprf_keyring
+:
+   KEYRING name = variable NEWLINE
+;
+
+cisprf_line_null
 :
    NO?
    (
-      KEYRING
-      | MATCH
-      | REVERSE_ROUTE
+      REVERSE_ROUTE
       | VRF
    ) ~NEWLINE* NEWLINE
+;
+
+cisprf_local_address
+:
+   LOCAL_ADDRESS IP_ADDRESS NEWLINE
+;
+
+cisprf_match
+:
+   MATCH IDENTITY ADDRESS address = IP_ADDRESS mask = IP_ADDRESS NEWLINE
 ;
 
 ck_null
@@ -407,12 +452,22 @@ ckpn_null
    ) ~NEWLINE* NEWLINE
 ;
 
-ckr_null
+ckr_line
 :
-   NO?
    (
-      PRE_SHARED_KEY
-   ) ~NEWLINE* NEWLINE
+      ckr_local_address
+      | ckr_psk
+   )
+;
+
+ckr_local_address
+:
+   LOCAL_ADDRESS IP_ADDRESS NEWLINE
+;
+
+ckr_psk
+:
+   PRE_SHARED_KEY ADDRESS IP_ADDRESS KEY variable NEWLINE
 ;
 
 cpki_certificate_chain
@@ -566,7 +621,7 @@ crypto_keyring
 :
    KEYRING name = variable_permissive NEWLINE
    (
-      ckr_null
+      ckr_line
    )*
 ;
 

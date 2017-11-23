@@ -3682,6 +3682,21 @@ ESP
    'esp'
 ;
 
+ESP_AES
+:
+   'esp-aes'
+;
+
+ESP_SHA_HMAC
+:
+   'esp-sha-hmac'
+;
+
+ESP_SHA256_HMAC
+:
+   'esp-sha256-hmac'
+;
+
 ESSID
 :
    'essid'
@@ -4449,6 +4464,11 @@ GROUP_TIMEOUT
 GROUP_URL
 :
    'group-url'
+;
+
+GROUP2
+:
+   'group2'
 ;
 
 GSHUT
@@ -5701,6 +5721,11 @@ LOAD_SHARING
 LOCAL
 :
    'local'
+;
+
+LOCAL_ADDRESS
+:
+   'local-address'
 ;
 
 LOCAL_AS
@@ -7701,6 +7726,11 @@ PERSISTENT
 PFC
 :
    'pfc'
+;
+
+PFS
+:
+   'pfs'
 ;
 
 PHONE_CONTACT
