@@ -288,11 +288,19 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private final Map<String, IkePolicy> _ikePolicies;
 
+  private final Map<String, IkeProfile> _ikeProfiles;
+
   private final Map<String, Interface> _interfaces;
 
   private final Set<String> _ipNatDestinationAccessLists;
 
   private final Set<String> _ipPimNeighborFilters;
+
+  private final Map<String, IpsecPolicy> _ipsecPolicies;
+
+  private final Map<String, IpsecProfile> _ipsecProfiles;
+
+  private final Map<String, Keyring> _keyrings;
 
   private final Set<String> _lineAccessClassLists;
 
@@ -384,9 +392,13 @@ public final class CiscoConfiguration extends VendorConfiguration {
     _failoverStandbyPrefixes = new TreeMap<>();
     _igmpAcls = new TreeSet<>();
     _ikePolicies = new TreeMap<>();
+    _ikeProfiles = new TreeMap<>();
     _interfaces = new TreeMap<>();
     _ipNatDestinationAccessLists = new TreeSet<>();
     _ipPimNeighborFilters = new TreeSet<>();
+    _ipsecPolicies = new TreeMap<>();
+    _ipsecProfiles = new TreeMap<>();
+    _keyrings = new TreeMap<>();
     _lineAccessClassLists = new TreeSet<>();
     _lineIpv6AccessClassLists = new TreeSet<>();
     _macAccessLists = new TreeMap<>();
@@ -672,6 +684,10 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _ikePolicies;
   }
 
+  public Map<String, IkeProfile> getIkeProfiles() {
+    return _ikeProfiles;
+  }
+
   public Map<String, Interface> getInterfaces() {
     return _interfaces;
   }
@@ -682,6 +698,18 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   public Set<String> getIpPimNeighborFilters() {
     return _ipPimNeighborFilters;
+  }
+
+  public Map<String, IpsecPolicy> getIpsecPolicies() {
+    return _ipsecPolicies;
+  }
+
+  public Map<String, IpsecProfile> getIpsecProfiles() {
+    return _ipsecProfiles;
+  }
+
+  public Map<String, Keyring> getKeyrings() {
+    return _keyrings;
   }
 
   public Set<String> getLineAccessClassLists() {
