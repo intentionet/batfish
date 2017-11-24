@@ -293,6 +293,10 @@ import org.batfish.grammar.cisco.CiscoParser.Ifdhcpr_addressContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifdhcpr_clientContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifigmp_access_groupContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifigmpsg_aclContext;
+import org.batfish.grammar.cisco.CiscoParser.Iftunnel_destinationContext;
+import org.batfish.grammar.cisco.CiscoParser.Iftunnel_modeContext;
+import org.batfish.grammar.cisco.CiscoParser.Iftunnel_protectionContext;
+import org.batfish.grammar.cisco.CiscoParser.Iftunnel_sourceContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifvrrp_authenticationContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifvrrp_ipContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifvrrp_preemptContext;
@@ -681,6 +685,8 @@ import org.batfish.representation.cisco.StandardCommunityListLine;
 import org.batfish.representation.cisco.StandardIpv6AccessList;
 import org.batfish.representation.cisco.StandardIpv6AccessListLine;
 import org.batfish.representation.cisco.StaticRoute;
+import org.batfish.representation.cisco.Tunnel;
+import org.batfish.representation.cisco.Tunnel.TunnelMode;
 import org.batfish.representation.cisco.Vrf;
 import org.batfish.representation.cisco.VrrpGroup;
 import org.batfish.representation.cisco.VrrpInterface;
@@ -3539,6 +3545,48 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
         name,
         CiscoStructureUsage.INTERFACE_IGMP_STATIC_GROUP_ACL,
         line);
+  }
+
+  @Override
+  public void exitIftunnel_destination(Iftunnel_destinationContext ctx) {
+    Ip destination = toIp(ctx.IP_ADDRESS());
+    for (Interface iface : _currentInterfaces) {
+      iface.getTunnelInitIfNull().setDestination(destination);
+    }
+  }
+
+  @Override
+  public void exitIftunnel_mode(Iftunnel_modeContext ctx) {
+    for (Interface iface : _currentInterfaces) {
+      Tunnel tunnel = iface.getTunnelInitIfNull();
+      if (ctx.GRE() != null) {
+        tunnel.setMode(TunnelMode.GRE);
+      } else if (ctx.IPSEC() != null) {
+        tunnel.setMode(TunnelMode.IPSEC);
+      } else {
+        throw new BatfishException("unknown tunnel mode in " + ctx.getText());
+      }
+      if (ctx.IPV4() != null) {
+        tunnel.setProtocol(IpProtocol.IP);
+      } else if (ctx.IPV6() != null) {
+        tunnel.setProtocol(IpProtocol.IPV6);
+      }
+    }
+  }
+
+  @Override
+  public void exitIftunnel_protection(Iftunnel_protectionContext ctx) {
+    for (Interface iface : _currentInterfaces) {
+      iface.getTunnelInitIfNull().setIpsecProfile(ctx.variable().getText());
+    }
+  }
+
+  @Override
+  public void exitIftunnel_source(Iftunnel_sourceContext ctx) {
+    Ip source = toIp(ctx.IP_ADDRESS());
+    for (Interface iface : _currentInterfaces) {
+      iface.getTunnelInitIfNull().setSource(source);
+    }
   }
 
   @Override

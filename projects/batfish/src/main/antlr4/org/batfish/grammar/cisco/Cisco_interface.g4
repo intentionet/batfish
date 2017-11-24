@@ -677,7 +677,6 @@ if_null_block
       | TRANSPORT_MODE
       | TRUST
       | TUNABLE_OPTIC
-      | TUNNEL
       | TX_QUEUE
       | UC_TX_QUEUE
       | UDLD
@@ -868,6 +867,17 @@ if_switchport_trunk_native
    SWITCHPORT TRUNK NATIVE VLAN vlan = DEC NEWLINE
 ;
 
+if_tunnel
+:
+   TUNNEL
+   (
+       iftunnel_destination
+       | iftunnel_mode
+       | iftunnel_protection
+       | iftunnel_source
+   )
+;
+
 if_vrf
 :
    VRF name = variable NEWLINE
@@ -979,6 +989,35 @@ ifigmpsg_null
    ) ~NEWLINE* NEWLINE
 ;
 
+iftunnel_destination
+:
+   DESTINATION IP_ADDRESS NEWLINE
+;
+
+iftunnel_mode
+:
+   MODE
+   (
+     GRE
+     | IPSEC
+   )
+   (
+     IPV4
+     | IPV6
+   )
+   NEWLINE
+;
+
+iftunnel_protection
+:
+   PROTECTION IPSEC PROFILE variable NEWLINE
+;
+
+iftunnel_source
+:
+   SOURCE IP_ADDRESS NEWLINE
+;
+
 ifvrrp_authentication
 :
    AUTHENTICATION TEXT text = variable_permissive NEWLINE
@@ -1074,6 +1113,7 @@ s_interface
       | if_switchport_trunk_allowed
       | if_switchport_trunk_encapsulation
       | if_switchport_trunk_native
+      | if_tunnel
       | if_vrf
       | if_vrf_forwarding
       | if_vrf_member

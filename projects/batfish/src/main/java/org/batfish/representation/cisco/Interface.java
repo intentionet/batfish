@@ -172,6 +172,8 @@ public class Interface extends ComparableStructure<String> {
 
   private SwitchportEncapsulationType _switchportTrunkEncapsulation;
 
+  private Tunnel _tunnel;
+
   private String _vrf;
 
   public Interface(String name, CiscoConfiguration c) {
@@ -363,6 +365,17 @@ public class Interface extends ComparableStructure<String> {
     return _switchportTrunkEncapsulation;
   }
 
+  public Tunnel getTunnel() {
+    return _tunnel;
+  }
+
+  public Tunnel getTunnelInitIfNull() {
+    if (_tunnel == null) {
+      _tunnel = new Tunnel();
+    }
+    return _tunnel;
+  }
+
   public String getVrf() {
     return _vrf;
   }
@@ -497,6 +510,10 @@ public class Interface extends ComparableStructure<String> {
 
   public void setSwitchportTrunkEncapsulation(SwitchportEncapsulationType encapsulation) {
     _switchportTrunkEncapsulation = encapsulation;
+  }
+
+  public void setTunnel(Tunnel tunnel) {
+      _tunnel = tunnel;
   }
 
   public void setVrf(String vrf) {

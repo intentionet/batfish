@@ -1054,6 +1054,14 @@
           "configurationFormat" : "CISCO_NX",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
+          "ikePolicies" : {
+            "1" : {
+              "name" : "1",
+              "proposals" : [
+                "1"
+              ]
+            }
+          },
           "vendorFamily" : {
             "cisco" : {
               "hostname" : "aruba_crypto"
@@ -4223,6 +4231,14 @@
           "configurationFormat" : "CISCO_NX",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
+          "ikePolicies" : {
+            "1" : {
+              "name" : "1",
+              "proposals" : [
+                "1"
+              ]
+            }
+          },
           "vendorFamily" : {
             "cisco" : {
               "hostname" : "cisco_crypto"
