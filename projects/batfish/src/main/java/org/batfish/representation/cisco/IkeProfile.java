@@ -11,7 +11,7 @@ public class IkeProfile extends ComparableStructure<String> {
 
   private final int _definitionLine;
 
-  private  String _keyring;
+  private String _keyring;
 
   private Ip _localAddress;
 
@@ -26,11 +26,11 @@ public class IkeProfile extends ComparableStructure<String> {
     _keyring = keyring;
   }
 
-  public  void setLocalAddress(Ip address) {
+  public void setLocalAddress(Ip address) {
     _localAddress = address;
   }
 
   public void setMatchIdentityAddress(Ip address, Ip mask) {
-   _matchIdentityAddress = new Prefix(address, mask);
+    _matchIdentityAddress = new Prefix(address, mask);
   }
 }
