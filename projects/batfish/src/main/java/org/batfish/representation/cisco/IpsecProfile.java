@@ -8,7 +8,7 @@ public class IpsecProfile extends ComparableStructure<String> {
 
   private final int _definitionLine;
 
-  private  String _pfs;
+  private String _pfs;
 
   private String _transformSet;
 
@@ -21,7 +21,7 @@ public class IpsecProfile extends ComparableStructure<String> {
     _pfs = pfs;
   }
 
-  public  void setTransformSet(String transformSet) {
+  public void setTransformSet(String transformSet) {
     _transformSet = transformSet;
   }
 }

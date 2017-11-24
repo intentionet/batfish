@@ -9,7 +9,7 @@ public class IpsecPolicy extends ComparableStructure<String> {
 
   private final int _definitionLine;
 
-  private  String _mode;
+  private String _mode;
 
   private IpsecProposal _proposal;
 

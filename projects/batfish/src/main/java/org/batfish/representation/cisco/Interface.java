@@ -523,7 +523,7 @@ public class Interface extends ComparableStructure<String> {
   }
 
   public void setTunnel(Tunnel tunnel) {
-      _tunnel = tunnel;
+    _tunnel = tunnel;
   }
 
   public void setVrf(String vrf) {

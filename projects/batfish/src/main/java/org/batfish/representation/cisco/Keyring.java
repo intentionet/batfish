@@ -9,7 +9,7 @@ public class Keyring extends ComparableStructure<String> {
 
   private final int _definitionLine;
 
-  private  Ip _localAddress;
+  private Ip _localAddress;
 
   private Ip _remoteAddress;
 
@@ -21,7 +21,7 @@ public class Keyring extends ComparableStructure<String> {
   }
 
   public void setKey(String key) {
-     _key = key;
+    _key = key;
   }
 
   public void setLocalAddress(Ip address) {
