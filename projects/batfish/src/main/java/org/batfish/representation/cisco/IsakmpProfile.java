@@ -4,7 +4,7 @@ import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
 
-public class IkeProfile extends ComparableStructure<String> {
+public class IsakmpProfile extends ComparableStructure<String> {
 
   /** */
   private static final long serialVersionUID = 1L;
@@ -15,11 +15,27 @@ public class IkeProfile extends ComparableStructure<String> {
 
   private Ip _localAddress;
 
-  private Prefix _matchIdentityAddress;
+  private Prefix _matchIdentity;
 
-  public IkeProfile(String name, int definitionLine) {
+  public IsakmpProfile(String name, int definitionLine) {
     super(name);
     _definitionLine = definitionLine;
+  }
+
+  public int getDefinitionLine() {
+    return _definitionLine;
+  }
+
+  public String getKeyring() {
+    return _keyring;
+  }
+
+  public Ip getLocalAddress() {
+    return _localAddress;
+  }
+
+  public Prefix getMatchIdentity() {
+    return _matchIdentity;
   }
 
   public void setKeyring(String keyring) {
@@ -30,7 +46,7 @@ public class IkeProfile extends ComparableStructure<String> {
     _localAddress = address;
   }
 
-  public void setMatchIdentityAddress(Ip address, Ip mask) {
-    _matchIdentityAddress = new Prefix(address, mask);
+  public void setMatchIdentity(Ip address, Ip mask) {
+    _matchIdentity = new Prefix(address, mask);
   }
 }

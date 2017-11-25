@@ -399,6 +399,21 @@ AES
    'aes'
 ;
 
+AES128
+:
+   'aes128'
+;
+
+AES192
+:
+   'aes192'
+;
+
+AES256
+:
+   'aes256'
+;
+
 AES128_SHA1
 :
    'aes128-sha1'
@@ -3682,9 +3697,19 @@ ESP
    'esp'
 ;
 
+ESP_3DES
+:
+   'esp-3des'
+;
+
 ESP_AES
 :
    'esp-aes'
+;
+
+ESP_MD5_HMAC
+:
+   'esp-md5-hmac'
 ;
 
 ESP_SHA_HMAC
@@ -4466,6 +4491,11 @@ GROUP_URL
    'group-url'
 ;
 
+GROUP1
+:
+   'group1'
+;
+
 GROUP2
 :
    'group2'
@@ -4929,6 +4959,11 @@ IKEV1
 IKEV2
 :
    'ikev2'
+;
+
+IKEV2_PROFILE
+:
+   'ikev2-profile'
 ;
 
 ILMI_KEEPALIVE
@@ -9053,6 +9088,11 @@ RSA
    'rsa'
 ;
 
+RSA_SIG
+:
+   'rsa-sig'
+;
+
 RSAKEYPAIR
 :
    'rsakeypair'
@@ -9566,6 +9606,11 @@ SHA
 SHA1
 :
    'sha1' -> pushMode ( M_SHA1 )
+;
+
+SHA2_256_128
+:
+   'sha2-256-128'
 ;
 
 SHA512
@@ -12779,6 +12824,16 @@ M_Authentication_POLICY
 M_Authentication_PPP
 :
    'ppp' -> type ( PPP ) , popMode
+;
+
+M_Authentication_PRE_SHARE
+:
+   'pre-share' -> type ( PRE_SHARE ) , popMode
+;
+
+M_Authentication_RSA_SIG
+:
+   'rsa-sig' -> type ( RSA_SIG ) , popMode
 ;
 
 M_Authentication_SGBP

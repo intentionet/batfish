@@ -8,6 +8,8 @@ import org.batfish.common.util.ComparableStructure;
 
 public class IkeGateway extends ComparableStructure<String> {
 
+  private static final String PROP_EXTERNAL_INTERFACE = "externalInterface";
+
   private static final String PROP_IKE_POLICY = "ikePolicy";
 
   /** */
@@ -16,6 +18,8 @@ public class IkeGateway extends ComparableStructure<String> {
   private Ip _address;
 
   private Interface _externalInterface;
+
+  private transient String _externalInterfaceName;
 
   private IkePolicy _ikePolicy;
 
@@ -66,11 +70,21 @@ public class IkeGateway extends ComparableStructure<String> {
     return _address;
   }
 
+  @JsonIgnore
+  public Interface getExternalInterface() {
+    return _externalInterface;
+  }
+
+  @JsonProperty(PROP_EXTERNAL_INTERFACE)
   @JsonPropertyDescription(
       "Logical (non-VPN) interface from which to connect to IKE gateway. This interface is used to"
           + " determine source-address for the connection.")
-  public Interface getExternalInterface() {
-    return _externalInterface;
+  public String getExternalInterfaceName() {
+    if (_externalInterface != null) {
+      return _externalInterface.getName();
+    } else {
+      return _externalInterfaceName;
+    }
   }
 
   @JsonIgnore
@@ -105,6 +119,9 @@ public class IkeGateway extends ComparableStructure<String> {
   }
 
   public void resolveReferences(Configuration owner) {
+    if (_externalInterfaceName != null) {
+      _externalInterface = owner.getInterfaces().get(_externalInterfaceName);
+    }
     if (_ikePolicyName != null) {
       _ikePolicy = owner.getIkePolicies().get(_ikePolicyName);
     }
@@ -114,8 +131,14 @@ public class IkeGateway extends ComparableStructure<String> {
     _address = address;
   }
 
+  @JsonIgnore
   public void setExternalInterface(Interface externalInterface) {
     _externalInterface = externalInterface;
+  }
+
+  @JsonProperty(PROP_EXTERNAL_INTERFACE)
+  public void setExternalInterfaceName(String externalInterfaceName) {
+    _externalInterfaceName = externalInterfaceName;
   }
 
   @JsonIgnore

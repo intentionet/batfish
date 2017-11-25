@@ -3,7 +3,7 @@ package org.batfish.representation.cisco;
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.IpsecProposal;
 
-public class IpsecPolicy extends ComparableStructure<String> {
+public class IpsecTransformSet extends ComparableStructure<String> {
 
   private static final long serialVersionUID = 1L;
 
@@ -13,7 +13,7 @@ public class IpsecPolicy extends ComparableStructure<String> {
 
   private IpsecProposal _proposal;
 
-  public IpsecPolicy(String name, int definitionLine) {
+  public IpsecTransformSet(String name, int definitionLine) {
     super(name);
     _definitionLine = definitionLine;
     _proposal = new IpsecProposal(name, definitionLine);

@@ -1,6 +1,7 @@
 package org.batfish.representation.cisco;
 
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.datamodel.DiffieHellmanGroup;
 
 public class IpsecProfile extends ComparableStructure<String> {
 
@@ -8,7 +9,7 @@ public class IpsecProfile extends ComparableStructure<String> {
 
   private final int _definitionLine;
 
-  private String _pfs;
+  private DiffieHellmanGroup _pfsGroup;
 
   private String _transformSet;
 
@@ -17,8 +18,20 @@ public class IpsecProfile extends ComparableStructure<String> {
     _definitionLine = definitionLine;
   }
 
-  public void setPfs(String pfs) {
-    _pfs = pfs;
+  public int getDefinitionLine() {
+    return _definitionLine;
+  }
+
+  public DiffieHellmanGroup getPfsGroup() {
+    return _pfsGroup;
+  }
+
+  public String getTransformSet() {
+    return _transformSet;
+  }
+
+  public void setPfsGroup(DiffieHellmanGroup pfsGroup) {
+    _pfsGroup = pfsGroup;
   }
 
   public void setTransformSet(String transformSet) {

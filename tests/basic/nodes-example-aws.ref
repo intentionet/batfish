@@ -2419,64 +2419,16 @@
           "defaultInboundAction" : "ACCEPT",
           "ikeGateways" : {
             "vpn-ba2e34a8-1" : {
+              "name" : "vpn-ba2e34a8-1",
               "address" : "147.75.69.27",
-              "externalInterface" : {
-                "name" : "external1",
-                "accessVlan" : 0,
-                "active" : true,
-                "allPrefixes" : [
-                  "52.27.166.152/32"
-                ],
-                "autostate" : true,
-                "bandwidth" : 1.0E12,
-                "isisL1InterfaceMode" : "unset",
-                "isisL2InterfaceMode" : "unset",
-                "mtu" : 1500,
-                "nativeVlan" : 1,
-                "ospfDeadInterval" : 0,
-                "ospfEnabled" : false,
-                "ospfHelloMultiplier" : 0,
-                "ospfPassive" : false,
-                "prefix" : "52.27.166.152/32",
-                "ripEnabled" : false,
-                "ripPassive" : false,
-                "spanningTreePortfast" : false,
-                "switchportMode" : "NONE",
-                "switchportTrunkEncapsulation" : "DOT1Q",
-                "type" : "PHYSICAL"
-              },
-              "ikePolicy" : "vpn-ba2e34a8-1",
-              "name" : "vpn-ba2e34a8-1"
+              "externalInterface" : "external1",
+              "ikePolicy" : "vpn-ba2e34a8-1"
             },
             "vpn-ba2e34a8-2" : {
+              "name" : "vpn-ba2e34a8-2",
               "address" : "147.75.69.27",
-              "externalInterface" : {
-                "name" : "external2",
-                "accessVlan" : 0,
-                "active" : true,
-                "allPrefixes" : [
-                  "52.39.121.126/32"
-                ],
-                "autostate" : true,
-                "bandwidth" : 1.0E12,
-                "isisL1InterfaceMode" : "unset",
-                "isisL2InterfaceMode" : "unset",
-                "mtu" : 1500,
-                "nativeVlan" : 1,
-                "ospfDeadInterval" : 0,
-                "ospfEnabled" : false,
-                "ospfHelloMultiplier" : 0,
-                "ospfPassive" : false,
-                "prefix" : "52.39.121.126/32",
-                "ripEnabled" : false,
-                "ripPassive" : false,
-                "spanningTreePortfast" : false,
-                "switchportMode" : "NONE",
-                "switchportTrunkEncapsulation" : "DOT1Q",
-                "type" : "PHYSICAL"
-              },
-              "ikePolicy" : "vpn-ba2e34a8-2",
-              "name" : "vpn-ba2e34a8-2"
+              "externalInterface" : "external2",
+              "ikePolicy" : "vpn-ba2e34a8-2"
             }
           },
           "ikePolicies" : {

@@ -18,10 +18,12 @@ public enum CiscoStructureType implements StructureType {
   IP_ACCESS_LIST("ipv4/6 acl"),
   IP_ACCESS_LIST_EXTENDED("extended ip access-list"),
   IP_ACCESS_LIST_STANDARD("standard ip access-list"),
+  IPSEC_PROFILE("ipsec profile"),
   IPV4_ACCESS_LIST("ipv4 acl"),
   IPV6_ACCESS_LIST("ipv6 acl"),
   IPV6_ACCESS_LIST_EXTENDED("extended ipv6 access-list"),
   IPV6_ACCESS_LIST_STANDARD("standard ipv6 access-list"),
+  KEYRING("keyring"),
   L2TP_CLASS("l2tp-class"),
   MAC_ACCESS_LIST("mac acl"),
   NAT_POOL("nat pool"),
@@ -29,6 +31,7 @@ public enum CiscoStructureType implements StructureType {
   PREFIX6_LIST("ipv6 prefix-list"),
   ROUTE_MAP("route-map"),
   ROUTE_MAP_CLAUSE("route-map-clause"),
+  TRANSFORM_SET("ipsec transform-set"),
   SERVICE_CLASS("cable service-class");
 
   private final String _description;
