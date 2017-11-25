@@ -689,10 +689,14 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _interfaces;
   }
 
-  private Interface getInterfaceByTunnelSource(Ip sourceAddress) {
+  private Interface getInterfaceByTunnelAddresses(Ip sourceAddress, Prefix destPrefix) {
     for (Interface iface : _interfaces.values()) {
       Tunnel tunnel = iface.getTunnel();
-      if (tunnel != null && tunnel.getSource().equals(sourceAddress)) {
+      if (tunnel != null
+          && tunnel.getSource() != null
+          && tunnel.getSource().equals(sourceAddress)
+          && tunnel.getDestination() != null
+          && destPrefix.contains(tunnel.getDestination())) {
         return iface;
       }
     }
@@ -3772,9 +3776,19 @@ public final class CiscoConfiguration extends VendorConfiguration {
           ipsecVpn.setIpsecPolicy(c.getIpsecPolicies().get(profileName));
         }
 
-        for (IkeGateway ikeGateway : c.getIkeGateways().values()) {
-          if (ikeGateway.getLocalAddress().equals(tunnel.getSource())) {
-            ipsecVpn.setIkeGateway(ikeGateway);
+        Ip source = tunnel.getSource();
+        Ip destination = tunnel.getDestination();
+        if (source == null || destination == null) {
+          _w.redFlag("Can't match IkeGateway: tunnel source or destination is not set for " + name);
+        } else {
+          for (IkeGateway ikeGateway : c.getIkeGateways().values()) {
+            if (source.equals(ikeGateway.getLocalAddress())
+                && destination.equals(ikeGateway.getAddress())) {
+              ipsecVpn.setIkeGateway(ikeGateway);
+            }
+          }
+          if (ipsecVpn.getIkeGateway() == null) {
+            _w.redFlag("Can't find matching IkeGateway for " + name);
           }
         }
         c.getIpsecVpns().put(ipsecVpn.getName(), ipsecVpn);
@@ -3930,7 +3944,9 @@ public final class CiscoConfiguration extends VendorConfiguration {
       ikePolicy.setProposals(c.getIkeProposals());
 
       String keyringName = isakmpProfile.getKeyring();
-      if (!_keyrings.containsKey(keyringName)) {
+      if (keyringName == null) {
+        _w.redFlag("Cannot get PSK hash since keyring not configured for isakmpProfile " + name);
+      } else if (!_keyrings.containsKey(keyringName)) {
         undefined(
             CiscoStructureType.KEYRING,
             keyringName,
@@ -3941,26 +3957,29 @@ public final class CiscoConfiguration extends VendorConfiguration {
         if (keyring.match(isakmpProfile.getLocalAddress(), isakmpProfile.getMatchIdentity())) {
           ikePolicy.setPreSharedKeyHash(keyring.getKey());
         } else {
-          // TODO: warning??
+          _w.redFlag(
+              "The addresses of keyring " + keyringName + " do not match isakmpProfile " + name);
         }
       }
 
-      IkeGateway ikeGateway = new IkeGateway(e.getKey());
-      c.getIkeGateways().put(name, ikeGateway);
-      // TODO: correct?
-      ikeGateway.setAddress(isakmpProfile.getMatchIdentity().getAddress());
-      Interface oldIface = getInterfaceByTunnelSource(isakmpProfile.getLocalAddress());
-      if (oldIface != null) {
-        ikeGateway.setExternalInterface(c.getInterfaces().get(oldIface.getName()));
+      Ip localAddress = isakmpProfile.getLocalAddress();
+      Prefix remotePrefix = isakmpProfile.getMatchIdentity();
+      if (localAddress == null || remotePrefix == null) {
+        _w.redFlag(
+            "Can't get IkeGateway: Local or remote address is not set for isakmpProfile " + name);
       } else {
-        undefined(
-            CiscoStructureType.INTERFACE,
-            "Interface with tunnel source " + isakmpProfile.getLocalAddress(),
-            CiscoStructureUsage.ISAKMP_PROFILE,
-            isakmpProfile.getDefinitionLine());
+        IkeGateway ikeGateway = new IkeGateway(e.getKey());
+        c.getIkeGateways().put(name, ikeGateway);
+        ikeGateway.setAddress(remotePrefix.getAddress()); // correct?
+        Interface oldIface = getInterfaceByTunnelAddresses(localAddress, remotePrefix);
+        if (oldIface != null) {
+          ikeGateway.setExternalInterface(c.getInterfaces().get(oldIface.getName()));
+        } else {
+          _w.redFlag("External interface not found for ikeGateway for isakmpProfile " + name);
+        }
+        ikeGateway.setIkePolicy(ikePolicy);
+        ikeGateway.setLocalAddress(isakmpProfile.getLocalAddress());
       }
-      ikeGateway.setIkePolicy(ikePolicy);
-      ikeGateway.setLocalAddress(isakmpProfile.getLocalAddress());
     }
   }
 

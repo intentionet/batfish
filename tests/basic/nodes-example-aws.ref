@@ -915,6 +915,1333 @@
             }
           }
         },
+        "lhr-border-02" : {
+          "name" : "lhr-border-02",
+          "configurationFormat" : "CISCO_IOS",
+          "defaultCrossZoneAction" : "ACCEPT",
+          "defaultInboundAction" : "ACCEPT",
+          "domainName" : "demo.com",
+          "ikeGateways" : {
+            "isakmp-vpn-ba2e34a8-0" : {
+              "name" : "isakmp-vpn-ba2e34a8-0",
+              "address" : "52.27.166.152",
+              "externalInterface" : "Tunnel1",
+              "ikePolicy" : "isakmp-vpn-ba2e34a8-0",
+              "localAddress" : "172.16.1.2"
+            },
+            "isakmp-vpn-ba2e34a8-1" : {
+              "name" : "isakmp-vpn-ba2e34a8-1",
+              "address" : "52.39.121.126",
+              "externalInterface" : "Tunnel2",
+              "ikePolicy" : "isakmp-vpn-ba2e34a8-1",
+              "localAddress" : "172.16.1.2"
+            }
+          },
+          "ikePolicies" : {
+            "isakmp-vpn-ba2e34a8-0" : {
+              "name" : "isakmp-vpn-ba2e34a8-0",
+              "preSharedKeyHash" : "QMP5tKPP5qk95Y1Eee9c_82.MofNUJQV",
+              "proposals" : [
+                "200",
+                "201"
+              ]
+            },
+            "isakmp-vpn-ba2e34a8-1" : {
+              "name" : "isakmp-vpn-ba2e34a8-1",
+              "preSharedKeyHash" : "tYrysT4iT0.CRwQnhiBbng.BahDc7YPq",
+              "proposals" : [
+                "200",
+                "201"
+              ]
+            }
+          },
+          "ikeProposals" : {
+            "200" : {
+              "name" : "200",
+              "authenticationMethod" : "PRE_SHARED_KEYS",
+              "diffieHellmanGroup" : "GROUP2",
+              "encryptionAlgorithm" : "AES_128_CBC",
+              "lifetimeSeconds" : 28800
+            },
+            "201" : {
+              "name" : "201",
+              "authenticationMethod" : "PRE_SHARED_KEYS",
+              "diffieHellmanGroup" : "GROUP2",
+              "encryptionAlgorithm" : "AES_128_CBC",
+              "lifetimeSeconds" : 28800
+            }
+          },
+          "interfaces" : {
+            "Ethernet0/0" : {
+              "name" : "Ethernet0/0",
+              "accessVlan" : 0,
+              "active" : false,
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/0" : {
+              "name" : "Ethernet1/0",
+              "accessVlan" : 0,
+              "active" : true,
+              "allPrefixes" : [
+                "10.10.10.38/30"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "description" : "link to lhr-fw-01 e1/3",
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfArea" : 0,
+              "ospfCost" : 10,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : true,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "prefix" : "10.10.10.38/30",
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/1" : {
+              "name" : "Ethernet1/1",
+              "accessVlan" : 0,
+              "active" : true,
+              "allPrefixes" : [
+                "10.10.10.46/30"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "description" : "link to lhr-fw-02 e1/3",
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfArea" : 0,
+              "ospfCost" : 10,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : true,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "prefix" : "10.10.10.46/30",
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/2" : {
+              "name" : "Ethernet1/2",
+              "accessVlan" : 0,
+              "active" : true,
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/3" : {
+              "name" : "Ethernet1/3",
+              "accessVlan" : 0,
+              "active" : false,
+              "allPrefixes" : [
+                "10.10.30.1/30"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "description" : "link to lix-peer-01 e1/1",
+              "incomingFilter" : "LIMIT_PEER",
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "prefix" : "10.10.30.1/30",
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/4" : {
+              "name" : "Ethernet1/4",
+              "accessVlan" : 0,
+              "active" : false,
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/5" : {
+              "name" : "Ethernet1/5",
+              "accessVlan" : 0,
+              "active" : false,
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/6" : {
+              "name" : "Ethernet1/6",
+              "accessVlan" : 0,
+              "active" : false,
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Ethernet1/7" : {
+              "name" : "Ethernet1/7",
+              "accessVlan" : 0,
+              "active" : false,
+              "autostate" : true,
+              "bandwidth" : 1.0E7,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "GigabitEthernet0/0" : {
+              "name" : "GigabitEthernet0/0",
+              "accessVlan" : 0,
+              "active" : true,
+              "allPrefixes" : [
+                "192.168.60.37/24"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E9,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "prefix" : "192.168.60.37/24",
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "GigabitEthernet2/0" : {
+              "name" : "GigabitEthernet2/0",
+              "accessVlan" : 0,
+              "active" : true,
+              "allPrefixes" : [
+                "172.16.1.2/30"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E9,
+              "description" : "Border Interface",
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "prefix" : "172.16.1.2/30",
+              "proxyArp" : false,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "PHYSICAL",
+              "vrf" : "default"
+            },
+            "Loopback0" : {
+              "name" : "Loopback0",
+              "accessVlan" : 0,
+              "active" : true,
+              "allPrefixes" : [
+                "10.10.255.8/32"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E12,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfArea" : 0,
+              "ospfCost" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : true,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : true,
+              "prefix" : "10.10.255.8/32",
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "LOOPBACK",
+              "vrf" : "default"
+            },
+            "Tunnel1" : {
+              "name" : "Tunnel1",
+              "accessVlan" : 0,
+              "active" : false,
+              "allPrefixes" : [
+                "169.254.15.194/30"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E12,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "prefix" : "169.254.15.194/30",
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "TUNNEL",
+              "vrf" : "default"
+            },
+            "Tunnel2" : {
+              "name" : "Tunnel2",
+              "accessVlan" : 0,
+              "active" : false,
+              "allPrefixes" : [
+                "169.254.13.238/30"
+              ],
+              "autostate" : true,
+              "bandwidth" : 1.0E12,
+              "isisL1InterfaceMode" : "unset",
+              "isisL2InterfaceMode" : "unset",
+              "mtu" : 1500,
+              "nativeVlan" : 1,
+              "ospfDeadInterval" : 0,
+              "ospfEnabled" : false,
+              "ospfHelloMultiplier" : 0,
+              "ospfPassive" : false,
+              "prefix" : "169.254.13.238/30",
+              "proxyArp" : true,
+              "ripEnabled" : false,
+              "ripPassive" : false,
+              "spanningTreePortfast" : false,
+              "switchportMode" : "NONE",
+              "switchportTrunkEncapsulation" : "DOT1Q",
+              "type" : "TUNNEL",
+              "vrf" : "default"
+            }
+          },
+          "ipAccessLists" : {
+            "2001" : {
+              "name" : "2001",
+              "lines" : [
+                {
+                  "action" : "ACCEPT",
+                  "dstIps" : [
+                    "0.0.0.0/0"
+                  ],
+                  "ipProtocols" : [
+                    "ICMP"
+                  ],
+                  "name" : "permit icmp 10.100.0.0 0.0.255.255 any",
+                  "negate" : false,
+                  "srcIps" : [
+                    "10.100.0.0/16"
+                  ]
+                },
+                {
+                  "action" : "ACCEPT",
+                  "dstIps" : [
+                    "10.100.0.0/16"
+                  ],
+                  "ipProtocols" : [
+                    "ICMP"
+                  ],
+                  "name" : "permit icmp any 10.100.0.0 0.0.255.255",
+                  "negate" : false,
+                  "srcIps" : [
+                    "0.0.0.0/0"
+                  ]
+                }
+              ]
+            },
+            "LIMIT_PEER" : {
+              "name" : "LIMIT_PEER",
+              "lines" : [
+                {
+                  "action" : "ACCEPT",
+                  "dstIps" : [
+                    "0.0.0.0/0"
+                  ],
+                  "name" : "permit ip 10.1.30.0 0.0.0.255 any",
+                  "negate" : false,
+                  "srcIps" : [
+                    "10.1.30.0/24"
+                  ]
+                },
+                {
+                  "action" : "ACCEPT",
+                  "dstIps" : [
+                    "10.10.30.1"
+                  ],
+                  "name" : "permit ip host 10.10.30.2 host 10.10.30.1",
+                  "negate" : false,
+                  "srcIps" : [
+                    "10.10.30.2"
+                  ]
+                }
+              ]
+            },
+            "MATCH_ALL_BGP" : {
+              "name" : "MATCH_ALL_BGP",
+              "lines" : [
+                {
+                  "action" : "ACCEPT",
+                  "dstIps" : [
+                    "0.0.0.0/0"
+                  ],
+                  "name" : "permit ip any any",
+                  "negate" : false,
+                  "srcIps" : [
+                    "0.0.0.0/0"
+                  ]
+                }
+              ]
+            }
+          },
+          "ipsecPolicies" : {
+            "ipsec-vpn-ba2e34a8-0" : {
+              "name" : "ipsec-vpn-ba2e34a8-0",
+              "pfsKeyGroup" : "GROUP2",
+              "pfsKeyGroupDynamicIke" : false,
+              "proposals" : [
+                "ipsec-prop-vpn-ba2e34a8-0"
+              ]
+            },
+            "ipsec-vpn-ba2e34a8-1" : {
+              "name" : "ipsec-vpn-ba2e34a8-1",
+              "pfsKeyGroup" : "GROUP2",
+              "pfsKeyGroupDynamicIke" : false,
+              "proposals" : [
+                "ipsec-prop-vpn-ba2e34a8-1"
+              ]
+            }
+          },
+          "ipsecProposals" : {
+            "ipsec-prop-vpn-ba2e34a8-0" : {
+              "name" : "ipsec-prop-vpn-ba2e34a8-0",
+              "authenticationAlgorithm" : "HMAC_SHA1_96",
+              "encryptionAlgorithm" : "AES_128_CBC"
+            },
+            "ipsec-prop-vpn-ba2e34a8-1" : {
+              "name" : "ipsec-prop-vpn-ba2e34a8-1",
+              "authenticationAlgorithm" : "HMAC_SHA1_96",
+              "encryptionAlgorithm" : "AES_128_CBC"
+            }
+          },
+          "ipsecVpns" : {
+            "Tunnel1" : {
+              "name" : "Tunnel1",
+              "bindInterface" : "Tunnel1",
+              "ikeGateway" : "isakmp-vpn-ba2e34a8-0",
+              "ipsecPolicy" : "ipsec-vpn-ba2e34a8-0"
+            },
+            "Tunnel2" : {
+              "name" : "Tunnel2",
+              "bindInterface" : "Tunnel2",
+              "ikeGateway" : "isakmp-vpn-ba2e34a8-1",
+              "ipsecPolicy" : "ipsec-vpn-ba2e34a8-1"
+            }
+          },
+          "route6FilterLists" : {
+            "~BGP_NETWORK6_NETWORKS_FILTER:default~" : {
+              "name" : "~BGP_NETWORK6_NETWORKS_FILTER:default~"
+            }
+          },
+          "routeFilterLists" : {
+            "MATCH_ALL_BGP" : {
+              "name" : "MATCH_ALL_BGP",
+              "lines" : [
+                {
+                  "action" : "ACCEPT",
+                  "lengthRange" : "0-32",
+                  "prefix" : "0.0.0.0/0"
+                }
+              ]
+            },
+            "PROTECT_LOOPBACK" : {
+              "name" : "PROTECT_LOOPBACK",
+              "lines" : [
+                {
+                  "action" : "REJECT",
+                  "lengthRange" : "28-32",
+                  "prefix" : "10.10.255.0/28"
+                },
+                {
+                  "action" : "ACCEPT",
+                  "lengthRange" : "0-32",
+                  "prefix" : "0.0.0.0/0"
+                }
+              ]
+            }
+          },
+          "routingPolicies" : {
+            "PROTECT_LOOPBACK" : {
+              "name" : "PROTECT_LOOPBACK",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "comment" : "~RMCLAUSE~PROTECT_LOOPBACK~10~",
+                  "falseStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ReturnLocalDefaultAction"
+                    }
+                  ],
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
+                    "prefix" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
+                    },
+                    "prefixSet" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.NamedPrefixSet",
+                      "name" : "PROTECT_LOOPBACK"
+                    }
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ReturnTrue"
+                    }
+                  ]
+                }
+              ]
+            },
+            "SET_LOCAL_PREF" : {
+              "name" : "SET_LOCAL_PREF",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.SetLocalPreference",
+                  "localPreference" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.LiteralInt",
+                    "value" : 50
+                  }
+                },
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                  "type" : "ReturnTrue"
+                }
+              ]
+            },
+            "~BGP_COMMON_EXPORT_POLICY:default~" : {
+              "name" : "~BGP_COMMON_EXPORT_POLICY:default~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.Disjunction",
+                    "disjuncts" : [
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.expr.Conjunction",
+                        "conjuncts" : [
+                          {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
+                            "prefix" : {
+                              "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
+                            },
+                            "prefixSet" : {
+                              "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
+                              "prefixSpace" : [
+                                "10.10.0.0/16"
+                              ]
+                            }
+                          },
+                          {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.Not",
+                            "expr" : {
+                              "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                              "protocol" : "bgp"
+                            }
+                          },
+                          {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.Not",
+                            "expr" : {
+                              "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                              "protocol" : "ibgp"
+                            }
+                          },
+                          {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.Not",
+                            "expr" : {
+                              "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                              "protocol" : "aggregate"
+                            }
+                          },
+                          {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.WithEnvironmentExpr",
+                            "expr" : {
+                              "class" : "org.batfish.datamodel.routing_policy.expr.BooleanExprs$StaticBooleanExpr",
+                              "type" : "True"
+                            },
+                            "postStatements" : [
+                              {
+                                "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                                "type" : "UnsetWriteIntermediateBgpAttributes"
+                              }
+                            ],
+                            "postTrueStatements" : [
+                              {
+                                "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                                "type" : "SetReadIntermediateBgpAttributes"
+                              },
+                              {
+                                "class" : "org.batfish.datamodel.routing_policy.statement.SetOrigin",
+                                "originType" : {
+                                  "class" : "org.batfish.datamodel.routing_policy.expr.LiteralOrigin",
+                                  "originType" : "igp"
+                                }
+                              }
+                            ],
+                            "preStatements" : [
+                              {
+                                "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                                "type" : "SetWriteIntermediateBgpAttributes"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                        "protocol" : "bgp"
+                      },
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                        "protocol" : "ibgp"
+                      }
+                    ]
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ReturnTrue"
+                    }
+                  ]
+                },
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                  "type" : "ReturnFalse"
+                }
+              ]
+            },
+            "~BGP_DEFAULT_ROUTE_GENERATION_POLICY:default:169.254.13.237~" : {
+              "name" : "~BGP_DEFAULT_ROUTE_GENERATION_POLICY:default:169.254.13.237~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
+                    "comment" : "match default route",
+                    "prefix" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
+                    },
+                    "prefixSet" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
+                      "prefixSpace" : [
+                        "0.0.0.0/0"
+                      ]
+                    }
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ReturnTrue"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~BGP_DEFAULT_ROUTE_GENERATION_POLICY:default:169.254.15.193~" : {
+              "name" : "~BGP_DEFAULT_ROUTE_GENERATION_POLICY:default:169.254.15.193~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
+                    "comment" : "match default route",
+                    "prefix" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
+                    },
+                    "prefixSet" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
+                      "prefixSpace" : [
+                        "0.0.0.0/0"
+                      ]
+                    }
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ReturnTrue"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~BGP_PEER_EXPORT_POLICY:default:10.10.10.37~" : {
+              "name" : "~BGP_PEER_EXPORT_POLICY:default:10.10.10.37~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "comment" : "peer-export policy main conditional: exitAccept if true / exitReject if false",
+                  "falseStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitReject"
+                    }
+                  ],
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.CallExpr",
+                    "calledPolicyName" : "~BGP_COMMON_EXPORT_POLICY:default~"
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitAccept"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~BGP_PEER_EXPORT_POLICY:default:10.10.10.45~" : {
+              "name" : "~BGP_PEER_EXPORT_POLICY:default:10.10.10.45~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "comment" : "peer-export policy main conditional: exitAccept if true / exitReject if false",
+                  "falseStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitReject"
+                    }
+                  ],
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.CallExpr",
+                    "calledPolicyName" : "~BGP_COMMON_EXPORT_POLICY:default~"
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitAccept"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~BGP_PEER_EXPORT_POLICY:default:10.10.255.7~" : {
+              "name" : "~BGP_PEER_EXPORT_POLICY:default:10.10.255.7~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.SetNextHop",
+                  "destinationVrf" : false,
+                  "expr" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.SelfNextHop"
+                  }
+                },
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "comment" : "peer-export policy main conditional: exitAccept if true / exitReject if false",
+                  "falseStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitReject"
+                    }
+                  ],
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.CallExpr",
+                    "calledPolicyName" : "~BGP_COMMON_EXPORT_POLICY:default~"
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitAccept"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~BGP_PEER_EXPORT_POLICY:default:10.10.30.2~" : {
+              "name" : "~BGP_PEER_EXPORT_POLICY:default:10.10.30.2~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "comment" : "peer-export policy main conditional: exitAccept if true / exitReject if false",
+                  "falseStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitReject"
+                    }
+                  ],
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.CallExpr",
+                    "calledPolicyName" : "~BGP_COMMON_EXPORT_POLICY:default~"
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitAccept"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~BGP_PEER_EXPORT_POLICY:default:169.254.13.237~" : {
+              "name" : "~BGP_PEER_EXPORT_POLICY:default:169.254.13.237~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "comment" : "peer-export policy main conditional: exitAccept if true / exitReject if false",
+                  "falseStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitReject"
+                    }
+                  ],
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.Disjunction",
+                    "disjuncts" : [
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.expr.CallExpr",
+                        "calledPolicyName" : "~BGP_COMMON_EXPORT_POLICY:default~"
+                      },
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
+                        "comment" : "match default route",
+                        "prefix" : {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
+                        },
+                        "prefixSet" : {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
+                          "prefixSpace" : [
+                            "0.0.0.0/0"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitAccept"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~BGP_PEER_EXPORT_POLICY:default:169.254.15.193~" : {
+              "name" : "~BGP_PEER_EXPORT_POLICY:default:169.254.15.193~",
+              "statements" : [
+                {
+                  "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                  "comment" : "peer-export policy main conditional: exitAccept if true / exitReject if false",
+                  "falseStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitReject"
+                    }
+                  ],
+                  "guard" : {
+                    "class" : "org.batfish.datamodel.routing_policy.expr.Disjunction",
+                    "disjuncts" : [
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.expr.CallExpr",
+                        "calledPolicyName" : "~BGP_COMMON_EXPORT_POLICY:default~"
+                      },
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
+                        "comment" : "match default route",
+                        "prefix" : {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
+                        },
+                        "prefixSet" : {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
+                          "prefixSpace" : [
+                            "0.0.0.0/0"
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "trueStatements" : [
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                      "type" : "ExitAccept"
+                    }
+                  ]
+                }
+              ]
+            },
+            "~OSPF_EXPORT_POLICY:default~" : {
+              "name" : "~OSPF_EXPORT_POLICY:default~"
+            }
+          },
+          "vendorFamily" : {
+            "cisco" : {
+              "aaa" : {
+                "newModel" : true
+              },
+              "hostname" : "lhr-border-02",
+              "lines" : {
+                "aux0" : {
+                  "name" : "aux0",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0
+                },
+                "con0" : {
+                  "name" : "con0",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0
+                },
+                "vty0" : {
+                  "name" : "vty0",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0,
+                  "transportInput" : [
+                    "telnet"
+                  ]
+                },
+                "vty1" : {
+                  "name" : "vty1",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0,
+                  "transportInput" : [
+                    "telnet"
+                  ]
+                },
+                "vty2" : {
+                  "name" : "vty2",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0,
+                  "transportInput" : [
+                    "telnet"
+                  ]
+                },
+                "vty3" : {
+                  "name" : "vty3",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0,
+                  "transportInput" : [
+                    "ssh"
+                  ]
+                },
+                "vty4" : {
+                  "name" : "vty4",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0,
+                  "transportInput" : [
+                    "ssh"
+                  ]
+                },
+                "vty5" : {
+                  "name" : "vty5",
+                  "execTimeoutMinutes" : 0,
+                  "execTimeoutSeconds" : 0,
+                  "transportInput" : [
+                    "ssh"
+                  ]
+                }
+              },
+              "services" : {
+                "timestamps" : {
+                  "enabled" : true,
+                  "subservices" : {
+                    "debug" : {
+                      "enabled" : true,
+                      "subservices" : {
+                        "datetime" : {
+                          "enabled" : true,
+                          "subservices" : {
+                            "msec" : {
+                              "enabled" : true
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "log" : {
+                      "enabled" : true,
+                      "subservices" : {
+                        "datetime" : {
+                          "enabled" : true,
+                          "subservices" : {
+                            "msec" : {
+                              "enabled" : true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "ssh" : {
+                "version" : 2
+              },
+              "users" : {
+                "demo" : {
+                  "name" : "demo",
+                  "password" : "cd8471c7bbb9adeb9b20de5ce20510d05c44cb9c9724482cbb38ddb2a5bfcef4"
+                }
+              }
+            }
+          },
+          "vrfs" : {
+            "default" : {
+              "name" : "default",
+              "bgpProcess" : {
+                "multipathEbgp" : false,
+                "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
+                "multipathIbgp" : false,
+                "neighbors" : {
+                  "10.10.10.37/32" : {
+                    "name" : "10.10.10.37/32",
+                    "additionalPathsReceive" : false,
+                    "additionalPathsSelectAll" : false,
+                    "additionalPathsSend" : false,
+                    "address" : "10.10.10.37",
+                    "advertiseExternal" : false,
+                    "advertiseInactive" : true,
+                    "allowLocalAsIn" : false,
+                    "allowRemoteAsOut" : false,
+                    "clusterId" : 168492808,
+                    "defaultMetric" : 0,
+                    "dynamic" : false,
+                    "ebgpMultihop" : false,
+                    "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:10.10.10.37~",
+                    "group" : "FW",
+                    "importPolicy" : "SET_LOCAL_PREF",
+                    "localAs" : 65301,
+                    "localIp" : "10.10.10.38",
+                    "remoteAs" : 65201,
+                    "remotePrefix" : "10.10.10.37/32",
+                    "routeReflectorClient" : false,
+                    "sendCommunity" : false,
+                    "vrf" : "default"
+                  },
+                  "10.10.10.45/32" : {
+                    "name" : "10.10.10.45/32",
+                    "additionalPathsReceive" : false,
+                    "additionalPathsSelectAll" : false,
+                    "additionalPathsSend" : false,
+                    "address" : "10.10.10.45",
+                    "advertiseExternal" : false,
+                    "advertiseInactive" : true,
+                    "allowLocalAsIn" : false,
+                    "allowRemoteAsOut" : false,
+                    "clusterId" : 168492808,
+                    "defaultMetric" : 0,
+                    "dynamic" : false,
+                    "ebgpMultihop" : false,
+                    "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:10.10.10.45~",
+                    "group" : "FW",
+                    "localAs" : 65301,
+                    "localIp" : "10.10.10.46",
+                    "remoteAs" : 65202,
+                    "remotePrefix" : "10.10.10.45/32",
+                    "routeReflectorClient" : false,
+                    "sendCommunity" : false,
+                    "vrf" : "default"
+                  },
+                  "10.10.30.2/32" : {
+                    "name" : "10.10.30.2/32",
+                    "additionalPathsReceive" : false,
+                    "additionalPathsSelectAll" : false,
+                    "additionalPathsSend" : false,
+                    "address" : "10.10.30.2",
+                    "advertiseExternal" : false,
+                    "advertiseInactive" : true,
+                    "allowLocalAsIn" : false,
+                    "allowRemoteAsOut" : false,
+                    "clusterId" : 168492808,
+                    "defaultMetric" : 0,
+                    "dynamic" : false,
+                    "ebgpMultihop" : false,
+                    "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:10.10.30.2~",
+                    "importPolicy" : "PROTECT_LOOPBACK",
+                    "localAs" : 65301,
+                    "localIp" : "10.10.30.1",
+                    "remoteAs" : 65331,
+                    "remotePrefix" : "10.10.30.2/32",
+                    "routeReflectorClient" : false,
+                    "sendCommunity" : false,
+                    "vrf" : "default"
+                  },
+                  "10.10.255.7/32" : {
+                    "name" : "10.10.255.7/32",
+                    "additionalPathsReceive" : false,
+                    "additionalPathsSelectAll" : false,
+                    "additionalPathsSend" : false,
+                    "address" : "10.10.255.7",
+                    "advertiseExternal" : false,
+                    "advertiseInactive" : true,
+                    "allowLocalAsIn" : false,
+                    "allowRemoteAsOut" : false,
+                    "clusterId" : 168492808,
+                    "defaultMetric" : 0,
+                    "dynamic" : false,
+                    "ebgpMultihop" : false,
+                    "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:10.10.255.7~",
+                    "localAs" : 65301,
+                    "localIp" : "10.10.255.8",
+                    "remoteAs" : 65301,
+                    "remotePrefix" : "10.10.255.7/32",
+                    "routeReflectorClient" : false,
+                    "sendCommunity" : false,
+                    "vrf" : "default"
+                  },
+                  "169.254.13.237/32" : {
+                    "name" : "169.254.13.237/32",
+                    "additionalPathsReceive" : false,
+                    "additionalPathsSelectAll" : false,
+                    "additionalPathsSend" : false,
+                    "address" : "169.254.13.237",
+                    "advertiseExternal" : false,
+                    "advertiseInactive" : true,
+                    "allowLocalAsIn" : false,
+                    "allowRemoteAsOut" : false,
+                    "clusterId" : 168492808,
+                    "defaultMetric" : 0,
+                    "dynamic" : false,
+                    "ebgpMultihop" : false,
+                    "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:169.254.13.237~",
+                    "generatedRoutes" : [
+                      {
+                        "class" : "org.batfish.datamodel.GeneratedRoute",
+                        "administrativeCost" : 32767,
+                        "asPath" : [ ],
+                        "discard" : false,
+                        "generationPolicy" : "~BGP_DEFAULT_ROUTE_GENERATION_POLICY:default:169.254.13.237~",
+                        "metric" : 0,
+                        "network" : "0.0.0.0/0",
+                        "nextHopIp" : "AUTO/NONE(-1l)"
+                      }
+                    ],
+                    "importPolicy" : "PROTECT_LOOPBACK",
+                    "localAs" : 65301,
+                    "localIp" : "169.254.13.238",
+                    "remoteAs" : 65401,
+                    "remotePrefix" : "169.254.13.237/32",
+                    "routeReflectorClient" : false,
+                    "sendCommunity" : false,
+                    "vrf" : "default"
+                  },
+                  "169.254.15.193/32" : {
+                    "name" : "169.254.15.193/32",
+                    "additionalPathsReceive" : false,
+                    "additionalPathsSelectAll" : false,
+                    "additionalPathsSend" : false,
+                    "address" : "169.254.15.193",
+                    "advertiseExternal" : false,
+                    "advertiseInactive" : true,
+                    "allowLocalAsIn" : false,
+                    "allowRemoteAsOut" : false,
+                    "clusterId" : 168492808,
+                    "defaultMetric" : 0,
+                    "dynamic" : false,
+                    "ebgpMultihop" : false,
+                    "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:169.254.15.193~",
+                    "generatedRoutes" : [
+                      {
+                        "class" : "org.batfish.datamodel.GeneratedRoute",
+                        "administrativeCost" : 32767,
+                        "asPath" : [ ],
+                        "discard" : false,
+                        "generationPolicy" : "~BGP_DEFAULT_ROUTE_GENERATION_POLICY:default:169.254.15.193~",
+                        "metric" : 0,
+                        "network" : "0.0.0.0/0",
+                        "nextHopIp" : "AUTO/NONE(-1l)"
+                      }
+                    ],
+                    "importPolicy" : "PROTECT_LOOPBACK",
+                    "localAs" : 65301,
+                    "localIp" : "169.254.15.194",
+                    "remoteAs" : 65401,
+                    "remotePrefix" : "169.254.15.193/32",
+                    "routeReflectorClient" : false,
+                    "sendCommunity" : false,
+                    "vrf" : "default"
+                  }
+                },
+                "routerId" : "10.10.255.8",
+                "tieBreaker" : "ROUTER_ID"
+              },
+              "interfaces" : [
+                "Ethernet0/0",
+                "Ethernet1/0",
+                "Ethernet1/1",
+                "Ethernet1/2",
+                "Ethernet1/3",
+                "Ethernet1/4",
+                "Ethernet1/5",
+                "Ethernet1/6",
+                "Ethernet1/7",
+                "GigabitEthernet0/0",
+                "GigabitEthernet2/0",
+                "Loopback0",
+                "Tunnel1",
+                "Tunnel2"
+              ],
+              "ospfProcess" : {
+                "areas" : {
+                  "0" : {
+                    "name" : 0,
+                    "interfaces" : [
+                      "Ethernet1/0",
+                      "Ethernet1/1",
+                      "Loopback0"
+                    ]
+                  }
+                },
+                "exportPolicy" : "~OSPF_EXPORT_POLICY:default~",
+                "referenceBandwidth" : 1.0E8,
+                "routerId" : "10.10.255.8"
+              },
+              "staticRoutes" : [
+                {
+                  "class" : "org.batfish.datamodel.StaticRoute",
+                  "administrativeCost" : 1,
+                  "network" : "8.8.0.0/16",
+                  "nextHopInterface" : "dynamic",
+                  "nextHopIp" : "172.16.1.1",
+                  "tag" : -1
+                },
+                {
+                  "class" : "org.batfish.datamodel.StaticRoute",
+                  "administrativeCost" : 1,
+                  "network" : "10.10.0.0/16",
+                  "nextHopInterface" : "null_interface",
+                  "nextHopIp" : "AUTO/NONE(-1l)",
+                  "tag" : -1
+                },
+                {
+                  "class" : "org.batfish.datamodel.StaticRoute",
+                  "administrativeCost" : 1,
+                  "network" : "52.0.0.0/8",
+                  "nextHopInterface" : "dynamic",
+                  "nextHopIp" : "172.16.1.1",
+                  "tag" : -1
+                }
+              ]
+            }
+          }
+        },
         "subnet-073b8061" : {
           "name" : "subnet-073b8061",
           "configurationFormat" : "AWS_VPC",

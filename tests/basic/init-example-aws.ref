@@ -2,14 +2,32 @@
   "answerElements" : [
     {
       "class" : "org.batfish.datamodel.answers.ParseVendorConfigurationAnswerElement",
+      "fileMap" : {
+        "lhr-border-02" : "lhr-border-02.cfg"
+      },
+      "parseStatus" : {
+        "lhr-border-02" : "PASSED"
+      },
       "version" : "0.32.0"
     },
     {
       "class" : "org.batfish.datamodel.answers.ConvertConfigurationAnswerElement",
+      "unusedStructures" : {
+        "lhr-border-02" : {
+          "extended ip access-list" : {
+            "2001" : [
+              248
+            ]
+          }
+        }
+      },
       "version" : "0.32.0"
     },
     {
-      "class" : "org.batfish.datamodel.answers.InitInfoAnswerElement"
+      "class" : "org.batfish.datamodel.answers.InitInfoAnswerElement",
+      "parseStatus" : {
+        "lhr-border-02" : "PASSED"
+      }
     }
   ],
   "status" : "SUCCESS",
