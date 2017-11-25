@@ -4232,13 +4232,6 @@
           "configurationFormat" : "CISCO_NX",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
-          "ikeGateways" : {
-            "myprofile" : {
-              "name" : "myprofile",
-              "address" : "1.2.3.4",
-              "ikePolicy" : "myprofile"
-            }
-          },
           "ikePolicies" : {
             "myprofile" : {
               "name" : "myprofile",

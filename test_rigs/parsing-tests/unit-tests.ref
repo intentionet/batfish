@@ -46391,13 +46391,6 @@
           }
         },
         "cisco_crypto" : {
-          "interface" : {
-            "Interface with tunnel source null" : {
-              "isakmp profile" : [
-                157
-              ]
-            }
-          },
           "ipsec transform-set" : {
             "hijklmnop" : {
               "ipsec profile" : [
@@ -47581,6 +47574,11 @@
         "bgp_route_policy" : {
           "Red flags" : {
             "1" : "MISCELLANEOUS: Could not determine update source for BGP neighbor: '64.57.21.1'"
+          }
+        },
+        "cisco_crypto" : {
+          "Red flags" : {
+            "1" : "MISCELLANEOUS: Can't get IkeGateway: Local or remote address is not set for isakmpProfile myprofile"
           }
         },
         "cisco_interface" : {
