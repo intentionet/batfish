@@ -2,6 +2,7 @@ package org.batfish.representation.cisco;
 
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.Prefix;
 
 public class Keyring extends ComparableStructure<String> {
 
@@ -18,6 +19,26 @@ public class Keyring extends ComparableStructure<String> {
   public Keyring(String name, int definitionLine) {
     super(name);
     _definitionLine = definitionLine;
+  }
+
+  public int getDefinitionLine() {
+    return _definitionLine;
+  }
+
+  public String getKey() {
+    return _key;
+  }
+
+  public Ip getLocalAddress() {
+    return _localAddress;
+  }
+
+  public Ip getRemoteAddress() {
+    return _remoteAddress;
+  }
+
+  public boolean match(Ip localAddress, Prefix matchIdentity) {
+    return localAddress.equals(_localAddress) && matchIdentity.contains(_remoteAddress);
   }
 
   public void setKey(String key) {

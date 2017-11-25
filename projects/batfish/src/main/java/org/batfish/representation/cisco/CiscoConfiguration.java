@@ -35,6 +35,8 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.GeneratedRoute;
 import org.batfish.datamodel.GeneratedRoute6;
+import org.batfish.datamodel.IkeGateway;
+import org.batfish.datamodel.IkePolicy;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.Ip6AccessList;
@@ -44,6 +46,8 @@ import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
+import org.batfish.datamodel.IpsecPolicy;
+import org.batfish.datamodel.IpsecVpn;
 import org.batfish.datamodel.IsisInterfaceMode;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
@@ -105,6 +109,7 @@ import org.batfish.datamodel.vendor_family.cisco.DocsisPolicyRule;
 import org.batfish.datamodel.vendor_family.cisco.L2tpClass;
 import org.batfish.datamodel.vendor_family.cisco.Line;
 import org.batfish.datamodel.vendor_family.cisco.ServiceClass;
+import org.batfish.representation.cisco.Tunnel.TunnelMode;
 import org.batfish.vendor.StructureUsage;
 import org.batfish.vendor.VendorConfiguration;
 
@@ -286,9 +291,9 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private final Set<String> _igmpAcls;
 
-  private final Map<String, IkePolicy> _ikePolicies;
+  private final Map<String, IsakmpPolicy> _isakmpPolicies;
 
-  private final Map<String, IkeProfile> _ikeProfiles;
+  private final Map<String, IsakmpProfile> _isakmpProfiles;
 
   private final Map<String, Interface> _interfaces;
 
@@ -296,7 +301,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private final Set<String> _ipPimNeighborFilters;
 
-  private final Map<String, IpsecPolicy> _ipsecPolicies;
+  private final Map<String, IpsecTransformSet> _ipsecTransformSets;
 
   private final Map<String, IpsecProfile> _ipsecProfiles;
 
@@ -391,12 +396,12 @@ public final class CiscoConfiguration extends VendorConfiguration {
     _failoverPrimaryPrefixes = new TreeMap<>();
     _failoverStandbyPrefixes = new TreeMap<>();
     _igmpAcls = new TreeSet<>();
-    _ikePolicies = new TreeMap<>();
-    _ikeProfiles = new TreeMap<>();
+    _isakmpPolicies = new TreeMap<>();
+    _isakmpProfiles = new TreeMap<>();
     _interfaces = new TreeMap<>();
     _ipNatDestinationAccessLists = new TreeSet<>();
     _ipPimNeighborFilters = new TreeSet<>();
-    _ipsecPolicies = new TreeMap<>();
+    _ipsecTransformSets = new TreeMap<>();
     _ipsecProfiles = new TreeMap<>();
     _keyrings = new TreeMap<>();
     _lineAccessClassLists = new TreeSet<>();
@@ -680,16 +685,18 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _igmpAcls;
   }
 
-  public Map<String, IkePolicy> getIkePolicies() {
-    return _ikePolicies;
-  }
-
-  public Map<String, IkeProfile> getIkeProfiles() {
-    return _ikeProfiles;
-  }
-
   public Map<String, Interface> getInterfaces() {
     return _interfaces;
+  }
+
+  private Interface getInterfaceByTunnelSource(Ip sourceAddress) {
+    for (Interface iface : _interfaces.values()) {
+      Tunnel tunnel = iface.getTunnel();
+      if (tunnel != null && tunnel.getSource().equals(sourceAddress)) {
+        return iface;
+      }
+    }
+    return null;
   }
 
   public Set<String> getIpNatDestinationAccessLists() {
@@ -700,12 +707,20 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return _ipPimNeighborFilters;
   }
 
-  public Map<String, IpsecPolicy> getIpsecPolicies() {
-    return _ipsecPolicies;
+  public Map<String, IpsecTransformSet> getIpsecTransformSets() {
+    return _ipsecTransformSets;
   }
 
   public Map<String, IpsecProfile> getIpsecProfiles() {
     return _ipsecProfiles;
+  }
+
+  public Map<String, IsakmpPolicy> getIsakmpPolicies() {
+    return _isakmpPolicies;
+  }
+
+  public Map<String, IsakmpProfile> getIsakmpProfiles() {
+    return _isakmpProfiles;
   }
 
   public Map<String, Keyring> getKeyrings() {
@@ -3705,12 +3720,65 @@ public final class CiscoConfiguration extends VendorConfiguration {
     // apply vrrp settings to interfaces
     applyVrrp(c);
 
-    // convert ike policies
-    for (Entry<String, org.batfish.representation.cisco.IkePolicy> e : _ikePolicies.entrySet()) {
+    // get IKE proposals
+    for (Entry<String, IsakmpPolicy> e : _isakmpPolicies.entrySet()) {
+      c.getIkeProposals().put(e.getKey(), e.getValue().getProposal());
+    }
+
+    addIkePoliciesAndGateways(c);
+
+    // ipsec proposals
+    for (Entry<String, IpsecTransformSet> e : _ipsecTransformSets.entrySet()) {
+      c.getIpsecProposals().put(e.getKey(), e.getValue().getProposal());
+    }
+
+    // ipsec policies
+    for (Entry<String, IpsecProfile> e : _ipsecProfiles.entrySet()) {
       String name = e.getKey();
-      org.batfish.representation.cisco.IkePolicy oldIkePolicy = e.getValue();
-      org.batfish.datamodel.IkePolicy newPolicy = toIkePolicy(oldIkePolicy);
-      c.getIkePolicies().put(name, newPolicy);
+      IpsecProfile profile = e.getValue();
+
+      IpsecPolicy policy = new IpsecPolicy(name);
+      policy.setPfsKeyGroup(profile.getPfsGroup());
+      String transformSetName = profile.getTransformSet();
+      if (!c.getIpsecProposals().containsKey(transformSetName)) {
+        undefined(
+            CiscoStructureType.TRANSFORM_SET,
+            transformSetName,
+            CiscoStructureUsage.IPSEC_PROFILE,
+            profile.getDefinitionLine());
+      } else {
+        policy.getProposals().put(transformSetName, c.getIpsecProposals().get(transformSetName));
+      }
+      c.getIpsecPolicies().put(name, policy);
+    }
+
+    // ipsec vpns
+    for (Entry<String, Interface> e : _interfaces.entrySet()) {
+      String name = e.getKey();
+      Interface iface = e.getValue();
+      Tunnel tunnel = iface.getTunnel();
+      if (tunnel != null && tunnel.getMode() == TunnelMode.IPSEC) {
+        IpsecVpn ipsecVpn = new IpsecVpn(name, c);
+        ipsecVpn.setBindInterface(c.getInterfaces().get(name));
+
+        String profileName = tunnel.getIpsecProfileName();
+        if (!c.getIpsecPolicies().containsKey(profileName)) {
+          undefined(
+              CiscoStructureType.IPSEC_PROFILE,
+              profileName,
+              CiscoStructureUsage.TUNNEL_PROTECTION,
+              tunnel.getIpsecProfileNameLine());
+        } else {
+          ipsecVpn.setIpsecPolicy(c.getIpsecPolicies().get(profileName));
+        }
+
+        for (IkeGateway ikeGateway : c.getIkeGateways().values()) {
+          if (ikeGateway.getLocalAddress().equals(tunnel.getSource())) {
+            ipsecVpn.setIkeGateway(ikeGateway);
+          }
+        }
+        c.getIpsecVpns().put(ipsecVpn.getName(), ipsecVpn);
+      }
     }
 
     // convert routing processes
@@ -3851,15 +3919,49 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return c;
   }
 
-  private org.batfish.datamodel.IkePolicy toIkePolicy(IkePolicy oldIkePolicy) {
-    String name = oldIkePolicy.getName();
-    org.batfish.datamodel.IkePolicy newIkePolicy = new org.batfish.datamodel.IkePolicy(name);
+  private void addIkePoliciesAndGateways(Configuration c) {
+    // get IKE gateways and policies from Cisco isakmp profiles and keyrings
+    for (Entry<String, IsakmpProfile> e : _isakmpProfiles.entrySet()) {
+      String name = e.getKey();
+      IsakmpProfile isakmpProfile = e.getValue();
 
-    newIkePolicy
-        .getProposals()
-        .put(oldIkePolicy.getProposal().getName(), oldIkePolicy.getProposal());
+      IkePolicy ikePolicy = new IkePolicy(name);
+      c.getIkePolicies().put(name, ikePolicy);
+      ikePolicy.setProposals(c.getIkeProposals());
 
-    return newIkePolicy;
+      String keyringName = isakmpProfile.getKeyring();
+      if (!_keyrings.containsKey(keyringName)) {
+        undefined(
+            CiscoStructureType.KEYRING,
+            keyringName,
+            CiscoStructureUsage.ISAKMP_PROFILE,
+            isakmpProfile.getDefinitionLine());
+      } else {
+        Keyring keyring = _keyrings.get(keyringName);
+        if (keyring.match(isakmpProfile.getLocalAddress(), isakmpProfile.getMatchIdentity())) {
+          ikePolicy.setPreSharedKeyHash(keyring.getKey());
+        } else {
+          // TODO: warning??
+        }
+      }
+
+      IkeGateway ikeGateway = new IkeGateway(e.getKey());
+      c.getIkeGateways().put(name, ikeGateway);
+      // TODO: correct?
+      ikeGateway.setAddress(isakmpProfile.getMatchIdentity().getAddress());
+      Interface oldIface = getInterfaceByTunnelSource(isakmpProfile.getLocalAddress());
+      if (oldIface != null) {
+        ikeGateway.setExternalInterface(c.getInterfaces().get(oldIface.getName()));
+      } else {
+        undefined(
+            CiscoStructureType.INTERFACE,
+            "Interface with tunnel source " + isakmpProfile.getLocalAddress(),
+            CiscoStructureUsage.ISAKMP_PROFILE,
+            isakmpProfile.getDefinitionLine());
+      }
+      ikeGateway.setIkePolicy(ikePolicy);
+      ikeGateway.setLocalAddress(isakmpProfile.getLocalAddress());
+    }
   }
 
   private boolean usedForRouting(ExtendedAccessList eaList) {

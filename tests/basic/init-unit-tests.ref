@@ -26,6 +26,7 @@
         "aruba_aaa" : "aruba_aaa",
         "aruba_acl" : "aruba_acl",
         "aruba_airgroup" : "aruba_airgroup",
+        "aruba_crypto" : "aruba_crypto",
         "aruba_dhcp" : "aruba_dhcp",
         "aruba_interface" : "aruba_interface",
         "aruba_logging" : "aruba_logging",
@@ -74,6 +75,7 @@
         "cisco_callhome" : "cisco_callhome",
         "cisco_control_plane" : "cisco_control_plane",
         "cisco_controller" : "cisco_controller",
+        "cisco_crypto" : "cisco_crypto",
         "cisco_dhcp" : "cisco_dhcp",
         "cisco_domain" : "cisco_domain",
         "cisco_dot11" : "cisco_dot11",
@@ -259,7 +261,7 @@
         "aruba_aaa" : "PASSED",
         "aruba_acl" : "PASSED",
         "aruba_airgroup" : "PASSED",
-        "aruba_crypto" : "PARTIALLY_UNRECOGNIZED",
+        "aruba_crypto" : "PASSED",
         "aruba_dhcp" : "PASSED",
         "aruba_interface" : "PASSED",
         "aruba_logging" : "PASSED",
@@ -308,7 +310,7 @@
         "cisco_callhome" : "PASSED",
         "cisco_control_plane" : "PASSED",
         "cisco_controller" : "PASSED",
-        "cisco_crypto" : "PARTIALLY_UNRECOGNIZED",
+        "cisco_crypto" : "PASSED",
         "cisco_dhcp" : "PASSED",
         "cisco_domain" : "PASSED",
         "cisco_dot11" : "PASSED",
@@ -472,14 +474,6 @@
       },
       "version" : "0.32.0",
       "warnings" : {
-        "aruba_crypto" : {
-          "Red flags" : {
-            "1" : "MISCELLANEOUS: Unrecognized Line: 13:  encryption aes128\nLINES BELOW LINE  encryption aes128 MAY NOT BE PROCESSED CORRECTLY",
-            "2" : "MISCELLANEOUS: Unrecognized Line: 14:  encryption aes256\nLINES BELOW LINE  encryption aes256 MAY NOT BE PROCESSED CORRECTLY",
-            "3" : "MISCELLANEOUS: Unrecognized Line: 17:  hash sha2-256-128\nLINES BELOW LINE  hash sha2-256-128 MAY NOT BE PROCESSED CORRECTLY",
-            "4" : "MISCELLANEOUS: Unrecognized Line: 18:  prf prf-hmac-sha256\nLINES BELOW LINE  prf prf-hmac-sha256 MAY NOT BE PROCESSED CORRECTLY"
-          }
-        },
         "bgp_address_family" : {
           "Red flags" : {
             "1" : "MISCELLANEOUS: Ignoring reference to undeclared peer group: '13.16.3.16'"
@@ -501,19 +495,6 @@
           "Red flags" : {
             "1" : "MISCELLANEOUS: Ignoring reference to undeclared peer group: '1.2.3.4'",
             "2" : "MISCELLANEOUS: Ignoring reference to undeclared peer group: '1.2.3.4'"
-          }
-        },
-        "cisco_crypto" : {
-          "Red flags" : {
-            "1" : "MISCELLANEOUS: Unrecognized Line: 139:  set ikev2-profile someprofile\nLINES BELOW LINE  set ikev2-profile someprofile MAY NOT BE PROCESSED CORRECTLY",
-            "2" : "MISCELLANEOUS: Unrecognized Line: 142: crypto ipsec transform-set ESP-3DES-MD5 esp-3des esp-md5-hmac\nLINES BELOW LINE crypto ipsec transform-set ESP-3DES-MD5 esp-3des esp-md5-hmac MAY NOT BE PROCESSED CORRECTLY",
-            "3" : "MISCELLANEOUS: Unrecognized Line: 143:  mode transport\nLINES BELOW LINE  mode transport MAY NOT BE PROCESSED CORRECTLY",
-            "4" : "MISCELLANEOUS: Unrecognized Line: 144:  mode tunnel\nLINES BELOW LINE  mode tunnel MAY NOT BE PROCESSED CORRECTLY",
-            "5" : "MISCELLANEOUS: Unrecognized Line: 151:   encr 3des\nLINES BELOW LINE   encr 3des MAY NOT BE PROCESSED CORRECTLY",
-            "6" : "MISCELLANEOUS: Unrecognized Line: 153:   hash md5\nLINES BELOW LINE   hash md5 MAY NOT BE PROCESSED CORRECTLY",
-            "7" : "MISCELLANEOUS: Unrecognized Line: 154:   lifetime 28800\nLINES BELOW LINE   lifetime 28800 MAY NOT BE PROCESSED CORRECTLY",
-            "8" : "MISCELLANEOUS: Unrecognized Line: 157:    keyring VRF:MMS:RMT:UPM:1143\nLINES BELOW LINE    keyring VRF:MMS:RMT:UPM:1143 MAY NOT BE PROCESSED CORRECTLY",
-            "9" : "MISCELLANEOUS: Unrecognized Line: 180:   pre-shared-key address 1.1.1.1 key 9Aa9#A%X9AaAAAAAa\nLINES BELOW LINE   pre-shared-key address 1.1.1.1 key 9Aa9#A%X9AaAAAAAa MAY NOT BE PROCESSED CORRECTLY"
           }
         },
         "cisco_style_acl1" : {
@@ -740,10 +721,31 @@
           }
         },
         "cisco_crypto" : {
+          "interface" : {
+            "Interface with tunnel source null" : {
+              "isakmp profile" : [
+                157
+              ]
+            }
+          },
+          "ipsec transform-set" : {
+            "hijklmnop" : {
+              "ipsec profile" : [
+                138
+              ]
+            }
+          },
           "ipv4/6 acl" : {
             "myvpnacl" : {
               "crypto map ipsec-isakmp acl" : [
                 194
+              ]
+            }
+          },
+          "keyring" : {
+            "VRF:MMS:RMT:UPM:1143" : {
+              "isakmp profile" : [
+                157
               ]
             }
           }
@@ -2027,7 +2029,7 @@
         "aruba_aaa" : "PASSED",
         "aruba_acl" : "PASSED",
         "aruba_airgroup" : "PASSED",
-        "aruba_crypto" : "PARTIALLY_UNRECOGNIZED",
+        "aruba_crypto" : "PASSED",
         "aruba_dhcp" : "PASSED",
         "aruba_interface" : "PASSED",
         "aruba_logging" : "PASSED",
@@ -2076,7 +2078,7 @@
         "cisco_callhome" : "PASSED",
         "cisco_control_plane" : "PASSED",
         "cisco_controller" : "PASSED",
-        "cisco_crypto" : "PARTIALLY_UNRECOGNIZED",
+        "cisco_crypto" : "PASSED",
         "cisco_dhcp" : "PASSED",
         "cisco_domain" : "PASSED",
         "cisco_dot11" : "PASSED",

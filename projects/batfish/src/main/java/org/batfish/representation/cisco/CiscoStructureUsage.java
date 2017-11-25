@@ -45,6 +45,8 @@ public enum CiscoStructureUsage implements StructureUsage {
   IP_NAT_DESTINATION_ACCESS_LIST("ip nat destination acl"),
   IP_NAT_SOURCE_ACCESS_LIST("ip nat source dynamic access-list"),
   IP_NAT_SOURCE_POOL("ip nat source pool"),
+  IPSEC_PROFILE("ipsec profile"),
+  ISAKMP_PROFILE("isakmp profile"),
   LINE_ACCESS_CLASS_LIST("line access-class list"),
   LINE_ACCESS_CLASS_LIST6("line access-class ipv6 list"),
   MANAGEMENT_TELNET_ACCESS_GROUP("management telnet ip access-group"),
@@ -91,6 +93,7 @@ public enum CiscoStructureUsage implements StructureUsage {
   SSH_ACL("ssh acl"),
   SSH_IPV4_ACL("ssh ipv4 access-list"),
   SSH_IPV6_ACL("ssh ipv6 access-list"),
+  TUNNEL_PROTECTION("tunnel protection"),
   WCCP_GROUP_LIST("ip wccp group-list"),
   WCCP_REDIRECT_LIST("ip wccp redirect-list"),
   WCCP_SERVICE_LIST("ip wccp service-list");

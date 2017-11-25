@@ -242,15 +242,7 @@ cip_profile
 
 cip_transform_set
 :
-   TRANSFORM_SET name = variable
-   (
-      ESP_AES (bits = DEC)?
-   )
-   (
-      ESP_SHA_HMAC
-      | ESP_SHA256_HMAC
-   )
-   NEWLINE
+   TRANSFORM_SET variable ipsec_encryption ipsec_authentication NEWLINE
    (
       cipt_line
    )*
@@ -276,31 +268,41 @@ cipprf_set
 :
    SET
    (
-      cipprf_set_pfs
+      cipprf_set_null
+      | cipprf_set_pfs
       | cipprf_set_transform_set
-   ) NEWLINE
+   )
+;
+
+cipprf_set_null
+:
+   (
+      IKEV2_PROFILE
+   ) ~NEWLINE* NEWLINE
 ;
 
 cipprf_set_pfs
 :
-   PFS GROUP2
+   PFS dh_group NEWLINE
 ;
 
 cipprf_set_transform_set
 :
-   TRANSFORM_SET variable
+   TRANSFORM_SET variable NEWLINE
 ;
 
 cipt_line
 :
-   (
-      cipt_mode
-   )
+   cipt_mode
 ;
 
 cipt_mode
 :
-   MODE TUNNEL NEWLINE
+   MODE
+   (
+     TRANSPORT
+     | TUNNEL
+   ) NEWLINE
 ;
 
 cis_null
@@ -336,26 +338,32 @@ cispol_line
 :
    (
       cispol_authentication
-      | cispol_encr
+      | cispol_encr        //cisco
+      | cispol_encryption  //aruba
       | cispol_group
       | cispol_hash
       | cispol_lifetime
-      | cispol_line_null
+      | cispol_null
    )
 ;
 
 cispol_authentication
 :
-   AUTHENTICATION PRE_SHARE NEWLINE
+   AUTHENTICATION
+   (
+      PRE_SHARE
+      | RSA_SIG
+   ) NEWLINE
 ;
 
 cispol_encr
 :
-   ENCR
-   (
-      AES
-      | THREE_DES
-   ) NEWLINE
+   ENCR ike_encryption NEWLINE
+;
+
+cispol_encryption
+:
+   ENCRYPTION ike_encryption_aruba NEWLINE
 ;
 
 cispol_group
@@ -365,7 +373,11 @@ cispol_group
 
 cispol_hash
 :
-   HASH MD5 NEWLINE
+   HASH
+   (
+      MD5
+      | SHA2_256_128
+   ) NEWLINE
 ;
 
 cispol_lifetime
@@ -373,12 +385,11 @@ cispol_lifetime
     LIFETIME DEC NEWLINE
 ;
 
-cispol_line_null
+cispol_null
 :
    NO?
    (
-      ENCRYPTION
-      | PRF
+      PRF
       | VERSION
    ) ~NEWLINE* NEWLINE
 ;
@@ -387,24 +398,15 @@ cisprf_line
 :
    (
       cisprf_keyring
-      | cisprf_line_null
       | cisprf_local_address
       | cisprf_match
+      | cisprf_null
    )
 ;
 
 cisprf_keyring
 :
-   KEYRING name = variable NEWLINE
-;
-
-cisprf_line_null
-:
-   NO?
-   (
-      REVERSE_ROUTE
-      | VRF
-   ) ~NEWLINE* NEWLINE
+   KEYRING name = variable_permissive NEWLINE
 ;
 
 cisprf_local_address
@@ -415,6 +417,15 @@ cisprf_local_address
 cisprf_match
 :
    MATCH IDENTITY ADDRESS address = IP_ADDRESS mask = IP_ADDRESS NEWLINE
+;
+
+cisprf_null
+:
+   NO?
+   (
+      REVERSE_ROUTE
+      | VRF
+   ) ~NEWLINE* NEWLINE
 ;
 
 ck_null
@@ -467,7 +478,7 @@ ckr_local_address
 
 ckr_psk
 :
-   PRE_SHARED_KEY ADDRESS IP_ADDRESS KEY variable NEWLINE
+   PRE_SHARED_KEY ADDRESS IP_ADDRESS KEY variable_permissive NEWLINE
 ;
 
 cpki_certificate_chain
@@ -683,6 +694,12 @@ crypto_pki
    )
 ;
 
+dh_group
+:
+   GROUP1
+   | GROUP2
+;
+
 key_key
 :
    KEY name = variable NEWLINE
@@ -700,6 +717,40 @@ kk_null
       | KEY_STRING
       | SEND_LIFETIME
    ) ~NEWLINE* NEWLINE
+;
+
+ike_encryption
+:
+   (
+      AES
+      | THREE_DES
+   )
+;
+
+ike_encryption_aruba
+:
+   (
+      AES128
+      | AES192
+      | AES256
+   )
+;
+
+ipsec_authentication
+:
+   (
+      ESP_MD5_HMAC
+      | ESP_SHA_HMAC
+      | ESP_SHA256_HMAC
+   )
+;
+
+ipsec_encryption
+:
+   (
+      ESP_AES
+      | ESP_3DES
+   )
 ;
 
 s_crypto

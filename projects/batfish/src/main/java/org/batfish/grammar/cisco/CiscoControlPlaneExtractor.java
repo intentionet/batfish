@@ -196,6 +196,7 @@ import org.batfish.grammar.cisco.CiscoParser.Cis_profileContext;
 import org.batfish.grammar.cisco.CiscoParser.Cisco_configurationContext;
 import org.batfish.grammar.cisco.CiscoParser.Cispol_authenticationContext;
 import org.batfish.grammar.cisco.CiscoParser.Cispol_encrContext;
+import org.batfish.grammar.cisco.CiscoParser.Cispol_encryptionContext;
 import org.batfish.grammar.cisco.CiscoParser.Cispol_groupContext;
 import org.batfish.grammar.cisco.CiscoParser.Cispol_hashContext;
 import org.batfish.grammar.cisco.CiscoParser.Cispol_lifetimeContext;
@@ -227,6 +228,7 @@ import org.batfish.grammar.cisco.CiscoParser.Default_originate_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Default_shutdown_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Delete_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Description_bgp_tailContext;
+import org.batfish.grammar.cisco.CiscoParser.Dh_groupContext;
 import org.batfish.grammar.cisco.CiscoParser.Disable_peer_as_check_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Disposition_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Distribute_list_bgp_tailContext;
@@ -302,6 +304,8 @@ import org.batfish.grammar.cisco.CiscoParser.Ifvrrp_authenticationContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifvrrp_ipContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifvrrp_preemptContext;
 import org.batfish.grammar.cisco.CiscoParser.Ifvrrp_priorityContext;
+import org.batfish.grammar.cisco.CiscoParser.Ike_encryptionContext;
+import org.batfish.grammar.cisco.CiscoParser.Ike_encryption_arubaContext;
 import org.batfish.grammar.cisco.CiscoParser.Inherit_peer_policy_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Inherit_peer_session_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Int_compContext;
@@ -325,6 +329,8 @@ import org.batfish.grammar.cisco.CiscoParser.Ip_prefix_list_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_route_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_route_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_ssh_versionContext;
+import org.batfish.grammar.cisco.CiscoParser.Ipsec_authenticationContext;
+import org.batfish.grammar.cisco.CiscoParser.Ipsec_encryptionContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipv6_prefix_list_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipv6_prefix_list_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Is_type_is_stanzaContext;
@@ -577,15 +583,15 @@ import org.batfish.representation.cisco.ExtendedAccessList;
 import org.batfish.representation.cisco.ExtendedAccessListLine;
 import org.batfish.representation.cisco.ExtendedIpv6AccessList;
 import org.batfish.representation.cisco.ExtendedIpv6AccessListLine;
-import org.batfish.representation.cisco.IkePolicy;
-import org.batfish.representation.cisco.IkeProfile;
 import org.batfish.representation.cisco.Interface;
 import org.batfish.representation.cisco.IpAsPathAccessList;
 import org.batfish.representation.cisco.IpAsPathAccessListLine;
 import org.batfish.representation.cisco.IpBgpPeerGroup;
-import org.batfish.representation.cisco.IpsecPolicy;
 import org.batfish.representation.cisco.IpsecProfile;
+import org.batfish.representation.cisco.IpsecTransformSet;
 import org.batfish.representation.cisco.Ipv6BgpPeerGroup;
+import org.batfish.representation.cisco.IsakmpPolicy;
+import org.batfish.representation.cisco.IsakmpProfile;
 import org.batfish.representation.cisco.IsisProcess;
 import org.batfish.representation.cisco.IsisRedistributionPolicy;
 import org.batfish.representation.cisco.Keyring;
@@ -872,13 +878,13 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   private List<Interface> _currentInterfaces;
 
-  private IkePolicy _currentIkePolicy;
+  private IsakmpPolicy _currentIsakmpPolicy;
 
-  private IkeProfile _currentIkeProfile;
+  private IsakmpProfile _currentIsakmpProfile;
 
   private IpBgpPeerGroup _currentIpPeerGroup;
 
-  private IpsecPolicy _currentIpsecPolicy;
+  private IpsecTransformSet _currentIpsecTransformSet;
 
   private IpsecProfile _currentIpsecProfile;
 
@@ -1134,61 +1140,41 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterCip_transform_set(Cip_transform_setContext ctx) {
-    if (_currentIpsecPolicy != null) {
-      throw new BatfishException("IpsecPolicy should be null!");
+    if (_currentIpsecTransformSet != null) {
+      throw new BatfishException("IpsecTransformSet should be null!");
     }
-    _currentIpsecPolicy = new IpsecPolicy(ctx.name.getText(), ctx.getStart().getLine());
-    IpsecProposal proposal = _currentIpsecPolicy.getProposal();
-    // set encryption algorithm
-    if (ctx.ESP_AES() != null) {
-      if (ctx.bits == null) {
-        proposal.setEncryptionAlgorithm(EncryptionAlgorithm.AES_128_CBC);
-      } else {
-        int bits = toInteger(ctx.bits);
-        if (bits == 192) {
-          proposal.setEncryptionAlgorithm(EncryptionAlgorithm.AES_192_CBC);
-        } else if (bits == 256) {
-          proposal.setEncryptionAlgorithm(EncryptionAlgorithm.AES_256_CBC);
-        } else {
-          throw new BatfishException("Unknown encryption algo bits " + bits);
-        }
-      }
-    }
-    // set authentication algorithm
-    if (ctx.ESP_SHA_HMAC() != null) {
-      proposal.setAuthenticationAlgorithm(IpsecAuthenticationAlgorithm.HMAC_SHA1_96);
-    } else if (ctx.ESP_SHA256_HMAC() != null) {
-      proposal.setAuthenticationAlgorithm(IpsecAuthenticationAlgorithm.HMAC_SHA_256_128);
-    }
+    _currentIpsecTransformSet =
+        new IpsecTransformSet(ctx.variable().getText(), ctx.getStart().getLine());
+    IpsecProposal proposal = _currentIpsecTransformSet.getProposal();
+    proposal.setEncryptionAlgorithm(toEncryptionAlgorithm(ctx.ipsec_encryption()));
+    proposal.setAuthenticationAlgorithm(toIpsecAuthenticationAlgorithm(ctx.ipsec_authentication()));
   }
 
   @Override
   public void enterCipprf_set_pfs(Cipprf_set_pfsContext ctx) {
     if (_currentIpsecProfile == null) {
-      throw new BatfishException("_currentIkeProfile shouldn't be null!");
+      throw new BatfishException("_currentIsakmpProfile shouldn't be null!");
     }
-    if (ctx.GROUP2() != null) {
-      _currentIpsecProfile.setPfs(ctx.GROUP2().getText());
-    } else {
-      throw new BatfishException("Unsupported pfs variable " + ctx.getText());
-    }
+    _currentIpsecProfile.setPfsGroup(toDhGroup(ctx.dh_group()));
   }
 
   @Override
   public void enterCipprf_set_transform_set(Cipprf_set_transform_setContext ctx) {
     if (_currentIpsecProfile == null) {
-      throw new BatfishException("_currentIkeProfile shouldn't be null!");
+      throw new BatfishException("_currentIsakmpProfile shouldn't be null!");
     }
-    _currentIpsecProfile.setPfs(ctx.variable().getText());
+    _currentIpsecProfile.setTransformSet(ctx.variable().getText());
   }
 
   @Override
   public void enterCipt_mode(Cipt_modeContext ctx) {
-    if (_currentIpsecPolicy == null) {
-      throw new BatfishException("_currentIkePolicy shouldn't be null!");
+    if (_currentIpsecTransformSet == null) {
+      throw new BatfishException("_currentIsakmpPolicy shouldn't be null!");
     }
-    if (ctx.TUNNEL() != null) {
-      _currentIpsecPolicy.setMode(ctx.TUNNEL().getText());
+    if (ctx.TRANSPORT() != null) {
+      // do nothing for now
+    } else if (ctx.TUNNEL() != null) {
+      _currentIpsecTransformSet.setMode(ctx.TUNNEL().getText());
     } else {
       throw new BatfishException("Unsupported mode " + ctx.getText());
     }
@@ -1196,18 +1182,18 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterCis_policy(Cis_policyContext ctx) {
-    if (_currentIkePolicy != null) {
-      throw new BatfishException("IkePolicy should be null!");
+    if (_currentIsakmpPolicy != null) {
+      throw new BatfishException("IsakmpPolicy should be null!");
     }
-    _currentIkePolicy = new IkePolicy(ctx.name.getText(), ctx.getStart().getLine());
+    _currentIsakmpPolicy = new IsakmpPolicy(ctx.name.getText(), ctx.getStart().getLine());
   }
 
   @Override
   public void enterCis_profile(Cis_profileContext ctx) {
-    if (_currentIkeProfile != null) {
-      throw new BatfishException("IkeProfile should be null!");
+    if (_currentIsakmpProfile != null) {
+      throw new BatfishException("IsakmpProfile should be null!");
     }
-    _currentIkeProfile = new IkeProfile(ctx.name.getText(), ctx.getStart().getLine());
+    _currentIsakmpProfile = new IsakmpProfile(ctx.name.getText(), ctx.getStart().getLine());
   }
 
   @Override
@@ -1219,13 +1205,17 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterCispol_authentication(Cispol_authenticationContext ctx) {
-    if (_currentIkePolicy == null) {
+    if (_currentIsakmpPolicy == null) {
       throw new BatfishException("_currentIkeProposal shouldn't be null!");
     }
     if (ctx.PRE_SHARE() != null) {
-      _currentIkePolicy
+      _currentIsakmpPolicy
           .getProposal()
           .setAuthenticationMethod(IkeAuthenticationMethod.PRE_SHARED_KEYS);
+    } else if (ctx.RSA_SIG() != null) {
+      _currentIsakmpPolicy
+          .getProposal()
+          .setAuthenticationMethod(IkeAuthenticationMethod.RSA_SIGNATURES);
     } else {
       throw new BatfishException("Unsupported authentication method in " + ctx.getText());
     }
@@ -1233,36 +1223,46 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterCispol_encr(Cispol_encrContext ctx) {
-    if (_currentIkePolicy == null) {
-      throw new BatfishException("IkePolicy shouldn't be null!");
+    if (_currentIsakmpPolicy == null) {
+      throw new BatfishException("IsakmpPolicy shouldn't be null!");
     }
-    if (ctx.AES() != null) {
-      _currentIkePolicy.getProposal().setEncryptionAlgorithm(EncryptionAlgorithm.AES_128_CBC);
-    } else if (ctx.THREE_DES() != null) {
-      _currentIkePolicy.getProposal().setEncryptionAlgorithm(EncryptionAlgorithm.THREEDES_CBC);
-    } else {
-      throw new BatfishException("Unsupported encryption algorithm " + ctx.getText());
+    _currentIsakmpPolicy
+        .getProposal()
+        .setEncryptionAlgorithm(toEncryptionAlgorithm(ctx.ike_encryption()));
+  }
+
+  @Override
+  public void enterCispol_encryption(Cispol_encryptionContext ctx) {
+    if (_currentIsakmpPolicy == null) {
+      throw new BatfishException("IsakmpPolicy shouldn't be null!");
     }
+    _currentIsakmpPolicy
+        .getProposal()
+        .setEncryptionAlgorithm(toEncryptionAlgorithm(ctx.ike_encryption_aruba()));
   }
 
   @Override
   public void enterCispol_group(Cispol_groupContext ctx) {
-    if (_currentIkePolicy == null) {
-      throw new BatfishException("IkePolicy shouldn't be null!");
+    if (_currentIsakmpPolicy == null) {
+      throw new BatfishException("IsakmpPolicy shouldn't be null!");
     }
     int group = Integer.parseInt(ctx.DEC().getText());
-    _currentIkePolicy
+    _currentIsakmpPolicy
         .getProposal()
         .setDiffieHellmanGroup(DiffieHellmanGroup.fromGroupNumber(group));
   }
 
   @Override
   public void enterCispol_hash(Cispol_hashContext ctx) {
-    if (_currentIkePolicy == null) {
-      throw new BatfishException("IkePolicy shouldn't be null!");
+    if (_currentIsakmpPolicy == null) {
+      throw new BatfishException("IsakmpPolicy shouldn't be null!");
     }
     if (ctx.MD5() != null) {
-      _currentIkePolicy.getProposal().setAuthenticationAlgorithm(IkeAuthenticationAlgorithm.MD5);
+      _currentIsakmpPolicy.getProposal().setAuthenticationAlgorithm(IkeAuthenticationAlgorithm.MD5);
+    } else if (ctx.SHA2_256_128() != null) {
+      _currentIsakmpPolicy
+          .getProposal()
+          .setAuthenticationAlgorithm(IkeAuthenticationAlgorithm.SHA_256);
     } else {
       throw new BatfishException("Unsupported authentication method in " + ctx.getText());
     }
@@ -1270,34 +1270,34 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterCispol_lifetime(Cispol_lifetimeContext ctx) {
-    if (_currentIkePolicy == null) {
-      throw new BatfishException("IkePolicy shouldn't be null!");
+    if (_currentIsakmpPolicy == null) {
+      throw new BatfishException("IsakmpPolicy shouldn't be null!");
     }
-    _currentIkePolicy.getProposal().setLifetimeSeconds(Integer.parseInt(ctx.DEC().getText()));
+    _currentIsakmpPolicy.getProposal().setLifetimeSeconds(Integer.parseInt(ctx.DEC().getText()));
   }
 
   @Override
   public void enterCisprf_keyring(Cisprf_keyringContext ctx) {
-    if (_currentIkeProfile == null) {
-      throw new BatfishException("IkeProfile shouldn't be null!");
+    if (_currentIsakmpProfile == null) {
+      throw new BatfishException("IsakmpProfile shouldn't be null!");
     }
-    _currentIkeProfile.setKeyring(ctx.name.getText());
+    _currentIsakmpProfile.setKeyring(ctx.name.getText());
   }
 
   @Override
   public void enterCisprf_match(Cisprf_matchContext ctx) {
-    if (_currentIkeProfile == null) {
-      throw new BatfishException("IkeProfile shouldn't be null!");
+    if (_currentIsakmpProfile == null) {
+      throw new BatfishException("IsakmpProfile shouldn't be null!");
     }
-    _currentIkeProfile.setMatchIdentityAddress(toIp(ctx.address), toIp(ctx.mask));
+    _currentIsakmpProfile.setMatchIdentity(toIp(ctx.address), toIp(ctx.mask));
   }
 
   @Override
   public void enterCisprf_local_address(Cisprf_local_addressContext ctx) {
-    if (_currentIkeProfile == null) {
-      throw new BatfishException("IkeProfile shouldn't be null!");
+    if (_currentIsakmpProfile == null) {
+      throw new BatfishException("IsakmpProfile shouldn't be null!");
     }
-    _currentIkeProfile.setLocalAddress(toIp(ctx.IP_ADDRESS()));
+    _currentIsakmpProfile.setLocalAddress(toIp(ctx.IP_ADDRESS()));
   }
 
   @Override
@@ -1313,7 +1313,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     if (_currentKeyring == null) {
       throw new BatfishException("Keyrin shouldn't be null!");
     }
-    _currentKeyring.setKey(ctx.variable().getText());
+    _currentKeyring.setKey(ctx.variable_permissive().getText());
     _currentKeyring.setRemoteAddress(toIp(ctx.IP_ADDRESS()));
   }
 
@@ -2492,29 +2492,31 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitCip_transform_set(Cip_transform_setContext ctx) {
-    if (_currentIpsecPolicy == null) {
-      throw new BatfishException("IpsecPolicy shouldn't be null!");
+    if (_currentIpsecTransformSet == null) {
+      throw new BatfishException("IpsecTransformSet shouldn't be null!");
     }
-    _configuration.getIpsecPolicies().put(_currentIpsecPolicy.getName(), _currentIpsecPolicy);
-    _currentIpsecPolicy = null;
+    _configuration
+        .getIpsecTransformSets()
+        .put(_currentIpsecTransformSet.getName(), _currentIpsecTransformSet);
+    _currentIpsecTransformSet = null;
   }
 
   @Override
   public void exitCis_policy(Cis_policyContext ctx) {
-    if (_currentIkePolicy == null) {
-      throw new BatfishException("IkePolicy shouldn't be null!");
+    if (_currentIsakmpPolicy == null) {
+      throw new BatfishException("IsakmpPolicy shouldn't be null!");
     }
-    _configuration.getIkePolicies().put(_currentIkePolicy.getName(), _currentIkePolicy);
-    _currentIkePolicy = null;
+    _configuration.getIsakmpPolicies().put(_currentIsakmpPolicy.getName(), _currentIsakmpPolicy);
+    _currentIsakmpPolicy = null;
   }
 
   @Override
   public void exitCis_profile(Cis_profileContext ctx) {
-    if (_currentIkeProfile == null) {
-      throw new BatfishException("IkeProfile shouldn't be null!");
+    if (_currentIsakmpProfile == null) {
+      throw new BatfishException("IsakmpProfile shouldn't be null!");
     }
-    _configuration.getIkeProfiles().put(_currentIkeProfile.getName(), _currentIkeProfile);
-    _currentIkeProfile = null;
+    _configuration.getIsakmpProfiles().put(_currentIsakmpProfile.getName(), _currentIsakmpProfile);
+    _currentIsakmpProfile = null;
   }
 
   @Override
@@ -3605,7 +3607,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void exitIftunnel_protection(Iftunnel_protectionContext ctx) {
     for (Interface iface : _currentInterfaces) {
-      iface.getTunnelInitIfNull().setIpsecProfile(ctx.variable().getText());
+      iface.getTunnelInitIfNull().setIpsecProfileName(ctx.variable().getText());
+      iface.getTunnelInitIfNull().setIpsecProfileNameLine(ctx.getStart().getLine());
     }
   }
 
@@ -6315,6 +6318,19 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     return new ExplicitAsPathSet(elems);
   }
 
+  private IpsecAuthenticationAlgorithm toIpsecAuthenticationAlgorithm(
+      Ipsec_authenticationContext ctx) {
+    if (ctx.ESP_MD5_HMAC() != null) {
+      return IpsecAuthenticationAlgorithm.HMAC_MD5_96;
+    } else if (ctx.ESP_SHA_HMAC() != null) {
+      return IpsecAuthenticationAlgorithm.HMAC_SHA1_96;
+    } else if (ctx.ESP_SHA256_HMAC() != null) {
+      return IpsecAuthenticationAlgorithm.HMAC_SHA_256_128;
+    } else {
+      throw new BatfishException("Unknown ipsec authentication algo " + ctx.getText());
+    }
+  }
+
   private IntExpr toCommonIntExpr(Int_exprContext ctx) {
     if (ctx.DEC() != null && ctx.PLUS() == null && ctx.DASH() == null) {
       int val = toInteger(ctx.DEC());
@@ -6381,6 +6397,16 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     _unimplementedFeatures.add("Cisco: " + feature);
   }
 
+  private DiffieHellmanGroup toDhGroup(Dh_groupContext ctx) {
+    if (ctx.GROUP1() != null) {
+      return DiffieHellmanGroup.GROUP1;
+    } else if (ctx.GROUP2() != null) {
+      return DiffieHellmanGroup.GROUP2;
+    } else {
+      throw new BatfishException("invalid dh-group");
+    }
+  }
+
   private int toDscpType(Dscp_typeContext ctx) {
     int val;
     if (ctx.DEC() != null) {
@@ -6442,6 +6468,38 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       return SwitchportEncapsulationType.NEGOTIATE;
     } else {
       throw convError(SwitchportEncapsulationType.class, ctx);
+    }
+  }
+
+  private EncryptionAlgorithm toEncryptionAlgorithm(Ike_encryptionContext ctx) {
+    if (ctx.AES() != null) {
+      return EncryptionAlgorithm.AES_128_CBC;
+    } else if (ctx.THREE_DES() != null) {
+      return EncryptionAlgorithm.THREEDES_CBC;
+    } else {
+      throw new BatfishException("Unsupported encryption algorithm " + ctx.getText());
+    }
+  }
+
+  private EncryptionAlgorithm toEncryptionAlgorithm(Ike_encryption_arubaContext ctx) {
+    if (ctx.AES128() != null) {
+      return EncryptionAlgorithm.AES_128_CBC;
+    } else if (ctx.AES192() != null) {
+      return EncryptionAlgorithm.AES_192_CBC;
+    } else if (ctx.AES256() != null) {
+      return EncryptionAlgorithm.AES_256_CBC;
+    } else {
+      throw new BatfishException("Unsupported encryption algorithm " + ctx.getText());
+    }
+  }
+
+  private EncryptionAlgorithm toEncryptionAlgorithm(Ipsec_encryptionContext ctx) {
+    if (ctx.ESP_AES() != null) {
+      return EncryptionAlgorithm.AES_128_CBC;
+    } else if (ctx.ESP_3DES() != null) {
+      return EncryptionAlgorithm.THREEDES_CBC;
+    } else {
+      throw new BatfishException("Unknown encryption algorithm " + ctx.getText());
     }
   }
 
