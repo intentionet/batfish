@@ -697,7 +697,18 @@ public final class CiscoConfiguration extends VendorConfiguration {
           && tunnel.getSource().equals(sourceAddress)
           && tunnel.getDestination() != null
           && destPrefix.contains(tunnel.getDestination())) {
-        return iface;
+        /*
+         * We found a tunnel interface with the required parameters. Now return the external
+         * interface with this address.
+         */
+        return _interfaces
+            .values()
+            .stream()
+            .filter(
+                i ->
+                    i.getAllPrefixes().stream().anyMatch(p -> p.getAddress().equals(sourceAddress)))
+            .findFirst()
+            .orElse(null);
       }
     }
     return null;
@@ -3970,7 +3981,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
       } else {
         IkeGateway ikeGateway = new IkeGateway(e.getKey());
         c.getIkeGateways().put(name, ikeGateway);
-        ikeGateway.setAddress(remotePrefix.getAddress()); // correct?
+        ikeGateway.setAddress(remotePrefix.getAddress());
         Interface oldIface = getInterfaceByTunnelAddresses(localAddress, remotePrefix);
         if (oldIface != null) {
           ikeGateway.setExternalInterface(c.getInterfaces().get(oldIface.getName()));

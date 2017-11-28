@@ -208,11 +208,7 @@ public class IpsecVpnCheckQuestionPlugin extends QuestionPlugin {
               answerElement.addIpsecVpnPair(
                   answerElement.getIncompatibleIpsecProposals(), c, ipsecVpn, remoteIpsecVpn);
             }
-            if (!ipsecVpn
-                .getIkeGateway()
-                .getIkePolicy()
-                .getPreSharedKeyHash()
-                .equals(remoteIpsecVpn.getIkeGateway().getIkePolicy().getPreSharedKeyHash())) {
+            if (!ipsecVpn.compatiblePreSharedKey(remoteIpsecVpn)) {
               answerElement.addIpsecVpnPair(
                   answerElement.getPreSharedKeyMismatch(), c, ipsecVpn, remoteIpsecVpn);
             }

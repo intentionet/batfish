@@ -1,0 +1,86 @@
+!
+hostname r2
+!
+crypto keyring keyring12
+ local-address 10.12.0.2
+ pre-shared-key address 10.12.0.1 key keyring12password
+!
+crypto keyring keyring23
+ local-address 10.23.0.2
+ pre-shared-key address 10.23.0.3 key keyring23password
+!
+!
+crypto isakmp policy 12
+ encr aes
+ authentication pre-share
+ group 2
+ lifetime 28800
+!
+crypto isakmp policy 23
+ encr aes
+ authentication pre-share
+ group 2
+ lifetime 28800
+!
+!
+crypto isakmp keepalive 10 10
+!
+!
+crypto isakmp profile isakmp-profile12
+ keyring keyring12
+ match identity address 10.12.0.1 255.255.255.255
+ local-address 10.12.0.2
+!
+crypto isakmp profile isakmp-profile23
+ keyring keyring23
+ match identity address 10.23.0.3 255.255.255.255
+ local-address 10.23.0.2
+!
+crypto ipsec security-association replay window-size 128
+!
+!
+crypto ipsec transform-set ipsec-proposal12 esp-aes esp-sha-hmac
+ mode tunnel
+!
+crypto ipsec transform-set ipsec-proposal23 esp-aes esp-sha-hmac
+ mode tunnel
+!
+!
+crypto ipsec df-bit clear
+!
+!
+crypto ipsec profile ipsec-profile12
+ set transform-set ipsec-proposal12
+ set pfs group2
+!
+crypto ipsec profile ipsec-profile23
+ set transform-set ipsec-proposal23
+ set pfs group2
+!
+!
+interface Tunnel12
+ ip address 172.16.12.2 255.255.255.0
+ ip tcp adjust-mss 1379
+ tunnel source 10.12.0.2
+ tunnel mode ipsec ipv4
+ tunnel destination 10.12.0.1
+ tunnel protection ipsec profile ipsec-profile12
+!
+interface Tunnel23
+ ip address 172.16.23.2 255.255.255.0
+ ip tcp adjust-mss 1379
+ tunnel source 10.23.0.2
+ tunnel mode ipsec ipv4
+ tunnel destination 10.23.0.3
+ tunnel protection ipsec profile ipsec-profile23
+!
+interface Ethernet1/2
+ ip address 10.12.0.2 255.255.255.0
+ no shutdown
+!
+interface Ethernet2/3
+ ip address 10.23.0.2 255.255.255.0
+ no shutdown
+!
+!
+

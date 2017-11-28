@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1221,7 +1222,11 @@ public class Batfish extends PluginConsumer implements IBatfish {
     initRemoteIpsecVpns(configurations);
     for (Configuration c : configurations.values()) {
       for (IpsecVpn vpn : c.getIpsecVpns().values()) {
-        if (vpn.getRemoteIpsecVpn() == null) {
+        IpsecVpn remoteVpn = vpn.getRemoteIpsecVpn();
+        if (remoteVpn == null
+            || !vpn.compatibleIkeProposals(remoteVpn)
+            || !vpn.compatibleIpsecProposals(remoteVpn)
+            || !vpn.compatiblePreSharedKey(remoteVpn)) {
           String hostname = c.getHostname();
           Interface bindInterface = vpn.getBindInterface();
           if (bindInterface != null) {
@@ -2098,7 +2103,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   @Override
   public void initRemoteIpsecVpns(Map<String, Configuration> configurations) {
-    Map<IpsecVpn, Ip> remoteAddresses = new HashMap<>();
+    Map<IpsecVpn, Ip> remoteAddresses = new IdentityHashMap<>();
     Map<Ip, Set<IpsecVpn>> externalAddresses = new HashMap<>();
     for (Configuration c : configurations.values()) {
       for (IpsecVpn ipsecVpn : c.getIpsecVpns().values()) {
@@ -2109,7 +2114,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
         for (Prefix externalPrefix : externalPrefixes) {
           Ip externalAddress = externalPrefix.getAddress();
           Set<IpsecVpn> vpnsUsingExternalAddress =
-              externalAddresses.computeIfAbsent(externalAddress, k -> new HashSet<>());
+              externalAddresses.computeIfAbsent(externalAddress, k -> Sets.newIdentityHashSet());
           vpnsUsingExternalAddress.add(ipsecVpn);
         }
       }

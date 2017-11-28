@@ -1,0 +1,87 @@
+!
+hostname r3
+!
+crypto keyring keyring13
+ local-address 10.13.0.3
+ ! The VPN should not be established because the password is mistyped below
+ pre-shared-key address 10.13.0.1 key keyring13password_WITH_TYPO
+!
+crypto keyring keyring23
+ local-address 10.23.0.3
+ pre-shared-key address 10.23.0.2 key keyring23password
+!
+!
+crypto isakmp policy 13
+ encr aes
+ authentication pre-share
+ group 2
+ lifetime 28800
+!
+crypto isakmp policy 23
+ encr aes
+ authentication pre-share
+ group 2
+ lifetime 28800
+!
+!
+crypto isakmp keepalive 10 10
+!
+!
+crypto isakmp profile isakmp-profile13
+ keyring keyring13
+ match identity address 10.13.0.1 255.255.255.255
+ local-address 10.13.0.3
+!
+crypto isakmp profile isakmp-profile23
+ keyring keyring23
+ match identity address 10.23.0.2 255.255.255.255
+ local-address 10.23.0.3
+!
+crypto ipsec security-association replay window-size 128
+!
+!
+crypto ipsec transform-set ipsec-proposal13 esp-aes esp-sha-hmac
+ mode tunnel
+!
+crypto ipsec transform-set ipsec-proposal23 esp-aes esp-sha-hmac
+ mode tunnel
+!
+!
+crypto ipsec df-bit clear
+!
+!
+crypto ipsec profile ipsec-profile13
+ set transform-set ipsec-proposal13
+ set pfs group2
+!
+crypto ipsec profile ipsec-profile23
+ set transform-set ipsec-proposal23
+ set pfs group2
+!
+!
+interface Tunnel13
+ ip address 172.16.13.3 255.255.255.0
+ ip tcp adjust-mss 1379
+ tunnel source 10.13.0.3
+ tunnel mode ipsec ipv4
+ tunnel destination 10.13.0.1
+ tunnel protection ipsec profile ipsec-profile13
+!
+interface Tunnel23
+ ip address 172.16.23.3 255.255.255.0
+ ip tcp adjust-mss 1379
+ tunnel source 10.23.0.3
+ tunnel mode ipsec ipv4
+ tunnel destination 10.23.0.2
+ tunnel protection ipsec profile ipsec-profile23
+!
+interface Ethernet1/3
+ ip address 10.13.0.3 255.255.255.0
+ no shutdown
+!
+interface Ethernet2/3
+ ip address 10.23.0.3 255.255.255.0
+ no shutdown
+!
+!
+

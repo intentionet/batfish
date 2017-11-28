@@ -87,6 +87,20 @@ public final class IpsecVpn extends ComparableStructure<String> {
     return false;
   }
 
+  public boolean compatiblePreSharedKey(IpsecVpn remoteIpsecVpn) {
+    if (_ikeGateway == null || remoteIpsecVpn._ikeGateway == null) {
+      return false;
+    }
+    IkePolicy ikePolicy = _ikeGateway.getIkePolicy();
+    IkePolicy remoteIkePolicy = remoteIpsecVpn._ikeGateway.getIkePolicy();
+    if (ikePolicy == null || remoteIkePolicy == null) {
+      return false;
+    }
+    String psk = ikePolicy.getPreSharedKeyHash();
+    String remotePsk = remoteIkePolicy.getPreSharedKeyHash();
+    return psk != null && remotePsk != null && psk.equals(remotePsk);
+  }
+
   @Nullable
   @JsonIgnore
   private IkeProposal getActiveIkeProposal(IpsecVpn remoteIpsecVpn) {

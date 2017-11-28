@@ -26,6 +26,7 @@ import org.batfish.datamodel.AsPath;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
+import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.OspfProcess;
@@ -199,26 +200,39 @@ public class CiscoGrammarTest {
   }
 
   @Test
-  public void testOspfPointToPoint() throws IOException {
-    String testrigName = "ospf-point-to-point";
-    String iosOspfPointToPoint = "ios-ospf-point-to-point";
-    String[] configurationNames = new String[] {iosOspfPointToPoint};
+  public void testIpsecVpnIos() throws IOException {
+    String testrigName = "ipsec-vpn-ios";
+    String r1Name = "r1";
+    String r2Name = "r2";
+    String r3Name = "r3";
+    String[] configurationNames = new String[] {r1Name, r2Name, r3Name};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
             TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
-    batfish.getSettings().setDisableUnrecognized(false);
     SortedMap<String, Configuration> configurations;
     try {
       configurations = batfish.loadConfigurations();
     } catch (CompositeBatfishException e) {
       throw e.asSingleException();
     }
-    Configuration iosMaxMetric = configurations.get(iosOspfPointToPoint);
-    Interface e0Sub0 = iosMaxMetric.getInterfaces().get("Ethernet0/0");
-    Interface e0Sub1 = iosMaxMetric.getInterfaces().get("Ethernet0/1");
 
-    assertTrue(e0Sub0.getOspfPointToPoint());
-    assertFalse(e0Sub1.getOspfPointToPoint());
+    assertThat(
+        configurations.values().stream().flatMap(c -> c.getIpsecVpns().values().stream()).count(),
+        equalTo(6L));
+    configurations
+        .values()
+        .stream()
+        .flatMap(c -> c.getIpsecVpns().values().stream())
+        .forEach(iv -> assertThat(iv.getRemoteIpsecVpn(), not(nullValue())));
+    /* Two tunnels should not be established because of a password mismatch between r1 and r3 */
+    assertThat(
+        configurations
+            .values()
+            .stream()
+            .flatMap(c -> c.getInterfaces().values().stream())
+            .filter(i -> i.getInterfaceType().equals(InterfaceType.TUNNEL) && i.getActive())
+            .count(),
+        equalTo(4L));
   }
 
   @Test
@@ -267,6 +281,28 @@ public class CiscoGrammarTest {
     assertThat(procOnStartup.getMaxMetricStubNetworks(), is(nullValue()));
     assertThat(procOnStartup.getMaxMetricExternalNetworks(), is(nullValue()));
     assertThat(procOnStartup.getMaxMetricSummaryNetworks(), is(nullValue()));
+  }
+
+  @Test
+  public void testOspfPointToPoint() throws IOException {
+    String testrigName = "ospf-point-to-point";
+    String iosOspfPointToPoint = "ios-ospf-point-to-point";
+    String[] configurationNames = new String[] {iosOspfPointToPoint};
+    Batfish batfish =
+        BatfishTestUtils.getBatfishFromTestrigResource(
+            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+    SortedMap<String, Configuration> configurations;
+    try {
+      configurations = batfish.loadConfigurations();
+    } catch (CompositeBatfishException e) {
+      throw e.asSingleException();
+    }
+    Configuration iosMaxMetric = configurations.get(iosOspfPointToPoint);
+    Interface e0Sub0 = iosMaxMetric.getInterfaces().get("Ethernet0/0");
+    Interface e0Sub1 = iosMaxMetric.getInterfaces().get("Ethernet0/1");
+
+    assertTrue(e0Sub0.getOspfPointToPoint());
+    assertFalse(e0Sub1.getOspfPointToPoint());
   }
 
   @Test
