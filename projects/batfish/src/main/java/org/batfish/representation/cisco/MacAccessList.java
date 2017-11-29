@@ -3,8 +3,9 @@ package org.batfish.representation.cisco;
 import java.util.ArrayList;
 import java.util.List;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.common.util.DefinedStructure;
 
-public class MacAccessList extends ComparableStructure<String> {
+public class MacAccessList extends ComparableStructure<String> implements DefinedStructure {
 
   private static final long serialVersionUID = 1L;
 
@@ -18,6 +19,7 @@ public class MacAccessList extends ComparableStructure<String> {
     _lines = new ArrayList<>();
   }
 
+  @Override
   public int getDefinitionLine() {
     return _definitionLine;
   }

@@ -1160,10 +1160,17 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterCipprf_set_transform_set(Cipprf_set_transform_setContext ctx) {
+    String name = ctx.variable().getText();
+    int line = ctx.getStart().getLine();
     if (_currentIpsecProfile == null) {
       throw new BatfishException("_currentIsakmpProfile shouldn't be null!");
     }
-    _currentIpsecProfile.setTransformSet(ctx.variable().getText());
+    _currentIpsecProfile.setTransformSet(name);
+    _configuration.referenceStructure(
+        CiscoStructureType.IPSEC_TRANSFORM_SET,
+        name,
+        CiscoStructureUsage.IPSEC_PROFILE_TRANSFORM_SET,
+        line);
   }
 
   @Override
@@ -1278,10 +1285,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterCisprf_keyring(Cisprf_keyringContext ctx) {
+    String name = ctx.name.getText();
+    int line = ctx.getStart().getLine();
     if (_currentIsakmpProfile == null) {
       throw new BatfishException("IsakmpProfile shouldn't be null!");
     }
-    _currentIsakmpProfile.setKeyring(ctx.name.getText());
+    _currentIsakmpProfile.setKeyring(name);
+    _configuration.referenceStructure(
+        CiscoStructureType.KEYRING, name, CiscoStructureUsage.ISAKMP_PROFILE_KEYRING, line);
   }
 
   @Override
@@ -3606,9 +3617,12 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitIftunnel_protection(Iftunnel_protectionContext ctx) {
+    String name = ctx.variable().getText();
+    int line = ctx.getStart().getLine();
+    _configuration.referenceStructure(
+        CiscoStructureType.IPSEC_PROFILE, name, CiscoStructureUsage.TUNNEL_PROTECTION_IPSEC_PROFILE, line);
     for (Interface iface : _currentInterfaces) {
-      iface.getTunnelInitIfNull().setIpsecProfileName(ctx.variable().getText());
-      iface.getTunnelInitIfNull().setIpsecProfileNameLine(ctx.getStart().getLine());
+      iface.getTunnelInitIfNull().setIpsecProfileName(name);
     }
   }
 

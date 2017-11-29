@@ -1,10 +1,10 @@
 package org.batfish.representation.cisco;
 
-import java.io.Serializable;
+import org.batfish.common.util.ReferenceCountedStructure;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpProtocol;
 
-public class Tunnel implements Serializable {
+public class Tunnel extends ReferenceCountedStructure {
 
   public enum TunnelMode {
     GRE,
@@ -16,8 +16,6 @@ public class Tunnel implements Serializable {
   Ip _destination;
 
   String _ipsecProfileName;
-
-  int _ipsecProfileNameLine;
 
   TunnelMode _mode;
 
@@ -31,10 +29,6 @@ public class Tunnel implements Serializable {
 
   public String getIpsecProfileName() {
     return _ipsecProfileName;
-  }
-
-  public int getIpsecProfileNameLine() {
-    return _ipsecProfileNameLine;
   }
 
   public TunnelMode getMode() {
@@ -51,10 +45,6 @@ public class Tunnel implements Serializable {
 
   public void setIpsecProfileName(String name) {
     _ipsecProfileName = name;
-  }
-
-  public void setIpsecProfileNameLine(int line) {
-    _ipsecProfileNameLine = line;
   }
 
   public void setMode(TunnelMode mode) {

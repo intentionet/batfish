@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.common.util.DefinedStructure;
 
-public class DepiTunnel extends ComparableStructure<String> {
+public class DepiTunnel extends ComparableStructure<String> implements DefinedStructure {
 
   /** */
   private static final long serialVersionUID = 1L;
@@ -24,6 +25,7 @@ public class DepiTunnel extends ComparableStructure<String> {
   }
 
   @JsonIgnore
+  @Override
   public int getDefinitionLine() {
     return _definitionLine;
   }

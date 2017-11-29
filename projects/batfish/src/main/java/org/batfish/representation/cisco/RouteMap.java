@@ -3,8 +3,9 @@ package org.batfish.representation.cisco;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.common.util.DefinedStructure;
 
-public class RouteMap extends ComparableStructure<String> {
+public class RouteMap extends ComparableStructure<String> implements DefinedStructure {
 
   private static final long serialVersionUID = 1L;
 
@@ -22,6 +23,7 @@ public class RouteMap extends ComparableStructure<String> {
     return _clauses;
   }
 
+  @Override
   public int getDefinitionLine() {
     return _definitionLine;
   }

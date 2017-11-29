@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.common.util.DefinedStructure;
 
-public class ServiceClass extends ComparableStructure<String> {
+public class ServiceClass extends ComparableStructure<String> implements DefinedStructure {
 
   private static final String PROP_FRIENDLY_NAME = "friendlyName";
 
@@ -28,6 +29,7 @@ public class ServiceClass extends ComparableStructure<String> {
   }
 
   @JsonIgnore
+  @Override
   public int getDefinitionLine() {
     return _definitionLine;
   }

@@ -6,8 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.common.util.DefinedStructure;
 
-public class DocsisPolicy extends ComparableStructure<String> {
+public class DocsisPolicy extends ComparableStructure<String> implements DefinedStructure {
 
   /** */
   private static final long serialVersionUID = 1L;
@@ -30,6 +31,7 @@ public class DocsisPolicy extends ComparableStructure<String> {
   }
 
   @JsonIgnore
+  @Override
   public int getDefinitionLine() {
     return _definitionLine;
   }

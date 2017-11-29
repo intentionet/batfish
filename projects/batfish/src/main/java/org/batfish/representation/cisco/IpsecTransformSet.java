@@ -1,9 +1,10 @@
 package org.batfish.representation.cisco;
 
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.common.util.DefinedStructure;
 import org.batfish.datamodel.IpsecProposal;
 
-public class IpsecTransformSet extends ComparableStructure<String> {
+public class IpsecTransformSet extends ComparableStructure<String> implements DefinedStructure {
 
   private static final long serialVersionUID = 1L;
 
@@ -17,6 +18,15 @@ public class IpsecTransformSet extends ComparableStructure<String> {
     super(name);
     _definitionLine = definitionLine;
     _proposal = new IpsecProposal(name, definitionLine);
+  }
+
+  @Override
+  public int getDefinitionLine() {
+    return _definitionLine;
+  }
+
+  public String getMode() {
+    return _mode;
   }
 
   public IpsecProposal getProposal() {

@@ -3,9 +3,10 @@ package org.batfish.representation.cisco;
 import java.util.ArrayList;
 import java.util.List;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.common.util.DefinedStructure;
 import org.batfish.datamodel.routing_policy.expr.AsPathSetElem;
 
-public class AsPathSet extends ComparableStructure<String> {
+public class AsPathSet extends ComparableStructure<String> implements DefinedStructure {
 
   /** */
   private static final long serialVersionUID = 1L;
@@ -20,6 +21,7 @@ public class AsPathSet extends ComparableStructure<String> {
     _elements = new ArrayList<>();
   }
 
+  @Override
   public int getDefinitionLine() {
     return _definitionLine;
   }
