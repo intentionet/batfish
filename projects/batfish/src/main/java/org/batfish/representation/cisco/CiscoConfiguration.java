@@ -1002,10 +1002,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
     markStructure(
         CiscoStructureType.IP_ACCESS_LIST,
         usage,
-        _extendedAccessLists,
-        _standardAccessLists,
-        _extendedIpv6AccessLists,
-        _standardIpv6AccessLists);
+        Arrays.asList(
+            _extendedAccessLists,
+            _standardAccessLists,
+            _extendedIpv6AccessLists,
+            _standardIpv6AccessLists));
   }
 
   private void markDepiClasses(CiscoStructureUsage usage) {
@@ -1040,15 +1041,16 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private void markIpv4Acls(CiscoStructureUsage usage) {
     markStructure(
-        CiscoStructureType.IPV4_ACCESS_LIST, usage, _extendedAccessLists, _standardAccessLists);
+        CiscoStructureType.IPV4_ACCESS_LIST,
+        usage,
+        Arrays.asList(_extendedAccessLists, _standardAccessLists));
   }
 
   private void markIpv6Acls(CiscoStructureUsage usage) {
     markStructure(
         CiscoStructureType.IPV6_ACCESS_LIST,
         usage,
-        _extendedIpv6AccessLists,
-        _standardIpv6AccessLists);
+        Arrays.asList(_extendedIpv6AccessLists, _standardIpv6AccessLists));
   }
 
   private void markKeyrings(CiscoStructureUsage usage) {
@@ -1075,19 +1077,16 @@ public final class CiscoConfiguration extends VendorConfiguration {
    *
    * @param type The type of the structure to which a reference will be added
    * @param usage The usage mode of the structure that was pre-recorded
-   * @param firstMap The first map to check for the structure to be updated.
-   * @param subsequentMaps Additional maps to check for the structure to be updated. Each map could
-   *     be null. The structure may exist in more than one map.
+   * @param maps A list of maps to check for the structure to be updated. Each map could be null.
+   *     There must be at least one element. The structure may exist in more than one map.
    */
-  @SafeVarargs
   private final void markStructure(
       CiscoStructureType type,
       CiscoStructureUsage usage,
-      @Nullable Map<String, ? extends ReferenceCountedStructure> firstMap,
-      Map<String, ? extends ReferenceCountedStructure>... subsequentMaps) {
-    List<Map<String, ? extends ReferenceCountedStructure>> maps = new ArrayList<>();
-    maps.add(firstMap);
-    maps.addAll(Arrays.asList(subsequentMaps));
+      List<Map<String, ? extends ReferenceCountedStructure>> maps) {
+    if (maps.isEmpty()) {
+      throw new BatfishException("List of maps must contain at least one element");
+    }
     SortedMap<String, SortedMap<StructureUsage, SortedSet<Integer>>> byName =
         _structureReferences.get(type);
     if (byName != null) {
@@ -1111,6 +1110,13 @@ public final class CiscoConfiguration extends VendorConfiguration {
             }
           });
     }
+  }
+
+  private final void markStructure(
+      CiscoStructureType type,
+      CiscoStructureUsage usage,
+      Map<String, ? extends ReferenceCountedStructure> map) {
+    markStructure(type, usage, Collections.singletonList(map));
   }
 
   private void processFailoverSettings() {

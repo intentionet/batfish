@@ -3620,7 +3620,10 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     String name = ctx.variable().getText();
     int line = ctx.getStart().getLine();
     _configuration.referenceStructure(
-        CiscoStructureType.IPSEC_PROFILE, name, CiscoStructureUsage.TUNNEL_PROTECTION_IPSEC_PROFILE, line);
+        CiscoStructureType.IPSEC_PROFILE,
+        name,
+        CiscoStructureUsage.TUNNEL_PROTECTION_IPSEC_PROFILE,
+        line);
     for (Interface iface : _currentInterfaces) {
       iface.getTunnelInitIfNull().setIpsecProfileName(name);
     }
