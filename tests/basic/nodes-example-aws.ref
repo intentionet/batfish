@@ -4,8 +4,8 @@
       "class" : "org.batfish.question.NodesQuestionPlugin$NodesAnswerElement",
       "nodes" : {
         "i-0383fda87c012141d" : {
-          "name" : "i-0383fda87c012141d",
           "configurationFormat" : "AWS_VPC",
+          "name" : "i-0383fda87c012141d",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -27,6 +27,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "~SECURITY_GROUP_EGRESS_ACL~",
               "prefix" : "192.168.2.22/28",
               "ripEnabled" : false,
@@ -54,6 +55,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "~SECURITY_GROUP_EGRESS_ACL~",
               "prefix" : "192.168.1.243/24",
               "ripEnabled" : false,
@@ -135,8 +137,8 @@
           }
         },
         "i-075dc46a9bc347264" : {
-          "name" : "i-075dc46a9bc347264",
           "configurationFormat" : "AWS_VPC",
+          "name" : "i-075dc46a9bc347264",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -158,6 +160,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "~SECURITY_GROUP_EGRESS_ACL~",
               "prefix" : "192.168.1.25/24",
               "ripEnabled" : false,
@@ -238,8 +241,8 @@
           }
         },
         "i-0837c877110427f2b" : {
-          "name" : "i-0837c877110427f2b",
           "configurationFormat" : "AWS_VPC",
+          "name" : "i-0837c877110427f2b",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -261,6 +264,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "~SECURITY_GROUP_EGRESS_ACL~",
               "prefix" : "192.168.1.138/24",
               "ripEnabled" : false,
@@ -288,6 +292,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "~SECURITY_GROUP_EGRESS_ACL~",
               "prefix" : "192.168.2.57/28",
               "ripEnabled" : false,
@@ -369,8 +374,8 @@
           }
         },
         "i-0b26ec095feb42260" : {
-          "name" : "i-0b26ec095feb42260",
           "configurationFormat" : "AWS_VPC",
+          "name" : "i-0b26ec095feb42260",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -392,6 +397,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "~SECURITY_GROUP_EGRESS_ACL~",
               "prefix" : "192.168.2.23/28",
               "ripEnabled" : false,
@@ -419,6 +425,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "~SECURITY_GROUP_EGRESS_ACL~",
               "prefix" : "192.168.1.186/24",
               "ripEnabled" : false,
@@ -500,8 +507,8 @@
           }
         },
         "igw-068fee63" : {
-          "name" : "igw-068fee63",
           "configurationFormat" : "AWS_VPC",
+          "name" : "igw-068fee63",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -522,6 +529,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.19/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -547,6 +555,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.27/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -572,6 +581,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.43/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -594,6 +604,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.2/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -630,8 +641,8 @@
           }
         },
         "igw-9b93ddfc" : {
-          "name" : "igw-9b93ddfc",
           "configurationFormat" : "AWS_VPC",
+          "name" : "igw-9b93ddfc",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -652,6 +663,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.15/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -677,6 +689,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.31/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -702,6 +715,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.47/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -727,6 +741,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.23/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -752,6 +767,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.35/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -774,6 +790,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.4/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -812,8 +829,8 @@
           }
         },
         "igw-fac5839d" : {
-          "name" : "igw-fac5839d",
           "configurationFormat" : "AWS_VPC",
+          "name" : "igw-fac5839d",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -834,6 +851,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.39/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -859,6 +877,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.11/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -881,6 +900,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.0/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -916,8 +936,8 @@
           }
         },
         "lhr-border-02" : {
-          "name" : "lhr-border-02",
           "configurationFormat" : "CISCO_IOS",
+          "name" : "lhr-border-02",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "domainName" : "demo.com",
@@ -925,14 +945,14 @@
             "isakmp-vpn-ba2e34a8-0" : {
               "name" : "isakmp-vpn-ba2e34a8-0",
               "address" : "52.27.166.152",
-              "externalInterface" : "Tunnel1",
+              "externalInterface" : "GigabitEthernet2/0",
               "ikePolicy" : "isakmp-vpn-ba2e34a8-0",
               "localAddress" : "172.16.1.2"
             },
             "isakmp-vpn-ba2e34a8-1" : {
               "name" : "isakmp-vpn-ba2e34a8-1",
               "address" : "52.39.121.126",
-              "externalInterface" : "Tunnel2",
+              "externalInterface" : "GigabitEthernet2/0",
               "ikePolicy" : "isakmp-vpn-ba2e34a8-1",
               "localAddress" : "172.16.1.2"
             }
@@ -986,6 +1006,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "proxyArp" : true,
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -1015,6 +1036,7 @@
               "ospfEnabled" : true,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : true,
               "prefix" : "10.10.10.38/30",
               "proxyArp" : true,
               "ripEnabled" : false,
@@ -1045,6 +1067,7 @@
               "ospfEnabled" : true,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : true,
               "prefix" : "10.10.10.46/30",
               "proxyArp" : true,
               "ripEnabled" : false,
@@ -1069,6 +1092,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "proxyArp" : true,
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -1097,6 +1121,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "10.10.30.1/30",
               "proxyArp" : true,
               "ripEnabled" : false,
@@ -1121,6 +1146,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "proxyArp" : true,
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -1144,6 +1170,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "proxyArp" : true,
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -1167,6 +1194,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "proxyArp" : true,
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -1190,6 +1218,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "proxyArp" : true,
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -1216,6 +1245,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "192.168.60.37/24",
               "proxyArp" : true,
               "ripEnabled" : false,
@@ -1244,6 +1274,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "172.16.1.2/30",
               "proxyArp" : false,
               "ripEnabled" : false,
@@ -1273,6 +1304,7 @@
               "ospfEnabled" : true,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : true,
+              "ospfPointToPoint" : false,
               "prefix" : "10.10.255.8/32",
               "proxyArp" : true,
               "ripEnabled" : false,
@@ -1300,6 +1332,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "169.254.15.194/30",
               "proxyArp" : true,
               "ripEnabled" : false,
@@ -1327,6 +1360,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "169.254.13.238/30",
               "proxyArp" : true,
               "ripEnabled" : false,
@@ -2243,8 +2277,8 @@
           }
         },
         "subnet-073b8061" : {
-          "name" : "subnet-073b8061",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-073b8061",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -2266,6 +2300,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.14/31",
               "ripEnabled" : false,
@@ -2292,6 +2327,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "192.168.2.31/28",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -2318,6 +2354,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.12/31",
               "ripEnabled" : false,
@@ -2390,8 +2427,8 @@
           }
         },
         "subnet-1641fa70" : {
-          "name" : "subnet-1641fa70",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-1641fa70",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -2413,6 +2450,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.30/31",
               "ripEnabled" : false,
@@ -2439,6 +2477,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "192.168.1.255/24",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -2465,6 +2504,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.28/31",
               "ripEnabled" : false,
@@ -2537,8 +2577,8 @@
           }
         },
         "subnet-1f315846" : {
-          "name" : "subnet-1f315846",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-1f315846",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -2560,6 +2600,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-4db39c28_egress",
               "prefix" : "240.0.0.18/31",
               "ripEnabled" : false,
@@ -2586,6 +2627,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "172.31.15.255/20",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -2612,6 +2654,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-4db39c28_egress",
               "prefix" : "240.0.0.16/31",
               "ripEnabled" : false,
@@ -2693,8 +2736,8 @@
           }
         },
         "subnet-30398256" : {
-          "name" : "subnet-30398256",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-30398256",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -2716,6 +2759,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.46/31",
               "ripEnabled" : false,
@@ -2742,6 +2786,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "192.168.2.47/28",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -2768,6 +2813,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.44/31",
               "ripEnabled" : false,
@@ -2840,8 +2886,8 @@
           }
         },
         "subnet-62f14104" : {
-          "name" : "subnet-62f14104",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-62f14104",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -2863,6 +2909,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-3d4f745b_egress",
               "prefix" : "240.0.0.38/31",
               "ripEnabled" : false,
@@ -2889,6 +2936,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "10.0.0.255/24",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -2915,6 +2963,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-3d4f745b_egress",
               "prefix" : "240.0.0.36/31",
               "ripEnabled" : false,
@@ -2987,8 +3036,8 @@
           }
         },
         "subnet-7044ff16" : {
-          "name" : "subnet-7044ff16",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-7044ff16",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -3010,6 +3059,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.22/31",
               "ripEnabled" : false,
@@ -3036,6 +3086,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "192.168.2.15/28",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -3062,6 +3113,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.20/31",
               "ripEnabled" : false,
@@ -3134,8 +3186,8 @@
           }
         },
         "subnet-8d0cbdeb" : {
-          "name" : "subnet-8d0cbdeb",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-8d0cbdeb",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -3157,6 +3209,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-3d4f745b_egress",
               "prefix" : "240.0.0.10/31",
               "ripEnabled" : false,
@@ -3183,6 +3236,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "10.0.1.255/24",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -3209,6 +3263,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-3d4f745b_egress",
               "prefix" : "240.0.0.8/31",
               "ripEnabled" : false,
@@ -3281,8 +3336,8 @@
           }
         },
         "subnet-9c8adceb" : {
-          "name" : "subnet-9c8adceb",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-9c8adceb",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -3304,6 +3359,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-4db39c28_egress",
               "prefix" : "240.0.0.26/31",
               "ripEnabled" : false,
@@ -3330,6 +3386,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "172.31.47.255/20",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -3356,6 +3413,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-4db39c28_egress",
               "prefix" : "240.0.0.24/31",
               "ripEnabled" : false,
@@ -3437,8 +3495,8 @@
           }
         },
         "subnet-d9cafabc" : {
-          "name" : "subnet-d9cafabc",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-d9cafabc",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -3460,6 +3518,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-4db39c28_egress",
               "prefix" : "240.0.0.42/31",
               "ripEnabled" : false,
@@ -3486,6 +3545,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "172.31.31.255/20",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -3512,6 +3572,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-4db39c28_egress",
               "prefix" : "240.0.0.40/31",
               "ripEnabled" : false,
@@ -3593,8 +3654,8 @@
           }
         },
         "subnet-f73a8191" : {
-          "name" : "subnet-f73a8191",
           "configurationFormat" : "AWS_VPC",
+          "name" : "subnet-f73a8191",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -3616,6 +3677,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.34/31",
               "ripEnabled" : false,
@@ -3642,6 +3704,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "192.168.2.63/28",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -3668,6 +3731,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "outgoingFilter" : "acl-7b78771d_egress",
               "prefix" : "240.0.0.32/31",
               "ripEnabled" : false,
@@ -3740,8 +3804,8 @@
           }
         },
         "vgw-81fd279f" : {
-          "name" : "vgw-81fd279f",
           "configurationFormat" : "AWS_VPC",
+          "name" : "vgw-81fd279f",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "ikeGateways" : {
@@ -3807,6 +3871,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.6/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4041,8 +4106,8 @@
           }
         },
         "vpc-815775e7" : {
-          "name" : "vpc-815775e7",
           "configurationFormat" : "AWS_VPC",
+          "name" : "vpc-815775e7",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -4060,6 +4125,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.7/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4083,8 +4149,8 @@
           }
         },
         "vpc-925131f4" : {
-          "name" : "vpc-925131f4",
           "configurationFormat" : "AWS_VPC",
+          "name" : "vpc-925131f4",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -4102,6 +4168,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.1/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4127,6 +4194,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.37/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4152,6 +4220,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.9/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4195,8 +4264,8 @@
           }
         },
         "vpc-b390fad5" : {
-          "name" : "vpc-b390fad5",
           "configurationFormat" : "AWS_VPC",
+          "name" : "vpc-b390fad5",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -4214,6 +4283,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.5/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4239,6 +4309,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.13/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4264,6 +4335,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.29/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4289,6 +4361,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.45/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4314,6 +4387,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.21/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4339,6 +4413,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.33/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4409,8 +4484,8 @@
           }
         },
         "vpc-f8fad69d" : {
-          "name" : "vpc-f8fad69d",
           "configurationFormat" : "AWS_VPC",
+          "name" : "vpc-f8fad69d",
           "defaultCrossZoneAction" : "ACCEPT",
           "defaultInboundAction" : "ACCEPT",
           "interfaces" : {
@@ -4428,6 +4503,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.3/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4453,6 +4529,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.17/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4478,6 +4555,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.25/31",
               "ripEnabled" : false,
               "ripPassive" : false,
@@ -4503,6 +4581,7 @@
               "ospfEnabled" : false,
               "ospfHelloMultiplier" : 0,
               "ospfPassive" : false,
+              "ospfPointToPoint" : false,
               "prefix" : "240.0.0.41/31",
               "ripEnabled" : false,
               "ripPassive" : false,

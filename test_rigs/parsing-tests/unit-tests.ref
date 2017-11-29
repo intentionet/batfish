@@ -46375,6 +46375,18 @@
           }
         },
         "cisco_cable" : {
+          "cable service-class" : {
+            "barfoo" : {
+              "cable qos enforce-rule service-class" : [
+                77
+              ]
+            },
+            "foobar" : {
+              "cable qos enforce-rule service-class" : [
+                78
+              ]
+            }
+          },
           "depi-tunnel" : {
             "depitun0" : {
               "controller rf-channel depi-tunnel" : [
@@ -46391,10 +46403,17 @@
           }
         },
         "cisco_crypto" : {
-          "ipsec transform-set" : {
+          "crypto ipsec transform-set" : {
             "hijklmnop" : {
-              "ipsec profile" : [
-                138
+              "ipsec profile set transform-set" : [
+                139
+              ]
+            }
+          },
+          "crypto keyring" : {
+            "VRF:MMS:RMT:UPM:1143" : {
+              "isakmp profile keyring" : [
+                158
               ]
             }
           },
@@ -46402,13 +46421,6 @@
             "myvpnacl" : {
               "crypto map ipsec-isakmp acl" : [
                 194
-              ]
-            }
-          },
-          "keyring" : {
-            "VRF:MMS:RMT:UPM:1143" : {
-              "isakmp profile" : [
-                157
               ]
             }
           }
@@ -47192,6 +47204,23 @@
             ],
             "4" : [
               51
+            ]
+          }
+        },
+        "cisco_crypto" : {
+          "crypto ipsec profile" : {
+            "abcdefg" : [
+              138
+            ]
+          },
+          "crypto ipsec transform-set" : {
+            "ESP-3DES-MD5" : [
+              143
+            ]
+          },
+          "crypto keyring" : {
+            "VRF:ABC:DEF:GHI:1234" : [
+              180
             ]
           }
         },
