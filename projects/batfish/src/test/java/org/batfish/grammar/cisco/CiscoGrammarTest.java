@@ -494,8 +494,7 @@ public class CiscoGrammarTest {
     }
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
-            TestrigText.builder().setConfigurationText(configurationTextMap).build(),
-            _folder);
+            TestrigText.builder().setConfigurationText(configurationTextMap).build(), _folder);
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
 
     for (int i = 0; i < configurationNames.length; i++) {
