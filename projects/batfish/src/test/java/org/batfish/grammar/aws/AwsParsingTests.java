@@ -4,11 +4,11 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import jersey.repackaged.com.google.common.collect.ImmutableMap;
 import org.batfish.common.BfConsts;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.main.Batfish;
