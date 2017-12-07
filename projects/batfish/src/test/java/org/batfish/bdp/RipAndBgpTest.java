@@ -42,6 +42,7 @@ public class RipAndBgpTest {
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
+            Collections.emptySortedMap(),
             _folder);
     BdpDataPlanePlugin dataPlanePlugin = new BdpDataPlanePlugin();
     dataPlanePlugin.initialize(batfish);

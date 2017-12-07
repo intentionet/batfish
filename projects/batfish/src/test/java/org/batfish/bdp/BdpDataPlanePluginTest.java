@@ -364,7 +364,14 @@ public class BdpDataPlanePluginTest {
     String[] configurationNames = new String[] {"r1", "r2", "r3"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     batfish.getSettings().setBdpMaxOscillationRecoveryAttempts(0);
     BdpDataPlanePlugin dataPlanePlugin = new BdpDataPlanePlugin();
     dataPlanePlugin.initialize(batfish);
@@ -379,7 +386,14 @@ public class BdpDataPlanePluginTest {
     String[] configurationNames = new String[] {"r1", "r2", "r3"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     batfish.getSettings().setBdpDetail(true);
     batfish.getSettings().setBdpMaxOscillationRecoveryAttempts(1);
     batfish.getSettings().setBdpRecordAllIterations(true);
@@ -484,7 +498,14 @@ public class BdpDataPlanePluginTest {
     String[] configurationNames = new String[] {"r1", "r2", "r3"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     BdpDataPlanePlugin dataPlanePlugin = new BdpDataPlanePlugin();
     dataPlanePlugin.initialize(batfish);
     dataPlanePlugin.computeDataPlane(false);
@@ -581,7 +602,14 @@ public class BdpDataPlanePluginTest {
     String[] configurationNames = new String[] {"r1", "r2a", "r2b"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     BdpDataPlanePlugin dataPlanePlugin = new BdpDataPlanePlugin();
     dataPlanePlugin.initialize(batfish);
     dataPlanePlugin.computeDataPlane(false);
@@ -614,7 +642,14 @@ public class BdpDataPlanePluginTest {
     String[] configurationNames = new String[] {"r1", "r2", "r3", "r4"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     BdpDataPlanePlugin dataPlanePlugin = new BdpDataPlanePlugin();
     dataPlanePlugin.initialize(batfish);
     dataPlanePlugin.computeDataPlane(false);
@@ -643,6 +678,7 @@ public class BdpDataPlanePluginTest {
         BatfishTestUtils.getBatfishFromTestrigResource(
             TESTRIGS_PREFIX + testrigName,
             configurationNames,
+            null,
             null,
             null,
             null,

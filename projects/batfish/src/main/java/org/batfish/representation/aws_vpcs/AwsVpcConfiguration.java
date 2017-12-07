@@ -136,8 +136,14 @@ public class AwsVpcConfiguration implements Serializable, GenericConfigObject {
         _vpcs.put(vpc.getId(), vpc);
         break;
       case AwsVpcEntity.JSON_KEY_VPC_PEERING_CONNECTIONS:
-        VpcPeeringConnection vpcPeerConn = new VpcPeeringConnection(jsonObject, logger);
-        _vpcPeerings.put(vpcPeerConn.getId(), vpcPeerConn);
+        String code =
+            jsonObject
+                .getJSONObject(AwsVpcEntity.JSON_KEY_STATUS)
+                .getString(AwsVpcEntity.JSON_KEY_CODE);
+        if (!code.equals(AwsVpcEntity.STATUS_DELETED)) {
+          VpcPeeringConnection vpcPeerConn = new VpcPeeringConnection(jsonObject, logger);
+          _vpcPeerings.put(vpcPeerConn.getId(), vpcPeerConn);
+        }
         break;
       case AwsVpcEntity.JSON_KEY_VPN_CONNECTIONS:
         VpnConnection vpnConnection = new VpnConnection(jsonObject, logger);

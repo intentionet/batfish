@@ -71,6 +71,7 @@ public class BatfishTestUtils {
 
   private static Batfish initBatfishFromTestrigText(
       @Nullable SortedMap<String, String> configurationText,
+      @Nullable SortedMap<String, String> awsText,
       @Nullable SortedMap<String, String> bgpTablesText,
       @Nullable SortedMap<String, String> hostsText,
       @Nullable SortedMap<String, String> iptablesFilesText,
@@ -96,6 +97,7 @@ public class BatfishTestUtils {
     envSettings.getEnvironmentBasePath().toFile().mkdirs();
     writeTemporaryTestrigFiles(
         configurationText, testrigPath.resolve(BfConsts.RELPATH_CONFIGURATIONS_DIR));
+    writeTemporaryTestrigFiles(awsText, testrigPath.resolve(BfConsts.RELPATH_AWS_VPC_CONFIGS_DIR));
     writeTemporaryTestrigFiles(bgpTablesText, envSettings.getEnvironmentBgpTablesPath());
     writeTemporaryTestrigFiles(hostsText, testrigPath.resolve(BfConsts.RELPATH_HOST_CONFIGS_DIR));
     writeTemporaryTestrigFiles(iptablesFilesText, testrigPath.resolve("iptables"));
@@ -147,6 +149,7 @@ public class BatfishTestUtils {
   public static Batfish getBatfishFromTestrigResource(
       String testrigResourcePrefix,
       @Nullable String[] configFilenames,
+      @Nullable String[] awsFilenames,
       @Nullable String[] bgpFilenames,
       @Nullable String[] hostFilenames,
       @Nullable String[] iptablesFilenames,
@@ -156,6 +159,9 @@ public class BatfishTestUtils {
     SortedMap<String, String> configurationsText =
         readTestrigResources(
             testrigResourcePrefix, BfConsts.RELPATH_CONFIGURATIONS_DIR, configFilenames);
+    SortedMap<String, String> awsText =
+        readTestrigResources(
+            testrigResourcePrefix, BfConsts.RELPATH_AWS_VPC_CONFIGS_DIR, awsFilenames);
     SortedMap<String, String> bgpTablesText =
         readTestrigResources(
             testrigResourcePrefix, BfConsts.RELPATH_ENVIRONMENT_BGP_TABLES, bgpFilenames);
@@ -170,6 +176,7 @@ public class BatfishTestUtils {
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
             configurationsText,
+            awsText,
             bgpTablesText,
             hostFilesText,
             iptablesFilesText,
@@ -192,6 +199,7 @@ public class BatfishTestUtils {
    */
   public static Batfish getBatfishFromTestrigText(
       @Nullable SortedMap<String, String> configurationText,
+      @Nullable SortedMap<String, String> awsText,
       @Nullable SortedMap<String, String> bgpTablesText,
       @Nullable SortedMap<String, String> hostText,
       @Nullable SortedMap<String, String> iptablesText,
@@ -201,6 +209,8 @@ public class BatfishTestUtils {
     if (tempFolder == null) {
       if (configurationText != null && !configurationText.isEmpty()) {
         throw new BatfishException("tempFolder must be set for non-empty configurations");
+      } else if (awsText != null && !awsText.isEmpty()) {
+        throw new BatfishException("tempFolder must be set for non-empty aws configurations");
       } else if (bgpTablesText != null && !bgpTablesText.isEmpty()) {
         throw new BatfishException("tempFolder must be set for non-empty bgp tables");
       } else if (hostText != null && !hostText.isEmpty()) {
@@ -212,7 +222,13 @@ public class BatfishTestUtils {
       }
     }
     return initBatfishFromTestrigText(
-        configurationText, bgpTablesText, hostText, iptablesText, routingTablesText, tempFolder);
+        configurationText,
+        awsText,
+        bgpTablesText,
+        hostText,
+        iptablesText,
+        routingTablesText,
+        tempFolder);
   }
 
   /**

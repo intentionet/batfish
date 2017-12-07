@@ -69,6 +69,7 @@ public class CiscoGrammarTest {
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
+            Collections.emptySortedMap(),
             _folder);
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
     Configuration newModelConfiguration = configurations.get("aaaNewmodel");
@@ -85,7 +86,14 @@ public class CiscoGrammarTest {
     String[] configurationNames = new String[] {"r1", "r2"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
     Map<Ip, Set<String>> ipOwners = CommonUtil.computeIpOwners(configurations, true);
     CommonUtil.initRemoteBgpNeighbors(configurations, ipOwners);
@@ -114,7 +122,14 @@ public class CiscoGrammarTest {
         new String[] {"arista_disabled", "arista_enabled", "nxos_disabled", "nxos_enabled"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
     Map<Ip, Set<String>> ipOwners = CommonUtil.computeIpOwners(configurations, true);
     CommonUtil.initRemoteBgpNeighbors(configurations, ipOwners);
@@ -155,7 +170,14 @@ public class CiscoGrammarTest {
     String[] configurationNames = new String[] {"r1", "r2", "r3"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
     Map<Ip, Set<String>> ipOwners = CommonUtil.computeIpOwners(configurations, true);
     CommonUtil.initRemoteBgpNeighbors(configurations, ipOwners);
@@ -210,7 +232,14 @@ public class CiscoGrammarTest {
     String[] configurationNames = new String[] {iosName, nxosName, eosName};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     SortedMap<String, Configuration> configurations;
     try {
       configurations = batfish.loadConfigurations();
@@ -319,7 +348,14 @@ public class CiscoGrammarTest {
     String[] configurationNames = new String[] {r1Name, r2Name, r3Name};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     SortedMap<String, Configuration> configurations;
     try {
       configurations = batfish.loadConfigurations();
@@ -356,7 +392,14 @@ public class CiscoGrammarTest {
         new String[] {iosMaxMetricName, iosMaxMetricCustomName, iosMaxMetricOnStartupName};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     batfish.getSettings().setDisableUnrecognized(false);
     SortedMap<String, Configuration> configurations;
     try {
@@ -401,7 +444,14 @@ public class CiscoGrammarTest {
     String[] configurationNames = new String[] {iosOspfPointToPoint};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     SortedMap<String, Configuration> configurations;
     try {
       configurations = batfish.loadConfigurations();
@@ -423,7 +473,14 @@ public class CiscoGrammarTest {
     String[] configurationNames = new String[] {iosRecoveryName};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     batfish.getSettings().setDisableUnrecognized(false);
     SortedMap<String, Configuration> configurations;
     try {
@@ -465,6 +522,7 @@ public class CiscoGrammarTest {
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
             configurationTextMap,
+            Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),

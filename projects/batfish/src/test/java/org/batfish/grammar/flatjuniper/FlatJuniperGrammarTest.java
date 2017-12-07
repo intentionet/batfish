@@ -37,7 +37,14 @@ public class FlatJuniperGrammarTest {
         new String[] {"multiple_as_disabled", "multiple_as_enabled", "multiple_as_mixed"};
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigResource(
-            TESTRIGS_PREFIX + testrigName, configurationNames, null, null, null, null, _folder);
+            TESTRIGS_PREFIX + testrigName,
+            configurationNames,
+            null,
+            null,
+            null,
+            null,
+            null,
+            _folder);
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
     MultipathEquivalentAsPathMatchMode multipleAsDisabled =
         configurations

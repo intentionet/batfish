@@ -119,6 +119,7 @@ public class BatfishTest {
         BatfishTestUtils.getBatfishFromTestrigText(
             configurationsText,
             Collections.emptySortedMap(),
+            Collections.emptySortedMap(),
             hostsText,
             iptablesFilesText,
             Collections.emptySortedMap(),
@@ -142,6 +143,7 @@ public class BatfishTest {
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
             configurationsText,
+            Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
@@ -360,6 +362,7 @@ public class BatfishTest {
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
             configMap,
+            Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),
             Collections.emptySortedMap(),

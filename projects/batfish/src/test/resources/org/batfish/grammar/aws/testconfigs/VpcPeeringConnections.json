@@ -1,0 +1,76 @@
+{
+ "VpcPeeringConnections": [
+  {
+   "AccepterVpcInfo": {
+    "CidrBlock": "10.199.100.0/24",
+    "CidrBlockSet": [
+     {
+      "CidrBlock": "10.199.100.0/24"
+     }
+    ],
+    "OwnerId": "118292266645",
+    "PeeringOptions": {
+     "AllowDnsResolutionFromRemoteVpc": false,
+     "AllowEgressFromLocalClassicLinkToRemoteVpc": false,
+     "AllowEgressFromLocalVpcToRemoteClassicLink": false
+    },
+    "VpcId": "vpc-f6c5c790"
+   },
+   "RequesterVpcInfo": {
+    "CidrBlock": "10.130.0.0/16",
+    "CidrBlockSet": [
+     {
+      "CidrBlock": "10.130.0.0/16"
+     }
+    ],
+    "OwnerId": "118292266645",
+    "PeeringOptions": {
+     "AllowDnsResolutionFromRemoteVpc": false,
+     "AllowEgressFromLocalClassicLinkToRemoteVpc": false,
+     "AllowEgressFromLocalVpcToRemoteClassicLink": false
+    },
+    "VpcId": "vpc-07acbc61"
+   },
+   "Status": {
+    "Code": "active",
+    "Message": "Active"
+   },
+   "Tags": [
+    {
+     "Key": "Name",
+     "Value": "peering-test"
+    }
+   ],
+   "VpcPeeringConnectionId": "pcx-f754069e"
+  },
+  {
+   "AccepterVpcInfo": {
+    "OwnerId": "118292266645",
+    "VpcId": "vpc-6ee90d17"
+   },
+   "RequesterVpcInfo": {
+    "OwnerId": "118292266645",
+    "VpcId": "vpc-56c5212f"
+   },
+   "Status": {
+    "Code": "deleted",
+    "Message": "Deleted by 118292266645"
+   },
+   "Tags": [
+    {
+     "Key": "aws:cloudformation:logical-id",
+     "Value": "VPCPeeringConnection"
+    },
+    {
+     "Key": "aws:cloudformation:stack-id",
+     "Value": "arn:aws:cloudformation:us-west-2:118292266645:stack/batfish-stack-test-1-VPC-1RWP34XRWCZQR/8ced1590-dad0-11e7-bf5d-50a68a2012ba"
+    },
+    {
+     "Key": "aws:cloudformation:stack-name",
+     "Value": "batfish-stack-test-1-VPC-1RWP34XRWCZQR"
+    }
+   ],
+   "VpcPeeringConnectionId": "pcx-4ee8b427"
+  }
+ ]
+}

@@ -14,6 +14,7 @@ public interface AwsVpcEntity {
   String JSON_KEY_BGP_ASN = "BgpAsn";
   String JSON_KEY_CIDR_BLOCK = "CidrBlock";
   String JSON_KEY_CIDR_IP = "CidrIp";
+  String JSON_KEY_CODE = "Code";
   String JSON_KEY_CUSTOMER_GATEWAY_CONFIGURATION = "CustomerGatewayConfiguration";
   String JSON_KEY_CUSTOMER_GATEWAY_ID = "CustomerGatewayId";
   String JSON_KEY_CUSTOMER_GATEWAYS = "CustomerGateways";
@@ -84,6 +85,8 @@ public interface AwsVpcEntity {
   String JSON_KEY_VPN_CONNECTIONS = "VpnConnections";
   String JSON_KEY_VPN_GATEWAY_ID = "VpnGatewayId";
   String JSON_KEY_VPN_GATEWAYS = "VpnGateways";
+
+  String STATUS_DELETED = "deleted";
 
   String XML_KEY_ASN = "asn";
   String XML_KEY_AUTHENTICATION_PROTOCOL = "authentication_protocol";
