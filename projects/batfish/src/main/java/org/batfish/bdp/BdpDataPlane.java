@@ -168,21 +168,39 @@ public class BdpDataPlane implements Serializable, DataPlane {
                                     _topology
                                         .getInterfaceEdges()
                                         .get(new NodeInterfacePair(hostname, srNextHopInterface));
-                                interfaceRouteRows.put(route, currentRows);
-                                for (Edge edge : edges) {
-                                  if (edge.getNode1().equals(hostname)) {
-                                    String nextHop = edge.getNode2();
-                                    String nextHopInInt = edge.getInt2();
-                                    FibRow row =
+                                if (edges == null) {
+                                  if (_flowSinks.contains(srNextHopInterface)) {
+                                    fibSet.add(
                                         new FibRow(
-                                            network, srNextHopInterface, nextHop, nextHopInInt);
-                                    fibSet.add(row);
-                                    currentRows.add(row);
+                                            network,
+                                            srNextHopInterface,
+                                            Configuration.NODE_NONE_NAME,
+                                            Interface.FLOW_SINK_TERMINATION_NAME));
+                                  } else {
+                                    fibSet.add(
+                                        new FibRow(
+                                            network,
+                                            Interface.NULL_INTERFACE_NAME,
+                                            Configuration.NODE_NONE_NAME,
+                                            Interface.NULL_INTERFACE_NAME));
+                                  }
+                                } else {
+                                  interfaceRouteRows.put(route, currentRows);
+                                  for (Edge edge : edges) {
+                                    if (edge.getNode1().equals(hostname)) {
+                                      String nextHop = edge.getNode2();
+                                      String nextHopInInt = edge.getInt2();
+                                      FibRow row =
+                                          new FibRow(
+                                              network, srNextHopInterface, nextHop, nextHopInInt);
+                                      fibSet.add(row);
+                                      currentRows.add(row);
+                                    }
                                   }
                                 }
                               }
                               break;
-                            } else if (!srNextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)
+                            } else if (srNextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)
                                 && !srNextHopInterface.equals(Route.UNSET_NEXT_HOP_INTERFACE)) {
                               // just nextHopInterface; neighbor must not send dstIp back
                               // out receiving interface
@@ -202,16 +220,34 @@ public class BdpDataPlane implements Serializable, DataPlane {
                                     _topology
                                         .getInterfaceEdges()
                                         .get(new NodeInterfacePair(hostname, srNextHopInterface));
-                                interfaceRouteRows.put(route, currentRows);
-                                for (Edge edge : edges) {
-                                  if (edge.getNode1().equals(hostname)) {
-                                    String nextHop = edge.getNode2();
-                                    String nextHopInInt = edge.getInt2();
-                                    FibRow row =
+                                if (edges == null) {
+                                  if (_flowSinks.contains(srNextHopInterface)) {
+                                    fibSet.add(
                                         new FibRow(
-                                            network, srNextHopInterface, nextHop, nextHopInInt);
-                                    fibSet.add(row);
-                                    currentRows.add(row);
+                                            network,
+                                            srNextHopInterface,
+                                            Configuration.NODE_NONE_NAME,
+                                            Interface.FLOW_SINK_TERMINATION_NAME));
+                                  } else {
+                                    fibSet.add(
+                                        new FibRow(
+                                            network,
+                                            Interface.NULL_INTERFACE_NAME,
+                                            Configuration.NODE_NONE_NAME,
+                                            Interface.NULL_INTERFACE_NAME));
+                                  }
+                                } else {
+                                  interfaceRouteRows.put(route, currentRows);
+                                  for (Edge edge : edges) {
+                                    if (edge.getNode1().equals(hostname)) {
+                                      String nextHop = edge.getNode2();
+                                      String nextHopInInt = edge.getInt2();
+                                      FibRow row =
+                                          new FibRow(
+                                              network, srNextHopInterface, nextHop, nextHopInInt);
+                                      fibSet.add(row);
+                                      currentRows.add(row);
+                                    }
                                   }
                                 }
                               }
