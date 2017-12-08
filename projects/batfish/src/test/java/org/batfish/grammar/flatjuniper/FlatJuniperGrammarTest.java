@@ -3,10 +3,10 @@ package org.batfish.grammar.flatjuniper;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
+import java.util.List;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.config.Settings;
@@ -36,8 +36,8 @@ public class FlatJuniperGrammarTest {
   @Test
   public void testBgpMultipathMultipleAs() throws IOException {
     String testrigName = "multipath-multiple-as";
-    SortedSet<String> configurationNames =
-        ImmutableSortedSet.of("multiple_as_disabled", "multiple_as_enabled", "multiple_as_mixed");
+    List<String> configurationNames =
+        ImmutableList.of("multiple_as_disabled", "multiple_as_enabled", "multiple_as_mixed");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(

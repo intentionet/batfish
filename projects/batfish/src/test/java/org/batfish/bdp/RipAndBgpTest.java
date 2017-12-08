@@ -2,7 +2,7 @@ package org.batfish.bdp;
 
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.util.Set;
 import java.util.SortedMap;
@@ -29,7 +29,7 @@ public class RipAndBgpTest {
   @Test
   public void testOutputRoutes() throws IOException {
     String testrigResourcePrefix = TESTRIGS_PREFIX + "rip";
-    SortedSet<String> configurations = ImmutableSortedSet.of("r1", "r2", "r3");
+    Set<String> configurations = ImmutableSet.of("r1", "r2", "r3");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(

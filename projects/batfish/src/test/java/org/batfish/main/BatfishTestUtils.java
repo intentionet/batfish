@@ -78,12 +78,12 @@ public class BatfishTestUtils {
    */
   public static Batfish getBatfishFromTestrigText(
       TestrigText testrigText, TemporaryFolder tempFolder) throws IOException {
-    SortedMap<String, String> awsText = testrigText.getAwsText();
-    SortedMap<String, String> bgpTablesText = testrigText.getBgpTablesText();
-    SortedMap<String, String> configurationText = testrigText.getConfigurationText();
-    SortedMap<String, String> hostsText = testrigText.getHostsText();
-    SortedMap<String, String> iptablesFilesText = testrigText.getIptablesFilesText();
-    SortedMap<String, String> routingTablesText = testrigText.getRoutingTablesText();
+    Map<String, String> awsText = testrigText.getAwsText();
+    Map<String, String> bgpTablesText = testrigText.getBgpTablesText();
+    Map<String, String> configurationText = testrigText.getConfigurationText();
+    Map<String, String> hostsText = testrigText.getHostsText();
+    Map<String, String> iptablesFilesText = testrigText.getIptablesFilesText();
+    Map<String, String> routingTablesText = testrigText.getRoutingTablesText();
 
     Settings settings = new Settings(new String[] {});
     settings.setLogger(new BatfishLogger("debug", false));
@@ -154,7 +154,7 @@ public class BatfishTestUtils {
   }
 
   private static void writeTemporaryTestrigFiles(
-      @Nullable SortedMap<String, String> filesText, Path outputDirectory) {
+      @Nullable Map<String, String> filesText, Path outputDirectory) {
     if (filesText != null) {
       filesText.forEach(
           (filename, text) -> {

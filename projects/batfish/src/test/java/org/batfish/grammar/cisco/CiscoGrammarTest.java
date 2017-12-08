@@ -11,9 +11,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedSet;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -56,7 +57,7 @@ public class CiscoGrammarTest {
 
   @Test
   public void testAaaNewmodel() throws IOException {
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("aaaNoNewmodel", "aaaNewmodel");
+    List<String> configurationNames = ImmutableList.of("aaaNoNewmodel", "aaaNewmodel");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -83,7 +84,7 @@ public class CiscoGrammarTest {
   @Test
   public void testBgpLocalAs() throws IOException {
     String testrigName = "bgp-local-as";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2");
+    List<String> configurationNames = ImmutableList.of("r1", "r2");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -115,8 +116,8 @@ public class CiscoGrammarTest {
   @Test
   public void testBgpMultipathRelax() throws IOException {
     String testrigName = "bgp-multipath-relax";
-    SortedSet<String> configurationNames =
-        ImmutableSortedSet.of("arista_disabled", "arista_enabled", "nxos_disabled", "nxos_enabled");
+    List<String> configurationNames =
+        ImmutableList.of("arista_disabled", "arista_enabled", "nxos_disabled", "nxos_enabled");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -161,7 +162,7 @@ public class CiscoGrammarTest {
   @Test
   public void testBgpRemovePrivateAs() throws IOException {
     String testrigName = "bgp-remove-private-as";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2", "r3");
+    List<String> configurationNames = ImmutableList.of("r1", "r2", "r3");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -220,7 +221,7 @@ public class CiscoGrammarTest {
     String iosName = "ios";
     String nxosName = "nxos";
     String eosName = "eos";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of(iosName, nxosName, eosName);
+    List<String> configurationNames = ImmutableList.of(iosName, nxosName, eosName);
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -330,7 +331,7 @@ public class CiscoGrammarTest {
   @Test
   public void testIpsecVpnIos() throws IOException {
     String testrigName = "ipsec-vpn-ios";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2", "r3");
+    List<String> configurationNames = ImmutableList.of("r1", "r2", "r3");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -370,8 +371,8 @@ public class CiscoGrammarTest {
     String iosMaxMetricName = "ios-max-metric";
     String iosMaxMetricCustomName = "ios-max-metric-custom";
     String iosMaxMetricOnStartupName = "ios-max-metric-on-startup";
-    SortedSet<String> configurationNames =
-        ImmutableSortedSet.of(iosMaxMetricName, iosMaxMetricCustomName, iosMaxMetricOnStartupName);
+    List<String> configurationNames =
+        ImmutableList.of(iosMaxMetricName, iosMaxMetricCustomName, iosMaxMetricOnStartupName);
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -420,7 +421,7 @@ public class CiscoGrammarTest {
   public void testOspfPointToPoint() throws IOException {
     String testrigName = "ospf-point-to-point";
     String iosOspfPointToPoint = "ios-ospf-point-to-point";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of(iosOspfPointToPoint);
+    List<String> configurationNames = ImmutableList.of(iosOspfPointToPoint);
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -446,7 +447,7 @@ public class CiscoGrammarTest {
   public void testParsingRecovery() throws IOException {
     String testrigName = "parsing-recovery";
     String iosRecoveryName = "ios-recovery";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of(iosRecoveryName);
+    List<String> configurationNames = ImmutableList.of(iosRecoveryName);
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(

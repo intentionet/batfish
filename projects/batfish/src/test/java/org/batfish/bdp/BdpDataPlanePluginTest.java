@@ -11,7 +11,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -363,7 +363,7 @@ public class BdpDataPlanePluginTest {
   @Test
   public void testBgpOscillation() throws IOException {
     String testrigName = "bgp-oscillation";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2", "r3");
+    List<String> configurationNames = ImmutableList.of("r1", "r2", "r3");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -382,7 +382,7 @@ public class BdpDataPlanePluginTest {
   @Test
   public void testBgpOscillationRecovery() throws IOException {
     String testrigName = "bgp-oscillation";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2", "r3");
+    List<String> configurationNames = ImmutableList.of("r1", "r2", "r3");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -491,7 +491,7 @@ public class BdpDataPlanePluginTest {
   @Test
   public void testEbgpAcceptSameNeighborID() throws IOException {
     String testrigName = "ebgp-accept-routerid-match";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2", "r3");
+    List<String> configurationNames = ImmutableList.of("r1", "r2", "r3");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -592,7 +592,7 @@ public class BdpDataPlanePluginTest {
   @Test
   public void testIbgpRejectOwnAs() throws IOException {
     String testrigName = "ibgp-reject-own-as";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2a", "r2b");
+    List<String> configurationNames = ImmutableList.of("r1", "r2a", "r2b");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -629,7 +629,7 @@ public class BdpDataPlanePluginTest {
   @Test
   public void testIbgpRejectSameNeighborID() throws IOException {
     String testrigName = "ibgp-reject-routerid-match";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2", "r3", "r4");
+    List<String> configurationNames = ImmutableList.of("r1", "r2", "r3", "r4");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
@@ -659,8 +659,8 @@ public class BdpDataPlanePluginTest {
   @Test
   public void testIosRtStaticMatchesBdp() throws IOException {
     String testrigResourcePrefix = TESTRIGS_PREFIX + "ios-rt-static-ad";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1");
-    SortedSet<String> routingTableNames = ImmutableSortedSet.of("r1");
+    List<String> configurationNames = ImmutableList.of("r1");
+    List<String> routingTableNames = ImmutableList.of("r1");
 
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(

@@ -11,8 +11,8 @@ import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedSet;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -133,7 +133,7 @@ public class BatfishTest {
   @Test
   public void testMultipleBestVrrpCandidates() throws IOException {
     String testrigResourcePrefix = "org/batfish/grammar/cisco/testrigs/vrrp_multiple_best";
-    SortedSet<String> configurationNames = ImmutableSortedSet.of("r1", "r2");
+    List<String> configurationNames = ImmutableList.of("r1", "r2");
 
     Ip vrrpAddress = new Ip("1.0.0.10");
     Batfish batfish =
