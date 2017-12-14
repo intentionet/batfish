@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.cache.Cache;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +23,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -2072,7 +2072,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
     return answerElement;
   }
 
-  private Map<Ip, Set<IpSpace>> initPrivateIpsByPublicIp(
+  private SetMultimap<Ip, IpSpace> initPrivateIpsByPublicIp(
       Map<String, Configuration> configurations) {
     /*
      * Very hacky mapping from public IP to set of spaces of possible natted private IPs.
@@ -2082,7 +2082,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
      * interface (except the local address in each such prefix) to be a possible private IP
      * match for every public IP referred to by every source-nat pool on a masquerading interface.
      */
-    Map<Ip, ImmutableSet.Builder<IpSpace>> buildersByIp = new LinkedHashMap<>();
+    ImmutableSetMultimap.Builder<Ip, IpSpace> builder = ImmutableSetMultimap.builder();
     for (Configuration c : configurations.values()) {
       Collection<Interface> interfaces = c.getInterfaces().values();
       Set<Prefix> nonNattedInterfacePrefixes =
@@ -2111,16 +2111,11 @@ public class Batfish extends PluginConsumer implements IBatfish {
                     ipAsLong <= sourceNat.getPoolIpLast().asLong();
                     ipAsLong++) {
                   Ip currentPoolIp = new Ip(ipAsLong);
-                  buildersByIp
-                      .computeIfAbsent(currentPoolIp, v -> ImmutableSet.<IpSpace>builder())
-                      .add(ipSpace);
+                  builder.put(currentPoolIp, ipSpace);
                 }
               });
     }
-    return buildersByIp
-        .entrySet()
-        .stream()
-        .collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue().build()));
+    return builder.build();
   }
 
   private void initQuestionEnvironment(Question question, boolean dp, boolean differentialContext) {
@@ -2159,7 +2154,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
   public void initRemoteIpsecVpns(Map<String, Configuration> configurations) {
     Map<IpsecVpn, Ip> remoteAddresses = new IdentityHashMap<>();
     Map<Ip, Set<IpsecVpn>> externalAddresses = new HashMap<>();
-    Map<Ip, Set<IpSpace>> privateIpsByPublicIp = initPrivateIpsByPublicIp(configurations);
+    SetMultimap<Ip, IpSpace> privateIpsByPublicIp = initPrivateIpsByPublicIp(configurations);
     for (Configuration c : configurations.values()) {
       for (IpsecVpn ipsecVpn : c.getIpsecVpns().values()) {
         Ip remoteAddress = ipsecVpn.getIkeGateway().getAddress();
