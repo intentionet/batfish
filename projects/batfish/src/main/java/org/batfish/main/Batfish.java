@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -2071,16 +2072,17 @@ public class Batfish extends PluginConsumer implements IBatfish {
     return answerElement;
   }
 
-  private Map<Ip, IpSpace> initPrivateIpsByPublicIp(Map<String, Configuration> configurations) {
+  private Map<Ip, Set<IpSpace>> initPrivateIpsByPublicIp(
+      Map<String, Configuration> configurations) {
     /*
-     * Very hacky mapping from public IP to space of possible natted private IPs.
+     * Very hacky mapping from public IP to set of spaces of possible natted private IPs.
      * Does not currently support source-nat acl.
      *
      * The current implementation just considers every IP in every prefix on a non-masquerading
      * interface (except the local address in each such prefix) to be a possible private IP
      * match for every public IP referred to by every source-nat pool on a masquerading interface.
      */
-    ImmutableMap.Builder<Ip, IpSpace> builder = ImmutableMap.builder();
+    Map<Ip, ImmutableSet.Builder<IpSpace>> buildersByIp = new LinkedHashMap<>();
     for (Configuration c : configurations.values()) {
       Collection<Interface> interfaces = c.getInterfaces().values();
       Set<Prefix> nonNattedInterfacePrefixes =
@@ -2109,11 +2111,16 @@ public class Batfish extends PluginConsumer implements IBatfish {
                     ipAsLong <= sourceNat.getPoolIpLast().asLong();
                     ipAsLong++) {
                   Ip currentPoolIp = new Ip(ipAsLong);
-                  builder.put(currentPoolIp, ipSpace);
+                  buildersByIp
+                      .computeIfAbsent(currentPoolIp, v -> ImmutableSet.<IpSpace>builder())
+                      .add(ipSpace);
                 }
               });
     }
-    return builder.build();
+    return buildersByIp
+        .entrySet()
+        .stream()
+        .collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue().build()));
   }
 
   private void initQuestionEnvironment(Question question, boolean dp, boolean differentialContext) {
@@ -2152,7 +2159,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
   public void initRemoteIpsecVpns(Map<String, Configuration> configurations) {
     Map<IpsecVpn, Ip> remoteAddresses = new IdentityHashMap<>();
     Map<Ip, Set<IpsecVpn>> externalAddresses = new HashMap<>();
-    Map<Ip, IpSpace> privateIpsByPublicIp = initPrivateIpsByPublicIp(configurations);
+    Map<Ip, Set<IpSpace>> privateIpsByPublicIp = initPrivateIpsByPublicIp(configurations);
     for (Configuration c : configurations.values()) {
       for (IpsecVpn ipsecVpn : c.getIpsecVpns().values()) {
         Ip remoteAddress = ipsecVpn.getIkeGateway().getAddress();
@@ -2183,10 +2190,12 @@ public class Batfish extends PluginConsumer implements IBatfish {
           Ip reciprocalRemoteAddress = remoteAddresses.get(remoteIpsecVpnCandidate);
           Set<IpsecVpn> reciprocalVpns = externalAddresses.get(reciprocalRemoteAddress);
           if (reciprocalVpns == null) {
-            IpSpace privateIpsBehindReciprocalRemoteAddress =
+            Set<IpSpace> privateIpsBehindReciprocalRemoteAddress =
                 privateIpsByPublicIp.get(reciprocalRemoteAddress);
             if (privateIpsBehindReciprocalRemoteAddress != null
-                && privateIpsBehindReciprocalRemoteAddress.contains(localAddress)) {
+                && privateIpsBehindReciprocalRemoteAddress
+                    .stream()
+                    .anyMatch(ipSpace -> ipSpace.contains(localAddress))) {
               reciprocalVpns = externalAddresses.get(localAddress);
               ipsecVpn.setRemoteIpsecVpn(remoteIpsecVpnCandidate);
               ipsecVpn.getCandidateRemoteIpsecVpns().add(remoteIpsecVpnCandidate);
