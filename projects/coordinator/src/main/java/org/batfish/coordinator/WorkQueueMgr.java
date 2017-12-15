@@ -1,5 +1,7 @@
 package org.batfish.coordinator;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
@@ -136,14 +138,15 @@ public class WorkQueueMgr {
   }
 
   @Nullable
-  public QueuedWork getWorkForChecking() {
+  public List<QueuedWork> getWorkForChecking() {
+    List<QueuedWork> workToCheck = new ArrayList<>();
     for (QueuedWork work : _queueIncompleteWork) {
       if (work.getStatus() == WorkStatusCode.ASSIGNED) {
         work.setStatus(WorkStatusCode.CHECKINGSTATUS);
-        return work;
+        workToCheck.add(work);
       }
     }
-    return null;
+    return workToCheck;
   }
 
   public synchronized void makeWorkUnassigned(QueuedWork work) {

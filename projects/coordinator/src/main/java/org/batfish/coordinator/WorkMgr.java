@@ -62,15 +62,8 @@ public class WorkMgr extends AbstractCoordinator {
   static final class AssignWorkTask implements Runnable {
     @Override
     public void run() {
-      Main.getWorkMgr().checkTask();
+      Main.getWorkMgr().checkTasks();
       Main.getWorkMgr().assignWork();
-    }
-  }
-
-  static final class CheckTaskTask implements Runnable {
-    @Override
-    public void run() {
-      Main.getWorkMgr().checkTask();
     }
   }
 
@@ -244,22 +237,20 @@ public class WorkMgr extends AbstractCoordinator {
     Main.getPoolMgr().markAssignmentResult(worker, assigned);
   }
 
-  private void checkTask() {
+  private void checkTasks() {
     try {
-      QueuedWork work = _workQueueMgr.getWorkForChecking();
-      if (work == null) {
-        // _logger.info("WM:checkTask: No assigned work\n");
-        return;
+      List<QueuedWork> workToCheck = _workQueueMgr.getWorkForChecking();
+      for (QueuedWork work : workToCheck) {
+        String assignedWorker = work.getAssignedWorker();
+        if (assignedWorker == null) {
+          _logger.error("WM:CheckWork no assigned worker for " + work + "\n");
+          _workQueueMgr.makeWorkUnassigned(work);
+          return;
+        }
+        checkTask(work, assignedWorker);
       }
-      String assignedWorker = work.getAssignedWorker();
-      if (assignedWorker == null) {
-        _logger.error("WM:CheckWork no assinged worker for " + work + "\n");
-        _workQueueMgr.makeWorkUnassigned(work);
-        return;
-      }
-      checkTask(work, assignedWorker);
     } catch (Exception e) {
-      _logger.error("Got exception in assignWork: " + e.getMessage());
+      _logger.error("Got exception in checkTasks: " + e.getMessage());
     }
   }
 
