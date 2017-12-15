@@ -245,7 +245,7 @@ public class WorkMgr extends AbstractCoordinator {
         if (assignedWorker == null) {
           _logger.error("WM:CheckWork no assigned worker for " + work + "\n");
           _workQueueMgr.makeWorkUnassigned(work);
-          return;
+          continue;
         }
         checkTask(work, assignedWorker);
       }

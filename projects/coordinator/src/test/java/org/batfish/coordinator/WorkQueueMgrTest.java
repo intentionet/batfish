@@ -3,7 +3,9 @@ package org.batfish.coordinator;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
+import java.util.List;
 import org.batfish.common.BatfishException;
+import org.batfish.common.CoordConsts.WorkStatusCode;
 import org.batfish.common.WorkItem;
 import org.batfish.coordinator.WorkQueueMgr.QueueType;
 import org.batfish.coordinator.queues.WorkQueue.Type;
@@ -52,6 +54,36 @@ public class WorkQueueMgrTest {
     QueuedWork matchingWork = workQueueMgr.getMatchingWork(wItem3, QueueType.INCOMPLETE);
 
     assertThat(matchingWork, equalTo(work1));
+  }
+
+  @Test
+  public void testGetWorkForChecking() throws Exception {
+    WorkQueueMgr workQueueMgr = new WorkQueueMgr(Type.memory);
+
+    List<QueuedWork> workToCheck = workQueueMgr.getWorkForChecking();
+    assertThat(workToCheck.size(), equalTo(0));
+
+    QueuedWork work1 = new QueuedWork(new WorkItem("container", "testrig"));
+    QueuedWork work2 = new QueuedWork(new WorkItem("container", "testrig"));
+    workQueueMgr.queueUnassignedWork(work1);
+    workQueueMgr.queueUnassignedWork(work2);
+    workToCheck = workQueueMgr.getWorkForChecking();
+    assertThat(workToCheck.size(), equalTo(0));
+
+    work2.setStatus(WorkStatusCode.ASSIGNED);
+    workToCheck = workQueueMgr.getWorkForChecking();
+    assertThat(workToCheck.size(), equalTo(1));
+
+    // After getWorkForChecking(), work2 should have status CHECKINGSTATUS and
+    // therefore no longer show up in the workListToCheck
+    assertThat(work2.getStatus(), equalTo(WorkStatusCode.CHECKINGSTATUS));
+    workToCheck = workQueueMgr.getWorkForChecking();
+    assertThat(workToCheck.size(), equalTo(0));
+
+    work1.setStatus(WorkStatusCode.ASSIGNED);
+    work2.setStatus(WorkStatusCode.ASSIGNED);
+    workToCheck = workQueueMgr.getWorkForChecking();
+    assertThat(workToCheck.size(), equalTo(2));
   }
 
   @Test

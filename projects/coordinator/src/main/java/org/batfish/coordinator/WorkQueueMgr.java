@@ -137,7 +137,6 @@ public class WorkQueueMgr {
     return null;
   }
 
-  @Nullable
   public List<QueuedWork> getWorkForChecking() {
     List<QueuedWork> workToCheck = new ArrayList<>();
     for (QueuedWork work : _queueIncompleteWork) {
