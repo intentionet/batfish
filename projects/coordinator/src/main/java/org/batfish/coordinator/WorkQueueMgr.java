@@ -3,6 +3,7 @@ package org.batfish.coordinator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BfConsts.TaskStatus;
@@ -137,6 +138,7 @@ public class WorkQueueMgr {
     return null;
   }
 
+  @Nonnull
   public List<QueuedWork> getWorkForChecking() {
     List<QueuedWork> workToCheck = new ArrayList<>();
     for (QueuedWork work : _queueIncompleteWork) {
