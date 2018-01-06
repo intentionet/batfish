@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.batfish.datamodel.Interface;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
@@ -45,11 +44,6 @@ public final class InterfaceMatchers {
     }
   }
 
-  public static HasDeclaredNames hasDeclaredNames(@Nonnull String... expectedDeclaredNames) {
-    return new HasDeclaredNames(
-        containsInAnyOrder(ImmutableSet.copyOf(expectedDeclaredNames).toArray()));
-  }
-
   public static HasDeclaredNames hasDeclaredNames(@Nonnull Iterable<String> expectedDeclaredNames) {
     return new HasDeclaredNames(
         containsInAnyOrder(ImmutableSet.copyOf(expectedDeclaredNames).toArray()));
@@ -58,6 +52,11 @@ public final class InterfaceMatchers {
   public static HasDeclaredNames hasDeclaredNames(
       @Nonnull Matcher<? super Set<String>> subMatcher) {
     return new HasDeclaredNames(subMatcher);
+  }
+
+  public static HasDeclaredNames hasDeclaredNames(@Nonnull String... expectedDeclaredNames) {
+    return new HasDeclaredNames(
+        containsInAnyOrder(ImmutableSet.copyOf(expectedDeclaredNames).toArray()));
   }
 
   public static HasSourceNats hasSourceNats(@Nonnull Matcher<? super List<SourceNat>> subMatcher) {
