@@ -18,7 +18,7 @@ public enum OutliersHypothesis {
 
   private static final Map<String, OutliersHypothesis> _map = buildMap();
 
-  private static synchronized Map<String, OutliersHypothesis> buildMap() {
+  private static Map<String, OutliersHypothesis> buildMap() {
     ImmutableMap.Builder<String, OutliersHypothesis> map = ImmutableMap.builder();
     for (OutliersHypothesis value : OutliersHypothesis.values()) {
       String name = value._name;

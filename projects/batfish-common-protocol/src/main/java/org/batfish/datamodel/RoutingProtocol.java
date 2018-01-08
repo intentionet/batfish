@@ -32,7 +32,7 @@ public enum RoutingProtocol {
 
   private static final Map<String, RoutingProtocol> _map = buildMap();
 
-  private static synchronized Map<String, RoutingProtocol> buildMap() {
+  private static Map<String, RoutingProtocol> buildMap() {
     ImmutableMap.Builder<String, RoutingProtocol> map = ImmutableMap.builder();
     for (RoutingProtocol protocol : RoutingProtocol.values()) {
       String protocolName = protocol._protocolName.toLowerCase();

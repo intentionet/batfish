@@ -15,7 +15,7 @@ public enum NeighborType {
 
   private static final Map<String, NeighborType> _map = buildMap();
 
-  private static synchronized Map<String, NeighborType> buildMap() {
+  private static Map<String, NeighborType> buildMap() {
     ImmutableMap.Builder<String, NeighborType> map = ImmutableMap.builder();
     for (NeighborType value : NeighborType.values()) {
       String name = value._name;

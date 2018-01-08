@@ -15,7 +15,7 @@ public enum State {
 
   private static final Map<String, State> _nameMap = buildNameMap();
 
-  private static synchronized Map<String, State> buildNameMap() {
+  private static Map<String, State> buildNameMap() {
     ImmutableMap.Builder<String, State> map = ImmutableMap.builder();
     for (State value : State.values()) {
       String name = value.name().toLowerCase();
@@ -24,7 +24,7 @@ public enum State {
     return map.build();
   }
 
-  private static synchronized Map<Integer, State> buildNumberMap() {
+  private static Map<Integer, State> buildNumberMap() {
     ImmutableMap.Builder<Integer, State> map = ImmutableMap.builder();
     for (State value : State.values()) {
       int num = value._num;

@@ -104,7 +104,7 @@ public class Driver {
   static Logger networkListenerLogger =
       Logger.getLogger("org.glassfish.grizzly.http.server.NetworkListener");
 
-  private static synchronized Cache<TestrigSettings, DataPlane> buildDataPlaneCache() {
+  private static Cache<TestrigSettings, DataPlane> buildDataPlaneCache() {
     return CacheBuilder.newBuilder().maximumSize(MAX_CACHED_DATA_PLANES).weakValues().build();
   }
 
@@ -122,8 +122,7 @@ public class Driver {
             MAX_CACHED_ENVIRONMENT_ROUTING_TABLES));
   }
 
-  private static synchronized Cache<TestrigSettings, SortedMap<String, Configuration>>
-      buildTestrigCache() {
+  private static Cache<TestrigSettings, SortedMap<String, Configuration>> buildTestrigCache() {
     return CacheBuilder.newBuilder().maximumSize(MAX_CACHED_TESTRIGS).build();
   }
 

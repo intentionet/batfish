@@ -1,8 +1,8 @@
 package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.common.collect.ImmutableMap;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -270,12 +270,12 @@ public enum IpProtocol {
 
   private static final Map<Integer, IpProtocol> NUMBER_TO_PROTOCOL_MAP = buildNumberToProtocolMap();
 
-  private static synchronized Map<Integer, IpProtocol> buildNumberToProtocolMap() {
-    Map<Integer, IpProtocol> map = new HashMap<>();
+  private static Map<Integer, IpProtocol> buildNumberToProtocolMap() {
+    ImmutableMap.Builder<Integer, IpProtocol> map = ImmutableMap.builder();
     for (IpProtocol protocol : values()) {
       map.put(protocol._number, protocol);
     }
-    return map;
+    return map.build();
   }
 
   public static IpProtocol fromNumber(int number) {
