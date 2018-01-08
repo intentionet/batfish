@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.service.AutoService;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -51,13 +50,13 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
 
     private static final Map<String, EdgeStyle> _map = buildMap();
 
-    private static synchronized Map<String, EdgeStyle> buildMap() {
-      Map<String, EdgeStyle> map = new HashMap<>();
+    private static Map<String, EdgeStyle> buildMap() {
+      ImmutableMap.Builder<String, EdgeStyle> map = ImmutableMap.builder();
       for (EdgeStyle value : EdgeStyle.values()) {
         String name = value._name;
         map.put(name, value);
       }
-      return Collections.unmodifiableMap(map);
+      return map.build();
     }
 
     @JsonCreator

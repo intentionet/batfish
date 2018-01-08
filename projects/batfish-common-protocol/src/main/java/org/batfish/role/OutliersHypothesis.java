@@ -2,8 +2,7 @@ package org.batfish.role;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -20,12 +19,12 @@ public enum OutliersHypothesis {
   private static final Map<String, OutliersHypothesis> _map = buildMap();
 
   private static synchronized Map<String, OutliersHypothesis> buildMap() {
-    Map<String, OutliersHypothesis> map = new HashMap<>();
+    ImmutableMap.Builder<String, OutliersHypothesis> map = ImmutableMap.builder();
     for (OutliersHypothesis value : OutliersHypothesis.values()) {
       String name = value._name;
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator

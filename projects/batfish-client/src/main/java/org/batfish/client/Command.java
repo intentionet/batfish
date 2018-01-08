@@ -1,7 +1,6 @@
 package org.batfish.client;
 
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.TreeMap;
 import org.batfish.common.BatfishException;
@@ -88,12 +87,12 @@ public enum Command {
   private static final Map<Command, Pair<String, String>> _usageMap = buildUsageMap();
 
   private static Map<String, Command> buildNameMap() {
-    Map<String, Command> map = new HashMap<>();
+    ImmutableMap.Builder<String, Command> map = ImmutableMap.builder();
     for (Command value : Command.values()) {
       String name = value._name;
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   private static Map<Command, Pair<String, String>> buildUsageMap() {

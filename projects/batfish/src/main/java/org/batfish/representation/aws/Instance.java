@@ -2,9 +2,9 @@ package org.batfish.representation.aws;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -46,18 +46,18 @@ public class Instance implements AwsVpcEntity, Serializable {
       return value;
     }
 
-    private static synchronized Map<String, Status> initMap() {
-      Map<String, Status> map = new HashMap<>();
+    private static Map<String, Status> initMap() {
+      ImmutableMap.Builder<String, Status> map = ImmutableMap.builder();
       for (Status value : Status.values()) {
         String name = value._name.toLowerCase();
         map.put(name, value);
       }
-      return Collections.unmodifiableMap(map);
+      return map.build();
     }
 
     private final String _name;
 
-    private Status(String name) {
+    Status(String name) {
       _name = name;
     }
 

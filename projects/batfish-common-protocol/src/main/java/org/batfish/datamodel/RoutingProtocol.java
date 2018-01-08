@@ -2,8 +2,7 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -34,12 +33,12 @@ public enum RoutingProtocol {
   private static final Map<String, RoutingProtocol> _map = buildMap();
 
   private static synchronized Map<String, RoutingProtocol> buildMap() {
-    Map<String, RoutingProtocol> map = new HashMap<>();
+    ImmutableMap.Builder<String, RoutingProtocol> map = ImmutableMap.builder();
     for (RoutingProtocol protocol : RoutingProtocol.values()) {
       String protocolName = protocol._protocolName.toLowerCase();
       map.put(protocolName, protocol);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator

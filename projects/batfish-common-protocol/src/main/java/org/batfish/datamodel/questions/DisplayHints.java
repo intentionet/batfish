@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -20,21 +20,18 @@ public class DisplayHints {
 
   public static class Schema {
 
-    private static final Map<String, String> schemaAliases;
-
-    static {
-      Map<String, String> aMap = new HashMap<>();
-      aMap.put("Environment", "class:org.batfish.datamodel.pojo.Environment");
-      aMap.put("FileLine", "class:org.batfish.datamodel.collections.FileLinePair");
-      aMap.put("Flow", "class:org.batfish.datamodel.Flow");
-      aMap.put("FlowTrace", "class:org.batfish.datamodel.FlowTrace");
-      aMap.put("Integer", "class:java.lang.Integer");
-      aMap.put("Interface", "class:org.batfish.datamodel.collections.NodeInterfacePair");
-      aMap.put("Ip", "class:org.batfish.datamodel.Ip");
-      aMap.put("Node", "class:org.batfish.datamodel.pojo.Node");
-      aMap.put("String", "class:java.lang.String");
-      schemaAliases = Collections.unmodifiableMap(aMap);
-    }
+    private static final Map<String, String> schemaAliases =
+        ImmutableMap.<String, String>builder()
+            .put("Environment", "class:org.batfish.datamodel.pojo.Environment")
+            .put("FileLine", "class:org.batfish.datamodel.collections.FileLinePair")
+            .put("Flow", "class:org.batfish.datamodel.Flow")
+            .put("FlowTrace", "class:org.batfish.datamodel.FlowTrace")
+            .put("Integer", "class:java.lang.Integer")
+            .put("Interface", "class:org.batfish.datamodel.collections.NodeInterfacePair")
+            .put("Ip", "class:org.batfish.datamodel.Ip")
+            .put("Node", "class:org.batfish.datamodel.pojo.Node")
+            .put("String", "class:java.lang.String")
+            .build();
 
     private Class<?> _baseType;
 

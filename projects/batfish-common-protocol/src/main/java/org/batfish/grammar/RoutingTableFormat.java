@@ -2,8 +2,7 @@ package org.batfish.grammar;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -16,13 +15,13 @@ public enum RoutingTableFormat {
 
   private static final Map<String, RoutingTableFormat> _map = buildMap();
 
-  private static synchronized Map<String, RoutingTableFormat> buildMap() {
-    Map<String, RoutingTableFormat> map = new HashMap<>();
+  private static Map<String, RoutingTableFormat> buildMap() {
+    ImmutableMap.Builder<String, RoutingTableFormat> map = ImmutableMap.builder();
     for (RoutingTableFormat value : RoutingTableFormat.values()) {
       String name = value._name;
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator

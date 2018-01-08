@@ -2,11 +2,9 @@ package org.batfish.datamodel.routing_policy.expr;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableSortedSet;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import org.batfish.datamodel.CommunityList;
 import org.batfish.datamodel.CommunityListLine;
 import org.batfish.datamodel.routing_policy.Environment;
@@ -27,13 +25,13 @@ public class NamedCommunitySet extends CommunitySetExpr {
 
   @Override
   public SortedSet<Long> allCommunities(Environment environment) {
-    SortedSet<Long> out = new TreeSet<>();
+    ImmutableSortedSet.Builder<Long> out = ImmutableSortedSet.naturalOrder();
     CommunityList cl = environment.getConfiguration().getCommunityLists().get(_name);
     for (CommunityListLine line : cl.getLines()) {
       Long community = line.toLiteralCommunity();
       out.add(community);
     }
-    return Collections.unmodifiableSortedSet(out);
+    return out.build();
   }
 
   @Override

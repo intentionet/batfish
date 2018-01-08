@@ -11,10 +11,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -72,13 +71,13 @@ public abstract class Question implements IQuestion {
           return value;
         }
 
-        private static synchronized Map<String, Type> initMap() {
-          Map<String, Type> map = new HashMap<>();
+        private static Map<String, Type> initMap() {
+          ImmutableMap.Builder<String, Type> map = ImmutableMap.builder();
           for (Type value : Type.values()) {
             String name = value._name.toLowerCase();
             map.put(name, value);
           }
-          return Collections.unmodifiableMap(map);
+          return map.build();
         }
 
         private final String _name;

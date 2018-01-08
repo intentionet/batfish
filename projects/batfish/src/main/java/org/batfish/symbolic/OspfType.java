@@ -1,7 +1,6 @@
 package org.batfish.symbolic;
 
-import java.util.Arrays;
-import java.util.Collections;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.batfish.common.BatfishException;
 
@@ -17,8 +16,7 @@ public enum OspfType {
   E1,
   E2;
 
-  public static final List<OspfType> values =
-      Collections.unmodifiableList(Arrays.asList(O, OIA, E1, E2));
+  public static final List<OspfType> values = ImmutableList.of(O, OIA, E1, E2);
 
   @Override
   public String toString() {

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.google.common.collect.ImmutableMap;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
@@ -34,12 +34,12 @@ public class BgpAdvertisement implements Comparable<BgpAdvertisement>, Serializa
     private static final Map<String, BgpAdvertisementType> _map = buildMap();
 
     private static Map<String, BgpAdvertisementType> buildMap() {
-      Map<String, BgpAdvertisementType> map = new HashMap<>();
+      ImmutableMap.Builder<String, BgpAdvertisementType> map = ImmutableMap.builder();
       for (BgpAdvertisementType bgpAdvertisementType : BgpAdvertisementType.values()) {
         String name = bgpAdvertisementType.toString().toLowerCase();
         map.put(name, bgpAdvertisementType);
       }
-      return Collections.unmodifiableMap(map);
+      return map.build();
     }
 
     @JsonCreator

@@ -2,8 +2,7 @@ package org.batfish.datamodel.questions.smt;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -15,12 +14,12 @@ public enum EnvironmentType {
   private static final Map<String, EnvironmentType> _map = buildMap();
 
   private static Map<String, EnvironmentType> buildMap() {
-    Map<String, EnvironmentType> map = new HashMap<>();
+    ImmutableMap.Builder<String, EnvironmentType> map = ImmutableMap.builder();
     for (EnvironmentType value : EnvironmentType.values()) {
       String name = value._name.toLowerCase();
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator

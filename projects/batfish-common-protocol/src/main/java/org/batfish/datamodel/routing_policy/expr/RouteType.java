@@ -2,8 +2,7 @@ package org.batfish.datamodel.routing_policy.expr;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -24,13 +23,13 @@ public enum RouteType {
 
   private static final Map<String, RouteType> _map = buildMap();
 
-  private static synchronized Map<String, RouteType> buildMap() {
-    Map<String, RouteType> map = new HashMap<>();
+  private static Map<String, RouteType> buildMap() {
+    ImmutableMap.Builder<String, RouteType> map = ImmutableMap.builder();
     for (RouteType value : RouteType.values()) {
       String name = value._name.toLowerCase();
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator

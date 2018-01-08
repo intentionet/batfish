@@ -2,8 +2,7 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -15,12 +14,12 @@ public enum OriginType {
   private static final Map<String, OriginType> _map = buildMap();
 
   private static Map<String, OriginType> buildMap() {
-    Map<String, OriginType> map = new HashMap<>();
+    ImmutableMap.Builder<String, OriginType> map = ImmutableMap.builder();
     for (OriginType value : OriginType.values()) {
       String name = value._name;
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator

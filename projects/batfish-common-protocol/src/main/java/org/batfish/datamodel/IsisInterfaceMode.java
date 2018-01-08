@@ -2,8 +2,7 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -16,12 +15,12 @@ public enum IsisInterfaceMode {
   private static final Map<String, IsisInterfaceMode> _map = buildMap();
 
   private static Map<String, IsisInterfaceMode> buildMap() {
-    Map<String, IsisInterfaceMode> map = new HashMap<>();
+    ImmutableMap.Builder<String, IsisInterfaceMode> map = ImmutableMap.builder();
     for (IsisInterfaceMode value : IsisInterfaceMode.values()) {
       String name = value._name;
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator

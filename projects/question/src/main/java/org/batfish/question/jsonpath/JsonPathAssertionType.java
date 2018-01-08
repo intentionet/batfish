@@ -2,8 +2,7 @@ package org.batfish.question.jsonpath;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Collections;
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.batfish.common.BatfishException;
 
@@ -15,12 +14,12 @@ public enum JsonPathAssertionType {
   private static final Map<String, JsonPathAssertionType> _map = buildMap();
 
   private static Map<String, JsonPathAssertionType> buildMap() {
-    Map<String, JsonPathAssertionType> map = new HashMap<>();
+    ImmutableMap.Builder<String, JsonPathAssertionType> map = ImmutableMap.builder();
     for (JsonPathAssertionType value : JsonPathAssertionType.values()) {
       String name = value._name.toLowerCase();
       map.put(name, value);
     }
-    return Collections.unmodifiableMap(map);
+    return map.build();
   }
 
   @JsonCreator
