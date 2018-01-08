@@ -3,8 +3,10 @@ package org.batfish.bdp;
 import static org.batfish.datamodel.RoutingProtocol.OSPF;
 import static org.batfish.datamodel.RoutingProtocol.OSPF_E1;
 import static org.batfish.datamodel.RoutingProtocol.OSPF_IA;
+import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasMetric;
+import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasPrefix;
+import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasProtocol;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nonnull;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.AbstractRoute;
@@ -46,47 +47,9 @@ import org.batfish.datamodel.routing_policy.statement.SetMetric;
 import org.batfish.datamodel.routing_policy.statement.SetOspfMetricType;
 import org.batfish.datamodel.routing_policy.statement.Statement;
 import org.batfish.datamodel.routing_policy.statement.Statements;
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
 import org.junit.Test;
 
 public class OspfTest {
-
-  private static final class HasMetric extends FeatureMatcher<AbstractRoute, Long> {
-
-    private HasMetric(@Nonnull long expectedMetric) {
-      super(equalTo(expectedMetric), "metric", "metric");
-    }
-
-    @Override
-    protected Long featureValueOf(AbstractRoute actual) {
-      return actual.getMetric();
-    }
-  }
-
-  private static final class HasPrefix extends FeatureMatcher<AbstractRoute, Prefix> {
-
-    private HasPrefix(@Nonnull Prefix expectedPrefix) {
-      super(equalTo(expectedPrefix), "network", "network");
-    }
-
-    @Override
-    protected Prefix featureValueOf(AbstractRoute actual) {
-      return actual.getNetwork();
-    }
-  }
-
-  private static final class HasProtocol extends FeatureMatcher<AbstractRoute, RoutingProtocol> {
-
-    private HasProtocol(@Nonnull RoutingProtocol expectedProtocol) {
-      super(equalTo(expectedProtocol), "protocol", "protocol");
-    }
-
-    @Override
-    protected RoutingProtocol featureValueOf(AbstractRoute actual) {
-      return actual.getProtocol();
-    }
-  }
 
   private static final Prefix C1_E1_2_PREFIX = new Prefix("10.12.0.1/24");
   private static final Prefix C1_L0_PREFIX = new Prefix("1.1.1.1/32");
@@ -334,18 +297,6 @@ public class OspfTest {
             new BdpAnswerElement());
 
     return engine.getRoutes(dp);
-  }
-
-  private static final Matcher<AbstractRoute> hasMetric(long expectedMetric) {
-    return new HasMetric(expectedMetric);
-  }
-
-  private static final Matcher<AbstractRoute> hasPrefix(Prefix expectedPrefix) {
-    return new HasPrefix(expectedPrefix);
-  }
-
-  private static final Matcher<AbstractRoute> hasProtocol(RoutingProtocol expectedProtocol) {
-    return new HasProtocol(expectedProtocol);
   }
 
   @Test
