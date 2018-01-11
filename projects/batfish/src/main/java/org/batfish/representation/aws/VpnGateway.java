@@ -56,7 +56,7 @@ public class VpnGateway implements AwsVpcEntity, Serializable {
       Interface vpcIface = new Interface(vpcIfaceName, vpcConfigNode);
       Ip vpcIfaceIp = vgwIfacePrefix.getEndAddress();
       Prefix vpcIfacePrefix = new Prefix(vpcIfaceIp, vgwIfacePrefix.getPrefixLength());
-      vpcIface.setPrefix(vpcIfacePrefix);
+      vpcIface.setAddress(vpcIfacePrefix);
       Utils.newInterface(vpcIfaceName, vpcConfigNode, vpcIfacePrefix);
 
       // associate this gateway with the vpc

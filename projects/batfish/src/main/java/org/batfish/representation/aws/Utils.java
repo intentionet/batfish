@@ -36,7 +36,7 @@ public class Utils {
         .setOwner(c)
         .setVrf(c.getDefaultVrf())
         .setActive(true)
-        .setPrefix(primaryPrefix)
+        .setAddress(primaryPrefix)
         .build();
   }
 

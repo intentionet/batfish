@@ -136,7 +136,7 @@ public class BgpLoopbacksQuestionPlugin extends QuestionPlugin {
               boolean exported = false;
 
               outerloop:
-              for (Prefix prefix : iface.getAllPrefixes()) {
+              for (Prefix prefix : iface.getAllAddresses()) {
                 ConnectedRoute route = new ConnectedRoute(prefix, interfaceName);
                 for (RoutingPolicy exportPolicy : exportPolicies) {
                   if (exportPolicy.process(

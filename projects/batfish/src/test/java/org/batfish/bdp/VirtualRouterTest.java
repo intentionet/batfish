@@ -131,7 +131,7 @@ public class VirtualRouterTest {
         nf.interfaceBuilder().setActive(true).setOwner(c).setVrf(c.getDefaultVrf());
     interfacePrefixes.forEach(
         (ifaceName, prefix) -> {
-          ib.setName(ifaceName).setPrefix(prefix).build();
+          ib.setName(ifaceName).setAddress(prefix).build();
         });
   }
 

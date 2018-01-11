@@ -714,7 +714,7 @@ class EncoderSlice {
                       .contains(e);
 
               Interface i = e.getStart();
-              Prefix p = i.getPrefix();
+              Prefix p = i.getAddress();
 
               boolean doModel = !(proto.isConnected() && p != null && !relevantPrefix(p));
               // Optimization: Don't model the connected interfaces that aren't relevant
@@ -1595,11 +1595,11 @@ class EncoderSlice {
           GraphEdge other = getGraph().getOtherEnd().get(ge);
           BoolExpr connectedWillSend;
           if (other == null || getGraph().isHost(ge.getPeer())) {
-            Ip ip = ge.getStart().getPrefix().getAddress();
+            Ip ip = ge.getStart().getAddress().getAddress();
             BitVecExpr val = getCtx().mkBV(ip.asLong(), 32);
             connectedWillSend = mkNot(mkEq(_symbolicPacket.getDstIp(), val));
           } else {
-            Ip ip = other.getStart().getPrefix().getAddress();
+            Ip ip = other.getStart().getAddress().getAddress();
             BitVecExpr val = getCtx().mkBV(ip.asLong(), 32);
             connectedWillSend = mkEq(_symbolicPacket.getDstIp(), val);
           }
@@ -1993,7 +1993,7 @@ class EncoderSlice {
     if (vars.getIsUsed()) {
 
       if (proto.isConnected()) {
-        Prefix p = iface.getPrefix();
+        Prefix p = iface.getAddress();
         BoolExpr relevant =
             mkAnd(
                 interfaceActive(iface, proto),

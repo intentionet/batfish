@@ -706,9 +706,9 @@ public class Abstraction {
       if (leavesNetwork
           || (abstractRouters.contains(ge.getRouter()) && abstractRouters.contains(ge.getPeer()))) {
         toRetain.add(ge.getStart());
-        Ip start = ge.getStart().getPrefix().getAddress();
+        Ip start = ge.getStart().getAddress().getAddress();
         if (!leavesNetwork) {
-          Ip end = ge.getEnd().getPrefix().getAddress();
+          Ip end = ge.getEnd().getAddress().getAddress();
           ipNeighbors.add(new Pair<>(start, end));
         }
         BgpNeighbor n = _graph.getEbgpNeighbors().get(ge);

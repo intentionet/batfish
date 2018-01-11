@@ -192,15 +192,15 @@ public class OspfTest {
     OspfArea oa1a = oaba.setOspfProcess(op1).build();
     OspfArea oa1b = areaA == areaB ? oa1a : oabb.setOspfProcess(op1).build();
     ib.setOwner(c1).setVrf(v1).setOspfArea(oa1a);
-    ib.setOspfPassive(true).setName(l0Name).setPrefix(C1_L0_PREFIX).build();
+    ib.setOspfPassive(true).setName(l0Name).setAddress(C1_L0_PREFIX).build();
     ib.setOspfEnabled(false)
         .setOspfPassive(false)
         .setOspfArea(null)
         .setName(l1Name)
-        .setPrefix(C1_L1_PREFIX)
+        .setAddress(C1_L1_PREFIX)
         .build();
     ib.setOspfEnabled(true).setOspfArea(oa1b);
-    ib.setName(c1E1To2Name).setPrefix(C1_E1_2_PREFIX).build();
+    ib.setName(c1E1To2Name).setAddress(C1_E1_2_PREFIX).build();
 
     Configuration c2 = cb.setHostname(C2_NAME).build();
     Vrf v2 = vb.setOwner(c2).build();
@@ -223,17 +223,17 @@ public class OspfTest {
     OspfArea oa2d =
         areaB == areaD ? oa2b : areaC == areaD ? oa2c : oabd.setOspfProcess(op2).build();
     ib.setOwner(c2).setVrf(v2).setOspfArea(oa2c);
-    ib.setOspfPassive(true).setName(l0Name).setPrefix(C2_L0_PREFIX).build();
+    ib.setOspfPassive(true).setName(l0Name).setAddress(C2_L0_PREFIX).build();
     ib.setOspfEnabled(false)
         .setOspfPassive(false)
         .setOspfArea(null)
         .setName(l1Name)
-        .setPrefix(C2_L1_PREFIX)
+        .setAddress(C2_L1_PREFIX)
         .build();
     ib.setOspfEnabled(true).setOspfArea(oa2b);
-    ib.setName(c2E2To1Name).setPrefix(C2_E2_1_PREFIX).setOspfPointToPoint(true).build();
+    ib.setName(c2E2To1Name).setAddress(C2_E2_1_PREFIX).setOspfPointToPoint(true).build();
     ib.setOspfPointToPoint(false).setOspfArea(oa2d);
-    ib.setName(c2E2To3Name).setPrefix(C2_E2_3_PREFIX).build();
+    ib.setName(c2E2To3Name).setAddress(C2_E2_3_PREFIX).build();
 
     Configuration c3 = cb.setHostname(C3_NAME).build();
     Vrf v3 = vb.setOwner(c3).build();
@@ -245,16 +245,16 @@ public class OspfTest {
     OspfArea oa3f =
         areaD == areaF ? oa3d : areaE == areaF ? oa3e : oabf.setOspfProcess(op3).build();
     ib.setOwner(c3).setVrf(v3).setOspfArea(oa3e);
-    ib.setOspfPassive(true).setName(l0Name).setPrefix(C3_L0_PREFIX).build();
+    ib.setOspfPassive(true).setName(l0Name).setAddress(C3_L0_PREFIX).build();
     ib.setOspfEnabled(false)
         .setOspfPassive(false)
         .setOspfArea(null)
         .setName(l1Name)
-        .setPrefix(C3_L1_PREFIX)
+        .setAddress(C3_L1_PREFIX)
         .build();
     ib.setOspfEnabled(true).setOspfArea(oa3d);
-    ib.setName(c3E3To2Name).setPrefix(C3_E3_2_PREFIX).build();
-    ib.setName(c3E3To4Name).setPrefix(C3_E3_4_PREFIX).setOspfArea(oa3f).build();
+    ib.setName(c3E3To2Name).setAddress(C3_E3_2_PREFIX).build();
+    ib.setName(c3E3To4Name).setAddress(C3_E3_4_PREFIX).setOspfArea(oa3f).build();
 
     Configuration c4 = cb.setHostname(C4_NAME).build();
     Vrf v4 = vb.setOwner(c4).build();
@@ -264,15 +264,15 @@ public class OspfTest {
     OspfArea oa4f = oabf.setOspfProcess(op4).build();
     OspfArea oa4g = areaF == areaG ? oa4f : oabg.setOspfProcess(op4).build();
     ib.setOwner(c4).setVrf(v4).setOspfArea(oa4g);
-    ib.setOspfPassive(true).setName(l0Name).setPrefix(C4_L0_PREFIX).build();
+    ib.setOspfPassive(true).setName(l0Name).setAddress(C4_L0_PREFIX).build();
     ib.setOspfEnabled(false)
         .setOspfPassive(false)
         .setOspfArea(null)
         .setName(l1Name)
-        .setPrefix(C4_L1_PREFIX)
+        .setAddress(C4_L1_PREFIX)
         .build();
     ib.setOspfEnabled(true).setOspfArea(oa4f);
-    ib.setName(c4E4To3Name).setPrefix(C4_E4_3_PREFIX).build();
+    ib.setName(c4E4To3Name).setAddress(C4_E4_3_PREFIX).build();
 
     SortedMap<String, Configuration> configurations =
         new ImmutableSortedMap.Builder<String, Configuration>(String::compareTo)

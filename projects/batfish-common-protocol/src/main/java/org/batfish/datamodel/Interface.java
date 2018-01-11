@@ -40,7 +40,7 @@ public final class Interface extends ComparableStructure<String> {
 
     private Configuration _owner;
 
-    private Prefix _prefix;
+    private NetworkAddress __address;
 
     private Vrf _vrf;
 
@@ -66,9 +66,9 @@ public final class Interface extends ComparableStructure<String> {
       if (_owner != null) {
         _owner.getInterfaces().put(name, iface);
       }
-      iface.setPrefix(_prefix);
-      if (_prefix != null) {
-        iface.setAllPrefixes(Collections.singleton(_prefix));
+      iface.setAddress(__address);
+      if (__address != null) {
+        iface.setAllAddresses(Collections.singleton(__address));
       }
       iface.setVrf(_vrf);
       if (_vrf != null) {
@@ -121,8 +121,8 @@ public final class Interface extends ComparableStructure<String> {
       return this;
     }
 
-    public Builder setPrefix(Prefix prefix) {
-      _prefix = prefix;
+    public Builder setAddress(NetworkAddress address) {
+      __address = address;
       return this;
     }
 
@@ -142,7 +142,7 @@ public final class Interface extends ComparableStructure<String> {
 
   private static final String PROP_ACTIVE = "active";
 
-  private static final String PROP_ALL_PREFIXES = "allPrefixes";
+  private static final String PROP_ALL_ADDRESSES = "allAddresses";
 
   private static final String PROP_ALLOWED_VLANS = "allowedVlans";
 
@@ -188,7 +188,7 @@ public final class Interface extends ComparableStructure<String> {
 
   private static final String PROP_OUTGOING_FILTER = "outgoingFilter";
 
-  private static final String PROP_PREFIX = "prefix";
+  private static final String PROP_ADDRESS = "address";
 
   private static final String PROP_RIP_ENABLED = "ripEnabled";
 
@@ -377,7 +377,7 @@ public final class Interface extends ComparableStructure<String> {
 
   private List<SubRange> _allowedVlans;
 
-  private SortedSet<Prefix> _allPrefixes;
+  private SortedSet<NetworkAddress> _allAddresses;
 
   private boolean _autoState;
 
@@ -433,7 +433,7 @@ public final class Interface extends ComparableStructure<String> {
 
   private Configuration _owner;
 
-  private Prefix _prefix;
+  private NetworkAddress _address;
 
   private Boolean _proxyArp;
 
@@ -480,7 +480,7 @@ public final class Interface extends ComparableStructure<String> {
     _active = true;
     _autoState = true;
     _allowedVlans = new ArrayList<>();
-    _allPrefixes = ImmutableSortedSet.of();
+    _allAddresses = ImmutableSortedSet.of();
     _declaredNames = ImmutableSortedSet.of();
     _dhcpRelayAddresses = new ArrayList<>();
     _interfaceType = InterfaceType.UNKNOWN;
@@ -525,7 +525,7 @@ public final class Interface extends ComparableStructure<String> {
     if (!this._allowedVlans.equals(other._allowedVlans)) {
       return false;
     }
-    if (!this._allPrefixes.equals(other._allPrefixes)) {
+    if (!this._allAddresses.equals(other._allAddresses)) {
       return false;
     }
     if (this._autoState != other._autoState) {
@@ -561,7 +561,7 @@ public final class Interface extends ComparableStructure<String> {
       return false;
     }
 
-    if (!Objects.equals(this._prefix, other._prefix)) {
+    if (!Objects.equals(this._address, other._address)) {
       return false;
     }
 
@@ -598,10 +598,10 @@ public final class Interface extends ComparableStructure<String> {
     return _allowedVlans;
   }
 
-  @JsonProperty(PROP_ALL_PREFIXES)
+  @JsonProperty(PROP_ALL_ADDRESSES)
   @JsonPropertyDescription("All IPV4 address/network assignments on this interface")
-  public Set<Prefix> getAllPrefixes() {
-    return _allPrefixes;
+  public Set<NetworkAddress> getAllAddresses() {
+    return _allAddresses;
   }
 
   @JsonProperty(PROP_AUTOSTATE)
@@ -788,10 +788,10 @@ public final class Interface extends ComparableStructure<String> {
     return _owner;
   }
 
-  @JsonProperty(PROP_PREFIX)
+  @JsonProperty(PROP_ADDRESS)
   @JsonPropertyDescription("The primary IPV4 address/network of this interface")
-  public Prefix getPrefix() {
-    return _prefix;
+  public NetworkAddress getAddress() {
+    return _address;
   }
 
   @JsonPropertyDescription("Whether or not proxy-ARP is enabled on this interface.")
@@ -941,9 +941,9 @@ public final class Interface extends ComparableStructure<String> {
     _allowedVlans = allowedVlans;
   }
 
-  @JsonProperty(PROP_ALL_PREFIXES)
-  public void setAllPrefixes(Iterable<Prefix> allPrefixes) {
-    _allPrefixes = ImmutableSortedSet.copyOf(allPrefixes);
+  @JsonProperty(PROP_ALL_ADDRESSES)
+  public void setAllAddresses(Iterable<NetworkAddress> allAddresses) {
+    _allAddresses = ImmutableSortedSet.copyOf(allAddresses);
   }
 
   @JsonProperty(PROP_AUTOSTATE)
@@ -1081,9 +1081,9 @@ public final class Interface extends ComparableStructure<String> {
     _owner = owner;
   }
 
-  @JsonProperty(PROP_PREFIX)
-  public void setPrefix(Prefix prefix) {
-    _prefix = prefix;
+  @JsonProperty(PROP_ADDRESS)
+  public void setAddress(NetworkAddress address) {
+    _address = address;
   }
 
   public void setProxyArp(Boolean proxyArp) {
@@ -1167,7 +1167,7 @@ public final class Interface extends ComparableStructure<String> {
     JSONObject iface = new JSONObject();
     iface.put("node", _owner.getName());
     iface.put("name", _key);
-    iface.put(PROP_PREFIX, _prefix.toString());
+    iface.put(PROP_ADDRESS, _address.toString());
     iface.put(PROP_INTERFACE_TYPE, _interfaceType.toString());
     return iface;
   }

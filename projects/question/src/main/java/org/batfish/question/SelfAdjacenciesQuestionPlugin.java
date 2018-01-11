@@ -101,7 +101,7 @@ public class SelfAdjacenciesQuestionPlugin extends QuestionPlugin {
                 for (Interface iface : vrf.getInterfaces().values()) {
                   Set<Prefix> ifaceBasePrefixes = new HashSet<>();
                   if (iface.getActive()) {
-                    for (Prefix prefix : iface.getAllPrefixes()) {
+                    for (Prefix prefix : iface.getAllAddresses()) {
                       Prefix basePrefix = prefix.getNetworkPrefix();
                       if (!ifaceBasePrefixes.contains(basePrefix)) {
                         ifaceBasePrefixes.add(basePrefix);
@@ -111,7 +111,7 @@ public class SelfAdjacenciesQuestionPlugin extends QuestionPlugin {
                   }
                 }
                 for (Interface iface : vrf.getInterfaces().values()) {
-                  for (Prefix prefix : iface.getAllPrefixes()) {
+                  for (Prefix prefix : iface.getAllAddresses()) {
                     Prefix basePrefix = prefix.getNetworkPrefix();
                     if (nodePrefixes.count(basePrefix) > 1) {
                       Ip address = prefix.getAddress();

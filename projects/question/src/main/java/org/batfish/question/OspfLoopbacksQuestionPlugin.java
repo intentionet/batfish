@@ -181,7 +181,7 @@ public class OspfLoopbacksQuestionPlugin extends QuestionPlugin {
                   if (exportPolicyName != null) {
                     RoutingPolicy exportPolicy = c.getRoutingPolicies().get(exportPolicyName);
                     if (exportPolicy != null) {
-                      for (Prefix prefix : iface.getAllPrefixes()) {
+                      for (Prefix prefix : iface.getAllAddresses()) {
                         ConnectedRoute route = new ConnectedRoute(prefix, interfaceName);
                         if (exportPolicy.process(
                             route,

@@ -490,8 +490,8 @@ public class CiscoGrammarTest {
     Configuration iosRecovery = configurations.get(iosRecoveryName);
     SortedMap<String, Interface> iosRecoveryInterfaces = iosRecovery.getInterfaces();
     Set<String> iosRecoveryInterfaceNames = iosRecoveryInterfaces.keySet();
-    Set<Prefix> l3Prefixes = iosRecoveryInterfaces.get("Loopback3").getAllPrefixes();
-    Set<Prefix> l4Prefixes = iosRecoveryInterfaces.get("Loopback4").getAllPrefixes();
+    Set<Prefix> l3Prefixes = iosRecoveryInterfaces.get("Loopback3").getAllAddresses();
+    Set<Prefix> l4Prefixes = iosRecoveryInterfaces.get("Loopback4").getAllAddresses();
 
     assertThat("Loopback0", isIn(iosRecoveryInterfaceNames));
     assertThat("Loopback1", isIn(iosRecoveryInterfaceNames));

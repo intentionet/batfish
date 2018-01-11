@@ -202,7 +202,7 @@ public class Graph {
       for (OspfArea area : ospf.getAreas().values()) {
         for (Interface iface : area.getInterfaces().values()) {
           if (iface.getActive() && iface.getOspfEnabled()) {
-            acc.add(iface.getPrefix().getNetworkPrefix());
+            acc.add(iface.getAddress().getNetworkPrefix());
           }
         }
       }
@@ -249,7 +249,7 @@ public class Graph {
 
     if (proto.isConnected()) {
       for (Interface iface : conf.getInterfaces().values()) {
-        Prefix p = iface.getPrefix();
+        Prefix p = iface.getAddress();
         if (p != null) {
           acc.add(p.getNetworkPrefix());
         }
@@ -311,7 +311,7 @@ public class Graph {
       for (NodeInterfacePair nip : nips) {
         SortedSet<Edge> es = ifaceEdges.get(nip);
         Interface i1 = ifaceMap.get(nip);
-        boolean hasNoOtherEnd = (es == null && i1.getPrefix() != null);
+        boolean hasNoOtherEnd = (es == null && i1.getAddress() != null);
         if (hasNoOtherEnd) {
           GraphEdge ge = new GraphEdge(i1, null, router, null, false, false);
           graphEdges.add(ge);
@@ -433,8 +433,8 @@ public class Graph {
 
           boolean isNextHop =
               there != null
-                  && there.getPrefix() != null
-                  && there.getPrefix().getAddress().equals(nhIp);
+                  && there.getAddress() != null
+                  && there.getAddress().getAddress().equals(nhIp);
 
           if (isNextHop) {
             someIface = true;
@@ -477,7 +477,7 @@ public class Graph {
         // Create null route interface
         Interface iface = new Interface(name);
         iface.setActive(true);
-        iface.setPrefix(sr.getNetwork());
+        iface.setAddress(sr.getNetwork());
         iface.setBandwidth(0.);
         // Add static route to all static routes list
         Map<String, List<StaticRoute>> map = _staticRoutes.get(router);
@@ -529,7 +529,7 @@ public class Graph {
             Ip ip = ipList.get(i);
             BgpNeighbor n = ns.get(i);
             Interface iface = ge.getStart();
-            if (ip != null && iface.getPrefix().contains(ip)) {
+            if (ip != null && iface.getAddress().contains(ip)) {
               _ebgpNeighbors.put(ge, n);
             }
           }
@@ -545,7 +545,7 @@ public class Graph {
   private Interface createIbgpInterface(BgpNeighbor n, String peer) {
     Interface iface = new Interface("iBGP-" + peer);
     iface.setActive(true);
-    iface.setPrefix(n.getPrefix());
+    iface.setAddress(n.getPrefix());
     iface.setBandwidth(0.);
     return iface;
   }
@@ -1160,7 +1160,7 @@ public class Graph {
                       .append(",")
                       .append(edge.getEnd().getName());
                 }
-                sb.append(edge.getStart().getPrefix());
+                sb.append(edge.getStart().getAddress());
                 sb.append("\n");
               });
         });

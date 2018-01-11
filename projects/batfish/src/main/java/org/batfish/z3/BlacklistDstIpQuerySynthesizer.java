@@ -44,7 +44,7 @@ public class BlacklistDstIpQuerySynthesizer extends BaseQuerySynthesizer {
         Configuration node = configurations.get(hostname);
         for (Interface iface : node.getInterfaces().values()) {
           if (iface.getActive()) {
-            Prefix prefix = iface.getPrefix();
+            Prefix prefix = iface.getAddress();
             if (prefix != null) {
               _blacklistIps.add(prefix.getAddress());
             }
@@ -59,7 +59,7 @@ public class BlacklistDstIpQuerySynthesizer extends BaseQuerySynthesizer {
         Configuration node = configurations.get(hostname);
         Interface iface = node.getInterfaces().get(ifaceName);
         if (iface.getActive()) {
-          Prefix prefix = iface.getPrefix();
+          Prefix prefix = iface.getAddress();
           if (prefix != null) {
             _blacklistIps.add(prefix.getAddress());
           }
@@ -73,14 +73,14 @@ public class BlacklistDstIpQuerySynthesizer extends BaseQuerySynthesizer {
                 .get(edge.getNode1())
                 .getInterfaces()
                 .get(edge.getInt1())
-                .getPrefix()
+                .getAddress()
                 .getAddress();
         Ip ip2 =
             configurations
                 .get(edge.getNode2())
                 .getInterfaces()
                 .get(edge.getInt2())
-                .getPrefix()
+                .getAddress()
                 .getAddress();
         _blacklistIps.add(ip1);
         _blacklistIps.add(ip2);

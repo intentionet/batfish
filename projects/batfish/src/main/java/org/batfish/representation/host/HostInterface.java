@@ -138,8 +138,8 @@ public class HostInterface implements Serializable {
     Interface iface = new Interface(_canonicalName, configuration);
     iface.setBandwidth(_bandwidth);
     iface.setDeclaredNames(ImmutableSortedSet.of(_name));
-    iface.setPrefix(_prefix);
-    iface.setAllPrefixes(Iterables.concat(Collections.singleton(_prefix), _otherPrefixes));
+    iface.setAddress(_prefix);
+    iface.setAllAddresses(Iterables.concat(Collections.singleton(_prefix), _otherPrefixes));
     iface.setVrf(configuration.getDefaultVrf());
     if (_shared) {
       SourceNat sourceNat = new SourceNat();

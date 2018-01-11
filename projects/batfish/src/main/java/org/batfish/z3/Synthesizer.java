@@ -1127,7 +1127,7 @@ public class Synthesizer {
       Configuration c = e.getValue();
       for (Interface i : c.getInterfaces().values()) {
         if (i.getActive()) {
-          Prefix prefix = i.getPrefix();
+          Prefix prefix = i.getAddress();
           if (prefix != null) {
             Ip ip = prefix.getAddress();
             interfaceIps.add(ip);
@@ -1158,7 +1158,7 @@ public class Synthesizer {
       Configuration c = e.getValue();
       for (Interface i : c.getInterfaces().values()) {
         if (i.getActive()) {
-          Prefix prefix = i.getPrefix();
+          Prefix prefix = i.getAddress();
           if (prefix != null) {
             Ip ip = prefix.getAddress();
             interfaceIps.add(ip);
@@ -1371,7 +1371,7 @@ public class Synthesizer {
         Map<String, IpAccessList> aclMap = new TreeMap<>();
         Set<Interface> interfaces = _topologyInterfaces.get(hostname);
         for (Interface iface : interfaces) {
-          if (iface.getPrefix() != null) {
+          if (iface.getAddress() != null) {
             IpAccessList aclIn = iface.getIncomingFilter();
             IpAccessList aclOut = iface.getOutgoingFilter();
             String routePolicy = iface.getRoutingPolicyName();
@@ -1748,7 +1748,7 @@ public class Synthesizer {
         String ifaceName = i.getName();
         AndExpr conditions = new AndExpr();
         OrExpr dstIpMatchesInterface = new OrExpr();
-        Prefix prefix = i.getPrefix();
+        Prefix prefix = i.getAddress();
         if (prefix != null) {
           Ip ip = prefix.getAddress();
           EqExpr dstIpMatches = new EqExpr(new VarIntExpr(DST_IP_VAR), new LitIntExpr(ip));
@@ -1814,7 +1814,7 @@ public class Synthesizer {
       for (Interface i : c.getInterfaces().values()) {
         String ifaceName = i.getName();
         OrExpr dstIpMatchesInterface = new OrExpr();
-        Prefix prefix = i.getPrefix();
+        Prefix prefix = i.getAddress();
         if (prefix != null) {
           Ip ip = prefix.getAddress();
           EqExpr dstIpMatches = new EqExpr(new VarIntExpr(DST_IP_VAR), new LitIntExpr(ip));
@@ -1840,7 +1840,7 @@ public class Synthesizer {
    * c.getHostname(); PostInExpr postIn = new PostInExpr(hostname); for
    * (Interface i : c.getInterfaces().values()) { String ifaceName =
    * i.getName(); OrExpr someDstIpMatches = new OrExpr(); Prefix prefix =
-   * i.getPrefix(); if (prefix != null) { Ip ip = prefix.getAddress(); EqExpr
+   * i.getAddress(); if (prefix != null) { Ip ip = prefix.getAddress(); EqExpr
    * dstIpMatches = new EqExpr(new VarIntExpr(DST_IP_VAR), new LitIntExpr(ip));
    * someDstIpMatches.addDisjunct(dstIpMatches); } AndExpr
    * inboundInterfaceConditions = new AndExpr();
@@ -1873,7 +1873,7 @@ public class Synthesizer {
       String hostname = c.getHostname();
       OrExpr someDstIpMatch = new OrExpr();
       for (Interface i : c.getInterfaces().values()) {
-        Prefix prefix = i.getPrefix();
+        Prefix prefix = i.getAddress();
         if (prefix != null) {
           Ip ip = prefix.getAddress();
           EqExpr dstIpMatches = new EqExpr(new VarIntExpr(DST_IP_VAR), new LitIntExpr(ip));

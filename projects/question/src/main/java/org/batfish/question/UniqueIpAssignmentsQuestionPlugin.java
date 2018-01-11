@@ -148,7 +148,7 @@ public class UniqueIpAssignmentsQuestionPlugin extends QuestionPlugin {
         }
         Configuration c = e.getValue();
         for (Interface iface : c.getInterfaces().values()) {
-          for (Prefix prefix : iface.getAllPrefixes()) {
+          for (Prefix prefix : iface.getAllAddresses()) {
             Ip ip = prefix.getAddress();
             allIps.add(ip);
             if (iface.getActive()) {
@@ -166,7 +166,7 @@ public class UniqueIpAssignmentsQuestionPlugin extends QuestionPlugin {
         for (Entry<String, Interface> e2 : c.getInterfaces().entrySet()) {
           String interfaceName = e2.getKey();
           Interface iface = e2.getValue();
-          for (Prefix prefix : iface.getAllPrefixes()) {
+          for (Prefix prefix : iface.getAllAddresses()) {
             Ip ip = prefix.getAddress();
             if (allIps.count(ip) != 1) {
               answerElement.add(answerElement.getAllIps(), ip, hostname, interfaceName);

@@ -867,7 +867,7 @@ public class BdpDataPlanePluginTest {
         nf.interfaceBuilder()
             .setOwner(c)
             .setVrf(vrf)
-            .setPrefix(new Prefix("10.0.0.0/24"))
+            .setAddress(new Prefix("10.0.0.0/24"))
             .setActive(true)
             .build();
     StaticRoute srBoth =

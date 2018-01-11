@@ -309,10 +309,10 @@ public class VyosConfiguration extends VendorConfiguration {
     newIface.setDescription(iface.getDescription());
     Prefix prefix = iface.getPrefix();
     if (prefix != null) {
-      newIface.setPrefix(iface.getPrefix());
+      newIface.setAddress(iface.getPrefix());
     }
-    newIface.getAllPrefixes().addAll(iface.getAllPrefixes());
-    for (Prefix p : newIface.getAllPrefixes()) {
+    newIface.getAllAddresses().addAll(iface.getAllPrefixes());
+    for (Prefix p : newIface.getAllAddresses()) {
       _ipToInterfaceMap.put(p.getAddress(), newIface);
     }
     return newIface;

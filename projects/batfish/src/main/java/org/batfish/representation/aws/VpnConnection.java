@@ -247,7 +247,7 @@ public class VpnConnection implements AwsVpcEntity, Serializable {
       // ike
       ikeGateway.setExternalInterface(externalInterface);
       ikeGateway.setAddress(ipsecTunnel.getCgwOutsideAddress());
-      ikeGateway.setLocalAddress(externalInterface.getPrefix().getAddress());
+      ikeGateway.setLocalAddress(externalInterface.getAddress().getAddress());
       if (ipsecTunnel.getIkePreSharedKeyHash() != null) {
         ikePolicy.setPreSharedKeyHash(ipsecTunnel.getIkePreSharedKeyHash());
         ikeProposal.setAuthenticationMethod(IkeAuthenticationMethod.PRE_SHARED_KEYS);
@@ -293,9 +293,9 @@ public class VpnConnection implements AwsVpcEntity, Serializable {
 
         // iBGP connection to VPC
         Configuration vpcNode = awsConfiguration.getConfigurationNodes().get(vpcId);
-        Ip vpcIfaceAddress = vpcNode.getInterfaces().get(_vpnGatewayId).getPrefix().getAddress();
+        Ip vpcIfaceAddress = vpcNode.getInterfaces().get(_vpnGatewayId).getAddress().getAddress();
         Ip vgwToVpcIfaceAddress =
-            vpnGatewayCfgNode.getInterfaces().get(vpcId).getPrefix().getAddress();
+            vpnGatewayCfgNode.getInterfaces().get(vpcId).getAddress().getAddress();
         BgpNeighbor vgwToVpcBgpNeighbor = new BgpNeighbor(vpcIfaceAddress, vpnGatewayCfgNode);
         proc.getNeighbors().put(vgwToVpcBgpNeighbor.getPrefix(), vgwToVpcBgpNeighbor);
         vgwToVpcBgpNeighbor.setVrf(Configuration.DEFAULT_VRF_NAME);

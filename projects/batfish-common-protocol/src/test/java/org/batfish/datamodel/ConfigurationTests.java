@@ -164,10 +164,10 @@ public class ConfigurationTests {
     Prefix p1to2Tunnel = new Prefix(ip1to2Tunnel, 24);
     Prefix p1to3Physical = new Prefix(ip1to3Physical, 24);
     Prefix p1to4Tunnel = new Prefix(ip1to4Tunnel, 24);
-    Interface i1to2 = ib.setOwner(c1).setVrf(v1).setPrefix(p1to2Physical).build();
-    Interface t1to2 = ib.setPrefix(p1to2Tunnel).build();
-    Interface i1to3 = ib.setOwner(c1).setVrf(v1).setPrefix(p1to3Physical).build();
-    Interface t1to4 = ib.setPrefix(p1to4Tunnel).build();
+    Interface i1to2 = ib.setOwner(c1).setVrf(v1).setAddress(p1to2Physical).build();
+    Interface t1to2 = ib.setAddress(p1to2Tunnel).build();
+    Interface i1to3 = ib.setOwner(c1).setVrf(v1).setAddress(p1to3Physical).build();
+    Interface t1to4 = ib.setAddress(p1to4Tunnel).build();
     IpsecVpn vpn1to2 = new IpsecVpn("vpn1to2", c1);
     c1.getIpsecVpns().put(vpn1to2.getName(), vpn1to2);
     vpn1to2.setBindInterface(t1to2);
@@ -191,8 +191,8 @@ public class ConfigurationTests {
     Vrf v2 = vb.setOwner(c2).build();
     Prefix p2to1Physical = new Prefix(ip2to1Physical, 24);
     Prefix p2to1Tunnel = new Prefix(ip2to1Tunnel, 24);
-    Interface i2to1 = ib.setOwner(c2).setVrf(v2).setPrefix(p2to1Physical).build();
-    Interface t2to1 = ib.setPrefix(p2to1Tunnel).build();
+    Interface i2to1 = ib.setOwner(c2).setVrf(v2).setAddress(p2to1Physical).build();
+    Interface t2to1 = ib.setAddress(p2to1Tunnel).build();
     IpsecVpn vpn2to1 = new IpsecVpn("vpn2to1", c2);
     c2.getIpsecVpns().put(vpn2to1.getName(), vpn2to1);
     vpn2to1.setBindInterface(t2to1);
@@ -207,8 +207,8 @@ public class ConfigurationTests {
     Vrf v3 = vb.setOwner(c3).build();
     Prefix p3to1Physical = new Prefix(ip3to1Physical, 24);
     Prefix p3to4Physical = new Prefix(ip3to4Physical, 24);
-    Interface i3to1 = ib.setOwner(c3).setVrf(v3).setPrefix(p3to1Physical).build();
-    ib.setPrefix(p3to4Physical).build();
+    Interface i3to1 = ib.setOwner(c3).setVrf(v3).setAddress(p3to1Physical).build();
+    ib.setAddress(p3to4Physical).build();
     SourceNat snat3copy1 = new SourceNat();
     snat3copy1.setPoolIpFirst(ip3to1Physical);
     snat3copy1.setPoolIpLast(ip3to1Physical);
@@ -222,8 +222,8 @@ public class ConfigurationTests {
     Vrf v4 = vb.setOwner(c4).build();
     Prefix p4to1Tunnel = new Prefix(ip4to1Tunnel, 24);
     Prefix p4to3Physical = new Prefix(ip4to3Physical, 24);
-    Interface t4to1 = ib.setOwner(c4).setVrf(v4).setPrefix(p4to1Tunnel).build();
-    Interface i4to3 = ib.setPrefix(p4to3Physical).build();
+    Interface t4to1 = ib.setOwner(c4).setVrf(v4).setAddress(p4to1Tunnel).build();
+    Interface i4to3 = ib.setAddress(p4to3Physical).build();
     IpsecVpn vpn4to1 = new IpsecVpn("vpn4to1", c4);
     c4.getIpsecVpns().put(vpn4to1.getName(), vpn4to1);
     vpn4to1.setBindInterface(t4to1);

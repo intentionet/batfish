@@ -329,7 +329,7 @@ public final class Configuration extends ComparableStructure<String> {
         .values()
         .stream()
         .flatMap(v -> v.getInterfaces().values().stream())
-        .flatMap(i -> i.getAllPrefixes().stream())
+        .flatMap(i -> i.getAllAddresses().stream())
         .map(Prefix::getAddress)
         .min(Ip::compareTo)
         .orElse(null);

@@ -233,7 +233,7 @@ public class Instance implements AwsVpcEntity, Serializable {
       }
       SortedSet<Prefix> ifacePrefixes = ifacePrefixesBuilder.build();
       Interface iface = Utils.newInterface(interfaceId, cfgNode, ifacePrefixes.first());
-      iface.setAllPrefixes(ifacePrefixes);
+      iface.setAllAddresses(ifacePrefixes);
 
       // apply ACLs to interface
       iface.setIncomingFilter(_inAcl);

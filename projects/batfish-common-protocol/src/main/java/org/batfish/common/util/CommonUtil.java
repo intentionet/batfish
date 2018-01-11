@@ -225,7 +225,7 @@ public class CommonUtil {
                         candidates.add(i);
                       });
               // collect prefixes
-              i.getAllPrefixes()
+              i.getAllAddresses()
                   .stream()
                   .map(p -> p.getAddress())
                   .forEach(
@@ -661,7 +661,7 @@ public class CommonUtil {
           interfaces
               .stream()
               .filter(i -> i.getSourceNats().isEmpty())
-              .flatMap(i -> i.getAllPrefixes().stream())
+              .flatMap(i -> i.getAllAddresses().stream())
               .collect(ImmutableSet.toImmutableSet());
       Set<IpWildcard> blacklist =
           nonNattedInterfacePrefixes
@@ -699,7 +699,7 @@ public class CommonUtil {
         Ip remoteAddress = ipsecVpn.getIkeGateway().getAddress();
         remoteAddresses.put(ipsecVpn, remoteAddress);
         Set<Prefix> externalPrefixes =
-            ipsecVpn.getIkeGateway().getExternalInterface().getAllPrefixes();
+            ipsecVpn.getIkeGateway().getExternalInterface().getAllAddresses();
         for (Prefix externalPrefix : externalPrefixes) {
           Ip externalAddress = externalPrefix.getAddress();
           Set<IpsecVpn> vpnsUsingExternalAddress =
@@ -923,7 +923,7 @@ public class CommonUtil {
             String ifaceName = e.getKey();
             Interface iface = e.getValue();
             if (!iface.isLoopback(node.getConfigurationFormat()) && iface.getActive()) {
-              for (Prefix prefix : iface.getAllPrefixes()) {
+              for (Prefix prefix : iface.getAllAddresses()) {
                 if (prefix.getPrefixLength() < 32) {
                   Prefix network = new Prefix(prefix.getNetworkAddress(), prefix.getPrefixLength());
                   NodeInterfacePair pair = new NodeInterfacePair(nodeName, ifaceName);

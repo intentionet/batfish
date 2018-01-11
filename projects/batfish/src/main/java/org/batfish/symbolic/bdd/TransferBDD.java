@@ -703,9 +703,9 @@ class TransferBDD {
     // y = r2.getPrefixLength();
     // ret.getPrefixLength().setValue(ite(guard, x, y));
 
-    // x = r1.getPrefix();
-    // y = r2.getPrefix();
-    // ret.getPrefix().setValue(ite(guard, x, y));
+    // x = r1.getAddress();
+    // y = r2.getAddress();
+    // ret.getAddress().setValue(ite(guard, x, y));
 
     x = r1.getAdminDist();
     y = r2.getAdminDist();

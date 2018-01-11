@@ -205,8 +205,8 @@ public class Route implements Serializable {
                 .getDefaultVrf()
                 .getInterfaces()
                 .put(remoteVpcIfaceName, remoteVpcIface);
-            remoteVpcIface.setPrefix(remoteVpcIfacePrefix);
-            remoteVpcIface.getAllPrefixes().add(remoteVpcIfacePrefix);
+            remoteVpcIface.setAddress(remoteVpcIfacePrefix);
+            remoteVpcIface.getAllAddresses().add(remoteVpcIfacePrefix);
           }
           // interface pair exists now, so just retrieve existing information
           remoteVpcIfaceAddress =
@@ -214,7 +214,7 @@ public class Route implements Serializable {
                   .getDefaultVrf()
                   .getInterfaces()
                   .get(remoteVpcIfaceName)
-                  .getPrefix()
+                  .getAddress()
                   .getAddress();
 
           // initialize static route on new link

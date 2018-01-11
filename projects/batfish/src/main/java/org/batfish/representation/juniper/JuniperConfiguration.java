@@ -491,7 +491,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
         // peer
         outerloop:
         for (org.batfish.datamodel.Interface iface : vrf.getInterfaces().values()) {
-          for (Prefix prefix : iface.getAllPrefixes()) {
+          for (Prefix prefix : iface.getAllAddresses()) {
             if (prefix.contains(ip)) {
               localAddress = prefix.getAddress();
               break outerloop;
@@ -1194,22 +1194,22 @@ public final class JuniperConfiguration extends VendorConfiguration {
     }
 
     // Prefix primaryPrefix = iface.getPrimaryPrefix();
-    // Set<Prefix> allPrefixes = iface.getAllPrefixes();
+    // Set<Prefix> allPrefixes = iface.getAllAddresses();
     // if (primaryPrefix != null) {
-    // newIface.setPrefix(primaryPrefix);
+    // newIface.setAddress(primaryPrefix);
     // }
     // else {
     // if (!allPrefixes.isEmpty()) {
     // Prefix firstOfAllPrefixes = allPrefixes.toArray(new Prefix[] {})[0];
-    // newIface.setPrefix(firstOfAllPrefixes);
+    // newIface.setAddress(firstOfAllPrefixes);
     // }
     // }
-    // newIface.getAllPrefixes().addAll(allPrefixes);
+    // newIface.getAllAddresses().addAll(allPrefixes);
 
     if (iface.getPrimaryPrefix() != null) {
-      newIface.setPrefix(iface.getPrimaryPrefix());
+      newIface.setAddress(iface.getPrimaryPrefix());
     }
-    newIface.setAllPrefixes(iface.getAllPrefixes());
+    newIface.setAllAddresses(iface.getAllPrefixes());
     newIface.setActive(iface.getActive());
     newIface.setAccessVlan(iface.getAccessVlan());
     newIface.setNativeVlan(iface.getNativeVlan());
@@ -1422,7 +1422,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
     // if (from instanceof FwFromDestinationAddress) {
     // FwFromDestinationAddress fromDestinationAddress =
     // (FwFromDestinationAddress) from;
-    // Prefix destinationPrefix = fromDestinationAddress.getPrefix();
+    // Prefix destinationPrefix = fromDestinationAddress.getAddress();
     // destinationPrefixes.add(destinationPrefix);
     // }
     // if (from instanceof FwFromDestinationPort) {
@@ -1434,7 +1434,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
     // }
     // else if (from instanceof FwFromSourceAddress) {
     // FwFromSourceAddress fromSourceAddress = (FwFromSourceAddress) from;
-    // Prefix sourcePrefix = fromSourceAddress.getPrefix();
+    // Prefix sourcePrefix = fromSourceAddress.getAddress();
     // sourcePrefixes.add(sourcePrefix);
     // }
     // if (from instanceof FwFromSourcePort) {

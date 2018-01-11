@@ -1519,7 +1519,7 @@ public class BdpEngine {
             // TODO: proxyArp probably shouldn't be null
             neighborUnreachable = true;
           } else {
-            for (Prefix prefix : int2.getAllPrefixes()) {
+            for (Prefix prefix : int2.getAllAddresses()) {
               if (prefix.getNetworkPrefix().contains(arpIp)) {
                 neighborUnreachable = true;
                 break;
