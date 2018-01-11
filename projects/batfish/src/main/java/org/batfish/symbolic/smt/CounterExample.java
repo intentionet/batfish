@@ -253,7 +253,7 @@ class CounterExample {
       nhip = ge.getStart().getAddress().getAddress().toString();
       nhint = "dynamic";
     }
-    return String.format("%s<%s,nhip:%s,nhint:%s>", type, pfx.getNetworkPrefix(), nhip, nhint);
+    return String.format("%s<%s,nhip:%s,nhint:%s>", type, pfx, nhip, nhint);
   }
 
   /*

@@ -31,6 +31,7 @@ import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Protocol;
 import org.batfish.datamodel.State;
@@ -1127,7 +1128,7 @@ public class Synthesizer {
       Configuration c = e.getValue();
       for (Interface i : c.getInterfaces().values()) {
         if (i.getActive()) {
-          Prefix prefix = i.getAddress();
+          NetworkAddress prefix = i.getAddress();
           if (prefix != null) {
             Ip ip = prefix.getAddress();
             interfaceIps.add(ip);
@@ -1158,7 +1159,7 @@ public class Synthesizer {
       Configuration c = e.getValue();
       for (Interface i : c.getInterfaces().values()) {
         if (i.getActive()) {
-          Prefix prefix = i.getAddress();
+          NetworkAddress prefix = i.getAddress();
           if (prefix != null) {
             Ip ip = prefix.getAddress();
             interfaceIps.add(ip);
@@ -1748,7 +1749,7 @@ public class Synthesizer {
         String ifaceName = i.getName();
         AndExpr conditions = new AndExpr();
         OrExpr dstIpMatchesInterface = new OrExpr();
-        Prefix prefix = i.getAddress();
+        NetworkAddress prefix = i.getAddress();
         if (prefix != null) {
           Ip ip = prefix.getAddress();
           EqExpr dstIpMatches = new EqExpr(new VarIntExpr(DST_IP_VAR), new LitIntExpr(ip));
@@ -1814,7 +1815,7 @@ public class Synthesizer {
       for (Interface i : c.getInterfaces().values()) {
         String ifaceName = i.getName();
         OrExpr dstIpMatchesInterface = new OrExpr();
-        Prefix prefix = i.getAddress();
+        NetworkAddress prefix = i.getAddress();
         if (prefix != null) {
           Ip ip = prefix.getAddress();
           EqExpr dstIpMatches = new EqExpr(new VarIntExpr(DST_IP_VAR), new LitIntExpr(ip));
@@ -1873,7 +1874,7 @@ public class Synthesizer {
       String hostname = c.getHostname();
       OrExpr someDstIpMatch = new OrExpr();
       for (Interface i : c.getInterfaces().values()) {
-        Prefix prefix = i.getAddress();
+        NetworkAddress prefix = i.getAddress();
         if (prefix != null) {
           Ip ip = prefix.getAddress();
           EqExpr dstIpMatches = new EqExpr(new VarIntExpr(DST_IP_VAR), new LitIntExpr(ip));

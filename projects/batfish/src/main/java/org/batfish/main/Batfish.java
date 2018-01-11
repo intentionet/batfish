@@ -90,6 +90,7 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpsecVpn;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.NodeRoleSpecifier;
 import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.OspfNeighbor;
@@ -1362,7 +1363,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
       int offset = 0;
       for (NodeInterfacePair currentPair : interfaceSet) {
         Ip ip = new Ip(currentStartingIpAsLong + offset);
-        Prefix prefix = new Prefix(ip, subnetBits);
+        NetworkAddress prefix = new NetworkAddress(ip, subnetBits);
         String ifaceName = currentPair.getInterface();
         Interface iface = new Interface(ifaceName, configs.get(currentPair.getHostname()));
         iface.setAddress(prefix);

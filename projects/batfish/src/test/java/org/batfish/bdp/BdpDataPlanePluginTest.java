@@ -49,6 +49,7 @@ import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
@@ -867,7 +868,7 @@ public class BdpDataPlanePluginTest {
         nf.interfaceBuilder()
             .setOwner(c)
             .setVrf(vrf)
-            .setAddress(new Prefix("10.0.0.0/24"))
+            .setAddress(new NetworkAddress("10.0.0.0/24"))
             .setActive(true)
             .build();
     StaticRoute srBoth =

@@ -38,6 +38,7 @@ import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.ConnectedRoute;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.OspfExternalType1Route;
@@ -66,11 +67,11 @@ import org.junit.Test;
 
 public class VirtualRouterTest {
   /** Make a CISCO IOS router with 3 interfaces named Eth1-Eth3, /16 prefixes on each interface */
-  private static final Map<String, Prefix> exampleInterfacePrefixes =
-      ImmutableMap.<String, Prefix>builder()
-          .put("Ethernet1", new Prefix("10.1.0.0/16"))
-          .put("Ethernet2", new Prefix("10.2.0.0/16"))
-          .put("Ethernet3", new Prefix("10.3.0.0/16"))
+  private static final Map<String, NetworkAddress> exampleInterfaceAddresses =
+      ImmutableMap.<String, NetworkAddress>builder()
+          .put("Ethernet1", new NetworkAddress("10.1.0.0/16"))
+          .put("Ethernet2", new NetworkAddress("10.2.0.0/16"))
+          .put("Ethernet3", new NetworkAddress("10.3.0.0/16"))
           .build();
 
   private static final String NEIGHBOR_HOST_NAME = "neighbornode";
@@ -125,14 +126,13 @@ public class VirtualRouterTest {
     _routingPolicyBuilder = nf.routingPolicyBuilder().setOwner(_testVirtualRouter._c);
   }
 
-  private static void addInterfaces(Configuration c, Map<String, Prefix> interfacePrefixes) {
+  private static void addInterfaces(
+      Configuration c, Map<String, NetworkAddress> interfaceAddresses) {
     NetworkFactory nf = new NetworkFactory();
     Interface.Builder ib =
         nf.interfaceBuilder().setActive(true).setOwner(c).setVrf(c.getDefaultVrf());
-    interfacePrefixes.forEach(
-        (ifaceName, prefix) -> {
-          ib.setName(ifaceName).setAddress(prefix).build();
-        });
+    interfaceAddresses.forEach(
+        (ifaceName, address) -> ib.setName(ifaceName).setAddress(address).build());
   }
 
   private static Node makeIosRouter(String hostname) {
@@ -409,7 +409,7 @@ public class VirtualRouterTest {
   public void testInitConnectedRib() {
     // Setup
     VirtualRouter vr = makeIosVirtualRouter(null);
-    addInterfaces(vr._c, exampleInterfacePrefixes);
+    addInterfaces(vr._c, exampleInterfaceAddresses);
     vr.initRibs();
 
     // Test
@@ -419,10 +419,10 @@ public class VirtualRouterTest {
     assertThat(
         vr._connectedRib.getRoutes(),
         Matchers.containsInAnyOrder(
-            exampleInterfacePrefixes
+            exampleInterfaceAddresses
                 .entrySet()
                 .stream()
-                .map(e -> new ConnectedRoute(e.getValue(), e.getKey()))
+                .map(e -> new ConnectedRoute(Prefix.forNetworkAddress(e.getValue()), e.getKey()))
                 .collect(Collectors.toList())
                 .toArray(new ConnectedRoute[] {})));
   }
@@ -518,10 +518,10 @@ public class VirtualRouterTest {
     VirtualRouter exportingRouter = routers.get(exportingRouterName);
     testRouter.initRibs();
     exportingRouter.initRibs();
-    addInterfaces(testRouter._c, exampleInterfacePrefixes);
+    addInterfaces(testRouter._c, exampleInterfaceAddresses);
     addInterfaces(
         exportingRouter._c,
-        ImmutableMap.of(exportingRouterInterfaceName, new Prefix("10.4.0.0/16")));
+        ImmutableMap.of(exportingRouterInterfaceName, new NetworkAddress("10.4.0.0/16")));
     int adminCost =
         RoutingProtocol.OSPF.getDefaultAdministrativeCost(testRouter._c.getConfigurationFormat());
 
@@ -572,7 +572,7 @@ public class VirtualRouterTest {
   public void testRipInitialization() {
     // Incomplete Setup
     VirtualRouter vr = makeIosVirtualRouter(null);
-    addInterfaces(vr._c, exampleInterfacePrefixes);
+    addInterfaces(vr._c, exampleInterfaceAddresses);
     vr.initRibs();
     vr.initBaseRipRoutes();
 
@@ -589,13 +589,13 @@ public class VirtualRouterTest {
     assertThat(
         vr._ripInternalRib.getRoutes(),
         containsInAnyOrder(
-            exampleInterfacePrefixes
+            exampleInterfaceAddresses
                 .values()
                 .stream()
                 .map(
-                    p ->
+                    address ->
                         new RipInternalRoute(
-                            p,
+                            Prefix.forNetworkAddress(address),
                             null,
                             RoutingProtocol.RIP.getDefaultAdministrativeCost(
                                 vr._c.getConfigurationFormat()),

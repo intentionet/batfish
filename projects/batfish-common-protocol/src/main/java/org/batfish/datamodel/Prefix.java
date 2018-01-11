@@ -14,6 +14,10 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
 
   public static final Prefix ZERO = new Prefix(Ip.ZERO, 0);
 
+  public static Prefix forNetworkAddress(NetworkAddress address) {
+    return new Prefix(address.getAddress(), address.getNetworkBits());
+  }
+
   private static long getNetworkEnd(long networkStart, int prefixLength) {
     long networkEnd = networkStart;
     int onesLength = 32 - prefixLength;
@@ -39,7 +43,7 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
     if (address == null) {
       throw new BatfishException("Cannot create prefix with null network");
     }
-    _address = address;
+    _address = address.getNetworkAddress(prefixLength);
     _prefixLength = prefixLength;
   }
 
@@ -78,7 +82,7 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
   }
 
   public boolean contains(Ip ip) {
-    long start = getNetworkAddress().asLong();
+    long start = _address.asLong();
     long end = getEndAddress().asLong();
     long ipAsLong = ip.asLong();
     return start <= ipAsLong && ipAsLong <= end;
@@ -105,14 +109,6 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
 
   public Ip getEndAddress() {
     return new Ip(getNetworkEnd(_address.asLong(), _prefixLength));
-  }
-
-  public Ip getNetworkAddress() {
-    return _address.getNetworkAddress(_prefixLength);
-  }
-
-  public Prefix getNetworkPrefix() {
-    return new Prefix(getNetworkAddress(), _prefixLength);
   }
 
   public int getPrefixLength() {

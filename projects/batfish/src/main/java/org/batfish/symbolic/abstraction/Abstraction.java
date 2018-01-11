@@ -167,7 +167,7 @@ public class Abstraction {
           if (PrefixUtils.overlap(p, dstIps) && !PrefixUtils.overlap(p, notDstIps)) {
             Set<Prefix> toAdd = new HashSet<>();
             for (Prefix pfx : dstIps) {
-              if (p.equals(pfx.getNetworkPrefix())) {
+              if (p.equals(pfx)) {
                 toAdd.add(p);
               } else if (pfx.containsPrefix(p)) {
                 toAdd.add(p);

@@ -27,10 +27,10 @@ public class PrefixUtils {
    * Checks if two prefixes ever overlap
    */
   public static boolean overlap(Prefix p1, Prefix p2) {
-    long l1 = p1.getNetworkPrefix().getAddress().asLong();
-    long l2 = p2.getNetworkPrefix().getAddress().asLong();
-    long u1 = p1.getNetworkPrefix().getEndAddress().asLong();
-    long u2 = p2.getNetworkPrefix().getEndAddress().asLong();
+    long l1 = p1.getAddress().asLong();
+    long l2 = p2.getAddress().asLong();
+    long u1 = p1.getEndAddress().asLong();
+    long u2 = p2.getEndAddress().asLong();
     return (l1 >= l2 && l1 <= u2)
         || (u1 <= u2 && u1 >= l2)
         || (u2 >= l1 && u2 <= u1)

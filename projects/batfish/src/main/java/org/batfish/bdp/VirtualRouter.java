@@ -27,6 +27,7 @@ import org.batfish.datamodel.Edge;
 import org.batfish.datamodel.GeneratedRoute;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.OspfExternalRoute;
@@ -601,7 +602,7 @@ public class VirtualRouter extends ComparableStructure<String> {
                       iface
                           .getAllAddresses()
                           .stream()
-                          .map(Prefix::getNetworkPrefix)
+                          .map(Prefix::forNetworkAddress)
                           .collect(Collectors.toSet());
                   int interfaceOspfCost = iface.getOspfCost();
                   for (Prefix prefix : allNetworkPrefixes) {
@@ -643,7 +644,7 @@ public class VirtualRouter extends ComparableStructure<String> {
             iface
                 .getAllAddresses()
                 .stream()
-                .map(Prefix::getNetworkPrefix)
+                .map(Prefix::forNetworkAddress)
                 .collect(Collectors.toSet());
         long cost = RipProcess.DEFAULT_RIP_COST;
         for (Prefix prefix : allNetworkPrefixes) {
@@ -705,8 +706,8 @@ public class VirtualRouter extends ComparableStructure<String> {
     for (Interface i : _vrf.getInterfaces().values()) {
       if (i.getActive()) { // Make sure the interface is active
         // Create a route for each interface prefix
-        for (Prefix ifacePrefix : i.getAllAddresses()) {
-          Prefix prefix = ifacePrefix.getNetworkPrefix();
+        for (NetworkAddress ifaceAddress : i.getAllAddresses()) {
+          Prefix prefix = Prefix.forNetworkAddress(ifaceAddress);
           ConnectedRoute cr = new ConnectedRoute(prefix, i.getName());
           _connectedRib.mergeRoute(cr);
         }
@@ -1057,7 +1058,7 @@ public class VirtualRouter extends ComparableStructure<String> {
         if (nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
           // should only happen for ibgp
           String nextHopInterface = route.getNextHopInterface();
-          Prefix nextHopPrefix = _c.getInterfaces().get(nextHopInterface).getAddress();
+          NetworkAddress nextHopPrefix = _c.getInterfaces().get(nextHopInterface).getAddress();
           if (nextHopPrefix == null) {
             throw new BatfishException("route's nextHopInterface has no address");
           }
@@ -1343,7 +1344,8 @@ public class VirtualRouter extends ComparableStructure<String> {
         if (nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
           // should only happen for ibgp
           String nextHopInterface = remoteRoute.getNextHopInterface();
-          Prefix nextHopPrefix = remoteVrf.getInterfaces().get(nextHopInterface).getAddress();
+          NetworkAddress nextHopPrefix =
+              remoteVrf.getInterfaces().get(nextHopInterface).getAddress();
           if (nextHopPrefix == null) {
             throw new BatfishException("remote route's nextHopInterface has no address");
           }

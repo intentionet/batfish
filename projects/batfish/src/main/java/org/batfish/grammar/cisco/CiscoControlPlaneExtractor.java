@@ -53,6 +53,7 @@ import org.batfish.datamodel.IsisMetricType;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NamedPort;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.OspfMetricType;
 import org.batfish.datamodel.Prefix;
@@ -1791,9 +1792,9 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     }
     // might cause problems if interfaces are declared after ospf, but
     // whatever
-    for (Prefix prefix : iface.getAllPrefixes()) {
-      Prefix networkPrefix = prefix.getNetworkPrefix();
-      OspfNetwork network = new OspfNetwork(networkPrefix, _currentOspfArea);
+    for (NetworkAddress address : iface.getAllAddresses()) {
+      Prefix prefix = Prefix.forNetworkAddress(address);
+      OspfNetwork network = new OspfNetwork(prefix, _currentOspfArea);
       _currentOspfProcess.getNetworks().add(network);
     }
     _currentOspfInterface = iface.getName();
@@ -3149,10 +3150,10 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     Ip primaryIp = toIp(ctx.pip);
     Ip primaryMask = toIp(ctx.pmask);
     Ip standbyIp = toIp(ctx.sip);
-    Prefix primaryPrefix = new Prefix(primaryIp, primaryMask);
-    Prefix standbyPrefix = new Prefix(standbyIp, primaryMask);
-    _configuration.getFailoverPrimaryPrefixes().put(name, primaryPrefix);
-    _configuration.getFailoverStandbyPrefixes().put(name, standbyPrefix);
+    NetworkAddress primaryAddress = new NetworkAddress(primaryIp, primaryMask);
+    NetworkAddress standbyAddress = new NetworkAddress(standbyIp, primaryMask);
+    _configuration.getFailoverPrimaryAddresses().put(name, primaryAddress);
+    _configuration.getFailoverStandbyAddresses().put(name, standbyAddress);
   }
 
   @Override
@@ -3214,40 +3215,40 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitIf_ip_address(If_ip_addressContext ctx) {
-    Prefix prefix;
+    NetworkAddress address;
     if (ctx.prefix != null) {
-      prefix = new Prefix(ctx.prefix.getText());
+      address = new NetworkAddress(ctx.prefix.getText());
     } else {
-      Ip address = new Ip(ctx.ip.getText());
+      Ip ip = new Ip(ctx.ip.getText());
       Ip mask = new Ip(ctx.subnet.getText());
-      prefix = new Prefix(address, mask);
+      address = new NetworkAddress(ip, mask);
     }
     for (Interface currentInterface : _currentInterfaces) {
-      currentInterface.setPrefix(prefix);
+      currentInterface.setAddress(address);
     }
     if (ctx.STANDBY() != null) {
-      Ip standbyAddress = toIp(ctx.standby_address);
-      Prefix standbyPrefix = new Prefix(standbyAddress, prefix.getPrefixLength());
+      Ip standbyIp = toIp(ctx.standby_address);
+      NetworkAddress standbyAddress = new NetworkAddress(standbyIp, address.getNetworkBits());
       for (Interface currentInterface : _currentInterfaces) {
-        currentInterface.setStandbyPrefix(standbyPrefix);
+        currentInterface.setStandbyAddress(standbyAddress);
       }
     }
   }
 
   @Override
   public void exitIf_ip_address_secondary(If_ip_address_secondaryContext ctx) {
-    Ip address;
+    Ip ip;
     Ip mask;
-    Prefix prefix;
+    NetworkAddress address;
     if (ctx.prefix != null) {
-      prefix = new Prefix(ctx.prefix.getText());
+      address = new NetworkAddress(ctx.prefix.getText());
     } else {
-      address = new Ip(ctx.ip.getText());
+      ip = new Ip(ctx.ip.getText());
       mask = new Ip(ctx.subnet.getText());
-      prefix = new Prefix(address, mask.numSubnetBits());
+      address = new NetworkAddress(ip, mask.numSubnetBits());
     }
     for (Interface currentInterface : _currentInterfaces) {
-      currentInterface.getSecondaryPrefixes().add(prefix);
+      currentInterface.getSecondaryAddresses().add(address);
     }
   }
 

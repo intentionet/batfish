@@ -35,6 +35,7 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.OspfProcess;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Vrf;
@@ -490,18 +491,18 @@ public class CiscoGrammarTest {
     Configuration iosRecovery = configurations.get(iosRecoveryName);
     SortedMap<String, Interface> iosRecoveryInterfaces = iosRecovery.getInterfaces();
     Set<String> iosRecoveryInterfaceNames = iosRecoveryInterfaces.keySet();
-    Set<Prefix> l3Prefixes = iosRecoveryInterfaces.get("Loopback3").getAllAddresses();
-    Set<Prefix> l4Prefixes = iosRecoveryInterfaces.get("Loopback4").getAllAddresses();
+    Set<NetworkAddress> l3Prefixes = iosRecoveryInterfaces.get("Loopback3").getAllAddresses();
+    Set<NetworkAddress> l4Prefixes = iosRecoveryInterfaces.get("Loopback4").getAllAddresses();
 
     assertThat("Loopback0", isIn(iosRecoveryInterfaceNames));
     assertThat("Loopback1", isIn(iosRecoveryInterfaceNames));
     assertThat("Loopback2", not(isIn(iosRecoveryInterfaceNames)));
     assertThat("Loopback3", isIn(iosRecoveryInterfaceNames));
-    assertThat(new Prefix("10.0.0.1/32"), not(isIn(l3Prefixes)));
-    assertThat(new Prefix("10.0.0.2/32"), isIn(l3Prefixes));
+    assertThat(new NetworkAddress("10.0.0.1/32"), not(isIn(l3Prefixes)));
+    assertThat(new NetworkAddress("10.0.0.2/32"), isIn(l3Prefixes));
     assertThat("Loopback4", isIn(iosRecoveryInterfaceNames));
-    assertThat(new Prefix("10.0.0.3/32"), not(isIn(l4Prefixes)));
-    assertThat(new Prefix("10.0.0.4/32"), isIn(l4Prefixes));
+    assertThat(new NetworkAddress("10.0.0.3/32"), not(isIn(l4Prefixes)));
+    assertThat(new NetworkAddress("10.0.0.4/32"), isIn(l4Prefixes));
   }
 
   public String readTestConfig(String name) {

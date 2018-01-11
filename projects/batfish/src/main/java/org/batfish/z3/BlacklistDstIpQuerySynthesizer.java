@@ -12,7 +12,7 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Edge;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.z3.node.AndExpr;
 import org.batfish.z3.node.BooleanExpr;
@@ -44,7 +44,7 @@ public class BlacklistDstIpQuerySynthesizer extends BaseQuerySynthesizer {
         Configuration node = configurations.get(hostname);
         for (Interface iface : node.getInterfaces().values()) {
           if (iface.getActive()) {
-            Prefix prefix = iface.getAddress();
+            NetworkAddress prefix = iface.getAddress();
             if (prefix != null) {
               _blacklistIps.add(prefix.getAddress());
             }
@@ -59,7 +59,7 @@ public class BlacklistDstIpQuerySynthesizer extends BaseQuerySynthesizer {
         Configuration node = configurations.get(hostname);
         Interface iface = node.getInterfaces().get(ifaceName);
         if (iface.getActive()) {
-          Prefix prefix = iface.getAddress();
+          NetworkAddress prefix = iface.getAddress();
           if (prefix != null) {
             _blacklistIps.add(prefix.getAddress());
           }

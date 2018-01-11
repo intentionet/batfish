@@ -4,10 +4,10 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import org.batfish.common.BatfishLogger;
+import org.batfish.common.Pair;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.StaticRoute;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -47,17 +47,17 @@ public class VpnGateway implements AwsVpcEntity, Serializable {
     for (String vpcId : _attachmentVpcIds) {
 
       String vgwIfaceName = vpcId;
-      Prefix vgwIfacePrefix = awsConfiguration.getNextGeneratedLinkSubnet();
-      Utils.newInterface(vgwIfaceName, cfgNode, vgwIfacePrefix);
+      Pair<NetworkAddress, NetworkAddress> vpcLink = awsConfiguration.getNextGeneratedLinkSubnet();
+      NetworkAddress vgwIfaceAddress = vpcLink.getFirst();
+      Utils.newInterface(vgwIfaceName, cfgNode, vgwIfaceAddress);
 
       // add the interface to the vpc router
       Configuration vpcConfigNode = awsConfiguration.getConfigurationNodes().get(vpcId);
       String vpcIfaceName = _vpnGatewayId;
       Interface vpcIface = new Interface(vpcIfaceName, vpcConfigNode);
-      Ip vpcIfaceIp = vgwIfacePrefix.getEndAddress();
-      Prefix vpcIfacePrefix = new Prefix(vpcIfaceIp, vgwIfacePrefix.getPrefixLength());
-      vpcIface.setAddress(vpcIfacePrefix);
-      Utils.newInterface(vpcIfaceName, vpcConfigNode, vpcIfacePrefix);
+      NetworkAddress vpcIfaceAddress = vpcLink.getSecond();
+      vpcIface.setAddress(vpcIfaceAddress);
+      Utils.newInterface(vpcIfaceName, vpcConfigNode, vpcIfaceAddress);
 
       // associate this gateway with the vpc
       region.getVpcs().get(vpcId).setVpnGatewayId(_vpnGatewayId);
@@ -70,7 +70,7 @@ public class VpnGateway implements AwsVpcEntity, Serializable {
                 StaticRoute vgwVpcRoute =
                     StaticRoute.builder()
                         .setNetwork(prefix)
-                        .setNextHopIp(vpcIfaceIp)
+                        .setNextHopIp(vpcIfaceAddress.getAddress())
                         .setAdministrativeCost(Route.DEFAULT_STATIC_ROUTE_ADMIN)
                         .setMetric(Route.DEFAULT_STATIC_ROUTE_COST)
                         .build();

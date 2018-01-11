@@ -6,9 +6,11 @@ import java.util.TreeSet;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
+import org.batfish.common.Pair;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.StaticRoute;
 import org.codehaus.jettison.json.JSONException;
@@ -73,7 +75,7 @@ public class Route implements Serializable {
 
   @Nullable
   public StaticRoute toStaticRoute(
-      AwsConfiguration awsConfiguraion,
+      AwsConfiguration awsConfiguration,
       Region region,
       Ip vpcAddress,
       @Nullable Ip igwAddress,
@@ -142,23 +144,23 @@ public class Route implements Serializable {
             // need to create a link between subnet on which route is created
             // and instance containing network interface
             String subnetIfaceName = _target;
-            Prefix instanceLinkPrefix = awsConfiguraion.getNextGeneratedLinkSubnet();
-            Prefix subnetIfacePrefix = instanceLinkPrefix;
-            Utils.newInterface(subnetIfaceName, subnetCfgNode, subnetIfacePrefix);
+            Pair<NetworkAddress, NetworkAddress> instanceLink =
+                awsConfiguration.getNextGeneratedLinkSubnet();
+            NetworkAddress subnetIfaceAddress = instanceLink.getFirst();
+            Utils.newInterface(subnetIfaceName, subnetCfgNode, subnetIfaceAddress);
 
             // set up instance interface
             String instanceId = networkInterface.getAttachmentInstanceId();
             String instanceIfaceName = subnet.getId();
-            Configuration instanceCfgNode = awsConfiguraion.getConfigurationNodes().get(instanceId);
-            Prefix instanceIfacePrefix =
-                new Prefix(
-                    instanceLinkPrefix.getEndAddress(), instanceLinkPrefix.getPrefixLength());
+            Configuration instanceCfgNode =
+                awsConfiguration.getConfigurationNodes().get(instanceId);
+            NetworkAddress instanceIfaceAddress = instanceLink.getSecond();
             Interface instanceIface =
-                Utils.newInterface(instanceIfaceName, instanceCfgNode, instanceIfacePrefix);
+                Utils.newInterface(instanceIfaceName, instanceCfgNode, instanceIfaceAddress);
             Instance instance = region.getInstances().get(instanceId);
             instanceIface.setIncomingFilter(instance.getInAcl());
             instanceIface.setOutgoingFilter(instance.getOutAcl());
-            Ip nextHopIp = instanceIfacePrefix.getAddress();
+            Ip nextHopIp = instanceIfaceAddress.getAddress();
             srBuilder.setNextHopIp(nextHopIp);
           }
           break;
@@ -172,9 +174,10 @@ public class Route implements Serializable {
           String accepterVpcId = vpcPeeringConnection.getAccepterVpcId();
           String requesterVpcId = vpcPeeringConnection.getRequesterVpcId();
           String remoteVpcId = localVpcId.equals(accepterVpcId) ? requesterVpcId : accepterVpcId;
-          Configuration remoteVpcCfgNode = awsConfiguraion.getConfigurationNodes().get(remoteVpcId);
+          Configuration remoteVpcCfgNode =
+              awsConfiguration.getConfigurationNodes().get(remoteVpcId);
           if (remoteVpcCfgNode == null) {
-            awsConfiguraion
+            awsConfiguration
                 .getWarnings()
                 .redFlag(
                     "VPC \""
@@ -188,28 +191,28 @@ public class Route implements Serializable {
           // set up subnet interface if necessary
           String subnetIfaceName = remoteVpcId;
           String remoteVpcIfaceName = subnet.getId();
-          Ip remoteVpcIfaceAddress;
+          Ip remoteVpcIfaceIp;
           if (!subnetCfgNode.getDefaultVrf().getInterfaces().containsKey(subnetIfaceName)) {
             // create prefix on which subnet and remote vpc router will
             // connect
-            Prefix peeringLinkPrefix = awsConfiguraion.getNextGeneratedLinkSubnet();
-            Prefix subnetIfacePrefix = peeringLinkPrefix;
-            Utils.newInterface(subnetIfaceName, subnetCfgNode, subnetIfacePrefix);
+            Pair<NetworkAddress, NetworkAddress> peeringLink =
+                awsConfiguration.getNextGeneratedLinkSubnet();
+            NetworkAddress subnetIfaceAddress = peeringLink.getFirst();
+            Utils.newInterface(subnetIfaceName, subnetCfgNode, subnetIfaceAddress);
 
             // set up remote vpc router interface
-            Prefix remoteVpcIfacePrefix =
-                new Prefix(peeringLinkPrefix.getEndAddress(), peeringLinkPrefix.getPrefixLength());
+            NetworkAddress remoteVpcIfaceAddress = peeringLink.getSecond();
             Interface remoteVpcIface = new Interface(remoteVpcIfaceName, remoteVpcCfgNode);
             remoteVpcCfgNode.getInterfaces().put(remoteVpcIfaceName, remoteVpcIface);
             remoteVpcCfgNode
                 .getDefaultVrf()
                 .getInterfaces()
                 .put(remoteVpcIfaceName, remoteVpcIface);
-            remoteVpcIface.setAddress(remoteVpcIfacePrefix);
-            remoteVpcIface.getAllAddresses().add(remoteVpcIfacePrefix);
+            remoteVpcIface.setAddress(remoteVpcIfaceAddress);
+            remoteVpcIface.getAllAddresses().add(remoteVpcIfaceAddress);
           }
           // interface pair exists now, so just retrieve existing information
-          remoteVpcIfaceAddress =
+          remoteVpcIfaceIp =
               remoteVpcCfgNode
                   .getDefaultVrf()
                   .getInterfaces()
@@ -218,12 +221,12 @@ public class Route implements Serializable {
                   .getAddress();
 
           // initialize static route on new link
-          srBuilder.setNextHopIp(remoteVpcIfaceAddress);
+          srBuilder.setNextHopIp(remoteVpcIfaceIp);
           break;
 
         case Instance:
           // TODO: create route for instance
-          awsConfiguraion
+          awsConfiguration
               .getWarnings()
               .redFlag(
                   "Skipping creating route to "

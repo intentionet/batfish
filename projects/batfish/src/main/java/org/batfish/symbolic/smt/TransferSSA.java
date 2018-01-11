@@ -1331,9 +1331,8 @@ class TransferSSA {
       _aggregates = aggregateRoutes();
       if (_aggregates.size() > 0) {
         for (Map.Entry<Prefix, Boolean> entry : _aggregates.entrySet()) {
-          Prefix prefix = entry.getKey();
+          Prefix p = entry.getKey();
           Boolean isSuppressed = entry.getValue();
-          Prefix p = prefix.getNetworkPrefix();
           ArithExpr len = _enc.mkInt(p.getPrefixLength());
           BoolExpr relevantPfx = _enc.isRelevantFor(p, _enc.getSymbolicPacket().getDstIp());
           BoolExpr relevantLen = _enc.mkGt(param.getData().getPrefixLength(), len);

@@ -17,6 +17,7 @@ import org.batfish.common.plugin.Plugin;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.answers.AnswerElement;
@@ -101,8 +102,8 @@ public class SelfAdjacenciesQuestionPlugin extends QuestionPlugin {
                 for (Interface iface : vrf.getInterfaces().values()) {
                   Set<Prefix> ifaceBasePrefixes = new HashSet<>();
                   if (iface.getActive()) {
-                    for (Prefix prefix : iface.getAllAddresses()) {
-                      Prefix basePrefix = prefix.getNetworkPrefix();
+                    for (NetworkAddress prefix : iface.getAllAddresses()) {
+                      Prefix basePrefix = Prefix.forNetworkAddress(prefix);
                       if (!ifaceBasePrefixes.contains(basePrefix)) {
                         ifaceBasePrefixes.add(basePrefix);
                         nodePrefixes.add(basePrefix);
@@ -111,8 +112,8 @@ public class SelfAdjacenciesQuestionPlugin extends QuestionPlugin {
                   }
                 }
                 for (Interface iface : vrf.getInterfaces().values()) {
-                  for (Prefix prefix : iface.getAllAddresses()) {
-                    Prefix basePrefix = prefix.getNetworkPrefix();
+                  for (NetworkAddress prefix : iface.getAllAddresses()) {
+                    Prefix basePrefix = Prefix.forNetworkAddress(prefix);
                     if (nodePrefixes.count(basePrefix) > 1) {
                       Ip address = prefix.getAddress();
                       String interfaceName = iface.getName();

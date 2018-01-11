@@ -32,7 +32,7 @@ public class PrefixTrieMap implements Serializable {
       BitSet bits = prefix.getAddress().getAddressBits();
       Set<String> devices = new HashSet<>();
       devices.add(device);
-      _root.addPrefix(prefix.getNetworkPrefix(), devices, bits, prefixLength, 0);
+      _root.addPrefix(prefix, devices, bits, prefixLength, 0);
     }
   }
 

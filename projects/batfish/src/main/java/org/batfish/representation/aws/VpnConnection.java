@@ -30,6 +30,7 @@ import org.batfish.datamodel.IpsecProtocol;
 import org.batfish.datamodel.IpsecVpn;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RouteFilterLine;
@@ -222,13 +223,15 @@ public class VpnConnection implements AwsVpcEntity, Serializable {
       vpnGatewayCfgNode.getIkeProposals().put(vpnId, ikeProposal);
       ikePolicy.getProposals().put(vpnId, ikeProposal);
       String externalInterfaceName = "external" + idNum;
-      Prefix externalInterfacePrefix = new Prefix(ipsecTunnel.getVgwOutsideAddress(), 32);
+      NetworkAddress externalInterfacePrefix =
+          new NetworkAddress(ipsecTunnel.getVgwOutsideAddress(), 32);
       Interface externalInterface =
           Utils.newInterface(externalInterfaceName, vpnGatewayCfgNode, externalInterfacePrefix);
 
       String vpnInterfaceName = "vpn" + idNum;
-      Prefix vpnInterfacePrefix =
-          new Prefix(ipsecTunnel.getVgwInsideAddress(), ipsecTunnel.getVgwInsidePrefixLength());
+      NetworkAddress vpnInterfacePrefix =
+          new NetworkAddress(
+              ipsecTunnel.getVgwInsideAddress(), ipsecTunnel.getVgwInsidePrefixLength());
       Interface vpnInterface =
           Utils.newInterface(vpnInterfaceName, vpnGatewayCfgNode, vpnInterfacePrefix);
 

@@ -309,8 +309,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
       RibTreeNode oldNode = node;
 
       // newNetwork has the max prefix match up to nextUnmatchedBit
-      Prefix newNetwork =
-          new Prefix(route.getNetwork().getAddress(), nextUnmatchedBit).getNetworkPrefix();
+      Prefix newNetwork = new Prefix(route.getNetwork().getAddress(), nextUnmatchedBit);
       node = new RibTreeNode(newNetwork); // node is the node we are inserting in the middle
       RibTreeNode child = new RibTreeNode(route.getNetwork());
       child._routes = Collections.singleton(route);

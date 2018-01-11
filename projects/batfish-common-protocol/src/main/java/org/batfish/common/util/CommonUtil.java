@@ -72,6 +72,7 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.IpsecVpn;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Route;
 import org.batfish.datamodel.Topology;
@@ -657,19 +658,19 @@ public class CommonUtil {
     ImmutableSetMultimap.Builder<Ip, IpSpace> builder = ImmutableSetMultimap.builder();
     for (Configuration c : configurations.values()) {
       Collection<Interface> interfaces = c.getInterfaces().values();
-      Set<Prefix> nonNattedInterfacePrefixes =
+      Set<NetworkAddress> nonNattedInterfaceAddresses =
           interfaces
               .stream()
               .filter(i -> i.getSourceNats().isEmpty())
               .flatMap(i -> i.getAllAddresses().stream())
               .collect(ImmutableSet.toImmutableSet());
       Set<IpWildcard> blacklist =
-          nonNattedInterfacePrefixes
+          nonNattedInterfaceAddresses
               .stream()
               .map(p -> new IpWildcard(p.getAddress(), Ip.ZERO))
               .collect(ImmutableSet.toImmutableSet());
       Set<IpWildcard> whitelist =
-          nonNattedInterfacePrefixes
+          nonNattedInterfaceAddresses
               .stream()
               .map(IpWildcard::new)
               .collect(ImmutableSet.toImmutableSet());
@@ -698,9 +699,9 @@ public class CommonUtil {
       for (IpsecVpn ipsecVpn : c.getIpsecVpns().values()) {
         Ip remoteAddress = ipsecVpn.getIkeGateway().getAddress();
         remoteAddresses.put(ipsecVpn, remoteAddress);
-        Set<Prefix> externalPrefixes =
+        Set<NetworkAddress> externalPrefixes =
             ipsecVpn.getIkeGateway().getExternalInterface().getAllAddresses();
-        for (Prefix externalPrefix : externalPrefixes) {
+        for (NetworkAddress externalPrefix : externalPrefixes) {
           Ip externalAddress = externalPrefix.getAddress();
           Set<IpsecVpn> vpnsUsingExternalAddress =
               externalAddresses.computeIfAbsent(externalAddress, k -> Sets.newIdentityHashSet());
@@ -916,26 +917,25 @@ public class CommonUtil {
 
   public static Topology synthesizeTopology(Map<String, Configuration> configurations) {
     SortedSet<Edge> edges = new TreeSet<>();
-    Map<Prefix, Set<NodeInterfacePair>> prefixInterfaces = new HashMap<>();
+    Map<NetworkAddress, Set<NodeInterfacePair>> addressInterfaces = new HashMap<>();
     configurations.forEach(
         (nodeName, node) -> {
           for (Entry<String, Interface> e : node.getInterfaces().entrySet()) {
             String ifaceName = e.getKey();
             Interface iface = e.getValue();
             if (!iface.isLoopback(node.getConfigurationFormat()) && iface.getActive()) {
-              for (Prefix prefix : iface.getAllAddresses()) {
-                if (prefix.getPrefixLength() < 32) {
-                  Prefix network = new Prefix(prefix.getNetworkAddress(), prefix.getPrefixLength());
+              for (NetworkAddress address : iface.getAllAddresses()) {
+                if (address.getNetworkBits() < 32) {
                   NodeInterfacePair pair = new NodeInterfacePair(nodeName, ifaceName);
                   Set<NodeInterfacePair> interfaceBucket =
-                      prefixInterfaces.computeIfAbsent(network, k -> new HashSet<>());
+                      addressInterfaces.computeIfAbsent(address, k -> new HashSet<>());
                   interfaceBucket.add(pair);
                 }
               }
             }
           }
         });
-    for (Set<NodeInterfacePair> bucket : prefixInterfaces.values()) {
+    for (Set<NodeInterfacePair> bucket : addressInterfaces.values()) {
       for (NodeInterfacePair p1 : bucket) {
         for (NodeInterfacePair p2 : bucket) {
           if (!p1.equals(p2)) {

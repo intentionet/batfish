@@ -552,8 +552,7 @@ public class Encoder {
             if (x != null) {
               int len = Integer.parseInt(x);
               Prefix p1 = new Prefix(dip, len);
-              Prefix p2 = p1.getNetworkPrefix();
-              recordMap.put("prefix", p2.toString());
+              recordMap.put("prefix", p1.toString());
             }
           }
           if (r.getAdminDist() != null) {

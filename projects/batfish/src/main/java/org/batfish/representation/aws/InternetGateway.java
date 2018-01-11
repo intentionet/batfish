@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import org.batfish.common.BatfishLogger;
+import org.batfish.common.Pair;
 import org.batfish.datamodel.Configuration;
-import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.StaticRoute;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -42,15 +42,16 @@ public class InternetGateway implements AwsVpcEntity, Serializable {
     for (String vpcId : _attachmentVpcIds) {
 
       String igwIfaceName = vpcId;
-      Prefix igwIfacePrefix = awsConfiguration.getNextGeneratedLinkSubnet();
-      Utils.newInterface(igwIfaceName, cfgNode, igwIfacePrefix);
+      Pair<NetworkAddress, NetworkAddress> igwAddresses =
+          awsConfiguration.getNextGeneratedLinkSubnet();
+      NetworkAddress igwIfaceAddress = igwAddresses.getFirst();
+      Utils.newInterface(igwIfaceName, cfgNode, igwIfaceAddress);
 
       // add the interface to the vpc router
       Configuration vpcConfigNode = awsConfiguration.getConfigurationNodes().get(vpcId);
       String vpcIfaceName = _internetGatewayId;
-      Ip vpcIfaceIp = igwIfacePrefix.getEndAddress();
-      Prefix vpcIfacePrefix = new Prefix(vpcIfaceIp, igwIfacePrefix.getPrefixLength());
-      Utils.newInterface(vpcIfaceName, vpcConfigNode, vpcIfacePrefix);
+      NetworkAddress vpcIfaceAddress = igwAddresses.getSecond();
+      Utils.newInterface(vpcIfaceName, vpcConfigNode, vpcIfaceAddress);
 
       // associate this gateway with the vpc
       region.getVpcs().get(vpcId).setInternetGatewayId(_internetGatewayId);
@@ -63,7 +64,7 @@ public class InternetGateway implements AwsVpcEntity, Serializable {
                 StaticRoute igwVpcRoute =
                     StaticRoute.builder()
                         .setNetwork(prefix)
-                        .setNextHopIp(vpcIfaceIp)
+                        .setNextHopIp(vpcIfaceAddress.getAddress())
                         .setAdministrativeCost(Route.DEFAULT_STATIC_ROUTE_ADMIN)
                         .setMetric(Route.DEFAULT_STATIC_ROUTE_COST)
                         .build();

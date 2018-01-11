@@ -25,6 +25,7 @@ import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Edge;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.OspfProcess;
 import org.batfish.datamodel.Prefix;
@@ -202,7 +203,7 @@ public class Graph {
       for (OspfArea area : ospf.getAreas().values()) {
         for (Interface iface : area.getInterfaces().values()) {
           if (iface.getActive() && iface.getOspfEnabled()) {
-            acc.add(iface.getAddress().getNetworkPrefix());
+            acc.add(Prefix.forNetworkAddress(iface.getAddress()));
           }
         }
       }
@@ -234,7 +235,7 @@ public class Graph {
                           ExplicitPrefixSet eps = (ExplicitPrefixSet) e;
                           Set<PrefixRange> ranges = eps.getPrefixSpace().getPrefixRanges();
                           for (PrefixRange r : ranges) {
-                            acc.add(r.getPrefix().getNetworkPrefix());
+                            acc.add(r.getPrefix());
                           }
                         }
                       }
@@ -249,9 +250,9 @@ public class Graph {
 
     if (proto.isConnected()) {
       for (Interface iface : conf.getInterfaces().values()) {
-        Prefix p = iface.getAddress();
+        NetworkAddress p = iface.getAddress();
         if (p != null) {
-          acc.add(p.getNetworkPrefix());
+          acc.add(Prefix.forNetworkAddress(p));
         }
       }
       return acc;
@@ -260,7 +261,7 @@ public class Graph {
     if (proto.isStatic()) {
       for (StaticRoute sr : conf.getDefaultVrf().getStaticRoutes()) {
         if (sr.getNetwork() != null) {
-          acc.add(sr.getNetwork().getNetworkPrefix());
+          acc.add(sr.getNetwork());
         }
       }
       return acc;
@@ -477,7 +478,8 @@ public class Graph {
         // Create null route interface
         Interface iface = new Interface(name);
         iface.setActive(true);
-        iface.setAddress(sr.getNetwork());
+        iface.setAddress(
+            new NetworkAddress(sr.getNetwork().getAddress(), sr.getNextHopIp().numSubnetBits()));
         iface.setBandwidth(0.);
         // Add static route to all static routes list
         Map<String, List<StaticRoute>> map = _staticRoutes.get(router);
@@ -529,7 +531,7 @@ public class Graph {
             Ip ip = ipList.get(i);
             BgpNeighbor n = ns.get(i);
             Interface iface = ge.getStart();
-            if (ip != null && iface.getAddress().contains(ip)) {
+            if (ip != null && Prefix.forNetworkAddress(iface.getAddress()).contains(ip)) {
               _ebgpNeighbors.put(ge, n);
             }
           }
@@ -545,7 +547,10 @@ public class Graph {
   private Interface createIbgpInterface(BgpNeighbor n, String peer) {
     Interface iface = new Interface("iBGP-" + peer);
     iface.setActive(true);
-    iface.setAddress(n.getPrefix());
+    // TODO is this valid.
+    Prefix p = n.getPrefix();
+    assert p.getPrefixLength() == Prefix.MAX_PREFIX_LENGTH;
+    iface.setAddress(new NetworkAddress(n.getPrefix().getAddress(), Prefix.MAX_PREFIX_LENGTH));
     iface.setBandwidth(0.);
     return iface;
   }

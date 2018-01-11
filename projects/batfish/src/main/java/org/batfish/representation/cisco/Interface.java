@@ -12,7 +12,7 @@ import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IsisInterfaceMode;
-import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.SwitchportEncapsulationType;
 import org.batfish.datamodel.SwitchportMode;
@@ -151,7 +151,7 @@ public class Interface extends ComparableStructure<String> {
 
   private int _outgoingFilterLine;
 
-  private Prefix _prefix;
+  private NetworkAddress _address;
 
   private boolean _proxyArp;
 
@@ -159,13 +159,13 @@ public class Interface extends ComparableStructure<String> {
 
   int _routingPolicyLine;
 
-  private Set<Prefix> _secondaryPrefixes;
+  private Set<NetworkAddress> _secondaryAddresses;
 
   private List<CiscoSourceNat> _sourceNats;
 
   private boolean _spanningTreePortfast;
 
-  private Prefix _standbyPrefix;
+  private NetworkAddress _standbyAddress;
 
   private Boolean _switchport;
 
@@ -190,7 +190,7 @@ public class Interface extends ComparableStructure<String> {
     _dhcpRelayAddresses = new TreeSet<>();
     _isisInterfaceMode = IsisInterfaceMode.UNSET;
     _nativeVlan = 1;
-    _secondaryPrefixes = new LinkedHashSet<>();
+    _secondaryAddresses = new LinkedHashSet<>();
     SwitchportMode defaultSwitchportMode = c.getCf().getDefaultSwitchportMode();
     ConfigurationFormat vendor = c.getVendor();
     if (defaultSwitchportMode == null) {
@@ -238,13 +238,13 @@ public class Interface extends ComparableStructure<String> {
     return _allowedVlans;
   }
 
-  public Set<Prefix> getAllPrefixes() {
-    Set<Prefix> allPrefixes = new TreeSet<>();
-    if (_prefix != null) {
-      allPrefixes.add(_prefix);
+  public Set<NetworkAddress> getAllAddresses() {
+    Set<NetworkAddress> allAddresses = new TreeSet<>();
+    if (_address != null) {
+      allAddresses.add(_address);
     }
-    allPrefixes.addAll(_secondaryPrefixes);
-    return allPrefixes;
+    allAddresses.addAll(_secondaryAddresses);
+    return allAddresses;
   }
 
   public boolean getAutoState() {
@@ -327,8 +327,8 @@ public class Interface extends ComparableStructure<String> {
     return _outgoingFilterLine;
   }
 
-  public Prefix getPrefix() {
-    return _prefix;
+  public NetworkAddress getAddress() {
+    return _address;
   }
 
   public boolean getProxyArp() {
@@ -343,8 +343,8 @@ public class Interface extends ComparableStructure<String> {
     return _routingPolicyLine;
   }
 
-  public Set<Prefix> getSecondaryPrefixes() {
-    return _secondaryPrefixes;
+  public Set<NetworkAddress> getSecondaryAddresses() {
+    return _secondaryAddresses;
   }
 
   public List<CiscoSourceNat> getSourceNats() {
@@ -355,8 +355,8 @@ public class Interface extends ComparableStructure<String> {
     return _spanningTreePortfast;
   }
 
-  public Prefix getStandbyPrefix() {
-    return _standbyPrefix;
+  public NetworkAddress getStandbyAddress() {
+    return _standbyAddress;
   }
 
   public Boolean getSwitchport() {
@@ -478,8 +478,8 @@ public class Interface extends ComparableStructure<String> {
     _outgoingFilterLine = outgoingFilterLine;
   }
 
-  public void setPrefix(Prefix prefix) {
-    _prefix = prefix;
+  public void setAddress(NetworkAddress address) {
+    _address = address;
   }
 
   public void setProxyArp(boolean proxyArp) {
@@ -502,8 +502,8 @@ public class Interface extends ComparableStructure<String> {
     _spanningTreePortfast = spanningTreePortfast;
   }
 
-  public void setStandbyPrefix(Prefix standbyPrefix) {
-    _standbyPrefix = standbyPrefix;
+  public void setStandbyAddress(NetworkAddress standbyAddress) {
+    _standbyAddress = standbyAddress;
   }
 
   public void setSwitchport(boolean switchport) {

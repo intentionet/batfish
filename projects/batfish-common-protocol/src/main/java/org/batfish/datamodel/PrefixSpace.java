@@ -36,7 +36,7 @@ public class PrefixSpace implements Serializable {
       int minLength = prefixRange.getLengthRange().getStart();
       int maxLength = Math.min(prefixRange.getLengthRange().getEnd(), prefix.getPrefixLength() - 1);
       for (int currentLength = minLength; currentLength <= maxLength; currentLength++) {
-        Prefix currentPrefix = new Prefix(prefix.getAddress(), currentLength).getNetworkPrefix();
+        Prefix currentPrefix = new Prefix(prefix.getAddress(), currentLength);
         PrefixRange currentPrefixRange = PrefixRange.fromPrefix(currentPrefix);
         BitSet currentBits = getAddressBits(currentPrefix.getAddress());
         _root.addPrefixRange(currentPrefixRange, currentBits, currentLength, 0);

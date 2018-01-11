@@ -23,7 +23,7 @@ import org.batfish.datamodel.IpsecProposal;
 import org.batfish.datamodel.IpsecProtocol;
 import org.batfish.datamodel.IpsecVpn;
 import org.batfish.datamodel.LineAction;
-import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.RouteFilterLine;
 import org.batfish.datamodel.RouteFilterList;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
@@ -307,12 +307,12 @@ public class VyosConfiguration extends VendorConfiguration {
     newIface.setActive(true); // TODO: may have to change
     newIface.setBandwidth(iface.getBandwidth());
     newIface.setDescription(iface.getDescription());
-    Prefix prefix = iface.getPrefix();
+    NetworkAddress prefix = iface.getAddress();
     if (prefix != null) {
-      newIface.setAddress(iface.getPrefix());
+      newIface.setAddress(iface.getAddress());
     }
-    newIface.getAllAddresses().addAll(iface.getAllPrefixes());
-    for (Prefix p : newIface.getAllAddresses()) {
+    newIface.getAllAddresses().addAll(iface.getAllAddresses());
+    for (NetworkAddress p : newIface.getAllAddresses()) {
       _ipToInterfaceMap.put(p.getAddress(), newIface);
     }
     return newIface;

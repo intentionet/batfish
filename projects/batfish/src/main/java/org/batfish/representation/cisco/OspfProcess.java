@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import javax.annotation.Nullable;
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.OspfMetricType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
@@ -90,7 +91,7 @@ public class OspfProcess extends ComparableStructure<String> {
 
   public void computeNetworks(Collection<Interface> interfaces) {
     for (Interface i : interfaces) {
-      Prefix intPrefix = i.getPrefix();
+      NetworkAddress intPrefix = i.getAddress();
       if (intPrefix == null) {
         continue;
       }
@@ -105,8 +106,7 @@ public class OspfProcess extends ComparableStructure<String> {
         if (wildcardedOspfNetworkLong == wildcardedIntIpLong) {
           // since we have a match, we add the INTERFACE network, ignoring
           // the wildcard stuff from before
-          Prefix newOspfNetwork =
-              new Prefix(intPrefix.getNetworkAddress(), intPrefix.getPrefixLength());
+          Prefix newOspfNetwork = Prefix.forNetworkAddress(intPrefix);
           _networks.add(new OspfNetwork(newOspfNetwork, wn.getArea()));
           break;
         }

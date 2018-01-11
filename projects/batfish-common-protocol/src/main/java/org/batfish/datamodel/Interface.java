@@ -40,7 +40,7 @@ public final class Interface extends ComparableStructure<String> {
 
     private Configuration _owner;
 
-    private NetworkAddress __address;
+    private NetworkAddress _address;
 
     private Vrf _vrf;
 
@@ -66,9 +66,9 @@ public final class Interface extends ComparableStructure<String> {
       if (_owner != null) {
         _owner.getInterfaces().put(name, iface);
       }
-      iface.setAddress(__address);
-      if (__address != null) {
-        iface.setAllAddresses(Collections.singleton(__address));
+      iface.setAddress(_address);
+      if (_address != null) {
+        iface.setAllAddresses(Collections.singleton(_address));
       }
       iface.setVrf(_vrf);
       if (_vrf != null) {
@@ -122,7 +122,7 @@ public final class Interface extends ComparableStructure<String> {
     }
 
     public Builder setAddress(NetworkAddress address) {
-      __address = address;
+      _address = address;
       return this;
     }
 

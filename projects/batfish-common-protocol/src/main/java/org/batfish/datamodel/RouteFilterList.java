@@ -62,7 +62,7 @@ public class RouteFilterList extends ComparableStructure<String> {
       Prefix linePrefix = line.getPrefix();
       int lineBits = linePrefix.getPrefixLength();
       Prefix truncatedLinePrefix = new Prefix(linePrefix.getAddress(), lineBits);
-      Prefix relevantPortion = new Prefix(prefix.getAddress(), lineBits).getNetworkPrefix();
+      Prefix relevantPortion = new Prefix(prefix.getAddress(), lineBits);
       if (relevantPortion.equals(truncatedLinePrefix)) {
         int prefixLength = prefix.getPrefixLength();
         SubRange range = line.getLengthRange();

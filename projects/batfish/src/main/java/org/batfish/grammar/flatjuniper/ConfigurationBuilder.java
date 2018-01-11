@@ -36,6 +36,7 @@ import org.batfish.datamodel.IsisOption;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NamedPort;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
 import org.batfish.datamodel.RoutingProtocol;
@@ -1406,7 +1407,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   private Interface _currentInterface;
 
-  private Prefix _currentInterfacePrefix;
+  private NetworkAddress _currentInterfaceAddress;
 
   private IpsecPolicy _currentIpsecPolicy;
 
@@ -1622,26 +1623,26 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void enterIfi_address(Ifi_addressContext ctx) {
-    Set<Prefix> allPrefixes = _currentInterface.getAllPrefixes();
-    Prefix prefix;
+    Set<NetworkAddress> allAddresses = _currentInterface.getAllAddresses();
+    NetworkAddress address;
     if (ctx.IP_PREFIX() != null) {
-      prefix = new Prefix(ctx.IP_PREFIX().getText());
+      address = new NetworkAddress(ctx.IP_PREFIX().getText());
     } else if (ctx.IP_ADDRESS() != null) {
       Ip ip = new Ip(ctx.IP_ADDRESS().getText());
-      prefix = new Prefix(ip, 32);
+      address = new NetworkAddress(ip, 32);
     } else {
       throw new BatfishException("Invalid or missing address");
     }
-    _currentInterfacePrefix = prefix;
-    if (_currentInterface.getPrimaryPrefix() == null) {
-      _currentInterface.setPrimaryPrefix(prefix);
+    _currentInterfaceAddress = address;
+    if (_currentInterface.getPrimaryAddress() == null) {
+      _currentInterface.setPrimaryAddress(address);
     }
-    if (_currentInterface.getPreferredPrefix() == null) {
-      _currentInterface.setPreferredPrefix(prefix);
+    if (_currentInterface.getPreferredAddress() == null) {
+      _currentInterface.setPreferredAddress(address);
     }
-    allPrefixes.add(prefix);
-    Ip ip = prefix.getAddress();
-    _currentInterface.getAllPrefixIps().add(ip);
+    allAddresses.add(address);
+    Ip ip = address.getAddress();
+    _currentInterface.getAllAddressIps().add(ip);
   }
 
   @Override
@@ -1771,7 +1772,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       Ip ip = new Ip(ctx.ip.getText());
       for (Interface iface : interfaces.values()) {
         for (Interface unit : iface.getUnits().values()) {
-          if (unit.getAllPrefixIps().contains(ip)) {
+          if (unit.getAllAddressIps().contains(ip)) {
             _currentOspfInterface = unit;
             unitFullName = unit.getName();
           }
@@ -2779,7 +2780,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitIfi_address(Ifi_addressContext ctx) {
-    _currentInterfacePrefix = null;
+    _currentInterfaceAddress = null;
   }
 
   @Override
@@ -2801,12 +2802,12 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitIfia_preferred(Ifia_preferredContext ctx) {
-    _currentInterface.setPreferredPrefix(_currentInterfacePrefix);
+    _currentInterface.setPreferredAddress(_currentInterfaceAddress);
   }
 
   @Override
   public void exitIfia_primary(Ifia_primaryContext ctx) {
-    _currentInterface.setPrimaryPrefix(_currentInterfacePrefix);
+    _currentInterface.setPrimaryAddress(_currentInterfaceAddress);
   }
 
   @Override
@@ -2828,7 +2829,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void exitIfiav_virtual_address(Ifiav_virtual_addressContext ctx) {
     Ip virtualAddress = new Ip(ctx.IP_ADDRESS().getText());
-    int prefixLength = _currentInterfacePrefix.getPrefixLength();
+    int prefixLength = _currentInterfaceAddress.getNetworkBits();
     _currentVrrpGroup.setVirtualAddress(new Prefix(virtualAddress, prefixLength));
   }
 

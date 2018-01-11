@@ -38,6 +38,7 @@ import org.batfish.datamodel.IsisProcess;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.OspfMetricType;
 import org.batfish.datamodel.OspfProcess;
@@ -491,9 +492,9 @@ public final class JuniperConfiguration extends VendorConfiguration {
         // peer
         outerloop:
         for (org.batfish.datamodel.Interface iface : vrf.getInterfaces().values()) {
-          for (Prefix prefix : iface.getAllAddresses()) {
-            if (prefix.contains(ip)) {
-              localAddress = prefix.getAddress();
+          for (NetworkAddress address : iface.getAllAddresses()) {
+            if (Prefix.forNetworkAddress(address).contains(ip)) {
+              localAddress = address.getAddress();
               break outerloop;
             }
           }
@@ -502,7 +503,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
       if (localAddress == null && _defaultAddressSelection) {
         initFirstLoopbackInterface();
         if (_lo0 != null) {
-          Prefix lo0Unit0Prefix = _lo0.getPrimaryPrefix();
+          NetworkAddress lo0Unit0Prefix = _lo0.getPrimaryAddress();
           if (lo0Unit0Prefix != null) {
             localAddress = lo0Unit0Prefix.getAddress();
           }
@@ -796,7 +797,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
           }
         }
       }
-    } else if (_lo0.getPrimaryPrefix() == null) {
+    } else if (_lo0.getPrimaryAddress() == null) {
       Pattern q = Pattern.compile("lo[0-9][0-9]*\\.[0-9][0-9]*");
       for (Interface iface : _defaultRoutingInstance.getInterfaces().values()) {
         for (Interface unit : iface.getUnits().values()) {
@@ -1193,7 +1194,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
       }
     }
 
-    // Prefix primaryPrefix = iface.getPrimaryPrefix();
+    // Prefix primaryPrefix = iface.getPrimaryAddress();
     // Set<Prefix> allPrefixes = iface.getAllAddresses();
     // if (primaryPrefix != null) {
     // newIface.setAddress(primaryPrefix);
@@ -1206,10 +1207,10 @@ public final class JuniperConfiguration extends VendorConfiguration {
     // }
     // newIface.getAllAddresses().addAll(allPrefixes);
 
-    if (iface.getPrimaryPrefix() != null) {
-      newIface.setAddress(iface.getPrimaryPrefix());
+    if (iface.getPrimaryAddress() != null) {
+      newIface.setAddress(iface.getPrimaryAddress());
     }
-    newIface.setAllAddresses(iface.getAllPrefixes());
+    newIface.setAllAddresses(iface.getAllAddresses());
     newIface.setActive(iface.getActive());
     newIface.setAccessVlan(iface.getAccessVlan());
     newIface.setNativeVlan(iface.getNativeVlan());
@@ -1771,7 +1772,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
       if (loopback0 != null) {
         Interface loopback0unit0 = loopback0.getUnits().get(FIRST_LOOPBACK_INTERFACE_NAME + ".0");
         if (loopback0unit0 != null) {
-          Prefix prefix = loopback0unit0.getPrimaryPrefix();
+          NetworkAddress prefix = loopback0unit0.getPrimaryAddress();
           if (prefix != null) {
             // now we should set router-id
             Ip routerId = prefix.getAddress();

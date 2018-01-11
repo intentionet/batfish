@@ -25,6 +25,7 @@ import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.OspfMetricType;
@@ -33,7 +34,6 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.PrefixRange;
 import org.batfish.datamodel.PrefixSpace;
 import org.batfish.datamodel.RoutingProtocol;
-import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.answers.BdpAnswerElement;
@@ -51,26 +51,26 @@ import org.junit.Test;
 
 public class OspfTest {
 
-  private static final Prefix C1_E1_2_PREFIX = new Prefix("10.12.0.1/24");
-  private static final Prefix C1_L0_PREFIX = new Prefix("1.1.1.1/32");
-  private static final Prefix C1_L1_PREFIX = new Prefix("1.1.1.11/32");
+  private static final NetworkAddress C1_E1_2_PREFIX = new NetworkAddress("10.12.0.1/24");
+  private static final NetworkAddress C1_L0_PREFIX = new NetworkAddress("1.1.1.1/32");
+  private static final NetworkAddress C1_L1_PREFIX = new NetworkAddress("1.1.1.11/32");
   private static final String C1_NAME = "R1";
 
-  private static final Prefix C2_E2_1_PREFIX = new Prefix("10.12.0.2/24");
-  private static final Prefix C2_E2_3_PREFIX = new Prefix("10.23.0.2/24");
-  private static final Prefix C2_L0_PREFIX = new Prefix("2.2.2.2/32");
-  private static final Prefix C2_L1_PREFIX = new Prefix("2.2.2.22/32");
+  private static final NetworkAddress C2_E2_1_PREFIX = new NetworkAddress("10.12.0.2/24");
+  private static final NetworkAddress C2_E2_3_PREFIX = new NetworkAddress("10.23.0.2/24");
+  private static final NetworkAddress C2_L0_PREFIX = new NetworkAddress("2.2.2.2/32");
+  private static final NetworkAddress C2_L1_PREFIX = new NetworkAddress("2.2.2.22/32");
   private static final String C2_NAME = "R2";
 
-  private static final Prefix C3_E3_2_PREFIX = new Prefix("10.23.0.3/24");
-  private static final Prefix C3_E3_4_PREFIX = new Prefix("10.34.0.3/24");
-  private static final Prefix C3_L0_PREFIX = new Prefix("3.3.3.3/32");
-  private static final Prefix C3_L1_PREFIX = new Prefix("3.3.3.33/32");
+  private static final NetworkAddress C3_E3_2_PREFIX = new NetworkAddress("10.23.0.3/24");
+  private static final NetworkAddress C3_E3_4_PREFIX = new NetworkAddress("10.34.0.3/24");
+  private static final NetworkAddress C3_L0_PREFIX = new NetworkAddress("3.3.3.3/32");
+  private static final NetworkAddress C3_L1_PREFIX = new NetworkAddress("3.3.3.33/32");
   private static final String C3_NAME = "R3";
 
-  private static final Prefix C4_E4_3_PREFIX = new Prefix("10.34.0.4/24");
-  private static final Prefix C4_L0_PREFIX = new Prefix("4.4.4.4/32");
-  private static final Prefix C4_L1_PREFIX = new Prefix("4.4.4.44/32");
+  private static final NetworkAddress C4_E4_3_PREFIX = new NetworkAddress("10.34.0.4/24");
+  private static final NetworkAddress C4_L0_PREFIX = new NetworkAddress("4.4.4.4/32");
+  private static final NetworkAddress C4_L1_PREFIX = new NetworkAddress("4.4.4.44/32");
   private static final String C4_NAME = "R4";
 
   private static final long MAX_METRIC_EXTERNAL_NETWORKS = 16711680L;
@@ -81,7 +81,8 @@ public class OspfTest {
   private static void assertNoRoute(
       SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> routesByNode,
       String hostname,
-      Prefix prefix) {
+      NetworkAddress address) {
+    Prefix prefix = Prefix.forNetworkAddress(address);
     assertThat(routesByNode, hasKey(hostname));
     SortedMap<String, SortedSet<AbstractRoute>> routesByVrf = routesByNode.get(hostname);
     assertThat(routesByVrf, hasKey(Configuration.DEFAULT_VRF_NAME));
@@ -93,8 +94,9 @@ public class OspfTest {
       SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> routesByNode,
       RoutingProtocol protocol,
       String hostname,
-      Prefix prefix,
+      NetworkAddress address,
       long expectedCost) {
+    Prefix prefix = Prefix.forNetworkAddress(address);
     assertThat(routesByNode, hasKey(hostname));
     SortedMap<String, SortedSet<AbstractRoute>> routesByVrf = routesByNode.get(hostname);
     assertThat(routesByVrf, hasKey(Configuration.DEFAULT_VRF_NAME));
@@ -106,7 +108,7 @@ public class OspfTest {
     assertThat(route, hasProtocol(protocol));
   }
 
-  private static List<Statement> getExportPolicyStatements(Prefix prefix) {
+  private static List<Statement> getExportPolicyStatements(NetworkAddress address) {
     long externalOspfMetric = 20L;
     If exportIfMatchL2Prefix = new If();
     exportIfMatchL2Prefix.setGuard(
@@ -114,10 +116,7 @@ public class OspfTest {
             new DestinationNetwork(),
             new ExplicitPrefixSet(
                 new PrefixSpace(
-                    ImmutableSet.of(
-                        new PrefixRange(
-                            prefix,
-                            new SubRange(prefix.getPrefixLength(), prefix.getPrefixLength())))))));
+                    ImmutableSet.of(PrefixRange.fromPrefix(Prefix.forNetworkAddress(address)))))));
     exportIfMatchL2Prefix.setTrueStatements(
         ImmutableList.of(
             new SetOspfMetricType(OspfMetricType.E1),
@@ -320,30 +319,30 @@ public class OspfTest {
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C3_L1_PREFIX, 65556L);
     assertRoute(routesByNode, OSPF, C1_NAME, C4_L0_PREFIX, 65538L);
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C4_L1_PREFIX, 65557L);
-    assertRoute(routesByNode, OSPF, C1_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 65536L);
-    assertRoute(routesByNode, OSPF, C1_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 65537L);
+    assertRoute(routesByNode, OSPF, C1_NAME, C2_E2_3_PREFIX, 65536L);
+    assertRoute(routesByNode, OSPF, C1_NAME, C3_E3_4_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF, C2_NAME, C1_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C1_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C3_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C4_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C4_L1_PREFIX, 65556L);
-    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 65536L);
+    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF, C3_NAME, C1_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C1_L1_PREFIX, 65556L);
     assertRoute(routesByNode, OSPF, C3_NAME, C2_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C2_L1_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C3_NAME, C4_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C4_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF, C3_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 2L);
+    assertRoute(routesByNode, OSPF, C3_NAME, C1_E1_2_PREFIX, 2L);
     assertRoute(routesByNode, OSPF, C4_NAME, C1_L0_PREFIX, 65538L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C1_L1_PREFIX, 65557L);
     assertRoute(routesByNode, OSPF, C4_NAME, C2_L0_PREFIX, 3L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C2_L1_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF, C4_NAME, C3_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C3_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF, C4_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 3L);
-    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 2L);
+    assertRoute(routesByNode, OSPF, C4_NAME, C1_E1_2_PREFIX, 3L);
+    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX, 2L);
   }
 
   @Test
@@ -367,30 +366,30 @@ public class OspfTest {
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C3_L1_PREFIX, 65556L);
     assertRoute(routesByNode, OSPF, C1_NAME, C4_L0_PREFIX, 65538L);
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C4_L1_PREFIX, 65557L);
-    assertRoute(routesByNode, OSPF, C1_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 65536L);
-    assertRoute(routesByNode, OSPF, C1_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 65537L);
+    assertRoute(routesByNode, OSPF, C1_NAME, C2_E2_3_PREFIX, 65536L);
+    assertRoute(routesByNode, OSPF, C1_NAME, C3_E3_4_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF, C2_NAME, C1_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C1_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C3_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C4_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C4_L1_PREFIX, 65556L);
-    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 65536L);
+    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF, C3_NAME, C1_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C1_L1_PREFIX, 65556L);
     assertRoute(routesByNode, OSPF, C3_NAME, C2_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C2_L1_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C3_NAME, C4_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C4_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF, C3_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 65536L);
+    assertRoute(routesByNode, OSPF, C3_NAME, C1_E1_2_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF, C4_NAME, C1_L0_PREFIX, 65538L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C1_L1_PREFIX, 65557L);
     assertRoute(routesByNode, OSPF, C4_NAME, C2_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C2_L1_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF, C4_NAME, C3_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C3_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF, C4_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 65537L);
-    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 2L);
+    assertRoute(routesByNode, OSPF, C4_NAME, C1_E1_2_PREFIX, 65537L);
+    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX, 2L);
   }
 
   @Test
@@ -414,30 +413,30 @@ public class OspfTest {
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C3_L1_PREFIX, 16711701L);
     assertRoute(routesByNode, OSPF_IA, C1_NAME, C4_L0_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C4_L1_PREFIX, 16711701L);
-    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 16711681L);
-    assertRoute(routesByNode, OSPF_IA, C1_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX, 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C1_NAME, C3_E3_4_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C2_NAME, C1_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C1_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C3_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C4_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C4_L1_PREFIX, 65556L);
-    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 65536L);
+    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_L0_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C1_L1_PREFIX, 16711701L);
     assertRoute(routesByNode, OSPF, C3_NAME, C2_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C2_L1_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C3_NAME, C4_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C4_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_L0_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C1_L1_PREFIX, 16711702L);
     assertRoute(routesByNode, OSPF, C4_NAME, C2_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C2_L1_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF, C4_NAME, C3_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C3_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 16711682L);
-    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 2L);
+    assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_E1_2_PREFIX, 16711682L);
+    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX, 2L);
   }
 
   @Test
@@ -461,30 +460,30 @@ public class OspfTest {
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C3_L1_PREFIX, 16711701L);
     assertRoute(routesByNode, OSPF_IA, C1_NAME, C4_L0_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C4_L1_PREFIX, 16711701L);
-    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 16711681L);
-    assertRoute(routesByNode, OSPF_IA, C1_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX, 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C1_NAME, C3_E3_4_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C2_NAME, C1_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C1_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C3_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C4_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C4_L1_PREFIX, 65556L);
-    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 65536L);
+    assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_L0_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C1_L1_PREFIX, 16711701L);
     assertRoute(routesByNode, OSPF, C3_NAME, C2_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C2_L1_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C3_NAME, C4_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C4_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_L0_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C1_L1_PREFIX, 16711702L);
     assertRoute(routesByNode, OSPF, C4_NAME, C2_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C2_L1_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF, C4_NAME, C3_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C3_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 16711682L);
-    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 2L);
+    assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_E1_2_PREFIX, 16711682L);
+    assertRoute(routesByNode, OSPF, C4_NAME, C2_E2_3_PREFIX, 2L);
   }
 
   @Test
@@ -508,30 +507,30 @@ public class OspfTest {
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C3_L1_PREFIX, 16711701);
     assertRoute(routesByNode, OSPF_IA, C1_NAME, C4_L0_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C4_L1_PREFIX, 16711701L);
-    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 16711681L);
-    assertRoute(routesByNode, OSPF_IA, C1_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX, 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C1_NAME, C3_E3_4_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C2_NAME, C1_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C1_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C3_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF_IA, C2_NAME, C4_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C4_L1_PREFIX, 65556L);
-    assertRoute(routesByNode, OSPF_IA, C2_NAME, C3_E3_4_PREFIX.getNetworkPrefix(), 65536L);
+    assertRoute(routesByNode, OSPF_IA, C2_NAME, C3_E3_4_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_L0_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C1_L1_PREFIX, 16711701L);
     assertRoute(routesByNode, OSPF, C3_NAME, C2_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C2_L1_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C3_NAME, C4_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C4_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_L0_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C1_L1_PREFIX, 16711702L);
     assertRoute(routesByNode, OSPF_IA, C4_NAME, C2_L0_PREFIX, 65537L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C2_L1_PREFIX, 16711682L);
     assertRoute(routesByNode, OSPF_IA, C4_NAME, C3_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C3_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 16711682L);
-    assertRoute(routesByNode, OSPF_IA, C4_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 2L);
+    assertRoute(routesByNode, OSPF_IA, C4_NAME, C1_E1_2_PREFIX, 16711682L);
+    assertRoute(routesByNode, OSPF_IA, C4_NAME, C2_E2_3_PREFIX, 2L);
   }
 
   @Test
@@ -555,29 +554,29 @@ public class OspfTest {
     assertRoute(routesByNode, OSPF_E1, C1_NAME, C3_L1_PREFIX, 16711701L);
     assertNoRoute(routesByNode, C1_NAME, C4_L0_PREFIX);
     assertNoRoute(routesByNode, C1_NAME, C4_L1_PREFIX);
-    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX.getNetworkPrefix(), 16711681L);
-    assertNoRoute(routesByNode, C1_NAME, C3_E3_4_PREFIX.getNetworkPrefix());
+    assertRoute(routesByNode, OSPF_IA, C1_NAME, C2_E2_3_PREFIX, 16711681L);
+    assertNoRoute(routesByNode, C1_NAME, C3_E3_4_PREFIX);
     assertRoute(routesByNode, OSPF, C2_NAME, C1_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C1_L1_PREFIX, 65555L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C2_NAME, C3_L1_PREFIX, 65555L);
     assertNoRoute(routesByNode, C2_NAME, C4_L0_PREFIX);
     assertNoRoute(routesByNode, C2_NAME, C4_L1_PREFIX);
-    assertNoRoute(routesByNode, C2_NAME, C3_E3_4_PREFIX.getNetworkPrefix());
+    assertNoRoute(routesByNode, C2_NAME, C3_E3_4_PREFIX);
     assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_L0_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C1_L1_PREFIX, 16711701L);
     assertRoute(routesByNode, OSPF, C3_NAME, C2_L0_PREFIX, 65536L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C2_L1_PREFIX, 16711681L);
     assertRoute(routesByNode, OSPF, C3_NAME, C4_L0_PREFIX, 2L);
     assertRoute(routesByNode, OSPF_E1, C3_NAME, C4_L1_PREFIX, 21L);
-    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX.getNetworkPrefix(), 16711681L);
+    assertRoute(routesByNode, OSPF_IA, C3_NAME, C1_E1_2_PREFIX, 16711681L);
     assertNoRoute(routesByNode, C4_NAME, C1_L0_PREFIX);
     assertNoRoute(routesByNode, C4_NAME, C1_L1_PREFIX);
     assertNoRoute(routesByNode, C4_NAME, C2_L0_PREFIX);
     assertNoRoute(routesByNode, C4_NAME, C2_L1_PREFIX);
     assertNoRoute(routesByNode, C4_NAME, C3_L0_PREFIX);
     assertRoute(routesByNode, OSPF_E1, C4_NAME, C3_L1_PREFIX, 21L);
-    assertNoRoute(routesByNode, C4_NAME, C1_E1_2_PREFIX.getNetworkPrefix());
-    assertNoRoute(routesByNode, C4_NAME, C2_E2_3_PREFIX.getNetworkPrefix());
+    assertNoRoute(routesByNode, C4_NAME, C1_E1_2_PREFIX);
+    assertNoRoute(routesByNode, C4_NAME, C2_E2_3_PREFIX);
   }
 }

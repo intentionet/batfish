@@ -18,6 +18,7 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.StaticRoute;
 import org.codehaus.jettison.json.JSONArray;
@@ -204,7 +205,7 @@ public class Instance implements AwsVpcEntity, Serializable {
             "Network interface " + interfaceId + " for instance " + _instanceId + " not found");
       }
 
-      ImmutableSortedSet.Builder<Prefix> ifacePrefixesBuilder =
+      ImmutableSortedSet.Builder<NetworkAddress> ifaceAddressesBuilder =
           new ImmutableSortedSet.Builder<>(Comparator.naturalOrder());
 
       Subnet subnet = region.getSubnets().get(netInterface.getSubnetId());
@@ -228,12 +229,12 @@ public class Instance implements AwsVpcEntity, Serializable {
           throw new BatfishException(
               "Expected end address: " + ip + " to be used by generated subnet node");
         }
-        Prefix prefix = new Prefix(ip, ifaceSubnet.getPrefixLength());
-        ifacePrefixesBuilder.add(prefix);
+        NetworkAddress address = new NetworkAddress(ip, ifaceSubnet.getPrefixLength());
+        ifaceAddressesBuilder.add(address);
       }
-      SortedSet<Prefix> ifacePrefixes = ifacePrefixesBuilder.build();
-      Interface iface = Utils.newInterface(interfaceId, cfgNode, ifacePrefixes.first());
-      iface.setAllAddresses(ifacePrefixes);
+      SortedSet<NetworkAddress> ifaceAddresses = ifaceAddressesBuilder.build();
+      Interface iface = Utils.newInterface(interfaceId, cfgNode, ifaceAddresses.first());
+      iface.setAllAddresses(ifaceAddresses);
 
       // apply ACLs to interface
       iface.setIncomingFilter(_inAcl);

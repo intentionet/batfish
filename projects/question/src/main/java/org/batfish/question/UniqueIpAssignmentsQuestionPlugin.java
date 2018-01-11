@@ -15,7 +15,7 @@ import org.batfish.common.plugin.Plugin;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.collections.MultiSet;
 import org.batfish.datamodel.collections.NodeInterfacePair;
@@ -148,7 +148,7 @@ public class UniqueIpAssignmentsQuestionPlugin extends QuestionPlugin {
         }
         Configuration c = e.getValue();
         for (Interface iface : c.getInterfaces().values()) {
-          for (Prefix prefix : iface.getAllAddresses()) {
+          for (NetworkAddress prefix : iface.getAllAddresses()) {
             Ip ip = prefix.getAddress();
             allIps.add(ip);
             if (iface.getActive()) {
@@ -166,7 +166,7 @@ public class UniqueIpAssignmentsQuestionPlugin extends QuestionPlugin {
         for (Entry<String, Interface> e2 : c.getInterfaces().entrySet()) {
           String interfaceName = e2.getKey();
           Interface iface = e2.getValue();
-          for (Prefix prefix : iface.getAllAddresses()) {
+          for (NetworkAddress prefix : iface.getAllAddresses()) {
             Ip ip = prefix.getAddress();
             if (allIps.count(ip) != 1) {
               answerElement.add(answerElement.getAllIps(), ip, hostname, interfaceName);
