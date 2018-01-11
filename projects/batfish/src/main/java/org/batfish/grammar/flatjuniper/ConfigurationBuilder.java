@@ -1849,7 +1849,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       _currentPsTerm.getFroms().add(from);
     }
     if (ctx.IP_PREFIX() != null) {
-      _currentRouteFilterPrefix = new Prefix(ctx.IP_PREFIX().getText());
+      _currentRouteFilterPrefix = Prefix.fromString(ctx.IP_PREFIX().getText());
       _currentRouteFilter.setIpv4(true);
     } else if (ctx.IPV6_PREFIX() != null) {
       _currentRoute6FilterPrefix = new Prefix6(ctx.IPV6_PREFIX().getText());
@@ -1921,7 +1921,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void enterPopsfrf_through(Popsfrf_throughContext ctx) {
     if (_currentRouteFilterPrefix != null) { // ipv4
-      Prefix throughPrefix = new Prefix(ctx.IP_PREFIX().getText());
+      Prefix throughPrefix = Prefix.fromString(ctx.IP_PREFIX().getText());
       Route4FilterLine line = new Route4FilterLineThrough(_currentRouteFilterPrefix, throughPrefix);
       _currentRouteFilterLine = _currentRouteFilter.insertLine(line, Route4FilterLine.class);
     } else if (_currentRoute6FilterPrefix != null) { // ipv6
@@ -1955,7 +1955,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void enterRo_aggregate(Ro_aggregateContext ctx) {
     if (ctx.prefix != null) {
-      Prefix prefix = new Prefix(ctx.IP_PREFIX().getText());
+      Prefix prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
       Map<Prefix, AggregateRoute> aggregateRoutes = _currentRib.getAggregateRoutes();
       _currentAggregateRoute = aggregateRoutes.computeIfAbsent(prefix, AggregateRoute::new);
     } else {
@@ -1966,7 +1966,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void enterRo_generate(Ro_generateContext ctx) {
     if (ctx.IP_PREFIX() != null) {
-      Prefix prefix = new Prefix(ctx.IP_PREFIX().getText());
+      Prefix prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
       Map<Prefix, GeneratedRoute> generatedRoutes = _currentRib.getGeneratedRoutes();
       _currentGeneratedRoute = generatedRoutes.computeIfAbsent(prefix, GeneratedRoute::new);
     } else if (ctx.IPV6_PREFIX() != null) {
@@ -1986,7 +1986,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void enterRos_route(Ros_routeContext ctx) {
     if (ctx.IP_PREFIX() != null) {
-      Prefix prefix = new Prefix(ctx.IP_PREFIX().getText());
+      Prefix prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
       Map<Prefix, StaticRoute> staticRoutes = _currentRib.getStaticRoutes();
       _currentStaticRoute = staticRoutes.computeIfAbsent(prefix, StaticRoute::new);
     } else if (ctx.IPV6_PREFIX() != null) {
@@ -2422,7 +2422,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     if (ctx.IP_ADDRESS() != null || ctx.IP_PREFIX() != null) {
       Prefix prefix;
       if (ctx.IP_PREFIX() != null) {
-        prefix = new Prefix(ctx.IP_PREFIX().getText());
+        prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
       } else {
         prefix = new Prefix(new Ip(ctx.IP_ADDRESS().getText()), Prefix.MAX_PREFIX_LENGTH);
       }
@@ -2587,7 +2587,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     if (ctx.IP_ADDRESS() != null || ctx.IP_PREFIX() != null) {
       Prefix prefix;
       if (ctx.IP_PREFIX() != null) {
-        prefix = new Prefix(ctx.IP_PREFIX().getText());
+        prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
       } else {
         prefix = new Prefix(new Ip(ctx.IP_ADDRESS().getText()), Prefix.MAX_PREFIX_LENGTH);
       }
@@ -2685,7 +2685,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       Ip nextIp = new Ip(ctx.ip.getText());
       nextPrefix = new Prefix(nextIp, 32);
     } else {
-      nextPrefix = new Prefix(ctx.prefix.getText());
+      nextPrefix = Prefix.fromString(ctx.prefix.getText());
     }
     FwThenNextIp then = new FwThenNextIp(nextPrefix);
     _currentFwTerm.getThens().add(then);
@@ -3012,7 +3012,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitPoplt_network(Poplt_networkContext ctx) {
-    Prefix prefix = new Prefix(ctx.network.getText());
+    Prefix prefix = Prefix.fromString(ctx.network.getText());
     _currentPrefixList.getPrefixes().add(prefix);
   }
 
@@ -3705,7 +3705,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void exitSezsa_address(Sezsa_addressContext ctx) {
     String name = ctx.name.getText();
-    Prefix prefix = new Prefix(ctx.IP_PREFIX().getText());
+    Prefix prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
     AddressBookEntry addressEntry = new AddressAddressBookEntry(name, prefix);
     _currentZone.getAddressBook().getEntries().put(name, addressEntry);
   }

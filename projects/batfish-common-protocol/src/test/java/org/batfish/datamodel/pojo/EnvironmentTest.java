@@ -39,7 +39,7 @@ public class EnvironmentTest {
     bgpAdvertisements.add(
         new BgpAdvertisement(
             BgpAdvertisementType.EBGP_SENT,
-            new Prefix("1.1.1.1/24"),
+            Prefix.fromString("1.1.1.1/24"),
             new Ip("1.1.1.1"),
             "srcNode",
             "srcVrf",

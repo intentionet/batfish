@@ -381,7 +381,7 @@ public class Client extends AbstractClient implements IClient {
           throw new BatfishException(
               String.format("A Batfish %s must be a JSON string", expectedType.getName()));
         }
-        new Prefix(value.textValue());
+        Prefix.fromString(value.textValue());
         break;
       case PREFIX_RANGE:
         if (!value.isTextual()) {

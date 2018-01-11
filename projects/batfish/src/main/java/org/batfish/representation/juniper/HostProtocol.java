@@ -199,7 +199,8 @@ public enum HostProtocol {
           line.setIpProtocols(Collections.singleton(IpProtocol.UDP));
           line.setDstPorts(
               Collections.singleton(new SubRange(NamedPort.SAP.number(), NamedPort.SAP.number())));
-          line.setDstIps(Collections.singleton(new IpWildcard(new Prefix("224.2.127.285/32"))));
+          line.setDstIps(
+              Collections.singleton(new IpWildcard(Prefix.fromString("224.2.127.285/32"))));
           break;
         }
 

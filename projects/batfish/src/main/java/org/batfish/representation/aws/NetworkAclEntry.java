@@ -26,7 +26,7 @@ public class NetworkAclEntry implements Serializable {
   private final int _toPort;
 
   public NetworkAclEntry(JSONObject jObj, BatfishLogger logger) throws JSONException {
-    _cidrBlock = new Prefix(jObj.getString(AwsVpcEntity.JSON_KEY_CIDR_BLOCK));
+    _cidrBlock = Prefix.fromString(jObj.getString(AwsVpcEntity.JSON_KEY_CIDR_BLOCK));
 
     _isAllow = jObj.getString(AwsVpcEntity.JSON_KEY_RULE_ACTION).equals("allow") ? true : false;
 

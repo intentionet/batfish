@@ -19,13 +19,13 @@ public class RipInternalRibTest {
     RipInternalRib rib = new RipInternalRib(null);
     RipInternalRoute r1 =
         new RipInternalRoute(
-            new Prefix("10.1.0.0/16"),
+            Prefix.fromString("10.1.0.0/16"),
             Ip.AUTO,
             RoutingProtocol.RIP.getDefaultAdministrativeCost(ConfigurationFormat.CISCO_IOS),
             10);
     RipInternalRoute r2 =
         new RipInternalRoute(
-            new Prefix("10.1.0.0/16"),
+            Prefix.fromString("10.1.0.0/16"),
             Ip.AUTO,
             RoutingProtocol.RIP.getDefaultAdministrativeCost(ConfigurationFormat.CISCO_IOS),
             12);

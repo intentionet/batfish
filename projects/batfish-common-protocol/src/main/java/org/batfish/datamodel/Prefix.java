@@ -3,6 +3,7 @@ package org.batfish.datamodel;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
+import javax.annotation.Nonnull;
 import org.batfish.common.BatfishException;
 
 public final class Prefix implements Comparable<Prefix>, Serializable {
@@ -47,29 +48,24 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
     _prefixLength = prefixLength;
   }
 
-  public Prefix(Ip address, Ip mask) {
-    if (address == null) {
-      throw new BatfishException("Cannot create prefix with null network");
-    }
-    if (mask == null) {
-      throw new BatfishException("Cannot create prefix with null mask");
-    }
-    _address = address;
-    _prefixLength = mask.numSubnetBits();
+  public Prefix(@Nonnull Ip address, @Nonnull Ip mask) {
+    this(address, mask.numSubnetBits());
   }
 
   @JsonCreator
-  public Prefix(String text) {
+  public static Prefix fromString(String text) {
     String[] parts = text.split("/");
     if (parts.length != 2) {
       throw new BatfishException("Invalid prefix string: \"" + text + "\"");
     }
-    _address = new Ip(parts[0]);
+    Ip ip = new Ip(parts[0]);
+    int prefixLength;
     try {
-      _prefixLength = Integer.parseInt(parts[1]);
+      prefixLength = Integer.parseInt(parts[1]);
     } catch (NumberFormatException e) {
       throw new BatfishException("Invalid prefix length: \"" + parts[1] + "\"", e);
     }
+    return new Prefix(ip, prefixLength);
   }
 
   @Override

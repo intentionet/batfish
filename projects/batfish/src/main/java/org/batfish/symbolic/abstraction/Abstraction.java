@@ -186,7 +186,7 @@ public class Abstraction {
 
   private void extractPrefixesFromHeaderSpace(List<Prefix> dstIps, List<Prefix> notDstIps) {
     if (_headerspace == null || _headerspace.getDstIps().isEmpty()) {
-      dstIps.add(new Prefix("0.0.0.0/0"));
+      dstIps.add(Prefix.ZERO);
     } else {
       for (IpWildcard ip : _headerspace.getDstIps()) {
         if (!ip.isPrefix()) {

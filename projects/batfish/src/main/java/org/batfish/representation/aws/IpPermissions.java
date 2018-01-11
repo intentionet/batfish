@@ -66,7 +66,7 @@ public class IpPermissions implements Serializable {
 
     for (int index = 0; index < ranges.length(); index++) {
       JSONObject childObject = ranges.getJSONObject(index);
-      _ipRanges.add(new Prefix(childObject.getString(AwsVpcEntity.JSON_KEY_CIDR_IP)));
+      _ipRanges.add(Prefix.fromString(childObject.getString(AwsVpcEntity.JSON_KEY_CIDR_IP)));
     }
   }
 

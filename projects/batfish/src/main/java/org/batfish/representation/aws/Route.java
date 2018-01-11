@@ -45,7 +45,7 @@ public class Route implements Serializable {
 
   public Route(JSONObject jObj, BatfishLogger logger) throws JSONException {
     _destinationCidrBlock =
-        new Prefix(jObj.getString(AwsVpcEntity.JSON_KEY_DESTINATION_CIDR_BLOCK));
+        Prefix.fromString(jObj.getString(AwsVpcEntity.JSON_KEY_DESTINATION_CIDR_BLOCK));
     _state = State.valueOf(jObj.getString(AwsVpcEntity.JSON_KEY_STATE).toUpperCase());
 
     if (jObj.has(AwsVpcEntity.JSON_KEY_VPC_PEERING_CONNECTION_ID)) {

@@ -31,7 +31,7 @@ public class AbstractRibTest {
    */
   private AbstractRib<StaticRoute> _rib;
   private static final StaticRoute _mostGeneralRoute =
-      new StaticRoute(new Prefix("0.0.0.0/0"), Ip.ZERO, null, 0, 0);
+      new StaticRoute(Prefix.ZERO, Ip.ZERO, null, 0, 0);
   @Rule public ExpectedException _expectedException = ExpectedException.none();
 
   @Before
@@ -57,7 +57,7 @@ public class AbstractRibTest {
     // Check that containsRoute works as expected for this simple case
     assertThat(_rib.containsRoute(_mostGeneralRoute), is(true));
     assertThat(
-        _rib.containsRoute(new StaticRoute(new Prefix("1.1.1.1/32"), Ip.ZERO, null, 0, 0)),
+        _rib.containsRoute(new StaticRoute(Prefix.fromString("1.1.1.1/32"), Ip.ZERO, null, 0, 0)),
         is(false));
   }
 
@@ -70,7 +70,7 @@ public class AbstractRibTest {
 
     // Test: merge the routes into the RIB
     for (String prefixStr : testPrefixes) {
-      StaticRoute r = new StaticRoute(new Prefix(prefixStr), Ip.ZERO, null, 0, 0);
+      StaticRoute r = new StaticRoute(Prefix.fromString(prefixStr), Ip.ZERO, null, 0, 0);
       _rib.mergeRoute(r);
       routes.add(r);
     }
@@ -81,7 +81,7 @@ public class AbstractRibTest {
   @Test
   public void testRepeatedAdd() {
     // Setup
-    StaticRoute route = new StaticRoute(new Prefix("10.0.0.0/11"), Ip.ZERO, null, 0, 0);
+    StaticRoute route = new StaticRoute(Prefix.fromString("10.0.0.0/11"), Ip.ZERO, null, 0, 0);
 
     // Test
     for (int i = 0; i < 5; i++) {
@@ -102,8 +102,8 @@ public class AbstractRibTest {
   @Test
   public void testNonOverlappingRouteAdd() {
     // Setup
-    StaticRoute r1 = new StaticRoute(new Prefix("1.1.1.1/32"), Ip.ZERO, null, 0, 0);
-    StaticRoute r2 = new StaticRoute(new Prefix("128.1.1.1/32"), Ip.ZERO, null, 0, 0);
+    StaticRoute r1 = new StaticRoute(Prefix.fromString("1.1.1.1/32"), Ip.ZERO, null, 0, 0);
+    StaticRoute r2 = new StaticRoute(Prefix.fromString("128.1.1.1/32"), Ip.ZERO, null, 0, 0);
 
     // Test:
     _rib.mergeRoute(r1);
@@ -199,7 +199,7 @@ public class AbstractRibTest {
   public void testGetRoutesWithReplacement() {
     // Use OSPF RIBs for this, as routes with better metric can replace other routes
     OspfIntraAreaRib rib = new OspfIntraAreaRib(null);
-    Prefix prefix = new Prefix("1.1.1.1/32");
+    Prefix prefix = Prefix.fromString("1.1.1.1/32");
     rib.mergeRoute(new OspfIntraAreaRoute(prefix, null, 100, 30, 1));
 
     assertThat(rib.getRoutes(), hasSize(1));
@@ -209,7 +209,7 @@ public class AbstractRibTest {
     assertThat(rib.getRoutes(), contains(newRoute));
 
     // Add completely new route and check that the size increases
-    rib.mergeRoute(new OspfIntraAreaRoute(new Prefix("2.2.2.2/32"), null, 100, 30, 1));
+    rib.mergeRoute(new OspfIntraAreaRoute(Prefix.fromString("2.2.2.2/32"), null, 100, 30, 1));
     assertThat(rib.getRoutes(), hasSize(2));
   }
 
@@ -218,7 +218,7 @@ public class AbstractRibTest {
   public void testGetRoutesCannotBeModified() {
     _rib.mergeRoute(_mostGeneralRoute);
     Set<StaticRoute> routes = _rib.getRoutes();
-    StaticRoute r1 = new StaticRoute(new Prefix("1.1.1.1/32"), Ip.ZERO, null, 0, 0);
+    StaticRoute r1 = new StaticRoute(Prefix.fromString("1.1.1.1/32"), Ip.ZERO, null, 0, 0);
 
     // Exception because ImmutableSet
     _expectedException.expect(UnsupportedOperationException.class);
@@ -230,7 +230,7 @@ public class AbstractRibTest {
   public void testGetRoutesIsNotAView() {
     _rib.mergeRoute(_mostGeneralRoute);
     Set<StaticRoute> routes = _rib.getRoutes();
-    StaticRoute r1 = new StaticRoute(new Prefix("1.1.1.1/32"), Ip.ZERO, null, 0, 0);
+    StaticRoute r1 = new StaticRoute(Prefix.fromString("1.1.1.1/32"), Ip.ZERO, null, 0, 0);
 
     _rib.mergeRoute(r1);
 

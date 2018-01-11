@@ -25,11 +25,11 @@ public class VpcPeeringConnection implements AwsVpcEntity, Serializable {
 
     JSONObject accepterJson = jObj.getJSONObject(JSON_KEY_ACCEPTER_VPC_INFO);
     _accepterVpcId = accepterJson.getString(JSON_KEY_VPC_ID);
-    _accepterVpcCidrBlock = new Prefix(accepterJson.getString(JSON_KEY_CIDR_BLOCK));
+    _accepterVpcCidrBlock = Prefix.fromString(accepterJson.getString(JSON_KEY_CIDR_BLOCK));
 
     JSONObject requesterJson = jObj.getJSONObject(JSON_KEY_REQUESTER_VPC_INFO);
     _requesterVpcId = requesterJson.getString(JSON_KEY_VPC_ID);
-    _requesterVpcCidrBlock = new Prefix(requesterJson.getString(JSON_KEY_CIDR_BLOCK));
+    _requesterVpcCidrBlock = Prefix.fromString(requesterJson.getString(JSON_KEY_CIDR_BLOCK));
   }
 
   public Prefix getAccepterVpcCidrBlock() {

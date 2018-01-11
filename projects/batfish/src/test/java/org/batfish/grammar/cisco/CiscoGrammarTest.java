@@ -103,14 +103,14 @@ public class CiscoGrammarTest {
         r1.getDefaultVrf()
             .getBgpProcess()
             .getNeighbors()
-            .get(new Prefix("1.2.0.2/32"))
+            .get(Prefix.fromString("1.2.0.2/32"))
             .getRemoteBgpNeighbor(),
         is(notNullValue()));
     assertThat(
         r2.getDefaultVrf()
             .getBgpProcess()
             .getNeighbors()
-            .get(new Prefix("1.2.0.1/32"))
+            .get(Prefix.fromString("1.2.0.1/32"))
             .getRemoteBgpNeighbor(),
         is(notNullValue()));
   }
@@ -185,7 +185,7 @@ public class CiscoGrammarTest {
     SortedSet<AbstractRoute> r3Routes = routes.get("r3").get(Configuration.DEFAULT_VRF_NAME);
     Set<Prefix> r3Prefixes =
         r3Routes.stream().map(AbstractRoute::getNetwork).collect(Collectors.toSet());
-    Prefix r1Loopback = new Prefix("1.1.1.1/32");
+    Prefix r1Loopback = Prefix.fromString("1.1.1.1/32");
     assertTrue(r3Prefixes.contains(r1Loopback));
 
     // check that private AS is present in path in received 1.1.1.1/32 advert on r2

@@ -46,7 +46,7 @@ public class PrefixSpaceTest {
 
   @Test
   public void addPrefixTest() {
-    Prefix prefix = new Prefix("100.0.0.0/32");
+    Prefix prefix = Prefix.fromString("100.0.0.0/32");
     _ps.addPrefix(prefix);
     assertThat(_ps.getPrefixRanges().size(), equalTo(1));
     assertThat(_ps.containsPrefix(prefix), equalTo(true));
@@ -61,27 +61,27 @@ public class PrefixSpaceTest {
     assertThat(_ps.containsPrefixRange(range), equalTo(true));
     assertThat(
         "Shorter prefixes not included",
-        _ps.containsPrefix(new Prefix("10.10.10.0/15")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.0/15")),
         equalTo(false));
     assertThat(
         "Shortest prefix is included",
-        _ps.containsPrefix(new Prefix("10.10.10.0/16")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.0/16")),
         equalTo(true));
     assertThat(
         "Longest prefix is included",
-        _ps.containsPrefix(new Prefix("10.10.10.0/24")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.0/24")),
         equalTo(true));
     assertThat(
         "Longer prefixes not included",
-        _ps.containsPrefix(new Prefix("10.10.10.0/25")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.0/25")),
         equalTo(false));
     assertThat(
         "Prefixes with mismatch in masked bits not included",
-        _ps.containsPrefix(new Prefix("10.10.11.0/24")),
+        _ps.containsPrefix(Prefix.fromString("10.10.11.0/24")),
         equalTo(false));
     assertThat(
         "Prefixes with mismatch in unmasked bits included",
-        _ps.containsPrefix(new Prefix("10.10.10.255/24")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.255/24")),
         equalTo(true));
   }
 
@@ -97,28 +97,28 @@ public class PrefixSpaceTest {
 
   @Test
   public void containsPrefixTest() {
-    Prefix prefix = new Prefix("10.10.10.0/24");
+    Prefix prefix = Prefix.fromString("10.10.10.0/24");
     _ps.addPrefix(prefix);
 
     assertThat(
         "Shorter prefixes not included",
-        _ps.containsPrefix(new Prefix("10.10.10.0/20")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.0/20")),
         equalTo(false));
     assertThat(
         "Exact given prefix is included",
-        _ps.containsPrefix(new Prefix("10.10.10.0/24")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.0/24")),
         equalTo(true));
     assertThat(
         "Longer prefixes not included",
-        _ps.containsPrefix(new Prefix("10.10.10.0/26")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.0/26")),
         equalTo(false));
     assertThat(
         "Prefixes with mismatch in masked bits not included",
-        _ps.containsPrefix(new Prefix("10.10.11.0/24")),
+        _ps.containsPrefix(Prefix.fromString("10.10.11.0/24")),
         equalTo(false));
     assertThat(
         "Prefixes with mismatch in unmasked bits included",
-        _ps.containsPrefix(new Prefix("10.10.10.255/24")),
+        _ps.containsPrefix(Prefix.fromString("10.10.10.255/24")),
         equalTo(true));
   }
 
@@ -178,11 +178,11 @@ public class PrefixSpaceTest {
     PrefixSpace intersection = _ps.intersection(other);
     assertThat(
         "now intersect for length 18",
-        intersection.containsPrefix(new Prefix("10.10.0.0/18")),
+        intersection.containsPrefix(Prefix.fromString("10.10.0.0/18")),
         equalTo(true));
     assertThat(
         "now intersect for length 19",
-        intersection.containsPrefix(new Prefix("10.10.0.0/19")),
+        intersection.containsPrefix(Prefix.fromString("10.10.0.0/19")),
         equalTo(true));
     assertThat(
         "now intersect for range 18-20",

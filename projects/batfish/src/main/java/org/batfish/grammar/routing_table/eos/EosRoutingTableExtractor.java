@@ -88,7 +88,7 @@ public class EosRoutingTableExtractor extends EosRoutingTableParserBaseListener
       initVrf(_currentVrfName);
     }
     RoutingProtocol protocol = toProtocol(ctx.protocol());
-    Prefix prefix = new Prefix(ctx.IP_PREFIX().getText());
+    Prefix prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
     int admin;
     int cost;
     Ip nextHopIp;

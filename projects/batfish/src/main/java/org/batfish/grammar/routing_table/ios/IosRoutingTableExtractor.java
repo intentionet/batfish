@@ -94,7 +94,7 @@ public class IosRoutingTableExtractor extends IosRoutingTableParserBaseListener
     if (protocol == RoutingProtocol.LOCAL) {
       return;
     }
-    Prefix prefix = new Prefix(ctx.IP_PREFIX().getText());
+    Prefix prefix = Prefix.fromString(ctx.IP_PREFIX().getText());
     int admin;
     int cost;
     List<String> nextHopInterfaces =

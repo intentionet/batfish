@@ -32,7 +32,7 @@ public class Subnet implements AwsVpcEntity, Serializable {
   private transient String _vpnGatewayId;
 
   public Subnet(JSONObject jObj, BatfishLogger logger) throws JSONException {
-    _cidrBlock = new Prefix(jObj.getString(JSON_KEY_CIDR_BLOCK));
+    _cidrBlock = Prefix.fromString(jObj.getString(JSON_KEY_CIDR_BLOCK));
     _subnetId = jObj.getString(JSON_KEY_SUBNET_ID);
     _vpcId = jObj.getString(JSON_KEY_VPC_ID);
   }

@@ -84,7 +84,7 @@ public class VirtualRouterTest {
   private static final ConfigurationFormat FORMAT = ConfigurationFormat.CISCO_IOS;
   private static final int TEST_METRIC = 30;
   private static final Ip TEST_SRC_IP = new Ip("1.1.1.1");
-  private static final Prefix TEST_NETWORK = new Prefix("4.4.4.4/32");
+  private static final Prefix TEST_NETWORK = Prefix.fromString("4.4.4.4/32");
   private static final Ip TEST_NEXT_HOP_IP1 = new Ip("1.2.3.4");
   private static final Ip TEST_NEXT_HOP_IP2 = new Ip("2.3.4.5");
   private static final String TEST_VIRTUAL_ROUTER_NAME = "testvirtualrouter";
@@ -353,7 +353,7 @@ public class VirtualRouterTest {
 
   @Test
   public void testGetBetterOspfRouteMetric() {
-    Prefix ospfInterAreaRoutePrefix = new Prefix("1.1.1.1/24");
+    Prefix ospfInterAreaRoutePrefix = Prefix.fromString("1.1.1.1/24");
     long definedMetric = 5;
     long definedArea = 1;
     OspfInterAreaRoute route =
@@ -387,7 +387,7 @@ public class VirtualRouterTest {
     // The route is not in the area's prefix, return the current metric
     assertThat(
         VirtualRouter.computeUpdatedOspfSummaryMetric(
-            route, new Prefix("2.0.0.0/8"), 4L, definedArea, true),
+            route, Prefix.fromString("2.0.0.0/8"), 4L, definedArea, true),
         equalTo(4L));
 
     OspfInterAreaRoute sameAreaRoute =
@@ -525,7 +525,7 @@ public class VirtualRouterTest {
     int adminCost =
         RoutingProtocol.OSPF.getDefaultAdministrativeCost(testRouter._c.getConfigurationFormat());
 
-    Prefix prefix = new Prefix("7.7.7.0/24");
+    Prefix prefix = Prefix.fromString("7.7.7.0/24");
     OspfIntraAreaRoute route = new OspfIntraAreaRoute(prefix, new Ip("7.7.1.1"), adminCost, 20, 1);
     exportingRouter._ospfIntraAreaRib.mergeRoute(route);
 
@@ -614,7 +614,7 @@ public class VirtualRouterTest {
     int admin = 50;
     int metric = 100;
     long area = 1L;
-    Prefix prefix = new Prefix("7.7.7.0/24");
+    Prefix prefix = Prefix.fromString("7.7.7.0/24");
     OspfInterAreaRoute iaroute =
         new OspfInterAreaRoute(prefix, new Ip("7.7.1.1"), admin, metric, area);
 
@@ -635,7 +635,8 @@ public class VirtualRouterTest {
     VirtualRouter vr = makeIosVirtualRouter(null);
     vr.initRibs();
     SortedSet<StaticRoute> routeSet =
-        ImmutableSortedSet.of(new StaticRoute(new Prefix("1.1.1.1/32"), Ip.ZERO, null, 1, 0));
+        ImmutableSortedSet.of(
+            new StaticRoute(Prefix.fromString("1.1.1.1/32"), Ip.ZERO, null, 1, 0));
     vr._vrf.setStaticRoutes(routeSet);
 
     // Test

@@ -75,7 +75,7 @@ public class NxosRoutingTableExtractor extends NxosRoutingTableParserBaseListene
 
   @Override
   public void enterNetwork(NetworkContext ctx) {
-    _currentPrefix = new Prefix(ctx.IP_PREFIX().getText());
+    _currentPrefix = Prefix.fromString(ctx.IP_PREFIX().getText());
   }
 
   @Override

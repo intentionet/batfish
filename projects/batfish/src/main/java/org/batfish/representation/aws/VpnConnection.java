@@ -174,7 +174,7 @@ public class VpnConnection implements AwsVpcEntity, Serializable {
       JSONArray routes = jObj.getJSONArray(JSON_KEY_ROUTES);
       for (int index = 0; index < routes.length(); index++) {
         JSONObject childObject = routes.getJSONObject(index);
-        _routes.add(new Prefix(childObject.getString(JSON_KEY_DESTINATION_CIDR_BLOCK)));
+        _routes.add(Prefix.fromString(childObject.getString(JSON_KEY_DESTINATION_CIDR_BLOCK)));
       }
     }
 

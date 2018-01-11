@@ -212,7 +212,7 @@ public class IptablesControlPlaneExtractor extends IptablesParserBaseListener
     if (endpoint.IP_ADDRESS() != null) {
       return new Ip(endpoint.IP_ADDRESS().getText());
     } else if (endpoint.IP_PREFIX() != null) {
-      return new Prefix(endpoint.IP_PREFIX().getText());
+      return Prefix.fromString(endpoint.IP_PREFIX().getText());
     } else if (endpoint.IPV6_ADDRESS() != null) {
       // return new Ip6(endpoint.IPV6_ADDRESS().getText());
       todo(endpoint, "IPV6 address as endpoint");

@@ -541,7 +541,7 @@ public class Hierarchy {
               Prefix6 prefix6 = new Prefix6(candidatePrefix);
               finalPrefixStr = prefix6.toString();
             } else {
-              Prefix prefix = new Prefix(candidatePrefix);
+              Prefix prefix = Prefix.fromString(candidatePrefix);
               finalPrefixStr = prefix.toString();
             }
           } else {

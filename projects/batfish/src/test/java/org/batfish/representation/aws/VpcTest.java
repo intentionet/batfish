@@ -24,8 +24,8 @@ public class VpcTest {
 
     Vpc vpc = new Vpc(vpcArray.getJSONObject(0), null);
 
-    Prefix p1 = new Prefix("10.100.0.0/16");
-    Prefix p2 = new Prefix("10.200.0.0/16");
+    Prefix p1 = Prefix.fromString("10.100.0.0/16");
+    Prefix p2 = Prefix.fromString("10.200.0.0/16");
     assertThat(vpc.getCidrBlock(), equalTo(p1));
     assertThat(vpc.getCidrBlockAssociations(), hasSize(2));
     assertThat(vpc.getCidrBlockAssociations(), hasItem(p1));

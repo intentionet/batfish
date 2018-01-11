@@ -28,12 +28,12 @@ public class Vpc implements AwsVpcEntity, Serializable {
 
   public Vpc(JSONObject jObj, BatfishLogger logger) throws JSONException {
     _vpcId = jObj.getString(JSON_KEY_VPC_ID);
-    _cidrBlock = new Prefix(jObj.getString(JSON_KEY_CIDR_BLOCK));
+    _cidrBlock = Prefix.fromString(jObj.getString(JSON_KEY_CIDR_BLOCK));
     _cidrBlockAssociations = new HashSet<>();
     JSONArray cidrArray = jObj.getJSONArray(JSON_KEY_CIDR_BLOCK_ASSOCIATION_SET);
     for (int index = 0; index < cidrArray.length(); index++) {
       String cidrBlock = cidrArray.getJSONObject(index).getString(JSON_KEY_CIDR_BLOCK);
-      _cidrBlockAssociations.add(new Prefix(cidrBlock));
+      _cidrBlockAssociations.add(Prefix.fromString(cidrBlock));
     }
   }
 
