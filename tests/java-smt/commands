@@ -9,7 +9,9 @@ add-batfish-option initinfo false
 init-testrig test_rigs/smt-examples/BGP1 tr-smt-bgp1
 test tests/java-smt/bgp1-forwarding.ref get smt-forwarding dstIps=["42.42.42.0"], fullModel=True
 test tests/java-smt/bgp1-reachability.ref get smt-reachability finalNodeRegex="R1", finalIfaceRegex="Loopback.*", fullModel=True
+test tests/java-smt/bgp1-reachability-negate.ref get smt-reachability finalNodeRegex="R1", finalIfaceRegex="Loopback.*", negate=True
 test tests/java-smt/bgp1-bounded-len.ref get smt-bounded-length finalNodeRegex="R1", finalIfaceRegex="Loopback.*", bound=1, fullModel=True
+test tests/java-smt/bgp1-bounded-len-negate.ref get smt-bounded-length finalNodeRegex="R1", finalIfaceRegex="Loopback.*", bound=1, negate=True
 test tests/java-smt/bgp1-bounded-len2.ref get smt-bounded-length finalNodeRegex="R1", finalIfaceRegex="Loopback.*", bound=0, fullModel=True
 test tests/java-smt/bgp1-routing-loop.ref get smt-routing-loop fullModel=True
 test tests/java-smt/bgp1-multipath.ref get smt-multipath-consistency finalNodeRegex="R1", finalIfaceRegex="Loopback.*", fullModel=True

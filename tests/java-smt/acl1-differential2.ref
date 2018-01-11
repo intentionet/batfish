@@ -132,6 +132,7 @@
   "question" : {
     "class" : "org.batfish.question.SmtReachabilityQuestionPlugin$ReachabilityQuestion",
     "baseEnvType" : "any",
+    "benchmark" : false,
     "deltaEnvType" : "any",
     "diffType" : "reduced",
     "differential" : false,
@@ -154,7 +155,9 @@
     "finalNodeRegex" : ".*",
     "fullModel" : false,
     "ingressNodeRegex" : ".*",
-    "minimize" : false
+    "minimize" : false,
+    "negate" : false,
+    "useAbstraction" : false
   },
   "status" : "SUCCESS",
   "summary" : {

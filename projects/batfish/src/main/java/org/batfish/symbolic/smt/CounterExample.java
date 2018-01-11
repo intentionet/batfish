@@ -413,12 +413,12 @@ class CounterExample {
       String testrigName,
       Collection<String> sourceRouters,
       Encoder enc,
-      Map<String, BoolExpr> reach) {
+      Map<String, Boolean> reach) {
 
     FlowHistory fh = new FlowHistory();
     for (String source : sourceRouters) {
-      BoolExpr sourceVar = reach.get(source);
-      if (isFalse(sourceVar)) {
+      Boolean sourceVar = reach.get(source);
+      if (!sourceVar) {
         Tuple<Flow, FlowTrace> tup = buildFlowTrace(enc, source);
         SortedSet<Edge> failedLinks = buildFailedLinks(enc);
         SortedSet<BgpAdvertisement> envRoutes = buildEnvRoutingTable(enc);

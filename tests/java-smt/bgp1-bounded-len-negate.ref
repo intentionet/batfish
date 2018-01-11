@@ -1,0 +1,45 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.symbolic.answers.SmtOneAnswerElement",
+      "result" : {
+        "forwardingModel" : [
+          "R1,Loopback0 --> _,_ (CONNECTED)",
+          "R2,Serial0 --> R1,Serial0 (BGP)"
+        ],
+        "packetModel" : {
+          "dstIp" : "42.42.42.0"
+        },
+        "verified" : false
+      }
+    }
+  ],
+  "question" : {
+    "class" : "org.batfish.question.SmtBoundedLengthQuestionPlugin$BoundedLengthQuestion",
+    "baseEnvType" : "any",
+    "benchmark" : false,
+    "bound" : 1,
+    "deltaEnvType" : "any",
+    "differential" : false,
+    "dstIps" : [
+      "42.42.42.0/24"
+    ],
+    "envDiff" : false,
+    "failNode1Regex" : ".*",
+    "failNode2Regex" : ".*",
+    "failures" : 0,
+    "finalIfaceRegex" : "Loopback.*",
+    "finalNodeRegex" : "R1",
+    "fullModel" : false,
+    "ingressNodeRegex" : ".*",
+    "minimize" : false,
+    "negate" : true,
+    "useAbstraction" : false
+  },
+  "status" : "SUCCESS",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}

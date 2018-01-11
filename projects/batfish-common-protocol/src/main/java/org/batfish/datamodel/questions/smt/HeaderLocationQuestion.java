@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class HeaderLocationQuestion extends HeaderQuestion {
 
+  private static final boolean DEFAULT_NEGATE = false;
+
   private static final String DEFAULT_FINAL_IFACE_REGEX = ".*";
 
   private static final String DEFAULT_FINAL_NODE_REGEX = ".*";
@@ -24,6 +26,8 @@ public class HeaderLocationQuestion extends HeaderQuestion {
 
   private static final String DEFAULT_NOT_FAIL_NODE2_REGEX = "";
 
+  private static final String PROP_NEGATE = "negate";
+
   private static final String PROP_FINAL_NODE_REGEX = "finalNodeRegex";
 
   private static final String PROP_FINAL_IFACE_REGEX = "finalIfaceRegex";
@@ -43,6 +47,8 @@ public class HeaderLocationQuestion extends HeaderQuestion {
   private static final String NOT_FAIL_NODE1_REGEX_VAR = "notFailNode1Regex";
 
   private static final String NOT_FAIL_NODE2_REGEX_VAR = "notFailNode2Regex";
+
+  private boolean _negate;
 
   private String _finalNodeRegex;
 
@@ -66,6 +72,7 @@ public class HeaderLocationQuestion extends HeaderQuestion {
 
   public HeaderLocationQuestion() {
     super();
+    _negate = DEFAULT_NEGATE;
     _finalNodeRegex = DEFAULT_FINAL_NODE_REGEX;
     _finalIfaceRegex = DEFAULT_FINAL_IFACE_REGEX;
     _ingressNodeRegex = DEFAULT_INGRESS_NODE_REGEX;
@@ -80,6 +87,7 @@ public class HeaderLocationQuestion extends HeaderQuestion {
 
   public HeaderLocationQuestion(HeaderLocationQuestion other) {
     super(other);
+    this._negate = other._negate;
     this._finalNodeRegex = other._finalNodeRegex;
     this._finalIfaceRegex = other._finalIfaceRegex;
     this._ingressNodeRegex = other._ingressNodeRegex;
@@ -90,6 +98,11 @@ public class HeaderLocationQuestion extends HeaderQuestion {
     this._notIngressNodeRegex = other._notIngressNodeRegex;
     this._notFailNode1Regex = other._notFailNode1Regex;
     this._notFailNode2Regex = other._notFailNode2Regex;
+  }
+
+  @JsonProperty(PROP_NEGATE)
+  public boolean getNegate() {
+    return _negate;
   }
 
   @JsonProperty(PROP_FINAL_NODE_REGEX)
@@ -140,6 +153,9 @@ public class HeaderLocationQuestion extends HeaderQuestion {
   protected String prettyPrintParams() {
     try {
       String retString = super.prettyPrintParams();
+      if (!(_negate == DEFAULT_NEGATE)) {
+        retString += String.format(", %s=%s", PROP_NEGATE, _negate);
+      }
       if (!_finalNodeRegex.equals(DEFAULT_FINAL_NODE_REGEX)) {
         retString += String.format(", %s=%s", PROP_FINAL_NODE_REGEX, _finalNodeRegex);
       }
@@ -172,6 +188,11 @@ public class HeaderLocationQuestion extends HeaderQuestion {
   @JsonProperty(NOT_FAIL_NODE2_REGEX_VAR)
   public String getNotFailNode2Regex() {
     return _notFailNode2Regex;
+  }
+
+  @JsonProperty(PROP_NEGATE)
+  public void setNegate(boolean negate) {
+    _negate = negate;
   }
 
   @JsonProperty(PROP_FINAL_NODE_REGEX)

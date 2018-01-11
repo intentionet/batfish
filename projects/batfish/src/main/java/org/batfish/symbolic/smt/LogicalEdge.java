@@ -7,6 +7,9 @@ import org.batfish.symbolic.GraphEdge;
  * A logical edge in the network graph. Wraps a graph edge with additional information about the
  * type of the edge (Import/Export) as well as the record of symbolic variables.
  *
+ * <p>We will have two LogicalEdges for each GraphEdge: one for the route that's imported on the
+ * port, one for the route that's exported to the port.
+ *
  * @author Ryan Beckett
  */
 class LogicalEdge {

@@ -1,0 +1,143 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.symbolic.answers.SmtReachabilityAnswerElement",
+      "flowHistory" : {
+        "class" : "org.batfish.datamodel.FlowHistory",
+        "traces" : {
+          "Flow<ingressNode:R1 ingressVrf:default srcIp:0.0.0.0 dstIp:42.42.42.1 ipProtocol:HOPOPT dscp: 0 ecn:0 fragmentOffset:0 packetLength:0 state:NEW tag:SMT>" : {
+            "environments" : {
+              "BASE" : {
+                "envName" : "BASE",
+                "testrigName" : "tr-smt-bgp1"
+              }
+            },
+            "flow" : {
+              "dscp" : 0,
+              "dstIp" : "42.42.42.1",
+              "dstPort" : 0,
+              "ecn" : 0,
+              "fragmentOffset" : 0,
+              "icmpCode" : 0,
+              "icmpVar" : 0,
+              "ingressNode" : "R1",
+              "ingressVrf" : "default",
+              "ipProtocol" : "HOPOPT",
+              "packetLength" : 0,
+              "srcIp" : "0.0.0.0",
+              "srcPort" : 0,
+              "state" : "NEW",
+              "tag" : "SMT",
+              "tcpFlagsAck" : 1,
+              "tcpFlagsCwr" : 1,
+              "tcpFlagsEce" : 1,
+              "tcpFlagsFin" : 1,
+              "tcpFlagsPsh" : 1,
+              "tcpFlagsRst" : 1,
+              "tcpFlagsSyn" : 1,
+              "tcpFlagsUrg" : 1
+            },
+            "paths" : {
+              "BASE" : [
+                {
+                  "disposition" : "ACCEPTED",
+                  "notes" : "ACCEPTED"
+                }
+              ]
+            }
+          },
+          "Flow<ingressNode:R2 ingressVrf:default srcIp:0.0.0.0 dstIp:42.42.42.1 ipProtocol:HOPOPT dscp: 0 ecn:0 fragmentOffset:0 packetLength:0 state:NEW tag:SMT>" : {
+            "environments" : {
+              "BASE" : {
+                "envName" : "BASE",
+                "testrigName" : "tr-smt-bgp1"
+              }
+            },
+            "flow" : {
+              "dscp" : 0,
+              "dstIp" : "42.42.42.1",
+              "dstPort" : 0,
+              "ecn" : 0,
+              "fragmentOffset" : 0,
+              "icmpCode" : 0,
+              "icmpVar" : 0,
+              "ingressNode" : "R2",
+              "ingressVrf" : "default",
+              "ipProtocol" : "HOPOPT",
+              "packetLength" : 0,
+              "srcIp" : "0.0.0.0",
+              "srcPort" : 0,
+              "state" : "NEW",
+              "tag" : "SMT",
+              "tcpFlagsAck" : 1,
+              "tcpFlagsCwr" : 1,
+              "tcpFlagsEce" : 1,
+              "tcpFlagsFin" : 1,
+              "tcpFlagsPsh" : 1,
+              "tcpFlagsRst" : 1,
+              "tcpFlagsSyn" : 1,
+              "tcpFlagsUrg" : 1
+            },
+            "paths" : {
+              "BASE" : [
+                {
+                  "disposition" : "ACCEPTED",
+                  "hops" : [
+                    {
+                      "edge" : {
+                        "node1" : "R2",
+                        "node1interface" : "Serial0",
+                        "node2" : "R1",
+                        "node2interface" : "Serial0"
+                      },
+                      "routes" : [
+                        "BgpRoute<42.42.42.0/24,nhip:192.168.42.2,nhint:dynamic>"
+                      ]
+                    }
+                  ],
+                  "notes" : "ACCEPTED"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "result" : {
+        "forwardingModel" : [
+          "R2,Serial0 --> R1,Serial0 (BGP)"
+        ],
+        "packetModel" : {
+          "dstIp" : "42.42.42.1"
+        },
+        "verified" : false
+      }
+    }
+  ],
+  "question" : {
+    "class" : "org.batfish.question.SmtReachabilityQuestionPlugin$ReachabilityQuestion",
+    "baseEnvType" : "any",
+    "benchmark" : false,
+    "deltaEnvType" : "any",
+    "differential" : false,
+    "dstIps" : [
+      "42.42.42.0/24"
+    ],
+    "envDiff" : false,
+    "failNode1Regex" : ".*",
+    "failNode2Regex" : ".*",
+    "failures" : 0,
+    "finalIfaceRegex" : "Loopback.*",
+    "finalNodeRegex" : "R1",
+    "fullModel" : false,
+    "ingressNodeRegex" : ".*",
+    "minimize" : false,
+    "negate" : true,
+    "useAbstraction" : false
+  },
+  "status" : "SUCCESS",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}

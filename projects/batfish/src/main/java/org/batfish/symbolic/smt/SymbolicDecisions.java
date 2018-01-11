@@ -18,14 +18,22 @@ import org.batfish.symbolic.collections.Table3;
  */
 class SymbolicDecisions {
 
+  // control plane: best route for each protocol.
   private Table2<String, Protocol, SymbolicRoute> _bestNeighborPerProtocol;
 
+  // control plane: best route over all protocols. The one that will be used
+  // to forward.
   private Map<String, SymbolicRoute> _bestNeighbor;
 
+  // helper for encoding _controlForwarding
+  // for each router (String), each protocol, each port, will the protocol running
+  // on that router choose this port?
   private Table3<String, Protocol, LogicalEdge, BoolExpr> _choiceVariables;
 
+  // for each router (String), each port (GraphEdge), does that router forward out that port?
   private Table2<String, GraphEdge, BoolExpr> _controlForwarding;
 
+  // data plane: once control plane selects a route, do we actually forward (is there no filter).
   private Table2<String, GraphEdge, BoolExpr> _dataForwarding;
 
   SymbolicDecisions() {
