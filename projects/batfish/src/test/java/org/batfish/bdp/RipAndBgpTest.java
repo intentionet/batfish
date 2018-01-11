@@ -56,7 +56,7 @@ public class RipAndBgpTest {
     Prefix prefix2 = new Prefix("2.0.0.0/8");
     Prefix prefix3 = new Prefix("3.0.0.0/8");
 
-    assertThat(r1Prefixes, containsInAnyOrder(prefix1, prefix2));
+    assertThat(r1Prefixes, containsInAnyOrder(prefix1, prefix2, prefix3));
     assertThat(r2Prefixes, containsInAnyOrder(prefix1, prefix2, prefix3));
     assertThat(r3Prefixes, containsInAnyOrder(prefix1, prefix3));
   }

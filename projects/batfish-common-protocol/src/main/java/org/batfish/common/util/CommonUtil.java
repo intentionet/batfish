@@ -73,6 +73,7 @@ import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.IpsecVpn;
 import org.batfish.datamodel.NetworkAddress;
+import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Route;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
@@ -916,7 +917,7 @@ public class CommonUtil {
 
   public static Topology synthesizeTopology(Map<String, Configuration> configurations) {
     SortedSet<Edge> edges = new TreeSet<>();
-    Map<NetworkAddress, Set<NodeInterfacePair>> addressInterfaces = new HashMap<>();
+    Map<Prefix, Set<NodeInterfacePair>> prefixInterfaces = new HashMap<>();
     configurations.forEach(
         (nodeName, node) -> {
           for (Entry<String, Interface> e : node.getInterfaces().entrySet()) {
@@ -925,16 +926,17 @@ public class CommonUtil {
             if (!iface.isLoopback(node.getConfigurationFormat()) && iface.getActive()) {
               for (NetworkAddress address : iface.getAllAddresses()) {
                 if (address.getNetworkBits() < 32) {
+                  Prefix prefix = Prefix.forNetworkAddress(address);
                   NodeInterfacePair pair = new NodeInterfacePair(nodeName, ifaceName);
                   Set<NodeInterfacePair> interfaceBucket =
-                      addressInterfaces.computeIfAbsent(address, k -> new HashSet<>());
+                      prefixInterfaces.computeIfAbsent(prefix, k -> new HashSet<>());
                   interfaceBucket.add(pair);
                 }
               }
             }
           }
         });
-    for (Set<NodeInterfacePair> bucket : addressInterfaces.values()) {
+    for (Set<NodeInterfacePair> bucket : prefixInterfaces.values()) {
       for (NodeInterfacePair p1 : bucket) {
         for (NodeInterfacePair p2 : bucket) {
           if (!p1.equals(p2)) {
