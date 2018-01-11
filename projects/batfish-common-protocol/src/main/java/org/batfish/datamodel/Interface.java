@@ -142,7 +142,9 @@ public final class Interface extends ComparableStructure<String> {
 
   private static final String PROP_ACTIVE = "active";
 
-  private static final String PROP_ALL_ADDRESSES = "allAddresses";
+  private static final String PROP_ADDRESS = "prefix";
+
+  private static final String PROP_ALL_ADDRESSES = "allPrefixes";
 
   private static final String PROP_ALLOWED_VLANS = "allowedVlans";
 
@@ -187,8 +189,6 @@ public final class Interface extends ComparableStructure<String> {
   private static final String PROP_OSPF_POINT_TO_POINT = "ospfPointToPoint";
 
   private static final String PROP_OUTGOING_FILTER = "outgoingFilter";
-
-  private static final String PROP_ADDRESS = "address";
 
   private static final String PROP_RIP_ENABLED = "ripEnabled";
 
