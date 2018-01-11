@@ -462,7 +462,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
                         int prefixLength = ifacePrefix.getNetworkBits();
                         Ip address = vrrpGroup.getVirtualAddress();
                         if (address != null) {
-                          Prefix virtualAddress = new Prefix(address, prefixLength);
+                          NetworkAddress virtualAddress = new NetworkAddress(address, prefixLength);
                           newGroup.setVirtualAddress(virtualAddress);
                         } else {
                           _w.redFlag(

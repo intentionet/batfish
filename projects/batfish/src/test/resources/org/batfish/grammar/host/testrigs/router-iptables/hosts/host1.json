@@ -1,11 +1,11 @@
 {
-    "hostname": "host1",
-    "iptablesFile": "iptables/host1.iptables",
-    "hostInterfaces": {
-        "eth0": {
-            "name": "eth0",
-            "prefix": "2.128.0.101/24"
-        }
-    },
-    "overlay":true
+  "hostname": "host1",
+  "iptablesFile": "iptables/host1.iptables",
+  "hostInterfaces": {
+    "eth0": {
+      "name": "eth0",
+      "address": "2.128.0.101/24"
+    }
+  },
+  "overlay": true
 }

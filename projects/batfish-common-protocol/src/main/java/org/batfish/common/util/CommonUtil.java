@@ -73,7 +73,6 @@ import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.IpsecVpn;
 import org.batfish.datamodel.NetworkAddress;
-import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Route;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
@@ -203,7 +202,7 @@ public class CommonUtil {
       Map<String, Configuration> configurations, boolean excludeInactive) {
     // TODO: confirm VRFs are handled correctly
     Map<Ip, Set<String>> ipOwners = new HashMap<>();
-    Map<Pair<Prefix, Integer>, Set<Interface>> vrrpGroups = new HashMap<>();
+    Map<Pair<NetworkAddress, Integer>, Set<Interface>> vrrpGroups = new HashMap<>();
     configurations.forEach(
         (hostname, c) -> {
           for (Interface i : c.getInterfaces().values()) {
@@ -212,14 +211,14 @@ public class CommonUtil {
               i.getVrrpGroups()
                   .forEach(
                       (groupNum, vrrpGroup) -> {
-                        Prefix prefix = vrrpGroup.getVirtualAddress();
-                        if (prefix == null) {
+                        NetworkAddress address = vrrpGroup.getVirtualAddress();
+                        if (address == null) {
                           // This Vlan Interface has invalid configuration. The VRRP has no source
                           // IP address that would be used for VRRP election. This interface could
                           // never win the election, so is not a candidate.
                           return;
                         }
-                        Pair<Prefix, Integer> key = new Pair<>(prefix, groupNum);
+                        Pair<NetworkAddress, Integer> key = new Pair<>(address, groupNum);
                         Set<Interface> candidates =
                             vrrpGroups.computeIfAbsent(
                                 key, k -> Collections.newSetFromMap(new IdentityHashMap<>()));
@@ -228,7 +227,7 @@ public class CommonUtil {
               // collect prefixes
               i.getAllAddresses()
                   .stream()
-                  .map(p -> p.getAddress())
+                  .map(NetworkAddress::getAddress)
                   .forEach(
                       ip -> {
                         Set<String> owners = ipOwners.computeIfAbsent(ip, k -> new HashSet<>());
@@ -240,8 +239,8 @@ public class CommonUtil {
     vrrpGroups.forEach(
         (p, candidates) -> {
           int groupNum = p.getSecond();
-          Prefix prefix = p.getFirst();
-          Ip ip = prefix.getAddress();
+          NetworkAddress address = p.getFirst();
+          Ip ip = address.getAddress();
           int lowestPriority = Integer.MAX_VALUE;
           String bestCandidate = null;
           SortedSet<String> bestCandidates = new TreeSet<>();

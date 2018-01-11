@@ -69,8 +69,8 @@ public class IpWildcard extends Pair<Ip, Ip> {
   }
 
   public IpWildcard(NetworkAddress address) {
-    super(null, null);
-    throw new UnsupportedOperationException();
+    // TODO: fix this.
+    this(Prefix.forNetworkAddress(address));
   }
 
   @JsonCreator

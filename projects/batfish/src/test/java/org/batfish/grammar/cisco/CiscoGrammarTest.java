@@ -183,7 +183,8 @@ public class CiscoGrammarTest {
     SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> routes =
         dataPlanePlugin.getRoutes();
     SortedSet<AbstractRoute> r3Routes = routes.get("r3").get(Configuration.DEFAULT_VRF_NAME);
-    Set<Prefix> r3Prefixes = r3Routes.stream().map(r -> r.getNetwork()).collect(Collectors.toSet());
+    Set<Prefix> r3Prefixes =
+        r3Routes.stream().map(AbstractRoute::getNetwork).collect(Collectors.toSet());
     Prefix r1Loopback = new Prefix("1.1.1.1/32");
     assertTrue(r3Prefixes.contains(r1Loopback));
 

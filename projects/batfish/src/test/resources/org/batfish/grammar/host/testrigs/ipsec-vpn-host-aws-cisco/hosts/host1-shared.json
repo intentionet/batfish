@@ -1,14 +1,14 @@
 {
-	"hostname" : "host1",
-	"hostInterfaces" : {
-		"eth0" : {
-			"name": "eth0",
-      "prefix" : "4.4.4.27/31",
-      "shared":true
-		},
-		"tap0" : {
-			"name": "tap0",
-      "prefix" : "172.16.1.1/30"
-		}
-	}
+  "hostname": "host1",
+  "hostInterfaces": {
+    "eth0": {
+      "name": "eth0",
+      "address": "4.4.4.27/31",
+      "shared": true
+    },
+    "tap0": {
+      "name": "tap0",
+      "address": "172.16.1.1/30"
+    }
+  }
 }

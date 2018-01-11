@@ -1,6 +1,7 @@
 package org.batfish.bdp;
 
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
@@ -45,19 +46,18 @@ public class RipAndBgpTest {
     SortedSet<AbstractRoute> r1Routes = routes.get("r1").get(Configuration.DEFAULT_VRF_NAME);
     SortedSet<AbstractRoute> r2Routes = routes.get("r2").get(Configuration.DEFAULT_VRF_NAME);
     SortedSet<AbstractRoute> r3Routes = routes.get("r3").get(Configuration.DEFAULT_VRF_NAME);
-    Set<Prefix> r1Prefixes = r1Routes.stream().map(r -> r.getNetwork()).collect(Collectors.toSet());
-    Set<Prefix> r2Prefixes = r2Routes.stream().map(r -> r.getNetwork()).collect(Collectors.toSet());
-    Set<Prefix> r3Prefixes = r3Routes.stream().map(r -> r.getNetwork()).collect(Collectors.toSet());
+    Set<Prefix> r1Prefixes =
+        r1Routes.stream().map(AbstractRoute::getNetwork).collect(Collectors.toSet());
+    Set<Prefix> r2Prefixes =
+        r2Routes.stream().map(AbstractRoute::getNetwork).collect(Collectors.toSet());
+    Set<Prefix> r3Prefixes =
+        r3Routes.stream().map(AbstractRoute::getNetwork).collect(Collectors.toSet());
     Prefix prefix1 = new Prefix("1.0.0.0/8");
     Prefix prefix2 = new Prefix("2.0.0.0/8");
     Prefix prefix3 = new Prefix("3.0.0.0/8");
 
-    assertTrue(r1Prefixes.contains(prefix1));
-    assertTrue(r1Prefixes.contains(prefix2));
-    assertTrue(r2Prefixes.contains(prefix1));
-    assertTrue(r2Prefixes.contains(prefix2));
-    assertTrue(r2Prefixes.contains(prefix3));
-    assertTrue(r3Prefixes.contains(prefix1));
-    assertTrue(r3Prefixes.contains(prefix3));
+    assertThat(r1Prefixes, containsInAnyOrder(prefix1, prefix2));
+    assertThat(r2Prefixes, containsInAnyOrder(prefix1, prefix2, prefix3));
+    assertThat(r3Prefixes, containsInAnyOrder(prefix1, prefix3));
   }
 }

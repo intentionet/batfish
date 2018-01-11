@@ -2830,7 +2830,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   public void exitIfiav_virtual_address(Ifiav_virtual_addressContext ctx) {
     Ip virtualAddress = new Ip(ctx.IP_ADDRESS().getText());
     int prefixLength = _currentInterfaceAddress.getNetworkBits();
-    _currentVrrpGroup.setVirtualAddress(new Prefix(virtualAddress, prefixLength));
+    _currentVrrpGroup.setVirtualAddress(new NetworkAddress(virtualAddress, prefixLength));
   }
 
   @Override

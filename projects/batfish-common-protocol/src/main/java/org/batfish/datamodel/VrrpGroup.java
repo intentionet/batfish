@@ -19,7 +19,7 @@ public class VrrpGroup extends ComparableStructure<Integer> {
 
   private int _priority;
 
-  private Prefix _virtualAddress;
+  private NetworkAddress _virtualAddress;
 
   @JsonCreator
   public VrrpGroup(@JsonProperty(PROP_NAME) Integer name) {
@@ -37,7 +37,7 @@ public class VrrpGroup extends ComparableStructure<Integer> {
   }
 
   @JsonProperty(PROP_VIRTUAL_ADDRESS)
-  public Prefix getVirtualAddress() {
+  public NetworkAddress getVirtualAddress() {
     return _virtualAddress;
   }
 
@@ -52,7 +52,7 @@ public class VrrpGroup extends ComparableStructure<Integer> {
   }
 
   @JsonProperty(PROP_VIRTUAL_ADDRESS)
-  public void setVirtualAddress(Prefix virtualAddress) {
+  public void setVirtualAddress(NetworkAddress virtualAddress) {
     _virtualAddress = virtualAddress;
   }
 }

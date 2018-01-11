@@ -20,6 +20,7 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkAddress;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.Prefix;
 import org.batfish.representation.host.HostInterface;
@@ -69,19 +70,19 @@ public class HostInterfaceTest {
   @Test
   public void testShared() throws JsonParseException, JsonMappingException, IOException {
     Ip sharedAddress = new Ip("1.0.0.1");
-    Prefix sharedPrefix = new Prefix(sharedAddress, 24);
+    NetworkAddress sharedPrefix = new NetworkAddress(sharedAddress, 24);
     Prefix nonShared1Prefix = new Prefix("2.0.0.2/24");
     Prefix nonShared2Prefix = new Prefix("3.0.0.2/24");
     String ifaceSharedText =
-        "{\"name\":\"shared_interface\", \"prefix\":\""
+        "{\"name\":\"shared_interface\", \"address\":\""
             + sharedPrefix.toString()
             + "\", \"shared\":true}";
     String ifaceNonShared1Text =
-        "{\"name\":\"non_shared1_interface\", \"prefix\":\""
+        "{\"name\":\"non_shared1_interface\", \"address\":\""
             + nonShared1Prefix.toString()
             + "\", \"shared\":false}";
     String ifaceNonShared2Text =
-        "{\"name\":\"non_shared2_interface\", \"prefix\":\"" + nonShared2Prefix.toString() + "\"}";
+        "{\"name\":\"non_shared2_interface\", \"address\":\"" + nonShared2Prefix.toString() + "\"}";
 
     HostInterface sharedHostInterface = _mapper.readValue(ifaceSharedText, HostInterface.class);
     HostInterface nonShared1HostInterface =
