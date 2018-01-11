@@ -2,7 +2,6 @@
 /client
 /testrigs
 .DS_Store
-*.testout
 .*.swp
 
 # ignore maven pom version backups
