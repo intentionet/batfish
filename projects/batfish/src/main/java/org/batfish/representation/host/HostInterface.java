@@ -15,10 +15,13 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.NetworkAddress;
+import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SourceNat;
 import org.batfish.datamodel.Vrf;
 
 public class HostInterface implements Serializable {
+
+  private static final String PROP_ADDRESS = "address";
 
   private static final String PROP_BANDWIDTH = "bandwidth";
 
@@ -28,7 +31,7 @@ public class HostInterface implements Serializable {
 
   private static final String PROP_OTHER_ADDRESSES = "otherAddresses";
 
-  private static final String PROP_ADDRESS = "address";
+  private static final String PROP_PREFIX = "prefix";
 
   private static final String PROP_SHARED = "shared";
 
@@ -122,6 +125,13 @@ public class HostInterface implements Serializable {
   @JsonProperty(PROP_ADDRESS)
   public void setAddress(NetworkAddress address) {
     _address = address;
+  }
+
+  /** For backwards-compatible parsing. TODO: hack. */
+  @JsonProperty(PROP_PREFIX)
+  @Deprecated
+  public void setPrefix(String prefix) {
+    _address = new NetworkAddress(prefix);
   }
 
   @JsonProperty(PROP_SHARED)
