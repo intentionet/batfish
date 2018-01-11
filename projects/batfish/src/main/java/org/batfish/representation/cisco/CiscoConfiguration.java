@@ -1366,7 +1366,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
               new MatchPrefixSet(
                   new DestinationNetwork(),
                   new ExplicitPrefixSet(
-                      new PrefixSpace(Collections.singleton(new PrefixRange(prefix.toString()))))));
+                      new PrefixSpace(Collections.singleton(PrefixRange.fromPrefix(prefix))))));
       applyCurrentAggregateAttributesConditions
           .getConjuncts()
           .add(new MatchProtocol(RoutingProtocol.AGGREGATE));

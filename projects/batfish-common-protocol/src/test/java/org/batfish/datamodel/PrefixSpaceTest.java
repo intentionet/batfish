@@ -39,9 +39,9 @@ public class PrefixSpaceTest {
 
   @Test
   public void constructPrefixSpaceTest() {
-    _ps = new PrefixSpace(ImmutableSet.of(new PrefixRange("100.0.0.0/32")));
+    _ps = new PrefixSpace(ImmutableSet.of(PrefixRange.fromString("100.0.0.0/32")));
     assertThat(_ps.isEmpty(), equalTo(false));
-    assertThat(_ps.containsPrefixRange(new PrefixRange("100.0.0.0/32")), equalTo(true));
+    assertThat(_ps.containsPrefixRange(PrefixRange.fromString("100.0.0.0/32")), equalTo(true));
   }
 
   @Test
@@ -55,7 +55,7 @@ public class PrefixSpaceTest {
   @Test
   public void addPrefixRangeTest() {
     Set<PrefixRange> ranges = new TreeSet<>();
-    PrefixRange range = new PrefixRange("10.10.10.0/32:16-24");
+    PrefixRange range = PrefixRange.fromString("10.10.10.0/32:16-24");
     ranges.add(range);
     _ps = new PrefixSpace(ranges);
     assertThat(_ps.containsPrefixRange(range), equalTo(true));
@@ -88,7 +88,7 @@ public class PrefixSpaceTest {
   @Test
   public void addSpaceTest() {
     Set<PrefixRange> ranges = new TreeSet<>();
-    PrefixRange range = new PrefixRange("100.0.0.0/32");
+    PrefixRange range = PrefixRange.fromString("100.0.0.0/32");
     ranges.add(range);
     _ps.addSpace(new PrefixSpace(ranges));
     assertThat(_ps.isEmpty(), equalTo(false));
@@ -124,43 +124,43 @@ public class PrefixSpaceTest {
 
   @Test
   public void containsPrefixRangeTest() {
-    PrefixRange range = new PrefixRange("10.10.10.0/20:16-24");
+    PrefixRange range = PrefixRange.fromString("10.10.10.0/20:16-24");
     _ps.addPrefixRange(range);
 
     assertThat(
         "Ranges earlier than this range not included",
-        _ps.containsPrefixRange(new PrefixRange("10.10.10.0/20:15-24")),
+        _ps.containsPrefixRange(PrefixRange.fromString("10.10.10.0/20:15-24")),
         equalTo(false));
     assertThat(
         "Ranges later than this range not included",
-        _ps.containsPrefixRange(new PrefixRange("10.10.10.0/20:18-26")),
+        _ps.containsPrefixRange(PrefixRange.fromString("10.10.10.0/20:18-26")),
         equalTo(false));
     assertThat(
         "Ranges contained in this range included",
-        _ps.containsPrefixRange(new PrefixRange("10.10.10.0/20:18-20")),
+        _ps.containsPrefixRange(PrefixRange.fromString("10.10.10.0/20:18-20")),
         equalTo(true));
     assertThat(
         "Range not included if prefix is shorter",
-        _ps.containsPrefixRange(new PrefixRange("10.10.10.0/8:16-24")),
+        _ps.containsPrefixRange(PrefixRange.fromString("10.10.10.0/8:16-24")),
         equalTo(false));
     assertThat(
         "Range included if prefix is longer",
-        _ps.containsPrefixRange(new PrefixRange("10.10.10.0/28:16-24")),
+        _ps.containsPrefixRange(PrefixRange.fromString("10.10.10.0/28:16-24")),
         equalTo(true));
   }
 
   @Test
   public void getPrefixRangesTest() {
     assertThat("No ranges yet", _ps.getPrefixRanges().isEmpty(), equalTo(true));
-    _ps.addPrefixRange(new PrefixRange("10.10.10.0/20:18-21"));
+    _ps.addPrefixRange(PrefixRange.fromString("10.10.10.0/20:18-21"));
     Set<PrefixRange> ranges = _ps.getPrefixRanges();
-    assertThat(ranges.contains(new PrefixRange("10.10.0.0/18")), equalTo(true));
-    assertThat(ranges.contains(new PrefixRange("10.10.0.0/19")), equalTo(true));
-    assertThat(ranges.contains(new PrefixRange("10.10.10.0/20:18-21")), equalTo(true));
+    assertThat(ranges.contains(PrefixRange.fromString("10.10.0.0/18")), equalTo(true));
+    assertThat(ranges.contains(PrefixRange.fromString("10.10.0.0/19")), equalTo(true));
+    assertThat(ranges.contains(PrefixRange.fromString("10.10.10.0/20:18-21")), equalTo(true));
     assertThat(ranges.size(), equalTo(3));
-    _ps.addPrefixRange((new PrefixRange("10.10.10.0/20:20-22")));
+    _ps.addPrefixRange((PrefixRange.fromString("10.10.10.0/20:20-22")));
     ranges = _ps.getPrefixRanges();
-    assertThat(ranges.contains(new PrefixRange("10.10.10.0/20:20-22")), equalTo(true));
+    assertThat(ranges.contains(PrefixRange.fromString("10.10.10.0/20:20-22")), equalTo(true));
   }
 
   @Test
@@ -168,13 +168,13 @@ public class PrefixSpaceTest {
     PrefixSpace other = new PrefixSpace();
     assertThat("empty spaces don't intersect", _ps.intersection(other).isEmpty(), equalTo(true));
     assertThat("no overlap for empty spaces", _ps.overlaps(other), equalTo(false));
-    _ps.addPrefixRange(new PrefixRange("10.10.10.0/20:18-21"));
+    _ps.addPrefixRange(PrefixRange.fromString("10.10.10.0/20:18-21"));
     assertThat("no intersection for one empty", _ps.intersection(other).isEmpty(), equalTo(true));
     assertThat("no overlap for one empty", _ps.overlaps(other), equalTo(false));
-    other.addPrefixRange(new PrefixRange("10.10.10.0/16:14-16"));
+    other.addPrefixRange(PrefixRange.fromString("10.10.10.0/16:14-16"));
     assertThat("no intersection", _ps.intersection(other).isEmpty(), equalTo(true));
     assertThat("no overlap", _ps.overlaps(other), equalTo(false));
-    other.addPrefixRange(new PrefixRange("10.10.10.0/20:18-20"));
+    other.addPrefixRange(PrefixRange.fromString("10.10.10.0/20:18-20"));
     PrefixSpace intersection = _ps.intersection(other);
     assertThat(
         "now intersect for length 18",
@@ -186,7 +186,7 @@ public class PrefixSpaceTest {
         equalTo(true));
     assertThat(
         "now intersect for range 18-20",
-        intersection.containsPrefixRange(new PrefixRange("10.10.0.0/20:18-20")),
+        intersection.containsPrefixRange(PrefixRange.fromString("10.10.0.0/20:18-20")),
         equalTo(true));
     assertThat("don't intersect anywhere else", intersection.getPrefixRanges().size(), equalTo(3));
     assertThat("has overlap", _ps.overlaps(other), equalTo(true));
