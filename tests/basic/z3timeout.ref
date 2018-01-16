@@ -1,0 +1,58 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.common.BatfishException$BatfishStackTrace",
+      "answer" : [
+        "org.batfish.common.BatfishException: Failed to answer question",
+        "   at org.batfish.main.Batfish.answer(Batfish.java:592)",
+        "   at org.batfish.main.Batfish.run(Batfish.java:3723)",
+        "   at org.batfish.main.Driver$1.run(Driver.java:367)",
+        "Caused by: org.batfish.common.BatfishException: Error executing job",
+        "   at org.batfish.job.BatfishJobExecutor.executeJobs(BatfishJobExecutor.java:129)",
+        "   at org.batfish.job.BatfishJobExecutor.runJobsInExecutor(BatfishJobExecutor.java:72)",
+        "   at org.batfish.main.Batfish.computeNodOutput(Batfish.java:994)",
+        "   at org.batfish.main.Batfish.standard(Batfish.java:4240)",
+        "   at org.batfish.question.ReachabilityQuestionPlugin$ReachabilityAnswerer.standard(ReachabilityQuestionPlugin.java:86)",
+        "   at org.batfish.question.ReachabilityQuestionPlugin$ReachabilityAnswerer.answer(ReachabilityQuestionPlugin.java:42)",
+        "   at org.batfish.main.Batfish.answer(Batfish.java:589)",
+        "   ... 2 more",
+        "Caused by: java.util.concurrent.ExecutionException: org.batfish.common.BatfishException: Query satisfiability unknown",
+        "   at java.util.concurrent.FutureTask.report(FutureTask.java:122)",
+        "   at java.util.concurrent.FutureTask.get(FutureTask.java:192)",
+        "   at org.batfish.job.BatfishJobExecutor.executeJobs(BatfishJobExecutor.java:125)",
+        "   ... 8 more",
+        "Caused by: org.batfish.common.BatfishException: Query satisfiability unknown",
+        "   at org.batfish.z3.NodJob.call(NodJob.java:179)",
+        "   at org.batfish.z3.NodJob.call(NodJob.java:33)",
+        "   at java.util.concurrent.FutureTask.run(FutureTask.java:266)",
+        "   at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511)",
+        "   at java.util.concurrent.FutureTask.run(FutureTask.java:266)",
+        "   at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)",
+        "   at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)",
+        "   at java.lang.Thread.run(Thread.java:748)"
+      ]
+    }
+  ],
+  "question" : {
+    "class" : "org.batfish.question.ReachabilityQuestionPlugin$ReachabilityQuestion",
+    "actions" : [
+      "ACCEPT"
+    ],
+    "differential" : false,
+    "dstIps" : [
+      "70.0.78.0"
+    ],
+    "finalNodeRegex" : ".*",
+    "ingressNodeRegex" : ".*",
+    "negateHeader" : false,
+    "notFinalNodeRegex" : "",
+    "notIngressNodeRegex" : "",
+    "type" : "standard"
+  },
+  "status" : "FAILURE",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}

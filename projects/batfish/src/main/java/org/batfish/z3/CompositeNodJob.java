@@ -65,6 +65,7 @@ public class CompositeNodJob extends BatfishJob<NodJobResult> {
     try (Context ctx = new Context()) {
       BoolExpr[] answers = new BoolExpr[_numPrograms];
       Params p = ctx.mkParams();
+      p.add("timeout", _settings.getZ3timeout());
       p.add("fixedpoint.engine", "datalog");
       p.add("fixedpoint.datalog.default_relation", "doc");
       p.add("fixedpoint.print_answer", true);

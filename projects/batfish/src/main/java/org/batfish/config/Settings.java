@@ -479,6 +479,8 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
   private static final String ARG_TIMESTAMP = "timestamp";
 
+  private static final String ARG_Z3_TIMEOUT = "z3timeout";
+
   private static final String ARGNAME_AS = "as";
 
   private static final String ARGNAME_HOSTNAME = "hostname";
@@ -696,6 +698,8 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
   private boolean _validateEnvironment;
 
   private boolean _verboseParse;
+
+  private int _z3timeout;
 
   public Settings() {
     this(new String[] {});
@@ -1105,6 +1109,10 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     return _ignoreUnsupported;
   }
 
+  public int getZ3timeout() {
+    return _z3timeout;
+  }
+
   private void initConfigDefaults() {
     setDefaultProperty(BfConsts.ARG_ANALYSIS_NAME, null);
     setDefaultProperty(BfConsts.ARG_ANSWER_JSON_PATH, null);
@@ -1192,6 +1200,7 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     setDefaultProperty(BfConsts.COMMAND_PARSE_VENDOR_SPECIFIC, false);
     setDefaultProperty(BfConsts.COMMAND_REPORT, false);
     setDefaultProperty(BfConsts.COMMAND_VALIDATE_ENVIRONMENT, false);
+    setDefaultProperty(ARG_Z3_TIMEOUT, 0);
   }
 
   private void initOptions() {
@@ -1470,6 +1479,8 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
     addBooleanOption(
         BfConsts.COMMAND_VALIDATE_ENVIRONMENT, "validate an environment that has been initialized");
+
+    addOption(ARG_Z3_TIMEOUT, "set a timeout (in milliseconds) for Z3 queries", "z3timeout");
   }
 
   private void parseCommandLine(String[] args) {
@@ -1576,6 +1587,7 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     _unrecognizedAsRedFlag = getBooleanOptionValue(BfConsts.ARG_UNRECOGNIZED_AS_RED_FLAG);
     _validateEnvironment = getBooleanOptionValue(BfConsts.COMMAND_VALIDATE_ENVIRONMENT);
     _verboseParse = getBooleanOptionValue(BfConsts.ARG_VERBOSE_PARSE);
+    _z3timeout = getIntegerOptionValue(ARG_Z3_TIMEOUT);
   }
 
   public boolean prettyPrintAnswer() {
@@ -1744,5 +1756,9 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
   public void setVerboseParse(boolean verboseParse) {
     _verboseParse = verboseParse;
+  }
+
+  public void setZ3Timeout(int z3Timeout) {
+    _z3timeout = z3Timeout;
   }
 }

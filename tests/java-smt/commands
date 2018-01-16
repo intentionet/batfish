@@ -139,3 +139,8 @@ test tests/java-smt/differential2.ref get smt-reachability finalNodeRegex="R3", 
 init-testrig test_rigs/smt-examples/BDD1 tr-bdd1
 test tests/java-smt/roles1.ref get smt-roles equivType=policy
 
+# z3 timeout - 1 second
+add-batfish-option z3timeout 1000
+init-testrig test_rigs/fattree-examples/fattree8.zip
+test tests/java-smt/z3timeout.ref -error get smt-reachability dstIps=['70.0.78.0']
+

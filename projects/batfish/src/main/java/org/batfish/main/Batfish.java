@@ -4088,7 +4088,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   @Override
   public AnswerElement smtBlackhole(HeaderQuestion q) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkBlackHole(q);
   }
 
@@ -4097,49 +4097,49 @@ public class Batfish extends PluginConsumer implements IBatfish {
     if (bound == null) {
       throw new BatfishException("Missing parameter length bound: (e.g., bound=3)");
     }
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkBoundedLength(q, bound);
   }
 
   @Override
   public AnswerElement smtDeterminism(HeaderQuestion q) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkDeterminism(q);
   }
 
   @Override
   public AnswerElement smtEqualLength(HeaderLocationQuestion q) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkEqualLength(q);
   }
 
   @Override
   public AnswerElement smtForwarding(HeaderQuestion q) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkForwarding(q);
   }
 
   @Override
   public AnswerElement smtLoadBalance(HeaderLocationQuestion q, int threshold) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkLoadBalancing(q, threshold);
   }
 
   @Override
   public AnswerElement smtLocalConsistency(Pattern routerRegex, boolean strict, boolean fullModel) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkLocalEquivalence(routerRegex, strict, fullModel);
   }
 
   @Override
   public AnswerElement smtMultipathConsistency(HeaderLocationQuestion q) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkMultipathConsistency(q);
   }
 
   @Override
   public AnswerElement smtReachability(HeaderLocationQuestion q) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkReachability(q);
   }
 
@@ -4151,7 +4151,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   @Override
   public AnswerElement smtRoutingLoop(HeaderQuestion q) {
-    PropertyChecker p = new PropertyChecker(this);
+    PropertyChecker p = new PropertyChecker(this, _settings);
     return p.checkRoutingLoop(q);
   }
 

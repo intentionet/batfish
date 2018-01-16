@@ -78,4 +78,7 @@ test tests/basic/example-iptables-reachability.ref get reachability ingressNodeR
 test tests/basic/example-iptables-transit.ref get reachability notIngressNodeRegex="z1-.*", dstIps=["10.0.3.0/24"], notDstIps=["10.0.3.1"], notTransitNodes=["z1-firewall"], actions=["ACCEPT"]
 test tests/basic/example-iptables-protection.ref get reachability notIngressNodeRegex="z1-.*", dstIps=["10.0.3.20","10.0.3.21"], notSrcIps=["10.0.3.0/24", "10.0.4.0/24"], notIpProtocols=["OSPF"], actions=["ACCEPT"]
 
-
+# z3 timeout - 1 second
+add-batfish-option z3timeout 1000
+init-testrig test_rigs/fattree-examples/fattree8.zip
+test tests/basic/z3timeout.ref -error get reachability dstIps=['70.0.78.0']

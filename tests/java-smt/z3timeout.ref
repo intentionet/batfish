@@ -1,0 +1,58 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.common.BatfishException$BatfishStackTrace",
+      "answer" : [
+        "org.batfish.common.BatfishException: Failed to answer question",
+        "   at org.batfish.main.Batfish.answer(Batfish.java:592)",
+        "   at org.batfish.main.Batfish.run(Batfish.java:3723)",
+        "   at org.batfish.main.Driver$1.run(Driver.java:367)",
+        "Caused by: org.batfish.common.BatfishException: ERROR: satisfiability unknown",
+        "   at org.batfish.symbolic.smt.Encoder.verify(Encoder.java:746)",
+        "   at org.batfish.symbolic.smt.PropertyChecker.lambda$checkProperty$2(PropertyChecker.java:442)",
+        "   at java.util.stream.MatchOps$1MatchSink.accept(MatchOps.java:90)",
+        "   at java.util.ArrayList$ArrayListSpliterator.tryAdvance(ArrayList.java:1359)",
+        "   at java.util.stream.ReferencePipeline.forEachWithCancel(ReferencePipeline.java:126)",
+        "   at java.util.stream.AbstractPipeline.copyIntoWithCancel(AbstractPipeline.java:498)",
+        "   at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:485)",
+        "   at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:471)",
+        "   at java.util.stream.MatchOps$MatchOp.evaluateSequential(MatchOps.java:230)",
+        "   at java.util.stream.MatchOps$MatchOp.evaluateSequential(MatchOps.java:196)",
+        "   at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)",
+        "   at java.util.stream.ReferencePipeline.anyMatch(ReferencePipeline.java:449)",
+        "   at org.batfish.symbolic.smt.PropertyChecker.checkProperty(PropertyChecker.java:337)",
+        "   at org.batfish.symbolic.smt.PropertyChecker.checkReachability(PropertyChecker.java:479)",
+        "   at org.batfish.main.Batfish.smtReachability(Batfish.java:4143)",
+        "   at org.batfish.question.SmtReachabilityQuestionPlugin$ReachabilityAnswerer.answer(SmtReachabilityQuestionPlugin.java:33)",
+        "   at org.batfish.main.Batfish.answer(Batfish.java:589)",
+        "   ... 2 more"
+      ]
+    }
+  ],
+  "question" : {
+    "class" : "org.batfish.question.SmtReachabilityQuestionPlugin$ReachabilityQuestion",
+    "baseEnvType" : "any",
+    "benchmark" : false,
+    "deltaEnvType" : "any",
+    "differential" : false,
+    "dstIps" : [
+      "70.0.78.0"
+    ],
+    "envDiff" : false,
+    "failNode1Regex" : ".*",
+    "failNode2Regex" : ".*",
+    "failures" : 0,
+    "finalIfaceRegex" : ".*",
+    "finalNodeRegex" : ".*",
+    "fullModel" : false,
+    "ingressNodeRegex" : ".*",
+    "minimize" : false,
+    "useAbstraction" : false
+  },
+  "status" : "FAILURE",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}
