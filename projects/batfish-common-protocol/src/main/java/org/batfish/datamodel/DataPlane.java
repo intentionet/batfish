@@ -16,7 +16,5 @@ public interface DataPlane extends Serializable {
 
   SortedMap<String, Map<Ip, SortedSet<Edge>>> getPolicyRouteFibNodeMap();
 
-  SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> getRibs();
-
   SortedSet<Edge> getTopologyEdges();
 }
