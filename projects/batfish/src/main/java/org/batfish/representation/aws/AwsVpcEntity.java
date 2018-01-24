@@ -19,6 +19,10 @@ public interface AwsVpcEntity {
   String JSON_KEY_CUSTOMER_GATEWAY_CONFIGURATION = "CustomerGatewayConfiguration";
   String JSON_KEY_CUSTOMER_GATEWAY_ID = "CustomerGatewayId";
   String JSON_KEY_CUSTOMER_GATEWAYS = "CustomerGateways";
+  String JSON_KEY_DB_INSTANCES = "DBInstances";
+  String JSON_KEY_DB_INSTANCE_IDENTIFIER = "DBInstanceIdentifier";
+  String JSON_KEY_DB_INSTANCE_STATUS = "DBInstanceStatus";
+  String JSON_KEY_DB_SUBNET_GROUP = "DBSubnetGroup";
   String JSON_KEY_DESTINATION_CIDR_BLOCK = "DestinationCidrBlock";
   String JSON_KEY_DHCP_OPTIONS = "DhcpOptions";
   String JSON_KEY_EGRESS = "Egress";
@@ -40,6 +44,7 @@ public interface AwsVpcEntity {
   String JSON_KEY_IP_PROTOCOL = "IpProtocol";
   String JSON_KEY_IP_RANGES = "IpRanges";
   String JSON_KEY_MAIN = "Main";
+  String JSON_KEY_MULTI_AZ = "MultiAZ";
   String JSON_KEY_NAT_GATEWAY_ADDRESSES = "NatGatewayAddresses";
   String JSON_KEY_NAT_GATEWAY_ID = "NatGatewayId";
   String JSON_KEY_NAT_GATEWAYS = "NatGateways";
@@ -70,7 +75,10 @@ public interface AwsVpcEntity {
   String JSON_KEY_STATIC_ROUTES_ONLY = "StaticRoutesOnly";
   String JSON_KEY_STATUS = "Status";
   String JSON_KEY_STATUS_MESSAGE = "StatusMessage";
+  String JSON_KEY_SUBNET_AVAILABILITY_ZONE = "SubnetAvailabilityZone";
   String JSON_KEY_SUBNET_ID = "SubnetId";
+  String JSON_KEY_SUBNET_IDENTIFIER = "SubnetIdentifier";
+  String JSON_KEY_SUBNET_STATUS = "SubnetStatus";
   String JSON_KEY_SUBNETS = "Subnets";
   String JSON_KEY_TAGS = "Tags";
   String JSON_KEY_TO = "To";
@@ -81,6 +89,8 @@ public interface AwsVpcEntity {
   String JSON_KEY_VPC_ID = "VpcId";
   String JSON_KEY_VPC_PEERING_CONNECTION_ID = "VpcPeeringConnectionId";
   String JSON_KEY_VPC_PEERING_CONNECTIONS = "VpcPeeringConnections";
+  String JSON_KEY_VPC_SECURITY_GROUPS = "VpcSecurityGroups";
+  String JSON_KEY_VPC_SECURITY_GROUP_ID = "VpcSecurityGroupId";
   String JSON_KEY_VPCS = "Vpcs";
   String JSON_KEY_VPN_CONNECTION_ID = "VpnConnectionId";
   String JSON_KEY_VPN_CONNECTIONS = "VpnConnections";

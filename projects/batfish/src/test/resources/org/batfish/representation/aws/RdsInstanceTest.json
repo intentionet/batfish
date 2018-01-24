@@ -1,0 +1,75 @@
+{
+  "DBInstances": [
+    {
+      "AllocatedStorage": 5,
+      "AutoMinorVersionUpgrade": true,
+      "AvailabilityZone": "us-west-2b",
+      "BackupRetentionPeriod": 7,
+      "CACertificateIdentifier": "rds-ca-2015",
+      "CopyTagsToSnapshot": true,
+      "DBInstanceArn": "arn:aws:rds:us-west-2:1111111111:db:test-db",
+      "DBInstanceClass": "db.t2.micro",
+      "DBInstanceIdentifier": "test-db",
+      "DBInstanceStatus": "available",
+      "DBParameterGroups": [
+        {
+          "DBParameterGroupName": "default.mysql5.7",
+          "ParameterApplyStatus": "in-sync"
+        }
+      ],
+      "DBSecurityGroups": [],
+      "DBSubnetGroup": {
+        "DBSubnetGroupDescription": "default",
+        "DBSubnetGroupName": "default",
+        "SubnetGroupStatus": "Complete",
+        "Subnets": [
+          {
+            "SubnetAvailabilityZone": {
+              "Name": "us-west-2b"
+            },
+            "SubnetIdentifier": "subnet-1",
+            "SubnetStatus": "Active"
+          }
+        ],
+        "VpcId": "vpc-1"
+      },
+      "DbInstancePort": 0,
+      "DbiResourceId": "db-12345",
+      "DomainMemberships": [],
+      "Endpoint": {
+        "Address": "batfish-db.com",
+        "HostedZoneId": "ABCD12345",
+        "Port": 3306
+      },
+      "Engine": "mysql",
+      "EngineVersion": "5.7.16",
+      "IAMDatabaseAuthenticationEnabled": false,
+      "InstanceCreateTime": "2017-12-12 02:25:51.609000+00:00",
+      "LatestRestorableTime": "2018-01-21 10:30:00+00:00",
+      "LicenseModel": "general-public-license",
+      "MasterUsername": "testuser",
+      "MonitoringInterval": 0,
+      "MultiAZ": false,
+      "OptionGroupMemberships": [
+        {
+          "OptionGroupName": "default:mysql-5-7",
+          "Status": "in-sync"
+        }
+      ],
+      "PendingModifiedValues": {},
+      "PerformanceInsightsEnabled": false,
+      "PreferredBackupWindow": "14:00-14:30",
+      "PreferredMaintenanceWindow": "sun:12:00-sun:12:30",
+      "PubliclyAccessible": true,
+      "ReadReplicaDBInstanceIdentifiers": [],
+      "StorageEncrypted": false,
+      "StorageType": "gp2",
+      "VpcSecurityGroups": [
+        {
+          "Status": "active",
+          "VpcSecurityGroupId": "sg-12345"
+        }
+      ]
+    }
+  ]
+}
