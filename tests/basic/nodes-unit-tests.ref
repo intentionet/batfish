@@ -7075,7 +7075,7 @@
               "mtu" : 1500,
               "nativeVlan" : 1,
               "ospfArea" : 0,
-              "ospfCost" : 10,
+              "ospfCost" : 4000,
               "ospfDeadInterval" : 0,
               "ospfEnabled" : true,
               "ospfHelloMultiplier" : 0,
@@ -7180,7 +7180,7 @@
                   }
                 },
                 "exportPolicy" : "~OSPF_EXPORT_POLICY:default~",
-                "referenceBandwidth" : 1.0E8,
+                "referenceBandwidth" : 4.0E10,
                 "routerId" : "1.2.3.4"
               }
             }
@@ -9120,7 +9120,7 @@
               "mtu" : 1500,
               "nativeVlan" : 1,
               "ospfArea" : 0,
-              "ospfCost" : 1,
+              "ospfCost" : 40,
               "ospfDeadInterval" : 0,
               "ospfEnabled" : true,
               "ospfHelloMultiplier" : 0,
@@ -9154,7 +9154,7 @@
               "mtu" : 1500,
               "nativeVlan" : 1,
               "ospfArea" : 0,
-              "ospfCost" : 1,
+              "ospfCost" : 40,
               "ospfDeadInterval" : 0,
               "ospfEnabled" : true,
               "ospfHelloMultiplier" : 0,
@@ -9239,7 +9239,7 @@
                   }
                 },
                 "exportPolicy" : "~OSPF_EXPORT_POLICY:default~",
-                "referenceBandwidth" : 1.0E8,
+                "referenceBandwidth" : 4.0E10,
                 "routerId" : "2.130.0.1"
               }
             }
@@ -10591,7 +10591,7 @@
                   }
                 },
                 "exportPolicy" : "~OSPF_EXPORT_POLICY:default~",
-                "referenceBandwidth" : 1.0E8,
+                "referenceBandwidth" : 4.0E10,
                 "routerId" : "169.232.1.4"
               }
             }
