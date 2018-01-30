@@ -360,6 +360,36 @@ public class WorkQueueMgr {
     return retList;
   }
 
+  public synchronized QueuedWork getDataplaningWork(String containerName, String testrigName) {
+    QueuedWork work =
+        getTestrigWork(containerName, testrigName, _queueIncompleteWork, WorkType.DATAPLANING);
+    if (work != null) {
+      return work;
+    }
+    return getTestrigWork(containerName, testrigName, _queueCompletedWork, WorkType.DATAPLANING);
+  }
+
+  public synchronized QueuedWork getParsingWork(String containerName, String testrigName) {
+    QueuedWork work =
+        getTestrigWork(containerName, testrigName, _queueIncompleteWork, WorkType.PARSING);
+    if (work != null) {
+      return work;
+    }
+    return getTestrigWork(containerName, testrigName, _queueCompletedWork, WorkType.PARSING);
+  }
+
+  private synchronized QueuedWork getTestrigWork(
+      String containerName, String testrigName, WorkQueue queue, WorkType type) {
+    for (QueuedWork work : queue) {
+      if (work.getWorkItem().getContainerName().equals(containerName)
+          && work.getDetails().baseTestrig.equals(testrigName)
+          && work.getDetails().workType == type) {
+        return work;
+      }
+    }
+    return null;
+  }
+
   public synchronized void makeWorkUnassigned(QueuedWork work) {
     work.setStatus(WorkStatusCode.UNASSIGNED);
   }

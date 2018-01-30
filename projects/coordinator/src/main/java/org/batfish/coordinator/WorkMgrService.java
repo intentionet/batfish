@@ -689,6 +689,108 @@ public class WorkMgrService {
     }
   }
 
+  /**
+   * Get most recent complete or incomplete dataplaning work for the given testrig
+   *
+   * @param apiKey The API key of the client
+   * @param clientVersion The version of the client
+   * @param containerName The name of the container for which to get work
+   * @param testrigName The name of the testrig for which to get work
+   * @return A JSON object containing the most recent dataplaning work
+   */
+  @POST
+  @Path(CoordConsts.SVC_RSC_GET_DATAPLANING_WORK)
+  @Produces(MediaType.APPLICATION_JSON)
+  public JSONArray getDataplaningWork(
+      @FormDataParam(CoordConsts.SVC_KEY_API_KEY) String apiKey,
+      @FormDataParam(CoordConsts.SVC_KEY_VERSION) String clientVersion,
+      @FormDataParam(CoordConsts.SVC_KEY_CONTAINER_NAME) String containerName,
+      @FormDataParam(CoordConsts.SVC_KEY_TESTRIG_NAME) String testrigName) {
+    try {
+      _logger.info("WMS:getDataplaningWork " + containerName + " " + testrigName + "\n");
+
+      checkStringParam(apiKey, "API key");
+      checkStringParam(clientVersion, "Client version");
+      checkStringParam(containerName, "Container name");
+      checkStringParam(containerName, "Container name");
+      checkStringParam(testrigName, "Base testrig name");
+
+      checkApiKeyValidity(apiKey);
+      checkClientVersion(clientVersion);
+      checkContainerAccessibility(apiKey, containerName);
+
+      QueuedWork work = Main.getWorkMgr().getDataplaningWork(containerName, testrigName);
+      if (work == null) {
+        return successResponse(new JSONObject().put(CoordConsts.SVC_KEY_WORKSTATUS, ""));
+      }
+      WorkStatus status =
+          new WorkStatus(work.getWorkItem(), work.getStatus(), work.getLastTaskCheckResult());
+
+      BatfishObjectMapper mapper = new BatfishObjectMapper();
+      return successResponse(
+          new JSONObject().put(CoordConsts.SVC_KEY_WORKSTATUS, mapper.writeValueAsString(status)));
+
+    } catch (IllegalArgumentException | AccessControlException e) {
+      _logger.error("WMS:getDataplaningWork exception: " + e.getMessage() + "\n");
+      return failureResponse(e.getMessage());
+    } catch (Exception e) {
+      String stackTrace = ExceptionUtils.getFullStackTrace(e);
+      _logger.error("WMS:getDataplaningWork exception: " + stackTrace);
+      return failureResponse(e.getMessage());
+    }
+  }
+
+  /**
+   * Get most recent complete or incomplete parsing work for the given testrig
+   *
+   * @param apiKey The API key of the client
+   * @param clientVersion The version of the client
+   * @param containerName The name of the container for which to get work
+   * @param testrigName The name of the testrig for which to get work
+   * @return A JSON object containing the most recent parsing work
+   */
+  @POST
+  @Path(CoordConsts.SVC_RSC_GET_PARSING_WORK)
+  @Produces(MediaType.APPLICATION_JSON)
+  public JSONArray getParsingWork(
+      @FormDataParam(CoordConsts.SVC_KEY_API_KEY) String apiKey,
+      @FormDataParam(CoordConsts.SVC_KEY_VERSION) String clientVersion,
+      @FormDataParam(CoordConsts.SVC_KEY_CONTAINER_NAME) String containerName,
+      @FormDataParam(CoordConsts.SVC_KEY_TESTRIG_NAME) String testrigName) {
+    try {
+      _logger.info("WMS:getParsingWork " + containerName + " " + testrigName + "\n");
+
+      checkStringParam(apiKey, "API key");
+      checkStringParam(clientVersion, "Client version");
+      checkStringParam(containerName, "Container name");
+      checkStringParam(containerName, "Container name");
+      checkStringParam(testrigName, "Base testrig name");
+
+      checkApiKeyValidity(apiKey);
+      checkClientVersion(clientVersion);
+      checkContainerAccessibility(apiKey, containerName);
+
+      QueuedWork work = Main.getWorkMgr().getParsingWork(containerName, testrigName);
+      if (work == null) {
+        return successResponse(new JSONObject().put(CoordConsts.SVC_KEY_WORKSTATUS, ""));
+      }
+      WorkStatus status =
+          new WorkStatus(work.getWorkItem(), work.getStatus(), work.getLastTaskCheckResult());
+
+      BatfishObjectMapper mapper = new BatfishObjectMapper();
+      return successResponse(
+          new JSONObject().put(CoordConsts.SVC_KEY_WORKSTATUS, mapper.writeValueAsString(status)));
+
+    } catch (IllegalArgumentException | AccessControlException e) {
+      _logger.error("WMS:getParsingWork exception: " + e.getMessage() + "\n");
+      return failureResponse(e.getMessage());
+    } catch (Exception e) {
+      String stackTrace = ExceptionUtils.getFullStackTrace(e);
+      _logger.error("WMS:getParsingWork exception: " + stackTrace);
+      return failureResponse(e.getMessage());
+    }
+  }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public JSONArray getInfo() {

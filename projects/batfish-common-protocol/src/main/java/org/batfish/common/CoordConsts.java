@@ -115,7 +115,9 @@ public class CoordConsts {
   public static final String SVC_RSC_GET_ANSWER = "getanswer";
   public static final String SVC_RSC_GET_CONFIGURATION = "getconfiguration";
   public static final String SVC_RSC_GET_CONTAINER = "getcontainer";
+  public static final String SVC_RSC_GET_DATAPLANING_WORK = "getdataplaningwork";
   public static final String SVC_RSC_GET_OBJECT = "getobject";
+  public static final String SVC_RSC_GET_PARSING_WORK = "getparsingwork";
   public static final String SVC_RSC_GET_QUESTION_TEMPLATES = "getquestiontemplates";
   public static final String SVC_RSC_GET_WORKSTATUS = "getworkstatus";
   public static final String SVC_RSC_GETSTATUS = "getstatus";
