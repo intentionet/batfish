@@ -1,0 +1,10 @@
+boot system flash this-is-an-arista-device.swi
+!
+hostname aristaOspfCostDefaults
+!
+router ospf 1
+  ! Batfish drops routers with no router-id.
+  router-id 1.1.1.1
+
+  ! Use default reference bandwidth
+!

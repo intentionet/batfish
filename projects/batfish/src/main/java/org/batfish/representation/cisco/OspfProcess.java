@@ -9,7 +9,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
+import org.batfish.common.BatfishException;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.OspfMetricType;
@@ -26,8 +28,11 @@ public class OspfProcess extends ComparableStructure<String> {
 
   public static final long DEFAULT_MAX_METRIC_SUMMARY_LSA = 0xFF0000L;
 
-  /** bits per second */
-  public static final double DEFAULT_REFERENCE_BANDWIDTH = 1E8D;
+  private static final double DEFAULT_REFERENCE_BANDWIDTH_10_MBPS = 10E6D;
+
+  private static final double DEFAULT_REFERENCE_BANDWIDTH_100_MBPS = 100E6D;
+
+  private static final double DEFAULT_REFERENCE_BANDWIDTH_40_GBPS = 40E9D;
 
   public static final long MAX_METRIC_ROUTER_LSA = 0xFFFFL;
 
@@ -75,9 +80,27 @@ public class OspfProcess extends ComparableStructure<String> {
 
   private Set<OspfWildcardNetwork> _wildcardNetworks;
 
-  public OspfProcess(String name) {
+  public static double getReferenceOspfBandwidth(ConfigurationFormat format) {
+    switch (format) {
+      case ARISTA: // EOS manual, Chapter 27, "auto-cost reference-bandwidth (OSPFv2)"
+        return DEFAULT_REFERENCE_BANDWIDTH_10_MBPS;
+
+      case CISCO_ASA: // ASA uses 100 Mbps, switches to 40 Gbps for OSPF v3
+      case CISCO_IOS: // https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/iproute_ospf/command/iro-cr-book/ospf-a1.html#wp3271966058
+      case CISCO_IOS_XR: // https://www.cisco.com/c/en/us/td/docs/ios_xr_sw/iosxr_r3-7/routing/command/reference/rr37ospf.html
+        return DEFAULT_REFERENCE_BANDWIDTH_100_MBPS;
+
+      case CISCO_NX: // https://www.cisco.com/c/m/en_us/techdoc/dc/reference/cli/nxos/commands/ospf/auto-cost-ospf.html
+        return DEFAULT_REFERENCE_BANDWIDTH_40_GBPS;
+
+      default:
+        throw new BatfishException("Unknown default OSPF reference bandwidth for format " + format);
+    }
+  }
+
+  public OspfProcess(String name, ConfigurationFormat format) {
     super(name);
-    _referenceBandwidth = DEFAULT_REFERENCE_BANDWIDTH;
+    _referenceBandwidth = getReferenceOspfBandwidth(format);
     _networks = new TreeSet<>();
     _defaultInformationMetric = DEFAULT_DEFAULT_INFORMATION_METRIC;
     _defaultInformationMetricType = DEFAULT_DEFAULT_INFORMATION_METRIC_TYPE;

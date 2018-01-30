@@ -1,0 +1,13 @@
+!!!!!! trick Batfish into recognizing this as an IOS device. !!!!!!
+! exit-address-family
+!!!!!! trick Batfish into recognizing this as an IOS device. !!!!!!
+!
+hostname iosOspfCost
+!
+router ospf 1
+  ! Batfish drops routers with no router-id.
+  router-id 1.1.1.1
+
+  ! In IOS, should be interpreted as 10 Mbps.
+  auto-cost reference-bandwidth 10
+!

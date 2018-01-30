@@ -1,7 +1,7 @@
 package org.batfish.grammar.cisco;
 
-import static java.util.Comparator.naturalOrder;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasDeclaredNames;
+import static org.batfish.representation.cisco.OspfProcess.getReferenceOspfBandwidth;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -13,8 +13,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSortedMap;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +31,7 @@ import org.batfish.datamodel.AsPath;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.CommunityList;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.InterfaceType;
@@ -47,11 +48,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
-/** Tests for {@link CiscoParser}Cisco parser and {@link CiscoControlPlaneExtractor}. */
+/** Tests for {@link CiscoParser} and {@link CiscoControlPlaneExtractor}. */
 public class CiscoGrammarTest {
 
-  private static String TESTCONFIGS_PREFIX = "org/batfish/grammar/cisco/testconfigs/";
-  private static String TESTRIGS_PREFIX = "org/batfish/grammar/cisco/testrigs/";
+  private static final String TESTCONFIGS_PREFIX = "org/batfish/grammar/cisco/testconfigs/";
+  private static final String TESTRIGS_PREFIX = "org/batfish/grammar/cisco/testrigs/";
 
   @Rule public TemporaryFolder _folder = new TemporaryFolder();
 
@@ -59,28 +60,86 @@ public class CiscoGrammarTest {
 
   @Test
   public void testAaaNewmodel() throws IOException {
-    List<String> configurationNames = ImmutableList.of("aaaNoNewmodel", "aaaNewmodel");
-
-    Batfish batfish =
-        BatfishTestUtils.getBatfishFromTestrigText(
-            TestrigText.builder()
-                .setConfigurationText(
-                    configurationNames
-                        .stream()
-                        .collect(
-                            ImmutableSortedMap.toImmutableSortedMap(
-                                naturalOrder(),
-                                n -> n,
-                                n -> CommonUtil.readResource(TESTCONFIGS_PREFIX + n))))
-                .build(),
-            _folder);
+    Batfish batfish = batfishWithTextConfigs("aaaNoNewmodel", "aaaNewmodel");
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+
     Configuration newModelConfiguration = configurations.get("aaaNewmodel");
     boolean aaaNewmodel = newModelConfiguration.getVendorFamily().getCisco().getAaa().getNewModel();
     assertTrue(aaaNewmodel);
+
     Configuration noNewModelConfiguration = configurations.get("aaaNoNewmodel");
     aaaNewmodel = noNewModelConfiguration.getVendorFamily().getCisco().getAaa().getNewModel();
     assertFalse(aaaNewmodel);
+  }
+
+  @Test
+  public void testAristaOspfReferenceBandwidth() throws IOException {
+    Batfish batfish = batfishWithTextConfigs("aristaOspfCost", "aristaOspfCostDefaults");
+    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+
+    Configuration manual = configurations.get("aristaOspfCost");
+    assertThat(manual.getDefaultVrf().getOspfProcess().getReferenceBandwidth(), equalTo(3e6d));
+
+    Configuration defaults = configurations.get("aristaOspfCostDefaults");
+    assertThat(
+        defaults.getDefaultVrf().getOspfProcess().getReferenceBandwidth(),
+        equalTo(getReferenceOspfBandwidth(ConfigurationFormat.ARISTA)));
+  }
+
+  @Test
+  public void testAsaOspfReferenceBandwidth() throws IOException {
+    Batfish batfish = batfishWithTextConfigs("asaOspfCost", "asaOspfCostDefaults");
+    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+
+    Configuration manual = configurations.get("asaOspfCost");
+    assertThat(manual.getDefaultVrf().getOspfProcess().getReferenceBandwidth(), equalTo(3e6d));
+
+    Configuration defaults = configurations.get("asaOspfCostDefaults");
+    assertThat(
+        defaults.getDefaultVrf().getOspfProcess().getReferenceBandwidth(),
+        equalTo(getReferenceOspfBandwidth(ConfigurationFormat.CISCO_ASA)));
+  }
+
+  @Test
+  public void testIosOspfReferenceBandwidth() throws IOException {
+    Batfish batfish = batfishWithTextConfigs("iosOspfCost", "iosOspfCostDefaults");
+    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+
+    Configuration manual = configurations.get("iosOspfCost");
+    assertThat(manual.getDefaultVrf().getOspfProcess().getReferenceBandwidth(), equalTo(10e6d));
+
+    Configuration defaults = configurations.get("iosOspfCostDefaults");
+    assertThat(
+        defaults.getDefaultVrf().getOspfProcess().getReferenceBandwidth(),
+        equalTo(getReferenceOspfBandwidth(ConfigurationFormat.CISCO_IOS)));
+  }
+
+  @Test
+  public void testIosXrOspfReferenceBandwidth() throws IOException {
+    Batfish batfish = batfishWithTextConfigs("iosxrOspfCost", "iosxrOspfCostDefaults");
+    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+
+    Configuration manual = configurations.get("iosxrOspfCost");
+    assertThat(manual.getDefaultVrf().getOspfProcess().getReferenceBandwidth(), equalTo(10e6d));
+
+    Configuration defaults = configurations.get("iosxrOspfCostDefaults");
+    assertThat(
+        defaults.getDefaultVrf().getOspfProcess().getReferenceBandwidth(),
+        equalTo(getReferenceOspfBandwidth(ConfigurationFormat.CISCO_IOS_XR)));
+  }
+
+  @Test
+  public void testNxosOspfReferenceBandwidth() throws IOException {
+    Batfish batfish = batfishWithTextConfigs("nxosOspfCost", "nxosOspfCostDefaults");
+    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+
+    Configuration manual = configurations.get("nxosOspfCost");
+    assertThat(manual.getDefaultVrf().getOspfProcess().getReferenceBandwidth(), equalTo(10e9d));
+
+    Configuration defaults = configurations.get("nxosOspfCostDefaults");
+    assertThat(
+        defaults.getDefaultVrf().getOspfProcess().getReferenceBandwidth(),
+        equalTo(getReferenceOspfBandwidth(ConfigurationFormat.CISCO_NX)));
   }
 
   @Test
@@ -199,7 +258,7 @@ public class CiscoGrammarTest {
             .getAsPath()
             .getAsSets()
             .stream()
-            .flatMap(asSet -> asSet.stream())
+            .flatMap(Collection::stream)
             .anyMatch(AsPath::isPrivateAs);
     assertTrue(r2HasPrivate);
 
@@ -213,7 +272,7 @@ public class CiscoGrammarTest {
             .getAsPath()
             .getAsSets()
             .stream()
-            .flatMap(asSet -> asSet.stream())
+            .flatMap(Collection::stream)
             .anyMatch(AsPath::isPrivateAs);
     assertFalse(r3HasPrivate);
   }
@@ -374,7 +433,7 @@ public class CiscoGrammarTest {
     }
 
     assertThat(
-        configurations.values().stream().flatMap(c -> c.getIpsecVpns().values().stream()).count(),
+        configurations.values().stream().mapToLong(c -> c.getIpsecVpns().values().size()).sum(),
         equalTo(6L));
     configurations
         .values()
@@ -506,12 +565,8 @@ public class CiscoGrammarTest {
     assertThat(new InterfaceAddress("10.0.0.4/32"), isIn(l4Prefixes));
   }
 
-  @Test
-  public void testRfc1583Compatible() throws IOException {
+  private Batfish batfishWithTextConfigs(String... configurationNames) throws IOException {
     SortedMap<String, String> configurationTextMap = new TreeMap<>();
-    String[] configurationNames =
-        new String[] {"rfc1583Compatible", "rfc1583NoCompatible", "rfc1583Unconfigured"};
-    Boolean[] expectedResults = new Boolean[] {Boolean.TRUE, Boolean.FALSE, null};
     for (String configName : configurationNames) {
       String configurationText = CommonUtil.readResource(TESTCONFIGS_PREFIX + configName);
       configurationTextMap.put(configName, configurationText);
@@ -519,8 +574,17 @@ public class CiscoGrammarTest {
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
             TestrigText.builder().setConfigurationText(configurationTextMap).build(), _folder);
+    return batfish;
+  }
+
+  @Test
+  public void testRfc1583Compatible() throws IOException {
+    String[] configurationNames =
+        new String[] {"rfc1583Compatible", "rfc1583NoCompatible", "rfc1583Unconfigured"};
+    Batfish batfish = batfishWithTextConfigs(configurationNames);
     SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
 
+    Boolean[] expectedResults = new Boolean[] {Boolean.TRUE, Boolean.FALSE, null};
     for (int i = 0; i < configurationNames.length; i++) {
       Configuration configuration = configurations.get(configurationNames[i]);
       assertThat(configuration.getVrfs().size(), equalTo(1));

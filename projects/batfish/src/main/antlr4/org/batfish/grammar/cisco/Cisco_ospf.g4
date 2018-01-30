@@ -62,6 +62,11 @@ ro_authentication
    AUTHENTICATION MESSAGE_DIGEST? NEWLINE
 ;
 
+ro_auto_cost
+:
+   AUTO_COST REFERENCE_BANDWIDTH DEC (GBPS | MBPS)? NEWLINE
+;
+
 ro_common
 :
    ro_authentication
@@ -542,6 +547,7 @@ s_router_ospf
       | ro_area_nssa
       | ro_area_range
       | ro_area_stub
+      | ro_auto_cost
       | ro_common
       | ro_default_information
       | ro_distance

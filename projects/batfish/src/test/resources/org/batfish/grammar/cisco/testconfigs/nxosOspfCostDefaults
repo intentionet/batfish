@@ -1,0 +1,12 @@
+!!!!!! trick Batfish into recognizing this as an NXOS device. !!!!!!
+no feature foo
+!!!!!! trick Batfish into recognizing this as an NXOS device. !!!!!!
+!
+hostname nxosOspfCostDefaults
+!
+router ospf 1
+  ! Batfish drops routers with no router-id.
+  router-id 1.1.1.1
+
+  ! Use default reference bandwidth
+!

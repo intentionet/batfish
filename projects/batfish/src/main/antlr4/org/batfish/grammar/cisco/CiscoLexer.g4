@@ -4381,6 +4381,11 @@ GATEWAY
    'gateway'
 ;
 
+GBPS
+:
+    'Gbps'
+;
+
 GE
 :
    'ge'
@@ -6281,6 +6286,11 @@ MAXPOLL
 MAXSTARTUPS
 :
    'maxstartups'
+;
+
+MBPS
+:
+    'Mbps'
 ;
 
 MBSSID

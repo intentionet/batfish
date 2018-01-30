@@ -1,0 +1,11 @@
+boot system flash this-is-an-arista-device.swi
+!
+hostname aristaOspfCost
+!
+router ospf 1
+  ! Batfish drops routers with no router-id.
+  router-id 1.1.1.1
+
+  ! In Arista, should be interpreted as 3 Mbps.
+  auto-cost reference-bandwidth 3
+!

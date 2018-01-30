@@ -1,0 +1,10 @@
+ASA Version this-is-an-ASA
+!
+hostname asaOspfCostDefaults
+!
+router ospf 1
+  ! Batfish drops routers with no router-id.
+  router-id 1.1.1.1
+
+  ! Use default reference bandwidth
+!
