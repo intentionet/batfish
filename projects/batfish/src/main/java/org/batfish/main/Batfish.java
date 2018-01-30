@@ -1393,11 +1393,12 @@ public class Batfish extends PluginConsumer implements IBatfish {
       currentStartingIpAsLong += (1L << (Prefix.MAX_PREFIX_LENGTH - subnetBits));
     }
     for (Configuration config : configs.values()) {
-      // use cisco arbitrarily
       OspfProcess proc = new OspfProcess();
       config.getDefaultVrf().setOspfProcess(proc);
+      // use cisco arbitrarily
       proc.setReferenceBandwidth(
-          org.batfish.representation.cisco.OspfProcess.DEFAULT_REFERENCE_BANDWIDTH);
+          org.batfish.representation.cisco.OspfProcess.getReferenceOspfBandwidth(
+              ConfigurationFormat.CISCO_IOS));
       long backboneArea = 0;
       OspfArea area = new OspfArea(backboneArea);
       proc.getAreas().put(backboneArea, area);

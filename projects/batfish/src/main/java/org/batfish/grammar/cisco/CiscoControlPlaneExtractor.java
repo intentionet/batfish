@@ -420,6 +420,7 @@ import org.batfish.grammar.cisco.CiscoParser.Remote_as_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Remove_private_as_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_areaContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_area_nssaContext;
+import org.batfish.grammar.cisco.CiscoParser.Ro_auto_costContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_default_informationContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_max_metricContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_maximum_pathsContext;
@@ -2069,9 +2070,28 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     if (ctx.vrf != null) {
       _currentVrf = ctx.vrf.getText();
     }
-    OspfProcess proc = new OspfProcess(procName);
+    OspfProcess proc = new OspfProcess(procName, _format);
     currentVrf().setOspfProcess(proc);
     _currentOspfProcess = proc;
+  }
+
+  @Override
+  public void exitRo_auto_cost(Ro_auto_costContext ctx) {
+    long referenceBandwidthDec = Long.parseLong(ctx.DEC().getText());
+    long referenceBandwidth;
+    if (ctx.MBPS() != null) {
+      referenceBandwidth = referenceBandwidthDec * 1_000_000;
+    } else if (ctx.GBPS() != null) {
+      referenceBandwidth = referenceBandwidthDec * 1_000_000_000;
+    } else {
+      /* Different OSes interpret the units on DEC differently. */
+      if (_format == ConfigurationFormat.CISCO_NX) {
+        referenceBandwidth = referenceBandwidthDec * 1_000_000_000;
+      } else {
+        referenceBandwidth = referenceBandwidthDec * 1_000_000;
+      }
+    }
+    _currentOspfProcess.setReferenceBandwidth(referenceBandwidth);
   }
 
   @Override
