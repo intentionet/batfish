@@ -7596,12 +7596,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void visitErrorNode(ErrorNode errorNode) {
     Token token = errorNode.getSymbol();
-    String lineText = errorNode.getText().replace("\n", "").replace("\r", "");
+    String lineText = errorNode.getText().replace("\n", "").replace("\r", "").trim();
     int line = token.getLine();
     String msg = String.format("Unrecognized Line: %d: %s", line, lineText);
     if (_unrecognizedAsRedFlag) {
-      msg += "\nLINES BELOW LINE " + lineText + " MAY NOT BE PROCESSED CORRECTLY";
-      _w.redFlag(msg);
+      _w.redFlag(msg + " SUBSEQUENT LINES MAY NOT BE PROCESSED CORRECTLY\n");
       _configuration.setUnrecognized(true);
     } else {
       _parser.getErrors().add(msg);
