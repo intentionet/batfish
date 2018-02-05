@@ -91,7 +91,8 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
           question.getFinalNodeRegex(),
           question.getNotFinalNodeRegex(),
           question.getTransitNodes(),
-          question.getNotTransitNodes());
+          question.getNotTransitNodes(),
+          question.getUseCompression());
     }
   }
 
@@ -130,6 +131,8 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
 
     private static final SortedSet<String> DEFAULT_NOT_TRANSIT_NODES =
         Collections.<String>emptySortedSet();
+
+    private static final boolean DEFAULT_USE_COMPRESSION = false;
 
     private static final String PROP_DST_IPS = "dstIps";
 
@@ -197,6 +200,8 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
 
     private static final String PROP_NOT_TRANSIT_NODES = "notTransitNodes";
 
+    private static final String PROP_USE_COMPRESSION = "useCompression";
+
     private SortedSet<ForwardingAction> _actions;
 
     private NodesSpecifier _finalNodeRegex;
@@ -215,6 +220,8 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
 
     private ReachabilityType _reachabilityType;
 
+    private boolean _useCompression;
+
     public ReachabilityQuestion() {
       _actions = new TreeSet<>(Collections.singleton(ForwardingAction.ACCEPT));
       _finalNodeRegex = new NodesSpecifier(DEFAULT_FINAL_NODE_REGEX);
@@ -225,6 +232,7 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
       _notIngressNodeRegex = new NodesSpecifier(DEFAULT_NOT_INGRESS_NODE_REGEX);
       _transitNodes = DEFAULT_TRANSIT_NODES;
       _notTransitNodes = DEFAULT_NOT_TRANSIT_NODES;
+      _useCompression = DEFAULT_USE_COMPRESSION;
     }
 
     @JsonProperty(PROP_ACTIONS)
@@ -410,6 +418,11 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
     @JsonProperty(PROP_SRC_PROTOCOLS)
     public SortedSet<Protocol> getSrcProtocols() {
       return _headerSpace.getSrcProtocols();
+    }
+
+    @JsonProperty(PROP_USE_COMPRESSION)
+    public boolean getUseCompression() {
+      return _useCompression;
     }
 
     @Override
@@ -704,6 +717,11 @@ public class ReachabilityQuestionPlugin extends QuestionPlugin {
     @JsonProperty(PROP_SRC_PROTOCOLS)
     public void setSrcProtocols(SortedSet<Protocol> srcProtocols) {
       _headerSpace.setSrcProtocols(new TreeSet<>(srcProtocols));
+    }
+
+    @JsonProperty(PROP_USE_COMPRESSION)
+    public void setUseCompression(boolean useCompression) {
+      _useCompression = useCompression;
     }
   }
 

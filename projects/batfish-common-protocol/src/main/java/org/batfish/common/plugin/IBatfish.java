@@ -179,9 +179,10 @@ public interface IBatfish extends IPluginConsumer {
       NodesSpecifier finalNodeRegex,
       NodesSpecifier notFinalNodeRegex,
       Set<String> transitNodes,
-      Set<String> notTransitNodes);
-
-  void writeDataPlane(DataPlane dp, DataPlaneAnswerElement ae);
+      Set<String> notTransitNodes,
+      boolean useCompression);
 
   void registerDataPlanePlugin(DataPlanePlugin plugin, String name);
+
+  DataPlaneAnswerElement computeDataPlane(boolean differentialContext);
 }

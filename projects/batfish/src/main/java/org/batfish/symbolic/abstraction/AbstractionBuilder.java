@@ -53,6 +53,8 @@ class AbstractionBuilder {
 
   private List<Prefix> _prefixes;
 
+  private boolean _isDefaultCase;
+
   private Map<GraphEdge, InterfacePolicy> _exportPol;
 
   private Map<GraphEdge, InterfacePolicy> _importPol;
@@ -73,7 +75,8 @@ class AbstractionBuilder {
       Set<String> devices,
       HeaderSpace h,
       List<Prefix> pfxs,
-      int fails) {
+      int fails,
+      boolean isDefaultCase) {
     this._batfish = a.getBatfish();
     this._graph = a.getGraph();
     this._network = network;
@@ -81,6 +84,7 @@ class AbstractionBuilder {
     this._destinations = devices;
     this._headerspace = h;
     this._prefixes = pfxs;
+    this._isDefaultCase = isDefaultCase;
     this._eeMap = new Table2<>();
     this._polMap = new Table2<>();
     this._existentialMap = new Table2<>();
@@ -93,8 +97,10 @@ class AbstractionBuilder {
       Set<String> devices,
       HeaderSpace h,
       List<Prefix> pfxs,
-      int fails) {
-    AbstractionBuilder g = new AbstractionBuilder(a, network, devices, h, pfxs, fails);
+      int fails,
+      boolean isDefaultCase) {
+    AbstractionBuilder g =
+        new AbstractionBuilder(a, network, devices, h, pfxs, fails, isDefaultCase);
     return g.computeAbstraction();
   }
 
@@ -167,7 +173,7 @@ class AbstractionBuilder {
     AbstractionMap abstractionMap = abstractNetwork.getSecond();
     // System.out.println("Num configs: " + abstractGraph.getConfigurations().size());
     Abstraction a = new Abstraction(abstractGraph, abstractionMap);
-    return new NetworkSlice(_headerspace, a);
+    return new NetworkSlice(_headerspace, a, _isDefaultCase);
   }
 
   /*

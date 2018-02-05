@@ -66,7 +66,12 @@ public class BatfishTestUtils {
     }
     Batfish batfish =
         new Batfish(
-            settings, testrigs, makeDataPlaneCache(), makeEnvBgpCache(), makeEnvRouteCache());
+            settings,
+            testrigs,
+            makeDataPlaneCache(),
+            makeDataPlaneCache(),
+            makeEnvBgpCache(),
+            makeEnvRouteCache());
     batfish.setMonotonicCache(true);
     if (!configurations.isEmpty()) {
       Batfish.serializeAsJson(
@@ -123,6 +128,7 @@ public class BatfishTestUtils {
         new Batfish(
             settings,
             makeTestrigCache(),
+            makeDataPlaneCache(),
             makeDataPlaneCache(),
             makeEnvBgpCache(),
             makeEnvRouteCache());

@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
 import org.batfish.common.plugin.IBatfish;
@@ -48,7 +49,7 @@ public class DestinationClasses {
 
   private boolean _useDefaultCase;
 
-  private Map<Set<String>, Tuple<HeaderSpace, List<Prefix>>> _headerspaceMap;
+  private Map<Set<String>, Tuple<HeaderSpace, Tuple<List<Prefix>, Boolean>>> _headerspaceMap;
 
   private DestinationClasses(IBatfish batfish, @Nullable HeaderSpace h, boolean defaultCase) {
     _batfish = batfish;
@@ -94,25 +95,26 @@ public class DestinationClasses {
       List<Prefix> dstIps, List<Prefix> notDstIps, Map<Set<String>, List<Prefix>> destinationMap) {
     HeaderSpace catchAll = createHeaderSpace(dstIps);
     // System.out.println("DstIps: " + dstIps);
-    for (Prefix pfx : notDstIps) {
-      catchAll.getNotDstIps().add(new IpWildcard(pfx));
-    }
-    for (Entry<Set<String>, List<Prefix>> entry : destinationMap.entrySet()) {
-      // Set<String> devices = entry.getKey();
-      List<Prefix> prefixes = entry.getValue();
-      for (Prefix pfx : prefixes) {
-        // System.out.println("Check for: " + devices + " --> " + prefixes);
-        catchAll.getNotDstIps().add(new IpWildcard(pfx));
-      }
-    }
+
+    SortedSet<IpWildcard> newNotDstIps = new TreeSet<>();
+    newNotDstIps.addAll(
+        notDstIps.stream().map(pfx -> new IpWildcard(pfx)).collect(Collectors.toList()));
+
+    newNotDstIps.addAll(
+        destinationMap
+            .entrySet()
+            .stream()
+            .flatMap(e -> e.getValue().stream())
+            .map(pfx -> new IpWildcard(pfx))
+            .collect(Collectors.toList()));
+
     if (_headerspace != null) {
       copyAllButDestinationIp(catchAll, _headerspace);
     }
     if (!catchAll.getNotDstIps().equals(catchAll.getDstIps())) {
       // System.out.println("Catch all: " + catchAll.getDstIps());
       // System.out.println("Catch all: " + catchAll.getNotDstIps());
-      Tuple<HeaderSpace, List<Prefix>> tup = new Tuple<>(catchAll, null);
-      _headerspaceMap.put(new HashSet<>(), tup);
+      _headerspaceMap.put(new HashSet<>(), new Tuple<>(catchAll, new Tuple<>(null, true)));
     }
   }
 
@@ -123,8 +125,7 @@ public class DestinationClasses {
           if (_headerspace != null) {
             copyAllButDestinationIp(h, _headerspace);
           }
-          Tuple<HeaderSpace, List<Prefix>> tup = new Tuple<>(h, prefixes);
-          _headerspaceMap.put(devices, tup);
+          _headerspaceMap.put(devices, new Tuple<>(h, new Tuple<>(prefixes, false)));
         });
   }
 
@@ -266,7 +267,7 @@ public class DestinationClasses {
     return _headerspace;
   }
 
-  public Map<Set<String>, Tuple<HeaderSpace, List<Prefix>>> getHeaderspaceMap() {
+  public Map<Set<String>, Tuple<HeaderSpace, Tuple<List<Prefix>, Boolean>>> getHeaderspaceMap() {
     return _headerspaceMap;
   }
 }

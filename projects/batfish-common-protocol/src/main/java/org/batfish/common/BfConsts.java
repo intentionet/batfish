@@ -131,6 +131,8 @@ public class BfConsts {
   public static final String RELPATH_AWS_CONFIGS_FILE = "aws_configs";
   public static final String RELPATH_CONFIGURATIONS_DIR = "configs";
   public static final String RELPATH_CONVERT_ANSWER_PATH = "convert_answer";
+  public static final String RELPATH_COMPRESSED_DATA_PLANE = "compressed_dp";
+  public static final String RELPATH_COMPRESSED_DATA_PLANE_ANSWER = "compressed_dp_answer";
   public static final String RELPATH_DATA_PLANE = "dp";
   public static final String RELPATH_DATA_PLANE_ANSWER_PATH = "dp_answer";
   public static final String RELPATH_DEFAULT_ENVIRONMENT_NAME = "env_default";

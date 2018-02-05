@@ -1,0 +1,259 @@
+{
+  "answerElements" : [
+    {
+      "class" : "org.batfish.datamodel.FlowHistory",
+      "traces" : {
+        "Flow<ingressNode:as2border1 ingressVrf:default srcIp:0.0.0.0 dstIp:2.34.201.4 ipProtocol:ICMP dscp: 0 ecn:0 fragmentOffset:0 icmpType:255 icmpCode:255 packetLength:0 state:NEW tag:BASE>" : {
+          "environments" : {
+            "BASE" : {
+              "envName" : "env_default",
+              "testrigName" : "tr-smt-campus2"
+            }
+          },
+          "flow" : {
+            "dscp" : 0,
+            "dstIp" : "2.34.201.4",
+            "dstPort" : 0,
+            "ecn" : 0,
+            "fragmentOffset" : 0,
+            "icmpCode" : 255,
+            "icmpVar" : 255,
+            "ingressNode" : "as2border1",
+            "ingressVrf" : "default",
+            "ipProtocol" : "ICMP",
+            "packetLength" : 0,
+            "srcIp" : "0.0.0.0",
+            "srcPort" : 0,
+            "state" : "NEW",
+            "tag" : "BASE",
+            "tcpFlagsAck" : 0,
+            "tcpFlagsCwr" : 0,
+            "tcpFlagsEce" : 0,
+            "tcpFlagsFin" : 0,
+            "tcpFlagsPsh" : 0,
+            "tcpFlagsRst" : 0,
+            "tcpFlagsSyn" : 0,
+            "tcpFlagsUrg" : 0
+          },
+          "paths" : {
+            "BASE" : [
+              {
+                "disposition" : "ACCEPTED",
+                "hops" : [
+                  {
+                    "edge" : {
+                      "node1" : "as2border1",
+                      "node1interface" : "FastEthernet0/1",
+                      "node2" : "as2core1",
+                      "node2interface" : "FastEthernet0/0"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.12.11.2,nhint:dynamic>_fnhip:2.12.11.2"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2core1",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2dist2",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.23.12.3,nhint:dynamic>_fnhip:2.23.12.3"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2dist2",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2dept1",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "ConnectedRoute<2.34.201.0/24,nhip:AUTO/NONE(-1l),nhint:FastEthernet1/0>_fnhip:null"
+                    ]
+                  }
+                ],
+                "notes" : "ACCEPTED"
+              },
+              {
+                "disposition" : "ACCEPTED",
+                "hops" : [
+                  {
+                    "edge" : {
+                      "node1" : "as2border1",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2core2",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.12.12.2,nhint:dynamic>_fnhip:2.12.12.2"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2core2",
+                      "node1interface" : "FastEthernet2/0",
+                      "node2" : "as2dist2",
+                      "node2interface" : "FastEthernet0/0"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.23.22.3,nhint:dynamic>_fnhip:2.23.22.3"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2dist2",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2dept1",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "ConnectedRoute<2.34.201.0/24,nhip:AUTO/NONE(-1l),nhint:FastEthernet1/0>_fnhip:null"
+                    ]
+                  }
+                ],
+                "notes" : "ACCEPTED"
+              }
+            ]
+          }
+        },
+        "Flow<ingressNode:as2border2 ingressVrf:default srcIp:0.0.0.0 dstIp:2.34.201.4 ipProtocol:ICMP dscp: 0 ecn:0 fragmentOffset:0 icmpType:255 icmpCode:255 packetLength:0 state:NEW tag:BASE>" : {
+          "environments" : {
+            "BASE" : {
+              "envName" : "env_default",
+              "testrigName" : "tr-smt-campus2"
+            }
+          },
+          "flow" : {
+            "dscp" : 0,
+            "dstIp" : "2.34.201.4",
+            "dstPort" : 0,
+            "ecn" : 0,
+            "fragmentOffset" : 0,
+            "icmpCode" : 255,
+            "icmpVar" : 255,
+            "ingressNode" : "as2border2",
+            "ingressVrf" : "default",
+            "ipProtocol" : "ICMP",
+            "packetLength" : 0,
+            "srcIp" : "0.0.0.0",
+            "srcPort" : 0,
+            "state" : "NEW",
+            "tag" : "BASE",
+            "tcpFlagsAck" : 0,
+            "tcpFlagsCwr" : 0,
+            "tcpFlagsEce" : 0,
+            "tcpFlagsFin" : 0,
+            "tcpFlagsPsh" : 0,
+            "tcpFlagsRst" : 0,
+            "tcpFlagsSyn" : 0,
+            "tcpFlagsUrg" : 0
+          },
+          "paths" : {
+            "BASE" : [
+              {
+                "disposition" : "ACCEPTED",
+                "hops" : [
+                  {
+                    "edge" : {
+                      "node1" : "as2border2",
+                      "node1interface" : "FastEthernet0/1",
+                      "node2" : "as2core1",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.12.21.2,nhint:dynamic>_fnhip:2.12.21.2"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2core1",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2dist2",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.23.12.3,nhint:dynamic>_fnhip:2.23.12.3"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2dist2",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2dept1",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "ConnectedRoute<2.34.201.0/24,nhip:AUTO/NONE(-1l),nhint:FastEthernet1/0>_fnhip:null"
+                    ]
+                  }
+                ],
+                "notes" : "ACCEPTED"
+              },
+              {
+                "disposition" : "ACCEPTED",
+                "hops" : [
+                  {
+                    "edge" : {
+                      "node1" : "as2border2",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2core2",
+                      "node2interface" : "FastEthernet0/0"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.12.22.2,nhint:dynamic>_fnhip:2.12.22.2"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2core2",
+                      "node1interface" : "FastEthernet2/0",
+                      "node2" : "as2dist2",
+                      "node2interface" : "FastEthernet0/0"
+                    },
+                    "routes" : [
+                      "OspfExternalType2Route<2.34.201.0/24,nhip:2.23.22.3,nhint:dynamic>_fnhip:2.23.22.3"
+                    ]
+                  },
+                  {
+                    "edge" : {
+                      "node1" : "as2dist2",
+                      "node1interface" : "FastEthernet1/0",
+                      "node2" : "as2dept1",
+                      "node2interface" : "FastEthernet0/1"
+                    },
+                    "routes" : [
+                      "ConnectedRoute<2.34.201.0/24,nhip:AUTO/NONE(-1l),nhint:FastEthernet1/0>_fnhip:null"
+                    ]
+                  }
+                ],
+                "notes" : "ACCEPTED"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "question" : {
+    "class" : "org.batfish.question.ReachabilityQuestionPlugin$ReachabilityQuestion",
+    "actions" : [
+      "ACCEPT"
+    ],
+    "differential" : false,
+    "finalNodeRegex" : "as2dept1",
+    "ingressNodeRegex" : "as2border.*",
+    "negateHeader" : false,
+    "notFinalNodeRegex" : "",
+    "notIngressNodeRegex" : "",
+    "type" : "standard",
+    "useCompression" : true
+  },
+  "status" : "SUCCESS",
+  "summary" : {
+    "numFailed" : 0,
+    "numPassed" : 0,
+    "numResults" : 0
+  }
+}

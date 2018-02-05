@@ -115,6 +115,9 @@ public class Driver {
 
   private static ConcurrentMap<String, Task> _taskLog;
 
+  private static final Cache<TestrigSettings, DataPlane> CACHED_COMPRESSED_DATA_PLANES =
+      buildDataPlaneCache();
+
   private static final Cache<TestrigSettings, DataPlane> CACHED_DATA_PLANES = buildDataPlaneCache();
 
   private static final Map<EnvironmentSettings, SortedMap<String, BgpAdvertisementsByVrf>>
@@ -539,6 +542,7 @@ public class Driver {
           new Batfish(
               settings,
               CACHED_TESTRIGS,
+              CACHED_COMPRESSED_DATA_PLANES,
               CACHED_DATA_PLANES,
               CACHED_ENVIRONMENT_BGP_TABLES,
               CACHED_ENVIRONMENT_ROUTING_TABLES);

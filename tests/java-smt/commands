@@ -128,6 +128,9 @@ test tests/java-smt/campus2-reachability1.ref get smt-reachability ingressNodeRe
 test tests/java-smt/campus2-reachability2.ref get smt-reachability ingressNodeRegex="as2border.*", finalNodeRegex="as2dept1", finalIfaceRegex="FastEthernet1/0" , failures=1
 #test tests/java-smt/campus2-reachability3.ref get smt-reachability ingressNodeRegex="as2border.*", finalNodeRegex="as2dept1", finalIfaceRegex="FastEthernet1/0" , failures=2, noEnvironment=True
 
+# Test dataplane reachability on compressed network
+test tests/java-smt/compressed-reachability1.ref get reachability ingressNodeRegex="as2border.*", finalNodeRegex="as2dept1", useCompression=True
+
 # Test differential reachabililty 
 init-testrig test_rigs/smt-examples/OSPF5 tr-smt-ospf5
 test tests/java-smt/differential1.ref get smt-reachability finalNodeRegex="R3", finalIfaceRegex="Loopback.*", failures=1, diffType=any, dstIps=["70.70.70.70"]

@@ -260,7 +260,7 @@ public class PropertyChecker {
       List<Supplier<NetworkSlice>> singleEc = new ArrayList<>();
       Graph g = graph == null ? new Graph(_batfish) : graph;
       Abstraction a = new Abstraction(g, null);
-      NetworkSlice slice = new NetworkSlice(q.getHeaderSpace(), a);
+      NetworkSlice slice = new NetworkSlice(q.getHeaderSpace(), a, false);
       Supplier<NetworkSlice> sup = () -> slice;
       singleEc.add(sup);
       return new Tuple<>(singleEc.stream(), 0L);
