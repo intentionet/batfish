@@ -13,7 +13,6 @@ import org.batfish.common.BatfishLogger;
 import org.batfish.common.BatfishLogger.BatfishLoggerHistory;
 import org.batfish.config.Settings;
 import org.batfish.datamodel.answers.AnswerElement;
-import org.batfish.job.BatfishJobExecutor.HandleProcessingErrorException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -113,7 +112,8 @@ public class BatfishJobExecutorTest {
     List<BatfishException> failureCauses = new ArrayList<>();
 
     // checking if the exception thrown has correct class
-    _thrown.expect(HandleProcessingErrorException.class);
+    _thrown.expect(BatfishException.class);
+    _thrown.expectMessage(BatfishJobExecutor.JOB_FAILURE_MESSAGE);
     executor.handleProcessingError(
         Lists.newArrayList(new BfTestJob(settings, "result1")), failureCauses, true);
   }

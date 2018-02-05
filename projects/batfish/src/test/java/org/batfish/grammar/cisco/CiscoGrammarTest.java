@@ -27,7 +27,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 import org.batfish.bdp.BdpDataPlanePlugin;
-import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.WellKnownCommunity;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.AbstractRoute;
@@ -306,11 +305,7 @@ public class CiscoGrammarTest {
                 .build(),
             _folder);
     SortedMap<String, Configuration> configurations;
-    try {
-      configurations = batfish.loadConfigurations();
-    } catch (CompositeBatfishException e) {
-      throw e.asSingleException();
-    }
+    configurations = batfish.loadConfigurations();
 
     Configuration iosCommunityListConfig = configurations.get(iosName);
     SortedMap<String, CommunityList> iosCommunityLists = iosCommunityListConfig.getCommunityLists();
@@ -419,11 +414,8 @@ public class CiscoGrammarTest {
                 .build(),
             _folder);
     SortedMap<String, Configuration> configurations;
-    try {
-      configurations = batfish.loadConfigurations();
-    } catch (CompositeBatfishException e) {
-      throw e.asSingleException();
-    }
+    configurations = batfish.loadConfigurations();
+
     Interface i1 = configurations.get(iosHostname).getInterfaces().get(i1Name);
     assertThat(i1, hasDeclaredNames("Ethernet0/0", "e0/0", "Eth0/0", "ether0/0-1"));
   }
@@ -440,11 +432,7 @@ public class CiscoGrammarTest {
                 .build(),
             _folder);
     SortedMap<String, Configuration> configurations;
-    try {
-      configurations = batfish.loadConfigurations();
-    } catch (CompositeBatfishException e) {
-      throw e.asSingleException();
-    }
+    configurations = batfish.loadConfigurations();
 
     assertThat(
         configurations.values().stream().mapToLong(c -> c.getIpsecVpns().values().size()).sum(),
@@ -482,11 +470,8 @@ public class CiscoGrammarTest {
             _folder);
     batfish.getSettings().setDisableUnrecognized(false);
     SortedMap<String, Configuration> configurations;
-    try {
-      configurations = batfish.loadConfigurations();
-    } catch (CompositeBatfishException e) {
-      throw e.asSingleException();
-    }
+    configurations = batfish.loadConfigurations();
+
     Configuration iosMaxMetric = configurations.get(iosMaxMetricName);
     Configuration iosMaxMetricCustom = configurations.get(iosMaxMetricCustomName);
     Configuration iosMaxMetricOnStartup = configurations.get(iosMaxMetricOnStartupName);
@@ -530,11 +515,8 @@ public class CiscoGrammarTest {
                 .build(),
             _folder);
     SortedMap<String, Configuration> configurations;
-    try {
-      configurations = batfish.loadConfigurations();
-    } catch (CompositeBatfishException e) {
-      throw e.asSingleException();
-    }
+    configurations = batfish.loadConfigurations();
+
     Configuration iosMaxMetric = configurations.get(iosOspfPointToPoint);
     Interface e0Sub0 = iosMaxMetric.getInterfaces().get("Ethernet0/0");
     Interface e0Sub1 = iosMaxMetric.getInterfaces().get("Ethernet0/1");
@@ -556,12 +538,8 @@ public class CiscoGrammarTest {
                 .build(),
             _folder);
     batfish.getSettings().setDisableUnrecognized(false);
-    SortedMap<String, Configuration> configurations;
-    try {
-      configurations = batfish.loadConfigurations();
-    } catch (CompositeBatfishException e) {
-      throw e.asSingleException();
-    }
+    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+
     Configuration iosRecovery = configurations.get(hostname);
     SortedMap<String, Interface> iosRecoveryInterfaces = iosRecovery.getInterfaces();
     Set<String> iosRecoveryInterfaceNames = iosRecoveryInterfaces.keySet();

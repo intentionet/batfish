@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.SortedMap;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.config.Settings;
 import org.batfish.datamodel.BgpNeighbor;
@@ -75,11 +74,8 @@ public class FlatJuniperGrammarTest {
                 .build(),
             _folder);
     SortedMap<String, Configuration> configurations;
-    try {
-      configurations = batfish.loadConfigurations();
-    } catch (CompositeBatfishException e) {
-      throw e.asSingleException();
-    }
+    configurations = batfish.loadConfigurations();
+
     Configuration rr = configurations.get(configName);
     BgpProcess proc = rr.getDefaultVrf().getBgpProcess();
     BgpNeighbor neighbor1 =

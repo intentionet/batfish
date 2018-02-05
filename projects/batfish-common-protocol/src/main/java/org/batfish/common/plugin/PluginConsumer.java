@@ -31,7 +31,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.batfish.common.BatfishException;
-import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.util.BatfishObjectInputStream;
 
 public abstract class PluginConsumer implements IPluginConsumer {
@@ -150,9 +149,9 @@ public abstract class PluginConsumer implements IPluginConsumer {
       }
     }
     if (!initializationExceptions.isEmpty()) {
-      throw new CompositeBatfishException(
-          new BatfishException("Failed to initialize one or more plugins"),
-          initializationExceptions);
+      BatfishException e = new BatfishException("Failed to initialize one or more plugins");
+      initializationExceptions.forEach(e::addSuppressed);
+      throw e;
     }
   }
 

@@ -54,7 +54,6 @@ import org.batfish.common.BatfishException.BatfishStackTrace;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
 import org.batfish.common.CleanBatfishException;
-import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.CoordConsts;
 import org.batfish.common.Directory;
 import org.batfish.common.Pair;
@@ -3331,9 +3330,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
    * contents in {@code iptablesDate}. Each task fails if the Iptable file specified by host is not
    * under {@code testRigPath} or does not exist.
    *
-   * @throws BatfishException if there is a failed task and {@code _exitOnFirstError} is set
-   * @throws CompositeBatfishException if there is at least one failed task, {@code
-   *     _exitOnFirstError} is not set, and {@code _haltOnParseError} is set.
+   * @throws BatfishException if there is a failed task and either {@link
+   *     Settings#getExitOnFirstError()} or {@link Settings#getHaltOnParseError()} is set.
    */
   void readIptableFiles(
       Path testRigPath,
@@ -3383,11 +3381,12 @@ public class Batfish extends PluginConsumer implements IBatfish {
     }
 
     if (_settings.getHaltOnParseError() && !failureCauses.isEmpty()) {
-      throw new CompositeBatfishException(
+      BatfishException e =
           new BatfishException(
-              "Fatal exception due to at least one Iptables file is not contained"
-                  + " within the testrig"),
-          failureCauses);
+              "Fatal exception due to at least one Iptables file is"
+                  + " not contained within the testrig");
+      failureCauses.forEach(e::addSuppressed);
+      throw e;
     }
   }
 
