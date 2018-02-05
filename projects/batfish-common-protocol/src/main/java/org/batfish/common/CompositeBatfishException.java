@@ -52,6 +52,7 @@ public class CompositeBatfishException extends RuntimeException implements Answe
   public CompositeBatfishException(
       BatfishException cause, List<BatfishException> contributingCauses) {
     super(cause);
+    contributingCauses.forEach(this::addSuppressed);
     _answerElement = new CompositeBatfishExceptionAnswerElement(cause, contributingCauses);
   }
 
