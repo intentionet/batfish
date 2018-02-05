@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.SnmpServer;
 
 public class RoutingInstance implements Serializable {

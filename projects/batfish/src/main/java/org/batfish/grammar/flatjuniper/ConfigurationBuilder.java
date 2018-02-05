@@ -37,6 +37,7 @@ import org.batfish.datamodel.IsisOption;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NamedPort;
+import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
 import org.batfish.datamodel.RoutingProtocol;
@@ -374,7 +375,6 @@ import org.batfish.representation.juniper.JuniperStructureUsage;
 import org.batfish.representation.juniper.JunosApplication;
 import org.batfish.representation.juniper.NamedBgpGroup;
 import org.batfish.representation.juniper.NodeDevice;
-import org.batfish.representation.juniper.OspfArea;
 import org.batfish.representation.juniper.PolicyStatement;
 import org.batfish.representation.juniper.PrefixList;
 import org.batfish.representation.juniper.PsFrom;
@@ -1760,7 +1760,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   public void enterO_area(O_areaContext ctx) {
     Ip areaIp = new Ip(ctx.area.getText());
     Map<Ip, OspfArea> areas = _currentRoutingInstance.getOspfAreas();
-    _currentArea = areas.computeIfAbsent(areaIp, OspfArea::new);
+    _currentArea = areas.computeIfAbsent(areaIp, ip -> new OspfArea(ip.asLong()));
   }
 
   @Override
@@ -1786,7 +1786,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       _currentOspfInterface = initInterface(ctx.id);
       unitFullName = _currentOspfInterface.getName();
     }
-    Ip currentArea = _currentArea.getAreaIp();
+    Ip currentArea = new Ip(_currentArea.getName());
     if (ctx.oai_passive() != null) {
       _currentOspfInterface.getOspfPassiveAreas().add(currentArea);
     } else {
@@ -2950,6 +2950,11 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void exitOa_interface(Oa_interfaceContext ctx) {
     _currentOspfInterface = null;
+  }
+
+  @Override
+  public void exitOaa_override_metric(FlatJuniperParser.Oaa_override_metricContext ctx) {
+    long metric = Long.parseLong(ctx.DEC().getText());
   }
 
   @Override
