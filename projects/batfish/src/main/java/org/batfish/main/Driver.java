@@ -70,8 +70,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.jettison.JettisonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
 @SuppressWarnings("restriction")
 public class Driver {
@@ -415,14 +413,7 @@ public class Driver {
     if (_mainSettings.getTracingEnable() && !GlobalTracer.isRegistered()) {
       initTracer();
     }
-    SignalHandler handler =
-        new SignalHandler() {
-          @Override
-          public void handle(Signal signal) {
-            _mainLogger.debugf("WorkService: Ignoring signal: %s\n", signal);
-          }
-        };
-    Signal.handle(new Signal("INT"), handler);
+
     String protocol = _mainSettings.getSslDisable() ? "http" : "https";
     String baseUrl = String.format("%s://%s", protocol, _mainSettings.getServiceBindHost());
     URI baseUri = UriBuilder.fromUri(baseUrl).port(_mainSettings.getServicePort()).build();

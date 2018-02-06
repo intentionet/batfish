@@ -32,7 +32,7 @@ public class DbAuthorizer implements Authorizer {
 
   @VisibleForTesting static final String TABLE_CONTAINERS = "batfish_containers";
   @VisibleForTesting static final String TABLE_PERMISSIONS = "batfish_containerpermissions";
-  @VisibleForTesting static final String TABLE_USERS = "batfish_members";
+  @VisibleForTesting static final String TABLE_USERS = "batfish_ui_server_userprofile";
 
   private Map<String, Date> _cacheApiKeys = new HashMap<>();
   private Map<String, Date> _cachePermissions = new HashMap<>();

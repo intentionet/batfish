@@ -102,9 +102,10 @@ import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.completer.ArgumentCompleter;
 import org.jline.reader.impl.completer.NullCompleter;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.Terminal.Signal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.InfoCmp.Capability;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 public class Client extends AbstractClient implements IClient {
 
@@ -509,7 +510,9 @@ public class Client extends AbstractClient implements IClient {
           Path historyPath = Paths.get(System.getenv(ENV_HOME), HISTORY_FILE);
           historyPath.toFile().createNewFile();
           _reader.setVariable(LineReader.HISTORY_FILE, historyPath.toAbsolutePath().toString());
-          _reader.getTerminal().handle(Signal.INT, signal -> handleSigInt());
+          _reader
+              .getTerminal()
+              .handle(org.jline.terminal.Terminal.Signal.INT, signal -> handleSigInt());
           _reader.unsetOpt(Option.INSERT_TAB); // supports completion with nothing entered
 
           PrintWriter pWriter = new PrintWriter(_reader.getTerminal().output(), true);
@@ -2730,6 +2733,8 @@ public class Client extends AbstractClient implements IClient {
     if (_settings.getTracingEnable() && !GlobalTracer.isRegistered()) {
       initTracer();
     }
+    SignalHandler handler = signal -> _logger.debugf("Client: Ignoring signal: %s\n", signal);
+    Signal.handle(new Signal("INT"), handler);
     loadPlugins();
     initHelpers();
     _logger.debugf(
