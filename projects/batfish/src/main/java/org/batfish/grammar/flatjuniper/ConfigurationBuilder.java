@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.annotation.Nullable;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -38,6 +39,7 @@ import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NamedPort;
 import org.batfish.datamodel.OspfArea;
+import org.batfish.datamodel.OspfAreaSummary;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
 import org.batfish.datamodel.RoutingProtocol;
@@ -1380,6 +1382,8 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   private OspfArea _currentArea;
 
+  private Prefix _currentAreaRange;
+
   private JuniperAuthenticationKey _currentAuthenticationKey;
 
   private JuniperAuthenticationKeyChain _currentAuthenticationKeyChain;
@@ -1759,8 +1763,17 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void enterO_area(O_areaContext ctx) {
     Ip areaIp = new Ip(ctx.area.getText());
-    Map<Ip, OspfArea> areas = _currentRoutingInstance.getOspfAreas();
-    _currentArea = areas.computeIfAbsent(areaIp, ip -> new OspfArea(ip.asLong()));
+    Map<Long, OspfArea> areas = _currentRoutingInstance.getOspfAreas();
+    _currentArea = areas.computeIfAbsent(areaIp.asLong(), OspfArea::new);
+  }
+
+  @Override
+  public void enterOa_area_range(FlatJuniperParser.Oa_area_rangeContext ctx) {
+    if (ctx.IP_PREFIX() != null) {
+      /* TODO: handle ipv6 */
+      Prefix range = Prefix.parse(ctx.IP_PREFIX().getText());
+      _currentAreaRange = range;
+    }
   }
 
   @Override
@@ -2948,6 +2961,11 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   }
 
   @Override
+  public void exitOa_area_range(FlatJuniperParser.Oa_area_rangeContext ctx) {
+    _currentAreaRange = null;
+  }
+
+  @Override
   public void exitOa_interface(Oa_interfaceContext ctx) {
     _currentOspfInterface = null;
   }
@@ -2955,6 +2973,14 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void exitOaa_override_metric(FlatJuniperParser.Oaa_override_metricContext ctx) {
     long metric = Long.parseLong(ctx.DEC().getText());
+    if (_currentAreaRange != null) {
+      /* TODO: handle ipv6 */
+      Map<Prefix, OspfAreaSummary> summaries = _currentArea.getSummaries();
+      @Nullable OspfAreaSummary summary = summaries.get(_currentAreaRange);
+      OspfAreaSummary newSummary =
+          new OspfAreaSummary(summary == null || summary.getAdvertise(), metric);
+      summaries.put(_currentAreaRange, newSummary);
+    }
   }
 
   @Override

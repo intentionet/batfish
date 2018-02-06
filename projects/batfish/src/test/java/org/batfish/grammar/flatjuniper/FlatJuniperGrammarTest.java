@@ -1,6 +1,9 @@
 package org.batfish.grammar.flatjuniper;
 
+import static org.batfish.datamodel.matchers.OspfAreaSummaryMatchers.hasMetric;
+import static org.batfish.datamodel.matchers.OspfAreaSummaryMatchers.isAdvertised;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -16,7 +19,9 @@ import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
+import org.batfish.datamodel.OspfAreaSummary;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.matchers.OspfAreaSummaryMatchers;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Flat_juniper_configurationContext;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
@@ -121,6 +126,23 @@ public class FlatJuniperGrammarTest {
     assertThat(multipleAsDisabled, equalTo(MultipathEquivalentAsPathMatchMode.FIRST_AS));
     assertThat(multipleAsEnabled, equalTo(MultipathEquivalentAsPathMatchMode.PATH_LENGTH));
     assertThat(multipleAsMixed, equalTo(MultipathEquivalentAsPathMatchMode.FIRST_AS));
+  }
+
+  @Test
+  public void testOspf() throws IOException {
+    Configuration config =
+        BatfishTestUtils.parseTextConfigs(_folder, "org/batfish/grammar/juniper/testconfigs/ospf")
+            .get("ospf");
+    OspfAreaSummary summary =
+        config
+            .getDefaultVrf()
+            .getOspfProcess()
+            .getAreas()
+            .get(1L)
+            .getSummaries()
+            .get(Prefix.parse("10.0.0.0/16"));
+    assertThat(summary, isAdvertised());
+    assertThat(summary, hasMetric(123L));
   }
 
   @Test

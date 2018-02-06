@@ -611,13 +611,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
             });
     // areas
     Map<Long, OspfArea> newAreas = newProc.getAreas();
-    for (Entry<Ip, OspfArea> e : routingInstance.getOspfAreas().entrySet()) {
-      Ip areaIp = e.getKey();
-      long areaLong = areaIp.asLong();
-      // OspfArea area = e.getValue();
-      OspfArea newArea = new OspfArea(areaLong);
-      newAreas.put(areaLong, newArea);
-    }
+    newAreas.putAll(routingInstance.getOspfAreas());
     // place interfaces into areas
     for (Entry<String, Interface> e : routingInstance.getInterfaces().entrySet()) {
       String name = e.getKey();

@@ -1,0 +1,4 @@
+#
+set system host-name ospf
+#
+set protocols ospf area 0.0.0.1 area-range 10.0.0.0/16 override-metric 123
