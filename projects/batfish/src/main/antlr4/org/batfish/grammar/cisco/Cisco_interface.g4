@@ -876,6 +876,7 @@ if_tunnel
    TUNNEL
    (
        iftunnel_destination
+       | iftunnel_key
        | iftunnel_mode
        | iftunnel_protection
        | iftunnel_source
@@ -998,6 +999,11 @@ iftunnel_destination
    DESTINATION IP_ADDRESS NEWLINE
 ;
 
+iftunnel_key
+:
+   KEY keynum = DEC NEWLINE
+;
+
 iftunnel_mode
 :
    MODE
@@ -1008,6 +1014,7 @@ iftunnel_mode
    (
      IPV4
      | IPV6
+     | MULTIPOINT
    )
    NEWLINE
 ;
@@ -1019,7 +1026,7 @@ iftunnel_protection
 
 iftunnel_source
 :
-   SOURCE IP_ADDRESS NEWLINE
+   SOURCE (IP_ADDRESS | interface_name) NEWLINE
 ;
 
 ifvrrp_authentication

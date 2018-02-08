@@ -11,6 +11,33 @@ ro_address_family
    ADDRESS_FAMILY IPV4 UNICAST? NEWLINE ro_common*
 ;
 
+ro_area
+:
+   AREA
+   (
+      area_int = DEC
+      | area_ip = IP_ADDRESS
+   ) NEWLINE
+   (
+      ro_common
+      | roa_cost
+      | roa_interface
+      | roa_network_null
+      | roa_range
+   )*
+;
+
+ro_area_filterlist
+:
+   AREA
+   (
+      area_int = DEC
+      | area_ip = IP_ADDRESS
+   )
+   FILTER_LIST PREFIX list = VARIABLE (IN | OUT)
+   NEWLINE
+;
+
 ro_area_nssa
 :
    AREA
@@ -52,22 +79,6 @@ ro_area_stub
    (
       NO_SUMMARY
    )* NEWLINE
-;
-
-ro_area
-:
-   AREA
-   (
-      area_int = DEC
-      | area_ip = IP_ADDRESS
-   ) NEWLINE
-   (
-      ro_common
-      | roa_cost
-      | roa_interface
-      | roa_network_null
-      | roa_range
-   )*
 ;
 
 ro_authentication
@@ -561,6 +572,7 @@ s_router_ospf
    (
       ro_address_family
       | ro_area
+      | ro_area_filterlist
       | ro_area_nssa
       | ro_area_range
       | ro_area_stub

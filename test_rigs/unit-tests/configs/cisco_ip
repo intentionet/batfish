@@ -4,6 +4,7 @@ hostname cisco_ip
 ip adjacency route distance 250
 ip adjmgr internal event-history snmp size small
 ip wccp 1 redirect-list wccp-redir group-list wccp-cachelist password 7 0123456789ABCD
+ip ssh logging events
 ip ssh maxstartups 42
 ip ssh time-out 60
 ip ssh version 2

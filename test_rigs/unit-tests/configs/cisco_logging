@@ -52,6 +52,7 @@ logging monitor errors
 logging linecard informational
 logging logfile aclfile 3
 logging message-counter syslog
+logging origin-id hostname
 logging permit-hostdown
 logging queue-limit 100
 logging rate-limit 100

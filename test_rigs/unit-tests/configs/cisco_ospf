@@ -42,6 +42,8 @@ router ospf 1
     network point-to-point
     dead-interval 6
     hello-interval 2
+  area 0 filter-list prefix INFILTER in
+  area 0 filter-list prefix OUTFILTER out
 !
 ospf name-lookup
 ospfv3 name-lookup

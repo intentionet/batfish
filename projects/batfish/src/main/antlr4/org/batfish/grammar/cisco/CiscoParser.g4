@@ -1160,6 +1160,7 @@ ip_ssh_null
    (
       AUTHENTICATION_RETRIES
       | CLIENT
+      | LOGGING
       | MAXSTARTUPS
       | PORT
       | RSA

@@ -222,8 +222,11 @@ interface Ethernet0
  transceiver permit pid all
  transport-mode otn bit-transparent opu2e
  tunnel destination 3.4.5.6
+ tunnel key 123
  tunnel mode gre ipv4
+ tunnel mode gre multipoint
  tunnel source 2.3.4.5
+ tunnel source Cellular0
  xconnect 1.2.3.4 649 encapsulation mpls
   backup peer 13.5.25.3 707
   remote circuit id 649

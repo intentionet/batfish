@@ -25,6 +25,10 @@ aaa accounting exec default
 !
 aaa accounting nested
 aaa accounting network default start-stop group tacacs+
+aaa accounting network default
+ action-type start-stop
+ group tacacs+
+!
 aaa accounting send stop-record authentication failure
 aaa accounting system default start-stop group tacacs+
 aaa accounting system default

@@ -165,6 +165,7 @@ logging_null
       | MONITOR
       | PERMIT_HOSTDOWN
       | PROPRIETARY
+      | ORIGIN_ID
       | OVERRIDE
       | QUEUE_LIMIT
       | RATE_LIMIT
