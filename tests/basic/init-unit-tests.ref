@@ -845,7 +845,7 @@
           "ipv4/6 acl" : {
             "cops-acl" : {
               "cops listener access-list" : [
-                29
+                42
               ]
             }
           }

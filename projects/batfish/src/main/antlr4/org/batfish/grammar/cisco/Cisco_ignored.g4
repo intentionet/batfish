@@ -38,7 +38,6 @@ null_block
       | COMMIT
       | CONFDCONFIG
       | CONFIGURATION
-      | CONFIGURE
       | COAP
       | COPP
       | COPY

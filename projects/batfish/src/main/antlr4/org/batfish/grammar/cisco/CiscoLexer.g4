@@ -5368,6 +5368,11 @@ ISL
    'isl'
 ;
 
+ISOLATE
+:
+  'isolate'
+;
+
 ISPF
 :
    'ispf'
@@ -6056,6 +6061,11 @@ MAIL_SERVER
 MAIN_CPU
 :
    'main-cpu'
+;
+
+MAINTENANCE
+:
+  'maintenance'
 ;
 
 MANAGEMENT

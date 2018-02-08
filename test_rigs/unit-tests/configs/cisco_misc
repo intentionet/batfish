@@ -26,6 +26,19 @@ cluster enable ts 0
 cluster run
 coap http enable
 config-register 0x2102
+configure maintenance profile normal-mode
+ router ospf 1
+  no isolate
+ router bgp 12345
+  no isolate
+ no ip pim isolate
+configure maintenance profile maintenance-mode
+ ip pim isolate
+ router bgp 65601
+  isolate
+ router ospf 1
+  isolate
+configure terminal
 cops listener access-list cops-acl
 cos-queue-group queuemap-red
  precedence 0 random-detect-label 0
