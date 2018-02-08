@@ -46,6 +46,7 @@ line 2
  exec-timeout 0 15
  exec-timeout 1
  location The end of the world
+ script dialer EVDO
 !
 line vty 0 4
  access-class 99 in
@@ -54,7 +55,9 @@ line vty 0 4
  password xxx  
  logging synchronous
  ipv6 access-class ipv6-vty-acl in
+ rxspeed 300
  transport preferred none
+ txspeed 500
  notify
 !
 !

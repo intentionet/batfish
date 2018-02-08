@@ -824,7 +824,7 @@
             },
             "99" : {
               "line access-class list" : [
-                51
+                52
               ]
             },
             "vty-acl" : {
@@ -836,7 +836,7 @@
           "ipv6 acl" : {
             "ipv6-vty-acl" : {
               "line access-class ipv6 list" : [
-                56
+                57
               ]
             }
           }
@@ -895,7 +895,7 @@
           "ipv4 prefix-list" : {
             "bobble" : {
               "route-map match ip prefix-list" : [
-                30
+                31
               ]
             },
             "hpr-connector-subnets" : {
@@ -1613,7 +1613,7 @@
               19
             ],
             "beeble" : [
-              29
+              30
             ],
             "connected-to-bgp" : [
               4
@@ -1625,7 +1625,7 @@
               26
             ],
             "multicaststuff" : [
-              38
+              40
             ],
             "next-hop-null" : [
               23

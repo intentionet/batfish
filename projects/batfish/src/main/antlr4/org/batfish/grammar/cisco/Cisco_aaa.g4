@@ -19,7 +19,8 @@ aaa_accounting
       | aaa_accounting_exec_line
       | aaa_accounting_exec_stanza
       | aaa_accounting_nested
-      | aaa_accounting_network
+      | aaa_accounting_network_line
+      | aaa_accounting_network_stanza
       | aaa_accounting_send
       | aaa_accounting_system_line
       | aaa_accounting_system_stanza
@@ -181,13 +182,28 @@ aaa_accounting_nested
    NESTED NEWLINE
 ;
 
-aaa_accounting_network
+aaa_accounting_network_line
 :
    NETWORK
    (
       DEFAULT
       | list = variable
    ) aaa_accounting_method NEWLINE
+;
+
+aaa_accounting_network_stanza
+:
+   NETWORK
+   (
+      DEFAULT
+      | list = variable
+   ) NEWLINE
+   (
+      (
+         ACTION_TYPE
+         | GROUP
+      ) ~NEWLINE* NEWLINE
+   )+
 ;
 
 aaa_accounting_send

@@ -25,6 +25,7 @@ route-map next-hop-null deny 15
 !
 route-map mgmt permit 10
  match route-type internal
+ match source-protocol ospf 1
 !
 route-map beeble permit 5
  match ip address prefix-list bobble
@@ -32,6 +33,7 @@ route-map beeble permit 5
  set community no-export additive
 !
 route-map beeble permit 10
+ match source-protocol static
  set metric 0
  set local-preference 100
 !

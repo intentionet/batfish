@@ -329,6 +329,11 @@ match_route_type_rm_stanza
    MATCH ROUTE_TYPE variable NEWLINE
 ;
 
+match_source_protocol_rm_stanza
+:
+   MATCH SOURCE_PROTOCOL variable (asn = DEC)? NEWLINE
+;
+
 match_rm_stanza
 :
    match_as_path_access_list_rm_stanza
@@ -346,6 +351,7 @@ match_rm_stanza
    | match_length_rm_stanza
    | match_policy_list_rm_stanza
    | match_route_type_rm_stanza
+   | match_source_protocol_rm_stanza
    | match_tag_rm_stanza
 ;
 
@@ -601,6 +607,22 @@ set_ip_df_rm_stanza
    SET IP DF ~NEWLINE* NEWLINE
 ;
 
+set_ip_precedence_stanza
+:
+   SET IP PRECEDENCE
+   (
+      val = DIGIT
+      | CRITICAL
+      | FLASH
+      | FLASH_OVERRIDE
+      | IMMEDIATE
+      | INTERNET
+      | NETWORK
+      | PRIORITY
+      | ROUTE
+   ) NEWLINE
+;
+
 set_ipv6_rm_stanza
 :
    SET IPV6 ~NEWLINE* NEWLINE
@@ -733,6 +755,7 @@ set_rm_stanza
    | set_extcommunity_rm_stanza
    | set_interface_rm_stanza
    | set_ip_df_rm_stanza
+   | set_ip_precedence_stanza
    | set_ipv6_rm_stanza
    | set_local_preference_rm_stanza
    | set_metric_rm_stanza

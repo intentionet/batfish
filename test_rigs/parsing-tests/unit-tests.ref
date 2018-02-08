@@ -1793,7 +1793,7 @@
             "      (null_single",
             "        BOOT:'boot'  <== mode:DEFAULT_MODE",
             "        SYSTEM:'system'  <== mode:DEFAULT_MODE",
-            "        VARIABLE:'flash'  <== mode:DEFAULT_MODE",
+            "        FLASH:'flash'  <== mode:DEFAULT_MODE",
             "        VARIABLE:'fake.swi'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  (stanza",
@@ -12060,7 +12060,7 @@
             "      AAA:'aaa'  <== mode:DEFAULT_MODE",
             "      (aaa_accounting",
             "        ACCOUNTING:'accounting'  <== mode:DEFAULT_MODE",
-            "        (aaa_accounting_network",
+            "        (aaa_accounting_network_line",
             "          NETWORK:'network'  <== mode:DEFAULT_MODE",
             "          DEFAULT:'default'  <== mode:DEFAULT_MODE",
             "          (aaa_accounting_method",
@@ -12069,6 +12069,21 @@
             "              (aaa_accounting_method_target",
             "                GROUP:'group'  <== mode:DEFAULT_MODE",
             "                TACACS_PLUS:'tacacs+'  <== mode:DEFAULT_MODE)))",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
+            "  (stanza",
+            "    (s_aaa",
+            "      AAA:'aaa'  <== mode:DEFAULT_MODE",
+            "      (aaa_accounting",
+            "        ACCOUNTING:'accounting'  <== mode:DEFAULT_MODE",
+            "        (aaa_accounting_network_stanza",
+            "          NETWORK:'network'  <== mode:DEFAULT_MODE",
+            "          DEFAULT:'default'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
+            "          ACTION_TYPE:'action-type'  <== mode:DEFAULT_MODE",
+            "          START_STOP:'start-stop'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
+            "          GROUP:'group'  <== mode:DEFAULT_MODE",
+            "          TACACS_PLUS:'tacacs+'  <== mode:DEFAULT_MODE",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
             "  (stanza",
             "    (s_aaa",
@@ -20165,6 +20180,12 @@
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (if_tunnel",
             "        TUNNEL:'tunnel'  <== mode:DEFAULT_MODE",
+            "        (iftunnel_key",
+            "          KEY:'key'  <== mode:DEFAULT_MODE",
+            "          DEC:'123'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
+            "      (if_tunnel",
+            "        TUNNEL:'tunnel'  <== mode:DEFAULT_MODE",
             "        (iftunnel_mode",
             "          MODE:'mode'  <== mode:DEFAULT_MODE",
             "          GRE:'gre'  <== mode:DEFAULT_MODE",
@@ -20172,9 +20193,23 @@
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (if_tunnel",
             "        TUNNEL:'tunnel'  <== mode:DEFAULT_MODE",
+            "        (iftunnel_mode",
+            "          MODE:'mode'  <== mode:DEFAULT_MODE",
+            "          GRE:'gre'  <== mode:DEFAULT_MODE",
+            "          MULTIPOINT:'multipoint'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
+            "      (if_tunnel",
+            "        TUNNEL:'tunnel'  <== mode:DEFAULT_MODE",
             "        (iftunnel_source",
             "          SOURCE:'source'  <== mode:DEFAULT_MODE",
             "          IP_ADDRESS:'2.3.4.5'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
+            "      (if_tunnel",
+            "        TUNNEL:'tunnel'  <== mode:DEFAULT_MODE",
+            "        (iftunnel_source",
+            "          SOURCE:'source'  <== mode:DEFAULT_MODE",
+            "          (interface_name",
+            "            VARIABLE:'Cellular0'  <== mode:DEFAULT_MODE)",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (if_null_block",
             "        XCONNECT:'xconnect'  <== mode:DEFAULT_MODE",
@@ -20515,6 +20550,14 @@
             "        DEC:'7'  <== mode:DEFAULT_MODE",
             "        (variable",
             "          VARIABLE:'0123456789ABCD'  <== mode:DEFAULT_MODE)",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "  (stanza",
+            "    (s_ip_ssh",
+            "      IP:'ip'  <== mode:DEFAULT_MODE",
+            "      SSH:'ssh'  <== mode:DEFAULT_MODE",
+            "      (ip_ssh_null",
+            "        LOGGING:'logging'  <== mode:DEFAULT_MODE",
+            "        EVENTS:'events'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  (stanza",
             "    (s_ip_ssh",
@@ -22600,7 +22643,13 @@
             "      (l_null",
             "        LOCATION:'location'  <== mode:DEFAULT_MODE",
             "        M_COMMENT_NON_NEWLINE:' The end of the world'  <== mode:M_COMMENT",
-            "        NEWLINE:'\\n'  <== mode:M_COMMENT)))",
+            "        NEWLINE:'\\n'  <== mode:M_COMMENT)",
+            "      (l_script",
+            "        SCRIPT:'script'  <== mode:DEFAULT_MODE",
+            "        DIALER:'dialer'  <== mode:DEFAULT_MODE",
+            "        (variable",
+            "          VARIABLE:'EVDO'  <== mode:DEFAULT_MODE)",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  (stanza",
             "    (s_line",
             "      LINE:'line'  <== mode:DEFAULT_MODE",
@@ -22640,11 +22689,19 @@
             "          VARIABLE:'ipv6-vty-acl'  <== mode:DEFAULT_MODE)",
             "        IN:'in'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "      (l_null",
+            "        RXSPEED:'rxspeed'  <== mode:DEFAULT_MODE",
+            "        DEC:'300'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
             "      (l_transport",
             "        TRANSPORT:'transport'  <== mode:DEFAULT_MODE",
             "        PREFERRED:'preferred'  <== mode:DEFAULT_MODE",
             "        (variable",
             "          NONE:'none'  <== mode:DEFAULT_MODE)",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "      (l_null",
+            "        TXSPEED:'txspeed'  <== mode:DEFAULT_MODE",
+            "        DEC:'500'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
             "      (l_null",
             "        NOTIFY:'notify'  <== mode:DEFAULT_MODE",
@@ -23151,6 +23208,14 @@
             "      LOGGING:'logging'  <== mode:DEFAULT_MODE",
             "      (logging_common",
             "        (logging_null",
+            "          ORIGIN_ID:'origin-id'  <== mode:DEFAULT_MODE",
+            "          HOSTNAME:'hostname'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
+            "  (stanza",
+            "    (s_logging",
+            "      LOGGING:'logging'  <== mode:DEFAULT_MODE",
+            "      (logging_common",
+            "        (logging_null",
             "          PERMIT_HOSTDOWN:'permit-hostdown'  <== mode:DEFAULT_MODE",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
             "  (stanza",
@@ -23502,7 +23567,7 @@
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
             "      (archive_null",
             "        PATH:'path'  <== mode:DEFAULT_MODE",
-            "        VARIABLE:'flash'  <== mode:DEFAULT_MODE",
+            "        FLASH:'flash'  <== mode:DEFAULT_MODE",
             "        COLON:':'  <== mode:DEFAULT_MODE",
             "        VARIABLE:'myconfig'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
@@ -25904,7 +25969,23 @@
             "          (ro_null",
             "            HELLO_INTERVAL:'hello-interval'  <== mode:DEFAULT_MODE",
             "            DEC:'2'  <== mode:DEFAULT_MODE",
-            "            NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))))",
+            "            NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "      (ro_area_filterlist",
+            "        AREA:'area'  <== mode:DEFAULT_MODE",
+            "        DEC:'0'  <== mode:DEFAULT_MODE",
+            "        FILTER_LIST:'filter-list'  <== mode:DEFAULT_MODE",
+            "        PREFIX:'prefix'  <== mode:DEFAULT_MODE",
+            "        VARIABLE:'INFILTER'  <== mode:DEFAULT_MODE",
+            "        IN:'in'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "      (ro_area_filterlist",
+            "        AREA:'area'  <== mode:DEFAULT_MODE",
+            "        DEC:'0'  <== mode:DEFAULT_MODE",
+            "        FILTER_LIST:'filter-list'  <== mode:DEFAULT_MODE",
+            "        PREFIX:'prefix'  <== mode:DEFAULT_MODE",
+            "        VARIABLE:'OUTFILTER'  <== mode:DEFAULT_MODE",
+            "        OUT:'out'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  (stanza",
             "    (s_null",
             "      (null_block",
@@ -27468,6 +27549,15 @@
             "            ROUTE_TYPE:'route-type'  <== mode:DEFAULT_MODE",
             "            (variable",
             "              INTERNAL:'internal'  <== mode:DEFAULT_MODE)",
+            "            NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "      (rm_stanza",
+            "        (match_rm_stanza",
+            "          (match_source_protocol_rm_stanza",
+            "            MATCH:'match'  <== mode:DEFAULT_MODE",
+            "            SOURCE_PROTOCOL:'source-protocol'  <== mode:DEFAULT_MODE",
+            "            (variable",
+            "              OSPF:'ospf'  <== mode:DEFAULT_MODE)",
+            "            DEC:'1'  <== mode:DEFAULT_MODE",
             "            NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))))",
             "  (stanza",
             "    (route_map_stanza",
@@ -27510,6 +27600,14 @@
             "        PERMIT:'permit'  <== mode:DEFAULT_MODE)",
             "      DEC:'10'  <== mode:DEFAULT_MODE",
             "      NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
+            "      (rm_stanza",
+            "        (match_rm_stanza",
+            "          (match_source_protocol_rm_stanza",
+            "            MATCH:'match'  <== mode:DEFAULT_MODE",
+            "            SOURCE_PROTOCOL:'source-protocol'  <== mode:DEFAULT_MODE",
+            "            (variable",
+            "              STATIC:'static'  <== mode:DEFAULT_MODE)",
+            "            NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "      (rm_stanza",
             "        (set_rm_stanza",
             "          (set_metric_rm_stanza",
@@ -28024,7 +28122,7 @@
             "        ENABLE:'enable'  <== mode:DEFAULT_MODE",
             "        TRAPS:'traps'  <== mode:DEFAULT_MODE",
             "        (variable",
-            "          VARIABLE:'flash'  <== mode:DEFAULT_MODE)",
+            "          FLASH:'flash'  <== mode:DEFAULT_MODE)",
             "        (variable",
             "          VARIABLE:'insertion'  <== mode:DEFAULT_MODE)",
             "        (variable",
@@ -47516,7 +47614,7 @@
             },
             "99" : {
               "line access-class list" : [
-                51
+                52
               ]
             },
             "vty-acl" : {
@@ -47528,7 +47626,7 @@
           "ipv6 acl" : {
             "ipv6-vty-acl" : {
               "line access-class ipv6 list" : [
-                56
+                57
               ]
             }
           }
@@ -47587,7 +47685,7 @@
           "ipv4 prefix-list" : {
             "bobble" : {
               "route-map match ip prefix-list" : [
-                30
+                31
               ]
             },
             "hpr-connector-subnets" : {
@@ -48305,7 +48403,7 @@
               19
             ],
             "beeble" : [
-              29
+              30
             ],
             "connected-to-bgp" : [
               4
@@ -48317,7 +48415,7 @@
               26
             ],
             "multicaststuff" : [
-              38
+              40
             ],
             "next-hop-null" : [
               23
