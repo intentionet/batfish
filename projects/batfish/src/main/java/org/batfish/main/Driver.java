@@ -49,7 +49,6 @@ import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
 import org.batfish.common.BfConsts.TaskStatus;
 import org.batfish.common.CleanBatfishException;
-import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.CoordConsts;
 import org.batfish.common.QuestionException;
 import org.batfish.common.Task;
@@ -577,12 +576,12 @@ public class Driver {
                   answer = e.getAnswer();
                   answer.setStatus(AnswerStatus.FAILURE);
                   batfish.setTerminatedWithException(true);
-                } catch (CompositeBatfishException e) {
+                } catch (BatfishException e) {
                   String stackTrace = ExceptionUtils.getFullStackTrace(e);
                   logger.error(stackTrace);
                   answer = new Answer();
                   answer.setStatus(AnswerStatus.FAILURE);
-                  answer.addAnswerElement(e.getAnswerElement());
+                  answer.addAnswerElement(e.getBatfishStackTrace());
                   batfish.setTerminatedWithException(true);
                 } catch (Throwable e) {
                   String stackTrace = ExceptionUtils.getFullStackTrace(e);

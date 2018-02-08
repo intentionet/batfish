@@ -30,7 +30,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.batfish.common.BatfishException;
-import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
@@ -294,7 +293,7 @@ public class BatfishTest {
     String parseErrorMessage =
         "Fatal exception due to at least one Iptables file is not contained"
             + " within the testrig";
-    _thrown.expect(CompositeBatfishException.class);
+    _thrown.expect(BatfishException.class);
     _thrown.expectMessage(parseErrorMessage);
     batfish.readIptableFiles(testRigPath, hostConfigurations, iptablesData, answerElement);
   }

@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
-import org.batfish.common.CompositeBatfishException;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.config.Settings;
 import org.batfish.datamodel.answers.AnswerElement;
@@ -239,7 +238,10 @@ public class BatfishJobExecutor {
     int numSucceeded = numJobs - numFailed;
     _logger.infof("%d jobs succeeded; %d jobs failed\n", numSucceeded, numFailed);
     if (haltOnProcessingError) {
-      throw new HandleProcessingErrorException(failureCauses);
+      BatfishException e =
+          new BatfishException("Fatal exception due to failure of at least one job");
+      failureCauses.forEach(e::addSuppressed);
+      throw e;
     }
   }
 
@@ -254,17 +256,5 @@ public class BatfishJobExecutor {
     _finishedJobs++;
     _completed.incrementAndGet();
     _finishedPercent = 100 * ((double) _finishedJobs) / _totalJobs;
-  }
-
-  static final class HandleProcessingErrorException extends CompositeBatfishException {
-
-    private static final long serialVersionUID = 1L;
-
-    private static final String PROCESSING_ERROR_MESSAGE =
-        "Fatal exception due to failure of at least one job";
-
-    public HandleProcessingErrorException(List<BatfishException> failureCauses) {
-      super(new BatfishException(PROCESSING_ERROR_MESSAGE), failureCauses);
-    }
   }
 }
