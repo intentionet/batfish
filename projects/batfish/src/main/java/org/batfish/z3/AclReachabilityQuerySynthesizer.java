@@ -1,16 +1,11 @@
 package org.batfish.z3;
 
 import com.google.common.collect.ImmutableList;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Z3Exception;
-import java.util.List;
 import org.batfish.z3.expr.AndExpr;
-import org.batfish.z3.expr.DeclareRelStatement;
+import org.batfish.z3.expr.BasicRuleStatement;
 import org.batfish.z3.expr.QueryStatement;
 import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.SaneExpr;
-import org.batfish.z3.expr.visitors.BoolExprTransformer;
 import org.batfish.z3.state.AclLineMatch;
 import org.batfish.z3.state.NumberedQuery;
 
@@ -29,31 +24,25 @@ public final class AclReachabilityQuerySynthesizer extends SatQuerySynthesizer<A
   }
 
   @Override
-  public NodProgram getNodProgram(SynthesizerInput input, NodProgram baseProgram)
-      throws Z3Exception {
-    Context ctx = baseProgram.getContext();
-    NodProgram program = new NodProgram(ctx);
+  public ReachabilityProgram getReachabilityProgram(SynthesizerInput input) {
+    ReachabilityProgram.Builder builder = ReachabilityProgram.builder().setInput(input);
+    ImmutableList.Builder<QueryStatement> queries = ImmutableList.builder();
+    ImmutableList.Builder<RuleStatement> rules = ImmutableList.builder();
     for (int line = 0; line < _numLines; line++) {
-      AclLineMatch matchAclLine = new AclLineMatch(_hostname, _aclName, line);
-      AndExpr queryConditions = new AndExpr(ImmutableList.of(matchAclLine, SaneExpr.INSTANCE));
-      NumberedQuery queryRel = new NumberedQuery(line);
-      String queryRelName = BoolExprTransformer.getNodName(input, queryRel);
-      DeclareRelStatement declaration = new DeclareRelStatement(queryRelName);
-      baseProgram.getRelationDeclarations().put(queryRelName, declaration.toFuncDecl(ctx));
-      RuleStatement queryRule = new RuleStatement(queryConditions, queryRel);
-      List<BoolExpr> rules = program.getRules();
-      rules.add(BoolExprTransformer.toBoolExpr(queryRule.getSubExpression(), input, baseProgram));
-      QueryStatement query = new QueryStatement(queryRel);
-      BoolExpr queryBoolExpr =
-          BoolExprTransformer.toBoolExpr(query.getSubExpression(), input, baseProgram);
-      program.getQueries().add(queryBoolExpr);
+      NumberedQuery query = new NumberedQuery(line);
+      rules.add(
+          new BasicRuleStatement(
+              new AndExpr(
+                  ImmutableList.of(new AclLineMatch(_hostname, _aclName, line), SaneExpr.INSTANCE)),
+              new NumberedQuery(line)));
+      queries.add(new QueryStatement(query));
       _keys.add(new AclLine(_hostname, _aclName, line));
     }
-    return program;
+    return builder.setInput(input).setQueries(queries.build()).setRules(rules.build()).build();
   }
 
   @Override
-  public NodProgram synthesizeBaseProgram(Synthesizer synthesizer, Context ctx) {
-    return synthesizer.synthesizeNodAclProgram(_hostname, _aclName, ctx);
+  public ReachabilityProgram synthesizeBaseProgram(Synthesizer synthesizer) {
+    return synthesizer.synthesizeNodAclProgram(_hostname, _aclName);
   }
 }

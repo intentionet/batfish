@@ -2,6 +2,8 @@ package org.batfish.z3.expr;
 
 public interface VoidStatementVisitor {
 
+  void visitBasicRuleStatement(BasicRuleStatement basicRuleStatement);
+
   void visitComment(Comment comment);
 
   void visitDeclareRelStatement(DeclareRelStatement declareRelStatement);
@@ -10,5 +12,5 @@ public interface VoidStatementVisitor {
 
   void visitQueryStatement(QueryStatement queryStatement);
 
-  void visitRuleStatement(RuleStatement ruleStatement);
+  void visitTransformationRuleStatement(TransformationRuleStatement transformationRuleStatement);
 }

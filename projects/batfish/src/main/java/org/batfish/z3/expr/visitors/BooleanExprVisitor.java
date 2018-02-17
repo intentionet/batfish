@@ -1,6 +1,8 @@
 package org.batfish.z3.expr.visitors;
 
 import org.batfish.z3.expr.AndExpr;
+import org.batfish.z3.expr.BasicStateExpr;
+import org.batfish.z3.expr.CurrentIsOriginalExpr;
 import org.batfish.z3.expr.EqExpr;
 import org.batfish.z3.expr.FalseExpr;
 import org.batfish.z3.expr.HeaderSpaceMatchExpr;
@@ -10,12 +12,16 @@ import org.batfish.z3.expr.OrExpr;
 import org.batfish.z3.expr.PrefixMatchExpr;
 import org.batfish.z3.expr.RangeMatchExpr;
 import org.batfish.z3.expr.SaneExpr;
-import org.batfish.z3.expr.StateExpr;
+import org.batfish.z3.expr.TransformationStateExpr;
 import org.batfish.z3.expr.TrueExpr;
 
 public interface BooleanExprVisitor {
 
   void visitAndExpr(AndExpr andExpr);
+
+  void visitBasicStateExpr(BasicStateExpr basicStateExpr);
+
+  void visitCurrentIsOriginal(CurrentIsOriginalExpr currentIsOriginalExpr);
 
   void visitEqExpr(EqExpr eqExpr);
 
@@ -35,7 +41,7 @@ public interface BooleanExprVisitor {
 
   void visitSaneExpr(SaneExpr saneExpr);
 
-  void visitStateExpr(StateExpr stateExpr);
+  void visitTransformationStateExpr(TransformationStateExpr transformationStateExpr);
 
   void visitTrueExpr(TrueExpr trueExpr);
 }

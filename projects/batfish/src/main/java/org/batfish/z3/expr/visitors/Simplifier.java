@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.batfish.common.BatfishException;
 import org.batfish.z3.expr.AndExpr;
+import org.batfish.z3.expr.BasicRuleStatement;
+import org.batfish.z3.expr.BasicStateExpr;
 import org.batfish.z3.expr.BitVecExpr;
 import org.batfish.z3.expr.BooleanExpr;
 import org.batfish.z3.expr.Comment;
+import org.batfish.z3.expr.CurrentIsOriginalExpr;
 import org.batfish.z3.expr.DeclareRelStatement;
 import org.batfish.z3.expr.DeclareVarStatement;
 import org.batfish.z3.expr.EqExpr;
@@ -28,8 +31,9 @@ import org.batfish.z3.expr.QueryStatement;
 import org.batfish.z3.expr.RangeMatchExpr;
 import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.SaneExpr;
-import org.batfish.z3.expr.StateExpr;
 import org.batfish.z3.expr.Statement;
+import org.batfish.z3.expr.TransformationRuleStatement;
+import org.batfish.z3.expr.TransformationStateExpr;
 import org.batfish.z3.expr.TrueExpr;
 import org.batfish.z3.expr.VarIntExpr;
 
@@ -104,6 +108,16 @@ public class Simplifier implements ExprVisitor, GenericStatementVisitor<Statemen
   }
 
   @Override
+  public Statement visitBasicRuleStatement(BasicRuleStatement basicRuleStatement) {
+    return visitRuleStatement(basicRuleStatement);
+  }
+
+  @Override
+  public void visitBasicStateExpr(BasicStateExpr basicStateExpr) {
+    _simplifiedBooleanExpr = basicStateExpr;
+  }
+
+  @Override
   public void visitBitVecExpr(BitVecExpr bitVecExpr) {
     throw new UnsupportedOperationException(
         "no implementation for generated method"); // TODO Auto-generated method stub
@@ -112,6 +126,11 @@ public class Simplifier implements ExprVisitor, GenericStatementVisitor<Statemen
   @Override
   public Statement visitComment(Comment comment) {
     return comment;
+  }
+
+  @Override
+  public void visitCurrentIsOriginal(CurrentIsOriginalExpr currentIsOriginalExpr) {
+    _simplifiedBooleanExpr = simplifyBooleanExpr(currentIsOriginalExpr.getExpr());
   }
 
   @Override
@@ -271,7 +290,6 @@ public class Simplifier implements ExprVisitor, GenericStatementVisitor<Statemen
     _simplifiedBooleanExpr = simplifyBooleanExpr(rangeMatchExpr.getExpr());
   }
 
-  @Override
   public Statement visitRuleStatement(RuleStatement ruleStatement) {
     BooleanExpr oldExpr = ruleStatement.getSubExpression();
     BooleanExpr newExpr = simplifyBooleanExpr(oldExpr);
@@ -283,12 +301,29 @@ public class Simplifier implements ExprVisitor, GenericStatementVisitor<Statemen
       } else if (newExpr instanceof IfExpr
           && ((IfExpr) newExpr).getAntecedent() == FalseExpr.INSTANCE) {
         return UNUSABLE_RULE;
-      } else if (newExpr instanceof StateExpr) {
-        return new RuleStatement((StateExpr) newExpr);
-      } else {
+      } else if (newExpr instanceof BasicStateExpr) {
+        return new BasicRuleStatement((BasicStateExpr) newExpr);
+      } else if (newExpr instanceof TransformationStateExpr) {
+        return new TransformationRuleStatement((TransformationStateExpr) newExpr);
+      } else if (newExpr instanceof IfExpr) {
         IfExpr newInterior = (IfExpr) newExpr;
-        return new RuleStatement(
-            newInterior.getAntecedent(), (StateExpr) newInterior.getConsequent());
+        BooleanExpr newConsequent = newInterior.getConsequent();
+        if (newConsequent instanceof BasicStateExpr) {
+          return new BasicRuleStatement(
+              newInterior.getAntecedent(), (BasicStateExpr) newConsequent);
+        } else if (newConsequent instanceof TransformationStateExpr) {
+          return new TransformationRuleStatement(
+              newInterior.getAntecedent(), (TransformationStateExpr) newConsequent);
+        } else {
+          throw new BatfishException(
+              String.format(
+                  "Unexpected consequent type after simplification: %s",
+                  newConsequent.getClass().getCanonicalName()));
+        }
+      } else {
+        throw new BatfishException(
+            String.format(
+                "Unexpected type after simplification: %s", newExpr.getClass().getCanonicalName()));
       }
     } else {
       return ruleStatement;
@@ -301,8 +336,15 @@ public class Simplifier implements ExprVisitor, GenericStatementVisitor<Statemen
   }
 
   @Override
-  public void visitStateExpr(StateExpr stateExpr) {
-    _simplifiedBooleanExpr = stateExpr;
+  public Statement visitTransformationRuleStatement(
+      TransformationRuleStatement transformationRuleStatement) {
+    return visitRuleStatement(transformationRuleStatement);
+  }
+
+  @Override
+  public void visitTransformationStateExpr(TransformationStateExpr transformationStateExpr) {
+    /** TODO: something smarter */
+    _simplifiedBooleanExpr = transformationStateExpr;
   }
 
   @Override

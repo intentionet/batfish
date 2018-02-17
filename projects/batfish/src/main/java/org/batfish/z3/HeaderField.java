@@ -1,34 +1,23 @@
 package org.batfish.z3;
 
-public enum HeaderField {
-  DSCP(6),
-  DST_IP(32),
-  DST_PORT(16),
-  ECN(2),
-  FRAGMENT_OFFSET(13),
-  ICMP_CODE(8),
-  ICMP_TYPE(8),
-  IP_PROTOCOL(8),
-  PACKET_LENGTH(16),
-  SRC_IP(32),
-  SRC_PORT(16),
-  STATE(2),
-  TCP_FLAGS_ACK(1),
-  TCP_FLAGS_CWR(1),
-  TCP_FLAGS_ECE(1),
-  TCP_FLAGS_FIN(1),
-  TCP_FLAGS_PSH(1),
-  TCP_FLAGS_RST(1),
-  TCP_FLAGS_SYN(1),
-  TCP_FLAGS_URG(1);
+import org.batfish.common.BatfishException;
 
-  private final int _size;
+public interface HeaderField {
 
-  private HeaderField(int size) {
-    _size = size;
+  static HeaderField parse(String name) {
+    HeaderField val = BasicHeaderField.valueOf(name);
+    if (val != null) {
+      return val;
+    }
+    val = TransformationHeaderField.valueOf(name);
+    if (val != null) {
+      return val;
+    }
+    throw new BatfishException(
+        String.format("No %s with name: %s", HeaderField.class.getSimpleName(), name));
   }
 
-  public int getSize() {
-    return _size;
-  }
+  String getName();
+
+  int getSize();
 }

@@ -1,13 +1,13 @@
 package org.batfish.z3.expr;
 
 import java.util.Objects;
-import org.batfish.z3.HeaderField;
+import org.batfish.z3.BasicHeaderField;
 
 public class DeclareVarStatement extends Statement {
 
-  private final HeaderField _headerField;
+  private final BasicHeaderField _headerField;
 
-  public DeclareVarStatement(HeaderField headerField) {
+  public DeclareVarStatement(BasicHeaderField headerField) {
     _headerField = headerField;
   }
 
@@ -21,7 +21,7 @@ public class DeclareVarStatement extends Statement {
     visitor.visitDeclareVarStatement(this);
   }
 
-  public HeaderField getHeaderField() {
+  public BasicHeaderField getHeaderField() {
     return _headerField;
   }
 

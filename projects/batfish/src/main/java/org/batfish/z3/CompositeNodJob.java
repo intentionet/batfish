@@ -73,14 +73,15 @@ public class CompositeNodJob extends BatfishJob<NodJobResult> {
       for (int i = 0; i < _numPrograms; i++) {
         Synthesizer dataPlaneSynthesizer = _dataPlaneSynthesizers.get(i);
         QuerySynthesizer querySynthesizer = _querySynthesizers.get(i);
-        NodProgram baseProgram = dataPlaneSynthesizer.synthesizeNodDataPlaneProgram(ctx);
-        NodProgram queryProgram =
-            querySynthesizer.getNodProgram(dataPlaneSynthesizer.getInput(), baseProgram);
-        NodProgram program = baseProgram.append(queryProgram);
+        ReachabilityProgram baseProgram = dataPlaneSynthesizer.synthesizeNodDataPlaneProgram();
+        ReachabilityProgram queryProgram =
+            querySynthesizer.getReachabilityProgram(dataPlaneSynthesizer.getInput());
+        NodProgram program = new NodProgram(ctx, baseProgram, queryProgram);
         latestProgram = program;
         Fixedpoint fix = ctx.mkFixedpoint();
         fix.setParameters(p);
-        for (FuncDecl relationDeclaration : program.getRelationDeclarations().values()) {
+        for (FuncDecl relationDeclaration :
+            program.getContext().getRelationDeclarations().values()) {
           fix.registerRelation(relationDeclaration);
         }
         for (BoolExpr rule : program.getRules()) {
@@ -106,7 +107,7 @@ public class CompositeNodJob extends BatfishJob<NodJobResult> {
         BoolExpr solverInput;
         if (answer.getArgs().length > 0) {
           List<Expr> reversedVarList = new ArrayList<>();
-          reversedVarList.addAll(program.getVariablesAsConsts().values());
+          reversedVarList.addAll(program.getContext().getVariablesAsConsts().values());
           Collections.reverse(reversedVarList);
           Expr[] reversedVars = reversedVarList.toArray(new Expr[] {});
           Expr substitutedAnswer = answer.substituteVars(reversedVars);
@@ -144,14 +145,17 @@ public class CompositeNodJob extends BatfishJob<NodJobResult> {
           Arrays.stream(model.getConstDecls())
               .map(FuncDecl::getName)
               .map(Object::toString)
-              .map(HeaderField::valueOf)
+              .map(HeaderField::parse)
               .collect(
                   ImmutableMap.toImmutableMap(
                       Function.identity(),
                       headerField ->
                           ((BitVecNum)
                                   model.getConstInterp(
-                                      currentLatestProgram.getVariablesAsConsts().get(headerField)))
+                                      currentLatestProgram
+                                          .getContext()
+                                          .getVariablesAsConsts()
+                                          .get(headerField.getName())))
                               .getLong()));
       Set<Flow> flows = new HashSet<>();
       for (Pair<String, String> nodeVrf : _nodeVrfSet) {

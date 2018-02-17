@@ -39,90 +39,105 @@ public final class NodJob extends BatfishJob<NodJobResult> {
     flowBuilder.setIngressNode(node);
     flowBuilder.setTag(tag);
     constraints.forEach(
-        (varName, value) -> {
-          switch (varName) {
-            case SRC_IP:
-              flowBuilder.setSrcIp(new Ip(value));
-              break;
+        (headerField, value) -> {
+          if (headerField instanceof BasicHeaderField) {
+            switch ((BasicHeaderField) headerField) {
+              case DST_IP:
+                flowBuilder.setDstIp(new Ip(value));
+                break;
 
-            case DST_IP:
-              flowBuilder.setDstIp(new Ip(value));
-              break;
+              case SRC_PORT:
+                flowBuilder.setSrcPort(value.intValue());
+                break;
 
-            case SRC_PORT:
-              flowBuilder.setSrcPort(value.intValue());
-              break;
+              case DST_PORT:
+                flowBuilder.setDstPort(value.intValue());
+                break;
 
-            case DST_PORT:
-              flowBuilder.setDstPort(value.intValue());
-              break;
+              case FRAGMENT_OFFSET:
+                flowBuilder.setFragmentOffset(value.intValue());
+                break;
 
-            case FRAGMENT_OFFSET:
-              flowBuilder.setFragmentOffset(value.intValue());
-              break;
+              case IP_PROTOCOL:
+                flowBuilder.setIpProtocol(IpProtocol.fromNumber(value.intValue()));
+                break;
 
-            case IP_PROTOCOL:
-              flowBuilder.setIpProtocol(IpProtocol.fromNumber(value.intValue()));
-              break;
+              case DSCP:
+                flowBuilder.setDscp(value.intValue());
+                break;
 
-            case DSCP:
-              flowBuilder.setDscp(value.intValue());
-              break;
+              case ECN:
+                flowBuilder.setEcn(value.intValue());
+                break;
 
-            case ECN:
-              flowBuilder.setEcn(value.intValue());
-              break;
+              case STATE:
+                flowBuilder.setState(State.fromNum(value.intValue()));
+                break;
 
-            case STATE:
-              flowBuilder.setState(State.fromNum(value.intValue()));
-              break;
+              case ICMP_TYPE:
+                flowBuilder.setIcmpType(value.intValue());
+                break;
 
-            case ICMP_TYPE:
-              flowBuilder.setIcmpType(value.intValue());
-              break;
+              case ICMP_CODE:
+                flowBuilder.setIcmpCode(value.intValue());
+                break;
 
-            case ICMP_CODE:
-              flowBuilder.setIcmpCode(value.intValue());
-              break;
+              case ORIG_SRC_IP:
+                flowBuilder.setSrcIp(new Ip(value));
+                break;
 
-            case PACKET_LENGTH:
-              flowBuilder.setPacketLength(value.intValue());
-              break;
+              case SRC_IP:
+                break;
 
-            case TCP_FLAGS_CWR:
-              flowBuilder.setTcpFlagsCwr(value.intValue());
-              break;
+              case PACKET_LENGTH:
+                flowBuilder.setPacketLength(value.intValue());
+                break;
 
-            case TCP_FLAGS_ECE:
-              flowBuilder.setTcpFlagsEce(value.intValue());
-              break;
+              case TCP_FLAGS_CWR:
+                flowBuilder.setTcpFlagsCwr(value.intValue());
+                break;
 
-            case TCP_FLAGS_URG:
-              flowBuilder.setTcpFlagsUrg(value.intValue());
-              break;
+              case TCP_FLAGS_ECE:
+                flowBuilder.setTcpFlagsEce(value.intValue());
+                break;
 
-            case TCP_FLAGS_ACK:
-              flowBuilder.setTcpFlagsAck(value.intValue());
-              break;
+              case TCP_FLAGS_URG:
+                flowBuilder.setTcpFlagsUrg(value.intValue());
+                break;
 
-            case TCP_FLAGS_PSH:
-              flowBuilder.setTcpFlagsPsh(value.intValue());
-              break;
+              case TCP_FLAGS_ACK:
+                flowBuilder.setTcpFlagsAck(value.intValue());
+                break;
 
-            case TCP_FLAGS_RST:
-              flowBuilder.setTcpFlagsRst(value.intValue());
-              break;
+              case TCP_FLAGS_PSH:
+                flowBuilder.setTcpFlagsPsh(value.intValue());
+                break;
 
-            case TCP_FLAGS_SYN:
-              flowBuilder.setTcpFlagsSyn(value.intValue());
-              break;
+              case TCP_FLAGS_RST:
+                flowBuilder.setTcpFlagsRst(value.intValue());
+                break;
 
-            case TCP_FLAGS_FIN:
-              flowBuilder.setTcpFlagsFin(value.intValue());
-              break;
+              case TCP_FLAGS_SYN:
+                flowBuilder.setTcpFlagsSyn(value.intValue());
+                break;
 
-            default:
-              throw new BatfishException("invalid variable name");
+              case TCP_FLAGS_FIN:
+                flowBuilder.setTcpFlagsFin(value.intValue());
+                break;
+
+              default:
+                throw new BatfishException(
+                    String.format(
+                        "Unsupported %s: %s", BasicHeaderField.class.getSimpleName(), headerField));
+            }
+          } else if (headerField instanceof TransformationHeaderField) {
+            switch ((TransformationHeaderField) headerField) {
+              default:
+                throw new BatfishException(
+                    String.format(
+                        "Unsupported %s: %s",
+                        TransformationHeaderField.class.getSimpleName(), headerField));
+            }
           }
         });
     return flowBuilder.build();
@@ -155,10 +170,11 @@ public final class NodJob extends BatfishJob<NodJobResult> {
     long startTime = System.currentTimeMillis();
     long elapsedTime;
     try (Context ctx = new Context()) {
-      NodProgram baseProgram = _dataPlaneSynthesizer.synthesizeNodDataPlaneProgram(ctx);
-      NodProgram queryProgram =
-          _querySynthesizer.getNodProgram(_dataPlaneSynthesizer.getInput(), baseProgram);
-      NodProgram program = baseProgram.append(queryProgram);
+      ReachabilityProgram baseProgram = _dataPlaneSynthesizer.synthesizeNodDataPlaneProgram();
+      ReachabilityProgram queryProgram =
+          _querySynthesizer.getReachabilityProgram(_dataPlaneSynthesizer.getInput());
+      NodProgram program = new NodProgram(ctx, baseProgram, queryProgram);
+      //      dumpAndQuit(program);
       Params p = ctx.mkParams();
       p.add("timeout", _settings.getZ3timeout());
       p.add("fixedpoint.engine", "datalog");
@@ -166,7 +182,7 @@ public final class NodJob extends BatfishJob<NodJobResult> {
       p.add("fixedpoint.print_answer", true);
       Fixedpoint fix = ctx.mkFixedpoint();
       fix.setParameters(p);
-      for (FuncDecl relationDeclaration : program.getRelationDeclarations().values()) {
+      for (FuncDecl relationDeclaration : program.getContext().getRelationDeclarations().values()) {
         fix.registerRelation(relationDeclaration);
       }
       for (BoolExpr rule : program.getRules()) {
@@ -189,7 +205,7 @@ public final class NodJob extends BatfishJob<NodJobResult> {
       BoolExpr solverInput;
       if (answer.getArgs().length > 0) {
         List<Expr> reversedVarList = new ArrayList<>();
-        reversedVarList.addAll(program.getVariablesAsConsts().values());
+        reversedVarList.addAll(program.getContext().getVariablesAsConsts().values());
         Collections.reverse(reversedVarList);
         Expr[] reversedVars = reversedVarList.toArray(new Expr[] {});
         Expr substitutedAnswer = answer.substituteVars(reversedVars);
@@ -222,14 +238,17 @@ public final class NodJob extends BatfishJob<NodJobResult> {
           Arrays.stream(model.getConstDecls())
               .map(FuncDecl::getName)
               .map(Object::toString)
-              .map(HeaderField::valueOf)
+              .map(HeaderField::parse)
               .collect(
                   ImmutableMap.toImmutableMap(
                       Function.identity(),
                       headerField ->
                           ((BitVecNum)
                                   model.getConstInterp(
-                                      program.getVariablesAsConsts().get(headerField)))
+                                      program
+                                          .getContext()
+                                          .getVariablesAsConsts()
+                                          .get(headerField.getName())))
                               .getLong()));
       Set<Flow> flows = new HashSet<>();
       for (Pair<String, String> nodeVrf : _nodeVrfSet) {

@@ -8,13 +8,13 @@ import com.microsoft.z3.Z3Exception;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import org.batfish.z3.HeaderField;
+import org.batfish.z3.BasicHeaderField;
 
 public class DeclareRelStatement extends Statement {
 
   public static final List<BitVecExpr> ARGUMENTS =
-      Arrays.stream(HeaderField.values())
-          .map(HeaderField::getSize)
+      Arrays.stream(BasicHeaderField.values())
+          .map(BasicHeaderField::getSize)
           .map(BitVecExpr::new)
           .collect(ImmutableList.toImmutableList());
 

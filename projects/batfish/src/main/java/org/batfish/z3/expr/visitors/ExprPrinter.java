@@ -3,10 +3,13 @@ package org.batfish.z3.expr.visitors;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
-import org.batfish.z3.HeaderField;
+import org.batfish.z3.BasicHeaderField;
 import org.batfish.z3.expr.AndExpr;
+import org.batfish.z3.expr.BasicRuleStatement;
+import org.batfish.z3.expr.BasicStateExpr;
 import org.batfish.z3.expr.BitVecExpr;
 import org.batfish.z3.expr.Comment;
+import org.batfish.z3.expr.CurrentIsOriginalExpr;
 import org.batfish.z3.expr.DeclareRelStatement;
 import org.batfish.z3.expr.DeclareVarStatement;
 import org.batfish.z3.expr.EqExpr;
@@ -27,6 +30,8 @@ import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.SaneExpr;
 import org.batfish.z3.expr.StateExpr;
 import org.batfish.z3.expr.Statement;
+import org.batfish.z3.expr.TransformationRuleStatement;
+import org.batfish.z3.expr.TransformationStateExpr;
 import org.batfish.z3.expr.TrueExpr;
 import org.batfish.z3.expr.VarIntExpr;
 import org.batfish.z3.expr.VoidStatementVisitor;
@@ -111,6 +116,16 @@ public class ExprPrinter implements ExprVisitor, VoidStatementVisitor {
   }
 
   @Override
+  public void visitBasicRuleStatement(BasicRuleStatement basicRuleStatement) {
+    visitRuleStatement(basicRuleStatement);
+  }
+
+  @Override
+  public void visitBasicStateExpr(BasicStateExpr basicStateExpr) {
+    visitStateExpr(basicStateExpr);
+  }
+
+  @Override
   public void visitBitVecExpr(BitVecExpr bitVecExpr) {
     List<Expr> subExpressions =
         ImmutableList.of(
@@ -129,6 +144,11 @@ public class ExprPrinter implements ExprVisitor, VoidStatementVisitor {
   }
 
   @Override
+  public void visitCurrentIsOriginal(CurrentIsOriginalExpr currentIsOriginalExpr) {
+    printExpr(currentIsOriginalExpr.getExpr());
+  }
+
+  @Override
   public void visitDeclareRelStatement(DeclareRelStatement declareRelStatement) {
     printCollapsedComplexExpr(
         ImmutableList.of(
@@ -139,7 +159,7 @@ public class ExprPrinter implements ExprVisitor, VoidStatementVisitor {
 
   @Override
   public void visitDeclareVarStatement(DeclareVarStatement declareVarStatement) {
-    HeaderField hf = declareVarStatement.getHeaderField();
+    BasicHeaderField hf = declareVarStatement.getHeaderField();
     printCollapsedComplexExpr(
         ImmutableList.of(
             new IdExpr("declare-var"), new IdExpr(hf.name()), new BitVecExpr(hf.getSize())));
@@ -240,7 +260,6 @@ public class ExprPrinter implements ExprVisitor, VoidStatementVisitor {
     printExpr(rangeMatchExpr.getExpr());
   }
 
-  @Override
   public void visitRuleStatement(RuleStatement ruleStatement) {
     printCollapsedComplexExpr(
         ImmutableList.of(new IdExpr("rule"), ruleStatement.getSubExpression()));
@@ -251,7 +270,6 @@ public class ExprPrinter implements ExprVisitor, VoidStatementVisitor {
     printExpr(saneExpr.getExpr());
   }
 
-  @Override
   public void visitStateExpr(StateExpr stateExpr) {
     /* TODO: handle vectorized state parameters as variables */
     /* TODO: handle arguments */
@@ -262,12 +280,23 @@ public class ExprPrinter implements ExprVisitor, VoidStatementVisitor {
   }
 
   @Override
+  public void visitTransformationRuleStatement(
+      TransformationRuleStatement transformationRuleStatement) {
+    visitRuleStatement(transformationRuleStatement);
+  }
+
+  @Override
+  public void visitTransformationStateExpr(TransformationStateExpr transformationStateExpr) {
+    visitStateExpr(transformationStateExpr);
+  }
+
+  @Override
   public void visitTrueExpr(TrueExpr trueExpr) {
     _sb.append("true");
   }
 
   @Override
   public void visitVarIntExpr(VarIntExpr varIntExpr) {
-    _sb.append(varIntExpr.getHeaderField().name());
+    _sb.append(varIntExpr.getHeaderField().getName());
   }
 }
