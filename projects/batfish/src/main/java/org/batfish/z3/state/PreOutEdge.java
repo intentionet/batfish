@@ -1,13 +1,13 @@
 package org.batfish.z3.state;
 
 import org.batfish.datamodel.Edge;
-import org.batfish.z3.expr.StateExpr;
+import org.batfish.z3.expr.BasicStateExpr;
 import org.batfish.z3.state.visitors.StateExprVisitor;
 import org.batfish.z3.state.visitors.StateVisitor;
 
-public class PreOutEdge extends StateExpr {
+public class PreOutEdge extends BasicStateExpr {
 
-  public static class State extends StateExpr.State {
+  public static class State extends BasicStateExpr.State {
 
     public static final State INSTANCE = new State();
 
@@ -57,5 +57,10 @@ public class PreOutEdge extends StateExpr {
 
   public String getSrcNode() {
     return _srcNode;
+  }
+
+  @Override
+  public State getState() {
+    return State.INSTANCE;
   }
 }

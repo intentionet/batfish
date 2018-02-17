@@ -1,25 +1,14 @@
 package org.batfish.z3;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.microsoft.z3.BitVecExpr;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
-import com.microsoft.z3.FuncDecl;
-import com.microsoft.z3.Z3Exception;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import org.batfish.z3.expr.DeclareRelStatement;
+import java.util.stream.Stream;
 import org.batfish.z3.expr.DeclareVarStatement;
 import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.Statement;
-import org.batfish.z3.expr.visitors.BoolExprTransformer;
-import org.batfish.z3.expr.visitors.RelationCollector;
 import org.batfish.z3.expr.visitors.Simplifier;
 import org.batfish.z3.state.Accept;
 import org.batfish.z3.state.AclDeny;
@@ -50,23 +39,14 @@ import org.batfish.z3.state.PreInInterface;
 import org.batfish.z3.state.PreOut;
 import org.batfish.z3.state.PreOutEdge;
 import org.batfish.z3.state.PreOutInterface;
-import org.batfish.z3.state.Query;
 import org.batfish.z3.state.visitors.DefaultTransitionGenerator;
 
 public class Synthesizer {
 
   public static List<Statement> getVarDeclExprs() {
-    return Arrays.stream(HeaderField.values())
+    return Arrays.stream(BasicHeaderField.values())
         .map(DeclareVarStatement::new)
         .collect(ImmutableList.toImmutableList());
-  }
-
-  public static String indent(int n) {
-    String output = "";
-    for (int i = 0; i < n; i++) {
-      output += "   ";
-    }
-    return output;
   }
 
   private final SynthesizerInput _input;
@@ -82,32 +62,12 @@ public class Synthesizer {
     return _input;
   }
 
-  public Map<String, FuncDecl> getRelDeclFuncDecls(List<Statement> existingStatements, Context ctx)
-      throws Z3Exception {
-    return ImmutableSet.<String>builder()
-        .addAll(
-            existingStatements
-                .stream()
-                .map(s -> RelationCollector.collectRelations(_input, s))
-                .flatMap(Collection::stream)
-                .collect(ImmutableSet.toImmutableSet()))
-        .add(BoolExprTransformer.getNodName(_input, Query.INSTANCE))
-        .build()
-        .stream()
-        .collect(
-            ImmutableMap.toImmutableMap(
-                Function.identity(),
-                packetRel -> new DeclareRelStatement(packetRel).toFuncDecl(ctx)));
-  }
-
   public List<String> getWarnings() {
     return _warnings;
   }
 
-  public NodProgram synthesizeNodAclProgram(String hostname, String aclName, Context ctx)
-      throws Z3Exception {
+  public ReachabilityProgram synthesizeNodAclProgram(String hostname, String aclName) {
     return synthesizeNodProgram(
-        ctx,
         ImmutableList.<Statement>copyOf(
             DefaultTransitionGenerator.generateTransitions(
                 _input,
@@ -118,9 +78,8 @@ public class Synthesizer {
                     AclPermit.State.INSTANCE))));
   }
 
-  public NodProgram synthesizeNodDataPlaneProgram(Context ctx) throws Z3Exception {
+  public ReachabilityProgram synthesizeNodDataPlaneProgram() {
     return synthesizeNodProgram(
-        ctx,
         ImmutableList.<Statement>copyOf(
             DefaultTransitionGenerator.generateTransitions(
                 _input,
@@ -156,37 +115,23 @@ public class Synthesizer {
                     PreOutInterface.State.INSTANCE))));
   }
 
-  private NodProgram synthesizeNodProgram(Context ctx, List<Statement> ruleStatements) {
-    NodProgram nodProgram = new NodProgram(ctx);
-    Map<String, FuncDecl> relDeclFuncDecls = getRelDeclFuncDecls(ruleStatements, ctx);
-    nodProgram.getRelationDeclarations().putAll(relDeclFuncDecls);
-    Map<HeaderField, BitVecExpr> variables = nodProgram.getVariables();
-    Map<HeaderField, BitVecExpr> variablesAsConsts = nodProgram.getVariablesAsConsts();
-    int deBruinIndex = 0;
-    for (HeaderField headerField : HeaderField.values()) {
-      int size = headerField.getSize();
-      BitVecExpr varExpr = (BitVecExpr) ctx.mkBound(deBruinIndex, ctx.mkBitVecSort(size));
-      BitVecExpr varAsConstExpr =
-          (BitVecExpr) ctx.mkConst(headerField.name(), ctx.mkBitVecSort(size));
-      variables.put(headerField, varExpr);
-      variablesAsConsts.put(headerField, varAsConstExpr);
-      deBruinIndex++;
-    }
-    List<BoolExpr> rules = nodProgram.getRules();
-    for (Statement rawStatement : ruleStatements) {
-      Statement statement;
-      if (_input.getSimplify()) {
-        statement = Simplifier.simplifyStatement(rawStatement);
-      } else {
-        statement = rawStatement;
-      }
-      if (statement instanceof RuleStatement) {
-        RuleStatement ruleStatement = (RuleStatement) statement;
-        BoolExpr ruleBoolExpr =
-            BoolExprTransformer.toBoolExpr(ruleStatement.getSubExpression(), _input, nodProgram);
-        rules.add(ruleBoolExpr);
-      }
-    }
-    return nodProgram;
+  private ReachabilityProgram synthesizeNodProgram(List<Statement> ruleStatements) {
+    ReachabilityProgram.Builder builder = ReachabilityProgram.builder();
+    Stream<RuleStatement> rawRuleStatements =
+        ruleStatements.stream().filter(s -> s instanceof RuleStatement).map(s -> (RuleStatement) s);
+    /*
+     * Simplify rule statements if desired, and remove statements that simplify to trivial
+     * statements that are no longer rules.
+     */
+    builder.setRules(
+        (_input.getSimplify()
+                ? rawRuleStatements
+                    .map(Simplifier::simplifyStatement)
+                    .filter(s -> s instanceof RuleStatement)
+                    .map(s -> (RuleStatement) s)
+                : rawRuleStatements)
+            .collect(ImmutableList.toImmutableList()));
+    builder.setInput(_input);
+    return builder.build();
   }
 }

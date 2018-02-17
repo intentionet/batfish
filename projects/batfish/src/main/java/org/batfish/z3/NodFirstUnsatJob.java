@@ -30,15 +30,15 @@ public class NodFirstUnsatJob<KeyT, ResultT>
     long startTime = System.currentTimeMillis();
     long elapsedTime;
     try (Context ctx = new Context()) {
-      NodProgram baseProgram = _query.synthesizeBaseProgram(_synthesizer, ctx);
-      NodProgram queryProgram = _query.getNodProgram(_synthesizer.getInput(), baseProgram);
-      NodProgram program = baseProgram.append(queryProgram);
+      ReachabilityProgram baseProgram = _query.synthesizeBaseProgram(_synthesizer);
+      ReachabilityProgram queryProgram = _query.getReachabilityProgram(_synthesizer.getInput());
+      NodProgram program = new NodProgram(ctx, baseProgram, queryProgram);
       Params p = ctx.mkParams();
       p.add("fixedpoint.engine", "datalog");
       p.add("fixedpoint.datalog.default_relation", "doc");
       Fixedpoint fix = ctx.mkFixedpoint();
       fix.setParameters(p);
-      for (FuncDecl relationDeclaration : program.getRelationDeclarations().values()) {
+      for (FuncDecl relationDeclaration : program.getContext().getRelationDeclarations().values()) {
         fix.registerRelation(relationDeclaration);
       }
       for (BoolExpr rule : program.getRules()) {

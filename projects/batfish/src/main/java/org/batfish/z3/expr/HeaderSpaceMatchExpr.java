@@ -16,7 +16,7 @@ import org.batfish.datamodel.Protocol;
 import org.batfish.datamodel.State;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.TcpFlags;
-import org.batfish.z3.HeaderField;
+import org.batfish.z3.BasicHeaderField;
 import org.batfish.z3.expr.visitors.BooleanExprVisitor;
 import org.batfish.z3.expr.visitors.ExprVisitor;
 
@@ -29,8 +29,8 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
             .map(
                 dscp ->
                     new EqExpr(
-                        new VarIntExpr(HeaderField.DSCP),
-                        new LitIntExpr(dscp, HeaderField.DSCP.getSize())))
+                        new VarIntExpr(BasicHeaderField.DSCP),
+                        new LitIntExpr(dscp, BasicHeaderField.DSCP.getSize())))
             .collect(ImmutableList.toImmutableList()));
   }
 
@@ -39,7 +39,8 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
   }
 
   public static BooleanExpr matchDstPort(Set<SubRange> dstPortRanges) {
-    return new RangeMatchExpr(HeaderField.DST_PORT, HeaderField.DST_PORT.getSize(), dstPortRanges);
+    return new RangeMatchExpr(
+        BasicHeaderField.DST_PORT, BasicHeaderField.DST_PORT.getSize(), dstPortRanges);
   }
 
   public static BooleanExpr matchDstProtocol(Set<Protocol> dstProtocols) {
@@ -53,22 +54,26 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
             .map(
                 dscp ->
                     new EqExpr(
-                        new VarIntExpr(HeaderField.ECN),
-                        new LitIntExpr(dscp, HeaderField.ECN.getSize())))
+                        new VarIntExpr(BasicHeaderField.ECN),
+                        new LitIntExpr(dscp, BasicHeaderField.ECN.getSize())))
             .collect(ImmutableList.toImmutableList()));
   }
 
   public static BooleanExpr matchFragmentOffset(Set<SubRange> fragmentOffsetRanges) {
     return new RangeMatchExpr(
-        HeaderField.FRAGMENT_OFFSET, HeaderField.FRAGMENT_OFFSET.getSize(), fragmentOffsetRanges);
+        BasicHeaderField.FRAGMENT_OFFSET,
+        BasicHeaderField.FRAGMENT_OFFSET.getSize(),
+        fragmentOffsetRanges);
   }
 
   public static BooleanExpr matchIcmpCode(Set<SubRange> icmpCodes) {
-    return new RangeMatchExpr(HeaderField.ICMP_CODE, HeaderField.ICMP_CODE.getSize(), icmpCodes);
+    return new RangeMatchExpr(
+        BasicHeaderField.ICMP_CODE, BasicHeaderField.ICMP_CODE.getSize(), icmpCodes);
   }
 
   public static BooleanExpr matchIcmpType(Set<SubRange> icmpTypes) {
-    return new RangeMatchExpr(HeaderField.ICMP_TYPE, HeaderField.ICMP_TYPE.getSize(), icmpTypes);
+    return new RangeMatchExpr(
+        BasicHeaderField.ICMP_TYPE, BasicHeaderField.ICMP_TYPE.getSize(), icmpTypes);
   }
 
   public static BooleanExpr matchIp(Set<IpWildcard> ipWildcards, boolean useSrc, boolean useDst) {
@@ -81,8 +86,10 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
         int ipStart = ipWildcardBits;
         int ipEnd = Prefix.MAX_PREFIX_LENGTH - 1;
         if (ipStart < Prefix.MAX_PREFIX_LENGTH) {
-          IntExpr extractSrcIp = ExtractExpr.newExtractExpr(HeaderField.SRC_IP, ipStart, ipEnd);
-          IntExpr extractDstIp = ExtractExpr.newExtractExpr(HeaderField.DST_IP, ipStart, ipEnd);
+          IntExpr extractSrcIp =
+              ExtractExpr.newExtractExpr(BasicHeaderField.SRC_IP, ipStart, ipEnd);
+          IntExpr extractDstIp =
+              ExtractExpr.newExtractExpr(BasicHeaderField.DST_IP, ipStart, ipEnd);
           LitIntExpr ipMatchLit = new LitIntExpr(ip, ipStart, ipEnd);
           EqExpr matchSrcIp = new EqExpr(extractSrcIp, ipMatchLit);
           EqExpr matchDstIp = new EqExpr(extractDstIp, ipMatchLit);
@@ -115,7 +122,8 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
             boolean useBit = currentWildcardBit == 0;
             if (useBit) {
               IntExpr extractSrcIp =
-                  ExtractExpr.newExtractExpr(HeaderField.SRC_IP, currentBitIndex, currentBitIndex);
+                  ExtractExpr.newExtractExpr(
+                      BasicHeaderField.SRC_IP, currentBitIndex, currentBitIndex);
               LitIntExpr srcIpMatchLit = new LitIntExpr(ip, currentBitIndex, currentBitIndex);
               EqExpr matchSrcIpBit = new EqExpr(extractSrcIp, srcIpMatchLit);
               matchSrcIp.add(matchSrcIpBit);
@@ -132,7 +140,8 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
             boolean useBit = currentWildcardBit == 0;
             if (useBit) {
               IntExpr extractDstIp =
-                  ExtractExpr.newExtractExpr(HeaderField.DST_IP, currentBitIndex, currentBitIndex);
+                  ExtractExpr.newExtractExpr(
+                      BasicHeaderField.DST_IP, currentBitIndex, currentBitIndex);
               LitIntExpr dstIpMatchLit = new LitIntExpr(ip, currentBitIndex, currentBitIndex);
               EqExpr matchDstIpBit = new EqExpr(extractDstIp, dstIpMatchLit);
               matchDstIp.add(matchDstIpBit);
@@ -168,14 +177,14 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
             .map(
                 num ->
                     new EqExpr(
-                        new VarIntExpr(HeaderField.IP_PROTOCOL),
-                        new LitIntExpr(num, HeaderField.IP_PROTOCOL.getSize())))
+                        new VarIntExpr(BasicHeaderField.IP_PROTOCOL),
+                        new LitIntExpr(num, BasicHeaderField.IP_PROTOCOL.getSize())))
             .collect(ImmutableList.toImmutableList()));
   }
 
   public static BooleanExpr matchPacketLength(Set<SubRange> packetLengths) {
     return new RangeMatchExpr(
-        HeaderField.PACKET_LENGTH, HeaderField.PACKET_LENGTH.getSize(), packetLengths);
+        BasicHeaderField.PACKET_LENGTH, BasicHeaderField.PACKET_LENGTH.getSize(), packetLengths);
   }
 
   public static BooleanExpr matchProtocol(Set<Protocol> protocols, boolean useSrc, boolean useDst) {
@@ -187,18 +196,19 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
                     protocol -> {
                       int protocolNumber = protocol.getIpProtocol().number();
                       Integer port = protocol.getPort();
-                      VarIntExpr protocolVar = new VarIntExpr(HeaderField.IP_PROTOCOL);
+                      VarIntExpr protocolVar = new VarIntExpr(BasicHeaderField.IP_PROTOCOL);
                       LitIntExpr protocolLit =
-                          new LitIntExpr(protocolNumber, HeaderField.IP_PROTOCOL.getSize());
+                          new LitIntExpr(protocolNumber, BasicHeaderField.IP_PROTOCOL.getSize());
                       EqExpr matchProtocol = new EqExpr(protocolVar, protocolLit);
                       ImmutableList.Builder<BooleanExpr> matchProtocolAndPort =
                           ImmutableList.builder();
                       matchProtocolAndPort.add(matchProtocol);
                       if (port != null) {
 
-                        VarIntExpr dstPortVar = new VarIntExpr(HeaderField.DST_PORT);
-                        VarIntExpr srcPortVar = new VarIntExpr(HeaderField.SRC_PORT);
-                        LitIntExpr portLit = new LitIntExpr(port, HeaderField.SRC_PORT.getSize());
+                        VarIntExpr dstPortVar = new VarIntExpr(BasicHeaderField.DST_PORT);
+                        VarIntExpr srcPortVar = new VarIntExpr(BasicHeaderField.SRC_PORT);
+                        LitIntExpr portLit =
+                            new LitIntExpr(port, BasicHeaderField.SRC_PORT.getSize());
                         EqExpr matchDstPort = new EqExpr(dstPortVar, portLit);
                         EqExpr matchSrcPort = new EqExpr(srcPortVar, portLit);
                         BooleanExpr matchSpecifiedPorts;
@@ -239,7 +249,8 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
   }
 
   public static BooleanExpr matchSrcPort(Set<SubRange> srcPortRanges) {
-    return new RangeMatchExpr(HeaderField.SRC_PORT, HeaderField.SRC_PORT.getSize(), srcPortRanges);
+    return new RangeMatchExpr(
+        BasicHeaderField.SRC_PORT, BasicHeaderField.SRC_PORT.getSize(), srcPortRanges);
   }
 
   public static BooleanExpr matchSrcProtocol(Set<Protocol> srcProtocols) {
@@ -253,8 +264,8 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
             .map(
                 state ->
                     new EqExpr(
-                        new VarIntExpr(HeaderField.STATE),
-                        new LitIntExpr(state.number(), HeaderField.STATE.getSize())))
+                        new VarIntExpr(BasicHeaderField.STATE),
+                        new LitIntExpr(state.number(), BasicHeaderField.STATE.getSize())))
             .collect(ImmutableList.toImmutableList()));
   }
 
@@ -269,42 +280,50 @@ public class HeaderSpaceMatchExpr extends BooleanExpr {
                   ImmutableList.Builder<BooleanExpr> matchCurrentTcpFlags = ImmutableList.builder();
                   if (currentTcpFlags.getUseCwr()) {
                     LitIntExpr bit = currentTcpFlags.getCwr() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_CWR), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_CWR), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   if (currentTcpFlags.getUseEce()) {
                     LitIntExpr bit = currentTcpFlags.getEce() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_ECE), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_ECE), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   if (currentTcpFlags.getUseUrg()) {
                     LitIntExpr bit = currentTcpFlags.getUrg() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_URG), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_URG), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   if (currentTcpFlags.getUseAck()) {
                     LitIntExpr bit = currentTcpFlags.getAck() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_ACK), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_ACK), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   if (currentTcpFlags.getUsePsh()) {
                     LitIntExpr bit = currentTcpFlags.getPsh() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_PSH), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_PSH), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   if (currentTcpFlags.getUseRst()) {
                     LitIntExpr bit = currentTcpFlags.getRst() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_RST), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_RST), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   if (currentTcpFlags.getUseSyn()) {
                     LitIntExpr bit = currentTcpFlags.getSyn() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_SYN), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_SYN), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   if (currentTcpFlags.getUseFin()) {
                     LitIntExpr bit = currentTcpFlags.getFin() ? one : zero;
-                    EqExpr matchFlag = new EqExpr(new VarIntExpr(HeaderField.TCP_FLAGS_FIN), bit);
+                    EqExpr matchFlag =
+                        new EqExpr(new VarIntExpr(BasicHeaderField.TCP_FLAGS_FIN), bit);
                     matchCurrentTcpFlags.add(matchFlag);
                   }
                   return new AndExpr(matchCurrentTcpFlags.build());

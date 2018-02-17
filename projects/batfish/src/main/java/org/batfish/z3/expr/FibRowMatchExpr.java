@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.collections.FibRow;
-import org.batfish.z3.HeaderField;
+import org.batfish.z3.BasicHeaderField;
 import org.batfish.z3.state.PostInVrf;
 import org.batfish.z3.state.PreOut;
 
@@ -58,7 +58,7 @@ public class FibRowMatchExpr {
       }
       int last = Prefix.MAX_PREFIX_LENGTH - 1;
       LitIntExpr prefixFragmentLit = new LitIntExpr(prefix, first, last);
-      IntExpr prefixFragmentExt = ExtractExpr.newExtractExpr(HeaderField.DST_IP, first, last);
+      IntExpr prefixFragmentExt = ExtractExpr.newExtractExpr(BasicHeaderField.DST_IP, first, last);
       EqExpr prefixMatch = new EqExpr(prefixFragmentExt, prefixFragmentLit);
       NotExpr noPrefixMatch = new NotExpr(prefixMatch);
       conditionsBuilder.add(noPrefixMatch);
@@ -71,7 +71,7 @@ public class FibRowMatchExpr {
     if (first < Prefix.MAX_PREFIX_LENGTH) {
       int last = Prefix.MAX_PREFIX_LENGTH - 1;
       LitIntExpr prefixFragmentLit = new LitIntExpr(prefix, first, last);
-      IntExpr prefixFragmentExt = ExtractExpr.newExtractExpr(HeaderField.DST_IP, first, last);
+      IntExpr prefixFragmentExt = ExtractExpr.newExtractExpr(BasicHeaderField.DST_IP, first, last);
       EqExpr prefixMatch = new EqExpr(prefixFragmentExt, prefixFragmentLit);
       conditionsBuilder.add(prefixMatch);
     }

@@ -9,6 +9,10 @@ import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.z3.expr.BooleanExpr;
 import org.batfish.z3.state.StateParameter.Type;
 
+/**
+ * The input to reachability program synthesis, including settings and marshalled information from
+ * configurations and data-plane
+ */
 public interface SynthesizerInput {
 
   /**

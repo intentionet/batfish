@@ -1,21 +1,17 @@
 package org.batfish.z3;
 
 import com.google.common.collect.ImmutableList;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Z3Exception;
 import java.util.List;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.z3.expr.AndExpr;
+import org.batfish.z3.expr.BasicRuleStatement;
 import org.batfish.z3.expr.BooleanExpr;
-import org.batfish.z3.expr.DeclareRelStatement;
 import org.batfish.z3.expr.HeaderSpaceMatchExpr;
 import org.batfish.z3.expr.NotExpr;
 import org.batfish.z3.expr.QueryStatement;
 import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.SaneExpr;
-import org.batfish.z3.expr.visitors.BoolExprTransformer;
 import org.batfish.z3.state.NumberedQuery;
 
 public class EarliestMoreGeneralReachableLineQuerySynthesizer
@@ -42,41 +38,38 @@ public class EarliestMoreGeneralReachableLineQuerySynthesizer
   }
 
   @Override
-  public NodProgram getNodProgram(SynthesizerInput input, NodProgram baseProgram)
-      throws Z3Exception {
-    Context ctx = baseProgram.getContext();
-    NodProgram program = new NodProgram(ctx);
+  public ReachabilityProgram getReachabilityProgram(SynthesizerInput input) {
     int unreachableLineIndex = _unreachableLine.getLine();
     IpAccessListLine unreachableLine = _list.getLines().get(unreachableLineIndex);
     BooleanExpr matchUnreachableLineHeaderSpace = new HeaderSpaceMatchExpr(unreachableLine);
+    ImmutableList.Builder<QueryStatement> queries = ImmutableList.builder();
+    ImmutableList.Builder<RuleStatement> rules = ImmutableList.builder();
     for (AclLine earlierReachableLine : _earlierReachableLines) {
       int earlierLineIndex = earlierReachableLine.getLine();
       IpAccessListLine earlierLine = _list.getLines().get(earlierLineIndex);
       BooleanExpr matchEarlierLineHeaderSpace = new HeaderSpaceMatchExpr(earlierLine);
-      AndExpr queryConditions =
-          new AndExpr(
-              ImmutableList.of(
-                  new NotExpr(matchEarlierLineHeaderSpace),
-                  matchUnreachableLineHeaderSpace,
-                  SaneExpr.INSTANCE));
       NumberedQuery queryRel = new NumberedQuery(earlierLineIndex);
-      String queryRelName = BoolExprTransformer.getNodName(input, queryRel);
-      DeclareRelStatement declaration = new DeclareRelStatement(queryRelName);
-      baseProgram.getRelationDeclarations().put(queryRelName, declaration.toFuncDecl(ctx));
-      RuleStatement queryRule = new RuleStatement(queryConditions, queryRel);
-      List<BoolExpr> rules = program.getRules();
-      rules.add(BoolExprTransformer.toBoolExpr(queryRule.getSubExpression(), input, baseProgram));
+      rules.add(
+          new BasicRuleStatement(
+              new AndExpr(
+                  ImmutableList.of(
+                      new NotExpr(matchEarlierLineHeaderSpace),
+                      matchUnreachableLineHeaderSpace,
+                      SaneExpr.INSTANCE)),
+              queryRel));
       QueryStatement query = new QueryStatement(queryRel);
-      BoolExpr queryBoolExpr =
-          BoolExprTransformer.toBoolExpr(query.getSubExpression(), input, baseProgram);
-      program.getQueries().add(queryBoolExpr);
+      queries.add(query);
       _resultsByQueryIndex.add(earlierLineIndex);
     }
-    return program;
+    return ReachabilityProgram.builder()
+        .setInput(input)
+        .setQueries(queries.build())
+        .setRules(rules.build())
+        .build();
   }
 
   @Override
-  public NodProgram synthesizeBaseProgram(Synthesizer synthesizer, Context ctx) {
-    return synthesizer.synthesizeNodAclProgram(_hostname, _aclName, ctx);
+  public ReachabilityProgram synthesizeBaseProgram(Synthesizer synthesizer) {
+    return synthesizer.synthesizeNodAclProgram(_hostname, _aclName);
   }
 }

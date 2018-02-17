@@ -14,12 +14,14 @@ import org.batfish.datamodel.collections.FibRow;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.z3.SynthesizerInput;
 import org.batfish.z3.expr.AndExpr;
+import org.batfish.z3.expr.BasicRuleStatement;
 import org.batfish.z3.expr.BooleanExpr;
 import org.batfish.z3.expr.HeaderSpaceMatchExpr;
 import org.batfish.z3.expr.NotExpr;
 import org.batfish.z3.expr.OrExpr;
 import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.StateExpr.State;
+import org.batfish.z3.expr.TransformationRuleStatement;
 import org.batfish.z3.state.Accept;
 import org.batfish.z3.state.AclDeny;
 import org.batfish.z3.state.AclLineMatch;
@@ -78,7 +80,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
   public void visitAccept(Accept.State accept) {
     // ProjectNodeAccept
     _rules.add(
-        new RuleStatement(
+        new BasicRuleStatement(
             new OrExpr(
                 _input
                     .getEnabledNodes()
@@ -112,7 +114,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                             .filter(lineEntry -> lineEntry.getValue() == LineAction.REJECT)
                             .map(
                                 lineEntry ->
-                                    new RuleStatement(
+                                    new BasicRuleStatement(
                                         new AclLineMatch(hostname, acl, lineEntry.getKey()),
                                         new AclDeny(hostname, acl)));
                       });
@@ -137,10 +139,10 @@ public class DefaultTransitionGenerator implements StateVisitor {
                         Map<Integer, LineAction> lineActions = aclActionsEntryByAclName.getValue();
                         AclDeny deny = new AclDeny(hostname, acl);
                         if (lineActions.isEmpty()) {
-                          return new RuleStatement(deny);
+                          return new BasicRuleStatement(deny);
                         } else {
                           int lastLine = lineActions.size() - 1;
-                          return new RuleStatement(
+                          return new BasicRuleStatement(
                               new AclLineNoMatch(hostname, acl, lastLine), deny);
                         }
                       });
@@ -180,7 +182,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                                                   lineCriteria,
                                                   new AclLineNoMatch(hostname, acl, line - 1)))
                                           : lineCriteria;
-                                  return new RuleStatement(
+                                  return new BasicRuleStatement(
                                       antecedent, new AclLineMatch(hostname, acl, line));
                                 });
                       });
@@ -217,7 +219,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                                                   lineCriteria,
                                                   new AclLineNoMatch(hostname, acl, line - 1)))
                                           : lineCriteria;
-                                  return new RuleStatement(
+                                  return new BasicRuleStatement(
                                       antecedent, new AclLineNoMatch(hostname, acl, line));
                                 });
                       });
@@ -249,7 +251,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                             .filter(lineEntry -> lineEntry.getValue() == LineAction.ACCEPT)
                             .map(
                                 lineEntry ->
-                                    new RuleStatement(
+                                    new BasicRuleStatement(
                                         new AclLineMatch(hostname, acl, lineEntry.getKey()),
                                         new AclPermit(hostname, acl)));
                       });
@@ -264,7 +266,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
   public void visitDrop(Drop.State drop) {
     // ProjectNodeDrop
     _rules.add(
-        new RuleStatement(
+        new BasicRuleStatement(
             new OrExpr(
                 _input
                     .getEnabledNodes()
@@ -277,10 +279,10 @@ public class DefaultTransitionGenerator implements StateVisitor {
   @Override
   public void visitDropAcl(DropAcl.State dropAcl) {
     // CopyDropAclIn
-    _rules.add(new RuleStatement(DropAclIn.INSTANCE, DropAcl.INSTANCE));
+    _rules.add(new BasicRuleStatement(DropAclIn.INSTANCE, DropAcl.INSTANCE));
 
     // CopyDropAclOut
-    _rules.add(new RuleStatement(DropAclOut.INSTANCE, DropAcl.INSTANCE));
+    _rules.add(new BasicRuleStatement(DropAclOut.INSTANCE, DropAcl.INSTANCE));
 
     // ProjectNodeDropAcl (unused for now)
     //    _rules.add(
@@ -299,7 +301,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
   public void visitDropAclIn(DropAclIn.State dropAclIn) {
     // ProjectNodeDropAclIn
     _rules.add(
-        new RuleStatement(
+        new BasicRuleStatement(
             new OrExpr(
                 _input
                     .getEnabledNodes()
@@ -313,7 +315,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
   public void visitDropAclOut(DropAclOut.State dropAclOut) {
     // ProjectNodeDropAclOut
     _rules.add(
-        new RuleStatement(
+        new BasicRuleStatement(
             new OrExpr(
                 _input
                     .getEnabledNodes()
@@ -327,7 +329,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
   public void visitDropNoRoute(DropNoRoute.State dropNoRoute) {
     // ProjectNodeDropNoRoute
     _rules.add(
-        new RuleStatement(
+        new BasicRuleStatement(
             new OrExpr(
                 _input
                     .getEnabledNodes()
@@ -341,7 +343,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
   public void visitDropNullRoute(DropNullRoute.State dropNullRoute) {
     // ProjectNodeDropNullRoute
     _rules.add(
-        new RuleStatement(
+        new BasicRuleStatement(
             new OrExpr(
                 _input
                     .getEnabledNodes()
@@ -359,7 +361,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
         .stream()
         .map(
             hostname ->
-                new RuleStatement(
+                new BasicRuleStatement(
                     new AndExpr(
                         ImmutableList.of(
                             new PostIn(hostname),
@@ -379,7 +381,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
         .stream()
         .map(
             niPair ->
-                new RuleStatement(
+                new BasicRuleStatement(
                     new PostOutInterface(niPair.getHostname(), niPair.getInterface()),
                     new NodeAccept(niPair.getHostname())))
         .forEach(_rules::add);
@@ -391,21 +393,25 @@ public class DefaultTransitionGenerator implements StateVisitor {
     _input
         .getEnabledNodes()
         .stream()
-        .map(hostname -> new RuleStatement(new NodeDropAcl(hostname), new NodeDrop(hostname)))
+        .map(hostname -> new BasicRuleStatement(new NodeDropAcl(hostname), new NodeDrop(hostname)))
         .forEach(_rules::add);
 
     // CopyNodeDropNoRoute
     _input
         .getEnabledNodes()
         .stream()
-        .map(hostname -> new RuleStatement(new NodeDropNoRoute(hostname), new NodeDrop(hostname)))
+        .map(
+            hostname ->
+                new BasicRuleStatement(new NodeDropNoRoute(hostname), new NodeDrop(hostname)))
         .forEach(_rules::add);
 
     // CopyNodeDropNullRoute
     _input
         .getEnabledNodes()
         .stream()
-        .map(hostname -> new RuleStatement(new NodeDropNullRoute(hostname), new NodeDrop(hostname)))
+        .map(
+            hostname ->
+                new BasicRuleStatement(new NodeDropNullRoute(hostname), new NodeDrop(hostname)))
         .forEach(_rules::add);
   }
 
@@ -415,14 +421,18 @@ public class DefaultTransitionGenerator implements StateVisitor {
     _input
         .getEnabledNodes()
         .stream()
-        .map(hostname -> new RuleStatement(new NodeDropAclIn(hostname), new NodeDropAcl(hostname)))
+        .map(
+            hostname ->
+                new BasicRuleStatement(new NodeDropAclIn(hostname), new NodeDropAcl(hostname)))
         .forEach(_rules::add);
 
     // CopyNodeDropAclOut
     _input
         .getEnabledNodes()
         .stream()
-        .map(hostname -> new RuleStatement(new NodeDropAclOut(hostname), new NodeDropAcl(hostname)))
+        .map(
+            hostname ->
+                new BasicRuleStatement(new NodeDropAclOut(hostname), new NodeDropAcl(hostname)))
         .forEach(_rules::add);
   }
 
@@ -444,7 +454,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                   .map(
                       ifaceName -> {
                         String inAcl = incomingAcls.get(ifaceName);
-                        return new RuleStatement(
+                        return new BasicRuleStatement(
                             new AndExpr(
                                 ImmutableList.of(
                                     new AclDeny(hostname, inAcl),
@@ -473,7 +483,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                   .map(
                       ifaceName -> {
                         String outAcl = outgoingAcls.get(ifaceName);
-                        return new RuleStatement(
+                        return new BasicRuleStatement(
                             new AndExpr(
                                 ImmutableList.of(
                                     new AclDeny(hostname, outAcl),
@@ -515,7 +525,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                                       fibConditionsByOutInterfaceEntry
                                           .getValue()
                                           .get(NodeInterfacePair.NONE);
-                                  return new RuleStatement(
+                                  return new BasicRuleStatement(
                                       conditions, new NodeDropNoRoute(hostname));
                                 });
                       });
@@ -555,7 +565,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                                       fibConditionsByOutInterfaceEntry
                                           .getValue()
                                           .get(NodeInterfacePair.NONE);
-                                  return new RuleStatement(
+                                  return new BasicRuleStatement(
                                       conditions, new NodeDropNullRoute(hostname));
                                 });
                       });
@@ -578,7 +588,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                   .stream()
                   .map(
                       ifaceName ->
-                          new RuleStatement(
+                          new BasicRuleStatement(
                               new PostOutInterface(hostname, ifaceName),
                               new NodeTransit(hostname)));
             })
@@ -603,7 +613,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                   .stream()
                   .map(
                       vrfName ->
-                          new RuleStatement(
+                          new BasicRuleStatement(
                               new OriginateVrf(hostname, vrfName), new Originate(hostname)));
             })
         .forEach(_rules::add);
@@ -618,7 +628,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
     _input
         .getEnabledNodes()
         .stream()
-        .map(hostname -> new RuleStatement(new Originate(hostname), new PostIn(hostname)))
+        .map(hostname -> new BasicRuleStatement(new Originate(hostname), new PostIn(hostname)))
         .forEach(_rules::add);
 
     // ProjectPostInInterface
@@ -634,7 +644,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                   .stream()
                   .map(
                       ifaceName ->
-                          new RuleStatement(
+                          new BasicRuleStatement(
                               new PostInInterface(hostname, ifaceName), new PostIn(hostname)));
             })
         .forEach(_rules::add);
@@ -665,7 +675,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                         } else {
                           antecedent = preIn;
                         }
-                        return new RuleStatement(
+                        return new BasicRuleStatement(
                             antecedent, new PostInInterface(hostname, ifaceName));
                       });
             })
@@ -689,7 +699,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                   .map(
                       enabledInterfacesByVrfEntry -> {
                         String vrf = enabledInterfacesByVrfEntry.getKey();
-                        return new RuleStatement(
+                        return new BasicRuleStatement(
                             new OriginateVrf(hostname, vrf), new PostInVrf(hostname, vrf));
                       });
             })
@@ -715,7 +725,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                             .stream()
                             .map(
                                 ifaceName ->
-                                    new RuleStatement(
+                                    new BasicRuleStatement(
                                         new PostInInterface(hostname, ifaceName),
                                         new PostInVrf(hostname, vrfName)));
                       });
@@ -749,7 +759,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                         } else {
                           antecedent = preOut;
                         }
-                        return new RuleStatement(
+                        return new TransformationRuleStatement(
                             antecedent, new PostOutInterface(hostname, ifaceName));
                       });
             })
@@ -766,7 +776,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
         .filter(e -> !_input.getEnabledFlowSinks().contains(e.getInterface2()))
         .map(
             edge ->
-                new RuleStatement(
+                new BasicRuleStatement(
                     new AndExpr(
                         ImmutableList.of(
                             new PreOutEdge(edge),
@@ -793,7 +803,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                               .stream()
                               .map(IpWildcard::new)
                               .collect(ImmutableSet.toImmutableSet())));
-              return new RuleStatement(
+              return new BasicRuleStatement(
                   new AndExpr(ImmutableList.of(new PostIn(hostname), ipForeignToCurrentNode)),
                   new PreOut(hostname));
             })
@@ -842,7 +852,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
                                                 fibConditionsByReceiverEntry.getValue();
                                             String inNode = receiver.getHostname();
                                             String inInterface = receiver.getInterface();
-                                            return new RuleStatement(
+                                            return new BasicRuleStatement(
                                                 conditions,
                                                 new PreOutEdge(
                                                     hostname, outInterface, inNode, inInterface));
@@ -861,7 +871,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
         .stream()
         .map(
             flowSink ->
-                new RuleStatement(
+                new BasicRuleStatement(
                     new PreOutEdge(
                         flowSink.getHostname(),
                         flowSink.getInterface(),
@@ -876,7 +886,7 @@ public class DefaultTransitionGenerator implements StateVisitor {
         .stream()
         .map(
             edge ->
-                new RuleStatement(
+                new BasicRuleStatement(
                     new PreOutEdge(edge), new PreOutInterface(edge.getNode1(), edge.getInt1())))
         .forEach(_rules::add);
   }

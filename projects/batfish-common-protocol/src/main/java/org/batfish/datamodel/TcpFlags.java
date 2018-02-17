@@ -5,6 +5,128 @@ import java.io.Serializable;
 
 public final class TcpFlags implements Serializable {
 
+  public static class Builder {
+    private boolean _ack;
+
+    private boolean _cwr;
+
+    private boolean _ece;
+
+    private boolean _fin;
+
+    private boolean _psh;
+
+    private boolean _rst;
+
+    private boolean _syn;
+
+    private boolean _urg;
+
+    private boolean _useAck;
+
+    private boolean _useCwr;
+
+    private boolean _useEce;
+
+    private boolean _useFin;
+
+    private boolean _usePsh;
+
+    private boolean _useRst;
+
+    private boolean _useSyn;
+
+    private boolean _useUrg;
+
+    private Builder() {}
+
+    public TcpFlags build() {
+      return new TcpFlags(
+          _ack, _cwr, _ece, _fin, _psh, _rst, _syn, _urg, _useAck, _useCwr, _useEce, _useFin,
+          _usePsh, _useRst, _useSyn, _useUrg);
+    }
+
+    public Builder setAck(boolean ack) {
+      _ack = ack;
+      return this;
+    }
+
+    public Builder setCwr(boolean cwr) {
+      _cwr = cwr;
+      return this;
+    }
+
+    public Builder setEce(boolean ece) {
+      _ece = ece;
+      return this;
+    }
+
+    public Builder setFin(boolean fin) {
+      _fin = fin;
+      return this;
+    }
+
+    public Builder setPsh(boolean psh) {
+      _psh = psh;
+      return this;
+    }
+
+    public Builder setRst(boolean rst) {
+      _rst = rst;
+      return this;
+    }
+
+    public Builder setSyn(boolean syn) {
+      _syn = syn;
+      return this;
+    }
+
+    public Builder setUrg(boolean urg) {
+      _urg = urg;
+      return this;
+    }
+
+    public Builder setUseAck(boolean useAck) {
+      _useAck = useAck;
+      return this;
+    }
+
+    public Builder setUseCwr(boolean useCwr) {
+      _useCwr = useCwr;
+      return this;
+    }
+
+    public Builder setUseEce(boolean useEce) {
+      _useEce = useEce;
+      return this;
+    }
+
+    public Builder setUseFin(boolean useFin) {
+      _useFin = useFin;
+      return this;
+    }
+
+    public Builder setUsePsh(boolean usePsh) {
+      _usePsh = usePsh;
+      return this;
+    }
+
+    public Builder setUseRst(boolean useRst) {
+      _useRst = useRst;
+      return this;
+    }
+
+    public Builder setUseSyn(boolean useSyn) {
+      _useSyn = useSyn;
+      return this;
+    }
+
+    public Builder setUseUrg(boolean useUrg) {
+      _useUrg = useUrg;
+      return this;
+    }
+  }
+
   public static final int ACK = 0x10;
 
   public static final int CWR = 0x80;
@@ -23,6 +145,10 @@ public final class TcpFlags implements Serializable {
   public static final int SYN = 0x02;
 
   public static final int URG = 0x20;
+
+  public static Builder builder() {
+    return new Builder();
+  }
 
   private boolean _ack;
 
@@ -55,6 +181,43 @@ public final class TcpFlags implements Serializable {
   private boolean _useSyn;
 
   private boolean _useUrg;
+
+  public TcpFlags() {}
+
+  private TcpFlags(
+      boolean ack,
+      boolean cwr,
+      boolean ece,
+      boolean fin,
+      boolean psh,
+      boolean rst,
+      boolean syn,
+      boolean urg,
+      boolean useAck,
+      boolean useCwr,
+      boolean useEce,
+      boolean useFin,
+      boolean usePsh,
+      boolean useRst,
+      boolean useSyn,
+      boolean useUrg) {
+    _ack = ack;
+    _cwr = cwr;
+    _ece = ece;
+    _fin = fin;
+    _psh = psh;
+    _rst = rst;
+    _syn = syn;
+    _urg = urg;
+    _useAck = useAck;
+    _useCwr = useCwr;
+    _useEce = useEce;
+    _useFin = useFin;
+    _usePsh = usePsh;
+    _useRst = useRst;
+    _useSyn = useSyn;
+    _useUrg = useUrg;
+  }
 
   @Override
   public boolean equals(Object obj) {

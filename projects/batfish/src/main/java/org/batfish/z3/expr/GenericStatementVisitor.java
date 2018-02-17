@@ -1,6 +1,8 @@
 package org.batfish.z3.expr;
 
 public interface GenericStatementVisitor<T> {
+  T visitBasicRuleStatement(BasicRuleStatement basicRuleStatement);
+
   T visitComment(Comment comment);
 
   T visitDeclareRelStatement(DeclareRelStatement declareRelStatement);
@@ -9,5 +11,5 @@ public interface GenericStatementVisitor<T> {
 
   T visitQueryStatement(QueryStatement queryStatement);
 
-  T visitRuleStatement(RuleStatement ruleStatement);
+  T visitTransformationRuleStatement(TransformationRuleStatement transformationRuleStatement);
 }

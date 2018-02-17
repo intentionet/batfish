@@ -1,9 +1,6 @@
 package org.batfish.z3;
 
 import com.google.common.collect.ImmutableList;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Z3Exception;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -21,10 +18,9 @@ import org.batfish.z3.expr.EqExpr;
 import org.batfish.z3.expr.LitIntExpr;
 import org.batfish.z3.expr.NotExpr;
 import org.batfish.z3.expr.QueryStatement;
-import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.SaneExpr;
+import org.batfish.z3.expr.TransformationRuleStatement;
 import org.batfish.z3.expr.VarIntExpr;
-import org.batfish.z3.expr.visitors.BoolExprTransformer;
 import org.batfish.z3.state.Query;
 
 public class BlacklistDstIpQuerySynthesizer extends BaseQuerySynthesizer {
@@ -91,24 +87,22 @@ public class BlacklistDstIpQuerySynthesizer extends BaseQuerySynthesizer {
   }
 
   @Override
-  public NodProgram getNodProgram(SynthesizerInput input, NodProgram baseProgram)
-      throws Z3Exception {
-    NodProgram program = new NodProgram(baseProgram.getContext());
+  public ReachabilityProgram getReachabilityProgram(SynthesizerInput input) {
     ImmutableList.Builder<BooleanExpr> queryConditionsBuilder = ImmutableList.builder();
     queryConditionsBuilder.add(SaneExpr.INSTANCE);
     for (Ip blacklistIp : _blacklistIps) {
       BooleanExpr blacklistIpCondition =
-          new NotExpr(new EqExpr(new VarIntExpr(HeaderField.DST_IP), new LitIntExpr(blacklistIp)));
+          new NotExpr(
+              new EqExpr(new VarIntExpr(BasicHeaderField.DST_IP), new LitIntExpr(blacklistIp)));
       queryConditionsBuilder.add(blacklistIpCondition);
     }
-    AndExpr queryConditions = new AndExpr(queryConditionsBuilder.build());
-    RuleStatement queryRule = new RuleStatement(queryConditions, Query.INSTANCE);
-    List<BoolExpr> rules = program.getRules();
-    rules.add(BoolExprTransformer.toBoolExpr(queryRule.getSubExpression(), input, baseProgram));
-    QueryStatement query = new QueryStatement(Query.INSTANCE);
-    BoolExpr queryBoolExpr =
-        BoolExprTransformer.toBoolExpr(query.getSubExpression(), input, baseProgram);
-    program.getQueries().add(queryBoolExpr);
-    return program;
+    return ReachabilityProgram.builder()
+        .setInput(input)
+        .setQueries(ImmutableList.of(new QueryStatement(Query.INSTANCE)))
+        .setRules(
+            ImmutableList.of(
+                new TransformationRuleStatement(
+                    new AndExpr(queryConditionsBuilder.build()), Query.INSTANCE)))
+        .build();
   }
 }

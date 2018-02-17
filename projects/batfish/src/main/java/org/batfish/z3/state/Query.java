@@ -1,12 +1,12 @@
 package org.batfish.z3.state;
 
-import org.batfish.z3.expr.StateExpr;
+import org.batfish.z3.expr.TransformationStateExpr;
 import org.batfish.z3.state.visitors.StateExprVisitor;
 import org.batfish.z3.state.visitors.StateVisitor;
 
-public class Query extends StateExpr {
+public class Query extends TransformationStateExpr {
 
-  public static class State extends StateExpr.State {
+  public static class State extends TransformationStateExpr.State {
 
     public static final State INSTANCE = new State();
 
@@ -25,5 +25,10 @@ public class Query extends StateExpr {
   @Override
   public void accept(StateExprVisitor visitor) {
     visitor.visitQuery(this);
+  }
+
+  @Override
+  public State getState() {
+    return State.INSTANCE;
   }
 }
