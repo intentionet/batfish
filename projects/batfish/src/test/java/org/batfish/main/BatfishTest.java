@@ -123,7 +123,7 @@ public class BatfishTest {
                 .setIptablesFilesText(iptablesFilesText)
                 .build(),
             _folder);
-    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+    Map<String, Configuration> configurations = batfish.loadConfigurations();
     assertThat(
         configurations.get("host1").getInterfaces().get("Ethernet0").getIncomingFilterName(),
         is(notNullValue()));
@@ -141,7 +141,7 @@ public class BatfishTest {
                 .setConfigurationText(testrigResourcePrefix, configurationNames)
                 .build(),
             _folder);
-    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+    Map<String, Configuration> configurations = batfish.loadConfigurations();
     Map<Ip, Set<String>> ipOwners = CommonUtil.computeIpOwners(configurations, true);
     assertThat(ipOwners.get(vrrpAddress), equalTo(Collections.singleton("r1")));
   }
@@ -355,7 +355,7 @@ public class BatfishTest {
     Batfish batfish =
         BatfishTestUtils.getBatfishFromTestrigText(
             TestrigText.builder().setConfigurationText(configMap).build(), _folder);
-    SortedMap<String, Configuration> configs = batfish.loadConfigurations();
+    Map<String, Configuration> configs = batfish.loadConfigurations();
 
     // Assert that the config parsed successfully
     assertThat(configs, hasKey("host1"));

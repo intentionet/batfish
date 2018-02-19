@@ -6,6 +6,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import org.batfish.common.Version;
 
 public class ValidateEnvironmentAnswerElement implements AnswerElement, Serializable {
 
@@ -44,6 +45,8 @@ public class ValidateEnvironmentAnswerElement implements AnswerElement, Serializ
     _undefinedInterfaceBlacklistNodes = new TreeSet<>();
     _undefinedNodeBlacklistNodes = new TreeSet<>();
     _undefinedNodeRoleSpecifierNodes = new TreeSet<>();
+    _valid = true;
+    _version = Version.getVersion();
   }
 
   @JsonProperty(PROP_UNDEFINED_INTERFACE_BLACKLIST_INTERFACES)
