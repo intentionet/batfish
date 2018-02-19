@@ -10,7 +10,7 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.List;
-import java.util.SortedMap;
+import java.util.Map;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.config.Settings;
@@ -73,8 +73,7 @@ public class FlatJuniperGrammarTest {
                 .setConfigurationText(TESTRIGS_PREFIX + testrigName, configurationNames)
                 .build(),
             _folder);
-    SortedMap<String, Configuration> configurations;
-    configurations = batfish.loadConfigurations();
+    Map<String, Configuration> configurations = batfish.loadConfigurations();
 
     Configuration rr = configurations.get(configName);
     BgpProcess proc = rr.getDefaultVrf().getBgpProcess();
@@ -99,7 +98,7 @@ public class FlatJuniperGrammarTest {
                 .setConfigurationText(TESTRIGS_PREFIX + testrigName, configurationNames)
                 .build(),
             _folder);
-    SortedMap<String, Configuration> configurations = batfish.loadConfigurations();
+    Map<String, Configuration> configurations = batfish.loadConfigurations();
     MultipathEquivalentAsPathMatchMode multipleAsDisabled =
         configurations
             .get("multiple_as_disabled")

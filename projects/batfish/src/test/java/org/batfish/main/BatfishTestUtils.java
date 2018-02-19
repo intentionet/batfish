@@ -29,7 +29,7 @@ import org.junit.rules.TemporaryFolder;
 
 public class BatfishTestUtils {
 
-  private static Cache<TestrigSettings, SortedMap<String, Configuration>> makeTestrigCache() {
+  private static Cache<Snapshot, SortedMap<String, Configuration>> makeTestrigCache() {
     return CacheBuilder.newBuilder().maximumSize(5).weakValues().build();
   }
 
@@ -51,7 +51,7 @@ public class BatfishTestUtils {
       throws IOException {
     Settings settings = new Settings(new String[] {});
     settings.setLogger(new BatfishLogger("debug", false));
-    final Cache<TestrigSettings, SortedMap<String, Configuration>> testrigs = makeTestrigCache();
+    final Cache<Snapshot, SortedMap<String, Configuration>> testrigs = makeTestrigCache();
 
     if (!configurations.isEmpty()) {
       Path containerDir = tempFolder.newFolder().toPath();
@@ -61,7 +61,7 @@ public class BatfishTestUtils {
       Batfish.initTestrigSettings(settings);
       settings.getBaseTestrigSettings().getSerializeIndependentPath().toFile().mkdirs();
       settings.getBaseTestrigSettings().getEnvironmentSettings().getEnvPath().toFile().mkdirs();
-      testrigs.put(settings.getBaseTestrigSettings(), configurations);
+      testrigs.put(new Snapshot("tempTestrig", "tempEnvironment"), configurations);
       settings.setActiveTestrigSettings(settings.getBaseTestrigSettings());
     }
     Batfish batfish =

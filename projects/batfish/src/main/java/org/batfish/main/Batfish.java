@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Predicates;
+import com.google.common.base.Verify;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -432,7 +433,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   private SortedMap<BgpTableFormat, BgpTablePlugin> _bgpTablePlugins;
 
-  private final Cache<TestrigSettings, SortedMap<String, Configuration>> _cachedConfigurations;
+  private final Cache<Snapshot, SortedMap<String, Configuration>> _cachedConfigurations;
 
   private final Cache<TestrigSettings, DataPlane> _cachedDataPlanes;
 
@@ -450,6 +451,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   private Settings _settings;
 
+  private final BatfishStorage _storage;
+
   // this variable is used communicate with parent thread on how the job
   // finished (null if job finished successfully)
   private String _terminatingExceptionMessage;
@@ -464,7 +467,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   public Batfish(
       Settings settings,
-      Cache<TestrigSettings, SortedMap<String, Configuration>> cachedConfigurations,
+      Cache<Snapshot, SortedMap<String, Configuration>> cachedConfigurations,
       Cache<TestrigSettings, DataPlane> cachedDataPlanes,
       Map<EnvironmentSettings, SortedMap<String, BgpAdvertisementsByVrf>>
           cachedEnvironmentBgpTables,
@@ -485,6 +488,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
     _answererCreators = new HashMap<>();
     _testrigSettingsStack = new ArrayList<>();
     _dataPlanePlugins = new HashMap<>();
+    _storage = new BatfishStorage(_settings.getContainerDir(), _logger, this::newBatch);
   }
 
   private Answer analyze() {
@@ -1064,29 +1068,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
     return Files.exists(dpPath);
   }
 
-  public SortedMap<String, Configuration> deserializeConfigurations(Path serializedConfigPath) {
-    _logger.info("\n*** DESERIALIZING VENDOR-INDEPENDENT CONFIGURATION STRUCTURES ***\n");
-    _logger.resetTimer();
-    if (!Files.exists(serializedConfigPath)) {
-      throw new BatfishException(
-          "Missing vendor-independent configs directory: '" + serializedConfigPath + "'");
-    }
-    Map<Path, String> namesByPath = new TreeMap<>();
-    try (DirectoryStream<Path> stream = Files.newDirectoryStream(serializedConfigPath)) {
-      for (Path serializedConfig : stream) {
-        String name = serializedConfig.getFileName().toString();
-        namesByPath.put(serializedConfig, name);
-      }
-    } catch (IOException e) {
-      throw new BatfishException(
-          "Error reading vendor-independent configs directory: '" + serializedConfigPath + "'", e);
-    }
-    SortedMap<String, Configuration> configurations =
-        deserializeObjects(namesByPath, Configuration.class);
-    _logger.printElapsedTime();
-    return configurations;
-  }
-
   private SortedMap<String, BgpAdvertisementsByVrf> deserializeEnvironmentBgpTables(
       Path serializeEnvironmentBgpTablesPath) {
     _logger.info("\n*** DESERIALIZING ENVIRONMENT BGP TABLES ***\n");
@@ -1138,14 +1119,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
             namesByPath.size());
     namesByPath.forEach(
         (inputPath, name) -> {
-          logger.debug(
-              "Reading and gunzipping: "
-                  + outputClassName
-                  + " '"
-                  + name
-                  + "' from '"
-                  + inputPath.toString()
-                  + "'");
+          logger.debugf(
+              "Reading and gunzipping: {} '{}' from '{}'", outputClassName, name, inputPath);
           byte[] data = fromGzipFile(inputPath);
           logger.debug(" ...OK\n");
           dataByName.put(name, data);
@@ -1155,11 +1130,12 @@ public class Batfish extends PluginConsumer implements IBatfish {
     AtomicInteger deserializeCompleted =
         newBatch("Deserializing '" + outputClassName + "' instances", dataByName.size());
     dataByName
-        .keySet()
+        .entrySet()
         .parallelStream()
         .forEach(
-            name -> {
-              byte[] data = dataByName.get(name);
+            entry -> {
+              String name = entry.getKey();
+              byte[] data = entry.getValue();
               S object = deserializeObject(data, outputClass);
               unsortedOutput.put(name, object);
               deserializeCompleted.incrementAndGet();
@@ -1622,24 +1598,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
   @Override
   public DataPlanePluginSettings getDataPlanePluginSettings() {
     return _settings;
-  }
-
-  private Map<String, Configuration> getDeltaConfigurations() {
-    EnvironmentSettings envSettings = _testrigSettings.getEnvironmentSettings();
-    Path deltaDir = envSettings.getDeltaConfigurationsDir();
-    if (deltaDir != null && Files.exists(deltaDir)) {
-      if (Files.exists(envSettings.getDeltaCompiledConfigurationsDir())) {
-        return deserializeConfigurations(envSettings.getDeltaCompiledConfigurationsDir());
-      } else {
-        throw new BatfishException("Missing compiled delta configurations");
-      }
-    } else {
-      return Collections.emptyMap();
-    }
-  }
-
-  public TestrigSettings getDeltaTestrigSettings() {
-    return _deltaTestrigSettings;
   }
 
   @Override
@@ -2246,30 +2204,49 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   @Override
   public SortedMap<String, Configuration> loadConfigurations() {
-    ValidateEnvironmentAnswerElement veae = loadValidateEnvironmentAnswerElement();
-    if (!veae.getValid()) {
-      throw new BatfishException(
-          "Cannot continue: environment '"
-              + getEnvironmentName()
-              + "' is invalid:\n"
-              + veae.prettyPrint());
+    Snapshot snapshot =
+        new Snapshot(
+            _testrigSettings.getName(), _testrigSettings.getEnvironmentSettings().getName());
+    _logger.debugf("Loading configurations for %s", snapshot);
+    return loadConfigurations(snapshot);
+  }
+
+  /**
+   * Returns the configurations for given snapshot, which including any environment-specific
+   * features.
+   */
+  private SortedMap<String, Configuration> loadConfigurations(Snapshot snapshot) {
+    // Do we already have configurations in the cache?
+    SortedMap<String, Configuration> configurations = _cachedConfigurations.getIfPresent(snapshot);
+    if (_monotonicCache && configurations != null) {
+      return configurations;
     }
-    SortedMap<String, Configuration> configurations = loadConfigurationsWithoutValidation();
+    _logger.debugf("Loading configurations for %s, cache miss", snapshot);
+
+    // Next, see if we have an up-to-date, environment-specific configurations on disk.
+    configurations = _storage.loadConfigurations(snapshot.getTestrig());
+    if (configurations != null) {
+      _logger.debugf("Loaded configurations for %s off disk", snapshot);
+      applyEnvironment(configurations);
+    } else {
+      // Otherwise, we have to parse the configurations. Fall back to old, hacky code.
+      configurations = parseConfigurationsAndApplyEnvironment();
+    }
+
+    _cachedConfigurations.put(snapshot, configurations);
     return configurations;
   }
 
-  private SortedMap<String, Configuration> loadConfigurationsWithoutValidation() {
+  @Nonnull
+  private SortedMap<String, Configuration> parseConfigurationsAndApplyEnvironment() {
+    _logger.infof("Repairing configurations for testrig %s", _testrigSettings.getName());
+    repairConfigurations();
     SortedMap<String, Configuration> configurations =
-        _cachedConfigurations.getIfPresent(_testrigSettings);
-    if (configurations == null) {
-      ConvertConfigurationAnswerElement ccae = loadConvertConfigurationAnswerElement();
-      if (!Version.isCompatibleVersion(
-          "Service", "Old processed configurations", ccae.getVersion())) {
-        repairConfigurations();
-      }
-      configurations = deserializeConfigurations(_testrigSettings.getSerializeIndependentPath());
-      _cachedConfigurations.put(_testrigSettings, configurations);
-    }
+        _storage.loadConfigurations(_testrigSettings.getName());
+    Verify.verify(
+        configurations != null,
+        "Configurations should not be null when loaded immediately after repair.");
+    applyEnvironment(configurations);
     return configurations;
   }
 
@@ -2479,7 +2456,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
       }
     }
     if (firstAttempt) {
-      repairEnvironment();
+      parseConfigurationsAndApplyEnvironment();
       return loadValidateEnvironmentAnswerElement(false);
     } else {
       throw new BatfishException(
@@ -3022,12 +2999,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
     _logger.printElapsedTime();
   }
 
-  private void processDeltaConfigurations(Map<String, Configuration> configurations) {
-    Map<String, Configuration> deltaConfigurations = getDeltaConfigurations();
-    configurations.putAll(deltaConfigurations);
-    // TODO: deal with topological changes
-  }
-
   @Override
   public Set<BgpAdvertisement> loadExternalBgpAnnouncements(
       Map<String, Configuration> configurations) {
@@ -3471,19 +3442,10 @@ public class Batfish extends PluginConsumer implements IBatfish {
    *   <li>Re-applying the environment to the configs, to ensure that blacklists are honored.
    * </ul>
    */
-  private void repairEnvironment() {
-    if (!_monotonicCache) {
-      _cachedConfigurations.invalidate(_testrigSettings);
-    }
-    SortedMap<String, Configuration> configurations = loadConfigurationsWithoutValidation();
-    processDeltaConfigurations(configurations);
-
+  private void applyEnvironment(Map<String, Configuration> configurationsWithoutEnvironment) {
     ValidateEnvironmentAnswerElement veae = new ValidateEnvironmentAnswerElement();
-    veae.setVersion(Version.getVersion());
-    veae.setValid(true);
-
-    updateBlacklistedAndInactiveConfigs(configurations, veae);
-    processNodeRoles(configurations, veae);
+    updateBlacklistedAndInactiveConfigs(configurationsWithoutEnvironment, veae);
+    processNodeRoles(configurationsWithoutEnvironment, veae);
 
     serializeObject(
         veae, _testrigSettings.getEnvironmentSettings().getValidateEnvironmentAnswerPath());
@@ -3851,7 +3813,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
     _logger.printElapsedTime();
   }
 
-  Answer serializeIndependentConfigs(Path vendorConfigPath, Path outputPath) {
+  private Answer serializeIndependentConfigs(Path vendorConfigPath, Path outputPath) {
     Answer answer = new Answer();
     ConvertConfigurationAnswerElement answerElement = new ConvertConfigurationAnswerElement();
     answerElement.setVersion(Version.getVersion());
@@ -3870,10 +3832,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
     serializeIndependentConfigs(configurations, outputPath);
     serializeObject(answerElement, _testrigSettings.getConvertAnswerPath());
 
-    ValidateEnvironmentAnswerElement veae = new ValidateEnvironmentAnswerElement();
-    veae.setValid(true);
-    veae.setVersion(Version.getVersion());
-    updateBlacklistedAndInactiveConfigs(configurations, veae);
+    applyEnvironment(configurations);
     Topology envTopology = computeEnvironmentTopology(configurations);
     serializeAsJson(
         _testrigSettings.getEnvironmentSettings().getSerializedTopologyPath(),
