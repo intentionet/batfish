@@ -21,14 +21,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
-import org.batfish.common.BfJson;
 import org.batfish.common.Warnings;
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.vendor_family.VendorFamily;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 @JsonSchemaDescription(
     "A Configuration represents an autonomous network device, such as a router, host, switch, or "
@@ -816,11 +813,5 @@ public final class Configuration extends ComparableStructure<String> {
                 Collectors.<Entry<String, RoutingPolicy>, String, RoutingPolicy>toMap(
                     e -> e.getKey(), e -> e.getValue().simplify())));
     _routingPolicies = simpleRoutingPolicies;
-  }
-
-  public JSONObject toJson() throws JSONException {
-    JSONObject jObj = new JSONObject();
-    jObj.put(BfJson.KEY_NODE_NAME, getHostname());
-    return jObj;
   }
 }

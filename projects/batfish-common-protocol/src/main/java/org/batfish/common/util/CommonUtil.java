@@ -884,12 +884,6 @@ public class CommonUtil {
     return upper + ":" + lower;
   }
 
-  /** Returns a hex {@link String} representation of the MD5 hash digest of the input string. */
-  @SuppressWarnings("deprecation") // md5 is deprecated, but used deliberately.
-  public static String md5Digest(String saltedSecret) {
-    return Hashing.md5().hashString(saltedSecret, StandardCharsets.UTF_8).toString();
-  }
-
   public static void moveByCopy(Path srcPath, Path dstPath) {
     if (Files.isDirectory(srcPath)) {
       copyDirectory(srcPath, dstPath);
