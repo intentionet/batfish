@@ -118,7 +118,7 @@ public class IsComplexVisitor implements ExprVisitor {
     saneExpr.getExpr().accept(this);
   }
 
-  public void visitStateExpr(StateExpr stateExpr) {
+  private void visitStateExpr(StateExpr stateExpr) {
     _isComplex = true;
   }
 

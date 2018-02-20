@@ -30,6 +30,9 @@ public abstract class TransformationStateExpr extends StateExpr {
   }
 
   @Override
+  public abstract State getState();
+
+  @Override
   public boolean exprEquals(Expr e) {
     return Parameterizer.getParameters(this)
         .equals(Parameterizer.getParameters((TransformationStateExpr) e));

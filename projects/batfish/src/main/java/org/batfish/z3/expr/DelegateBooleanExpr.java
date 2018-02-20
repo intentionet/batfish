@@ -8,6 +8,11 @@ import org.batfish.z3.expr.visitors.BoolExprTransformer;
 import org.batfish.z3.expr.visitors.BooleanExprVisitor;
 import org.batfish.z3.expr.visitors.ExprVisitor;
 
+/**
+ * Parent class for @{link BooleanExpr} subclasses that have behavior for specific visitors, but
+ * which visitors do not know of a priori. Intended to be used for external classes such as those
+ * that exist only in test packages.
+ */
 public abstract class DelegateBooleanExpr extends BooleanExpr {
 
   @Override

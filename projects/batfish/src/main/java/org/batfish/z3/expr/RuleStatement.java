@@ -2,6 +2,7 @@ package org.batfish.z3.expr;
 
 import java.util.Objects;
 
+/** A statement describing the preconditions necessary to reach a specified target state */
 public abstract class RuleStatement extends Statement {
 
   private final BooleanExpr _subExpression;

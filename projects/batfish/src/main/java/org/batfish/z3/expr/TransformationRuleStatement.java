@@ -1,5 +1,6 @@
 package org.batfish.z3.expr;
 
+/** A @{link RuleStatement} whose target state is a @{link TransformationStateExpr} */
 public class TransformationRuleStatement extends RuleStatement {
 
   public TransformationRuleStatement(BooleanExpr antecedent, TransformationStateExpr consequent) {

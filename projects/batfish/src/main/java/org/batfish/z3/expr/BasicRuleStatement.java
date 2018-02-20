@@ -1,5 +1,6 @@
 package org.batfish.z3.expr;
 
+/** A @{link RuleStatement} whose target state is a @{link BasicStateExpr} */
 public class BasicRuleStatement extends RuleStatement {
 
   public BasicRuleStatement(BasicStateExpr subExpression) {

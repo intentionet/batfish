@@ -161,7 +161,7 @@ public class RelationCollector implements ExprVisitor, VoidStatementVisitor {
     rangeMatchExpr.getExpr().accept(this);
   }
 
-  public void visitRuleStatement(RuleStatement ruleStatement) {
+  private void visitRuleStatement(RuleStatement ruleStatement) {
     ruleStatement.getSubExpression().accept(this);
   }
 
@@ -170,7 +170,7 @@ public class RelationCollector implements ExprVisitor, VoidStatementVisitor {
     saneExpr.getExpr().accept(this);
   }
 
-  public void visitStateExpr(StateExpr stateExpr) {
+  private void visitStateExpr(StateExpr stateExpr) {
     _relations.add(
         Maps.immutableEntry(
             BoolExprTransformer.getNodName(_input, stateExpr), stateExpr.getState()));

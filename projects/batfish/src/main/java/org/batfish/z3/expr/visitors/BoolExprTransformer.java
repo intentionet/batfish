@@ -57,8 +57,7 @@ public class BoolExprTransformer implements BooleanExprVisitor {
 
   private final Supplier<Expr[]> _basicArguments;
 
-  /** Visible for delegate */
-  BoolExpr _boolExpr;
+  private BoolExpr _boolExpr;
 
   private final SynthesizerInput _input;
 

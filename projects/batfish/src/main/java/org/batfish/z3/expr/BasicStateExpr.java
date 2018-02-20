@@ -19,6 +19,9 @@ public abstract class BasicStateExpr extends StateExpr {
   }
 
   @Override
+  public abstract State getState();
+
+  @Override
   public void accept(ExprVisitor visitor) {
     visitor.visitBasicStateExpr(this);
   }
