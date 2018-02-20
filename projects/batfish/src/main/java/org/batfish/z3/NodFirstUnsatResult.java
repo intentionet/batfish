@@ -21,16 +21,15 @@ public class NodFirstUnsatResult<KeyT, ResultT>
       @Nullable Integer firstUnsatQueryIndex,
       @Nullable ResultT result,
       BatfishLoggerHistory history,
-      long elapsedTime) {
-    super(elapsedTime, history);
+      long startTime) {
+    super(System.currentTimeMillis() - startTime, history);
     _firstUnsatQueryIndex = firstUnsatQueryIndex;
     _key = key;
     _result = result;
   }
 
-  public NodFirstUnsatResult(
-      long elapsedTime, BatfishLoggerHistory history, Throwable failureCause) {
-    super(elapsedTime, history, failureCause);
+  public NodFirstUnsatResult(long startTime, BatfishLoggerHistory history, Throwable failureCause) {
+    super(System.currentTimeMillis() - startTime, history, failureCause);
     _key = null;
     _result = null;
     _firstUnsatQueryIndex = null;

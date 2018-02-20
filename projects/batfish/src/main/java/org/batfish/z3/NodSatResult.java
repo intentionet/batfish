@@ -10,13 +10,13 @@ public class NodSatResult<KeyT> extends BatfishJobResult<Map<KeyT, Boolean>, Nod
 
   private final Map<KeyT, Boolean> _results;
 
-  public NodSatResult(long elapsedTime, BatfishLoggerHistory history, Throwable failureCause) {
-    super(elapsedTime, history, failureCause);
+  public NodSatResult(long startTime, BatfishLoggerHistory history, Throwable failureCause) {
+    super(System.currentTimeMillis() - startTime, history, failureCause);
     _results = null;
   }
 
-  public NodSatResult(Map<KeyT, Boolean> results, BatfishLoggerHistory history, long elapsedTime) {
-    super(elapsedTime, history);
+  public NodSatResult(Map<KeyT, Boolean> results, BatfishLoggerHistory history, long startTime) {
+    super(System.currentTimeMillis() - startTime, history);
     _results = results;
   }
 

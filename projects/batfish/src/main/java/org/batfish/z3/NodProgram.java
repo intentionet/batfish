@@ -52,7 +52,7 @@ public class NodProgram {
             .collect(ImmutableList.toImmutableList());
   }
 
-  public NodContext getContext() {
+  public NodContext getNodContext() {
     return _context;
   }
 

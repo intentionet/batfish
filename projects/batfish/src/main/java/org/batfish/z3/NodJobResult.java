@@ -13,18 +13,18 @@ public class NodJobResult extends BatfishJobResult<Set<Flow>, NodAnswerElement> 
   /** Elapsed time in milliseconds */
   private Set<Flow> _flows;
 
-  public NodJobResult(long elapsedTime, BatfishLoggerHistory history) {
-    super(elapsedTime, history);
+  public NodJobResult(long startTime, BatfishLoggerHistory history) {
+    super(System.currentTimeMillis() - startTime, history);
     _flows = Collections.<Flow>emptySet();
   }
 
-  public NodJobResult(long elapsedTime, BatfishLoggerHistory history, Set<Flow> flows) {
-    super(elapsedTime, history);
+  public NodJobResult(long startTime, BatfishLoggerHistory history, Set<Flow> flows) {
+    super(System.currentTimeMillis() - startTime, history);
     _flows = flows;
   }
 
-  public NodJobResult(long elapsedTime, BatfishLoggerHistory history, Throwable failureCause) {
-    super(elapsedTime, history, failureCause);
+  public NodJobResult(long startTime, BatfishLoggerHistory history, Throwable failureCause) {
+    super(System.currentTimeMillis() - startTime, history, failureCause);
   }
 
   @Override
