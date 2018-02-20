@@ -78,7 +78,7 @@ public class BatfishTest {
 
     Path questionPath = _folder.newFile("testAnswerBadQuestion").toPath();
     Files.write(questionPath, badQuestionStr.getBytes(StandardCharsets.UTF_8));
-    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), null);
+    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), _folder);
     batfish.getSettings().setQuestionPath(questionPath);
     Answer answer = batfish.answer();
     assertThat(answer.getQuestion(), is(nullValue()));
@@ -167,7 +167,7 @@ public class BatfishTest {
 
     Path topologyFilePath = _folder.newFile("testParseTopologyJson").toPath();
     Files.write(topologyFilePath, topologyBadJson.getBytes(StandardCharsets.UTF_8));
-    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), null);
+    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), _folder);
     String errorMessage = "Topology format error";
     _thrown.expect(BatfishException.class);
     _thrown.expectMessage(errorMessage);
@@ -178,7 +178,7 @@ public class BatfishTest {
   public void testParseTopologyEmpty() throws IOException {
     Path topologyFilePath = _folder.newFile("testParseTopologyJson").toPath();
     Files.write(topologyFilePath, new byte[0]);
-    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), null);
+    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), _folder);
     String errorMessage = "ERROR: empty topology\n";
     _thrown.expect(BatfishException.class);
     _thrown.expectMessage(errorMessage);
@@ -205,7 +205,7 @@ public class BatfishTest {
 
     Path topologyFilePath = _folder.newFile("testParseTopologyJson").toPath();
     Files.write(topologyFilePath, topologyJson.getBytes(StandardCharsets.UTF_8));
-    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), null);
+    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), _folder);
     Topology topology = batfish.parseTopology(topologyFilePath);
     assertEquals(topology.getEdges().size(), 2);
   }
@@ -267,7 +267,7 @@ public class BatfishTest {
     ParseVendorConfigurationAnswerElement answerElement =
         new ParseVendorConfigurationAnswerElement();
     answerElement.getParseStatus().put("host1", ParseStatus.PASSED);
-    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), null);
+    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), _folder);
     String failureMessage =
         "Iptables file iptables/host1.iptables for host host1 "
             + "is not contained within the testrig";
@@ -383,7 +383,7 @@ public class BatfishTest {
     ParseVendorConfigurationAnswerElement answerElement =
         new ParseVendorConfigurationAnswerElement();
     answerElement.getParseStatus().put("host1", ParseStatus.PASSED);
-    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), null);
+    Batfish batfish = BatfishTestUtils.getBatfish(new TreeMap<>(), _folder);
     batfish.readIptableFiles(testRigPath, hostConfigurations, iptablesData, answerElement);
     assertThat(answerElement.getParseStatus().get("host1"), equalTo(ParseStatus.PASSED));
     assertThat(answerElement.getErrors().size(), is(0));
