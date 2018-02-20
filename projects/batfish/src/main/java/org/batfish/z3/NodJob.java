@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableSet.Builder;
 import com.microsoft.z3.BitVecExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
-import java.util.SortedSet;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 import org.batfish.common.Pair;
 import org.batfish.config.Settings;
 
