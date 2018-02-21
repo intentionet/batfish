@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
@@ -78,7 +77,7 @@ public class RelationCollectorTest {
   @Test
   public void testVisitLiteral() {
     AndExpr and = new AndExpr(of(TrueExpr.INSTANCE, FalseExpr.INSTANCE));
-    assertThat(collectRelations(_input, and), equalTo(ImmutableMap.of()));
+    assertThat(collectRelations(_input, and), equalTo(ImmutableSet.of()));
   }
 
   /** Test that collectRelations traverses the child of a NotExpr. */
