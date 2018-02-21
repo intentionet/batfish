@@ -34,6 +34,7 @@ import org.batfish.z3.expr.SaneExpr;
 import org.batfish.z3.expr.Statement;
 import org.batfish.z3.expr.TransformationRuleStatement;
 import org.batfish.z3.expr.TransformationStateExpr;
+import org.batfish.z3.expr.TransformedExpr;
 import org.batfish.z3.expr.TrueExpr;
 import org.batfish.z3.expr.VarIntExpr;
 
@@ -345,6 +346,22 @@ public class Simplifier implements ExprVisitor, GenericStatementVisitor<Statemen
   public void visitTransformationStateExpr(TransformationStateExpr transformationStateExpr) {
     /** TODO: something smarter */
     _simplifiedBooleanExpr = transformationStateExpr;
+  }
+
+  @Override
+  public void visitTransformedExpr(TransformedExpr transformedExpr) {
+    /* TODO: push transformation down to children? */
+    /* TODO: eliminate non-adjacent TransformedExpr children */
+    BooleanExpr originalSubExpression = transformedExpr.getSubExpression();
+    BooleanExpr simplifiedSubExpression = simplifyBooleanExpr(originalSubExpression);
+    if (simplifiedSubExpression instanceof TransformedExpr) {
+      _simplifiedBooleanExpr = simplifiedSubExpression;
+    } else if (simplifiedSubExpression != originalSubExpression) {
+      _simplifiedBooleanExpr = new TransformedExpr(simplifiedSubExpression);
+
+    } else {
+      _simplifiedBooleanExpr = transformedExpr;
+    }
   }
 
   @Override

@@ -32,6 +32,7 @@ import org.batfish.z3.expr.StateExpr;
 import org.batfish.z3.expr.Statement;
 import org.batfish.z3.expr.TransformationRuleStatement;
 import org.batfish.z3.expr.TransformationStateExpr;
+import org.batfish.z3.expr.TransformedExpr;
 import org.batfish.z3.expr.TrueExpr;
 import org.batfish.z3.expr.VarIntExpr;
 import org.batfish.z3.expr.VoidStatementVisitor;
@@ -288,6 +289,12 @@ public class ExprPrinter implements ExprVisitor, VoidStatementVisitor {
   @Override
   public void visitTransformationStateExpr(TransformationStateExpr transformationStateExpr) {
     visitStateExpr(transformationStateExpr);
+  }
+
+  @Override
+  public void visitTransformedExpr(TransformedExpr transformedExpr) {
+    printCollapsedComplexExpr(
+        ImmutableList.of(new IdExpr("transformed"), transformedExpr.getSubExpression()));
   }
 
   @Override

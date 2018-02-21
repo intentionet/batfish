@@ -35,6 +35,7 @@ import org.batfish.z3.expr.StateExpr.State;
 import org.batfish.z3.expr.Statement;
 import org.batfish.z3.expr.TransformationRuleStatement;
 import org.batfish.z3.expr.TransformationStateExpr;
+import org.batfish.z3.expr.TransformedExpr;
 import org.batfish.z3.expr.TrueExpr;
 import org.batfish.z3.expr.VarIntExpr;
 import org.batfish.z3.expr.VoidStatementVisitor;
@@ -185,6 +186,11 @@ public class RelationCollector implements ExprVisitor, VoidStatementVisitor {
   @Override
   public void visitTransformationStateExpr(TransformationStateExpr transformationStateExpr) {
     visitStateExpr(transformationStateExpr);
+  }
+
+  @Override
+  public void visitTransformedExpr(TransformedExpr transformedExpr) {
+    transformedExpr.getSubExpression().accept(this);
   }
 
   @Override

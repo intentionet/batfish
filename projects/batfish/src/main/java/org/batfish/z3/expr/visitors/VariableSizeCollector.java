@@ -38,6 +38,7 @@ import org.batfish.z3.expr.SaneExpr;
 import org.batfish.z3.expr.Statement;
 import org.batfish.z3.expr.TransformationRuleStatement;
 import org.batfish.z3.expr.TransformationStateExpr;
+import org.batfish.z3.expr.TransformedExpr;
 import org.batfish.z3.expr.TrueExpr;
 import org.batfish.z3.expr.VarIntExpr;
 import org.batfish.z3.expr.VoidStatementVisitor;
@@ -192,6 +193,11 @@ public class VariableSizeCollector implements ExprVisitor, VoidStatementVisitor 
   @Override
   public void visitTransformationStateExpr(TransformationStateExpr transformationStateExpr) {
     _variableSizes.addAll(TRANSFORMATION_STATE_VARIABLE_SIZES.get());
+  }
+
+  @Override
+  public void visitTransformedExpr(TransformedExpr transformedExpr) {
+    transformedExpr.getSubExpression().accept(this);
   }
 
   @Override

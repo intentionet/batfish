@@ -2,10 +2,12 @@ package org.batfish.z3.expr.visitors;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import org.batfish.z3.BasicHeaderField;
 import org.batfish.z3.NodContext;
@@ -27,11 +29,15 @@ import org.batfish.z3.expr.RangeMatchExpr;
 import org.batfish.z3.expr.SaneExpr;
 import org.batfish.z3.expr.StateExpr;
 import org.batfish.z3.expr.TransformationStateExpr;
+import org.batfish.z3.expr.TransformedExpr;
 import org.batfish.z3.expr.TrueExpr;
 import org.batfish.z3.expr.VarIntExpr;
 import org.batfish.z3.state.StateParameter.Type;
 import org.batfish.z3.state.visitors.Parameterizer;
 
+/**
+ * Visitor that transforms Batfish reachability AST {@link BooleanExpr} into Z3 AST {@link BoolExpr}
+ */
 public class BoolExprTransformer implements BooleanExprVisitor {
 
   public static String getNodName(Set<Type> vectorizedParameters, StateExpr stateExpr) {
@@ -59,9 +65,15 @@ public class BoolExprTransformer implements BooleanExprVisitor {
 
   private BoolExpr _boolExpr;
 
+  private final Supplier<Expr[]> _from;
+
   private final SynthesizerInput _input;
 
   private final NodContext _nodContext;
+
+  private final Supplier<Map<Expr, Expr>> _substitutions;
+
+  private final Supplier<Expr[]> _to;
 
   private final Supplier<Expr[]> _transformationArguments;
 
@@ -84,6 +96,15 @@ public class BoolExprTransformer implements BooleanExprVisitor {
                             .map(VarIntExpr::new)
                             .map(e -> BitVecExprTransformer.toBitVecExpr(e, _nodContext)))
                     .toArray(Expr[]::new));
+    _substitutions =
+        () ->
+            Arrays.stream(TransformationHeaderField.values())
+                .collect(
+                    ImmutableMap.toImmutableMap(
+                        thf -> _nodContext.getVariables().get(thf.getCurrent().getName()),
+                        thf -> _nodContext.getVariables().get(thf.getName())));
+    _from = () -> _substitutions.get().keySet().toArray(new Expr[] {});
+    _to = () -> _substitutions.get().values().toArray(new Expr[] {});
   }
 
   private Expr[] getBasicRelationArgs(SynthesizerInput input, BasicStateExpr stateExpr) {
@@ -206,6 +227,13 @@ public class BoolExprTransformer implements BooleanExprVisitor {
                         .getRelationDeclarations()
                         .get(getNodName(_input, transformationStateExpr)),
                     getTransformationRelationArgs(_input, transformationStateExpr));
+  }
+
+  @Override
+  public void visitTransformedExpr(TransformedExpr transformedExpr) {
+    /* TODO: allow vectorized variables */
+    BoolExpr subExpression = toBoolExpr(transformedExpr.getSubExpression(), _input, _nodContext);
+    _boolExpr = (BoolExpr) subExpression.substitute(_from.get(), _to.get());
   }
 
   @Override
