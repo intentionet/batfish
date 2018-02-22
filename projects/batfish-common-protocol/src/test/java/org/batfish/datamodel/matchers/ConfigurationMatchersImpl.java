@@ -4,6 +4,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.vendor_family.VendorFamily;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
@@ -17,6 +18,17 @@ final class ConfigurationMatchersImpl {
     @Override
     protected Vrf featureValueOf(Configuration actual) {
       return actual.getDefaultVrf();
+    }
+  }
+
+  static final class HasVendorFamily extends FeatureMatcher<Configuration, VendorFamily> {
+    HasVendorFamily(@Nonnull Matcher<? super VendorFamily> subMatcher) {
+      super(subMatcher, "a configuration with vendorFamily", "vendorFamily");
+    }
+
+    @Override
+    protected VendorFamily featureValueOf(Configuration actual) {
+      return actual.getVendorFamily();
     }
   }
 

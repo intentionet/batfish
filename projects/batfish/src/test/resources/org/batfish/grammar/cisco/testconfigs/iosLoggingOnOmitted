@@ -1,0 +1,8 @@
+!!!!!! trick Batfish into recognizing this as an IOS device. !!!!!!
+! exit-address-family
+!!!!!! trick Batfish into recognizing this as an IOS device. !!!!!!
+!
+hostname iosLoggingOnOmitted
+!
+!
+

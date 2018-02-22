@@ -1237,6 +1237,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     _configuration = new CiscoConfiguration(_unimplementedFeatures);
     _configuration.setVendor(_format);
     _currentVrf = Configuration.DEFAULT_VRF_NAME;
+    if (_format == ConfigurationFormat.CISCO_IOS) {
+      Logging logging = new Logging();
+      logging.setOn(true);
+      _configuration.getCf().setLogging(logging);
+    }
   }
 
   @Override

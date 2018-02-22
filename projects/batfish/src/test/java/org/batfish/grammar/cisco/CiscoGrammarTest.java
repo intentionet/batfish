@@ -1,6 +1,7 @@
 package org.batfish.grammar.cisco;
 
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasDefaultVrf;
+import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVendorFamily;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrfs;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasDeclaredNames;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasOspfArea;
@@ -12,6 +13,9 @@ import static org.batfish.datamodel.matchers.OspfAreaSummaryMatchers.hasMetric;
 import static org.batfish.datamodel.matchers.OspfAreaSummaryMatchers.isAdvertised;
 import static org.batfish.datamodel.matchers.OspfProcessMatchers.hasAreas;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasOspfProcess;
+import static org.batfish.datamodel.vendor_family.VendorFamilyMatchers.hasCisco;
+import static org.batfish.datamodel.vendor_family.cisco.CiscoFamilyMatchers.hasLogging;
+import static org.batfish.datamodel.vendor_family.cisco.LoggingMatchers.isOn;
 import static org.batfish.representation.cisco.OspfProcess.getReferenceOspfBandwidth;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -104,6 +108,12 @@ public class CiscoGrammarTest {
     assertThat(
         defaults.getDefaultVrf().getOspfProcess().getReferenceBandwidth(),
         equalTo(getReferenceOspfBandwidth(ConfigurationFormat.CISCO_ASA)));
+  }
+
+  @Test
+  public void testIosLoggingOnDefault() throws IOException {
+    Configuration loggingOnOmitted = parseConfig("iosLoggingOnOmitted");
+    assertThat(loggingOnOmitted, hasVendorFamily(hasCisco(hasLogging(isOn()))));
   }
 
   @Test
