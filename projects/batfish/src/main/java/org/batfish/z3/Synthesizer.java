@@ -117,20 +117,13 @@ public class Synthesizer {
 
   private ReachabilityProgram synthesizeNodProgram(List<Statement> ruleStatements) {
     ReachabilityProgram.Builder builder = ReachabilityProgram.builder();
-    Stream<RuleStatement> rawRuleStatements =
-        ruleStatements.stream().filter(s -> s instanceof RuleStatement).map(s -> (RuleStatement) s);
-    /*
-     * Simplify rule statements if desired, and remove statements that simplify to trivial
-     * statements that are no longer rules.
-     */
-    builder.setRules(
-        (_input.getSimplify()
-                ? rawRuleStatements
-                    .map(Simplifier::simplifyStatement)
-                    .filter(s -> s instanceof RuleStatement)
-                    .map(s -> (RuleStatement) s)
-                : rawRuleStatements)
-            .collect(ImmutableList.toImmutableList()));
+    List<RuleStatement> rawRuleStatements =
+        ruleStatements
+            .stream()
+            .filter(s -> s instanceof RuleStatement)
+            .map(s -> (RuleStatement) s)
+            .collect(ImmutableList.toImmutableList());
+    builder.setRules(rawRuleStatements);
     builder.setInput(_input);
     return builder.build();
   }
