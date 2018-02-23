@@ -2,6 +2,7 @@ package org.batfish.z3;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import java.util.Arrays;
@@ -66,36 +67,38 @@ public class NodProgram {
 
   public String toSmt2String() {
     StringBuilder sb = new StringBuilder();
-    Arrays.stream(BasicHeaderField.values())
+    Streams.concat(
+            Arrays.stream(BasicHeaderField.values()),
+            Arrays.stream(TransformationHeaderField.values()))
         .forEach(
             hf -> {
               String var = hf.name();
               int size = hf.getSize();
               sb.append(String.format("(declare-var %s (_ BitVec %d))\n", var, size));
             });
-    StringBuilder sizeSb = new StringBuilder("(");
-    Arrays.stream(BasicHeaderField.values())
-        .map(BasicHeaderField::getSize)
-        .forEach(s -> sizeSb.append(String.format(" (_ BitVec %d)", s)));
-    String sizes = sizeSb.append(")").toString();
     _context
         .getRelationDeclarations()
-        .keySet()
+        .values()
         .stream()
         .map(
-            r ->
-                r.contains(":") || r.contains("(") || r.contains(")")
-                    ? String.format("|%s|", r)
-                    : r)
-        .forEach(relation -> sb.append(String.format("(declare-rel %s %s)\n", relation, sizes)));
+            funcDecl ->
+                funcDecl
+                    .getSExpr()
+                    .replaceAll("declare-fun", "declare-rel")
+                    .replaceAll(" Bool\\)", ")"))
+        .forEach(declaration -> sb.append(String.format("%s\n", declaration)));
     _rules.forEach(r -> sb.append(String.format("(rule %s)\n", r.toString())));
 
     sb.append("\n");
-    sb.append("(query query_relation)\n");
+    _queries.forEach(
+        query -> sb.append(String.format("(query %s)\n", query.getFuncDecl().getName())));
+
     String[] intermediate = new String[] {sb.toString()};
     final AtomicInteger currentVar = new AtomicInteger(0);
-    Arrays.stream(BasicHeaderField.values())
-        .map(BasicHeaderField::name)
+    Streams.concat(
+            Arrays.<HeaderField>stream(BasicHeaderField.values()),
+            Arrays.<HeaderField>stream(TransformationHeaderField.values()))
+        .map(HeaderField::getName)
         .collect(
             ImmutableMap.toImmutableMap(
                 Function.identity(), v -> String.format("(:var %d)", currentVar.getAndIncrement())))
