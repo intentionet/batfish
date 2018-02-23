@@ -2,7 +2,6 @@ package org.batfish.z3;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.stream.Stream;
 import org.batfish.z3.expr.QueryStatement;
 import org.batfish.z3.expr.RuleStatement;
 import org.batfish.z3.expr.visitors.Simplifier;
