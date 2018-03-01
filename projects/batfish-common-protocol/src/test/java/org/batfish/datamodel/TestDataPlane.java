@@ -14,27 +14,31 @@ import org.batfish.datamodel.collections.NodeInterfacePair;
 public class TestDataPlane implements DataPlane {
 
   public static class Builder {
-    private Map<String, Map<String, SortedSet<FibRow>>> _fibs;
+
+    private Map<String, Map<String, SortedSet<FibRow>>> _fibRows;
+
+    private Map<String, Map<String, Fib>> _fibs;
 
     private Set<NodeInterfacePair> _flowSinks;
 
-    private SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> _ribs;
+    private SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> _ribs;
 
     private SortedSet<Edge> _topologyEdges;
 
     private Builder() {
       _fibs = ImmutableMap.of();
+      _fibRows = ImmutableMap.of();
       _flowSinks = ImmutableSet.of();
       _ribs = ImmutableSortedMap.of();
       _topologyEdges = ImmutableSortedSet.of();
     }
 
     public TestDataPlane build() {
-      return new TestDataPlane(_fibs, _flowSinks, _ribs, _topologyEdges);
+      return new TestDataPlane(_fibs, _fibRows, _flowSinks, _ribs, _topologyEdges);
     }
 
-    public Builder setFibs(Map<String, Map<String, SortedSet<FibRow>>> fibs) {
-      _fibs = fibs;
+    public Builder setFibRows(Map<String, Map<String, SortedSet<FibRow>>> fibs) {
+      _fibRows = fibs;
       return this;
     }
 
@@ -43,7 +47,7 @@ public class TestDataPlane implements DataPlane {
       return this;
     }
 
-    public Builder setRibs(SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> ribs) {
+    public Builder setRibs(SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs) {
       _ribs = ribs;
       return this;
     }
@@ -61,27 +65,35 @@ public class TestDataPlane implements DataPlane {
     return new Builder();
   }
 
-  private final Map<String, Map<String, SortedSet<FibRow>>> _fibs;
+  private final Map<String, Map<String, SortedSet<FibRow>>> _fibRows;
+
+  private final Map<String, Map<String, Fib>> _fibs;
 
   private final Set<NodeInterfacePair> _flowSinks;
 
-  private final SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> _ribs;
+  private final SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> _ribs;
 
   private final SortedSet<Edge> _topologyEdges;
 
   private TestDataPlane(
-      Map<String, Map<String, SortedSet<FibRow>>> fibs,
+      Map<String, Map<String, Fib>> fibs,
+      Map<String, Map<String, SortedSet<FibRow>>> fibRows,
       Set<NodeInterfacePair> flowSinks,
-      SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> ribs,
+      SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs,
       SortedSet<Edge> topologyEdges) {
-    _fibs = ImmutableMap.copyOf(fibs);
+    _fibs = fibs;
+    _fibRows = ImmutableMap.copyOf(fibRows);
     _flowSinks = ImmutableSet.copyOf(flowSinks);
     _ribs = ImmutableSortedMap.copyOf(ribs);
     _topologyEdges = ImmutableSortedSet.copyOf(topologyEdges);
   }
 
   @Override
-  public Map<String, Map<String, SortedSet<FibRow>>> getFibs() {
+  public Map<String, Map<String, SortedSet<FibRow>>> getFibRows() {
+    return _fibRows;
+  }
+
+  public Map<String, Map<String, Fib>> getFibs() {
     return _fibs;
   }
 
@@ -96,7 +108,7 @@ public class TestDataPlane implements DataPlane {
   }
 
   @Override
-  public SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> getRibs() {
+  public SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> getRibs() {
     return _ribs;
   }
 

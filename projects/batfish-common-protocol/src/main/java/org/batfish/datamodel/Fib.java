@@ -1,4 +1,4 @@
-package org.batfish.bdp;
+package org.batfish.datamodel;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -8,23 +8,23 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.batfish.common.BatfishException;
-import org.batfish.datamodel.AbstractRoute;
-import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.Prefix;
-import org.batfish.datamodel.Route;
 
 public class Fib implements Serializable {
 
   private static final int MAX_DEPTH = 10;
 
-  /** */
   private static final long serialVersionUID = 1L;
 
+  /** route -> nexthopinterface -> nextHopIp -> interfaceRoutes */
   private final Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> _nextHopInterfaces;
 
-  private final Rib _rib;
+  public Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> getNextHopInterfaces() {
+    return _nextHopInterfaces;
+  }
 
-  public Fib(Rib rib) {
+  private final GenericRib<AbstractRoute> _rib;
+
+  public Fib(GenericRib<AbstractRoute> rib) {
     _rib = rib;
     _nextHopInterfaces = new HashMap<>();
     for (AbstractRoute route : rib.getRoutes()) {

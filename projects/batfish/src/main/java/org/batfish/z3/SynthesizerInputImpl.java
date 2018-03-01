@@ -205,7 +205,7 @@ public final class SynthesizerInputImpl implements SynthesizerInput {
     _simplify = simplify;
     _vectorizedParameters = vectorizedParameters;
     if (dataPlane != null) {
-      _fibs = ImmutableMap.copyOf(dataPlane.getFibs());
+      _fibs = ImmutableMap.copyOf(dataPlane.getFibRows());
       _flowSinks = ImmutableSet.copyOf(dataPlane.getFlowSinks());
       _enabledFlowSinks = computeEnabledFlowSinks();
       _ipsByHostname = computeIpsByHostname();

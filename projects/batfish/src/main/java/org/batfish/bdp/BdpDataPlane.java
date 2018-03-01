@@ -26,8 +26,9 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConnectedRoute;
 import org.batfish.datamodel.DataPlane;
 import org.batfish.datamodel.Edge;
+import org.batfish.datamodel.Fib;
 import org.batfish.datamodel.GeneratedRoute;
-import org.batfish.datamodel.IRib;
+import org.batfish.datamodel.GenericRib;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
@@ -53,7 +54,7 @@ public class BdpDataPlane implements Serializable, DataPlane {
   Topology _topology;
 
   @Override
-  public Map<String, Map<String, SortedSet<FibRow>>> getFibs() {
+  public Map<String, Map<String, SortedSet<FibRow>>> getFibRows() {
     ImmutableMap.Builder<String, Map<String, SortedSet<FibRow>>> fibsByNode =
         ImmutableMap.builder();
     _nodes
@@ -173,16 +174,16 @@ public class BdpDataPlane implements Serializable, DataPlane {
   }
 
   @Override
-  public SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> getRibs() {
-    ImmutableSortedMap.Builder<String, SortedMap<String, IRib<AbstractRoute>>> ribs =
+  public SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> getRibs() {
+    ImmutableSortedMap.Builder<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs =
         new ImmutableSortedMap.Builder<>(naturalOrder());
     _nodes.forEach(
         (hostname, node) -> {
-          ImmutableSortedMap.Builder<String, IRib<AbstractRoute>> byVrf =
+          ImmutableSortedMap.Builder<String, GenericRib<AbstractRoute>> byVrf =
               new ImmutableSortedMap.Builder<>(naturalOrder());
           node._virtualRouters.forEach(
               (vrf, virtualRouter) -> {
-                IRib<AbstractRoute> rib = virtualRouter._mainRib;
+                GenericRib<AbstractRoute> rib = virtualRouter._mainRib;
                 byVrf.put(vrf, rib);
               });
           ribs.put(hostname, byVrf.build());
@@ -370,5 +371,24 @@ public class BdpDataPlane implements Serializable, DataPlane {
 
   public void setTopology(Topology topology) {
     _topology = topology;
+  }
+
+  @Override
+  public Map<String, Map<String, Fib>> getFibs() {
+    return _nodes
+        .entrySet()
+        .stream()
+        .collect(
+            ImmutableMap.toImmutableMap(
+                Entry::getKey,
+                eNode ->
+                    eNode
+                        .getValue()
+                        ._virtualRouters
+                        .entrySet()
+                        .stream()
+                        .collect(
+                            ImmutableMap.toImmutableMap(
+                                Entry::getKey, eVr -> eVr.getValue()._fib))));
   }
 }
