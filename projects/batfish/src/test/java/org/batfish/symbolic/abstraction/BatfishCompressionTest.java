@@ -117,11 +117,11 @@ public class BatfishCompressionTest {
   @Test
   public void testCompressionFibs_simpleNetwork() throws IOException {
     DataPlane origDataPlane = getDataPlane(simpleNetwork());
-    Map<String, Map<String, SortedSet<FibRow>>> origFibs = origDataPlane.getFibs();
+    Map<String, Map<String, SortedSet<FibRow>>> origFibs = origDataPlane.getFibRows();
     SortedMap<String, Configuration> compressedConfigs =
         compressNetwork(simpleNetwork(), new HeaderSpace());
     DataPlane compressedDataPlane = getDataPlane(compressedConfigs);
-    Map<String, Map<String, SortedSet<FibRow>>> compressedFibs = compressedDataPlane.getFibs();
+    Map<String, Map<String, SortedSet<FibRow>>> compressedFibs = compressedDataPlane.getFibRows();
 
     compressedConfigs.values().forEach(BatfishCompressionTest::assertIsCompressedConfig);
     assertThat(origFibs.keySet(), equalTo(compressedFibs.keySet()));
@@ -177,11 +177,11 @@ public class BatfishCompressionTest {
   @Test
   public void testCompressionFibs_compressibleNetwork() throws IOException {
     DataPlane origDataPlane = getDataPlane(compressibleNetwork());
-    Map<String, Map<String, SortedSet<FibRow>>> origFibs = origDataPlane.getFibs();
+    Map<String, Map<String, SortedSet<FibRow>>> origFibs = origDataPlane.getFibRows();
     SortedMap<String, Configuration> compressedConfigs =
         compressNetwork(compressibleNetwork(), new HeaderSpace());
     DataPlane compressedDataPlane = getDataPlane(compressedConfigs);
-    Map<String, Map<String, SortedSet<FibRow>>> compressedFibs = compressedDataPlane.getFibs();
+    Map<String, Map<String, SortedSet<FibRow>>> compressedFibs = compressedDataPlane.getFibRows();
 
     compressedConfigs.values().forEach(BatfishCompressionTest::assertIsCompressedConfig);
 
@@ -296,7 +296,7 @@ public class BatfishCompressionTest {
     line.setDstIps(ImmutableList.of(new IpWildcard(Prefix.parse("4.4.4.4/32"))));
     SortedMap<String, Configuration> origConfigs = diamondNetwork();
     DataPlane origDataPlane = getDataPlane(origConfigs);
-    Map<String, Map<String, SortedSet<FibRow>>> origFibs = origDataPlane.getFibs();
+    Map<String, Map<String, SortedSet<FibRow>>> origFibs = origDataPlane.getFibRows();
 
     assertThat(
         origFibs
@@ -311,7 +311,7 @@ public class BatfishCompressionTest {
     SortedMap<String, Configuration> compressedConfigs =
         new TreeMap<>(compressNetwork(diamondNetwork(), line));
     DataPlane compressedDataPlane = getDataPlane(compressedConfigs);
-    Map<String, Map<String, SortedSet<FibRow>>> compressedFibs = compressedDataPlane.getFibs();
+    Map<String, Map<String, SortedSet<FibRow>>> compressedFibs = compressedDataPlane.getFibRows();
 
     compressedConfigs.values().forEach(BatfishCompressionTest::assertIsCompressedConfig);
 

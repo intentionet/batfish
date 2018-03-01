@@ -455,7 +455,7 @@ public class SynthesizerInputImplTest {
         _inputBuilder
             .setDataPlane(
                 TestDataPlane.builder()
-                    .setFibs(
+                    .setFibRows(
                         ImmutableMap.of(srcNode.getName(), ImmutableMap.of(srcVrf.getName(), fibs)))
                     .build())
             .build();

@@ -10,13 +10,16 @@ import org.batfish.datamodel.collections.NodeInterfacePair;
 
 public interface DataPlane extends Serializable {
 
-  Map<String, Map<String, SortedSet<FibRow>>> getFibs();
+  /** Mapping: hostname -> vrfName -> fibRows */
+  Map<String, Map<String, SortedSet<FibRow>>> getFibRows();
 
   Set<NodeInterfacePair> getFlowSinks();
 
   SortedMap<String, Map<Ip, SortedSet<Edge>>> getPolicyRouteFibNodeMap();
 
-  SortedMap<String, SortedMap<String, IRib<AbstractRoute>>> getRibs();
+  SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> getRibs();
+
+  Map<String, Map<String, Fib>> getFibs();
 
   SortedSet<Edge> getTopologyEdges();
 }

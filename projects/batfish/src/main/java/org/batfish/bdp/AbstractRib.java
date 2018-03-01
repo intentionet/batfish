@@ -1,10 +1,12 @@
 package org.batfish.bdp;
 
-import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,8 +15,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.AbstractRoute;
-import org.batfish.datamodel.IRib;
+import org.batfish.datamodel.GenericRib;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpSpace;
+import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.collections.MultiSet;
 import org.batfish.datamodel.collections.TreeMultiSet;
@@ -27,7 +31,15 @@ import org.batfish.datamodel.collections.TreeMultiSet;
  * @param <R> Type of route that this RIB will be storing. Required for properly comparing route
  *     preferences.
  */
-public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
+public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib<R> {
+
+  public final Map<Prefix, IpSpace> getMatchingIps() {
+    return _tree.getMatchingIps();
+  }
+
+  public final IpSpace getRoutableIps() {
+    return _tree.getRoutableIps();
+  }
 
   /**
    * Used to store the routes, supports longest prefix match operation.
@@ -40,10 +52,22 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
 
     private static final long serialVersionUID = 1L;
 
-    private RibTreeNode _root;
+    RibTreeNode _root;
 
     RibTree() {
       _root = new RibTreeNode(Prefix.ZERO);
+    }
+
+    public Map<Prefix, IpSpace> getMatchingIps() {
+      ImmutableMap.Builder<Prefix, IpSpace> builder = ImmutableMap.builder();
+      _root.addMatchingIps(builder);
+      return builder.build();
+    }
+
+    IpSpace getRoutableIps() {
+      IpSpace.Builder builder = IpSpace.builder();
+      _root.addRoutableIps(builder);
+      return builder.build();
     }
 
     boolean containsRoute(R route) {
@@ -59,9 +83,9 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
     }
 
     public Set<R> getRoutes() {
-      ImmutableSet.Builder<R> routes = ImmutableSet.builder();
+      Set<R> routes = new LinkedHashSet<>();
       _root.collectRoutes(routes);
-      return routes.build();
+      return routes;
     }
 
     boolean mergeRoute(R route) {
@@ -85,20 +109,66 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
 
     private static final long serialVersionUID = 1L;
 
-    private RibTreeNode _left;
+    RibTreeNode _left;
 
-    private Prefix _prefix;
+    Prefix _prefix;
 
-    private RibTreeNode _right;
+    RibTreeNode _right;
 
-    private Set<R> _routes;
+    Set<R> _routes;
 
     RibTreeNode(Prefix prefix) {
       _routes = Collections.emptySet();
       _prefix = prefix;
     }
 
-    void collectRoutes(ImmutableCollection.Builder<R> routes) {
+    public void addMatchingIps(ImmutableMap.Builder<Prefix, IpSpace> builder) {
+      if (_left != null) {
+        _left.addMatchingIps(builder);
+      }
+      if (_right != null) {
+        _right.addMatchingIps(builder);
+      }
+      if (!_routes.isEmpty()) {
+        IpSpace.Builder matchingIps = IpSpace.builder();
+        if (_left != null) {
+          _left.excludeRoutableIps(matchingIps);
+        }
+        if (_right != null) {
+          _right.excludeRoutableIps(matchingIps);
+        }
+        matchingIps.including(new IpWildcard(_prefix));
+        builder.put(_prefix, matchingIps.build());
+      }
+    }
+
+    public void addRoutableIps(IpSpace.Builder builder) {
+      if (!_routes.isEmpty()) {
+        builder.including(new IpWildcard(_prefix));
+      } else {
+        if (_left != null) {
+          _left.addRoutableIps(builder);
+        }
+        if (_right != null) {
+          _right.addRoutableIps(builder);
+        }
+      }
+    }
+
+    public void excludeRoutableIps(IpSpace.Builder builder) {
+      if (!_routes.isEmpty()) {
+        builder.excluding(new IpWildcard(_prefix));
+      } else {
+        if (_left != null) {
+          _left.excludeRoutableIps(builder);
+        }
+        if (_right != null) {
+          _right.excludeRoutableIps(builder);
+        }
+      }
+    }
+
+    void collectRoutes(Set<R> routes) {
       if (_left != null) {
         _left.collectRoutes(routes);
       }
@@ -146,10 +216,14 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
     }
 
     private Set<R> getLongestPrefixMatch(Ip address) {
-      return _routes
-          .stream()
-          .filter(r -> r.getNetwork().contains(address))
-          .collect(ImmutableSet.toImmutableSet());
+      Set<R> longestPrefixMatches = new HashSet<>();
+      for (R route : _routes) {
+        Prefix prefix = route.getNetwork();
+        if (prefix.contains(address)) {
+          longestPrefixMatches.add(route);
+        }
+      }
+      return longestPrefixMatches;
     }
 
     /**
@@ -385,7 +459,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements IRib<R> {
 
   protected VirtualRouter _owner;
 
-  private RibTree _tree;
+  RibTree _tree;
 
   private Set<R> _allRoutes;
 

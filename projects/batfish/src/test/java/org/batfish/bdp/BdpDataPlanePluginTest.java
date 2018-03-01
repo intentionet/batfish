@@ -927,6 +927,6 @@ public class BdpDataPlanePluginTest {
             new BdpAnswerElement());
 
     // generating fibs should not crash
-    dp.getFibs();
+    dp.getFibRows();
   }
 }

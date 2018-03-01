@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import org.batfish.datamodel.collections.MultiSet;
 
-public interface IRib<R extends AbstractRoute> extends Serializable {
+public interface GenericRib<R extends AbstractRoute> extends Serializable {
 
   /**
    * Compare the preferability of one route with anther
@@ -22,6 +22,15 @@ public interface IRib<R extends AbstractRoute> extends Serializable {
   MultiSet<Prefix> getPrefixCount();
 
   SortedSet<Prefix> getPrefixes();
+
+  /** Get all the IPs for which there is a matching route */
+  IpSpace getRoutableIps();
+
+  /**
+   * For each prefix appearing in a route in the RIB, get the IPs for which the longest-prefix match
+   * is a route of that prefix.
+   */
+  Map<Prefix, IpSpace> getMatchingIps();
 
   /** Return a set of routes this RIB contains. */
   Set<R> getRoutes();
