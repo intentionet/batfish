@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import java.io.File;
@@ -68,11 +69,7 @@ public class WorkMgrServiceTest {
     initContainerEnvironment();
     Response response = _service.getContainer("100", "0.0.0", _containerName);
     String containerJson = response.getEntity().toString();
-    String expected =
-        String.format(
-            "{%s  \"name\" : \"myContainer\"%s}",
-            System.getProperty("line.separator"), System.getProperty("line.separator"));
-    assertThat(containerJson, equalTo(expected));
+    assertThat(containerJson, equalTo("{\"name\":\"myContainer\"}"));
   }
 
   @Test
@@ -101,8 +98,8 @@ public class WorkMgrServiceTest {
     Path testrigPath = containerPath.resolve(BfConsts.RELPATH_TESTRIGS_DIR).resolve("testrig");
     assertThat(testrigPath.toFile().mkdirs(), is(true));
     Response response = _service.getContainer("100", "0.0.0", _containerName);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Container container = mapper.readValue(response.getEntity().toString(), Container.class);
+    Container container =
+        BatfishObjectMapper.mapper().readValue(response.getEntity().toString(), Container.class);
     Container expected =
         Container.of(_containerName, Sets.newTreeSet(Collections.singleton("testrig")));
     assertThat(container, equalTo(expected));
@@ -224,9 +221,9 @@ public class WorkMgrServiceTest {
   public void getQuestionTemplates() throws Exception {
     initContainerEnvironment();
     Question testQuestion = createTestQuestion("testquestion", "test description");
-    BatfishObjectMapper objectMapper = new BatfishObjectMapper();
+    ObjectMapper mapper = BatfishObjectMapper.mapper();
     // serializing the question in the temp questions folder
-    String questionJsonString = objectMapper.writeValueAsString(testQuestion);
+    String questionJsonString = mapper.writeValueAsString(testQuestion);
     CommonUtil.writeFile(
         _questionsTemplatesFolder.newFile("testQuestion.json").toPath(), questionJsonString);
     JSONArray questionsResponse = _service.getQuestionTemplates(CoordConsts.DEFAULT_API_KEY);
@@ -236,7 +233,7 @@ public class WorkMgrServiceTest {
       JSONObject questionsJsonObject = (JSONObject) questionsResponse.get(1);
       String questionsJsonString = questionsJsonObject.getString(CoordConsts.SVC_KEY_QUESTION_LIST);
       Map<String, String> questionsMap =
-          objectMapper.readValue(questionsJsonString, new TypeReference<Map<String, String>>() {});
+          mapper.readValue(questionsJsonString, new TypeReference<Map<String, String>>() {});
       if (questionsMap.containsKey("testquestion")) {
         assertThat(questionsMap.get("testquestion"), is(equalTo(questionJsonString)));
       } else {

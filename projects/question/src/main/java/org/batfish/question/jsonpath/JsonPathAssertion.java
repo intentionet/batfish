@@ -74,9 +74,9 @@ public class JsonPathAssertion {
         Set<JsonPathResultEntry> expectedEntries = new HashSet<>();
         for (final JsonNode nodeEntry : _expect) {
           try {
-            BatfishObjectMapper mapper = new BatfishObjectMapper();
             JsonPathResultEntry expectedEntry =
-                mapper.readValue(nodeEntry.toString(), JsonPathResultEntry.class);
+                BatfishObjectMapper.mapper()
+                    .readValue(nodeEntry.toString(), JsonPathResultEntry.class);
             expectedEntries.add(expectedEntry);
           } catch (IOException e) {
             throw new BatfishException(
@@ -109,7 +109,7 @@ public class JsonPathAssertion {
   @Override
   public String toString() {
     try {
-      return new BatfishObjectMapper().writeValueAsString(this);
+      return BatfishObjectMapper.writePrettyString(this);
     } catch (JsonProcessingException e) {
       throw new BatfishException("Cannot serialize to Json", e);
     }

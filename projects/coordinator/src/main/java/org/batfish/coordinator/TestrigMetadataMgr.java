@@ -44,7 +44,7 @@ public class TestrigMetadataMgr {
 
   public static TestrigMetadata readMetadata(Path metadataPath) throws IOException {
     String jsonStr = CommonUtil.readFile(metadataPath);
-    return new BatfishObjectMapper().readValue(jsonStr, TestrigMetadata.class);
+    return BatfishObjectMapper.mapper().readValue(jsonStr, TestrigMetadata.class);
   }
 
   public static void writeMetadata(TestrigMetadata metadata, String container, String testrig)
@@ -54,7 +54,7 @@ public class TestrigMetadataMgr {
 
   public static synchronized void writeMetadata(TestrigMetadata metadata, Path metadataPath)
       throws JsonProcessingException {
-    CommonUtil.writeFile(metadataPath, new BatfishObjectMapper().writeValueAsString(metadata));
+    CommonUtil.writeFile(metadataPath, BatfishObjectMapper.writePrettyString(metadata));
   }
 
   public static synchronized void updateEnvironmentStatus(

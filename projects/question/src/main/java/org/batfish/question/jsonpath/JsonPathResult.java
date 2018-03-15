@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -206,7 +207,7 @@ public class JsonPathResult {
     if (listLen == 0) {
       throw new BatfishException("None of the extraction values is a list for " + compositionName);
     }
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
+    ObjectMapper mapper = BatfishObjectMapper.mapper();
     ArrayNode arrayNode = mapper.createArrayNode();
     for (int index = 0; index < listLen; index++) {
       ObjectNode object = mapper.createObjectNode();
@@ -228,7 +229,7 @@ public class JsonPathResult {
 
   private void doCompositionSingleton(
       String resultKey, String compositionName, Composition composition) {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
+    ObjectMapper mapper = BatfishObjectMapper.mapper();
     ObjectNode object = mapper.createObjectNode();
     for (Entry<String, String> pEntry : composition.getDictionary().entrySet()) {
       String propertyName = pEntry.getKey();
@@ -331,8 +332,7 @@ public class JsonPathResult {
       }
 
       if (extraction.getSchemaAsObject().isList()) {
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
-        ArrayNode arrayNode = mapper.valueToTree(extractedList);
+        ArrayNode arrayNode = BatfishObjectMapper.mapper().valueToTree(extractedList);
         _displayValues.get(entry.getKey()).put(displayVar, arrayNode);
       } else {
         if (extractedList.size() > 1) {
@@ -346,9 +346,8 @@ public class JsonPathResult {
   }
 
   private static void confirmValueType(JsonNode value, Class<?> baseClass) {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     try {
-      mapper.readValue(value.toString(), baseClass);
+      BatfishObjectMapper.mapper().readValue(value.toString(), baseClass);
     } catch (IOException e) {
       throw new BatfishException(
           "Could not map extracted value to expected type " + baseClass + "\nValue: " + value, e);

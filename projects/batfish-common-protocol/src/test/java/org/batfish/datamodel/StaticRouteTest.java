@@ -56,8 +56,6 @@ public class StaticRouteTest {
 
   @Test
   public void checkSerialization() {
-    BatfishObjectMapper mapper =
-        new BatfishObjectMapper(Thread.currentThread().getContextClassLoader());
     StaticRoute sr =
         StaticRoute.builder()
             .setNextHopIp(new Ip("192.168.1.1"))
@@ -67,8 +65,7 @@ public class StaticRouteTest {
             .setTag(0)
             .build();
     try {
-      String json = mapper.writeValueAsString(sr);
-      StaticRoute parsedObj = mapper.readValue(json, StaticRoute.class);
+      StaticRoute parsedObj = BatfishObjectMapper.clone(sr, StaticRoute.class);
       assertThat(parsedObj.getNextHopIp(), is(new Ip("192.168.1.1")));
       assertThat(parsedObj.getNetwork(), is(Prefix.ZERO));
       assertThat(parsedObj.getNextHopInterface(), is("192.168.1.2"));

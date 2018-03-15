@@ -172,10 +172,9 @@ public class JsonPathQuestionPlugin extends QuestionPlugin {
       AnswerElement innerAnswer =
           (innerQuestion.getDifferential()) ? innerAnswerer.answerDiff() : innerAnswerer.answer();
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper(false /* save bytes: don't prettify */);
       String innerAnswerStr = null;
       try {
-        innerAnswerStr = mapper.writeValueAsString(innerAnswer);
+        innerAnswerStr = BatfishObjectMapper.writeString(innerAnswer);
       } catch (IOException e) {
         throw new BatfishException("Could not get JSON string from inner answer", e);
       }
@@ -424,13 +423,12 @@ public class JsonPathQuestionPlugin extends QuestionPlugin {
     @Override
     public Question configureTemplate(@Nullable String exceptions, @Nullable String assertion) {
       try {
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
-        JsonPathQuestion question =
-            mapper.readValue(mapper.writeValueAsString(this), JsonPathQuestion.class); // deep copy
+        JsonPathQuestion question = BatfishObjectMapper.clone(this, JsonPathQuestion.class);
 
         if (exceptions != null) {
           Set<JsonPathException> jpExceptions =
-              mapper.readValue(exceptions, new TypeReference<Set<JsonPathException>>() {});
+              BatfishObjectMapper.mapper()
+                  .readValue(exceptions, new TypeReference<Set<JsonPathException>>() {});
           for (JsonPathQuery query : question.getPaths()) {
             query.setExceptions(jpExceptions);
           }
@@ -440,7 +438,7 @@ public class JsonPathQuestionPlugin extends QuestionPlugin {
               // indicates a desire to remove the assertion
               (assertion.equals("") || assertion.equals("{}"))
                   ? null
-                  : mapper.readValue(assertion, JsonPathAssertion.class);
+                  : BatfishObjectMapper.mapper().readValue(assertion, JsonPathAssertion.class);
 
           for (JsonPathQuery query : question.getPaths()) {
             query.setAssertion(jpAssertion);

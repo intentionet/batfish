@@ -89,10 +89,9 @@ public class AssertQuestionPlugin extends QuestionPlugin {
       nodesQuestion.setSummary(false);
       NodesAnswerer nodesAnswerer = new NodesAnswerer(nodesQuestion, _batfish);
       AnswerElement nodesAnswer = nodesAnswerer.answer();
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       String nodesAnswerStr = null;
       try {
-        nodesAnswerStr = mapper.writeValueAsString(nodesAnswer);
+        nodesAnswerStr = BatfishObjectMapper.writePrettyString(nodesAnswer);
       } catch (IOException e) {
         throw new BatfishException("Could not get JSON string from nodes answer", e);
       }

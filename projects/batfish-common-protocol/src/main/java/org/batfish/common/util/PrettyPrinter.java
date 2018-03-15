@@ -1,7 +1,6 @@
 package org.batfish.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
@@ -58,11 +57,10 @@ public class PrettyPrinter {
     } else if (value instanceof LinkedList<?>) {
       sb.append(print(prefixStr + "  ", (LinkedList<?>) value));
     } else if (value instanceof String) {
-      sb.append(prefixStr + "  " + (String) value + "\n");
+      sb.append(prefixStr + "  " + value + "\n");
     } else {
-      ObjectMapper mapper = new BatfishObjectMapper();
       try {
-        sb.append(mapper.writeValueAsString(value));
+        sb.append(BatfishObjectMapper.writePrettyString(value));
       } catch (JsonProcessingException e) {
         sb.append("Exception while pretty printing " + value + "\n" + e.getMessage());
       }

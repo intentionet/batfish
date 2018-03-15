@@ -33,8 +33,7 @@ public class JsonPathDisplayHintsTest {
   public void readDisplayHints() throws IOException {
     String text =
         CommonUtil.readResource("org/batfish/question/jsonpath/jsonPathDisplayHintsTestHints.json");
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    _displayHints = mapper.readValue(text, DisplayHints.class);
+    _displayHints = BatfishObjectMapper.mapper().readValue(text, DisplayHints.class);
   }
 
   private static JsonPathResult computeJsonPathResult(

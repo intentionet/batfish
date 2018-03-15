@@ -574,11 +574,11 @@ public class Client extends AbstractClient implements IClient {
       throw new BatfishException("Question is missing instance data", e);
     }
     String instanceDataStr = instanceJson.toString();
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     InstanceData instanceData;
     try {
       instanceData =
-          mapper.<InstanceData>readValue(instanceDataStr, new TypeReference<InstanceData>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(instanceDataStr, new TypeReference<InstanceData>() {});
     } catch (IOException e) {
       throw new BatfishException("Invalid instance data (JSON)", e);
     }
@@ -588,7 +588,7 @@ public class Client extends AbstractClient implements IClient {
 
     String modifiedInstanceDataStr;
     try {
-      modifiedInstanceDataStr = mapper.writeValueAsString(instanceData);
+      modifiedInstanceDataStr = BatfishObjectMapper.writePrettyString(instanceData);
       JSONObject modifiedInstanceData = new JSONObject(modifiedInstanceDataStr);
       questionJson.put(BfConsts.PROP_INSTANCE, modifiedInstanceData);
     } catch (JSONException | JsonProcessingException e) {
@@ -729,10 +729,10 @@ public class Client extends AbstractClient implements IClient {
     }
 
     String modifiedQuestionJson = questionJson.toString();
-    BatfishObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
     Question modifiedQuestion = null;
     try {
-      modifiedQuestion = mapper.readValue(modifiedQuestionJson, Question.class);
+      modifiedQuestion =
+          BatfishObjectMapper.mapper().readValue(modifiedQuestionJson, Question.class);
     } catch (IOException e) {
       throw new BatfishException(
           "Modified question is no longer valid, likely due to invalid parameters", e);
@@ -1017,10 +1017,9 @@ public class Client extends AbstractClient implements IClient {
 
   private void generateDatamodel() {
     try {
-      ObjectMapper mapper = new BatfishObjectMapper();
-      JsonSchemaGenerator schemaGenNew = new JsonSchemaGenerator(mapper);
+      JsonSchemaGenerator schemaGenNew = new JsonSchemaGenerator(BatfishObjectMapper.mapper());
       JsonNode schemaNew = schemaGenNew.generateJsonSchema(Configuration.class);
-      _logger.output(mapper.writeValueAsString(schemaNew));
+      _logger.output(BatfishObjectMapper.writePrettyString(schemaNew));
 
       // Reflections reflections = new Reflections("org.batfish.datamodel");
       // Set<Class<? extends AnswerElement>> classes =
@@ -1252,10 +1251,9 @@ public class Client extends AbstractClient implements IClient {
 
     String answerStringToPrint = answerString;
     if (outWriter == null && _settings.getPrettyPrintAnswers()) {
-      ObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
       Answer answer;
       try {
-        answer = mapper.readValue(answerString, Answer.class);
+        answer = BatfishObjectMapper.mapper().readValue(answerString, Answer.class);
       } catch (IOException e) {
         throw new BatfishException(
             "Response does not appear to be valid JSON representation of "
@@ -1553,7 +1551,7 @@ public class Client extends AbstractClient implements IClient {
         if (!paramsNodeBlacklist.isEmpty()) {
           String nodeBlacklistText;
           try {
-            nodeBlacklistText = new BatfishObjectMapper().writeValueAsString(paramsNodeBlacklist);
+            nodeBlacklistText = BatfishObjectMapper.writePrettyString(paramsNodeBlacklist);
           } catch (JsonProcessingException e) {
             throw new BatfishException("Failed to write node blacklist to string", e);
           }
@@ -1564,7 +1562,7 @@ public class Client extends AbstractClient implements IClient {
           String interfaceBlacklistText;
           try {
             interfaceBlacklistText =
-                new BatfishObjectMapper().writeValueAsString(paramsInterfaceBlacklist);
+                BatfishObjectMapper.writePrettyString(paramsInterfaceBlacklist);
           } catch (JsonProcessingException e) {
             throw new BatfishException("Failed to write interface blacklist to string", e);
           }
@@ -1575,7 +1573,7 @@ public class Client extends AbstractClient implements IClient {
         if (!paramsEdgeBlacklist.isEmpty()) {
           String edgeBlacklistText;
           try {
-            edgeBlacklistText = new BatfishObjectMapper().writeValueAsString(paramsEdgeBlacklist);
+            edgeBlacklistText = BatfishObjectMapper.writePrettyString(paramsEdgeBlacklist);
           } catch (JsonProcessingException e) {
             throw new BatfishException("Failed to write edge blacklist to string", e);
           }
@@ -1692,14 +1690,13 @@ public class Client extends AbstractClient implements IClient {
       Answer answer = new Answer();
       answer.addAnswerElement(ae);
       mergeQuestions(analysisQuestions, questionMap, ae);
-      ObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
 
       String answerStringToPrint;
       if (_settings.getPrettyPrintAnswers()) {
         answerStringToPrint = answer.prettyPrint();
       } else {
         try {
-          answerStringToPrint = mapper.writeValueAsString(answer);
+          answerStringToPrint = BatfishObjectMapper.writePrettyString(answer);
         } catch (JsonProcessingException e) {
           throw new BatfishException("Could not write answer element as string", e);
         }
@@ -2050,9 +2047,9 @@ public class Client extends AbstractClient implements IClient {
       if (questionObj.has(BfConsts.PROP_INSTANCE) && !questionObj.isNull(BfConsts.PROP_INSTANCE)) {
         JSONObject instanceDataObj = questionObj.getJSONObject(BfConsts.PROP_INSTANCE);
         String instanceDataStr = instanceDataObj.toString();
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
         InstanceData instanceData =
-            mapper.<InstanceData>readValue(instanceDataStr, new TypeReference<InstanceData>() {});
+            BatfishObjectMapper.mapper()
+                .readValue(instanceDataStr, new TypeReference<InstanceData>() {});
         validateInstanceData(instanceData);
         return questionObj;
       } else {
@@ -2106,13 +2103,12 @@ public class Client extends AbstractClient implements IClient {
     }
 
     // outputting the final answer
-    ObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
     String answerStringToPrint;
     if (outWriter == null && _settings.getPrettyPrintAnswers()) {
       answerStringToPrint = answer.prettyPrint();
     } else {
       try {
-        answerStringToPrint = mapper.writeValueAsString(answer);
+        answerStringToPrint = BatfishObjectMapper.writePrettyString(answer);
       } catch (JsonProcessingException e) {
         throw new BatfishException("Could not write answer element as string", e);
       }
@@ -2137,10 +2133,10 @@ public class Client extends AbstractClient implements IClient {
       if (questionTemplatesJson == null) {
         return loadedQuestions;
       }
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       Map<String, String> questionsMap =
-          mapper.readValue(
-              questionTemplatesJson.toString(), new TypeReference<Map<String, String>>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(
+                  questionTemplatesJson.toString(), new TypeReference<Map<String, String>>() {});
 
       for (Entry<String, String> question : questionsMap.entrySet()) {
         JSONObject questionJSON = loadQuestionFromText(question.getValue(), question.getKey());
@@ -2252,13 +2248,13 @@ public class Client extends AbstractClient implements IClient {
 
   static InitEnvironmentParams parseInitEnvironmentParams(String paramsLine) {
     String jsonParamsStr = "{ " + paramsLine + " }";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     InitEnvironmentParams parameters;
     try {
       parameters =
-          mapper.<InitEnvironmentParams>readValue(
-              new JSONObject(jsonParamsStr).toString(),
-              new TypeReference<InitEnvironmentParams>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(
+                  new JSONObject(jsonParamsStr).toString(),
+                  new TypeReference<InitEnvironmentParams>() {});
       return parameters;
     } catch (JSONException | IOException e) {
       throw new BatfishException(
@@ -2270,13 +2266,13 @@ public class Client extends AbstractClient implements IClient {
 
   private Map<String, JsonNode> parseParams(String paramsLine) {
     String jsonParamsStr = "{ " + paramsLine + " }";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     Map<String, JsonNode> parameters;
     try {
       parameters =
-          mapper.<Map<String, JsonNode>>readValue(
-              new JSONObject(jsonParamsStr).toString(),
-              new TypeReference<Map<String, JsonNode>>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(
+                  new JSONObject(jsonParamsStr).toString(),
+                  new TypeReference<Map<String, JsonNode>>() {});
       return parameters;
     } catch (JSONException | IOException e) {
       throw new BatfishException(
@@ -2347,10 +2343,9 @@ public class Client extends AbstractClient implements IClient {
       // that case
       String answerStringToPrint = answerString;
       if (outWriter == null && _settings.getPrettyPrintAnswers()) {
-        ObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
         Answer answer;
         try {
-          answer = mapper.readValue(answerString, Answer.class);
+          answer = BatfishObjectMapper.mapper().readValue(answerString, Answer.class);
         } catch (IOException e) {
           throw new BatfishException(
               "Response does not appear to be valid JSON representation of "
@@ -2365,12 +2360,12 @@ public class Client extends AbstractClient implements IClient {
       // tests serialization/deserialization when running in debug mode
       if (_logger.getLogLevel() >= BatfishLogger.LEVEL_DEBUG) {
         try {
-          ObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
-          Answer answer = mapper.readValue(answerString, Answer.class);
+          ObjectMapper reader = BatfishObjectMapper.mapper();
+          Answer answer = reader.readValue(answerString, Answer.class);
 
-          String newAnswerString = mapper.writeValueAsString(answer);
-          JsonNode tree = mapper.readTree(answerString);
-          JsonNode newTree = mapper.readTree(newAnswerString);
+          String newAnswerString = BatfishObjectMapper.writeString(answer);
+          JsonNode tree = reader.readTree(answerString);
+          JsonNode newTree = reader.readTree(newAnswerString);
           if (!CommonUtil.checkJsonEqual(tree, newTree)) {
             // if (!tree.equals(newTree)) {
             _logger.errorf(
@@ -2417,10 +2412,9 @@ public class Client extends AbstractClient implements IClient {
       WorkStatusCode status = response.getFirst();
       _logger.outputf("status: %s\n", status);
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       Task task;
       try {
-        task = mapper.readValue(response.getSecond(), Task.class);
+        task = BatfishObjectMapper.mapper().readValue(response.getSecond(), Task.class);
       } catch (IOException e) {
         _logger.errorf("Could not deserialize task object: %s\n", e);
         return;
@@ -3127,10 +3121,11 @@ public class Client extends AbstractClient implements IClient {
     Map<String, String> settings = null;
 
     try {
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       settings =
-          mapper.readValue(
-              new JSONObject(settingsStr).toString(), new TypeReference<Map<String, String>>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(
+                  new JSONObject(settingsStr).toString(),
+                  new TypeReference<Map<String, String>>() {});
     } catch (JSONException | IOException e) {
       _logger.errorf(
           "Failed to parse parameters. "
@@ -3180,16 +3175,14 @@ public class Client extends AbstractClient implements IClient {
     if (!failingTest && testCommandSucceeded) {
       try {
 
-        ObjectMapper mapper = new BatfishObjectMapper(getCurrentClassLoader());
-
         // rewrite new answer string using local implementation
         String testOutput = CommonUtil.readFile(Paths.get(testoutFile.getAbsolutePath()));
 
         String testAnswerString = testOutput;
 
         try {
-          Answer testAnswer = mapper.readValue(testOutput, Answer.class);
-          testAnswerString = mapper.writeValueAsString(testAnswer);
+          Answer testAnswer = BatfishObjectMapper.mapper().readValue(testOutput, Answer.class);
+          testAnswerString = BatfishObjectMapper.writePrettyString(testAnswer);
         } catch (JsonProcessingException e) {
           // not all outputs of process command are of Answer.class type
           // in that case, we use the exact string as initialized above for
@@ -3205,8 +3198,8 @@ public class Client extends AbstractClient implements IClient {
           // rewrite reference string using local implementation
           Answer referenceAnswer;
           try {
-            referenceAnswer = mapper.readValue(referenceOutput, Answer.class);
-            referenceAnswerString = mapper.writeValueAsString(referenceAnswer);
+            referenceAnswer = BatfishObjectMapper.mapper().readValue(referenceOutput, Answer.class);
+            referenceAnswerString = BatfishObjectMapper.writePrettyString(referenceAnswer);
           } catch (JsonProcessingException e) {
             // not all outputs of process command are of Answer.class type
             // in that case, we use the exact string as initialized above

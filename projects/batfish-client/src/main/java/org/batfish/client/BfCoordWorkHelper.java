@@ -506,8 +506,7 @@ public class BfCoordWorkHelper {
       }
 
       String containerStr = response.readEntity(String.class);
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      Container container = mapper.readValue(containerStr, Container.class);
+      Container container = BatfishObjectMapper.mapper().readValue(containerStr, Container.class);
       return container;
     } catch (Exception e) {
       _logger.errorf("Exception in getContainer from %s for %s\n", _coordWorkMgrV2, containerName);
@@ -940,11 +939,10 @@ public class BfCoordWorkHelper {
         return null;
       }
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       String result = jObj.getString(CoordConsts.SVC_KEY_WORK_LIST);
 
       List<WorkStatus> workList =
-          mapper.readValue(result, new TypeReference<List<WorkStatus>>() {});
+          BatfishObjectMapper.mapper().readValue(result, new TypeReference<List<WorkStatus>>() {});
 
       return workList;
     } catch (Exception e) {
@@ -1075,8 +1073,8 @@ public class BfCoordWorkHelper {
       MultiPart multiPart = new MultiPart();
       multiPart.setMediaType(MediaType.MULTIPART_FORM_DATA_TYPE);
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      addTextMultiPart(multiPart, CoordConsts.SVC_KEY_WORKITEM, mapper.writeValueAsString(wItem));
+      addTextMultiPart(
+          multiPart, CoordConsts.SVC_KEY_WORKITEM, BatfishObjectMapper.writeString(wItem));
       addTextMultiPart(multiPart, CoordConsts.SVC_KEY_API_KEY, _settings.getApiKey());
 
       JSONObject jObj = postData(webTarget, multiPart);
@@ -1088,7 +1086,6 @@ public class BfCoordWorkHelper {
     }
   }
 
-  @Nullable
   public boolean syncTestrigsSyncNow(String pluginId, String containerName, boolean force) {
     try {
       WebTarget webTarget = getTarget(CoordConsts.SVC_RSC_SYNC_TESTRIGS_SYNC_NOW);
@@ -1111,12 +1108,10 @@ public class BfCoordWorkHelper {
     }
   }
 
-  @Nullable
   public boolean syncTestrigsUpdateSettings(
       String pluginId, String containerName, Map<String, String> settings) {
     try {
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      String settingsStr = mapper.writeValueAsString(settings);
+      String settingsStr = BatfishObjectMapper.writePrettyString(settings);
 
       WebTarget webTarget = getTarget(CoordConsts.SVC_RSC_SYNC_TESTRIGS_UPDATE_SETTINGS);
 

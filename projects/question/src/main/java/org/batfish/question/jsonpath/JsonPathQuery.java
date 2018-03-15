@@ -101,7 +101,7 @@ public class JsonPathQuery {
   @Override
   public String toString() {
     try {
-      return new BatfishObjectMapper().writeValueAsString(this);
+      return BatfishObjectMapper.writePrettyString(this);
     } catch (JsonProcessingException e) {
       throw new BatfishException("Cannot serialize to Json", e);
     }

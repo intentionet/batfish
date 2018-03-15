@@ -2,9 +2,6 @@ package org.batfish.representation.host;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -67,10 +64,9 @@ public class HostConfiguration extends VendorConfiguration {
   /** */
   private static final long serialVersionUID = 1L;
 
-  public static HostConfiguration fromJson(String text, Warnings warnings)
-      throws JsonParseException, JsonMappingException, IOException {
-    ObjectMapper mapper = new BatfishObjectMapper();
-    HostConfiguration hostConfiguration = mapper.readValue(text, HostConfiguration.class);
+  public static HostConfiguration fromJson(String text, Warnings warnings) throws IOException {
+    HostConfiguration hostConfiguration =
+        BatfishObjectMapper.mapper().readValue(text, HostConfiguration.class);
     hostConfiguration._w = warnings;
     return hostConfiguration;
   }

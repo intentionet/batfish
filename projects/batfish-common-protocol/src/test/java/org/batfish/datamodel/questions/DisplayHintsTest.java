@@ -15,8 +15,7 @@ public class DisplayHintsTest {
   @Test
   public void displayHintsParsingTest() throws IOException {
     String text = CommonUtil.readResource("org/batfish/datamodel/questions/displayHintsTest.json");
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    DisplayHints displayHints = mapper.readValue(text, DisplayHints.class);
+    DisplayHints displayHints = BatfishObjectMapper.mapper().readValue(text, DisplayHints.class);
 
     // here, we only test for ExtractionHint level concepts
     // tests that sit with jsonpath question validate if prefix/suffix filters are parsed correctly

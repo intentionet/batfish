@@ -543,7 +543,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
             // Ensuring that question was parsed successfully
             if (currentAnswer.getQuestion() != null) {
               try {
-                BatfishObjectMapper mapper = new BatfishObjectMapper(false);
                 // TODO: This can be represented much cleanly and easily with a Json
                 _logger.infof(
                     "Ran question:%s from analysis:%s in container:%s; work-id:%s, status:%s, "
@@ -554,8 +553,9 @@ public class Batfish extends PluginConsumer implements IBatfish {
                     getTaskId(),
                     currentAnswer.getSummary().getNumFailed() > 0 ? "failed" : "passed",
                     currentAnswer.getQuestion().getDataPlane(),
-                    mapper.writeValueAsString(
-                        currentAnswer.getQuestion().getInstance().getVariables()));
+                    BatfishObjectMapper.mapper()
+                        .writeValueAsString(
+                            currentAnswer.getQuestion().getInstance().getVariables()));
               } catch (JsonProcessingException e) {
                 throw new BatfishException(
                     String.format(
@@ -582,7 +582,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
     try (ActiveSpan parseQuestionSpan =
         GlobalTracer.get().buildSpan("Parse question").startActive()) {
       assert parseQuestionSpan != null; // avoid not used warning
-      question = Question.parseQuestion(_settings.getQuestionPath(), getCurrentClassLoader());
+      question = Question.parseQuestion(_settings.getQuestionPath());
     } catch (Exception e) {
       Answer answer = new Answer();
       BatfishException exception = new BatfishException("Could not parse question", e);
@@ -1682,11 +1682,11 @@ public class Batfish extends PluginConsumer implements IBatfish {
   @Override
   public Topology getEnvironmentTopology() {
     try {
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      return mapper.readValue(
-          CommonUtil.readFile(
-              _testrigSettings.getEnvironmentSettings().getSerializedTopologyPath()),
-          Topology.class);
+      return BatfishObjectMapper.mapper()
+          .readValue(
+              CommonUtil.readFile(
+                  _testrigSettings.getEnvironmentSettings().getSerializedTopologyPath()),
+              Topology.class);
     } catch (IOException e) {
       throw new BatfishException("Could not getEnvironmentTopology: ", e);
     }
@@ -1820,11 +1820,11 @@ public class Batfish extends PluginConsumer implements IBatfish {
     }
 
     try {
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       Map<String, String> templates =
-          mapper.readValue(
-              response.get(CoordConsts.SVC_KEY_QUESTION_LIST).toString(),
-              new TypeReference<Map<String, String>>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(
+                  response.get(CoordConsts.SVC_KEY_QUESTION_LIST).toString(),
+                  new TypeReference<Map<String, String>>() {});
       return templates;
     } catch (JSONException | IOException e) {
       throw new BatfishException("Could not cast response to Map: ", e);
@@ -2627,9 +2627,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
   }
 
   private void outputAnswer(Answer answer, boolean writeLog) {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     try {
-      String answerString = mapper.writeValueAsString(answer) + '\n';
+      String answerString = BatfishObjectMapper.writePrettyString(answer) + '\n';
       _logger.debug(answerString);
       @Nullable String logString = writeLog ? answerString : null;
       writeJsonAnswerWithLog(logString, answerString);
@@ -2638,7 +2637,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
       try {
         Answer failureAnswer = Answer.failureAnswer(e.toString(), answer.getQuestion());
         failureAnswer.addAnswerElement(be.getBatfishStackTrace());
-        String answerString = mapper.writeValueAsString(failureAnswer) + '\n';
+        String answerString = BatfishObjectMapper.writePrettyString(failureAnswer) + '\n';
         _logger.error(answerString);
         @Nullable String logString = writeLog ? answerString : null;
         writeJsonAnswerWithLog(logString, answerString);
@@ -2706,9 +2705,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
     SortedSet<Edge> edges;
     try {
       edges =
-          new BatfishObjectMapper()
-              .<SortedSet<Edge>>readValue(
-                  edgeBlacklistText, new TypeReference<SortedSet<Edge>>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(edgeBlacklistText, new TypeReference<SortedSet<Edge>>() {});
     } catch (IOException e) {
       throw new BatfishException("Failed to parse edge blacklist", e);
     }
@@ -2790,8 +2788,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
     SortedSet<NodeInterfacePair> ifaces;
     try {
       ifaces =
-          new BatfishObjectMapper()
-              .<SortedSet<NodeInterfacePair>>readValue(
+          BatfishObjectMapper.mapper()
+              .readValue(
                   interfaceBlacklistText, new TypeReference<SortedSet<NodeInterfacePair>>() {});
     } catch (IOException e) {
       throw new BatfishException("Failed to parse interface blacklist", e);
@@ -2804,9 +2802,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
     SortedSet<String> nodes;
     try {
       nodes =
-          new BatfishObjectMapper()
-              .<SortedSet<String>>readValue(
-                  nodeBlacklistText, new TypeReference<SortedSet<String>>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(nodeBlacklistText, new TypeReference<SortedSet<String>>() {});
     } catch (IOException e) {
       throw new BatfishException("Failed to parse node blacklist", e);
     }
@@ -2819,9 +2816,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
     NodeRoleSpecifier specifier;
     try {
       specifier =
-          new BatfishObjectMapper()
-              .<NodeRoleSpecifier>readValue(
-                  roleFileText, new TypeReference<NodeRoleSpecifier>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(roleFileText, new TypeReference<NodeRoleSpecifier>() {});
     } catch (IOException e) {
       throw new BatfishException("Failed to parse node roles", e);
     }
@@ -2847,8 +2843,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
       topology = extractor.getTopology();
     } else {
       try {
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
-        topology = mapper.readValue(topologyFileText, Topology.class);
+        topology = BatfishObjectMapper.mapper().readValue(topologyFileText, Topology.class);
       } catch (IOException e) {
         _logger.fatal("...ERROR\n");
         throw new BatfishException("Topology format error", e);
@@ -3099,8 +3094,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
         JSONArray announcements = jsonObj.getJSONArray(BfConsts.PROP_BGP_ANNOUNCEMENTS);
 
-        ObjectMapper mapper = new ObjectMapper();
-
         for (int index = 0; index < announcements.length(); index++) {
           JSONObject announcement = new JSONObject();
           announcement.put("@id", index);
@@ -3112,7 +3105,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
             }
           }
           BgpAdvertisement bgpAdvertisement =
-              mapper.readValue(announcement.toString(), BgpAdvertisement.class);
+              BatfishObjectMapper.mapper()
+                  .readValue(announcement.toString(), BgpAdvertisement.class);
           allCommunities.addAll(bgpAdvertisement.getCommunities());
           advertSet.add(bgpAdvertisement);
         }
@@ -3583,7 +3577,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
       throw new BatfishException(
           "Could not create directory stream for '" + questionsDir + "'", e1);
     }
-    ObjectMapper mapper = new BatfishObjectMapper();
+    ObjectMapper mapper = BatfishObjectMapper.mapper();
     for (Entry<Path, String> entry : answers.entrySet()) {
       Path answerPath = entry.getKey();
       String answerText = entry.getValue();
@@ -3711,7 +3705,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
   public static void serializeAsJson(Path outputPath, Object object, String objectName) {
     try {
-      new BatfishObjectMapper().writeValue(outputPath.toFile(), object);
+      BatfishObjectMapper.prettyWriter().writeValue(outputPath.toFile(), object);
     } catch (IOException e) {
       throw new BatfishException("Could not serialize " + objectName + " ", e);
     }

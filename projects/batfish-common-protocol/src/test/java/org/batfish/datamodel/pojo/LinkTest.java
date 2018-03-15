@@ -20,16 +20,14 @@ public class LinkTest {
   @Test
   public void constructorFail() throws IOException {
     String linkStr = "{\"nofield\" : \"test\"}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     _thrown.expect(com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException.class);
-    mapper.readValue(linkStr, Link.class);
+    BatfishObjectMapper.mapper().readValue(linkStr, Link.class);
   }
 
   @Test
   public void constructorBasic() throws IOException {
     String linkStr = "{\"srcId\" : \"src\", \"dstId\" : \"dst\"}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Link link = mapper.readValue(linkStr, Link.class);
+    Link link = BatfishObjectMapper.mapper().readValue(linkStr, Link.class);
 
     assertThat(link.getId(), equalTo(Link.getId("src", "dst")));
     assertThat(link.getDstId(), equalTo("dst"));
@@ -40,8 +38,7 @@ public class LinkTest {
   public void constructorProperties() throws IOException {
     String linkStr =
         "{\"srcId\" : \"src\", \"dstId\" : \"dst\", \"properties\" : { \"key\": \"value\"}}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Link link = mapper.readValue(linkStr, Link.class);
+    Link link = BatfishObjectMapper.mapper().readValue(linkStr, Link.class);
 
     assertThat(link.getId(), equalTo(Link.getId("src", "dst")));
     assertThat(link.getDstId(), equalTo("dst"));
@@ -56,8 +53,7 @@ public class LinkTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("key", "value");
     link.setProperties(properties);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    JsonNode jsonNode = mapper.valueToTree(link);
+    JsonNode jsonNode = BatfishObjectMapper.mapper().valueToTree(link);
 
     assertThat(jsonNode.get("id").asText(), equalTo(Link.getId("src", "dst")));
     assertThat(jsonNode.get("srcId").asText(), equalTo("src"));

@@ -19,8 +19,7 @@ public class TestrigMetadataTest {
     TestrigMetadata metadata =
         new TestrigMetadata(
             Instant.ofEpochMilli(758949005001L), BfConsts.RELPATH_DEFAULT_ENVIRONMENT_NAME);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    JsonNode jsonNode = mapper.valueToTree(metadata);
+    JsonNode jsonNode = BatfishObjectMapper.mapper().valueToTree(metadata);
     assertThat(jsonNode.get("creationTimestamp").asText(), equalTo("1994-01-19T03:10:05.001Z"));
     assertThat(
         jsonNode

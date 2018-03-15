@@ -45,10 +45,10 @@ public class JsonPathAssertionTest {
             "org/batfish/question/jsonpath/jsonPathAssertionTest.json",
             "$.nodes..interface1.mtu",
             true);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     JsonPathAssertion jpAssertion =
         new JsonPathAssertion(
-            JsonPathAssertionType.countequals, mapper.readValue("2", JsonNode.class));
+            JsonPathAssertionType.countequals,
+            BatfishObjectMapper.mapper().readValue("2", JsonNode.class));
     boolean result = jpAssertion.evaluate(results);
     assertThat(result, equalTo(false));
   }
@@ -58,10 +58,10 @@ public class JsonPathAssertionTest {
     Set<JsonPathResultEntry> results =
         computeResults(
             "org/batfish/question/jsonpath/jsonPathAssertionTest.json", "$.nodes..mtu", true);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     JsonPathAssertion jpAssertion =
         new JsonPathAssertion(
-            JsonPathAssertionType.countequals, mapper.readValue("2", JsonNode.class));
+            JsonPathAssertionType.countequals,
+            BatfishObjectMapper.mapper().readValue("2", JsonNode.class));
     boolean result = jpAssertion.evaluate(results);
     assertThat(result, equalTo(true));
   }
@@ -73,11 +73,11 @@ public class JsonPathAssertionTest {
             "org/batfish/question/jsonpath/jsonPathAssertionTest.json",
             "$.nodes..interface1.mtu",
             false);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     JsonPathAssertion jpAssertion =
         new JsonPathAssertion(
             JsonPathAssertionType.equals,
-            mapper.readValue("[{\"concretePath\": [\"'kkl'\"]}]", JsonNode.class));
+            BatfishObjectMapper.mapper()
+                .readValue("[{\"concretePath\": [\"'kkl'\"]}]", JsonNode.class));
     boolean result = jpAssertion.evaluate(results);
     assertThat(result, equalTo(false));
   }
@@ -87,14 +87,14 @@ public class JsonPathAssertionTest {
     Set<JsonPathResultEntry> results =
         computeResults(
             "org/batfish/question/jsonpath/jsonPathAssertionTest.json", "$..ntpServers", true);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     JsonNode expect =
-        mapper.readValue(
-            "[{"
-                + "\"concretePath\": [\"'nodes'\", \"'node1'\", \"'ntpServers'\"], "
-                + "\"suffix\" : [\"1.2.3.4\", \"5.6.7.8\"]"
-                + "}]",
-            JsonNode.class);
+        BatfishObjectMapper.mapper()
+            .readValue(
+                "[{"
+                    + "\"concretePath\": [\"'nodes'\", \"'node1'\", \"'ntpServers'\"], "
+                    + "\"suffix\" : [\"1.2.3.4\", \"5.6.7.8\"]"
+                    + "}]",
+                JsonNode.class);
     JsonPathAssertion jpAssertion = new JsonPathAssertion(JsonPathAssertionType.equals, expect);
     boolean result = jpAssertion.evaluate(results);
     assertThat(result, equalTo(true));
@@ -105,9 +105,9 @@ public class JsonPathAssertionTest {
     Set<JsonPathResultEntry> results =
         computeResults(
             "org/batfish/question/jsonpath/jsonPathAssertionTest.json", "$..node1", false);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     JsonNode expect =
-        mapper.readValue("[{\"concretePath\": [\"'nodes'\", \"'node1'\"]}]", JsonNode.class);
+        BatfishObjectMapper.mapper()
+            .readValue("[{\"concretePath\": [\"'nodes'\", \"'node1'\"]}]", JsonNode.class);
     JsonPathAssertion jpAssertion = new JsonPathAssertion(JsonPathAssertionType.equals, expect);
     boolean result = jpAssertion.evaluate(results);
     assertThat(result, equalTo(true));

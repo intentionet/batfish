@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
@@ -17,7 +18,7 @@ public class JsonPathQuestionPluginTest {
 
   @Test
   public void configureTemplateTest() throws IOException {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
+    ObjectMapper mapper = BatfishObjectMapper.mapper();
 
     Set<JsonPathException> oldExceptions =
         Collections.singleton(new JsonPathException(Collections.singletonList("old"), null));
@@ -46,7 +47,7 @@ public class JsonPathQuestionPluginTest {
 
   @Test
   public void configureTemplateTestNullValues() throws IOException {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
+    ObjectMapper mapper = BatfishObjectMapper.mapper();
 
     Set<JsonPathException> oldExceptions =
         Collections.singleton(new JsonPathException(Collections.singletonList("old"), null));

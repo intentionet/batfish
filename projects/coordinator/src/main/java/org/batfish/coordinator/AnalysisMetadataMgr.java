@@ -57,7 +57,7 @@ public class AnalysisMetadataMgr {
 
   public static AnalysisMetadata readMetadata(Path metadataPath) throws IOException {
     String jsonStr = CommonUtil.readFile(metadataPath);
-    return new BatfishObjectMapper().readValue(jsonStr, AnalysisMetadata.class);
+    return BatfishObjectMapper.mapper().readValue(jsonStr, AnalysisMetadata.class);
   }
 
   public static void writeMetadata(AnalysisMetadata metadata, String container, String analysis)
@@ -67,6 +67,6 @@ public class AnalysisMetadataMgr {
 
   public static synchronized void writeMetadata(AnalysisMetadata metadata, Path metadataPath)
       throws JsonProcessingException {
-    CommonUtil.writeFile(metadataPath, new BatfishObjectMapper().writeValueAsString(metadata));
+    CommonUtil.writeFile(metadataPath, BatfishObjectMapper.writePrettyString(metadata));
   }
 }

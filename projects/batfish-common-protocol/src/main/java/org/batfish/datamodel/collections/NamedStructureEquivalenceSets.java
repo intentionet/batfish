@@ -3,7 +3,6 @@ package org.batfish.datamodel.collections;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.Collections;
@@ -35,15 +34,12 @@ public class NamedStructureEquivalenceSets<T> {
       }
     }
 
-    private final ObjectMapper _mapper;
-
     private Map<String, Map<Integer, Set<NamedStructureEquivalenceSet<T>>>>
         _sameNamedStructuresByNameAndHash;
 
     private final String _structureClassName;
 
     private Builder(String structureClassName) {
-      _mapper = new BatfishObjectMapper();
       _sameNamedStructuresByNameAndHash = new HashMap<>();
       _structureClassName = structureClassName;
     }
@@ -100,7 +96,7 @@ public class NamedStructureEquivalenceSets<T> {
 
     private String writeObject(T t) {
       try {
-        String structureJson = _mapper.writeValueAsString(t);
+        String structureJson = BatfishObjectMapper.writePrettyString(t);
         return structureJson;
       } catch (JsonProcessingException e) {
         throw new BatfishException("Could not write named structure as JSON", e);

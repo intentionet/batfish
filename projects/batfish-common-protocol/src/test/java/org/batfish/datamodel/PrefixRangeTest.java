@@ -22,14 +22,14 @@ public class PrefixRangeTest {
   @Test
   public void testSerialization() throws JsonProcessingException {
     PrefixRange pr = PrefixRange.fromString("1.2.3.4/8:17-19");
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    assertThat(mapper.writeValueAsString(pr), equalTo("\"1.0.0.0/8:17-19\""));
+    assertThat(BatfishObjectMapper.writeString(pr), equalTo("\"1.0.0.0/8:17-19\""));
   }
 
   @Test
   public void testDeSerialization() throws IOException {
     PrefixRange pr = PrefixRange.fromString("1.2.3.4/8:17-19");
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    assertThat(mapper.readValue("\"1.0.0.0/8:17-19\"", PrefixRange.class), equalTo(pr));
+    assertThat(
+        BatfishObjectMapper.mapper().readValue("\"1.0.0.0/8:17-19\"", PrefixRange.class),
+        equalTo(pr));
   }
 }

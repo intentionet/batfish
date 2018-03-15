@@ -1,6 +1,5 @@
 package org.batfish.bgp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.service.AutoService;
 import java.io.IOException;
 import java.util.Iterator;
@@ -10,6 +9,7 @@ import org.batfish.common.BatfishException;
 import org.batfish.common.BfConsts;
 import org.batfish.common.plugin.ExternalBgpAdvertisementPlugin;
 import org.batfish.common.plugin.Plugin;
+import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -36,8 +36,6 @@ public class JsonExternalBgpAdvertisementPlugin extends ExternalBgpAdvertisement
 
         JSONArray announcements = jsonObj.getJSONArray(BfConsts.PROP_BGP_ANNOUNCEMENTS);
 
-        ObjectMapper mapper = new ObjectMapper();
-
         for (int index = 0; index < announcements.length(); index++) {
           JSONObject announcement = new JSONObject();
           JSONObject announcementSrc = announcements.getJSONObject(index);
@@ -46,7 +44,8 @@ public class JsonExternalBgpAdvertisementPlugin extends ExternalBgpAdvertisement
             announcement.put(key, announcementSrc.get(key));
           }
           BgpAdvertisement bgpAdvertisement =
-              mapper.readValue(announcement.toString(), BgpAdvertisement.class);
+              BatfishObjectMapper.mapper()
+                  .readValue(announcement.toString(), BgpAdvertisement.class);
           advertSet.add(bgpAdvertisement);
         }
 

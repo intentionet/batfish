@@ -25,8 +25,7 @@ public class AnswerSummaryTest {
   public void deserializationTest() throws IOException {
     String summaryStr =
         "{\"notes\" : \"notes1\", \"numFailed\" : 21, \"numPassed\" : 23, " + "\"numResults\": 42}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    AnswerSummary summary = mapper.readValue(summaryStr, AnswerSummary.class);
+    AnswerSummary summary = BatfishObjectMapper.mapper().readValue(summaryStr, AnswerSummary.class);
     assertThat(summary.getNotes(), equalTo("notes1"));
     assertThat(summary.getNumFailed(), equalTo(21));
     assertThat(summary.getNumPassed(), equalTo(23));
@@ -36,12 +35,12 @@ public class AnswerSummaryTest {
   @Test
   public void serializationTest() throws IOException {
     AnswerSummary summary = new AnswerSummary("notes1", 21, 23, 42);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    String summaryStr = mapper.writeValueAsString(summary);
+    String summaryStr = BatfishObjectMapper.writeString(summary);
 
     // we test if serialization happened correctly, by deserializing it
     // in fact, deserializing might be the problem, but then the test above should fail
-    AnswerSummary summaryAfter = mapper.readValue(summaryStr, AnswerSummary.class);
+    AnswerSummary summaryAfter =
+        BatfishObjectMapper.mapper().readValue(summaryStr, AnswerSummary.class);
     assertThat(summaryAfter.getNotes(), equalTo("notes1"));
     assertThat(summaryAfter.getNumFailed(), equalTo(21));
     assertThat(summaryAfter.getNumPassed(), equalTo(23));

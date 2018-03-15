@@ -296,9 +296,8 @@ public abstract class Question implements IQuestion {
   // by default, pretty printing is Json
   // override this function in derived classes to do something more meaningful
   public String prettyPrint() {
-    ObjectMapper mapper = new BatfishObjectMapper();
     try {
-      return mapper.writeValueAsString(this);
+      return BatfishObjectMapper.writePrettyString(this);
     } catch (JsonProcessingException e) {
       throw new BatfishException("Failed to pretty-print question", e);
     }
@@ -317,16 +316,14 @@ public abstract class Question implements IQuestion {
     }
   }
 
-  public static Question parseQuestion(Path questionPath, ClassLoader classLoader) {
-    return parseQuestion(CommonUtil.readFile(questionPath), classLoader);
+  public static Question parseQuestion(Path questionPath) {
+    return parseQuestion(CommonUtil.readFile(questionPath));
   }
 
-  public static Question parseQuestion(String rawQuestionText, ClassLoader classLoader) {
+  public static Question parseQuestion(String rawQuestionText) {
     String questionText = Question.preprocessQuestion(rawQuestionText);
     try {
-      ObjectMapper mapper =
-          (classLoader == null) ? new BatfishObjectMapper() : new BatfishObjectMapper(classLoader);
-      Question question = mapper.readValue(questionText, Question.class);
+      Question question = BatfishObjectMapper.mapper().readValue(questionText, Question.class);
       return question;
     } catch (IOException e) {
       throw new BatfishException("Could not parse JSON question", e);
@@ -338,9 +335,9 @@ public abstract class Question implements IQuestion {
       JSONObject jobj = new JSONObject(rawQuestionText);
       if (jobj.has(BfConsts.PROP_INSTANCE) && !jobj.isNull(BfConsts.PROP_INSTANCE)) {
         String instanceDataStr = jobj.getString(BfConsts.PROP_INSTANCE);
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
         InstanceData instanceData =
-            mapper.<InstanceData>readValue(instanceDataStr, new TypeReference<InstanceData>() {});
+            BatfishObjectMapper.mapper()
+                .readValue(instanceDataStr, new TypeReference<InstanceData>() {});
         for (Entry<String, Variable> e : instanceData.getVariables().entrySet()) {
           String varName = e.getKey();
           Variable variable = e.getValue();
@@ -447,10 +444,8 @@ public abstract class Question implements IQuestion {
 
   @Override
   public String toFullJsonString() {
-    ObjectMapper mapper = new BatfishObjectMapper();
-    mapper.setSerializationInclusion(Include.ALWAYS);
     try {
-      return mapper.writeValueAsString(this);
+      return BatfishObjectMapper.verboseWriter().writeValueAsString(this);
     } catch (JsonProcessingException e) {
       throw new BatfishException("Failed to convert question to full JSON string", e);
     }
@@ -458,9 +453,8 @@ public abstract class Question implements IQuestion {
 
   @Override
   public String toJsonString() {
-    ObjectMapper mapper = new BatfishObjectMapper();
     try {
-      return mapper.writeValueAsString(this);
+      return BatfishObjectMapper.writePrettyString(this);
     } catch (JsonProcessingException e) {
       throw new BatfishException("Failed to convert question to JSON string", e);
     }

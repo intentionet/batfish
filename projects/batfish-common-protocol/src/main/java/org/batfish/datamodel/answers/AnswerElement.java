@@ -3,7 +3,6 @@ package org.batfish.datamodel.answers;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
 import org.batfish.common.util.BatfishObjectMapper;
@@ -20,9 +19,8 @@ public interface AnswerElement {
   }
 
   default String prettyPrint() {
-    ObjectMapper mapper = new BatfishObjectMapper();
     try {
-      return mapper.writeValueAsString(this);
+      return BatfishObjectMapper.writePrettyString(this);
     } catch (JsonProcessingException e) {
       throw new BatfishException("Failed to pretty print answer element", e);
     }

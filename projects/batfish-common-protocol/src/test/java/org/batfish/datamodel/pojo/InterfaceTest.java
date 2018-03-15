@@ -20,16 +20,14 @@ public class InterfaceTest {
   @Test
   public void constructorFail() throws IOException {
     String ifaceStr = "{\"nofield\" : \"test\"}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     _thrown.expect(com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException.class);
-    mapper.readValue(ifaceStr, Interface.class);
+    BatfishObjectMapper.mapper().readValue(ifaceStr, Interface.class);
   }
 
   @Test
   public void constructorBasic() throws IOException {
     String ifaceStr = "{\"nodeId\" : \"node\", \"name\" : \"iname\"}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Interface iface = mapper.readValue(ifaceStr, Interface.class);
+    Interface iface = BatfishObjectMapper.mapper().readValue(ifaceStr, Interface.class);
 
     assertThat(iface.getId(), equalTo(Interface.getId("node", "iname")));
     assertThat(iface.getNodeId(), equalTo("node"));
@@ -40,8 +38,7 @@ public class InterfaceTest {
   public void constructorProperties() throws IOException {
     String ifaceStr =
         "{\"nodeId\" : \"node\", \"name\" : \"name\", \"properties\" : { \"key\": \"value\"}}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Interface iface = mapper.readValue(ifaceStr, Interface.class);
+    Interface iface = BatfishObjectMapper.mapper().readValue(ifaceStr, Interface.class);
 
     assertThat(iface.getId(), equalTo(Interface.getId("node", "name")));
     assertThat(iface.getNodeId(), equalTo("node"));
@@ -56,8 +53,7 @@ public class InterfaceTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("key", "value");
     iface.setProperties(properties);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    JsonNode jsonNode = mapper.valueToTree(iface);
+    JsonNode jsonNode = BatfishObjectMapper.mapper().valueToTree(iface);
 
     assertThat(jsonNode.get("id").asText(), equalTo(Interface.getId("node", "name")));
     assertThat(jsonNode.get("nodeId").asText(), equalTo("node"));

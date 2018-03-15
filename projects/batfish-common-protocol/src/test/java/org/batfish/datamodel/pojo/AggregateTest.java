@@ -20,16 +20,14 @@ public class AggregateTest {
   @Test
   public void constructorFail() throws IOException {
     String aggStr = "{\"nonamefield\" : \"nodeName\"}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
     _thrown.expect(com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException.class);
-    mapper.readValue(aggStr, Aggregate.class);
+    BatfishObjectMapper.mapper().readValue(aggStr, Aggregate.class);
   }
 
   @Test
   public void constructorBasic() throws IOException {
     String aggStr = "{\"name\" : \"test\"}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Aggregate aggregate = mapper.readValue(aggStr, Aggregate.class);
+    Aggregate aggregate = BatfishObjectMapper.mapper().readValue(aggStr, Aggregate.class);
 
     assertThat(aggregate.getId(), equalTo(Aggregate.getId("test")));
     assertThat(aggregate.getName(), equalTo("test"));
@@ -38,8 +36,7 @@ public class AggregateTest {
   @Test
   public void constructorProperties() throws IOException {
     String aggStr = "{\"name\" : \"aggName\", \"properties\" : { \"key\": \"value\"}}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Aggregate node = mapper.readValue(aggStr, Aggregate.class);
+    Aggregate node = BatfishObjectMapper.mapper().readValue(aggStr, Aggregate.class);
 
     assertThat(node.getId(), equalTo(Aggregate.getId("aggName")));
     assertThat(node.getName(), equalTo("aggName"));
@@ -53,8 +50,7 @@ public class AggregateTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("key", "value");
     aggregate.setProperties(properties);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    JsonNode jsonNode = mapper.valueToTree(aggregate);
+    JsonNode jsonNode = BatfishObjectMapper.mapper().valueToTree(aggregate);
 
     assertThat(jsonNode.get("id").asText(), equalTo(Aggregate.getId("test")));
     assertThat(jsonNode.get("name").asText(), equalTo("test"));

@@ -38,12 +38,12 @@ public class BatfishObjectMapperTest {
 
   private enum SomeEnum {
     ACCEPT,
-    DROP;
+    DROP
   }
 
   @Test
   public void testMapperAcceptsCaseInsensitiveEnums() throws IOException {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
+    ObjectMapper mapper = BatfishObjectMapper.mapper();
     assertThat(mapper.writeValueAsString(SomeEnum.ACCEPT), equalTo("\"ACCEPT\""));
     assertThat(mapper.writeValueAsString(SomeEnum.DROP), equalTo("\"DROP\""));
 

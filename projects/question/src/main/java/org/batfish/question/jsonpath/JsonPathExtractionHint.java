@@ -30,10 +30,8 @@ public class JsonPathExtractionHint {
 
   public static JsonPathExtractionHint fromExtractionHint(Extraction extraction)
       throws IOException {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    String extractionMethodStr = mapper.writeValueAsString(extraction.getMethod());
     JsonPathExtractionHint jpExtractionHint =
-        mapper.readValue(extractionMethodStr, JsonPathExtractionHint.class);
+        BatfishObjectMapper.clone(extraction.getMethod(), JsonPathExtractionHint.class);
 
     // sanity check what we got
     if (jpExtractionHint.getUse() == null) {

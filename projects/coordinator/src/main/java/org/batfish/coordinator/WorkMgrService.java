@@ -3,7 +3,6 @@ package org.batfish.coordinator;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import java.io.FileNotFoundException;
@@ -157,13 +156,13 @@ public class WorkMgrService {
 
       Map<String, String> questionsToAdd = new HashMap<>();
       if (addQuestionsStream != null) {
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
         Map<String, Object> streamValue;
         try {
           streamValue =
-              mapper.readValue(addQuestionsStream, new TypeReference<Map<String, Object>>() {});
+              BatfishObjectMapper.mapper()
+                  .readValue(addQuestionsStream, new TypeReference<Map<String, Object>>() {});
           for (Entry<String, Object> entry : streamValue.entrySet()) {
-            String textValue = mapper.writeValueAsString(entry.getValue());
+            String textValue = BatfishObjectMapper.writePrettyString(entry.getValue());
             questionsToAdd.put(entry.getKey(), textValue);
           }
         } catch (IOException e) {
@@ -231,15 +230,11 @@ public class WorkMgrService {
       checkApiKeyValidity(apiKey);
       checkClientVersion(clientVersion);
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      //      Question inputQuestion = mapper.readValue(questionTemplate, Question.class);
-      Question inputQuestion =
-          Question.parseQuestion(questionTemplate, Main.getWorkMgr().getCurrentClassLoader());
+      Question inputQuestion = Question.parseQuestion(questionTemplate);
       Question outputQuestion = inputQuestion.configureTemplate(exceptions, assertion);
+      String outputQuestionStr = BatfishObjectMapper.writePrettyString(outputQuestion);
 
-      return successResponse(
-          new JSONObject()
-              .put(CoordConsts.SVC_KEY_QUESTION, mapper.writeValueAsString(outputQuestion)));
+      return successResponse(new JSONObject().put(CoordConsts.SVC_KEY_QUESTION, outputQuestionStr));
     } catch (IllegalArgumentException | AccessControlException e) {
       _logger.errorf("WMS:getWorkStatus exception: %s\n", e.getMessage());
       return failureResponse(e.getMessage());
@@ -507,11 +502,10 @@ public class WorkMgrService {
       checkClientVersion(clientVersion);
       checkContainerAccessibility(apiKey, containerName);
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       JSONObject response = new JSONObject();
 
       if (!Strings.isNullOrEmpty(workItemStr)) {
-        WorkItem workItem = mapper.readValue(workItemStr, WorkItem.class);
+        WorkItem workItem = BatfishObjectMapper.mapper().readValue(workItemStr, WorkItem.class);
         if (!workItem.getContainerName().equals(containerName)
             || !workItem.getTestrigName().equals(testrigName)) {
           return failureResponse(
@@ -519,7 +513,7 @@ public class WorkMgrService {
         }
         QueuedWork work = Main.getWorkMgr().getMatchingWork(workItem, QueueType.INCOMPLETE);
         if (work != null) {
-          String taskStr = mapper.writeValueAsString(work.getLastTaskCheckResult());
+          String taskStr = BatfishObjectMapper.writePrettyString(work.getLastTaskCheckResult());
           response
               .put(CoordConsts.SVC_KEY_WORKID, work.getWorkItem().getId())
               .put(CoordConsts.SVC_KEY_WORKSTATUS, work.getStatus().toString())
@@ -532,7 +526,7 @@ public class WorkMgrService {
               .getAnalysisAnswers(
                   containerName, testrigName, baseEnv, deltaTestrig, deltaEnv, analysisName);
 
-      String answersStr = mapper.writeValueAsString(answers);
+      String answersStr = BatfishObjectMapper.writePrettyString(answers);
 
       return successResponse(response.put(CoordConsts.SVC_KEY_ANSWERS, answersStr));
     } catch (IllegalArgumentException | AccessControlException e) {
@@ -586,10 +580,8 @@ public class WorkMgrService {
       checkClientVersion(clientVersion);
       checkContainerAccessibility(apiKey, containerName);
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-
       if (!Strings.isNullOrEmpty(workItemStr)) {
-        WorkItem workItem = mapper.readValue(workItemStr, WorkItem.class);
+        WorkItem workItem = BatfishObjectMapper.mapper().readValue(workItemStr, WorkItem.class);
         if (!workItem.getContainerName().equals(containerName)
             || !workItem.getTestrigName().equals(testrigName)) {
           return failureResponse(
@@ -597,7 +589,7 @@ public class WorkMgrService {
         }
         QueuedWork work = Main.getWorkMgr().getMatchingWork(workItem, QueueType.INCOMPLETE);
         if (work != null) {
-          String taskStr = mapper.writeValueAsString(work.getLastTaskCheckResult());
+          String taskStr = BatfishObjectMapper.writePrettyString(work.getLastTaskCheckResult());
           return successResponse(
               new JSONObject()
                   .put(CoordConsts.SVC_KEY_WORKID, work.getWorkItem().getId())
@@ -727,8 +719,7 @@ public class WorkMgrService {
       checkContainerAccessibility(apiKey, containerName);
 
       Container container = Main.getWorkMgr().getContainer(containerDir);
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      String containerString = mapper.writeValueAsString(container);
+      String containerString = BatfishObjectMapper.writeString(container);
 
       return Response.ok(containerString).build();
     } catch (AccessControlException e) {
@@ -933,8 +924,7 @@ public class WorkMgrService {
 
       checkContainerAccessibility(apiKey, work.getWorkItem().getContainerName());
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      String taskStr = mapper.writeValueAsString(work.getLastTaskCheckResult());
+      String taskStr = BatfishObjectMapper.writePrettyString(work.getLastTaskCheckResult());
 
       // TODO: Use pojo.WorkStatus instead of this custom Json
       return successResponse(
@@ -1224,9 +1214,9 @@ public class WorkMgrService {
         workList.add(workStatus);
       }
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       return successResponse(
-          new JSONObject().put(CoordConsts.SVC_KEY_WORK_LIST, mapper.writeValueAsString(workList)));
+          new JSONObject()
+              .put(CoordConsts.SVC_KEY_WORK_LIST, BatfishObjectMapper.writePrettyString(workList)));
     } catch (IllegalArgumentException | AccessControlException e) {
       _logger.errorf("WMS:listIncompleteWork exception: %s\n", e.getMessage());
       return failureResponse(e.getMessage());
@@ -1325,7 +1315,7 @@ public class WorkMgrService {
                   .put(CoordConsts.SVC_KEY_TESTRIG_INFO, testrigInfo)
                   .put(
                       CoordConsts.SVC_KEY_TESTRIG_METADATA,
-                      new BatfishObjectMapper().writeValueAsString(trMetadata));
+                      BatfishObjectMapper.writePrettyString(trMetadata));
 
           retArray.put(jObject);
         } catch (Exception e) {
@@ -1417,8 +1407,7 @@ public class WorkMgrService {
       checkApiKeyValidity(apiKey);
       checkClientVersion(clientVersion);
 
-      ObjectMapper mapper = new BatfishObjectMapper();
-      WorkItem workItem = mapper.readValue(workItemStr, WorkItem.class);
+      WorkItem workItem = BatfishObjectMapper.mapper().readValue(workItemStr, WorkItem.class);
 
       checkContainerAccessibility(apiKey, workItem.getContainerName());
 
@@ -1519,9 +1508,9 @@ public class WorkMgrService {
       checkClientVersion(clientVersion);
       checkContainerAccessibility(apiKey, containerName);
 
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
       Map<String, String> settings =
-          mapper.readValue(settingsStr, new TypeReference<Map<String, String>>() {});
+          BatfishObjectMapper.mapper()
+              .readValue(settingsStr, new TypeReference<Map<String, String>>() {});
 
       boolean result =
           Main.getWorkMgr().syncTestrigsUpdateSettings(containerName, pluginId, settings);

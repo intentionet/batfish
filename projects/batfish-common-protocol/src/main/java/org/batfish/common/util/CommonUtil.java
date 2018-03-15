@@ -1,5 +1,6 @@
 package org.batfish.common.util;
 
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -174,10 +175,10 @@ public class CommonUtil {
   }
 
   public static boolean checkJsonEqual(Object a, Object b) {
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
+    ObjectWriter writer = BatfishObjectMapper.prettyWriter();
     try {
-      String aString = mapper.writeValueAsString(a);
-      String bString = mapper.writeValueAsString(b);
+      String aString = writer.writeValueAsString(a);
+      String bString = writer.writeValueAsString(b);
       JSONAssert.assertEquals(aString, bString, false);
       return true;
     } catch (Exception e) {

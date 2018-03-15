@@ -98,9 +98,8 @@ public class Main {
       if (questionObj.has(BfConsts.PROP_INSTANCE) && !questionObj.isNull(BfConsts.PROP_INSTANCE)) {
         JSONObject instanceDataObj = questionObj.getJSONObject(BfConsts.PROP_INSTANCE);
         String instanceDataStr = instanceDataObj.toString();
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
         Question.InstanceData instanceData =
-            mapper.<Question.InstanceData>readValue(instanceDataStr, Question.InstanceData.class);
+            BatfishObjectMapper.mapper().readValue(instanceDataStr, Question.InstanceData.class);
         String name = instanceData.getInstanceName();
 
         if (templates.containsKey(name)) {

@@ -1,6 +1,7 @@
 package org.batfish.coordinator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.Closer;
 import io.opentracing.ActiveSpan;
@@ -328,8 +329,7 @@ public class WorkMgr extends AbstractCoordinator {
                   "got error while refreshing status: %s %s\n", array.get(0), array.get(1)));
         } else {
           String taskStr = array.get(1).toString();
-          BatfishObjectMapper mapper = new BatfishObjectMapper();
-          task = mapper.readValue(taskStr, Task.class);
+          task = BatfishObjectMapper.mapper().readValue(taskStr, Task.class);
           if (task.getStatus() == null) {
             _logger.error("did not see status key in json response\n");
           }
@@ -387,7 +387,7 @@ public class WorkMgr extends AbstractCoordinator {
         throw new BatfishException("Question name not provided for ANSWER work");
       }
       Path qFile = getpathContainerQuestion(workItem.getContainerName(), qName);
-      Question question = Question.parseQuestion(qFile, getCurrentClassLoader());
+      Question question = Question.parseQuestion(qFile);
       workType =
           question.getDataPlane()
               ? WorkType.DATAPLANE_DEPENDENT_ANSWERING
@@ -406,7 +406,7 @@ public class WorkMgr extends AbstractCoordinator {
       workType = WorkType.DATAPLANE_INDEPENDENT_ANSWERING;
       for (String qName : qNames) {
         Path qFile = getpathAnalysisQuestion(workItem.getContainerName(), aName, qName);
-        Question question = Question.parseQuestion(qFile, getCurrentClassLoader());
+        Question question = Question.parseQuestion(qFile);
         if (question.getDataPlane()) {
           workType = WorkType.DATAPLANE_DEPENDENT_ANSWERING;
         }
@@ -604,8 +604,7 @@ public class WorkMgr extends AbstractCoordinator {
       if (!Files.exists(answerFile)) {
         Answer ans = Answer.failureAnswer("Not answered", null);
         ans.setStatus(AnswerStatus.NOTFOUND);
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
-        answer = mapper.writeValueAsString(ans);
+        answer = BatfishObjectMapper.writePrettyString(ans);
       } else {
         boolean answerIsStale;
         answerIsStale =
@@ -615,8 +614,7 @@ public class WorkMgr extends AbstractCoordinator {
         if (answerIsStale) {
           Answer ans = Answer.failureAnswer("Not fresh", null);
           ans.setStatus(AnswerStatus.STALE);
-          BatfishObjectMapper mapper = new BatfishObjectMapper();
-          answer = mapper.writeValueAsString(ans);
+          answer = BatfishObjectMapper.writePrettyString(ans);
         } else {
           answer = CommonUtil.readFile(answerFile);
         }
@@ -662,16 +660,14 @@ public class WorkMgr extends AbstractCoordinator {
     if (!Files.exists(answerFile)) {
       Answer ans = Answer.failureAnswer("Not answered", null);
       ans.setStatus(AnswerStatus.NOTFOUND);
-      BatfishObjectMapper mapper = new BatfishObjectMapper();
-      answer = mapper.writeValueAsString(ans);
+      answer = BatfishObjectMapper.writePrettyString(ans);
     } else {
       if (CommonUtil.getLastModifiedTime(questionFile)
               .compareTo(CommonUtil.getLastModifiedTime(answerFile))
           > 0) {
         Answer ans = Answer.failureAnswer("Not fresh", null);
         ans.setStatus(AnswerStatus.STALE);
-        BatfishObjectMapper mapper = new BatfishObjectMapper();
-        answer = mapper.writeValueAsString(ans);
+        answer = BatfishObjectMapper.writePrettyString(ans);
       } else {
         answer = CommonUtil.readFile(answerFile);
       }
@@ -861,9 +857,9 @@ public class WorkMgr extends AbstractCoordinator {
     }
     JSONObject warnings = new JSONObject();
     SortedMap<String, Warnings> warningsMap = pvcae.getWarnings();
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
+    ObjectWriter writer = BatfishObjectMapper.prettyWriter();
     for (String s : warningsMap.keySet()) {
-      warnings.put(s, mapper.writeValueAsString(warningsMap.get(s)));
+      warnings.put(s, writer.writeValueAsString(warningsMap.get(s)));
     }
     return warnings;
   }
@@ -1197,7 +1193,7 @@ public class WorkMgr extends AbstractCoordinator {
           if (!array.get(0).equals(BfConsts.SVC_SUCCESS_KEY)) {
             _logger.errorf("Got error while killing task: %s %s\n", array.get(0), array.get(1));
           } else {
-            Task task = new BatfishObjectMapper().readValue(array.getString(1), Task.class);
+            Task task = BatfishObjectMapper.mapper().readValue(array.getString(1), Task.class);
             _workQueueMgr.processTaskCheckResult(work, task);
             killed = true;
           }

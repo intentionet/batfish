@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import org.batfish.common.Warnings;
 import org.batfish.common.util.BatfishObjectMapper;
@@ -48,13 +47,10 @@ public class HostInterfaceTest {
 
   private NetworkFactory _factory;
 
-  private ObjectMapper _mapper;
-
   private Warnings _w;
 
   @Before
   public void setup() {
-    _mapper = new BatfishObjectMapper();
     _factory = new NetworkFactory();
     _c =
         _factory
@@ -80,11 +76,12 @@ public class HostInterfaceTest {
     String ifaceNonShared2Text =
         "{\"name\":\"non_shared2_interface\", \"prefix\":\"" + nonShared2Prefix + "\"}";
 
-    HostInterface sharedHostInterface = _mapper.readValue(ifaceSharedText, HostInterface.class);
+    HostInterface sharedHostInterface =
+        BatfishObjectMapper.mapper().readValue(ifaceSharedText, HostInterface.class);
     HostInterface nonShared1HostInterface =
-        _mapper.readValue(ifaceNonShared1Text, HostInterface.class);
+        BatfishObjectMapper.mapper().readValue(ifaceNonShared1Text, HostInterface.class);
     HostInterface nonShared2HostInterface =
-        _mapper.readValue(ifaceNonShared2Text, HostInterface.class);
+        BatfishObjectMapper.mapper().readValue(ifaceNonShared2Text, HostInterface.class);
     Interface sharedInterface = sharedHostInterface.toInterface(_c, _w);
     Interface nonShared1Interface = nonShared1HostInterface.toInterface(_c, _w);
     Interface nonShared2Interface = nonShared2HostInterface.toInterface(_c, _w);

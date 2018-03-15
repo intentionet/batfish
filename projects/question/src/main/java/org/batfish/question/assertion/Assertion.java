@@ -48,9 +48,8 @@ public class Assertion {
 
   @Override
   public String toString() {
-    BatfishObjectMapper mapper = new BatfishObjectMapper(false);
     try {
-      return mapper.writeValueAsString(this);
+      return BatfishObjectMapper.writePrettyString(this);
     } catch (JsonProcessingException e) {
       throw new BatfishException("Could not map to JSON string", e);
     }

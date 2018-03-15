@@ -21,8 +21,7 @@ public class TopologyTest {
             + " \"links\" : [{\"srcId\" : \"src\", \"dstId\" : \"dst\"}],"
             + " \"interfaces\" : [{\"nodeId\": \"node\", \"name\" : \"node\"}],"
             + " \"aggregates\" : [{\"name\": \"cloud\", \"contents\" : [\"id1\"]}]}";
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    Topology topo = mapper.readValue(str, Topology.class);
+    Topology topo = BatfishObjectMapper.mapper().readValue(str, Topology.class);
 
     assertThat(topo.getId(), equalTo(Topology.getId("testrig")));
     assertThat(topo.getTestrigName(), equalTo("testrig"));
@@ -44,8 +43,7 @@ public class TopologyTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("key", "value");
     topo.setProperties(properties);
-    BatfishObjectMapper mapper = new BatfishObjectMapper();
-    JsonNode jsonNode = mapper.valueToTree(topo);
+    JsonNode jsonNode = BatfishObjectMapper.mapper().valueToTree(topo);
 
     assertThat(jsonNode.get("id").asText(), equalTo(Topology.getId("testrig")));
     assertThat(jsonNode.get("aggregates").get(0).get("name").asText(), equalTo("cloud"));
