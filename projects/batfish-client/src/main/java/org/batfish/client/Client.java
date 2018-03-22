@@ -3166,11 +3166,13 @@ public class Client extends AbstractClient implements IClient {
     if (!isValidArgument(options, parameters, 1, 2, Integer.MAX_VALUE, Command.TEST)) {
       return false;
     }
+
     TestComparisonMode comparisonMode = TestComparisonMode.COMPAREANSWER;
-    if (options.size() > 0) {
-      String opt = options.get(0).toUpperCase();
-      comparisonMode = TestComparisonMode.valueOf(opt.substring(1, opt.length())); // remove '-'
+    if (!options.isEmpty()) {
+      comparisonMode =
+          TestComparisonMode.valueOf(options.get(0).substring(1).toUpperCase()); // remove '-'
     }
+
     if (parameters.get(testCommandIndex).equals(FLAG_FAILING_TEST)) {
       testCommandIndex++;
       failingTest = true;
@@ -3218,11 +3220,9 @@ public class Client extends AbstractClient implements IClient {
       }
     } else if (testCommandSucceeded) {
       try {
-        try {
+        if (TestComparisonMode.RAW != comparisonMode) {
           Answer testAnswer = BatfishObjectMapper.mapper().readValue(testOutput, Answer.class);
           testOutput = getTestComparisonString(testAnswer, comparisonMode);
-        } catch (JsonProcessingException e) {
-          // when the output cannot be converted to Answer, we use the exact string read from file
         }
 
         if (!missingReferenceFile) {

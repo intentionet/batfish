@@ -95,7 +95,8 @@ public enum Command {
     COMPAREANSWER,
     COMPAREALL,
     COMPAREFAILURES,
-    COMPARESUMMARY
+    COMPARESUMMARY,
+    RAW
   }
 
   private static final Map<String, Command> _nameMap = buildNameMap();

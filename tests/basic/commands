@@ -9,7 +9,7 @@ test -compareall tests/basic/init.ref init-testrig test_rigs/example basic-examp
 test -compareall tests/basic/init-delta.ref init-delta-testrig test_rigs/example-with-delta basic-example-delta
 test -compareall tests/basic/genDp.ref generate-dataplane
 test -compareall tests/basic/genDp-delta.ref generate-delta-dataplane
-test -compareall tests/basic/topology.ref get-object testrig_pojo_topology
+test -raw tests/basic/topology.ref get-object testrig_pojo_topology
 test tests/basic/aclReachability.ref get aclReachability
 test tests/basic/assert.ref get assert assertions=[{"assertion":"(eq 15 (pathsize '$.nodes[*]'))"},{"assertion":"(eq 0 (pathsize '$.nodes[\"as1border\"]'))"},{"assertion":"(not (eq 0 (pathsize '$.nodes[\"as1border1\"]')))"}, {"assertion":"(eq (pathsize '$.nodes[*].aaaSettings.newModel') (pathsize '$.nodes[*].aaaSettings[?(@.newModel == true)]'))"}]
 test tests/basic/bgpSessionStatus.ref get bgpsessionstatus type="ebgp.*", status="missing.*"
