@@ -1,0 +1,601 @@
+[
+  {
+    "class" : "org.batfish.question.NeighborsQuestionPlugin$NeighborsAnswerElement",
+    "ebgpNeighbors" : [
+      {
+        "ip1" : "10.12.11.1",
+        "ip2" : "10.12.11.2",
+        "node1" : "as1border1",
+        "node2" : "as2border1"
+      },
+      {
+        "ip1" : "10.13.22.1",
+        "ip2" : "10.13.22.3",
+        "node1" : "as1border2",
+        "node2" : "as3border2"
+      },
+      {
+        "ip1" : "10.12.11.2",
+        "ip2" : "10.12.11.1",
+        "node1" : "as2border1",
+        "node2" : "as1border1"
+      },
+      {
+        "ip1" : "10.23.21.2",
+        "ip2" : "10.23.21.3",
+        "node1" : "as2border2",
+        "node2" : "as3border1"
+      },
+      {
+        "ip1" : "2.34.101.4",
+        "ip2" : "2.34.101.3",
+        "node1" : "as2dept1",
+        "node2" : "as2dist1"
+      },
+      {
+        "ip1" : "2.34.201.4",
+        "ip2" : "2.34.201.3",
+        "node1" : "as2dept1",
+        "node2" : "as2dist2"
+      },
+      {
+        "ip1" : "2.34.101.3",
+        "ip2" : "2.34.101.4",
+        "node1" : "as2dist1",
+        "node2" : "as2dept1"
+      },
+      {
+        "ip1" : "2.34.201.3",
+        "ip2" : "2.34.201.4",
+        "node1" : "as2dist2",
+        "node2" : "as2dept1"
+      },
+      {
+        "ip1" : "10.23.21.3",
+        "ip2" : "10.23.21.2",
+        "node1" : "as3border1",
+        "node2" : "as2border2"
+      },
+      {
+        "ip1" : "10.13.22.3",
+        "ip2" : "10.13.22.1",
+        "node1" : "as3border2",
+        "node2" : "as1border2"
+      }
+    ],
+    "ibgpNeighbors" : [
+      {
+        "ip1" : "1.1.1.1",
+        "ip2" : "1.10.1.1",
+        "node1" : "as1border1",
+        "node2" : "as1core1"
+      },
+      {
+        "ip1" : "1.2.2.2",
+        "ip2" : "1.10.1.1",
+        "node1" : "as1border2",
+        "node2" : "as1core1"
+      },
+      {
+        "ip1" : "1.10.1.1",
+        "ip2" : "1.1.1.1",
+        "node1" : "as1core1",
+        "node2" : "as1border1"
+      },
+      {
+        "ip1" : "1.10.1.1",
+        "ip2" : "1.2.2.2",
+        "node1" : "as1core1",
+        "node2" : "as1border2"
+      },
+      {
+        "ip1" : "2.1.1.1",
+        "ip2" : "2.1.2.1",
+        "node1" : "as2border1",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.1.1.1",
+        "ip2" : "2.1.2.2",
+        "node1" : "as2border1",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "2.1.1.2",
+        "ip2" : "2.1.2.1",
+        "node1" : "as2border2",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.1.1.2",
+        "ip2" : "2.1.2.2",
+        "node1" : "as2border2",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "2.1.2.1",
+        "ip2" : "2.1.1.1",
+        "node1" : "as2core1",
+        "node2" : "as2border1"
+      },
+      {
+        "ip1" : "2.1.2.1",
+        "ip2" : "2.1.1.2",
+        "node1" : "as2core1",
+        "node2" : "as2border2"
+      },
+      {
+        "ip1" : "2.1.2.1",
+        "ip2" : "2.1.3.1",
+        "node1" : "as2core1",
+        "node2" : "as2dist1"
+      },
+      {
+        "ip1" : "2.1.2.1",
+        "ip2" : "2.1.3.2",
+        "node1" : "as2core1",
+        "node2" : "as2dist2"
+      },
+      {
+        "ip1" : "2.1.2.2",
+        "ip2" : "2.1.1.1",
+        "node1" : "as2core2",
+        "node2" : "as2border1"
+      },
+      {
+        "ip1" : "2.1.2.2",
+        "ip2" : "2.1.1.2",
+        "node1" : "as2core2",
+        "node2" : "as2border2"
+      },
+      {
+        "ip1" : "2.1.2.2",
+        "ip2" : "2.1.3.1",
+        "node1" : "as2core2",
+        "node2" : "as2dist1"
+      },
+      {
+        "ip1" : "2.1.2.2",
+        "ip2" : "2.1.3.2",
+        "node1" : "as2core2",
+        "node2" : "as2dist2"
+      },
+      {
+        "ip1" : "2.1.3.1",
+        "ip2" : "2.1.2.1",
+        "node1" : "as2dist1",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.1.3.1",
+        "ip2" : "2.1.2.2",
+        "node1" : "as2dist1",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "2.1.3.2",
+        "ip2" : "2.1.2.1",
+        "node1" : "as2dist2",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.1.3.2",
+        "ip2" : "2.1.2.2",
+        "node1" : "as2dist2",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "3.1.1.1",
+        "ip2" : "3.10.1.1",
+        "node1" : "as3border1",
+        "node2" : "as3core1"
+      },
+      {
+        "ip1" : "3.2.2.2",
+        "ip2" : "3.10.1.1",
+        "node1" : "as3border2",
+        "node2" : "as3core1"
+      },
+      {
+        "ip1" : "3.10.1.1",
+        "ip2" : "3.1.1.1",
+        "node1" : "as3core1",
+        "node2" : "as3border1"
+      },
+      {
+        "ip1" : "3.10.1.1",
+        "ip2" : "3.2.2.2",
+        "node1" : "as3core1",
+        "node2" : "as3border2"
+      }
+    ],
+    "lanNeighbors" : [
+      {
+        "node1" : "as1border1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as1core1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as1border1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2border1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as1border2",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as3border2",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as1border2",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as1core1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as1core1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as1border2",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as1core1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as1border1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as2border1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as1border1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2border1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2core1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as2border1",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "as2core2",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2border2",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as3border1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2border2",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2core2",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as2border2",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "as2core1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2core1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as2border1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2core1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2border2",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "as2core1",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "as2dist1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as2core1",
+        "node1interface" : "GigabitEthernet3/0",
+        "node2" : "as2dist2",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2core2",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as2border2",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2core2",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2border1",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "as2core2",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "as2dist2",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as2core2",
+        "node1interface" : "GigabitEthernet3/0",
+        "node2" : "as2dist1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as2dept1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as2dist1",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "as2dept1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2dist2",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "as2dept1",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "host1",
+        "node2interface" : "eth0"
+      },
+      {
+        "node1" : "as2dept1",
+        "node1interface" : "GigabitEthernet3/0",
+        "node2" : "host2",
+        "node2interface" : "eth0"
+      },
+      {
+        "node1" : "as2dist1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as2core1",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "as2dist1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2core2",
+        "node2interface" : "GigabitEthernet3/0"
+      },
+      {
+        "node1" : "as2dist1",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "as2dept1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as2dist2",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as2core2",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "as2dist2",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2core1",
+        "node2interface" : "GigabitEthernet3/0"
+      },
+      {
+        "node1" : "as2dist2",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "as2dept1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as3border1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as3core1",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as3border1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as2border2",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as3border2",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as1border2",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as3border2",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as3core1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as3core1",
+        "node1interface" : "GigabitEthernet0/0",
+        "node2" : "as3border2",
+        "node2interface" : "GigabitEthernet1/0"
+      },
+      {
+        "node1" : "as3core1",
+        "node1interface" : "GigabitEthernet1/0",
+        "node2" : "as3border1",
+        "node2interface" : "GigabitEthernet0/0"
+      },
+      {
+        "node1" : "as3core1",
+        "node1interface" : "GigabitEthernet2/0",
+        "node2" : "as3core1",
+        "node2interface" : "GigabitEthernet3/0"
+      },
+      {
+        "node1" : "as3core1",
+        "node1interface" : "GigabitEthernet3/0",
+        "node2" : "as3core1",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "host1",
+        "node1interface" : "eth0",
+        "node2" : "as2dept1",
+        "node2interface" : "GigabitEthernet2/0"
+      },
+      {
+        "node1" : "host2",
+        "node1interface" : "eth0",
+        "node2" : "as2dept1",
+        "node2interface" : "GigabitEthernet3/0"
+      }
+    ],
+    "ospfNeighbors" : [
+      {
+        "ip1" : "1.0.1.1",
+        "ip2" : "1.0.1.2",
+        "node1" : "as1border1",
+        "node2" : "as1core1"
+      },
+      {
+        "ip1" : "1.0.2.1",
+        "ip2" : "1.0.2.2",
+        "node1" : "as1border2",
+        "node2" : "as1core1"
+      },
+      {
+        "ip1" : "1.0.1.2",
+        "ip2" : "1.0.1.1",
+        "node1" : "as1core1",
+        "node2" : "as1border1"
+      },
+      {
+        "ip1" : "1.0.2.2",
+        "ip2" : "1.0.2.1",
+        "node1" : "as1core1",
+        "node2" : "as1border2"
+      },
+      {
+        "ip1" : "2.12.11.1",
+        "ip2" : "2.12.11.2",
+        "node1" : "as2border1",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.12.12.1",
+        "ip2" : "2.12.12.2",
+        "node1" : "as2border1",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "2.12.21.1",
+        "ip2" : "2.12.21.2",
+        "node1" : "as2border2",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.12.22.1",
+        "ip2" : "2.12.22.2",
+        "node1" : "as2border2",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "2.12.11.2",
+        "ip2" : "2.12.11.1",
+        "node1" : "as2core1",
+        "node2" : "as2border1"
+      },
+      {
+        "ip1" : "2.12.21.2",
+        "ip2" : "2.12.21.1",
+        "node1" : "as2core1",
+        "node2" : "as2border2"
+      },
+      {
+        "ip1" : "2.23.11.2",
+        "ip2" : "2.23.11.3",
+        "node1" : "as2core1",
+        "node2" : "as2dist1"
+      },
+      {
+        "ip1" : "2.23.12.2",
+        "ip2" : "2.23.12.3",
+        "node1" : "as2core1",
+        "node2" : "as2dist2"
+      },
+      {
+        "ip1" : "2.12.12.2",
+        "ip2" : "2.12.12.1",
+        "node1" : "as2core2",
+        "node2" : "as2border1"
+      },
+      {
+        "ip1" : "2.12.22.2",
+        "ip2" : "2.12.22.1",
+        "node1" : "as2core2",
+        "node2" : "as2border2"
+      },
+      {
+        "ip1" : "2.23.21.2",
+        "ip2" : "2.23.21.3",
+        "node1" : "as2core2",
+        "node2" : "as2dist1"
+      },
+      {
+        "ip1" : "2.23.22.2",
+        "ip2" : "2.23.22.3",
+        "node1" : "as2core2",
+        "node2" : "as2dist2"
+      },
+      {
+        "ip1" : "2.23.11.3",
+        "ip2" : "2.23.11.2",
+        "node1" : "as2dist1",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.23.21.3",
+        "ip2" : "2.23.21.2",
+        "node1" : "as2dist1",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "2.23.12.3",
+        "ip2" : "2.23.12.2",
+        "node1" : "as2dist2",
+        "node2" : "as2core1"
+      },
+      {
+        "ip1" : "2.23.22.3",
+        "ip2" : "2.23.22.2",
+        "node1" : "as2dist2",
+        "node2" : "as2core2"
+      },
+      {
+        "ip1" : "3.0.1.1",
+        "ip2" : "3.0.1.2",
+        "node1" : "as3border1",
+        "node2" : "as3core1"
+      },
+      {
+        "ip1" : "3.0.2.1",
+        "ip2" : "3.0.2.2",
+        "node1" : "as3border2",
+        "node2" : "as3core1"
+      },
+      {
+        "ip1" : "3.0.1.2",
+        "ip2" : "3.0.1.1",
+        "node1" : "as3core1",
+        "node2" : "as3border1"
+      },
+      {
+        "ip1" : "3.0.2.2",
+        "ip2" : "3.0.2.1",
+        "node1" : "as3core1",
+        "node2" : "as3border2"
+      }
+    ]
+  }
+]

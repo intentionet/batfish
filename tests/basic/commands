@@ -4,28 +4,33 @@ add-batfish-option haltonconverterror
 add-batfish-option haltonparseerror
 add-batfish-option verboseparse
 
-# example testrig
+# some ref tests using example testrig
 test -compareall tests/basic/init.ref init-testrig test_rigs/example basic-example
-test -compareall tests/basic/init-delta.ref init-delta-testrig test_rigs/example-with-delta basic-example-delta
 test -compareall tests/basic/genDp.ref generate-dataplane
-test -compareall tests/basic/genDp-delta.ref generate-delta-dataplane
 test -raw tests/basic/topology.ref get-object testrig_pojo_topology
+test tests/basic/nodes-summary.ref get nodes summary=true
+test tests/basic/nodes.ref get nodes summary=false
+test tests/basic/neighbors-summary.ref get neighbors neighborTypes=["ebgp","ibgp","ospf","lan"]
+test tests/basic/neighbors.ref get neighbors style=verbose, neighborTypes=["ebgp","ibgp","ospf","lan"]
+test tests/basic/routes.ref get routes
+
+# some ref tests using delta testrig
+test -compareall tests/basic/init-delta.ref init-delta-testrig test_rigs/example-with-delta basic-example-delta
+test -compareall tests/basic/genDp-delta.ref generate-delta-dataplane
+test tests/basic/nodes-diff.ref get nodes summary=false, differential=true
+
+# Everything below here is to be converted into regular unit tests in some form.
 test tests/basic/aclReachability.ref get aclReachability
 test tests/basic/assert.ref get assert assertions=[{"assertion":"(eq 15 (pathsize '$.nodes[*]'))"},{"assertion":"(eq 0 (pathsize '$.nodes[\"as1border\"]'))"},{"assertion":"(not (eq 0 (pathsize '$.nodes[\"as1border1\"]')))"}, {"assertion":"(eq (pathsize '$.nodes[*].aaaSettings.newModel') (pathsize '$.nodes[*].aaaSettings[?(@.newModel == true)]'))"}]
 test tests/basic/bgpSessionStatus.ref get bgpsessionstatus type="ebgp.*", status="missing.*"
 test tests/basic/compareSameName.ref get compareSameName
 test tests/basic/error.ref -error get error
 test tests/basic/isisLoopbacks.ref get isisLoopbacks
-test tests/basic/neighbors.ref get neighbors neighborTypes=["ebgp","ibgp","ospf","lan"]
 test tests/basic/roleNeighbors.ref get neighbors neighborTypes=["ebgp","ibgp","ospf","lan"], style="role"
-test tests/basic/nodes-summary.ref get nodes summary=true
-test tests/basic/nodes.ref get nodes summary=false
-test tests/basic/nodes-diff.ref get nodes summary=false, differential=true
 test tests/basic/ospfSessionCheck.ref get ospfsessioncheck
 test tests/basic/ospfStatus.ref get ospfstatus interfacesSpecifier="Loopback.*", status=".*passive"
 test tests/basic/roles.ref get roles
 test tests/basic/roles2.ref get roles inferred=true
-test tests/basic/routes.ref get routes
 test tests/basic/routes-diff.ref get routes differential=true
 test tests/basic/selfAdjacencies.ref get selfAdjacencies
 test tests/basic/traceroute-1-2.ref get traceroute ingressNode="as1core1", dst="host1"

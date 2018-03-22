@@ -14,7 +14,6 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import org.batfish.common.Pair;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.datamodel.BgpNeighbor;
 import org.batfish.datamodel.BgpProcess;
@@ -22,6 +21,7 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpLink;
 import org.batfish.datamodel.OspfNeighbor;
 import org.batfish.datamodel.OspfProcess;
 import org.batfish.datamodel.Prefix;
@@ -470,7 +470,7 @@ class AbstractionBuilder {
     abstractConf.setRoute6FilterLists(conf.getRoute6FilterLists());
 
     SortedSet<Interface> toRetain = new TreeSet<>();
-    SortedSet<Pair<Ip, Ip>> ipNeighbors = new TreeSet<>();
+    SortedSet<IpLink> ipNeighbors = new TreeSet<>();
     SortedSet<BgpNeighbor> bgpNeighbors = new TreeSet<>();
 
     List<GraphEdge> edges = _graph.getEdgeMap().get(conf.getName());
@@ -482,7 +482,7 @@ class AbstractionBuilder {
         Ip start = ge.getStart().getAddress().getIp();
         if (!leavesNetwork) {
           Ip end = ge.getEnd().getAddress().getIp();
-          ipNeighbors.add(new Pair<>(start, end));
+          ipNeighbors.add(new IpLink(start, end));
         }
         BgpNeighbor n = _graph.getEbgpNeighbors().get(ge);
         if (n != null) {
@@ -532,13 +532,13 @@ class AbstractionBuilder {
         abstractOspf.setReferenceBandwidth(ospf.getReferenceBandwidth());
         abstractOspf.setRouterId(ospf.getRouterId());
         // Copy over neighbors
-        Map<Pair<Ip, Ip>, OspfNeighbor> abstractNeighbors = new HashMap<>();
+        Map<IpLink, OspfNeighbor> abstractNeighbors = new HashMap<>();
         if (ospf.getOspfNeighbors() != null) {
-          for (Entry<Pair<Ip, Ip>, OspfNeighbor> entry2 : ospf.getOspfNeighbors().entrySet()) {
-            Pair<Ip, Ip> pair = entry2.getKey();
+          for (Entry<IpLink, OspfNeighbor> entry2 : ospf.getOspfNeighbors().entrySet()) {
+            IpLink link = entry2.getKey();
             OspfNeighbor neighbor = entry2.getValue();
-            if (ipNeighbors.contains(pair)) {
-              abstractNeighbors.put(pair, neighbor);
+            if (ipNeighbors.contains(link)) {
+              abstractNeighbors.put(link, neighbor);
             }
           }
         }

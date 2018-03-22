@@ -3,10 +3,9 @@ package org.batfish.datamodel;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.batfish.common.Pair;
 import org.batfish.common.util.ComparableStructure;
 
-public class OspfNeighbor extends ComparableStructure<Pair<Ip, Ip>> {
+public class OspfNeighbor extends ComparableStructure<IpLink> {
 
   public static final class OspfNeighborSummary extends ComparableStructure<String> {
 
@@ -27,8 +26,8 @@ public class OspfNeighbor extends ComparableStructure<Pair<Ip, Ip>> {
 
     public OspfNeighborSummary(OspfNeighbor ospfNeighbor) {
       super(ospfNeighbor.getOwner().getName() + ":" + ospfNeighbor._key);
-      _localIp = ospfNeighbor._key.getFirst();
-      _remoteIp = ospfNeighbor._key.getSecond();
+      _localIp = ospfNeighbor._key.getIp1();
+      _remoteIp = ospfNeighbor._key.getIp2();
       _vrf = ospfNeighbor._vrf;
     }
 
@@ -73,7 +72,8 @@ public class OspfNeighbor extends ComparableStructure<Pair<Ip, Ip>> {
 
   private String _vrf;
 
-  public OspfNeighbor(Pair<Ip, Ip> ipEdge) {
+  @JsonCreator
+  public OspfNeighbor(@JsonProperty(PROP_NAME) IpLink ipEdge) {
     super(ipEdge);
   }
 
@@ -87,7 +87,7 @@ public class OspfNeighbor extends ComparableStructure<Pair<Ip, Ip>> {
 
   @JsonIgnore
   public Ip getLocalIp() {
-    return _key.getFirst();
+    return _key.getIp1();
   }
 
   @JsonIgnore
@@ -97,7 +97,7 @@ public class OspfNeighbor extends ComparableStructure<Pair<Ip, Ip>> {
 
   @JsonIgnore
   public Ip getRemoteIp() {
-    return _key.getSecond();
+    return _key.getIp2();
   }
 
   @JsonIgnore

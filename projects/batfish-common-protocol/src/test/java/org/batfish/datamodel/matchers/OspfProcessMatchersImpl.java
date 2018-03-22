@@ -2,8 +2,7 @@ package org.batfish.datamodel.matchers;
 
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.batfish.common.Pair;
-import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpLink;
 import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.OspfNeighbor;
 import org.batfish.datamodel.OspfProcess;
@@ -38,13 +37,13 @@ final class OspfProcessMatchersImpl {
   }
 
   static final class HasOspfNeighbors
-      extends FeatureMatcher<OspfProcess, Map<Pair<Ip, Ip>, OspfNeighbor>> {
-    HasOspfNeighbors(@Nonnull Matcher<? super Map<Pair<Ip, Ip>, OspfNeighbor>> subMatcher) {
+      extends FeatureMatcher<OspfProcess, Map<IpLink, OspfNeighbor>> {
+    HasOspfNeighbors(@Nonnull Matcher<? super Map<IpLink, OspfNeighbor>> subMatcher) {
       super(subMatcher, "An OSPF process with ospfNeighbors:", "ospfNeighbors");
     }
 
     @Override
-    protected Map<Pair<Ip, Ip>, OspfNeighbor> featureValueOf(OspfProcess actual) {
+    protected Map<IpLink, OspfNeighbor> featureValueOf(OspfProcess actual) {
       return actual.getOspfNeighbors();
     }
   }

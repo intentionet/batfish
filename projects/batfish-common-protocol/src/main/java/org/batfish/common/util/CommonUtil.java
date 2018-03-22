@@ -85,6 +85,7 @@ import org.batfish.datamodel.FlowTrace;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpLink;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpWildcard;
@@ -892,7 +893,7 @@ public class CommonUtil {
                       if (remoteArea != null
                           && remoteArea.getInterfaces().contains(remoteIfaceName)) {
                         Ip remoteIp = remoteIface.getAddress().getIp();
-                        Pair<Ip, Ip> localKey = new Pair<>(localIp, remoteIp);
+                        IpLink localKey = new IpLink(localIp, remoteIp);
                         OspfNeighbor neighbor = proc.getOspfNeighbors().get(localKey);
                         if (neighbor == null) {
                           hasNeighbor = true;
@@ -906,7 +907,7 @@ public class CommonUtil {
                           proc.getOspfNeighbors().put(localKey, neighbor);
 
                           // initialize remote neighbor
-                          Pair<Ip, Ip> remoteKey = new Pair<>(remoteIp, localIp);
+                          IpLink remoteKey = new IpLink(remoteIp, localIp);
                           OspfNeighbor remoteNeighbor = new OspfNeighbor(remoteKey);
                           remoteNeighbor.setArea(areaNum);
                           remoteNeighbor.setVrf(remoteVrfName);
@@ -924,7 +925,7 @@ public class CommonUtil {
                 }
               }
               if (!hasNeighbor) {
-                Pair<Ip, Ip> key = new Pair<>(localIp, Ip.ZERO);
+                IpLink key = new IpLink(localIp, Ip.ZERO);
                 OspfNeighbor neighbor = new OspfNeighbor(key);
                 neighbor.setArea(areaNum);
                 neighbor.setVrf(vrfName);

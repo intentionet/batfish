@@ -12,7 +12,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
-import org.batfish.common.Pair;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 
@@ -126,7 +125,7 @@ public class OspfProcess implements Serializable {
 
   private Long _maxMetricTransitLinks;
 
-  private transient Map<Pair<Ip, Ip>, OspfNeighbor> _ospfNeighbors;
+  private transient Map<IpLink, OspfNeighbor> _ospfNeighbors;
 
   private String _processId;
 
@@ -213,7 +212,7 @@ public class OspfProcess implements Serializable {
   }
 
   @JsonIgnore
-  public Map<Pair<Ip, Ip>, OspfNeighbor> getOspfNeighbors() {
+  public Map<IpLink, OspfNeighbor> getOspfNeighbors() {
     return _ospfNeighbors;
   }
 
@@ -290,7 +289,7 @@ public class OspfProcess implements Serializable {
   }
 
   @JsonIgnore
-  public void setOspfNeighbors(Map<Pair<Ip, Ip>, OspfNeighbor> ospfNeighbors) {
+  public void setOspfNeighbors(Map<IpLink, OspfNeighbor> ospfNeighbors) {
     _ospfNeighbors = ospfNeighbors;
   }
 

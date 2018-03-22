@@ -2,8 +2,7 @@ package org.batfish.datamodel.matchers;
 
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.batfish.common.Pair;
-import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpLink;
 import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.OspfNeighbor;
 import org.batfish.datamodel.matchers.OspfProcessMatchersImpl.HasArea;
@@ -34,7 +33,7 @@ public class OspfProcessMatchers {
    * OSPF neighbors.
    */
   public static HasOspfNeighbors hasOspfNeighbors(
-      Matcher<? super Map<Pair<Ip, Ip>, OspfNeighbor>> subMatcher) {
+      Matcher<? super Map<IpLink, OspfNeighbor>> subMatcher) {
     return new HasOspfNeighbors(subMatcher);
   }
 }
