@@ -6,7 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.SortedSet;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
@@ -84,39 +85,29 @@ public class IpPermissions implements Serializable {
     }
   }
 
-  public IpAccessListLine toEgressIpAccessListLine(Region region) {
-    IpAccessListLine line = toIpAccessListLine();
+  private SortedSet<IpWildcard> collectIpWildCards(Region region) {
     ImmutableSortedSet.Builder<IpWildcard> ipWildcardBuilder =
         new ImmutableSortedSet.Builder<>(Comparator.naturalOrder());
-
-    _ipRanges
-        .stream()
-        .map(IpWildcard::new)
-        .forEach(ipWildcard -> ipWildcardBuilder.add(ipWildcard));
+    
+    _ipRanges.stream().map(IpWildcard::new).forEach(ipWildcardBuilder::add);
 
     _securityGroups
         .stream()
         .map(sgID -> region.getSecurityGroups().get(sgID))
-        .filter(sg -> sg != null)
+        .filter(Objects::nonNull)
         .flatMap(sg -> sg.getUsersIpSpace().stream())
-        .forEach(ipWildCard -> ipWildcardBuilder.add(ipWildCard));
+        .forEach(ipWildcardBuilder::add);
+  }
 
-    line.setDstIps(ipWildcardBuilder.build());
+  public IpAccessListLine toEgressIpAccessListLine(Region region) {
+    IpAccessListLine line = toIpAccessListLine();
+    line.setDstIps(collectIpWildCards(region));
     return line;
   }
 
   public IpAccessListLine toIngressIpAccessListLine(Region region) {
     IpAccessListLine line = toIpAccessListLine();
-    ImmutableSortedSet.Builder<IpWildcard> ipWildcardBuilder =
-        new ImmutableSortedSet.Builder<>(Comparator.naturalOrder());
-    ipWildcardBuilder.addAll(_ipRanges.stream().map(IpWildcard::new).collect(Collectors.toSet()));
-    ipWildcardBuilder.addAll(
-        _securityGroups
-            .stream()
-            .filter(sg -> region.getSecurityGroups().containsKey(sg))
-            .flatMap(sg -> region.getSecurityGroups().get(sg).getUsersIpSpace().stream())
-            .collect(Collectors.toSet()));
-    line.setSrcIps(ipWildcardBuilder.build());
+    line.setSrcIps(collectIpWildCards(region));
     return line;
   }
 
