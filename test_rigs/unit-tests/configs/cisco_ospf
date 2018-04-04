@@ -40,6 +40,7 @@ router ospf 1
   capability lls
   capability transit
   capability vrf-lite
+  default-metric 11
   discard-route external
   discard-route internal
   distance 110
