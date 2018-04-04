@@ -427,6 +427,7 @@ import org.batfish.grammar.cisco.CiscoParser.Ro_area_filterlistContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_area_nssaContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_auto_costContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_default_informationContext;
+import org.batfish.grammar.cisco.CiscoParser.Ro_default_metricContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_max_metricContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_maximum_pathsContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_networkContext;
@@ -5122,6 +5123,17 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       int line = ctx.map.getLine();
       proc.setDefaultInformationOriginateMap(ctx.map.getText());
       proc.setDefaultInformationOriginateMapLine(line);
+    }
+  }
+
+  @Override
+  public void exitRo_default_metric(Ro_default_metricContext ctx) {
+    OspfProcess proc = _currentOspfProcess;
+    if (ctx.NO() != null) {
+      proc.setDefaultMetric(null);
+    } else {
+      long metric = toLong(ctx.metric);
+      proc.setDefaultMetric(metric);
     }
   }
 

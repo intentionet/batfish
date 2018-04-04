@@ -150,6 +150,11 @@ ro_default_information
    )* NEWLINE
 ;
 
+ro_default_metric
+:
+   NO? DEFAULT_METRIC metric = DEC NEWLINE
+;
+
 ro_distance
 :
    DISTANCE value = DEC NEWLINE
@@ -622,6 +627,7 @@ s_router_ospf
       | ro_auto_cost
       | ro_common
       | ro_default_information
+      | ro_default_metric
       | ro_distance
       | ro_max_metric
       | ro_maximum_paths

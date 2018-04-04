@@ -2900,7 +2900,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
       ospfExportConnectedStatements.add(new SetOspfMetricType(metricType));
       boolean explicitMetric = metric != null;
       if (!explicitMetric) {
-        metric = OspfRedistributionPolicy.DEFAULT_REDISTRIBUTE_CONNECTED_METRIC;
+        metric = proc.getDefaultMetric(_vendor, RoutingProtocol.CONNECTED);
       }
       ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
       ospfExportStatements.add(ospfExportConnected);
@@ -2951,7 +2951,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
       ospfExportStaticStatements.add(new SetOspfMetricType(metricType));
       boolean explicitMetric = metric != null;
       if (!explicitMetric) {
-        metric = OspfRedistributionPolicy.DEFAULT_REDISTRIBUTE_STATIC_METRIC;
+        metric = proc.getDefaultMetric(_vendor, RoutingProtocol.STATIC);
       }
       ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
       ospfExportStatements.add(ospfExportStatic);
@@ -3000,7 +3000,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
       ospfExportBgpStatements.add(new SetOspfMetricType(metricType));
       boolean explicitMetric = metric != null;
       if (!explicitMetric) {
-        metric = OspfRedistributionPolicy.DEFAULT_REDISTRIBUTE_BGP_METRIC;
+        metric = proc.getDefaultMetric(_vendor, RoutingProtocol.BGP);
       }
       ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
       ospfExportStatements.add(ospfExportBgp);

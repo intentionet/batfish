@@ -51,6 +51,8 @@ public class OspfProcess extends ComparableStructure<String> {
 
   private Integer _defaultInformationOriginateMapLine;
 
+  private Long _defaultMetric;
+
   private Set<String> _interfaceBlacklist;
 
   private Set<String> _interfaceWhitelist;
@@ -96,6 +98,40 @@ public class OspfProcess extends ComparableStructure<String> {
 
       case CISCO_NX: // https://www.cisco.com/c/m/en_us/techdoc/dc/reference/cli/nxos/commands/ospf/auto-cost-ospf.html
         return DEFAULT_REFERENCE_BANDWIDTH_40_GBPS;
+
+      default:
+        throw new BatfishException("Unknown default OSPF reference bandwidth for format " + format);
+    }
+  }
+
+  public long getDefaultMetric(ConfigurationFormat format, RoutingProtocol protocol) {
+    if (this._defaultMetric != null) {
+      return this._defaultMetric;
+    }
+
+    switch (format) {
+      case ARISTA:
+        // Inferred from Arista manual OSPF v3 default-metric comment.
+        return 10;
+
+      case CADANT: // Assume all these use IOS defaults.
+      case CISCO_ASA:
+      case CISCO_IOS:
+      case CISCO_IOS_XR:
+      case FORCE10:
+      case FOUNDRY:
+        // https://www.cisco.com/c/en/us/support/docs/ip/open-shortest-path-first-ospf/7039-1.html
+        // "the cost allocated to the external route is 20 (the default is 1 for BGP)."
+        switch (protocol) {
+          case BGP:
+            return 1;
+          default:
+            return 20;
+        }
+
+      case CISCO_NX:
+        // https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus7000/sw/unicast/command/reference/n7k_unicast_cmds/l3_cmds_d.html#pgfId-1524238
+        return 25L;
 
       default:
         throw new BatfishException("Unknown default OSPF reference bandwidth for format " + format);
@@ -167,6 +203,10 @@ public class OspfProcess extends ComparableStructure<String> {
 
   public Integer getDefaultInformationOriginateMapLine() {
     return _defaultInformationOriginateMapLine;
+  }
+
+  public Long getDefaultMetric() {
+    return _defaultMetric;
   }
 
   public Long getMaxMetricExternalLsa() {
@@ -247,6 +287,10 @@ public class OspfProcess extends ComparableStructure<String> {
 
   public void setDefaultInformationOriginateMapLine(Integer defaultInformationOriginateMapLine) {
     _defaultInformationOriginateMapLine = defaultInformationOriginateMapLine;
+  }
+
+  public void setDefaultMetric(Long metric) {
+    _defaultMetric = metric;
   }
 
   public void setMaxMetricExternalLsa(Long maxMetricExternalLsa) {
