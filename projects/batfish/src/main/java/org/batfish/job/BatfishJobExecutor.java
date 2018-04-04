@@ -125,7 +125,7 @@ public class BatfishJobExecutor {
         } catch (InterruptedException e) {
           throw new BatfishException("Job didn't finish", e);
         } catch (ExecutionException e) {
-          throw new BatfishException("Error executing job", e);
+          throw new BatfishException("Error executing job: " + e.getMessage(), e);
         }
 
         markJobCompleted();
