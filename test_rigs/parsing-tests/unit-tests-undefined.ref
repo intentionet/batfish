@@ -931,7 +931,7 @@
         "description" : "Undefined reference to structure of type: 'route-map' with usage: 'ospf redistribute connected route-map' named 'DIRECT_OSPF'",
         "files" : {
           "cisco_ospf" : [
-            52
+            53
           ]
         }
       },
@@ -1264,7 +1264,7 @@
         "route-map" : {
           "DIRECT_OSPF" : {
             "ospf redistribute connected route-map" : [
-              52
+              53
             ]
           }
         }

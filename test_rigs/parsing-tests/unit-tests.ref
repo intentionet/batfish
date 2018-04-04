@@ -28240,6 +28240,10 @@
             "          (null_rest_of_line",
             "            VARIABLE:'vrf-lite'  <== mode:DEFAULT_MODE",
             "            NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "      (ro_default_metric",
+            "        DEFAULT_METRIC:'default-metric'  <== mode:DEFAULT_MODE",
+            "        DEC:'11'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
             "      (ro_common",
             "        (ro_null",
             "          DISCARD_ROUTE:'discard-route'  <== mode:DEFAULT_MODE",
@@ -51050,7 +51054,7 @@
           "route-map" : {
             "DIRECT_OSPF" : {
               "ospf redistribute connected route-map" : [
-                52
+                53
               ]
             }
           }
