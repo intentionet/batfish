@@ -45,4 +45,19 @@ public class RecoveryGrammarTest {
                 + extractor.getNumSimpleStatements()
                 + extractor.getNumErrorNodes()));
   }
+
+  @Test
+  public void testParsingRecoveryWithModes() {
+    String recoveryText = CommonUtil.readResource("org/batfish/grammar/recovery/recovery_badmode");
+    int totalLines = recoveryText.split("\n", -1).length;
+    GrammarSettings settings = new MockGrammarSettings(false, 0, 0, 0, false, true, true);
+    RecoveryCombinedParser cp = new RecoveryCombinedParser(recoveryText, settings);
+    RecoveryContext ctx = cp.parse();
+    RecoveryExtractor extractor = new RecoveryExtractor();
+    ParseTreeWalker walker = new ParseTreeWalker();
+    walker.walk(extractor, ctx);
+
+    assertThat(extractor.getFirstErrorLine(), equalTo(4));
+    assertThat(extractor.getNumErrorNodes(), equalTo(1));
+  }
 }

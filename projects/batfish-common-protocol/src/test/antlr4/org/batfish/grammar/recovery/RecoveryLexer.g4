@@ -85,3 +85,16 @@ F_Whitespace
 :
    [ \t]
 ;
+
+/* Test ability to recover out of bad lexer modes. */
+ENTER_BAD_MODE
+:
+   'enter-bad-mode' -> pushMode ( M_BadMode)
+;
+
+mode M_BadMode;
+
+M_BadMode_nonexistent
+:
+    'nonexistent'
+;

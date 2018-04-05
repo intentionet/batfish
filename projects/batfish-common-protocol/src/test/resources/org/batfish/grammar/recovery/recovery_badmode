@@ -1,0 +1,6 @@
+# Start of the file -- some valid content
+simple simple simple
+# Now enter the bad mode and immediately have a token that's invalid in this mode
+enter-bad-mode simple
+# Now simple is valid again
+simple
