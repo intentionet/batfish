@@ -2653,6 +2653,68 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return newProcess;
   }
 
+  private void applyOspfRedistributionPolicy(
+      OspfProcess proc,
+      RoutingProtocol protocol,
+      CiscoStructureUsage structureType,
+      List<Statement> allOspfExportStatements) {
+    OspfRedistributionPolicy rcp = proc.getRedistributionPolicies().get(protocol);
+    if (rcp == null) {
+      // There is no redistribution policy for this protocol.
+      return;
+    }
+
+    // All redistribution must match the specified protocol and must not be the entire universe.
+    Conjunction ospfExportConditions = new Conjunction();
+    ospfExportConditions.getConjuncts().add(new MatchProtocol(protocol));
+    ospfExportConditions
+        .getConjuncts()
+        .add(
+            new Not(
+                new MatchPrefixSet(
+                    new DestinationNetwork(),
+                    new ExplicitPrefixSet(
+                        new PrefixSpace(
+                            Collections.singleton(
+                                new PrefixRange(Prefix.ZERO, new SubRange(0, 0))))))));
+
+    ImmutableList.Builder<Statement> ospfExportStatements = ImmutableList.builder();
+
+    // Set the metric type and value.
+    ospfExportStatements.add(new SetOspfMetricType(rcp.getMetricType()));
+    long metric =
+        rcp.getMetric() != null ? rcp.getMetric() : proc.getDefaultMetric(_vendor, protocol);
+    ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
+
+    // If subnetted routes should not be redistributed, verify subnets.
+    if (!rcp.getSubnets()) {
+      // TODO: honor subnets option
+    }
+
+    // If a route-map filter is present, honor it.
+    String exportRouteMapName = rcp.getRouteMap();
+    if (exportRouteMapName != null) {
+      RouteMap exportRouteMap = _routeMaps.get(exportRouteMapName);
+      if (exportRouteMap == null) {
+        undefined(
+            CiscoStructureType.ROUTE_MAP, exportRouteMapName, structureType, rcp.getRouteMapLine());
+      } else {
+        exportRouteMap.getReferers().put(proc, structureType.getDescription());
+        ospfExportConditions.getConjuncts().add(new CallExpr(exportRouteMapName));
+      }
+    }
+
+    ospfExportStatements.add(Statements.ExitAccept.toStaticStatement());
+
+    // Construct the policy and add it before returning.
+    If ospfExportIf = new If();
+    ospfExportIf.setComment("OSPF export routes for " + protocol.protocolName());
+    ospfExportIf.setGuard(ospfExportConditions);
+    ospfExportIf.setTrueStatements(ospfExportStatements.build());
+
+    allOspfExportStatements.add(ospfExportIf);
+  }
+
   private org.batfish.datamodel.OspfProcess toOspfProcess(
       OspfProcess proc, String vrfName, Configuration c, CiscoConfiguration oldConfig) {
     org.batfish.datamodel.OspfProcess newProcess = new org.batfish.datamodel.OspfProcess();
@@ -2834,145 +2896,23 @@ public final class CiscoConfiguration extends VendorConfiguration {
     }
 
     // policy for redistributing connected routes
-    // TODO: honor subnets option
-    OspfRedistributionPolicy rcp = proc.getRedistributionPolicies().get(RoutingProtocol.CONNECTED);
-    if (rcp != null) {
-      If ospfExportConnected = new If();
-      ospfExportConnected.setComment("OSPF export connected routes");
-      Conjunction ospfExportConnectedConditions = new Conjunction();
-      ospfExportConnectedConditions
-          .getConjuncts()
-          .add(new MatchProtocol(RoutingProtocol.CONNECTED));
-      List<Statement> ospfExportConnectedStatements = ospfExportConnected.getTrueStatements();
-
-      Long metric = rcp.getMetric();
-      OspfMetricType metricType = rcp.getMetricType();
-      ospfExportConnectedStatements.add(new SetOspfMetricType(metricType));
-      boolean explicitMetric = metric != null;
-      if (!explicitMetric) {
-        metric = proc.getDefaultMetric(_vendor, RoutingProtocol.CONNECTED);
-      }
-      ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
-      ospfExportStatements.add(ospfExportConnected);
-      // add default export map with metric
-      String exportConnectedRouteMapName = rcp.getRouteMap();
-      if (exportConnectedRouteMapName != null) {
-        int exportConnectedRouteMapLine = rcp.getRouteMapLine();
-        RouteMap exportConnectedRouteMap = _routeMaps.get(exportConnectedRouteMapName);
-        if (exportConnectedRouteMap == null) {
-          undefined(
-              CiscoStructureType.ROUTE_MAP,
-              exportConnectedRouteMapName,
-              CiscoStructureUsage.OSPF_REDISTRIBUTE_CONNECTED_MAP,
-              exportConnectedRouteMapLine);
-        } else {
-          exportConnectedRouteMap.getReferers().put(proc, "ospf redistribute connected route-map");
-          ospfExportConnectedConditions
-              .getConjuncts()
-              .add(new CallExpr(exportConnectedRouteMapName));
-        }
-      }
-      ospfExportConnectedStatements.add(Statements.ExitAccept.toStaticStatement());
-      ospfExportConnected.setGuard(ospfExportConnectedConditions);
-    }
-
-    // policy map for redistributing static routes
-    // TODO: honor subnets option
-    OspfRedistributionPolicy rsp = proc.getRedistributionPolicies().get(RoutingProtocol.STATIC);
-    if (rsp != null) {
-      If ospfExportStatic = new If();
-      ospfExportStatic.setComment("OSPF export static routes");
-      Conjunction ospfExportStaticConditions = new Conjunction();
-      ospfExportStaticConditions.getConjuncts().add(new MatchProtocol(RoutingProtocol.STATIC));
-      List<Statement> ospfExportStaticStatements = ospfExportStatic.getTrueStatements();
-      ospfExportStaticConditions
-          .getConjuncts()
-          .add(
-              new Not(
-                  new MatchPrefixSet(
-                      new DestinationNetwork(),
-                      new ExplicitPrefixSet(
-                          new PrefixSpace(
-                              Collections.singleton(
-                                  new PrefixRange(Prefix.ZERO, new SubRange(0, 0))))))));
-
-      Long metric = rsp.getMetric();
-      OspfMetricType metricType = rsp.getMetricType();
-      ospfExportStaticStatements.add(new SetOspfMetricType(metricType));
-      boolean explicitMetric = metric != null;
-      if (!explicitMetric) {
-        metric = proc.getDefaultMetric(_vendor, RoutingProtocol.STATIC);
-      }
-      ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
-      ospfExportStatements.add(ospfExportStatic);
-      // add export map with metric
-      String exportStaticRouteMapName = rsp.getRouteMap();
-      if (exportStaticRouteMapName != null) {
-        int exportStaticRouteMapLine = rsp.getRouteMapLine();
-        RouteMap exportStaticRouteMap = _routeMaps.get(exportStaticRouteMapName);
-        if (exportStaticRouteMap == null) {
-          undefined(
-              CiscoStructureType.ROUTE_MAP,
-              exportStaticRouteMapName,
-              CiscoStructureUsage.OSPF_REDISTRIBUTE_STATIC_MAP,
-              exportStaticRouteMapLine);
-        } else {
-          exportStaticRouteMap.getReferers().put(proc, "ospf redistribute static route-map");
-          ospfExportStaticConditions.getConjuncts().add(new CallExpr(exportStaticRouteMapName));
-        }
-      }
-      ospfExportStaticStatements.add(Statements.ExitAccept.toStaticStatement());
-      ospfExportStatic.setGuard(ospfExportStaticConditions);
-    }
-
-    // policy map for redistributing bgp routes
-    // TODO: honor subnets option
-    OspfRedistributionPolicy rbp = proc.getRedistributionPolicies().get(RoutingProtocol.BGP);
-    if (rbp != null) {
-      If ospfExportBgp = new If();
-      ospfExportBgp.setComment("OSPF export bgp routes");
-      Conjunction ospfExportBgpConditions = new Conjunction();
-      ospfExportBgpConditions.getConjuncts().add(new MatchProtocol(RoutingProtocol.BGP));
-      List<Statement> ospfExportBgpStatements = ospfExportBgp.getTrueStatements();
-      ospfExportBgpConditions
-          .getConjuncts()
-          .add(
-              new Not(
-                  new MatchPrefixSet(
-                      new DestinationNetwork(),
-                      new ExplicitPrefixSet(
-                          new PrefixSpace(
-                              Collections.singleton(
-                                  new PrefixRange(Prefix.ZERO, new SubRange(0, 0))))))));
-
-      Long metric = rbp.getMetric();
-      OspfMetricType metricType = rbp.getMetricType();
-      ospfExportBgpStatements.add(new SetOspfMetricType(metricType));
-      boolean explicitMetric = metric != null;
-      if (!explicitMetric) {
-        metric = proc.getDefaultMetric(_vendor, RoutingProtocol.BGP);
-      }
-      ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
-      ospfExportStatements.add(ospfExportBgp);
-      // add export map with metric
-      String exportBgpRouteMapName = rbp.getRouteMap();
-      if (exportBgpRouteMapName != null) {
-        int exportBgpRouteMapLine = rbp.getRouteMapLine();
-        RouteMap exportBgpRouteMap = _routeMaps.get(exportBgpRouteMapName);
-        if (exportBgpRouteMap == null) {
-          undefined(
-              CiscoStructureType.ROUTE_MAP,
-              exportBgpRouteMapName,
-              CiscoStructureUsage.OSPF_REDISTRIBUTE_BGP_MAP,
-              exportBgpRouteMapLine);
-        } else {
-          exportBgpRouteMap.getReferers().put(proc, "ospf redistribute bgp route-map");
-          ospfExportBgpConditions.getConjuncts().add(new CallExpr(exportBgpRouteMapName));
-        }
-      }
-      ospfExportBgpStatements.add(Statements.ExitAccept.toStaticStatement());
-      ospfExportBgp.setGuard(ospfExportBgpConditions);
-    }
+    applyOspfRedistributionPolicy(
+        proc,
+        RoutingProtocol.CONNECTED,
+        CiscoStructureUsage.OSPF_REDISTRIBUTE_CONNECTED_MAP,
+        ospfExportStatements);
+    // ... for static routes
+    applyOspfRedistributionPolicy(
+        proc,
+        RoutingProtocol.STATIC,
+        CiscoStructureUsage.OSPF_REDISTRIBUTE_STATIC_MAP,
+        ospfExportStatements);
+    // ... for BGP routes
+    applyOspfRedistributionPolicy(
+        proc,
+        RoutingProtocol.BGP,
+        CiscoStructureUsage.OSPF_REDISTRIBUTE_BGP_MAP,
+        ospfExportStatements);
 
     newProcess.setReferenceBandwidth(proc.getReferenceBandwidth());
     Ip routerId = proc.getRouterId();
