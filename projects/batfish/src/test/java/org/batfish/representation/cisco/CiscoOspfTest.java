@@ -17,6 +17,7 @@ import org.batfish.datamodel.routing_policy.expr.CallExpr;
 import org.batfish.datamodel.routing_policy.expr.Conjunction;
 import org.batfish.datamodel.routing_policy.expr.LiteralLong;
 import org.batfish.datamodel.routing_policy.expr.MatchProtocol;
+import org.batfish.datamodel.routing_policy.expr.RouteIsClassful;
 import org.batfish.datamodel.routing_policy.statement.If;
 import org.batfish.datamodel.routing_policy.statement.SetMetric;
 import org.batfish.datamodel.routing_policy.statement.SetOspfMetricType;
@@ -52,7 +53,12 @@ public class CiscoOspfTest {
     If policy = _config.convertOspfRedistributionPolicy(rp, _proc, OSPF_REDISTRIBUTE_BGP_MAP);
     List<BooleanExpr> guard = ((Conjunction) policy.getGuard()).getConjuncts();
     assertThat(
-        guard, contains(new MatchProtocol(BGP), NOT_DEFAULT_ROUTE, new CallExpr("some-map")));
+        guard,
+        contains(
+            new MatchProtocol(BGP),
+            NOT_DEFAULT_ROUTE,
+            RouteIsClassful.instance(),
+            new CallExpr("some-map")));
     assertThat(
         policy.getTrueStatements(),
         contains(

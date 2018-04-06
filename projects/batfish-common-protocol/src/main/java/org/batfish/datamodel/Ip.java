@@ -173,14 +173,31 @@ public class Ip implements Comparable<Ip>, Serializable, IpSpace {
 
   public Ip getClassMask() {
     long firstOctet = _ip >> 24;
-    if (firstOctet <= 126) {
+    if (firstOctet <= 127) {
       return new Ip(0xFF000000L);
-    } else if (firstOctet >= 128 && firstOctet <= 191) {
+    } else if (firstOctet <= 191) {
       return new Ip(0XFFFF0000L);
-    } else if (firstOctet >= 192 && firstOctet <= 223) {
+    } else if (firstOctet <= 223) {
       return new Ip(0xFFFFFF00L);
     } else {
       throw new BatfishException("Cannot compute classmask");
+    }
+  }
+
+  /**
+   * Returns the size of an IPv4 network in IPv4 Address Class of this {@link Ip}. Returns {@code
+   * -1} if the class does not have a defined subnet size, e.g. the experimental subnet.
+   */
+  public int getClassNetworkSize() {
+    long firstOctet = _ip >> 24;
+    if (firstOctet <= 127) {
+      return 8;
+    } else if (firstOctet <= 191) {
+      return 16;
+    } else if (firstOctet <= 223) {
+      return 24;
+    } else {
+      return -1;
     }
   }
 
