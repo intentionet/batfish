@@ -184,6 +184,19 @@ public class Ip implements Comparable<Ip>, Serializable, IpSpace {
     }
   }
 
+  public int getClassNetworkSize() {
+    long firstOctet = _ip >> 24;
+    if (firstOctet <= 126) {
+      return 8;
+    } else if (firstOctet >= 128 && firstOctet <= 191) {
+      return 16;
+    } else if (firstOctet >= 192 && firstOctet <= 223) {
+      return 24;
+    } else {
+      throw new BatfishException("Cannot compute class network size");
+    }
+  }
+
   public Ip getNetworkAddress(int subnetBits) {
     long mask = numSubnetBitsToSubnetLong(subnetBits);
     return new Ip(_ip & mask);

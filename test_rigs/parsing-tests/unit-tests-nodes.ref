@@ -7546,6 +7546,9 @@
                           ]
                         }
                       }
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.RouteIsClassful"
                     }
                   ]
                 },
@@ -14994,6 +14997,9 @@
                           ]
                         }
                       }
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.RouteIsClassful"
                     }
                   ]
                 },
@@ -15039,6 +15045,9 @@
                           ]
                         }
                       }
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.RouteIsClassful"
                     }
                   ]
                 },
