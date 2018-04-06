@@ -97,6 +97,7 @@ import org.batfish.datamodel.routing_policy.expr.MatchPrefixSet;
 import org.batfish.datamodel.routing_policy.expr.MatchProtocol;
 import org.batfish.datamodel.routing_policy.expr.NamedPrefixSet;
 import org.batfish.datamodel.routing_policy.expr.Not;
+import org.batfish.datamodel.routing_policy.expr.RouteIsClassfull;
 import org.batfish.datamodel.routing_policy.expr.SelfNextHop;
 import org.batfish.datamodel.routing_policy.expr.WithEnvironmentExpr;
 import org.batfish.datamodel.routing_policy.statement.CallStatement;
@@ -2699,9 +2700,9 @@ public final class CiscoConfiguration extends VendorConfiguration {
         rcp.getMetric() != null ? rcp.getMetric() : proc.getDefaultMetric(_vendor, protocol);
     ospfExportStatements.add(new SetMetric(new LiteralLong(metric)));
 
-    // If subnetted routes should not be redistributed, verify subnets.
+    // If subnetted routes should not be redistributed, verify routes are classfull.
     if (!rcp.getSubnets()) {
-      // TODO: honor subnets option
+      ospfExportConditions.getConjuncts().add(RouteIsClassfull.instance());
     }
 
     // If a route-map filter is present, honor it.
