@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class OrMatchExpr extends AclLineMatchExpr {
+public class OrMatchExpr implements AclLineMatchExpr {
   private final Set<AclLineMatchExpr> _disjuncts;
 
   public OrMatchExpr(Iterable<AclLineMatchExpr> disjuncts) {
@@ -19,6 +19,12 @@ public class OrMatchExpr extends AclLineMatchExpr {
 
   @Override
   public boolean exprEquals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(getClass() == o.getClass())) {
+      return false;
+    }
     return Objects.equals(_disjuncts, ((OrMatchExpr) o)._disjuncts);
   }
 

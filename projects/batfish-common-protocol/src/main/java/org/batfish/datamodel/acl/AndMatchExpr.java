@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class AndMatchExpr extends AclLineMatchExpr {
+public class AndMatchExpr implements AclLineMatchExpr {
   private final Set<AclLineMatchExpr> _conjuncts;
 
   public AndMatchExpr(Iterable<AclLineMatchExpr> conjuncts) {
@@ -24,6 +24,12 @@ public class AndMatchExpr extends AclLineMatchExpr {
 
   @Override
   public boolean exprEquals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(getClass() == o.getClass())) {
+      return false;
+    }
     return Objects.equals(_conjuncts, ((AndMatchExpr) o)._conjuncts);
   }
 

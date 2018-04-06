@@ -1,21 +1,13 @@
 package org.batfish.datamodel.acl;
 
-public abstract class AclLineMatchExpr {
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(getClass() == o.getClass())) {
-      return false;
-    }
-    return exprEquals(o);
-  }
+public interface AclLineMatchExpr {
+  boolean equals(Object o);
 
-  public abstract boolean exprEquals(Object o);
+  boolean exprEquals(Object o);
 
-  public abstract int hashCode();
+  int hashCode();
 
-  public abstract String toString();
+  String toString();
 
-  public abstract <R> R accept(GenericAclLineMatchExprVisitor<R> visitor);
+  <R> R accept(GenericAclLineMatchExprVisitor<R> visitor);
 }

@@ -4,7 +4,7 @@ import com.google.common.base.MoreObjects;
 import java.util.Objects;
 import org.batfish.datamodel.HeaderSpace;
 
-public class MatchHeaderspace extends AclLineMatchExpr {
+public class MatchHeaderspace implements AclLineMatchExpr {
   private final HeaderSpace _headerspace;
 
   public MatchHeaderspace(HeaderSpace headerspace) {
@@ -18,6 +18,12 @@ public class MatchHeaderspace extends AclLineMatchExpr {
 
   @Override
   public boolean exprEquals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(getClass() == o.getClass())) {
+      return false;
+    }
     return Objects.equals(_headerspace, ((MatchHeaderspace) o)._headerspace);
   }
 

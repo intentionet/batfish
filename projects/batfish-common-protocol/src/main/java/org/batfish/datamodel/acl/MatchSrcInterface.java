@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class MatchSrcInterface extends AclLineMatchExpr {
+public class MatchSrcInterface implements AclLineMatchExpr {
   private final Set<String> _srcInterfaces;
 
   public MatchSrcInterface(Iterable<String> interfaces) {
@@ -19,6 +19,12 @@ public class MatchSrcInterface extends AclLineMatchExpr {
 
   @Override
   public boolean exprEquals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(getClass() == o.getClass())) {
+      return false;
+    }
     return Objects.equals(_srcInterfaces, ((MatchSrcInterface) o)._srcInterfaces);
   }
 

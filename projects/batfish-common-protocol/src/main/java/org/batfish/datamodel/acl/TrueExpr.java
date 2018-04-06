@@ -3,7 +3,7 @@ package org.batfish.datamodel.acl;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
 
-public class TrueExpr extends AclLineMatchExpr {
+public class TrueExpr implements AclLineMatchExpr {
 
   private TrueExpr() {}
 
@@ -21,6 +21,12 @@ public class TrueExpr extends AclLineMatchExpr {
 
   @Override
   public boolean exprEquals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(getClass() == o.getClass())) {
+      return false;
+    }
     return true;
   }
 

@@ -3,7 +3,7 @@ package org.batfish.datamodel.acl;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
 
-public class PermittedByAcl extends AclLineMatchExpr {
+public class PermittedByAcl implements AclLineMatchExpr {
   private final String _aclName;
 
   public PermittedByAcl(String aclName) {
@@ -17,6 +17,12 @@ public class PermittedByAcl extends AclLineMatchExpr {
 
   @Override
   public boolean exprEquals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(getClass() == o.getClass())) {
+      return false;
+    }
     return _aclName.equals(((PermittedByAcl) o)._aclName);
   }
 
