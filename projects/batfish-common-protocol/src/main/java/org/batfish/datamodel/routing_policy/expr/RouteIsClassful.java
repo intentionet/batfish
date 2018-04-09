@@ -38,7 +38,7 @@ public final class RouteIsClassful extends BooleanExpr {
     int classSize = network.getStartIp().getClassNetworkSize();
 
     Result ret = new Result();
-    ret.setBooleanValue(classSize == -1 || classSize == network.getPrefixLength());
+    ret.setBooleanValue(classSize == network.getPrefixLength());
     return ret;
   }
 
