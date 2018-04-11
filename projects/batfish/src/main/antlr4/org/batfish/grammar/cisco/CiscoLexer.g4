@@ -2352,6 +2352,11 @@ CURRENT_CONFIGURATION
    'Current configuration'
 ;
 
+CUSTOM
+:
+   'custom'
+;
+
 CUSTOMER_ID
 :
    'customer-id'
@@ -3737,9 +3742,34 @@ ESP_AES
    'esp-aes'
 ;
 
+ESP_DES
+:
+   'esp-des'
+;
+
+ESP_GCM
+:
+   'esp-gcm'
+;
+
+ESP_GMAC
+:
+   'esp-gmac'
+;
+
 ESP_MD5_HMAC
 :
    'esp-md5-hmac'
+;
+
+ESP_NULL
+:
+   'esp-null'
+;
+
+ESP_SEAL
+:
+   'esp-seal'
 ;
 
 ESP_SHA_HMAC
@@ -4661,6 +4691,11 @@ HASH_ALGORITHM
    'hash-algorithm'
 ;
 
+HEADER_COMPRESSION
+:
+   'header-compression'
+;
+
 HEADER_PASSING
 :
    'header-passing'
@@ -4959,6 +4994,11 @@ IDS_PROFILE
 IEC
 :
    'iec'
+;
+
+IETF_FORMAT
+:
+   'ietf-format'
 ;
 
 IF
@@ -5301,6 +5341,11 @@ IPC
 IPENACL
 :
    'ipenacl'
+;
+
+IPHC_FORMAT
+:
+   'iphc-format'
 ;
 
 IPINIP
@@ -6943,6 +6988,11 @@ NATPOOL
    'natpool'
 ;
 
+NBAR
+:
+   'nbar'
+;
+
 ND
 :
    'nd'
@@ -7886,6 +7936,11 @@ PERIODIC
 PERIODIC_INVENTORY
 :
    'periodic-inventory'
+;
+
+PERIODIC_REFRESH
+:
+   'periodic-refresh'
 ;
 
 PERMANENT

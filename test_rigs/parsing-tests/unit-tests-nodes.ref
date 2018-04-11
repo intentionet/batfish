@@ -4823,6 +4823,12 @@
             "authenticationAlgorithm" : "HMAC_MD5_96",
             "encryptionAlgorithm" : "THREEDES_CBC",
             "protocol" : "ESP"
+          },
+          "IPSEC_AES_256" : {
+            "name" : "IPSEC_AES_256",
+            "authenticationAlgorithm" : "HMAC_SHA1_96",
+            "encryptionAlgorithm" : "AES_256_CBC",
+            "protocol" : "ESP"
           }
         },
         "roleDimensions" : {

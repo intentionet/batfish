@@ -17327,6 +17327,21 @@
             "  (stanza",
             "    (s_crypto",
             "      CRYPTO:'crypto'  <== mode:DEFAULT_MODE",
+            "      (crypto_ipsec",
+            "        IPSEC:'ipsec'  <== mode:DEFAULT_MODE",
+            "        (cip_transform_set",
+            "          TRANSFORM_SET:'transform-set'  <== mode:DEFAULT_MODE",
+            "          (variable",
+            "            VARIABLE:'IPSEC_AES_256'  <== mode:DEFAULT_MODE)",
+            "          (ipsec_encryption",
+            "            ESP_AES:'esp-aes'  <== mode:DEFAULT_MODE",
+            "            DEC:'256'  <== mode:DEFAULT_MODE)",
+            "          (ipsec_authentication",
+            "            ESP_SHA_HMAC:'esp-sha-hmac'  <== mode:DEFAULT_MODE)",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
+            "  (stanza",
+            "    (s_crypto",
+            "      CRYPTO:'crypto'  <== mode:DEFAULT_MODE",
             "      (crypto_isakmp",
             "        ISAKMP:'isakmp'  <== mode:DEFAULT_MODE",
             "        (cis_null",
@@ -19800,9 +19815,49 @@
             "      ENABLE:'enable'  <== mode:DEFAULT_MODE",
             "      (enable_password",
             "        PASSWORD:'password'  <== mode:DEFAULT_MODE",
-            "        SHA512_PASSWORD:'$sha512$5000$98pqLCa2lpNvN6gnQl3zyQ==$QvdeF/4E4qAATT2/e64ujg=='  <== mode:DEFAULT_MODE",
-            "        PASSWORD_SEED:'woldj4'  <== mode:M_Seed",
+            "        (ep_sha512",
+            "          SHA512_PASSWORD:'$sha512$5000$98pqLCa2lpNvN6gnQl3zyQ==$QvdeF/4E4qAATT2/e64ujg=='  <== mode:DEFAULT_MODE",
+            "          PASSWORD_SEED:'woldj4'  <== mode:M_Seed)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "  (stanza",
+            "    (s_enable",
+            "      ENABLE:'enable'  <== mode:DEFAULT_MODE",
+            "      (enable_password",
+            "        PASSWORD:'password'  <== mode:DEFAULT_MODE",
+            "        LEVEL:'level'  <== mode:DEFAULT_MODE",
+            "        DEC:'2'  <== mode:DEFAULT_MODE",
+            "        (ep_plaintext",
+            "          (variable",
+            "            VARIABLE:'pswd2'  <== mode:DEFAULT_MODE))",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "  (stanza",
+            "    (s_enable",
+            "      ENABLE:'enable'  <== mode:DEFAULT_MODE",
+            "      (enable_password",
+            "        PASSWORD:'password'  <== mode:DEFAULT_MODE",
+            "        LEVEL:'level'  <== mode:DEFAULT_MODE",
+            "        DEC:'3'  <== mode:DEFAULT_MODE",
+            "        (ep_cisco_encryption",
+            "          DEC:'5'  <== mode:DEFAULT_MODE",
+            "          (variable_secret",
+            "            DOLLAR:'$'  <== mode:DEFAULT_MODE",
+            "            DEC:'1'  <== mode:DEFAULT_MODE",
+            "            RP_VARIABLE:'$i5Rkls3LoyxzS8t9'  <== mode:DEFAULT_MODE))",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "  (stanza",
+            "    (s_no_enable",
+            "      NO:'no'  <== mode:DEFAULT_MODE",
+            "      ENABLE:'enable'  <== mode:DEFAULT_MODE",
+            "      PASSWORD:'password'  <== mode:DEFAULT_MODE",
+            "      LEVEL:'level'  <== mode:DEFAULT_MODE",
+            "      DEC:'4'  <== mode:DEFAULT_MODE",
+            "      NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
+            "  (stanza",
+            "    (s_no_enable",
+            "      NO:'no'  <== mode:DEFAULT_MODE",
+            "      ENABLE:'enable'  <== mode:DEFAULT_MODE",
+            "      PASSWORD:'password'  <== mode:DEFAULT_MODE",
+            "      NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "  EOF:<EOF>  <== mode:DEFAULT_MODE)"
           ]
         },
@@ -21021,6 +21076,13 @@
             "        AREA:'area'  <== mode:DEFAULT_MODE",
             "        IP_ADDRESS:'0.1.2.3'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "      (if_ip_rtp",
+            "        IP:'ip'  <== mode:DEFAULT_MODE",
+            "        RTP:'rtp'  <== mode:DEFAULT_MODE",
+            "        HEADER_COMPRESSION:'header-compression'  <== mode:DEFAULT_MODE",
+            "        IPHC_FORMAT:'iphc-format'  <== mode:DEFAULT_MODE",
+            "        PERIODIC_REFRESH:'periodic-refresh'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
             "      (if_null_block",
             "        IP:'ip'  <== mode:DEFAULT_MODE",
             "        SAP:'sap'  <== mode:DEFAULT_MODE",
@@ -22177,21 +22239,18 @@
             "          VARIABLE:'small'  <== mode:DEFAULT_MODE",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
             "  (stanza",
-            "    (s_ip_wccp",
+            "    (s_ip_nbar",
             "      IP:'ip'  <== mode:DEFAULT_MODE",
-            "      WCCP:'wccp'  <== mode:DEFAULT_MODE",
-            "      (wccp_id",
-            "        DEC:'1'  <== mode:DEFAULT_MODE",
-            "        REDIRECT_LIST:'redirect-list'  <== mode:DEFAULT_MODE",
-            "        (variable",
-            "          VARIABLE:'wccp-redir'  <== mode:DEFAULT_MODE)",
-            "        GROUP_LIST:'group-list'  <== mode:DEFAULT_MODE",
-            "        (variable",
-            "          VARIABLE:'wccp-cachelist'  <== mode:DEFAULT_MODE)",
-            "        PASSWORD:'password'  <== mode:DEFAULT_MODE",
-            "        DEC:'7'  <== mode:DEFAULT_MODE",
-            "        (variable",
-            "          VARIABLE:'0123456789ABCD'  <== mode:DEFAULT_MODE)",
+            "      NBAR:'nbar'  <== mode:DEFAULT_MODE",
+            "      CUSTOM:'custom'  <== mode:DEFAULT_MODE",
+            "      (null_rest_of_line",
+            "        VARIABLE:'app_sales1'  <== mode:DEFAULT_MODE",
+            "        DEC:'5'  <== mode:DEFAULT_MODE",
+            "        VARIABLE:'ascii'  <== mode:DEFAULT_MODE",
+            "        VARIABLE:'SALES'  <== mode:DEFAULT_MODE",
+            "        SOURCE:'source'  <== mode:DEFAULT_MODE",
+            "        TCP:'tcp'  <== mode:DEFAULT_MODE",
+            "        DEC:'4567'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  (stanza",
             "    (s_ip_ssh",
@@ -22227,6 +22286,23 @@
             "      (ip_ssh_version",
             "        VERSION:'version'  <== mode:DEFAULT_MODE",
             "        DEC:'2'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "  (stanza",
+            "    (s_ip_wccp",
+            "      IP:'ip'  <== mode:DEFAULT_MODE",
+            "      WCCP:'wccp'  <== mode:DEFAULT_MODE",
+            "      (wccp_id",
+            "        DEC:'1'  <== mode:DEFAULT_MODE",
+            "        REDIRECT_LIST:'redirect-list'  <== mode:DEFAULT_MODE",
+            "        (variable",
+            "          VARIABLE:'wccp-redir'  <== mode:DEFAULT_MODE)",
+            "        GROUP_LIST:'group-list'  <== mode:DEFAULT_MODE",
+            "        (variable",
+            "          VARIABLE:'wccp-cachelist'  <== mode:DEFAULT_MODE)",
+            "        PASSWORD:'password'  <== mode:DEFAULT_MODE",
+            "        DEC:'7'  <== mode:DEFAULT_MODE",
+            "        (variable",
+            "          VARIABLE:'0123456789ABCD'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  EOF:<EOF>  <== mode:DEFAULT_MODE)"
           ]
@@ -50945,14 +51021,14 @@
           "crypto keyring" : {
             "VRF:MMS:RMT:UPM:1143" : {
               "isakmp profile keyring" : [
-                162
+                163
               ]
             }
           },
           "ipv4/6 acl" : {
             "myvpnacl" : {
               "crypto map ipsec-isakmp acl" : [
-                198
+                199
               ]
             }
           }
@@ -50961,7 +51037,7 @@
           "ipv4 acl" : {
             "167" : {
               "interface ip verify access-list" : [
-                117
+                118
               ]
             },
             "mynatacl" : {
@@ -50978,7 +51054,7 @@
             },
             "310-systems" : {
               "interface outgoing ip access-list" : [
-                120
+                121
               ]
             },
             "ag1" : {
@@ -51004,12 +51080,12 @@
           "ipv4/6 acl" : {
             "wccp-cachelist" : {
               "ip wccp group-list" : [
-                6
+                11
               ]
             },
             "wccp-redir" : {
               "ip wccp redirect-list" : [
-                6
+                11
               ]
             }
           }
@@ -51760,11 +51836,14 @@
           "crypto ipsec transform-set" : {
             "ESP-3DES-MD5" : [
               145
+            ],
+            "IPSEC_AES_256" : [
+              148
             ]
           },
           "crypto keyring" : {
             "VRF:ABC:DEF:GHI:1234" : [
-              184
+              185
             ]
           }
         },

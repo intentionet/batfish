@@ -8,5 +8,9 @@ enable super-user-password aaaaaaaaaaaaaaaaaaaaa
 enable telnet authentication
 enable telnet password aaaaaaaaaaaaaaaaaaaaaaaaa
 enable password $sha512$5000$98pqLCa2lpNvN6gnQl3zyQ==$QvdeF/4E4qAATT2/e64ujg== woldj4
+enable password level 2 pswd2
+enable password level 3 5 $1$i5Rkls3LoyxzS8t9
+no enable password level 4
+no enable password
 !
 

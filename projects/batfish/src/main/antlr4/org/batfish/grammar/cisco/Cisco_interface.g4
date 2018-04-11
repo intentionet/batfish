@@ -259,6 +259,11 @@ if_ip_router_ospf_area
    IP ROUTER OSPF procnum = DEC AREA area = IP_ADDRESS NEWLINE
 ;
 
+if_ip_rtp
+:
+   IP RTP HEADER_COMPRESSION (PASSIVE | IPHC_FORMAT | IETF_FORMAT) PERIODIC_REFRESH? NEWLINE
+;
+
 if_ip_sticky_arp
 :
    (NO? IP STICKY_ARP NEWLINE)
@@ -1154,6 +1159,7 @@ s_interface
       | if_ip_policy
       | if_ip_router_isis
       | if_ip_router_ospf_area
+      | if_ip_rtp
       | if_ip_sticky_arp
       | if_ip_virtual_router
       | if_ip_vrf_forwarding

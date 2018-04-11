@@ -724,8 +724,13 @@ ipsec_authentication
 ipsec_encryption
 :
    (
-      ESP_AES
+      ESP_AES (strength = DEC)?
+      | ESP_DES
       | ESP_3DES
+      | ESP_GCM
+      | ESP_GMAC
+      | ESP_NULL
+      | ESP_SEAL
    )
 ;
 

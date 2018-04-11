@@ -145,6 +145,7 @@ crypto ipsec security-association pmtu-aging infinite
 crypto ipsec transform-set ESP-3DES-MD5 esp-3des esp-md5-hmac
  mode transport
  mode tunnel
+crypto ipsec transform-set IPSEC_AES_256 esp-aes 256 esp-sha-hmac
 crypto isakmp identity address
 crypto isakmp invalid-spi-recovery
 crypto isakmp keepalive 10 3 periodic

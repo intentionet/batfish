@@ -108,6 +108,7 @@ interface Ethernet0
  no ip route-cache
  ip router isis
  ip router ospf 1 area 0.1.2.3
+ ip rtp header-compression iphc-format periodic-refresh
  ip sap listen
  ip sticky-arp
  no ip sticky-arp
