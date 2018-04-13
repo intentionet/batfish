@@ -33,7 +33,7 @@ aa_common
 
 aa_term
 :
-   TERM name = variable aa_common
+   TERM name = variable aa_common+
 ;
 
 aat_alg

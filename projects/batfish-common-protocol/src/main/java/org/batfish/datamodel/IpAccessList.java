@@ -140,11 +140,13 @@ public class IpAccessList extends ComparableStructure<String> {
 
   @Override
   public String toString() {
-    String output = super.toString() + "\n" + "Identifier: " + _key;
+    StringBuilder output =
+        new StringBuilder().append(getClass().getSimpleName()).append(":").append(_key);
     for (IpAccessListLine line : _lines) {
-      output += "\n" + line;
+      output.append("\n");
+      output.append(line);
     }
-    return output;
+    return output.toString();
   }
 
   public boolean unorderedEqual(Object obj) {

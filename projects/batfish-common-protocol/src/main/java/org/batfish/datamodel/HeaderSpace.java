@@ -1,6 +1,10 @@
 package org.batfish.datamodel;
 
+import static org.batfish.common.util.CommonUtil.nullIfEmpty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import java.io.Serializable;
@@ -443,6 +447,70 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
           .thenComparing(HeaderSpace::getStates, CommonUtil::compareIterable)
           .thenComparing(HeaderSpace::getTcpFlags, CommonUtil::compareIterable);
 
+  private static final String PROP_DSCPS = "dscps";
+
+  private static final String PROP_DST_IPS = "dstIps";
+
+  private static final String PROP_DST_PORTS = "dstPorts";
+
+  private static final String PROP_DST_PROTOCOLS = "dstProtocols";
+
+  private static final String PROP_ECNS = "ecns";
+
+  private static final String PROP_FRAGMENT_OFFSETS = "fragmentOffsets";
+
+  private static final String PROP_ICMP_CODES = "icmpCodes";
+
+  private static final String PROP_ICMP_TYPES = "icmpTypes";
+
+  private static final String PROP_IP_PROTOCOLS = "ipProtocols";
+
+  private static final String PROP_NEGATE = "negate";
+
+  private static final String PROP_NOT_DSCPS = "notDscps";
+
+  private static final String PROP_NOT_DST_IPS = "notDstIps";
+
+  private static final String PROP_NOT_DST_PORTS = "notDstPorts";
+
+  private static final String PROP_NOT_DST_PROTOCOLS = "notDstProtocols";
+
+  private static final String PROP_NOT_ECNS = "notEcns";
+
+  private static final String PROP_NOT_FRAGMENT_OFFSETS = "notFragmentOffsets";
+
+  private static final String PROP_NOT_ICMP_CODES = "notIcmpCodes";
+
+  private static final String PROP_NOT_ICMP_TYPES = "notIcmpTypes";
+
+  private static final String PROP_NOT_IP_PROTOCOLS = "notIpProtocols";
+
+  private static final String PROP_NOT_PACKET_LENGTHS = "notPacketLengths";
+
+  private static final String PROP_NOT_SRC_IPS = "notSrcIps";
+
+  private static final String PROP_NOT_SRC_PORTS = "notSrcPorts";
+
+  private static final String PROP_NOT_SRC_PROTOCOLS = "notSrcProtocols";
+
+  private static final String PROP_PACKET_LENGTHS = "packetLengths";
+
+  private static final String PROP_SRC_IPS = "srcIps";
+
+  private static final String PROP_SRC_OR_DST_IPS = "srcOrDstIps";
+
+  private static final String PROP_SRC_OR_DST_PORTS = "srcOrDstPorts";
+
+  private static final String PROP_SRC_OR_DST_PROTOCOLS = "srcOrDstProtocols";
+
+  private static final String PROP_SRC_PORTS = "srcPorts";
+
+  private static final String PROP_SRC_PROTOCOLS = "srcProtocols";
+
+  private static final String PROP_STATES = "states";
+
+  private static final String PROP_TCP_FLAGS = "tcpFlags";
+
   /** */
   private static final long serialVersionUID = 1L;
 
@@ -649,123 +717,148 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
   }
 
   @JsonPropertyDescription("A set of acceptable DSCP values for a packet")
+  @JsonProperty(PROP_DSCPS)
   public SortedSet<Integer> getDscps() {
     return _dscps;
   }
 
   /** The empty set of dstIps is interpreted as no constraint, or all IPs */
   @JsonPropertyDescription("A space of acceptable destination IP addresses for a packet")
+  @JsonProperty(PROP_DST_IPS)
   public SortedSet<IpWildcard> getDstIps() {
     return _dstIps;
   }
 
   @JsonPropertyDescription("A set of acceptable destination port ranges for a TCP/UDP packet")
+  @JsonProperty(PROP_DST_PORTS)
   public SortedSet<SubRange> getDstPorts() {
     return _dstPorts;
   }
 
+  @JsonProperty(PROP_DST_PROTOCOLS)
   public SortedSet<Protocol> getDstProtocols() {
     return _dstProtocols;
   }
 
   @JsonPropertyDescription("A set of acceptable ECN values for a packet")
+  @JsonProperty(PROP_ECNS)
   public SortedSet<Integer> getEcns() {
     return _ecns;
   }
 
   @JsonPropertyDescription("A set of acceptable fragment offsets for a UDP packet")
+  @JsonProperty(PROP_FRAGMENT_OFFSETS)
   public SortedSet<SubRange> getFragmentOffsets() {
     return _fragmentOffsets;
   }
 
   @JsonPropertyDescription("A set of acceptable ICMP code ranges for an ICMP packet")
+  @JsonProperty(PROP_ICMP_CODES)
   public SortedSet<SubRange> getIcmpCodes() {
     return _icmpCodes;
   }
 
   @JsonPropertyDescription("A set of acceptable ICMP type ranges for an ICMP packet")
+  @JsonProperty(PROP_ICMP_TYPES)
   public SortedSet<SubRange> getIcmpTypes() {
     return _icmpTypes;
   }
 
   @JsonPropertyDescription("A set of acceptable IP protocols for a packet")
+  @JsonProperty(PROP_IP_PROTOCOLS)
   public SortedSet<IpProtocol> getIpProtocols() {
     return _ipProtocols;
   }
 
   @JsonPropertyDescription(
       "Determines whether to match the complement of the stated criteria of this header space")
+  @JsonProperty(PROP_NEGATE)
   public boolean getNegate() {
     return _negate;
   }
 
   @JsonPropertyDescription("A set of unacceptable DSCP values for a packet")
+  @JsonProperty(PROP_NOT_DSCPS)
   public SortedSet<Integer> getNotDscps() {
     return _notDscps;
   }
 
   @JsonPropertyDescription("A space of unacceptable destination IP addresses for a packet")
+  @JsonProperty(PROP_NOT_DST_IPS)
   public SortedSet<IpWildcard> getNotDstIps() {
     return _notDstIps;
   }
 
   @JsonPropertyDescription("A set of unacceptable destination port ranges for a TCP/UDP packet")
+  @JsonProperty(PROP_NOT_DST_PORTS)
   public SortedSet<SubRange> getNotDstPorts() {
     return _notDstPorts;
   }
 
+  @JsonProperty(PROP_NOT_DST_PROTOCOLS)
   public SortedSet<Protocol> getNotDstProtocols() {
     return _notDstProtocols;
   }
 
   @JsonPropertyDescription("A set of unacceptable ECN values for a packet")
+  @JsonProperty(PROP_NOT_ECNS)
   public SortedSet<Integer> getNotEcns() {
     return _notEcns;
   }
 
   @JsonPropertyDescription("A set of unacceptable fragment offsets for a UDP packet")
+  @JsonProperty(PROP_NOT_FRAGMENT_OFFSETS)
   public SortedSet<SubRange> getNotFragmentOffsets() {
     return _notFragmentOffsets;
   }
 
   @JsonPropertyDescription("A set of unacceptable ICMP code ranges for an ICMP packet")
+  @JsonProperty(PROP_NOT_ICMP_CODES)
   public SortedSet<SubRange> getNotIcmpCodes() {
     return _notIcmpCodes;
   }
 
   @JsonPropertyDescription("A set of unacceptable ICMP type ranges for an ICMP packet")
+  @JsonProperty(PROP_NOT_ICMP_TYPES)
   public SortedSet<SubRange> getNotIcmpTypes() {
     return _notIcmpTypes;
   }
 
   @JsonPropertyDescription("A set of unacceptable IP protocols for a packet")
+  @JsonProperty(PROP_NOT_IP_PROTOCOLS)
   public SortedSet<IpProtocol> getNotIpProtocols() {
     return _notIpProtocols;
   }
 
+  @JsonProperty(PROP_NOT_PACKET_LENGTHS)
   public SortedSet<SubRange> getNotPacketLengths() {
     return _notPacketLengths;
   }
 
   @JsonPropertyDescription("A space of unacceptable source IP addresses for a packet")
+  @JsonProperty(PROP_NOT_SRC_IPS)
   public SortedSet<IpWildcard> getNotSrcIps() {
     return _notSrcIps;
   }
 
   @JsonPropertyDescription("A set of unacceptable source port ranges for a TCP/UDP packet")
+  @JsonProperty(PROP_NOT_SRC_PORTS)
   public SortedSet<SubRange> getNotSrcPorts() {
     return _notSrcPorts;
   }
 
+  @JsonProperty(PROP_NOT_SRC_PROTOCOLS)
   public SortedSet<Protocol> getNotSrcProtocols() {
     return _notSrcProtocols;
   }
 
+  @JsonProperty(PROP_PACKET_LENGTHS)
   public SortedSet<SubRange> getPacketLengths() {
     return _packetLengths;
   }
 
   @JsonPropertyDescription("A space of acceptable source IP addresses for a packet")
+  @JsonProperty(PROP_SRC_IPS)
   public SortedSet<IpWildcard> getSrcIps() {
     return _srcIps;
   }
@@ -773,6 +866,7 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
   @JsonPropertyDescription(
       "A space of IP addresses within which either the source or the destination IP of a packet"
           + " must fall for acceptance")
+  @JsonProperty(PROP_SRC_OR_DST_IPS)
   public SortedSet<IpWildcard> getSrcOrDstIps() {
     return _srcOrDstIps;
   }
@@ -780,29 +874,35 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
   @JsonPropertyDescription(
       "A set of ranges within which either the source or the destination port of a TCP/UDP packet"
           + " must fall for acceptance")
+  @JsonProperty(PROP_SRC_OR_DST_PORTS)
   public SortedSet<SubRange> getSrcOrDstPorts() {
     return _srcOrDstPorts;
   }
 
+  @JsonProperty(PROP_SRC_OR_DST_PROTOCOLS)
   public SortedSet<Protocol> getSrcOrDstProtocols() {
     return _srcOrDstProtocols;
   }
 
   @JsonPropertyDescription("A set of acceptable source port ranges for a TCP/UDP packet")
+  @JsonProperty(PROP_SRC_PORTS)
   public SortedSet<SubRange> getSrcPorts() {
     return _srcPorts;
   }
 
+  @JsonProperty(PROP_SRC_PROTOCOLS)
   public SortedSet<Protocol> getSrcProtocols() {
     return _srcProtocols;
   }
 
   @JsonPropertyDescription("A set of acceptable abstract firewall states for a packet to match")
+  @JsonProperty(PROP_STATES)
   public SortedSet<State> getStates() {
     return _states;
   }
 
   @JsonPropertyDescription("A set of acceptable TCP flag bitmasks for a TCP packet to match")
+  @JsonProperty(PROP_TCP_FLAGS)
   public List<TcpFlags> getTcpFlags() {
     return _tcpFlags;
   }
@@ -1045,197 +1145,203 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
         .setTcpFlags(_tcpFlags);
   }
 
+  @JsonProperty(PROP_DSCPS)
   public void setDscps(Iterable<Integer> dscps) {
     _dscps = ImmutableSortedSet.copyOf(dscps);
   }
 
+  @JsonProperty(PROP_DST_IPS)
   public void setDstIps(Iterable<IpWildcard> dstIps) {
     _dstIps = ImmutableSortedSet.copyOf(dstIps);
   }
 
+  @JsonProperty(PROP_DST_PORTS)
   public void setDstPorts(Iterable<SubRange> dstPorts) {
     _dstPorts = ImmutableSortedSet.copyOf(dstPorts);
   }
 
+  @JsonProperty(PROP_DST_PROTOCOLS)
   public void setDstProtocols(Iterable<Protocol> dstProtocols) {
     _dstProtocols = ImmutableSortedSet.copyOf(dstProtocols);
   }
 
+  @JsonProperty(PROP_ECNS)
   public void setEcns(Iterable<Integer> ecns) {
     _ecns = ImmutableSortedSet.copyOf(ecns);
   }
 
+  @JsonProperty(PROP_FRAGMENT_OFFSETS)
   public void setFragmentOffsets(Iterable<SubRange> fragmentOffsets) {
     _fragmentOffsets = ImmutableSortedSet.copyOf(fragmentOffsets);
   }
 
+  @JsonProperty(PROP_ICMP_CODES)
   public void setIcmpCodes(Iterable<SubRange> icmpCodes) {
     _icmpCodes = ImmutableSortedSet.copyOf(icmpCodes);
   }
 
+  @JsonProperty(PROP_ICMP_TYPES)
   public void setIcmpTypes(Iterable<SubRange> icmpTypes) {
     _icmpTypes = ImmutableSortedSet.copyOf(icmpTypes);
   }
 
+  @JsonProperty(PROP_IP_PROTOCOLS)
   public void setIpProtocols(Iterable<IpProtocol> ipProtocols) {
     _ipProtocols = ImmutableSortedSet.copyOf(ipProtocols);
   }
 
+  @JsonProperty(PROP_NEGATE)
   public void setNegate(boolean negate) {
     _negate = negate;
   }
 
+  @JsonProperty(PROP_NOT_DSCPS)
   public void setNotDscps(Iterable<Integer> notDscps) {
     _notDscps = ImmutableSortedSet.copyOf(notDscps);
   }
 
+  @JsonProperty(PROP_NOT_DST_IPS)
   public void setNotDstIps(Iterable<IpWildcard> notDstIps) {
     _notDstIps = ImmutableSortedSet.copyOf(notDstIps);
   }
 
+  @JsonProperty(PROP_NOT_DST_PORTS)
   public void setNotDstPorts(Iterable<SubRange> notDstPorts) {
     _notDstPorts = ImmutableSortedSet.copyOf(notDstPorts);
   }
 
+  @JsonProperty(PROP_NOT_DST_PROTOCOLS)
   public void setNotDstProtocols(Iterable<Protocol> notDstProtocols) {
     _notDstProtocols = ImmutableSortedSet.copyOf(notDstProtocols);
   }
 
+  @JsonProperty(PROP_NOT_ECNS)
   public void setNotEcns(Iterable<Integer> notEcns) {
     _notEcns = ImmutableSortedSet.copyOf(notEcns);
   }
 
+  @JsonProperty(PROP_NOT_FRAGMENT_OFFSETS)
   public void setNotFragmentOffsets(Iterable<SubRange> notFragmentOffsets) {
     _notFragmentOffsets = ImmutableSortedSet.copyOf(notFragmentOffsets);
   }
 
+  @JsonProperty(PROP_NOT_ICMP_CODES)
   public void setNotIcmpCodes(Iterable<SubRange> notIcmpCodes) {
     _notIcmpCodes = ImmutableSortedSet.copyOf(notIcmpCodes);
   }
 
+  @JsonProperty(PROP_NOT_ICMP_TYPES)
   public void setNotIcmpTypes(Iterable<SubRange> notIcmpTypes) {
     _notIcmpTypes = ImmutableSortedSet.copyOf(notIcmpTypes);
   }
 
+  @JsonProperty(PROP_NOT_IP_PROTOCOLS)
   public void setNotIpProtocols(Iterable<IpProtocol> notIpProtocols) {
     _notIpProtocols = ImmutableSortedSet.copyOf(notIpProtocols);
   }
 
+  @JsonProperty(PROP_NOT_PACKET_LENGTHS)
   public void setNotPacketLengths(Iterable<SubRange> notPacketLengths) {
     _notPacketLengths = ImmutableSortedSet.copyOf(notPacketLengths);
   }
 
+  @JsonProperty(PROP_NOT_SRC_IPS)
   public void setNotSrcIps(Iterable<IpWildcard> notSrcIps) {
     _notSrcIps = ImmutableSortedSet.copyOf(notSrcIps);
   }
 
+  @JsonProperty(PROP_NOT_SRC_PORTS)
   public void setNotSrcPorts(Iterable<SubRange> notSrcPorts) {
     _notSrcPorts = ImmutableSortedSet.copyOf(notSrcPorts);
   }
 
+  @JsonProperty(PROP_NOT_SRC_PROTOCOLS)
   public void setNotSrcProtocols(Iterable<Protocol> notSrcProtocols) {
     _notSrcProtocols = ImmutableSortedSet.copyOf(notSrcProtocols);
   }
 
+  @JsonProperty(PROP_PACKET_LENGTHS)
   public void setPacketLengths(Iterable<SubRange> packetLengths) {
     _packetLengths = ImmutableSortedSet.copyOf(packetLengths);
   }
 
+  @JsonProperty(PROP_SRC_IPS)
   public void setSrcIps(Iterable<IpWildcard> srcIps) {
     _srcIps = ImmutableSortedSet.copyOf(srcIps);
   }
 
+  @JsonProperty(PROP_SRC_OR_DST_IPS)
   public void setSrcOrDstIps(Iterable<IpWildcard> srcOrDstIps) {
     _srcOrDstIps = ImmutableSortedSet.copyOf(srcOrDstIps);
   }
 
+  @JsonProperty(PROP_SRC_OR_DST_PORTS)
   public void setSrcOrDstPorts(Iterable<SubRange> srcOrDstPorts) {
     _srcOrDstPorts = ImmutableSortedSet.copyOf(srcOrDstPorts);
   }
 
+  @JsonProperty(PROP_SRC_OR_DST_PROTOCOLS)
   public void setSrcOrDstProtocols(Iterable<Protocol> srcOrDstProtocols) {
     _srcOrDstProtocols = ImmutableSortedSet.copyOf(srcOrDstProtocols);
   }
 
+  @JsonProperty(PROP_SRC_PORTS)
   public void setSrcPorts(Iterable<SubRange> srcPorts) {
     _srcPorts = ImmutableSortedSet.copyOf(srcPorts);
   }
 
+  @JsonProperty(PROP_SRC_PROTOCOLS)
   public void setSrcProtocols(Iterable<Protocol> srcProtocols) {
     _srcProtocols = ImmutableSortedSet.copyOf(srcProtocols);
   }
 
+  @JsonProperty(PROP_STATES)
   public void setStates(Iterable<State> states) {
     _states = ImmutableSortedSet.copyOf(states);
   }
 
+  @JsonProperty(PROP_TCP_FLAGS)
   public void setTcpFlags(Iterable<TcpFlags> tcpFlags) {
     _tcpFlags = ImmutableList.copyOf(tcpFlags);
   }
 
   @Override
   public String toString() {
-    return "[Protocols:"
-        + _ipProtocols
-        + ", SrcIps:"
-        + _srcIps
-        + ", NotSrcIps:"
-        + _notSrcIps
-        + ", DstIps:"
-        + _dstIps
-        + ", NotDstIps:"
-        + _notDstIps
-        + ", SrcOrDstIps:"
-        + _srcOrDstIps
-        + ", SrcPorts:"
-        + _srcPorts
-        + ", NotSrcPorts:"
-        + _notSrcPorts
-        + ", DstPorts:"
-        + _dstPorts
-        + ", NotDstPorts:"
-        + _notDstPorts
-        + ", SrcOrDstPorts:"
-        + _srcOrDstPorts
-        + ", SrcProtocols:"
-        + _srcProtocols
-        + ", NotSrcProtocols:"
-        + _notSrcProtocols
-        + ", DstProtocols:"
-        + _dstProtocols
-        + ", NotDstProtocols:"
-        + _notDstProtocols
-        + ", SrcOrDstProtocols:"
-        + _srcOrDstProtocols
-        + ", Dscps: "
-        + _dscps
-        + ", NotDscps: "
-        + _notDscps
-        + ", Ecns: "
-        + _ecns
-        + ", NotEcns: "
-        + _notEcns
-        + ", FragmentOffsets: "
-        + _fragmentOffsets
-        + ", NotFragmentOffsets: "
-        + _notFragmentOffsets
-        + ", IcmpType:"
-        + _icmpTypes
-        + ", NotIcmpType:"
-        + _notIcmpTypes
-        + ", IcmpCode:"
-        + _icmpCodes
-        + ", NotIcmpCode:"
-        + _notIcmpCodes
-        + ", PacketLengths:"
-        + _packetLengths
-        + ", NotPacketLengths:"
-        + _notPacketLengths
-        + ", States:"
-        + _states
-        + ", TcpFlags:"
-        + _tcpFlags
-        + "]";
+    return MoreObjects.toStringHelper(getClass())
+        .omitNullValues()
+        .add(PROP_DSCPS, nullIfEmpty(_dscps))
+        .add(PROP_DST_IPS, nullIfEmpty(_dstIps))
+        .add(PROP_DST_PORTS, nullIfEmpty(_dstPorts))
+        .add(PROP_DST_PROTOCOLS, nullIfEmpty(_dstProtocols))
+        .add(PROP_ECNS, nullIfEmpty(_ecns))
+        .add(PROP_FRAGMENT_OFFSETS, nullIfEmpty(_fragmentOffsets))
+        .add(PROP_ICMP_CODES, nullIfEmpty(_icmpCodes))
+        .add(PROP_ICMP_TYPES, nullIfEmpty(_icmpTypes))
+        .add(PROP_IP_PROTOCOLS, nullIfEmpty(_ipProtocols))
+        .add(PROP_NEGATE, _negate ? _negate : null)
+        .add(PROP_NOT_DSCPS, nullIfEmpty(_notDscps))
+        .add(PROP_NOT_DST_IPS, nullIfEmpty(_notDstIps))
+        .add(PROP_NOT_DST_PORTS, nullIfEmpty(_notDstPorts))
+        .add(PROP_NOT_DST_PROTOCOLS, nullIfEmpty(_notDstProtocols))
+        .add(PROP_NOT_ECNS, nullIfEmpty(_notEcns))
+        .add(PROP_NOT_FRAGMENT_OFFSETS, nullIfEmpty(_notFragmentOffsets))
+        .add(PROP_NOT_ICMP_CODES, nullIfEmpty(_notIcmpCodes))
+        .add(PROP_NOT_ICMP_TYPES, nullIfEmpty(_notIcmpTypes))
+        .add(PROP_NOT_IP_PROTOCOLS, nullIfEmpty(_notIpProtocols))
+        .add(PROP_NOT_PACKET_LENGTHS, nullIfEmpty(_notPacketLengths))
+        .add(PROP_NOT_SRC_IPS, nullIfEmpty(_notSrcIps))
+        .add(PROP_NOT_SRC_PORTS, nullIfEmpty(_notSrcPorts))
+        .add(PROP_NOT_SRC_PROTOCOLS, nullIfEmpty(_notSrcProtocols))
+        .add(PROP_PACKET_LENGTHS, nullIfEmpty(_packetLengths))
+        .add(PROP_SRC_IPS, nullIfEmpty(_srcIps))
+        .add(PROP_SRC_OR_DST_IPS, nullIfEmpty(_srcOrDstIps))
+        .add(PROP_SRC_OR_DST_PORTS, nullIfEmpty(_srcOrDstPorts))
+        .add(PROP_SRC_OR_DST_PROTOCOLS, nullIfEmpty(_srcOrDstProtocols))
+        .add(PROP_SRC_PORTS, nullIfEmpty(_srcPorts))
+        .add(PROP_SRC_PROTOCOLS, nullIfEmpty(_srcProtocols))
+        .add(PROP_STATES, nullIfEmpty(_states))
+        .add(PROP_TCP_FLAGS, nullIfEmpty(_tcpFlags))
+        .toString();
   }
 
   public final boolean unrestricted() {

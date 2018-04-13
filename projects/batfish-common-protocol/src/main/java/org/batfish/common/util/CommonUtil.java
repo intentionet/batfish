@@ -110,6 +110,14 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 public class CommonUtil {
 
+  public static <M extends Map<?, ?>> M nullIfEmpty(M map) {
+    return map == null ? null : map.isEmpty() ? null : map;
+  }
+
+  public static <C extends Collection<?>> C nullIfEmpty(C collection) {
+    return collection == null ? null : collection.isEmpty() ? null : collection;
+  }
+
   private static class TrustAllHostNameVerifier implements HostnameVerifier {
     @Override
     public boolean verify(String hostname, SSLSession session) {

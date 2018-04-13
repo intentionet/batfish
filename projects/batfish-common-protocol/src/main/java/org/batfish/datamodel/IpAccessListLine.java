@@ -142,6 +142,7 @@ public final class IpAccessListLine implements Serializable {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(getClass())
+        .omitNullValues()
         .add(PROP_ACTION, _action)
         .add(PROP_MATCH_CONDITION, _matchCondition)
         .add(PROP_NAME, _name)

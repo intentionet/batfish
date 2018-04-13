@@ -5,6 +5,7 @@ import static org.batfish.datamodel.matchers.BgpNeighborMatchers.hasLocalAs;
 import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasNeighbor;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasDefaultVrf;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterface;
+import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpAccessLists;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrf;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasMtu;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasOspfCost;
@@ -15,9 +16,12 @@ import static org.batfish.datamodel.matchers.OspfProcessMatchers.hasArea;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasBgpProcess;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasOspfProcess;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasStaticRoutes;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -36,10 +40,14 @@ import org.batfish.config.Settings;
 import org.batfish.datamodel.BgpNeighbor;
 import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpAccessListLine;
+import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.OspfAreaSummary;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.matchers.OspfAreaMatchers;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Flat_juniper_configurationContext;
 import org.batfish.main.Batfish;
@@ -115,6 +123,38 @@ public class FlatJuniperGrammarTest {
     assertThat(byName, hasKey("a2"));
     assertThat(byName, not(hasKey("a1")));
     assertThat(byName, not(hasKey("a3")));
+  }
+
+  @Test
+  public void testApplicationWithTerms() throws IOException {
+    String hostname = "application-with-terms";
+    Configuration c = parseConfig(hostname);
+    assertThat(c, hasIpAccessLists(hasValue(anything())));
+
+    List<IpAccessListLine> lines = c.getIpAccessLists().values().iterator().next().getLines();
+    assertThat(lines, hasSize(2));
+
+    IpAccessListLine line1 = lines.get(0);
+    assertThat(
+        line1,
+        equalTo(
+            IpAccessListLine.acceptingHeaderSpace(
+                HeaderSpace.builder()
+                    .setDstPorts(ImmutableList.of(new SubRange(90, 90)))
+                    .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
+                    .setSrcPorts(ImmutableList.of(new SubRange(90, 90)))
+                    .build())));
+
+    IpAccessListLine line2 = lines.get(1);
+    assertThat(
+        line2,
+        equalTo(
+            IpAccessListLine.acceptingHeaderSpace(
+                HeaderSpace.builder()
+                    .setDstPorts(ImmutableList.of(new SubRange(91, 91)))
+                    .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
+                    .setSrcPorts(ImmutableList.of(new SubRange(91, 91)))
+                    .build())));
   }
 
   @Test

@@ -1,0 +1,10 @@
+#
+set system host-name application-with-terms
+#
+set applications application a4 term t1 protocol tcp destination-port 90
+set applications application a4 term t1 protocol tcp source-port 90
+set applications application a4 term t2 protocol tcp destination-port 91
+set applications application a4 term t2 protocol tcp source-port 91
+set security policies from-zone z1 to-zone z2 policy p1 match application a4
+set security policies from-zone z1 to-zone z2 policy p1 then permit
+#
