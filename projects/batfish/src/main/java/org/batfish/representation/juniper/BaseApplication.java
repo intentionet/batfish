@@ -63,6 +63,7 @@ public class BaseApplication extends DefinedStructure<String> implements Applica
 
   @Override
   public void applyTo(
+      JuniperConfiguration jc,
       HeaderSpace.Builder srcHeaderSpaceBuilder,
       LineAction action,
       List<IpAccessListLine> lines,

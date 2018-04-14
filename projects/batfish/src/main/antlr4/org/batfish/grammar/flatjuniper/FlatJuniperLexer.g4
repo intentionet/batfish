@@ -248,6 +248,11 @@ APPLICATION_PROTOCOL
    'application-protocol'
 ;
 
+APPLICATION_SET
+:
+   'application-set'
+;
+
 APPLICATION_TRACKING
 :
    'application-tracking'

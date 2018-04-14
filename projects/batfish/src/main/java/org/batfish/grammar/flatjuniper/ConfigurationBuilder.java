@@ -1,5 +1,6 @@
 package org.batfish.grammar.flatjuniper;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +55,10 @@ import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.VrrpGroup;
 import org.batfish.datamodel.vendor_family.juniper.TacplusServer;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.A_applicationContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.A_application_setContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Aa_termContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Aas_applicationContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Aas_application_setContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Aat_destination_portContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Aat_protocolContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Aat_source_portContext;
@@ -321,6 +325,10 @@ import org.batfish.representation.juniper.AddressBookEntry;
 import org.batfish.representation.juniper.AddressSetAddressBookEntry;
 import org.batfish.representation.juniper.AddressSetEntry;
 import org.batfish.representation.juniper.AggregateRoute;
+import org.batfish.representation.juniper.ApplicationReference;
+import org.batfish.representation.juniper.ApplicationSet;
+import org.batfish.representation.juniper.ApplicationSetMemberReference;
+import org.batfish.representation.juniper.ApplicationSetReference;
 import org.batfish.representation.juniper.BaseApplication;
 import org.batfish.representation.juniper.BaseApplication.Term;
 import org.batfish.representation.juniper.BgpGroup;
@@ -1496,6 +1504,8 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   private final Warnings _w;
 
+  private ApplicationSet _currentApplicationSet;
+
   public ConfigurationBuilder(
       FlatJuniperCombinedParser parser,
       String text,
@@ -1527,6 +1537,51 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     _currentApplication =
         _configuration.getApplications().computeIfAbsent(name, n -> new BaseApplication(n, line));
     _currentApplicationTerm = _currentApplication.getMainTerm();
+  }
+
+  @Override
+  public void enterA_application_set(A_application_setContext ctx) {
+    String name = ctx.name.getText();
+    int line = ctx.name.getStart().getLine();
+    _currentApplicationSet =
+        _configuration.getApplicationSets().computeIfAbsent(name, n -> new ApplicationSet(n, line));
+  }
+
+  @Override
+  public void exitA_application_set(A_application_setContext ctx) {
+    _currentApplicationSet = null;
+  }
+
+  @Override
+  public void exitAas_application(Aas_applicationContext ctx) {
+    String name = ctx.name.getText();
+    int line = ctx.name.getStart().getLine();
+    _configuration.referenceStructure(
+        JuniperStructureType.APPLICATION,
+        name,
+        JuniperStructureUsage.APPLICATION_SET_APPLICATION,
+        line);
+    _currentApplicationSet.setMembers(
+        ImmutableList.<ApplicationSetMemberReference>builder()
+            .addAll(_currentApplicationSet.getMembers())
+            .add(new ApplicationReference(name))
+            .build());
+  }
+
+  @Override
+  public void exitAas_application_set(Aas_application_setContext ctx) {
+    String name = ctx.name.getText();
+    int line = ctx.name.getStart().getLine();
+    _configuration.referenceStructure(
+        JuniperStructureType.APPLICATION_SET,
+        name,
+        JuniperStructureUsage.APPLICATION_SET_APPLICATION_SET,
+        line);
+    _currentApplicationSet.setMembers(
+        ImmutableList.<ApplicationSetMemberReference>builder()
+            .addAll(_currentApplicationSet.getMembers())
+            .add(new ApplicationSetReference(name))
+            .build());
   }
 
   @Override
@@ -3747,11 +3802,11 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       String name = ctx.name.getText();
       int line = ctx.name.getStart().getLine();
       _configuration.referenceStructure(
-          JuniperStructureType.APPLICATION,
+          JuniperStructureType.APPLICATION_OR_APPLICATION_SET,
           name,
           JuniperStructureUsage.SECURITY_POLICY_MATCH_APPLICATION,
           line);
-      FwFromApplication from = new FwFromApplication(name, _configuration.getApplications());
+      FwFromApplication from = new FwFromApplication(name);
       _currentFwTerm.getFromApplications().add(from);
     }
   }

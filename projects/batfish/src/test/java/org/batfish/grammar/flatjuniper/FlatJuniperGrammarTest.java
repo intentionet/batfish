@@ -46,12 +46,14 @@ import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.OspfAreaSummary;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SubRange;
+import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
 import org.batfish.datamodel.matchers.OspfAreaMatchers;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Flat_juniper_configurationContext;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.main.TestrigText;
 import org.batfish.representation.juniper.JuniperStructureType;
+import org.batfish.representation.juniper.JuniperStructureUsage;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 import org.junit.Rule;
@@ -121,6 +123,123 @@ public class FlatJuniperGrammarTest {
     assertThat(byName, hasKey("a2"));
     assertThat(byName, not(hasKey("a1")));
     assertThat(byName, not(hasKey("a3")));
+  }
+
+  @Test
+  public void testApplicationSet() throws IOException {
+    String hostname = "application-set";
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse();
+    SortedMap<String, SortedMap<String, SortedMap<String, SortedSet<Integer>>>> unusedStructures =
+        ccae.getUnusedStructures();
+    SortedMap<String, SortedMap<String, SortedMap<String, SortedMap<String, SortedSet<Integer>>>>>
+        undefinedReferences = ccae.getUndefinedReferences();
+    Configuration c = parseConfig(hostname);
+    assertThat(c, hasIpAccessLists(hasValue(anything())));
+
+    List<IpAccessListLine> lines = c.getIpAccessLists().values().iterator().next().getLines();
+    assertThat(lines, hasSize(3));
+
+    IpAccessListLine line1 = lines.get(0);
+    IpAccessListLine line2 = lines.get(1);
+    IpAccessListLine line3 = lines.get(2);
+
+    /* Check that appset2 contains definition of appset1 concatenated with definition of a3 */
+    assertThat(
+        line1,
+        equalTo(
+            IpAccessListLine.acceptingHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
+                    .setSrcPorts(ImmutableList.of(new SubRange(1, 1)))
+                    .build())));
+    assertThat(
+        line2,
+        equalTo(
+            IpAccessListLine.acceptingHeaderSpace(
+                HeaderSpace.builder()
+                    .setDstPorts(ImmutableList.of(new SubRange(2, 2)))
+                    .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
+                    .build())));
+    assertThat(
+        line3,
+        equalTo(
+            IpAccessListLine.acceptingHeaderSpace(
+                HeaderSpace.builder()
+                    .setDstPorts(ImmutableList.of(new SubRange(3, 3)))
+                    .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
+                    .build())));
+
+    /* Check that appset1 and appset2 are referenced, but appset3 is not */
+    assertThat(unusedStructures, hasKey(hostname));
+    SortedMap<String, SortedMap<String, SortedSet<Integer>>> unusedStructuresByType =
+        unusedStructures.get(hostname);
+    assertThat(
+        unusedStructuresByType, hasKey(JuniperStructureType.APPLICATION_SET.getDescription()));
+    SortedMap<String, SortedSet<Integer>> unusedStructuresByName =
+        unusedStructuresByType.get(JuniperStructureType.APPLICATION_SET.getDescription());
+    assertThat(unusedStructuresByName, not(hasKey("appset1")));
+    assertThat(unusedStructuresByName, not(hasKey("appset2")));
+    assertThat(unusedStructuresByName, hasKey("appset3"));
+
+    /*
+     * Check that there is an undefined reference to appset4, but not to appset1-3
+     * (via reference in security policy).
+     */
+    assertThat(undefinedReferences, hasKey(hostname));
+    SortedMap<String, SortedMap<String, SortedMap<String, SortedSet<Integer>>>>
+        undefinedReferencesByType = undefinedReferences.get(hostname);
+    assertThat(
+        undefinedReferencesByType,
+        hasKey(JuniperStructureType.APPLICATION_OR_APPLICATION_SET.getDescription()));
+    SortedMap<String, SortedMap<String, SortedSet<Integer>>> urApplicationOrApplicationSetByName =
+        undefinedReferencesByType.get(
+            JuniperStructureType.APPLICATION_OR_APPLICATION_SET.getDescription());
+    assertThat(urApplicationOrApplicationSetByName, not(hasKey("appset1")));
+    assertThat(urApplicationOrApplicationSetByName, not(hasKey("appset2")));
+    assertThat(urApplicationOrApplicationSetByName, not(hasKey("appset3")));
+    assertThat(urApplicationOrApplicationSetByName, hasKey("appset4"));
+    SortedMap<String, SortedSet<Integer>> urApplicationOrApplicationSetByUsage =
+        urApplicationOrApplicationSetByName.get("appset4");
+    assertThat(
+        urApplicationOrApplicationSetByUsage,
+        hasKey(JuniperStructureUsage.SECURITY_POLICY_MATCH_APPLICATION.getDescription()));
+
+    /*
+     * Check that there is an undefined reference to application-set appset4, but not to appset1-3
+     * (via reference in application-set definition).
+     */
+    assertThat(
+        undefinedReferencesByType, hasKey(JuniperStructureType.APPLICATION_SET.getDescription()));
+    SortedMap<String, SortedMap<String, SortedSet<Integer>>> urApplicationSetByName =
+        undefinedReferencesByType.get(JuniperStructureType.APPLICATION_SET.getDescription());
+    assertThat(urApplicationSetByName, not(hasKey("appset1")));
+    assertThat(urApplicationSetByName, not(hasKey("appset2")));
+    assertThat(urApplicationSetByName, not(hasKey("appset3")));
+    assertThat(urApplicationSetByName, hasKey("appset4"));
+    SortedMap<String, SortedSet<Integer>> urApplicationSetByUsage =
+        urApplicationSetByName.get("appset4");
+    assertThat(
+        urApplicationSetByUsage,
+        hasKey(JuniperStructureUsage.APPLICATION_SET_APPLICATION_SET.getDescription()));
+
+    /*
+     * Check that there is an undefined reference to application a4 but not a1-3
+     * (via reference in application-set definition).
+     */
+    assertThat(
+        undefinedReferencesByType, hasKey(JuniperStructureType.APPLICATION.getDescription()));
+    SortedMap<String, SortedMap<String, SortedSet<Integer>>> urApplicationByName =
+        undefinedReferencesByType.get(JuniperStructureType.APPLICATION.getDescription());
+    assertThat(urApplicationByName, not(hasKey("a1")));
+    assertThat(urApplicationByName, not(hasKey("a2")));
+    assertThat(urApplicationByName, not(hasKey("a3")));
+    assertThat(urApplicationByName, hasKey("a4"));
+    SortedMap<String, SortedSet<Integer>> urApplicationByUsage = urApplicationByName.get("a4");
+    assertThat(
+        urApplicationByUsage,
+        hasKey(JuniperStructureUsage.APPLICATION_SET_APPLICATION.getDescription()));
   }
 
   @Test

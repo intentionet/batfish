@@ -216,11 +216,12 @@ public enum JunosApplication implements Application {
 
   @Override
   public void applyTo(
+      JuniperConfiguration jc,
       HeaderSpace.Builder srcHeaderSpaceBuilder,
       LineAction action,
       List<IpAccessListLine> lines,
       Warnings w) {
-    _baseApplication.get().applyTo(srcHeaderSpaceBuilder, action, lines, w);
+    _baseApplication.get().applyTo(jc, srcHeaderSpaceBuilder, action, lines, w);
   }
 
   @Override

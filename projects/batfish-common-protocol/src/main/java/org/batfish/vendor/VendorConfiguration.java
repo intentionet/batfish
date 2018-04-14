@@ -3,7 +3,6 @@ package org.batfish.vendor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -130,7 +129,7 @@ public abstract class VendorConfiguration implements Serializable, GenericConfig
       StructureType type,
       StructureUsage usage,
       Map<String, ? extends ReferenceCountedStructure> map) {
-    markStructure(type, usage, Collections.singletonList(map));
+    markStructure(type, usage, ImmutableList.of(map));
   }
 
   public void referenceStructure(StructureType type, String name, StructureUsage usage, int line) {
