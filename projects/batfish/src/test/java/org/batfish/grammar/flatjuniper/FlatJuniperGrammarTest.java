@@ -136,40 +136,31 @@ public class FlatJuniperGrammarTest {
     SortedMap<String, SortedMap<String, SortedMap<String, SortedMap<String, SortedSet<Integer>>>>>
         undefinedReferences = ccae.getUndefinedReferences();
     Configuration c = parseConfig(hostname);
-    assertThat(c, hasIpAccessLists(hasValue(anything())));
-
-    List<IpAccessListLine> lines = c.getIpAccessLists().values().iterator().next().getLines();
-    assertThat(lines, hasSize(3));
-
-    IpAccessListLine line1 = lines.get(0);
-    IpAccessListLine line2 = lines.get(1);
-    IpAccessListLine line3 = lines.get(2);
+    String aclName = "a";
 
     /* Check that appset2 contains definition of appset1 concatenated with definition of a3 */
     assertThat(
-        line1,
-        equalTo(
-            IpAccessListLine.acceptingHeaderSpace(
-                HeaderSpace.builder()
-                    .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
-                    .setSrcPorts(ImmutableList.of(new SubRange(1, 1)))
-                    .build())));
-    assertThat(
-        line2,
-        equalTo(
-            IpAccessListLine.acceptingHeaderSpace(
-                HeaderSpace.builder()
-                    .setDstPorts(ImmutableList.of(new SubRange(2, 2)))
-                    .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
-                    .build())));
-    assertThat(
-        line3,
-        equalTo(
-            IpAccessListLine.acceptingHeaderSpace(
-                HeaderSpace.builder()
-                    .setDstPorts(ImmutableList.of(new SubRange(3, 3)))
-                    .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
-                    .build())));
+        c,
+        hasIpAccessList(
+            aclName,
+            hasLines(
+                equalTo(
+                    ImmutableList.of(
+                        IpAccessListLine.acceptingHeaderSpace(
+                            HeaderSpace.builder()
+                                .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
+                                .setSrcPorts(ImmutableList.of(new SubRange(1, 1)))
+                                .build()),
+                        IpAccessListLine.acceptingHeaderSpace(
+                            HeaderSpace.builder()
+                                .setDstPorts(ImmutableList.of(new SubRange(2, 2)))
+                                .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
+                                .build()),
+                        IpAccessListLine.acceptingHeaderSpace(
+                            HeaderSpace.builder()
+                                .setDstPorts(ImmutableList.of(new SubRange(3, 3)))
+                                .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
+                                .build()))))));
 
     /* Check that appset1 and appset2 are referenced, but appset3 is not */
     assertThat(unusedStructures, hasKey(hostname));
