@@ -1,0 +1,20 @@
+#
+set system host-name application-set
+#
+set applications application a1 protocol tcp
+set applications application a1 source-port 1
+set applications application a2 protocol udp
+set applications application a2 destination-port 2
+set applications application a3 protocol udp
+set applications application a3 destination-port 3
+set applications application-set appset1 application a1
+set applications application-set appset1 application a2
+set applications application-set appset2 application-set appset1
+set applications application-set appset2 application a3
+set applications application-set appset3 application a1
+set applications application-set appset3 application a4
+set applications application-set appset3 application-set appset4
+set security policies from-zone z1 to-zone z2 policy p1 match application appset2
+set security policies from-zone z1 to-zone z2 policy p1 then permit
+set security policies from-zone z3 to-zone z4 policy p1 match application appset4
+#

@@ -3,6 +3,8 @@ package org.batfish.representation.juniper;
 import org.batfish.vendor.StructureUsage;
 
 public enum JuniperStructureUsage implements StructureUsage {
+  APPLICATION_SET_APPLICATION("application-set application"),
+  APPLICATION_SET_APPLICATION_SET("application-set application-set"),
   AUTHENTICATION_KEY_CHAINS_POLICY("authentication-key-chains policy"),
   BGP_EXPORT_POLICY("bgp export policy-statement"),
   BGP_IMPORT_POLICY("bgp import policy-statement"),

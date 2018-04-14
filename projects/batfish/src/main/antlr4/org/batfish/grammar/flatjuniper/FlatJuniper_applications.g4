@@ -15,6 +15,15 @@ a_application
    )
 ;
 
+a_application_set
+:
+   APPLICATION_SET name = variable
+   (
+      aas_application
+      | aas_application_set
+   )
+;
+
 aa_common
 :
    aat_alg
@@ -34,6 +43,16 @@ aa_common
 aa_term
 :
    TERM name = variable aa_common+
+;
+
+aas_application
+:
+   APPLICATION name = variable
+;
+
+aas_application_set
+:
+   APPLICATION_SET name = variable
 ;
 
 aat_alg
@@ -129,5 +148,9 @@ application_protocol
 
 s_applications
 :
-   APPLICATIONS a_application
+   APPLICATIONS
+   (
+      a_application
+      | a_application_set
+   )
 ;
