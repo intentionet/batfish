@@ -172,6 +172,9 @@ interface Ethernet0
  no port-channel port load-defer
  port-type nni
  priority-flow-control mode auto
+ private-vlan mapping 1001
+ private-vlan mapping add 1002
+ private-vlan mapping remove 1001
  pvc 8/35
   dialer pool-member 1
   encapsulation aal5snap

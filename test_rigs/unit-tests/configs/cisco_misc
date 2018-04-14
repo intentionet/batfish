@@ -276,6 +276,7 @@ virtual-service
   signing level cisco
 vlan ifdescr detail
 vpc domain 32
+  auto-recovery
   delay restore 150
   ip arp synchronize
   peer-gateway

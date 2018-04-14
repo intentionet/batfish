@@ -781,6 +781,11 @@ if_port_security
    )*
 ;
 
+if_private_vlan
+:
+   PRIVATE_VLAN MAPPING (ADD | REMOVE)? null_rest_of_line
+;
+
 if_spanning_tree
 :
    NO? SPANNING_TREE
@@ -1174,6 +1179,7 @@ s_interface
       | if_mtu
       | if_no_ip_address
       | if_port_security
+      | if_private_vlan
       | if_shutdown
       | if_spanning_tree
       | if_switchport

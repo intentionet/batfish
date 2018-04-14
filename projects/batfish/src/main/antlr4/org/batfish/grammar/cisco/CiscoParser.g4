@@ -4188,7 +4188,8 @@ vpc_null
 :
    NO?
    (
-      DELAY
+      AUTO_RECOVERY
+      | DELAY
       | IP
       | PEER_GATEWAY
       | PEER_KEEPALIVE

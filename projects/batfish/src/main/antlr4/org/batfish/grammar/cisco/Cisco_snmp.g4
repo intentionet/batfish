@@ -28,7 +28,6 @@ s_snmp_server
       | ss_host
       | ss_mib
       | ss_null
-      | ss_removed
       | ss_source_interface
       | ss_tftp_server_list
       | ss_trap_source
@@ -186,11 +185,6 @@ ss_null
       | VIEW
       | VRF
    ) null_rest_of_line
-;
-
-ss_removed
-:
-   ~NEWLINE* REMOVED null_rest_of_line
 ;
 
 ss_source_interface

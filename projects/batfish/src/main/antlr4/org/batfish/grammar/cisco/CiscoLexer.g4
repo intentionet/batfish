@@ -1958,7 +1958,7 @@ COMMUNITY_LIST
 
 COMMUNITY_MAP
 :
-   'community-map'
+   'community-map' -> pushMode ( M_Name )
 ;
 
 COMMUNITY_SET
@@ -8968,9 +8968,9 @@ REMOTE_SPAN
    'remote-span'
 ;
 
-REMOVED
+REMOVE
 :
-   '<removed>'
+   'remove'
 ;
 
 REPLACE_AS
@@ -13440,11 +13440,6 @@ mode M_CertificateText;
 M_CertificateText_QUIT
 :
    'quit' -> type ( QUIT ) , mode ( DEFAULT_MODE )
-;
-
-M_CertificateText_REMOVED
-:
-   '<removed>' -> type ( REMOVED ) , mode ( DEFAULT_MODE )
 ;
 
 M_CertificateText_HEX_FRAGMENT

@@ -201,7 +201,6 @@ null_block
       | QOS_POLICY
       | QOS_POLICY_OUTPUT
       | RELOAD_TYPE
-      | REMOVED
       | RMON
       | ROUTE_ONLY
       |

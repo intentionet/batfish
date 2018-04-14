@@ -78,6 +78,7 @@ snmp-server logging threshold oid-processing 1000
 snmp-server manager
 snmp-server max-ifindex-per-module 40
 snmp-server mib community-map my_acl_for_public context public1
+snmp-server mib community-map community#1234 context public1
 snmp-server overload-control 0 0
 snmp-server packetsize 512
 snmp-server priority high

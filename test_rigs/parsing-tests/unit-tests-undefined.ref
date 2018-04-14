@@ -697,7 +697,7 @@
         "description" : "Undefined reference to structure of type: 'ipv4/6 acl' with usage: 'snmp server tftp-server list' named '8'",
         "files" : {
           "cisco_snmp" : [
-            91
+            92
           ]
         }
       },
@@ -1343,7 +1343,7 @@
               67
             ],
             "snmp server tftp-server list" : [
-              91
+              92
             ]
           },
           "customer-snmp" : {
