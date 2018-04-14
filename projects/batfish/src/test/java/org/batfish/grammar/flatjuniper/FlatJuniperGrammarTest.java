@@ -136,7 +136,7 @@ public class FlatJuniperGrammarTest {
     SortedMap<String, SortedMap<String, SortedMap<String, SortedMap<String, SortedSet<Integer>>>>>
         undefinedReferences = ccae.getUndefinedReferences();
     Configuration c = parseConfig(hostname);
-    String aclName = "a";
+    String aclName = "~FROM_ZONE~z1~TO_ZONE~z2";
 
     /* Check that appset2 contains definition of appset1 concatenated with definition of a3 */
     assertThat(
