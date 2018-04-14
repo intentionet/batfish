@@ -1995,11 +1995,11 @@ public final class JuniperConfiguration extends VendorConfiguration {
         ImmutableList.of(_applications, _applicationSets));
     markStructure(
         JuniperStructureType.APPLICATION,
-        JuniperStructureUsage.APPLICATION_SET_APPLICATION,
+        JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION,
         _applications);
     markStructure(
         JuniperStructureType.APPLICATION_SET,
-        JuniperStructureUsage.APPLICATION_SET_APPLICATION_SET,
+        JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION_SET,
         _applicationSets);
     markStructure(
         JuniperStructureType.FIREWALL_FILTER, JuniperStructureUsage.INTERFACE_FILTER, _filters);

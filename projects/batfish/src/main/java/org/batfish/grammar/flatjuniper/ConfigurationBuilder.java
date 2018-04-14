@@ -1559,7 +1559,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     _configuration.referenceStructure(
         JuniperStructureType.APPLICATION,
         name,
-        JuniperStructureUsage.APPLICATION_SET_APPLICATION,
+        JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION,
         line);
     _currentApplicationSet.setMembers(
         ImmutableList.<ApplicationSetMemberReference>builder()
@@ -1575,7 +1575,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     _configuration.referenceStructure(
         JuniperStructureType.APPLICATION_SET,
         name,
-        JuniperStructureUsage.APPLICATION_SET_APPLICATION_SET,
+        JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION_SET,
         line);
     _currentApplicationSet.setMembers(
         ImmutableList.<ApplicationSetMemberReference>builder()

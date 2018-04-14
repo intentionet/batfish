@@ -213,7 +213,7 @@ public class FlatJuniperGrammarTest {
         urApplicationSetByName.get("appset4");
     assertThat(
         urApplicationSetByUsage,
-        hasKey(JuniperStructureUsage.APPLICATION_SET_APPLICATION_SET.getDescription()));
+        hasKey(JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION_SET.getDescription()));
 
     /*
      * Check that there is an undefined reference to application a4 but not a1-3
@@ -230,7 +230,7 @@ public class FlatJuniperGrammarTest {
     SortedMap<String, SortedSet<Integer>> urApplicationByUsage = urApplicationByName.get("a4");
     assertThat(
         urApplicationByUsage,
-        hasKey(JuniperStructureUsage.APPLICATION_SET_APPLICATION.getDescription()));
+        hasKey(JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION.getDescription()));
   }
 
   @Test
