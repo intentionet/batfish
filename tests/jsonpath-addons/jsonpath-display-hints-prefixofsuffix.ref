@@ -1177,6 +1177,7 @@
                         "defaultMetric" : 0,
                         "dynamic" : false,
                         "ebgpMultihop" : false,
+                        "enforceFirstAs" : false,
                         "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:2.1.2.1~",
                         "group" : "as2",
                         "localAs" : 2,
@@ -1201,6 +1202,7 @@
                         "defaultMetric" : 0,
                         "dynamic" : false,
                         "ebgpMultihop" : false,
+                        "enforceFirstAs" : false,
                         "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:2.1.2.2~",
                         "group" : "as2",
                         "localAs" : 2,
@@ -1225,6 +1227,7 @@
                         "defaultMetric" : 0,
                         "dynamic" : false,
                         "ebgpMultihop" : false,
+                        "enforceFirstAs" : false,
                         "exportPolicy" : "~BGP_PEER_EXPORT_POLICY:default:10.12.11.1~",
                         "exportPolicySources" : [
                           "as2_to_as1"

@@ -310,6 +310,8 @@ public final class BgpNeighbor extends ComparableStructure<Prefix> {
 
   private static final String PROP_EBGP_MULTIHOP = "ebgpMultihop";
 
+  private static final String PROP_ENFORCE_FIRST_AS = "enforceFirstAs";
+
   private static final String PROP_EXPORT_POLICY = "exportPolicy";
 
   private static final String PROP_EXPORT_POLICY_SOURCES = "exportPolicySources";
@@ -366,6 +368,8 @@ public final class BgpNeighbor extends ComparableStructure<Prefix> {
   private String _description;
 
   private boolean _ebgpMultihop;
+
+  private boolean _enforceFirstAs;
 
   private String _exportPolicy;
 
@@ -482,6 +486,9 @@ public final class BgpNeighbor extends ComparableStructure<Prefix> {
     }
     // we will skip description
     if (this._ebgpMultihop != other._ebgpMultihop) {
+      return false;
+    }
+    if (_enforceFirstAs != other._enforceFirstAs) {
       return false;
     }
     if (!this._exportPolicy.equals(other._exportPolicy)) {
@@ -612,6 +619,14 @@ public final class BgpNeighbor extends ComparableStructure<Prefix> {
       "Whether to allow establishment of a multihop eBGP connection with this peer")
   public boolean getEbgpMultihop() {
     return _ebgpMultihop;
+  }
+
+  @JsonProperty(PROP_ENFORCE_FIRST_AS)
+  @JsonPropertyDescription(
+      "Whether to discard updates received from an external BGP (eBGP) peers that do not list "
+          + "their autonomous system (AS) number as the first AS path segment")
+  public boolean getEnforceFirstAs() {
+    return _enforceFirstAs;
   }
 
   @JsonProperty(PROP_EXPORT_POLICY)
@@ -782,6 +797,11 @@ public final class BgpNeighbor extends ComparableStructure<Prefix> {
   @JsonProperty(PROP_EBGP_MULTIHOP)
   public void setEbgpMultihop(boolean ebgpMultihop) {
     _ebgpMultihop = ebgpMultihop;
+  }
+
+  @JsonProperty(PROP_ENFORCE_FIRST_AS)
+  public void setEnforceFirstAs(boolean enforceFistAs) {
+    _enforceFirstAs = enforceFistAs;
   }
 
   @JsonProperty(PROP_EXPORT_POLICY)

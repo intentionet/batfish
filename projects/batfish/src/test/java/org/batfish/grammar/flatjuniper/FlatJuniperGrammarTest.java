@@ -20,6 +20,7 @@ import static org.batfish.datamodel.matchers.VrfMatchers.hasStaticRoutes;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -242,6 +243,16 @@ public class FlatJuniperGrammarTest {
     assertThat(multipleAsDisabled, equalTo(MultipathEquivalentAsPathMatchMode.FIRST_AS));
     assertThat(multipleAsEnabled, equalTo(MultipathEquivalentAsPathMatchMode.PATH_LENGTH));
     assertThat(multipleAsMixed, equalTo(MultipathEquivalentAsPathMatchMode.FIRST_AS));
+  }
+
+  @Test
+  public void testEnforceFistAs() throws IOException {
+    String hostname = "bgp-enforce-first-as";
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    Configuration c = batfish.loadConfigurations().get(hostname);
+    SortedMap<Prefix, BgpNeighbor> neighbors =
+        c.getVrfs().get(Configuration.DEFAULT_VRF_NAME).getBgpProcess().getNeighbors();
+    assertThat(neighbors.get(neighbors.firstKey()).getEnforceFirstAs(), is(true));
   }
 
   @Test

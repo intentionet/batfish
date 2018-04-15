@@ -34,6 +34,8 @@ public class BgpGroup implements Serializable {
 
   private Boolean _ebgpMultihop;
 
+  private Boolean _enforceFirstAs;
+
   private final Map<String, Integer> _exportPolicies;
 
   protected String _groupName;
@@ -97,6 +99,9 @@ public class BgpGroup implements Serializable {
       }
       if (_description == null) {
         _description = _parent._description;
+      }
+      if (_enforceFirstAs == null) {
+        _enforceFirstAs = _parent._enforceFirstAs;
       }
       if (_ebgpMultihop == null) {
         _ebgpMultihop = _parent._ebgpMultihop;
@@ -168,6 +173,10 @@ public class BgpGroup implements Serializable {
 
   public Boolean getEbgpMultihop() {
     return _ebgpMultihop;
+  }
+
+  public Boolean getEnforceFirstAs() {
+    return _enforceFirstAs;
   }
 
   public final Map<String, Integer> getExportPolicies() {
@@ -256,6 +265,10 @@ public class BgpGroup implements Serializable {
 
   public void setEbgpMultihop(boolean ebgpMultihop) {
     _ebgpMultihop = ebgpMultihop;
+  }
+
+  public void setEnforceFirstAs(Boolean enforceFirstAs) {
+    _enforceFirstAs = enforceFirstAs;
   }
 
   public void setIpv6(boolean ipv6) {

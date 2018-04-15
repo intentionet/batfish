@@ -68,6 +68,7 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_authentication_keyCon
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_authentication_key_chainContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_clusterContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_descriptionContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_enforce_first_asContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_exportContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_groupContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_importContext;
@@ -2399,6 +2400,11 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void exitB_description(B_descriptionContext ctx) {
     _currentBgpGroup.setDescription(ctx.description().text.getText());
+  }
+
+  @Override
+  public void exitB_enforce_first_as(B_enforce_first_asContext ctx) {
+    _currentBgpGroup.setEnforceFirstAs(true);
   }
 
   @Override

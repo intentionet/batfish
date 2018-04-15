@@ -65,6 +65,7 @@ b_common
    | b_damping
    | b_description
    | b_disable_4byte_as
+   | b_enforce_first_as
    | b_export
    | b_family
    | b_import
@@ -100,6 +101,11 @@ b_disable_4byte_as
 b_enable
 :
    ENABLE
+;
+
+b_enforce_first_as
+:
+   ENFORCE_FIRST_AS
 ;
 
 b_export

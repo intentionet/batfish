@@ -340,6 +340,11 @@ public final class JuniperConfiguration extends VendorConfiguration {
       if (ebgpMultihop == null) {
         ebgpMultihop = false;
       }
+      Boolean enforceFirstAs = ig.getEnforceFirstAs();
+      if (enforceFirstAs == null) {
+        enforceFirstAs = false;
+      }
+      neighbor.setEnforceFirstAs(enforceFirstAs);
       neighbor.setEbgpMultihop(ebgpMultihop);
       Integer loops = ig.getLoops();
       boolean allowLocalAsIn = loops != null && loops > 0;
