@@ -1,6 +1,6 @@
 package org.batfish.representation.juniper;
 
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.ArrayList;

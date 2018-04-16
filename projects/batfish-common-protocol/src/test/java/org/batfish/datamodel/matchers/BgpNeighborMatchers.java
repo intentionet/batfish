@@ -21,7 +21,19 @@ public class BgpNeighborMatchers {
     return new HasLocalAs(subMatcher);
   }
 
+  /**
+   * Provides a matcher that matches if the BGP neighbor's value of {@code enforceFirstAs} matches
+   * {@code subMatcher}
+   */
   public static HasEnforceFirstAs hasEnforceFirstAs(Matcher<? super Boolean> subMatcher) {
     return new HasEnforceFirstAs(subMatcher);
+  }
+
+  /**
+   * Provides a matcher that matches if the BGP neighbor's value of {@code enforceFirstAs} is {@code
+   * true}.
+   */
+  public static HasEnforceFirstAs hasEnforceFirstAs() {
+    return new HasEnforceFirstAs(equalTo(true));
   }
 }
