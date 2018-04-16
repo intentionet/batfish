@@ -17,4 +17,15 @@ final class BgpNeighborMatchersImpl {
       return actual.getLocalAs();
     }
   }
+
+  static final class HasEnforceFirstAs extends FeatureMatcher<BgpNeighbor, Boolean> {
+    HasEnforceFirstAs(@Nonnull Matcher<? super Boolean> subMatcher) {
+      super(subMatcher, "A BgpNeighbor with enforce-first-as:", "enforce-first-as");
+    }
+
+    @Override
+    protected Boolean featureValueOf(BgpNeighbor actual) {
+      return actual.getEnforceFirstAs();
+    }
+  }
 }

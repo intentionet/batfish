@@ -1,5 +1,7 @@
 package org.batfish.representation.juniper;
 
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -340,12 +342,8 @@ public final class JuniperConfiguration extends VendorConfiguration {
       if (ebgpMultihop == null) {
         ebgpMultihop = false;
       }
-      Boolean enforceFirstAs = ig.getEnforceFirstAs();
-      if (enforceFirstAs == null) {
-        enforceFirstAs = false;
-      }
-      neighbor.setEnforceFirstAs(enforceFirstAs);
       neighbor.setEbgpMultihop(ebgpMultihop);
+      neighbor.setEnforceFirstAs(firstNonNull(ig.getEnforceFirstAs(), Boolean.FALSE));
       Integer loops = ig.getLoops();
       boolean allowLocalAsIn = loops != null && loops > 0;
       neighbor.setAllowLocalAsIn(allowLocalAsIn);

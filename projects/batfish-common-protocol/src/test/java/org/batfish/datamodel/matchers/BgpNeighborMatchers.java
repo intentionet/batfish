@@ -2,6 +2,7 @@ package org.batfish.datamodel.matchers;
 
 import static org.hamcrest.Matchers.equalTo;
 
+import org.batfish.datamodel.matchers.BgpNeighborMatchersImpl.HasEnforceFirstAs;
 import org.batfish.datamodel.matchers.BgpNeighborMatchersImpl.HasLocalAs;
 import org.hamcrest.Matcher;
 
@@ -18,5 +19,9 @@ public class BgpNeighborMatchers {
    */
   public static HasLocalAs hasLocalAs(Matcher<? super Integer> subMatcher) {
     return new HasLocalAs(subMatcher);
+  }
+
+  public static HasEnforceFirstAs hasEnforceFirstAs(Matcher<? super Boolean> subMatcher) {
+    return new HasEnforceFirstAs(subMatcher);
   }
 }

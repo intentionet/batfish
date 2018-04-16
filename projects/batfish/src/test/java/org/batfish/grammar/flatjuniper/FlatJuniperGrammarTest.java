@@ -1,8 +1,10 @@
 package org.batfish.grammar.flatjuniper;
 
 import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasPrefix;
+import static org.batfish.datamodel.matchers.BgpNeighborMatchers.hasEnforceFirstAs;
 import static org.batfish.datamodel.matchers.BgpNeighborMatchers.hasLocalAs;
 import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasNeighbor;
+import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasNeighbors;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasDefaultVrf;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterface;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpAccessList;
@@ -23,6 +25,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.collection.IsMapContaining.hasValue;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -248,11 +251,9 @@ public class FlatJuniperGrammarTest {
   @Test
   public void testEnforceFistAs() throws IOException {
     String hostname = "bgp-enforce-first-as";
-    Batfish batfish = getBatfishForConfigurationNames(hostname);
-    Configuration c = batfish.loadConfigurations().get(hostname);
-    SortedMap<Prefix, BgpNeighbor> neighbors =
-        c.getVrfs().get(Configuration.DEFAULT_VRF_NAME).getBgpProcess().getNeighbors();
-    assertThat(neighbors.get(neighbors.firstKey()).getEnforceFirstAs(), is(true));
+    Configuration c = parseConfig(hostname);
+    assertThat(
+        c, hasDefaultVrf(hasBgpProcess(hasNeighbors(hasValue(hasEnforceFirstAs(is(true)))))));
   }
 
   @Test
