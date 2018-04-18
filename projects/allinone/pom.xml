@@ -98,6 +98,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.batfish</groupId>
+      <artifactId>question</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -117,13 +122,40 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
 
-    <!-- Runtime dependencies to add logging. -->
+    <!-- Test scope dependencies. -->
     <dependency>
       <groupId>org.batfish</groupId>
-      <artifactId>question</artifactId>
-      <scope>runtime</scope>
+      <artifactId>batfish-common-protocol</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.batfish</groupId>
+      <artifactId>batfish</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Runtime dependencies to add logging. -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>

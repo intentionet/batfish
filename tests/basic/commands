@@ -20,7 +20,6 @@ test -compareall tests/basic/genDp-delta.ref generate-delta-dataplane
 test tests/basic/nodes-diff.ref get nodes summary=false, differential=true
 
 # Everything below here is to be converted into regular unit tests in some form.
-test tests/basic/aclReachability.ref get aclReachability
 test tests/basic/assert.ref get assert assertions=[{"assertion":"(eq 15 (pathsize '$.nodes[*]'))"},{"assertion":"(eq 0 (pathsize '$.nodes[\"as1border\"]'))"},{"assertion":"(not (eq 0 (pathsize '$.nodes[\"as1border1\"]')))"}, {"assertion":"(eq (pathsize '$.nodes[*].aaaSettings.newModel') (pathsize '$.nodes[*].aaaSettings[?(@.newModel == true)]'))"}]
 test tests/basic/bgpSessionStatus.ref get bgpsessionstatus type="ebgp.*", status="missing.*"
 test tests/basic/compareSameName.ref get compareSameName

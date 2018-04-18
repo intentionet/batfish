@@ -454,19 +454,7 @@
 
       <dependency>
         <groupId>org.batfish</groupId>
-        <artifactId>batfish-client</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.batfish</groupId>
-        <artifactId>batfish-common-protocol</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.batfish</groupId>
-        <artifactId>batfish-common-protocol</artifactId>
+        <artifactId>batfish</artifactId>
         <classifier>tests</classifier>
         <version>${project.version}</version>
       </dependency>
@@ -538,6 +526,25 @@
         <groupId>com.kjetland</groupId>
         <artifactId>mbknor-jackson-jsonschema_2.12</artifactId>
         <version>${jackson-jsonschema.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.batfish</groupId>
+        <artifactId>batfish-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.batfish</groupId>
+        <artifactId>batfish-common-protocol</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.batfish</groupId>
+        <artifactId>batfish-common-protocol</artifactId>
+        <classifier>tests</classifier>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
