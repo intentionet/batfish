@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpAccessList;
+import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.vendor_family.VendorFamily;
 import org.hamcrest.FeatureMatcher;
@@ -71,6 +72,31 @@ final class ConfigurationMatchersImpl {
     @Override
     protected Map<String, IpAccessList> featureValueOf(Configuration actual) {
       return actual.getIpAccessLists();
+    }
+  }
+
+  static final class HasIpSpace extends FeatureMatcher<Configuration, IpSpace> {
+    private final String _name;
+
+    HasIpSpace(@Nonnull String name, @Nonnull Matcher<? super IpSpace> subMatcher) {
+      super(subMatcher, "A Configuration with ipSpace " + name + ":", "ipSpace " + name);
+      _name = name;
+    }
+
+    @Override
+    protected IpSpace featureValueOf(Configuration actual) {
+      return actual.getIpSpaces().get(_name);
+    }
+  }
+
+  static final class HasIpSpaces extends FeatureMatcher<Configuration, Map<String, IpSpace>> {
+    HasIpSpaces(@Nonnull Matcher<? super Map<String, IpSpace>> subMatcher) {
+      super(subMatcher, "a configuration with ipSpaces", "ipSpaces");
+    }
+
+    @Override
+    protected Map<String, IpSpace> featureValueOf(Configuration actual) {
+      return actual.getIpSpaces();
     }
   }
 
