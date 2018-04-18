@@ -2,10 +2,12 @@ package org.batfish.datamodel;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
+import java.util.Comparator;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.visitors.IpSpaceComparator;
 
-public class AclIpSpaceLine {
+public class AclIpSpaceLine implements Comparable<AclIpSpaceLine> {
 
   public static class Builder {
 
@@ -93,5 +95,12 @@ public class AclIpSpaceLine {
     }
     helper.add("ipSpace", _ipSpace);
     return helper.toString();
+  }
+
+  @Override
+  public int compareTo(AclIpSpaceLine o) {
+    return Comparator.comparing(AclIpSpaceLine::getAction)
+        .thenComparing(AclIpSpaceLine::getIpSpace, IpSpaceComparator::compare)
+        .compare(this, o);
   }
 }

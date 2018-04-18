@@ -1,12 +1,18 @@
 package org.batfish.datamodel;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
 import javax.annotation.Nonnull;
+import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.visitors.GenericIpSpaceVisitor;
 
 /**
@@ -15,7 +21,8 @@ import org.batfish.datamodel.visitors.GenericIpSpaceVisitor;
  *
  * <p>Any empty whitelist is equivalent to an {@link EmptyIpSpace}.
  */
-public final class IpWildcardSetIpSpace implements IpSpace, Serializable {
+public final class IpWildcardSetIpSpace
+    implements IpSpace, Serializable, Comparable<IpWildcardSetIpSpace> {
 
   public static class Builder {
 
@@ -54,6 +61,10 @@ public final class IpWildcardSetIpSpace implements IpSpace, Serializable {
   public static final IpWildcardSetIpSpace ANY =
       IpWildcardSetIpSpace.builder().including(IpWildcard.ANY).build();
 
+  private static final String PROP_BLACKLIST = "blacklist";
+
+  private static final String PROP_WHITELIST = "whitelist";
+
   /** */
   private static final long serialVersionUID = 1L;
 
@@ -61,13 +72,16 @@ public final class IpWildcardSetIpSpace implements IpSpace, Serializable {
     return new Builder();
   }
 
-  private final Set<IpWildcard> _blacklist;
+  private final SortedSet<IpWildcard> _blacklist;
 
-  private final Set<IpWildcard> _whitelist;
+  private final SortedSet<IpWildcard> _whitelist;
 
-  private IpWildcardSetIpSpace(Set<IpWildcard> blacklist, Set<IpWildcard> whitelist) {
-    _blacklist = ImmutableSet.copyOf(blacklist);
-    _whitelist = ImmutableSet.copyOf(whitelist);
+  @JsonCreator
+  private IpWildcardSetIpSpace(
+      @JsonProperty(PROP_BLACKLIST) Set<IpWildcard> blacklist,
+      @JsonProperty(PROP_WHITELIST) Set<IpWildcard> whitelist) {
+    _blacklist = blacklist == null ? ImmutableSortedSet.of() : ImmutableSortedSet.copyOf(blacklist);
+    _whitelist = whitelist == null ? ImmutableSortedSet.of() : ImmutableSortedSet.copyOf(whitelist);
   }
 
   @Override
@@ -76,9 +90,10 @@ public final class IpWildcardSetIpSpace implements IpSpace, Serializable {
   }
 
   @Override
-  public boolean containsIp(@Nonnull Ip ip) {
-    return _blacklist.stream().noneMatch(w -> w.containsIp(ip))
-        && _whitelist.stream().anyMatch(w -> w.containsIp(ip));
+  public int compareTo(IpWildcardSetIpSpace o) {
+    return Comparator.comparing(IpWildcardSetIpSpace::getBlacklist, CommonUtil::compareIterable)
+        .thenComparing(IpWildcardSetIpSpace::getWhitelist, CommonUtil::compareIterable)
+        .compare(this, o);
   }
 
   @Override
@@ -100,6 +115,12 @@ public final class IpWildcardSetIpSpace implements IpSpace, Serializable {
   }
 
   @Override
+  public boolean containsIp(@Nonnull Ip ip) {
+    return _blacklist.stream().noneMatch(w -> w.containsIp(ip))
+        && _whitelist.stream().anyMatch(w -> w.containsIp(ip));
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -111,11 +132,13 @@ public final class IpWildcardSetIpSpace implements IpSpace, Serializable {
     return Objects.equals(_blacklist, rhs._blacklist) && Objects.equals(_whitelist, rhs._whitelist);
   }
 
-  public Set<IpWildcard> getBlacklist() {
+  @JsonProperty(PROP_BLACKLIST)
+  public SortedSet<IpWildcard> getBlacklist() {
     return _blacklist;
   }
 
-  public Set<IpWildcard> getWhitelist() {
+  @JsonProperty(PROP_WHITELIST)
+  public SortedSet<IpWildcard> getWhitelist() {
     return _whitelist;
   }
 
@@ -127,8 +150,8 @@ public final class IpWildcardSetIpSpace implements IpSpace, Serializable {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(getClass())
-        .add("blacklist", _blacklist)
-        .add("whitelist", _whitelist)
+        .add(PROP_BLACKLIST, _blacklist)
+        .add(PROP_WHITELIST, _whitelist)
         .toString();
   }
 }

@@ -8,15 +8,18 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Spliterator;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.annotation.Nonnull;
+import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.visitors.GenericIpSpaceVisitor;
 
 /**
  * An ACL-based {@link IpSpace}. An IP is permitted if it is in the space the ACL represents, or
  * denied if it is not.
  */
-public class AclIpSpace implements IpSpace {
+public class AclIpSpace implements IpSpace, Comparable<AclIpSpace> {
 
   public static class Builder {
 
@@ -115,8 +118,8 @@ public class AclIpSpace implements IpSpace {
   }
 
   @Override
-  public boolean containsIp(@Nonnull Ip ip) {
-    return action(ip) == LineAction.ACCEPT;
+  public int compareTo(AclIpSpace o) {
+    return CommonUtil.compareIterable(_lines, o._lines);
   }
 
   @Override
@@ -132,6 +135,11 @@ public class AclIpSpace implements IpSpace {
         });
     builder.thenPermitting(UniverseIpSpace.INSTANCE);
     return builder.build();
+  }
+
+  @Override
+  public boolean containsIp(@Nonnull Ip ip) {
+    return action(ip) == LineAction.ACCEPT;
   }
 
   @Override
@@ -152,6 +160,32 @@ public class AclIpSpace implements IpSpace {
   @Override
   public int hashCode() {
     return _hash.get();
+  }
+
+  public static IpSpace intersection(IpSpace... ipSpaces) {
+    return intersection(Arrays.spliterator(ipSpaces));
+  }
+
+  public static IpSpace intersection(Iterable<IpSpace> ipSpaces) {
+    return intersection(ipSpaces.spliterator());
+  }
+
+  private static IpSpace intersection(Spliterator<IpSpace> ipSpaces) {
+    return builder()
+        .thenRejecting(
+            StreamSupport.stream(ipSpaces, false)
+                .map(IpSpace::complement)
+                .collect(ImmutableList.toImmutableList()))
+        .thenPermitting(UniverseIpSpace.INSTANCE)
+        .build();
+  }
+
+  public static IpSpace union(IpSpace... ipSpaces) {
+    return union(ImmutableList.copyOf(ipSpaces));
+  }
+
+  public static IpSpace union(Iterable<IpSpace> ipSpaces) {
+    return builder().thenPermitting(ipSpaces).build();
   }
 
   @Override

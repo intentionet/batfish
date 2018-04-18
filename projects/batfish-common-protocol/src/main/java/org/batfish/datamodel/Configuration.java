@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.ImmutableSortedSet;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.util.Collections;
@@ -118,6 +120,8 @@ public final class Configuration extends ComparableStructure<String> {
 
   private static final String PROP_IP_ACCESS_LISTS = "ipAccessLists";
 
+  private static final String PROP_IP_SPACES = "ipSpaces";
+
   private static final String PROP_IPSEC_POLICIES = "ipsecPolicies";
 
   private static final String PROP_IPSEC_PROPOSALS = "ipsecProposals";
@@ -185,6 +189,8 @@ public final class Configuration extends ComparableStructure<String> {
   private NavigableMap<String, Ip6AccessList> _ip6AccessLists;
 
   private NavigableMap<String, IpAccessList> _ipAccessLists;
+
+  private NavigableMap<String, IpSpace> _ipSpaces;
 
   private NavigableMap<String, IpsecPolicy> _ipsecPolicies;
 
@@ -267,6 +273,7 @@ public final class Configuration extends ComparableStructure<String> {
     _interfaces = new TreeMap<>();
     _ipAccessLists = new TreeMap<>();
     _ip6AccessLists = new TreeMap<>();
+    _ipSpaces = new TreeMap<>();
     _ipsecPolicies = new TreeMap<>();
     _ipsecProposals = new TreeMap<>();
     _ipsecVpns = new TreeMap<>();
@@ -440,6 +447,15 @@ public final class Configuration extends ComparableStructure<String> {
   @JsonPropertyDescription("Dictionary of all IPV4 access-lists for this node.")
   public NavigableMap<String, IpAccessList> getIpAccessLists() {
     return _ipAccessLists;
+  }
+
+  @JsonSerialize(
+    contentUsing = IpSpaceToJacksonSerializableIpSpace.class,
+    contentAs = JacksonSerializableIpSpace.class
+  )
+  @JsonProperty(PROP_IP_SPACES)
+  public NavigableMap<String, IpSpace> getIpSpaces() {
+    return _ipSpaces;
   }
 
   @JsonProperty(PROP_IPSEC_POLICIES)
@@ -697,6 +713,15 @@ public final class Configuration extends ComparableStructure<String> {
   @JsonProperty(PROP_IP_ACCESS_LISTS)
   public void setIpAccessLists(NavigableMap<String, IpAccessList> ipAccessLists) {
     _ipAccessLists = ipAccessLists;
+  }
+
+  @JsonDeserialize(
+    contentUsing = JacksonSerializableIpSpaceToIpSpace.class,
+    contentAs = JacksonSerializableIpSpace.class
+  )
+  @JsonProperty(PROP_IP_SPACES)
+  public void setIpSpaces(NavigableMap<String, IpSpace> ipSpaces) {
+    _ipSpaces = ipSpaces;
   }
 
   @JsonProperty(PROP_IPSEC_POLICIES)
