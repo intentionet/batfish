@@ -7440,7 +7440,7 @@ OBJECT
 
 OBJECT_GROUP
 :
-   'object-group'
+   'object-group' -> pushMode(M_Name)
 ;
 
 ON

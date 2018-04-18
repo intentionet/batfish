@@ -204,6 +204,8 @@ og_network
    (
       ogn_description
       | ogn_group_object
+      | ogn_host_ip
+      | ogn_ip_with_mask
       | ogn_network_object
    )*
 ;
@@ -277,6 +279,16 @@ ogn_description
 ogn_group_object
 :
    GROUP_OBJECT name = variable NEWLINE
+;
+
+ogn_host_ip
+:
+   HOST ip = IP_ADDRESS NEWLINE
+;
+
+ogn_ip_with_mask
+:
+   ip = IP_ADDRESS mask = IP_ADDRESS NEWLINE
 ;
 
 ogn_network_object

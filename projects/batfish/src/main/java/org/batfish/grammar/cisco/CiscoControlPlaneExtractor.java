@@ -394,6 +394,9 @@ import org.batfish.grammar.cisco.CiscoParser.Ntp_access_groupContext;
 import org.batfish.grammar.cisco.CiscoParser.Ntp_serverContext;
 import org.batfish.grammar.cisco.CiscoParser.Ntp_source_interfaceContext;
 import org.batfish.grammar.cisco.CiscoParser.Null_as_path_regexContext;
+import org.batfish.grammar.cisco.CiscoParser.Og_networkContext;
+import org.batfish.grammar.cisco.CiscoParser.Ogn_host_ipContext;
+import org.batfish.grammar.cisco.CiscoParser.Ogn_ip_with_maskContext;
 import org.batfish.grammar.cisco.CiscoParser.Origin_exprContext;
 import org.batfish.grammar.cisco.CiscoParser.Origin_expr_literalContext;
 import org.batfish.grammar.cisco.CiscoParser.Passive_iis_stanzaContext;
@@ -620,6 +623,7 @@ import org.batfish.representation.cisco.MacAccessList;
 import org.batfish.representation.cisco.MasterBgpPeerGroup;
 import org.batfish.representation.cisco.NamedBgpPeerGroup;
 import org.batfish.representation.cisco.NatPool;
+import org.batfish.representation.cisco.NetworkObjectGroup;
 import org.batfish.representation.cisco.OspfNetwork;
 import org.batfish.representation.cisco.OspfProcess;
 import org.batfish.representation.cisco.OspfRedistributionPolicy;
@@ -1000,6 +1004,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   private final boolean _unrecognizedAsRedFlag;
 
   private final Warnings _w;
+
+  private NetworkObjectGroup _currentNetworkObjectGroup;
 
   public CiscoControlPlaneExtractor(
       String text,
@@ -1793,6 +1799,33 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     IsisProcess proc = currentVrf().getIsisProcess();
     IsoAddress isoAddress = new IsoAddress(ctx.ISO_ADDRESS().getText());
     proc.setNetAddress(isoAddress);
+  }
+
+  @Override
+  public void enterOg_network(Og_networkContext ctx) {
+    String name = ctx.name.getText();
+    int definitionLine = ctx.name.getStart().getLine();
+    _currentNetworkObjectGroup =
+        _configuration
+            .getNetworkObjectGroups()
+            .computeIfAbsent(name, n -> new NetworkObjectGroup(n, definitionLine));
+  }
+
+  @Override
+  public void exitOg_network(Og_networkContext ctx) {
+    _currentNetworkObjectGroup = null;
+  }
+
+  @Override
+  public void exitOgn_host_ip(Ogn_host_ipContext ctx) {
+    _currentNetworkObjectGroup.getLines().add(new IpWildcard(toIp(ctx.ip)));
+  }
+
+  @Override
+  public void exitOgn_ip_with_mask(Ogn_ip_with_maskContext ctx) {
+    Ip ip = toIp(ctx.ip);
+    Ip mask = toIp(ctx.mask);
+    _currentNetworkObjectGroup.getLines().add(new IpWildcard(new Prefix(ip, mask)));
   }
 
   @Override

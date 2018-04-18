@@ -1,0 +1,14 @@
+!
+hostname ios-object-group-network
+!
+!
+object-group network ogn1
+ 1.0.0.0 255.0.0.0
+!
+object-group network ogn2
+ host 2.0.0.0
+ host 2.0.0.1
+!
+object-group network ogn3
+!
+!

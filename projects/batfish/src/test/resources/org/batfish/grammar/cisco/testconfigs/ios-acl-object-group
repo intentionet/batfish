@@ -1,0 +1,6 @@
+!
+hostname ios-acl-object-group
+!
+ip access-list extended acl1
+ permit object-group ogp1 object-group ogn1 object-group ogn2
+!

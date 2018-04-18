@@ -3,6 +3,7 @@ package org.batfish.grammar.cisco;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasDefaultVrf;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterface;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterfaces;
+import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpSpace;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVendorFamily;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrfs;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasDeclaredNames;
@@ -12,6 +13,7 @@ import static org.batfish.datamodel.matchers.InterfaceMatchers.hasVrf;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.isOspfPassive;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.isOspfPointToPoint;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.isProxyArp;
+import static org.batfish.datamodel.matchers.IpSpaceMatchers.containsIp;
 import static org.batfish.datamodel.matchers.OspfAreaMatchers.hasSummary;
 import static org.batfish.datamodel.matchers.OspfAreaSummaryMatchers.hasMetric;
 import static org.batfish.datamodel.matchers.OspfAreaSummaryMatchers.isAdvertised;
@@ -192,6 +194,22 @@ public class CiscoGrammarTest {
   public void testIosLoggingOnDefault() throws IOException {
     Configuration loggingOnOmitted = parseConfig("iosLoggingOnOmitted");
     assertThat(loggingOnOmitted, hasVendorFamily(hasCisco(hasLogging(isOn()))));
+  }
+
+  @Test
+  public void testIosObjectGroupNetwork() throws IOException {
+    Configuration c = parseConfig("ios-object-group-network");
+    Ip ogn1TestIp = new Ip("1.128.0.0");
+    Ip ogn2TestIp1 = new Ip("2.0.0.0");
+    Ip ogn2TestIp2 = new Ip("2.0.0.1");
+
+    /* Each object group should permit an IP iff it is in its space. */
+    assertThat(c, hasIpSpace("ogn1", containsIp(ogn1TestIp)));
+    assertThat(c, hasIpSpace("ogn1", not(containsIp(ogn2TestIp1))));
+    assertThat(c, hasIpSpace("ogn2", not(containsIp(ogn1TestIp))));
+    assertThat(c, hasIpSpace("ogn2", containsIp(ogn2TestIp1)));
+    assertThat(c, hasIpSpace("ogn2", containsIp(ogn2TestIp2)));
+    assertThat(c, hasIpSpace("ogn3", not(containsIp(ogn2TestIp2))));
   }
 
   @Test

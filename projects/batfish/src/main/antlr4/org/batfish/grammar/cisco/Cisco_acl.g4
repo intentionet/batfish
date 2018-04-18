@@ -312,7 +312,14 @@ extended_access_list_tail
    )? ala = access_list_action
    (
       VLAN vlan = DEC vmask = HEX
-   )? prot = protocol srcipr = access_list_ip_range
+   )?
+   (
+      prot = protocol
+      |
+      (
+         OBJECT_GROUP ogp = variable
+      )
+   ) srcipr = access_list_ip_range
    (
       alps_src = port_specifier
    )? dstipr = access_list_ip_range
@@ -860,12 +867,12 @@ s_arp_access_list_extended_tail
    (
       REQUEST
       | RESPONSE
-   )? IP senderip = access_list_ip_range 
+   )? IP senderip = access_list_ip_range
    (
-      targetip = access_list_ip_range 
+      targetip = access_list_ip_range
    )? MAC sendermac = access_list_mac_range
    (
-      targetmac = access_list_mac_range 
+      targetmac = access_list_mac_range
    )? LOG? NEWLINE
 ;
 
