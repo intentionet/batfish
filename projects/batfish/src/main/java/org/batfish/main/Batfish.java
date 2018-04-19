@@ -110,6 +110,7 @@ import org.batfish.datamodel.OspfProcess;
 import org.batfish.datamodel.RipNeighbor;
 import org.batfish.datamodel.RipProcess;
 import org.batfish.datamodel.SubRange;
+import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.answers.AclLinesAnswerElement;
@@ -1240,12 +1241,24 @@ public class Batfish extends PluginConsumer implements IBatfish {
       // Update vlanMemberCounts:
       for (Interface iface : nonVlanInterfaces) {
         List<SubRange> vlans = new ArrayList<>();
-        vlanNumber = iface.getAccessVlan();
-        if (vlanNumber == 0) { // vlan trunked interface
-          vlans.addAll(iface.getAllowedVlans());
+        if (iface.getSwitchportMode() == SwitchportMode.TRUNK) { // vlan trunked interface
+          Collection<SubRange> allowed = iface.getAllowedVlans();
+          if (!allowed.isEmpty()) {
+            // Explicit list of allowed VLANs
+            vlans.addAll(allowed);
+          } else {
+            // No explicit list, so all VLANs are allowed.
+            vlanInterfaces.keySet().forEach(v -> vlans.add(new SubRange(v, v)));
+          }
+          // Add the native VLAN as well.
           vlanNumber = iface.getNativeVlan();
+          vlans.add(new SubRange(vlanNumber, vlanNumber));
+        } else if (iface.getSwitchportMode() == SwitchportMode.ACCESS) { // access mode ACCESS
+          vlanNumber = iface.getAccessVlan();
+          vlans.add(new SubRange(vlanNumber, vlanNumber));
+        } else {
+          // TODO?
         }
-        vlans.add(new SubRange(vlanNumber, vlanNumber));
 
         for (SubRange sr : vlans) {
           for (int vlanId = sr.getStart(); vlanId <= sr.getEnd(); ++vlanId) {
