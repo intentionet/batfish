@@ -13,6 +13,12 @@ options {
 
    private boolean _multilineBgpNeighbors;
 
+   private boolean _nxos;
+
+   public boolean isNxos() {
+      return _nxos;
+   }
+
    public void setCadant(boolean b) {
       _cadant = b;
    }
@@ -21,11 +27,16 @@ options {
       _multilineBgpNeighbors = multilineBgpNeighbors;
    }
 
+   public void setNxos(boolean b) {
+      _nxos = b;
+   }
+
    @Override
    public String getStateInfo() {
-      return String.format("_cadant: %s\n_multilineBgpNeighbors: %s\n",
+      return String.format("_cadant: %s\n_multilineBgpNeighbors: %s\n_nxos: %s\n",
          _cadant,
-         _multilineBgpNeighbors
+         _multilineBgpNeighbors,
+         _nxos
       );
    }
 }

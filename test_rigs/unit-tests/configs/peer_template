@@ -9,7 +9,8 @@ router bgp 64601
     network 100.78.0.0/29
     network 100.78.3.0/29
     network 100.93.104.127/32
-    maximum-paths 32
+    maximum-paths 16
+    maximum-paths ibgp 16
   template peer RAAS
     remote-as 65511
     update-source loopback1

@@ -142,7 +142,6 @@ import org.batfish.datamodel.vendor_family.cisco.Sntp;
 import org.batfish.datamodel.vendor_family.cisco.SntpServer;
 import org.batfish.datamodel.vendor_family.cisco.SshSettings;
 import org.batfish.datamodel.vendor_family.cisco.User;
-import org.batfish.grammar.BatfishCombinedParser;
 import org.batfish.grammar.ControlPlaneExtractor;
 import org.batfish.grammar.cisco.CiscoParser.Aaa_accountingContext;
 import org.batfish.grammar.cisco.CiscoParser.Aaa_accounting_commands_lineContext;
@@ -176,6 +175,7 @@ import org.batfish.grammar.cisco.CiscoParser.Auto_summary_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Banner_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Bgp_address_familyContext;
 import org.batfish.grammar.cisco.CiscoParser.Bgp_advertise_inactive_rb_stanzaContext;
+import org.batfish.grammar.cisco.CiscoParser.Bgp_asnContext;
 import org.batfish.grammar.cisco.CiscoParser.Bgp_confederation_rb_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Bgp_listen_range_rb_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Boolean_and_rp_stanzaContext;
@@ -424,6 +424,43 @@ import org.batfish.grammar.cisco.CiscoParser.Prefix_set_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Prepend_as_path_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.ProtocolContext;
 import org.batfish.grammar.cisco.CiscoParser.RangeContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_address_familyContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_aa_tailContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_additional_pathsContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_client_to_clientContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_dampeningContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_default_informationContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_default_metricContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_distanceContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_inject_mapContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_maximum_pathsContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_networkContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_nexthop_route_mapContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_redistribute_directContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_redistribute_eigrpContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_redistribute_isisContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_redistribute_lispContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_redistribute_ospfContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_redistribute_ripContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_redistribute_staticContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_af_table_mapContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_bestpathContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_cluster_idContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_confederation_identifierContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_confederation_peersContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_enforce_first_asContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_log_neighbor_changesContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_maxas_limitContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_af_advertise_mapContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_af_default_originateContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_af_filter_listContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_af_prefix_listContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_af_route_mapContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_af_unsuppress_mapContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_neighborContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_router_idContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_v_local_asContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_vrfContext;
 import org.batfish.grammar.cisco.CiscoParser.Redistribute_aggregate_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Redistribute_connected_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Redistribute_connected_is_stanzaContext;
@@ -737,6 +774,8 @@ import org.batfish.representation.cisco.Vrf;
 import org.batfish.representation.cisco.VrrpGroup;
 import org.batfish.representation.cisco.VrrpInterface;
 import org.batfish.representation.cisco.WildcardAddressSpecifier;
+import org.batfish.representation.cisco.nx.CiscoNxBgpVrfAddressFamilyConfiguration;
+import org.batfish.representation.cisco.nx.CiscoNxBgpVrfConfiguration;
 import org.batfish.vendor.VendorConfiguration;
 
 public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
@@ -835,6 +874,13 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     return name;
   }
 
+  private static long toAsNum(Bgp_asnContext ctx) {
+    if (ctx.asn != null) {
+      return toLong(ctx.asn);
+    }
+    return toLong(ctx.asn_hi) << 16 + toLong(ctx.asn_lo);
+  }
+
   private static Ip toIp(TerminalNode t) {
     return new Ip(t.getText());
   }
@@ -900,6 +946,10 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   private AaaAuthenticationLoginList _currentAaaAuthenticationLoginList;
 
   private IpAsPathAccessList _currentAsPathAcl;
+
+  private CiscoNxBgpVrfAddressFamilyConfiguration _currentBgpNxVrfAddressFamily;
+
+  private CiscoNxBgpVrfConfiguration _currentBgpNxVrfConfiguration;
 
   private final Set<String> _currentBlockNeighborAddressFamilies;
 
@@ -1001,7 +1051,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   private boolean _no;
 
-  private final BatfishCombinedParser<?, ?> _parser;
+  private final CiscoCombinedParser _parser;
 
   private List<BgpPeerGroup> _peerGroupStack;
 
@@ -1019,7 +1069,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   public CiscoControlPlaneExtractor(
       String text,
-      BatfishCombinedParser<?, ?> parser,
+      CiscoCombinedParser parser,
       ConfigurationFormat format,
       Warnings warnings,
       boolean unrecognizedAsRedFlag) {
@@ -1877,6 +1927,396 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void enterRbnx_address_family(Rbnx_address_familyContext ctx) {
+    String familyStr = ctx.first.getText() + '-' + ctx.second.getText();
+    _currentBgpNxVrfAddressFamily =
+        _currentBgpNxVrfConfiguration.getOrCreateAddressFamily(familyStr);
+  }
+
+  @Override
+  public void exitRbnx_address_family(Rbnx_address_familyContext ctx) {
+    _currentBgpNxVrfAddressFamily = null;
+  }
+
+  @Override
+  public void exitRbnx_af_aa_tail(Rbnx_af_aa_tailContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_additional_paths(Rbnx_af_additional_pathsContext ctx) {
+    if (ctx.mapname != null) {
+      String name = ctx.mapname.getText();
+      _configuration.referenceStructure(
+          CiscoStructureType.ROUTE_MAP,
+          name,
+          CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+          ctx.getStart().getLine());
+    }
+  }
+
+  @Override
+  public void exitRbnx_af_client_to_client(Rbnx_af_client_to_clientContext ctx) {
+    _currentBgpNxVrfAddressFamily.setClientToClientReflection(true);
+  }
+
+  @Override
+  public void exitRbnx_af_dampening(Rbnx_af_dampeningContext ctx) {
+    if (ctx.mapname != null) {
+      String name = ctx.mapname.getText();
+      _configuration.referenceStructure(
+          CiscoStructureType.ROUTE_MAP,
+          name,
+          CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+          ctx.getStart().getLine());
+    }
+  }
+
+  @Override
+  public void exitRbnx_af_default_metric(Rbnx_af_default_metricContext ctx) {
+    long metric = toLong(ctx.metric);
+    _currentBgpNxVrfAddressFamily.setDefaultMetric(metric);
+  }
+
+  @Override
+  public void exitRbnx_af_default_information(Rbnx_af_default_informationContext ctx) {
+    _currentBgpNxVrfAddressFamily.setDefaultOriginate(true);
+  }
+
+  @Override
+  public void exitRbnx_af_distance(Rbnx_af_distanceContext ctx) {
+    _currentBgpNxVrfAddressFamily.setDistanceEbgp(toInteger(ctx.ebgp));
+    _currentBgpNxVrfAddressFamily.setDistanceIbgp(toInteger(ctx.ibgp));
+    _currentBgpNxVrfAddressFamily.setDistanceLocal(toInteger(ctx.local));
+  }
+
+  @Override
+  public void exitRbnx_af_inject_map(Rbnx_af_inject_mapContext ctx) {
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        ctx.injectmap.getText(),
+        CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+        ctx.getStart().getLine());
+
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        ctx.existmap.getText(),
+        CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_maximum_paths(Rbnx_af_maximum_pathsContext ctx) {
+    int limit = toInteger(ctx.numpaths);
+    if (ctx.IBGP() != null) {
+      _currentBgpNxVrfAddressFamily.setMaximumPathsIbgp(limit);
+    } else {
+      _currentBgpNxVrfAddressFamily.setMaximumPathsEbgp(limit);
+    }
+  }
+
+  @Override
+  public void exitRbnx_af_network(Rbnx_af_networkContext ctx) {
+    Prefix prefix =
+        (ctx.prefix != null)
+            ? Prefix.parse(ctx.prefix.getText())
+            : new Prefix(toIp(ctx.address), toIp(ctx.mask));
+
+    String prefixName = "";
+    if (ctx.mapname != null) {
+      prefixName = ctx.mapname.getText();
+      _configuration.referenceStructure(
+          CiscoStructureType.ROUTE_MAP,
+          prefixName,
+          CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+          ctx.getStart().getLine());
+    }
+
+    _currentBgpNxVrfAddressFamily.addIpNetwork(prefix, prefixName);
+  }
+
+  @Override
+  public void exitRbnx_af_nexthop_route_map(Rbnx_af_nexthop_route_mapContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_redistribute_direct(Rbnx_af_redistribute_directContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_REDISTRIBUTE_CONNECTED_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_redistribute_eigrp(Rbnx_af_redistribute_eigrpContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_REDISTRIBUTE_EIGRP_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_redistribute_isis(Rbnx_af_redistribute_isisContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_REDISTRIBUTE_ISIS_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_redistribute_lisp(Rbnx_af_redistribute_lispContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_REDISTRIBUTE_LISP_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_redistribute_ospf(Rbnx_af_redistribute_ospfContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_REDISTRIBUTE_OSPF_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_redistribute_rip(Rbnx_af_redistribute_ripContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_REDISTRIBUTE_RIP_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_redistribute_static(Rbnx_af_redistribute_staticContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_REDISTRIBUTE_STATIC_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_af_table_map(Rbnx_af_table_mapContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_TABLE_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_bestpath(Rbnx_bestpathContext ctx) {
+    if (ctx.ALWAYS_COMPARE_MED() != null) {
+      _currentBgpNxVrfConfiguration.setBestpathAlwaysCompareMed(true);
+    } else if (ctx.AS_PATH() != null && ctx.MULTIPATH_RELAX() != null) {
+      _currentBgpNxVrfConfiguration.setBestpathAsPathMultipathRelax(true);
+    } else if (ctx.COMPARE_ROUTERID() != null) {
+      _currentBgpNxVrfConfiguration.setBestpathCompareRouterId(true);
+    } else if (ctx.COST_COMMUNITY() != null && ctx.IGNORE() != null) {
+      _currentBgpNxVrfConfiguration.setBestpathCostCommunityIgnore(true);
+    } else if (ctx.MED() != null && ctx.CONFED() != null) {
+      _currentBgpNxVrfConfiguration.setBestpathMedConfed(true);
+    } else if (ctx.MED() != null && ctx.MISSING_AS_WORST() != null) {
+      _currentBgpNxVrfConfiguration.setBestpathMedMissingAsWorst(true);
+    } else if (ctx.MED() != null && ctx.NON_DETERMINISTIC() != null) {
+      _currentBgpNxVrfConfiguration.setBestpathMedNonDeterministic(true);
+    } else {
+      _w.redFlag("Unsupported BGP bestpath configuration: " + ctx.getText());
+    }
+  }
+
+  @Override
+  public void exitRbnx_cluster_id(Rbnx_cluster_idContext ctx) {
+    if (ctx.ip != null) {
+      _currentBgpNxVrfConfiguration.setClusterId(toIp(ctx.ip));
+    } else {
+      _currentBgpNxVrfConfiguration.setClusterId(new Ip(toLong(ctx.ip_as_int)));
+    }
+  }
+
+  @Override
+  public void exitRbnx_confederation_identifier(Rbnx_confederation_identifierContext ctx) {
+    todo(ctx, F_BGP_CONFEDERATION);
+  }
+
+  @Override
+  public void exitRbnx_confederation_peers(Rbnx_confederation_peersContext ctx) {
+    todo(ctx, F_BGP_CONFEDERATION);
+  }
+
+  @Override
+  public void exitRbnx_enforce_first_as(Rbnx_enforce_first_asContext ctx) {
+    _configuration.getNxBgpGlobalConfiguration().setEnforceFirstAs(true);
+  }
+
+  @Override
+  public void exitRbnx_log_neighbor_changes(Rbnx_log_neighbor_changesContext ctx) {
+    _currentBgpNxVrfConfiguration.setLogNeighborChanges(true);
+  }
+
+  @Override
+  public void exitRbnx_maxas_limit(Rbnx_maxas_limitContext ctx) {
+    int limit = toInteger(ctx.limit);
+    _currentBgpNxVrfConfiguration.setMaxasLimit(limit);
+  }
+
+  @Override
+  public void exitRbnx_neighbor(Rbnx_neighborContext ctx) {
+    if (ctx.ROUTE_MAP() != null) {
+      String name = ctx.mapname.getText();
+      _configuration.referenceStructure(
+          CiscoStructureType.ROUTE_MAP,
+          name,
+          CiscoStructureUsage.BGP_NEIGHBOR_REMOTE_AS_ROUTE_MAP,
+          ctx.getStart().getLine());
+    }
+  }
+
+  @Override
+  public void exitRbnx_n_af_advertise_map(Rbnx_n_af_advertise_mapContext ctx) {
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        ctx.mapname.getText(),
+        CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+        ctx.getStart().getLine());
+
+    if (ctx.EXIST_MAP() != null) {
+      _configuration.referenceStructure(
+          CiscoStructureType.ROUTE_MAP,
+          ctx.existmap.getText(),
+          CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+          ctx.getStart().getLine());
+    }
+
+    if (ctx.NON_EXIST_MAP() != null) {
+      _configuration.referenceStructure(
+          CiscoStructureType.ROUTE_MAP,
+          ctx.nonexistmap.getText(),
+          CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+          ctx.getStart().getLine());
+    }
+  }
+
+  @Override
+  public void exitRbnx_n_af_default_originate(Rbnx_n_af_default_originateContext ctx) {
+    if (ctx.ROUTE_MAP() != null) {
+      String name = ctx.mapname.getText();
+      _configuration.referenceStructure(
+          CiscoStructureType.ROUTE_MAP,
+          name,
+          CiscoStructureUsage.BGP_DEFAULT_ORIGINATE_ROUTE_MAP,
+          ctx.getStart().getLine());
+    }
+  }
+
+  @Override
+  public void exitRbnx_n_af_filter_list(Rbnx_n_af_filter_listContext ctx) {
+    String filterList = ctx.name.getText();
+    CiscoStructureType type =
+        _inIpv6BgpPeer ? CiscoStructureType.IPV6_ACCESS_LIST : CiscoStructureType.IPV4_ACCESS_LIST;
+    CiscoStructureUsage usage =
+        _inIpv6BgpPeer
+            ? ((ctx.IN() != null)
+                ? CiscoStructureUsage.BGP_INBOUND_FILTER6_LIST
+                : CiscoStructureUsage.BGP_OUTBOUND_FILTER6_LIST)
+            : ((ctx.IN() != null)
+                ? CiscoStructureUsage.BGP_INBOUND_FILTER_LIST
+                : CiscoStructureUsage.BGP_OUTBOUND_FILTER_LIST);
+    _configuration.referenceStructure(type, filterList, usage, ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_n_af_prefix_list(Rbnx_n_af_prefix_listContext ctx) {
+    String prefixList = ctx.listname.getText();
+    CiscoStructureType type =
+        _inIpv6BgpPeer ? CiscoStructureType.IPV6_ACCESS_LIST : CiscoStructureType.IPV4_ACCESS_LIST;
+    CiscoStructureUsage usage =
+        _inIpv6BgpPeer
+            ? ((ctx.IN() != null)
+                ? CiscoStructureUsage.BGP_INBOUND_PREFIX6_LIST
+                : CiscoStructureUsage.BGP_OUTBOUND_PREFIX6_LIST)
+            : ((ctx.IN() != null)
+                ? CiscoStructureUsage.BGP_INBOUND_PREFIX_LIST
+                : CiscoStructureUsage.BGP_OUTBOUND_PREFIX_LIST);
+    _configuration.referenceStructure(type, prefixList, usage, ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_n_af_route_map(Rbnx_n_af_route_mapContext ctx) {
+    String name = ctx.mapname.getText();
+    CiscoStructureUsage usage =
+        (ctx.IN() != null)
+            ? CiscoStructureUsage.BGP_INBOUND_ROUTE_MAP
+            : CiscoStructureUsage.BGP_OUTBOUND_ROUTE_MAP;
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP, name, usage, ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_n_af_unsuppress_map(Rbnx_n_af_unsuppress_mapContext ctx) {
+    String name = ctx.mapname.getText();
+    _configuration.referenceStructure(
+        CiscoStructureType.ROUTE_MAP,
+        name,
+        CiscoStructureUsage.BGP_ROUTE_MAP_OTHER,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRbnx_router_id(Rbnx_router_idContext ctx) {
+    Ip ip = toIp(ctx.IP_ADDRESS());
+    _currentBgpNxVrfConfiguration.setRouterId(ip);
+  }
+
+  @Override
+  public void enterRbnx_vrf(Rbnx_vrfContext ctx) {
+    String vrfName = ctx.name.getText();
+    Vrf vrf = initVrf(vrfName);
+    _currentBgpNxVrfConfiguration = vrf.getBgpNxConfig();
+    if (_currentBgpNxVrfConfiguration == null) {
+      _currentBgpNxVrfConfiguration = new CiscoNxBgpVrfConfiguration();
+      vrf.setBgpNxConfig(_currentBgpNxVrfConfiguration);
+    }
+  }
+
+  @Override
+  public void exitRbnx_vrf(Rbnx_vrfContext ctx) {
+    _currentBgpNxVrfConfiguration = _configuration.getDefaultVrf().getBgpNxConfig();
+  }
+
+  @Override
+  public void exitRbnx_v_local_as(Rbnx_v_local_asContext ctx) {
+    long asNum = toAsNum(ctx.bgp_asn());
+    _currentBgpNxVrfConfiguration.setLocalAs(asNum);
+  }
+
+  @Override
   public void enterRo_area(Ro_areaContext ctx) {
     long area;
     if (ctx.area_int != null) {
@@ -1958,10 +2398,21 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void enterRouter_bgp_stanza(Router_bgp_stanzaContext ctx) {
     int procNum = (ctx.procnum == null) ? 0 : toInteger(ctx.procnum);
-    BgpProcess proc = new BgpProcess(_format, procNum);
-    _configuration.getVrfs().get(Configuration.DEFAULT_VRF_NAME).setBgpProcess(proc);
-    _dummyPeerGroup = new MasterBgpPeerGroup();
-    pushPeer(proc.getMasterBgpPeerGroup());
+    Vrf vrf = _configuration.getVrfs().get(Configuration.DEFAULT_VRF_NAME);
+
+    if (_parser.getParser().isNxos()) {
+      _currentBgpNxVrfConfiguration = vrf.getBgpNxConfig();
+      if (_currentBgpNxVrfConfiguration == null) {
+        _currentBgpNxVrfConfiguration = new CiscoNxBgpVrfConfiguration();
+        vrf.setBgpNxConfig(_currentBgpNxVrfConfiguration);
+      }
+      _currentBgpNxVrfConfiguration.setLocalAs(procNum);
+    } else {
+      BgpProcess proc = new BgpProcess(_format, procNum);
+      vrf.setBgpProcess(proc);
+      _dummyPeerGroup = new MasterBgpPeerGroup();
+      pushPeer(proc.getMasterBgpPeerGroup());
+    }
   }
 
   @Override
@@ -2717,7 +3168,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   public void exitCluster_id_bgp_tail(Cluster_id_bgp_tailContext ctx) {
     Ip clusterId = null;
     if (ctx.DEC() != null) {
-      long ipAsLong = Long.parseLong(ctx.DEC().getText());
+      long ipAsLong = toLong(ctx.DEC());
       clusterId = new Ip(ipAsLong);
     } else if (ctx.IP_ADDRESS() != null) {
       clusterId = toIp(ctx.IP_ADDRESS());
@@ -5559,7 +6010,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitRouter_bgp_stanza(Router_bgp_stanzaContext ctx) {
-    popPeer();
+    if (_parser.getParser().isNxos()) {
+      _currentBgpNxVrfConfiguration = null;
+    } else {
+      popPeer();
+    }
   }
 
   @Override

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.SortedSet;
@@ -158,7 +159,7 @@ public class Vrf extends ComparableStructure<String> {
   }
 
   @JsonIgnore
-  public NavigableMap<String, Interface> getInterfaces() {
+  public Map<String, Interface> getInterfaces() {
     return _interfaces;
   }
 

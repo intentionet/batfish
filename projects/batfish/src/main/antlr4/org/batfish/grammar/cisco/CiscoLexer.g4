@@ -394,6 +394,11 @@ ADVERTISE_INACTIVE
    'advertise-inactive'
 ;
 
+ADVERTISE_MAP
+:
+   'advertise-map'
+;
+
 AES
 :
    'aes'
@@ -1266,6 +1271,11 @@ BESTPATH
    'bestpath'
 ;
 
+BESTPATH_LIMIT
+:
+   'bestpath-limit'
+;
+
 BEYOND_SCOPE
 :
    'beyond-scope'
@@ -2081,6 +2091,11 @@ CONNECTION
    'connection'
 ;
 
+CONNECTION_MODE
+:
+   'connection-mode'
+;
+
 CONNECTION_REUSE
 :
    'connection-reuse'
@@ -2187,6 +2202,11 @@ COPY
    'copy'
 ;
 
+COPY_ATTRIBUTES
+:
+   'copy-attributes'
+;
+
 COS
 :
    'cos'
@@ -2205,6 +2225,11 @@ COS_QUEUE_GROUP
 COST
 :
    'cost'
+;
+
+COST_COMMUNITY
+:
+   'cost-community'
 ;
 
 COUNT
@@ -3327,6 +3352,11 @@ DUAL_ACTIVE
    'dual-active'
 ;
 
+DUAL_AS
+:
+   'dual-as'
+;
+
 DUAL_MODE_DEFAULT_VLAN
 :
    'dual-mode-default-vlan'
@@ -3922,6 +3952,16 @@ EXECUTE
    'execute' -> pushMode ( M_Execute )
 ;
 
+EXEMPT
+:
+   'exempt'
+;
+
+EXIST_MAP
+:
+   'exist-map'
+;
+
 EXIT
 :
    'exit'
@@ -4336,6 +4376,11 @@ FLUSH_R1_ON_NEW_R0
    'flush-r1-on-new-r0'
 ;
 
+FLUSH_ROUTES
+:
+   'flush-routes'
+;
+
 FORCE
 :
    'force'
@@ -4534,6 +4579,11 @@ GOPHER
 GRACEFUL_RESTART
 :
    'graceful-restart'
+;
+
+GRACEFUL_RESTART_HELPER
+:
+   'graceful-restart-helper'
 ;
 
 GRACETIME
@@ -4986,6 +5036,11 @@ IDENT
    'ident'
 ;
 
+IDENTIFIER
+:
+   'identifier'
+;
+
 IDENTITY
 :
    'identity'
@@ -5254,6 +5309,11 @@ INIT_TECH_LIST
 INITIAL_ROLE
 :
    'initial-role'
+;
+
+INJECT_MAP
+:
+   'inject-map'
 ;
 
 INPUT
@@ -5693,6 +5753,11 @@ LAPB
    'lapb'
 ;
 
+LARGE
+:
+   'large'
+;
+
 LAST_AS
 :
    'last-as'
@@ -5871,6 +5936,11 @@ LINK_TYPE
 LINKDEBOUNCE
 :
    'linkdebounce'
+;
+
+LISP
+:
+   'lisp'
 ;
 
 LIST
@@ -6088,6 +6158,11 @@ LOTUSNOTES
    'lotusnotes'
 ;
 
+LOW_MEMORY
+:
+   'low-memory'
+;
+
 LPD
 :
    'lpd'
@@ -6296,6 +6371,11 @@ MATCHES_ANY
 MATCHES_EVERY
 :
    'matches-every'
+;
+
+MAXAS_LIMIT
+:
+   'maxas-limit'
 ;
 
 MAX_ASSOCIATIONS
@@ -6693,6 +6773,11 @@ MIRROR
    'mirror'
 ;
 
+MISSING_AS_WORST
+:
+   'missing-as-worst'
+;
+
 MLAG
 :
    'mlag'
@@ -6941,6 +7026,11 @@ MULTI_CONFIG
 MULTI_TOPOLOGY
 :
    'multi-topology'
+;
+
+MVPN
+:
+   'mvpn'
 ;
 
 MVR
@@ -7348,9 +7438,24 @@ NON_CLIENT_NRT
    'non-client-nrt'
 ;
 
+NON_CRITICAL
+:
+   'non-critical'
+;
+
+NON_DETERMINISTIC
+:
+   'non-deterministic'
+;
+
 NON_DETERMINISTIC_MED
 :
    'non-deterministic-med'
+;
+
+NON_EXIST_MAP
+:
+   'non-exist-map'
 ;
 
 NONE
@@ -7898,6 +8003,11 @@ PEER
    'peer'
 ;
 
+PEERS
+:
+   'peers'
+;
+
 PEER_ADDRESS
 :
    'peer-address'
@@ -8326,6 +8436,16 @@ PREFIX_LENGTH
 PREFIX_LIST
 :
    'prefix-list'
+;
+
+PREFIX_PEER_TIMEOUT
+:
+   'prefix-peer-timeout'
+;
+
+PREFIX_PEER_WAIT
+:
+   'prefix-peer-wait'
 ;
 
 PREFIX_SET
@@ -8888,6 +9008,11 @@ REFLECT
    'reflect'
 ;
 
+REFLECTION
+:
+   'reflection'
+;
+
 REFLEXIVE_LIST
 :
    'reflexive-list'
@@ -9051,6 +9176,16 @@ RESPONDER
 RESPONSE
 :
    'response'
+;
+
+RESTART
+:
+   'restart'
+;
+
+RESTART_TIME
+:
+   'restart-time'
 ;
 
 RESTRICTED
@@ -9618,6 +9753,11 @@ SELECT
    'select'
 ;
 
+SELECTION
+:
+   'selection'
+;
+
 SELECTIVE
 :
    'selective'
@@ -10053,6 +10193,11 @@ SITE_ID
    'site-id'
 ;
 
+SIZE
+:
+   'size'
+;
+
 SLA
 :
    'sla'
@@ -10066,6 +10211,11 @@ SLOT
 SLOT_TABLE_COS
 :
    'slot-table-cos'
+;
+
+SMALL
+:
+   'small'
 ;
 
 SMALL_HELLO
@@ -10136,6 +10286,11 @@ SNR_MIN
 SNTP
 :
    'sntp'
+;
+
+SOO
+:
+   'soo'
 ;
 
 SORT_BY
@@ -10356,6 +10511,11 @@ STACK_MIB
 STACK_UNIT
 :
    'stack-unit'
+;
+
+STALEPATH_TIME
+:
+   'stalepath-time'
 ;
 
 STALE_ROUTE
@@ -10630,9 +10790,19 @@ SUPPRESS_ARP
    'suppress-arp'
 ;
 
+SUPPRESS_INACTIVE
+:
+   'suppress-inactive'
+;
+
 SUPPRESS_FIB_PENDING
 :
    'suppress-fib-pending'
+;
+
+SUPPRESS_MAP
+:
+   'suppress-map'
 ;
 
 SUPPRESSED
@@ -11250,6 +11420,11 @@ TRIGGER
    'trigger'
 ;
 
+TRIGGER_DELAY
+:
+   'trigger-delay'
+;
+
 TRIMODE
 :
    'trimode'
@@ -11453,6 +11628,11 @@ UNREACHABLE
 UNREACHABLES
 :
    'unreachables'
+;
+
+UNSUPPRESS_MAP
+:
+   'unsuppress-map'
 ;
 
 UNICAST
@@ -12022,6 +12202,11 @@ WAIT_FOR
   'wait-for'
 ;
 
+WAIT_IGP_CONVERGENCE
+:
+   'wait-igp-convergence'
+;
+
 WAIT_START
 :
    'wait-start'
@@ -12030,6 +12215,11 @@ WAIT_START
 WARNINGS
 :
    'warnings'
+;
+
+WARNING_ONLY
+:
+   'warning-only'
 ;
 
 WARNTIME
@@ -12622,6 +12812,11 @@ FLOAT
 FORWARD_SLASH
 :
    '/'
+;
+
+FOUR_BYTE_AS
+:
+   '4-byte-as'
 ;
 
 IP_ADDRESS
