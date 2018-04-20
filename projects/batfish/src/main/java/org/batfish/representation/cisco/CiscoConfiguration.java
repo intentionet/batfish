@@ -1,5 +1,8 @@
 package org.batfish.representation.cisco;
 
+import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PATH;
+import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.PATH_LENGTH;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -118,6 +121,9 @@ import org.batfish.datamodel.vendor_family.cisco.Cable;
 import org.batfish.datamodel.vendor_family.cisco.CiscoFamily;
 import org.batfish.datamodel.vendor_family.cisco.Line;
 import org.batfish.representation.cisco.Tunnel.TunnelMode;
+import org.batfish.representation.cisco.nx.CiscoNxBgpGlobalConfiguration;
+import org.batfish.representation.cisco.nx.CiscoNxBgpVrfAddressFamilyConfiguration;
+import org.batfish.representation.cisco.nx.CiscoNxBgpVrfConfiguration;
 import org.batfish.vendor.VendorConfiguration;
 
 public final class CiscoConfiguration extends VendorConfiguration {
@@ -347,6 +353,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private String _ntpSourceInterface;
 
+  private CiscoNxBgpGlobalConfiguration _nxBgpGlobalConfiguration;
+
   private final Set<String> _pimAcls;
 
   private final Set<String> _pimRouteMaps;
@@ -436,6 +444,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     _natPools = new TreeMap<>();
     _networkObjectGroups = new TreeMap<>();
     _ntpAccessGroups = new TreeSet<>();
+    _nxBgpGlobalConfiguration = new CiscoNxBgpGlobalConfiguration();
     _pimAcls = new TreeSet<>();
     _pimRouteMaps = new TreeSet<>();
     _prefixLists = new TreeMap<>();
@@ -797,6 +806,10 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   public String getNtpSourceInterface() {
     return _ntpSourceInterface;
+  }
+
+  public CiscoNxBgpGlobalConfiguration getNxBgpGlobalConfiguration() {
+    return _nxBgpGlobalConfiguration;
   }
 
   public Set<String> getPimAcls() {
@@ -1255,6 +1268,35 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return line;
   }
 
+  private org.batfish.datamodel.BgpProcess toNxBgpProcess(
+      Configuration c,
+      CiscoNxBgpGlobalConfiguration nxBgpGlobal,
+      CiscoNxBgpVrfConfiguration nxBgpVrf,
+      String vrfName) {
+    org.batfish.datamodel.BgpProcess newBgpProcess = new org.batfish.datamodel.BgpProcess();
+    org.batfish.datamodel.Vrf v = c.getVrfs().get(vrfName);
+
+    if (nxBgpVrf.getBestpathCompareRouterId()) {
+      newBgpProcess.setTieBreaker(BgpTieBreaker.ROUTER_ID);
+    }
+
+    newBgpProcess.setRouterId(CiscoNxConversions.getNxBgpRouterId(c, nxBgpVrf, v));
+
+    // From NX-OS docs for `bestpath as-path multipath-relax`
+    //  Allows load sharing across providers with different (but equal-length) autonomous system
+    //  paths. Without this option, the AS paths must be identical for load sharing.
+    newBgpProcess.setMultipathEquivalentAsPathMatchMode(
+        nxBgpVrf.getBestpathAsPathMultipathRelax() ? PATH_LENGTH : EXACT_PATH);
+
+    CiscoNxBgpVrfAddressFamilyConfiguration ipv4af = nxBgpVrf.getIpv4UnicastAddressFamily();
+    if (ipv4af != null) {
+      newBgpProcess.setMultipathEbgp(ipv4af.getMaximumPathsEbgp() > 1);
+      newBgpProcess.setMultipathIbgp(ipv4af.getMaximumPathsIbgp() > 1);
+    }
+
+    return newBgpProcess;
+  }
+
   private org.batfish.datamodel.BgpProcess toBgpProcess(
       final Configuration c, BgpProcess proc, String vrfName) {
     org.batfish.datamodel.BgpProcess newBgpProcess = new org.batfish.datamodel.BgpProcess();
@@ -1264,9 +1306,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
       newBgpProcess.setTieBreaker(tieBreaker);
     }
     MultipathEquivalentAsPathMatchMode multipathEquivalentAsPathMatchMode =
-        proc.getAsPathMultipathRelax()
-            ? MultipathEquivalentAsPathMatchMode.PATH_LENGTH
-            : MultipathEquivalentAsPathMatchMode.EXACT_PATH;
+        proc.getAsPathMultipathRelax() ? PATH_LENGTH : EXACT_PATH;
     newBgpProcess.setMultipathEquivalentAsPathMatchMode(multipathEquivalentAsPathMatchMode);
     Integer maximumPaths = proc.getMaximumPaths();
     Integer maximumPathsEbgp = proc.getMaximumPathsEbgp();
@@ -3772,11 +3812,19 @@ public final class CiscoConfiguration extends VendorConfiguration {
             newVrf.setIsisProcess(newIsisProcess);
           }
 
-          // convert bgp process
+          // convert bgp process (non-NX-OS)
           BgpProcess bgpProcess = vrf.getBgpProcess();
           if (bgpProcess != null) {
             org.batfish.datamodel.BgpProcess newBgpProcess = toBgpProcess(c, bgpProcess, vrfName);
-            c.getVrfs().get(vrfName).setBgpProcess(newBgpProcess);
+            newVrf.setBgpProcess(newBgpProcess);
+          }
+
+          // convert NX-OS BGP configuration
+          CiscoNxBgpVrfConfiguration nxBgp = vrf.getBgpNxConfig();
+          if (nxBgp != null) {
+            org.batfish.datamodel.BgpProcess newBgpProcess =
+                toNxBgpProcess(c, getNxBgpGlobalConfiguration(), nxBgp, vrfName);
+            newVrf.setBgpProcess(newBgpProcess);
           }
         });
 
