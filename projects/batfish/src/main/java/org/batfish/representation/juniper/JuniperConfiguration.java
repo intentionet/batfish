@@ -319,17 +319,17 @@ public final class JuniperConfiguration extends VendorConfiguration {
       NamedBgpGroup group = e.getValue();
       if (!group.getIpv6() && !group.getInherited()) {
         _unreferencedBgpGroups.put(name, group.getDefinitionLine());
-        Ip fakeIp = new Ip(-1 * fakeIpCounter);
+        Prefix fakeIp = new Prefix(new Ip(-1 * fakeIpCounter), Prefix.MAX_PREFIX_LENGTH);
         IpBgpGroup dummy = new IpBgpGroup(fakeIp);
         dummy.setParent(group);
         dummy.cascadeInheritance();
         routingInstance.getIpBgpGroups().put(fakeIp, dummy);
       }
     }
-    for (Entry<Ip, IpBgpGroup> e : routingInstance.getIpBgpGroups().entrySet()) {
-      Ip ip = e.getKey();
+    for (Entry<Prefix, IpBgpGroup> e : routingInstance.getIpBgpGroups().entrySet()) {
+      Prefix prefix = e.getKey();
       IpBgpGroup ig = e.getValue();
-      BgpNeighbor neighbor = new BgpNeighbor(ip, _c, false);
+      BgpNeighbor neighbor = new BgpNeighbor(prefix, _c, ig.getDynamic());
       neighbor.setVrf(vrfName);
 
       // route reflection
@@ -538,7 +538,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
         outerloop:
         for (org.batfish.datamodel.Interface iface : vrf.getInterfaces().values()) {
           for (InterfaceAddress address : iface.getAllAddresses()) {
-            if (address.getPrefix().containsIp(ip)) {
+            if (address.getPrefix().containsPrefix(prefix)) {
               localIp = address.getIp();
               break outerloop;
             }
@@ -554,8 +554,8 @@ public final class JuniperConfiguration extends VendorConfiguration {
           }
         }
       }
-      if (localIp == null && ip.valid()) {
-        _w.redFlag("Could not determine local ip for bgp peering with neighbor ip: " + ip);
+      if (localIp == null) {
+        _w.redFlag("Could not determine local ip for bgp peering with neighbor ip: " + prefix);
       } else {
         neighbor.setLocalIp(localIp);
       }

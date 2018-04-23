@@ -41,6 +41,16 @@ b_authentication_key_chain
    AUTHENTICATION_KEY_CHAIN name = string
 ;
 
+b_allow
+:
+   ALLOW
+   (
+       IP_PREFIX
+       | IPV6_PREFIX
+       | ALL
+   )
+;
+
 b_as_override
 :
    AS_OVERRIDE
@@ -133,6 +143,7 @@ b_group
    (
       b_common
       | b_neighbor
+      | b_allow
    )
 ;
 

@@ -7,6 +7,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.OspfArea;
+import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SnmpServer;
 
 public class RoutingInstance implements Serializable {
@@ -36,7 +37,7 @@ public class RoutingInstance implements Serializable {
 
   private final Map<String, Interface> _interfaces;
 
-  private Map<Ip, IpBgpGroup> _ipBgpGroups;
+  private Map<Prefix, IpBgpGroup> _ipBgpGroups;
 
   private final IsisSettings _isisSettings;
 
@@ -137,7 +138,7 @@ public class RoutingInstance implements Serializable {
     return _interfaces;
   }
 
-  public Map<Ip, IpBgpGroup> getIpBgpGroups() {
+  public Map<Prefix, IpBgpGroup> getIpBgpGroups() {
     return _ipBgpGroups;
   }
 

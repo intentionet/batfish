@@ -1,19 +1,19 @@
 package org.batfish.representation.juniper;
 
-import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.Prefix;
 
 public class IpBgpGroup extends BgpGroup {
 
   /** */
   private static final long serialVersionUID = 1L;
 
-  private Ip _remoteAddress;
+  private Prefix _remoteAddress;
 
-  public IpBgpGroup(Ip remoteAddress) {
+  public IpBgpGroup(Prefix remoteAddress) {
     _remoteAddress = remoteAddress;
   }
 
-  public Ip getRemoteAddress() {
+  public Prefix getRemoteAddress() {
     return _remoteAddress;
   }
 }

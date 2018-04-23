@@ -69,6 +69,7 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.As_unitContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_advertise_externalContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_advertise_inactiveContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_advertise_peer_asContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_allowContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_authentication_algorithmContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_authentication_keyContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_authentication_key_chainContext;
@@ -1595,6 +1596,29 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   }
 
   @Override
+  public void enterB_allow(B_allowContext ctx) {
+    if (ctx.IPV6_PREFIX() != null) {
+      _currentBgpGroup.setIpv6(true);
+      _currentBgpGroup = DUMMY_BGP_GROUP;
+      // not supported for now
+      return;
+    }
+    Prefix remotePrefix = Prefix.ZERO; // equivalent to ALL
+    if (ctx.IP_PREFIX() != null) {
+      remotePrefix = Prefix.parse(ctx.IP_PREFIX().getText());
+    }
+    Map<Prefix, IpBgpGroup> ipBgpGroups = _currentRoutingInstance.getIpBgpGroups();
+    IpBgpGroup ipBgpGroup = ipBgpGroups.get(remotePrefix);
+    if (ipBgpGroup == null) {
+      ipBgpGroup = new IpBgpGroup(remotePrefix);
+      ipBgpGroup.setParent(_currentBgpGroup);
+      ipBgpGroups.put(remotePrefix, ipBgpGroup);
+      ipBgpGroup.setDynamic(true);
+    }
+    _currentBgpGroup = ipBgpGroup;
+  }
+
+  @Override
   public void enterB_group(B_groupContext ctx) {
     String name = ctx.name.getText();
     int definitionLine = ctx.name.getStart().getLine();
@@ -1611,8 +1635,9 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void enterB_neighbor(B_neighborContext ctx) {
     if (ctx.IP_ADDRESS() != null) {
-      Ip remoteAddress = new Ip(ctx.IP_ADDRESS().getText());
-      Map<Ip, IpBgpGroup> ipBgpGroups = _currentRoutingInstance.getIpBgpGroups();
+      Prefix remoteAddress =
+          new Prefix(new Ip(ctx.IP_ADDRESS().getText()), Prefix.MAX_PREFIX_LENGTH);
+      Map<Prefix, IpBgpGroup> ipBgpGroups = _currentRoutingInstance.getIpBgpGroups();
       IpBgpGroup ipBgpGroup = ipBgpGroups.get(remoteAddress);
       if (ipBgpGroup == null) {
         ipBgpGroup = new IpBgpGroup(remoteAddress);

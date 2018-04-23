@@ -32,6 +32,8 @@ public class BgpGroup implements Serializable {
 
   private String _description;
 
+  private boolean _dynamic;
+
   private Boolean _ebgpMultihop;
 
   private Boolean _enforceFirstAs;
@@ -171,6 +173,10 @@ public class BgpGroup implements Serializable {
     return _description;
   }
 
+  public boolean getDynamic() {
+    return _dynamic;
+  }
+
   public Boolean getEbgpMultihop() {
     return _ebgpMultihop;
   }
@@ -261,6 +267,10 @@ public class BgpGroup implements Serializable {
 
   public final void setDescription(String description) {
     _description = description;
+  }
+
+  public void setDynamic(boolean dynamic) {
+    this._dynamic = dynamic;
   }
 
   public void setEbgpMultihop(boolean ebgpMultihop) {
