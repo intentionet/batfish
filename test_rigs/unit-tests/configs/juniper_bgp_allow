@@ -1,0 +1,8 @@
+#
+set system host-name bgp-allow
+#
+set routing-options router-id 1.1.1.1
+set routing-options autonomous-system 1
+set protocols bgp group GROUP peer-as 2
+set protocols bgp group GROUP local-address 1.1.1.1
+set protocols bgp group GROUP allow 10.1.1.0/24

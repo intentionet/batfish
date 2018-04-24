@@ -28,4 +28,15 @@ final class BgpNeighborMatchersImpl {
       return actual.getEnforceFirstAs();
     }
   }
+
+  static final class IsDynamic extends FeatureMatcher<BgpNeighbor, Boolean> {
+    IsDynamic(@Nonnull Matcher<? super Boolean> subMatcher) {
+      super(subMatcher, "A BgpNeighbor with dynamic set to:", "dynamic");
+    }
+
+    @Override
+    protected Boolean featureValueOf(BgpNeighbor actual) {
+      return actual.getDynamic();
+    }
+  }
 }
