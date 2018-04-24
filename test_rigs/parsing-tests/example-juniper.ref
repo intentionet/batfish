@@ -10612,8 +10612,8 @@
       "warnings" : {
         "as1border1" : {
           "Red flags" : {
-            "1" : "MISCELLANEOUS: Could not determine local ip for bgp peering with neighbor ip: 3.2.2.2",
-            "2" : "MISCELLANEOUS: Could not determine local ip for bgp peering with neighbor ip: 5.6.7.8"
+            "1" : "MISCELLANEOUS: Could not determine local ip for bgp peering with neighbor ip: 3.2.2.2/32",
+            "2" : "MISCELLANEOUS: Could not determine local ip for bgp peering with neighbor ip: 5.6.7.8/32"
           }
         }
       }
