@@ -3,6 +3,9 @@ package org.batfish.grammar;
 /** Settings for parsers and lexers */
 public interface GrammarSettings {
 
+  /** Returns true iff the Cisco NX-OS specific parser is enabled. */
+  boolean getEnableCiscoNxParser();
+
   /**
    * Controls whether or not unrecognized lines will trigger recovery mode wherein they are
    * collected and ignored, i.e. they do not trigger a crash.

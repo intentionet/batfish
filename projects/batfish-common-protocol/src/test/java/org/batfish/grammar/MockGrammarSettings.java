@@ -49,6 +49,11 @@ public class MockGrammarSettings implements GrammarSettings {
   }
 
   @Override
+  public boolean getEnableCiscoNxParser() {
+    return false;
+  }
+
+  @Override
   public boolean getDisableUnrecognized() {
     return _disableUnrecognized;
   }
