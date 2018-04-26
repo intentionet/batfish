@@ -51,6 +51,7 @@ public class BfConsts {
   public static final String ARG_DIFF_ACTIVE = "diffactive";
   public static final String ARG_DIFFERENTIAL = "differential";
   public static final String ARG_DISABLE_UNRECOGNIZED = "disableunrecognized";
+  public static final String ARG_ENABLE_CISCO_NX_PARSER = "enable_cisco_nx_parser";
   public static final String ARG_ENVIRONMENT_NAME = "env";
   public static final String ARG_HALT_ON_CONVERT_ERROR = "haltonconverterror";
   public static final String ARG_HALT_ON_PARSE_ERROR = "haltonparseerror";

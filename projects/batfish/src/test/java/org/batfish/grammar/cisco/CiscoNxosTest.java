@@ -3,6 +3,7 @@ package org.batfish.grammar.cisco;
 import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasRouterId;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrf;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasBgpProcess;
+import static org.batfish.main.BatfishTestUtils.getBatfishForTextConfigs;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.util.Arrays;
 import java.util.Map;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Ip;
-import org.batfish.main.BatfishTestUtils;
+import org.batfish.main.Batfish;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -35,7 +36,9 @@ public class CiscoNxosTest {
       throws IOException {
     String[] names =
         Arrays.stream(configurationNames).map(s -> TESTCONFIGS_PREFIX + s).toArray(String[]::new);
-    return BatfishTestUtils.parseTextConfigs(_folder, names);
+    Batfish batfish = getBatfishForTextConfigs(_folder, names);
+    batfish.getSettings().setEnableCiscoNxParser(true);
+    return batfish.loadConfigurations();
   }
 
   @Test

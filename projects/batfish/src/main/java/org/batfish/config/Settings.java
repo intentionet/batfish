@@ -702,6 +702,10 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     return _config.getBoolean(BfConsts.ARG_DISABLE_UNRECOGNIZED);
   }
 
+  public boolean getEnableCiscoNxParser() {
+    return _config.getBoolean(BfConsts.ARG_ENABLE_CISCO_NX_PARSER);
+  }
+
   public String getEnvironmentName() {
     return _config.getString(BfConsts.ARG_ENVIRONMENT_NAME);
   }
@@ -1011,6 +1015,9 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     setDefaultProperty(BfConsts.ARG_DELTA_ENVIRONMENT_NAME, null);
     setDefaultProperty(BfConsts.ARG_DIFFERENTIAL, false);
     setDefaultProperty(BfConsts.ARG_DISABLE_UNRECOGNIZED, false);
+    setDefaultProperty(
+        BfConsts.ARG_ENABLE_CISCO_NX_PARSER,
+        false); // TODO: enable CiscoNxParser by default and remove this flag.
     setDefaultProperty(ARG_DISABLE_Z3_SIMPLIFICATION, false);
     setDefaultProperty(BfConsts.ARG_ENVIRONMENT_NAME, BfConsts.RELPATH_DEFAULT_ENVIRONMENT_NAME);
     setDefaultProperty(ARG_EXIT_ON_FIRST_ERROR, false);
@@ -1413,6 +1420,7 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
     getBooleanOptionValue(BfConsts.ARG_DIFF_ACTIVE);
     getBooleanOptionValue(BfConsts.ARG_DIFFERENTIAL);
     getBooleanOptionValue(BfConsts.ARG_DISABLE_UNRECOGNIZED);
+    getBooleanOptionValue(BfConsts.ARG_ENABLE_CISCO_NX_PARSER);
     getStringOptionValue(BfConsts.ARG_ENVIRONMENT_NAME);
     getBooleanOptionValue(ARG_EXIT_ON_FIRST_ERROR);
     getBooleanOptionValue(ARG_FLATTEN);
@@ -1544,6 +1552,10 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
   @Override
   public void setDisableUnrecognized(boolean b) {
     _config.setProperty(BfConsts.ARG_DISABLE_UNRECOGNIZED, b);
+  }
+
+  public void setEnableCiscoNxParser(boolean b) {
+    _config.setProperty(BfConsts.ARG_ENABLE_CISCO_NX_PARSER, b);
   }
 
   public void setEnvironmentName(String envName) {
