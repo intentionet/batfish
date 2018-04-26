@@ -4,6 +4,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import org.batfish.datamodel.BgpNeighbor;
 import org.batfish.datamodel.BgpProcess;
+import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
@@ -32,6 +33,17 @@ final class BgpProcessMatchersImpl {
     @Override
     protected Map<Prefix, BgpNeighbor> featureValueOf(BgpProcess actual) {
       return actual.getNeighbors();
+    }
+  }
+
+  static final class HasRouterId extends FeatureMatcher<BgpProcess, Ip> {
+    HasRouterId(@Nonnull Matcher<? super Ip> subMatcher) {
+      super(subMatcher, "A BGP process with router id:", "router id");
+    }
+
+    @Override
+    protected Ip featureValueOf(BgpProcess actual) {
+      return actual.getRouterId();
     }
   }
 }
