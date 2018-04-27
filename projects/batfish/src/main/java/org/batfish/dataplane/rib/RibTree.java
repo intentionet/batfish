@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -11,7 +11,7 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpWildcardSetIpSpace;
 import org.batfish.datamodel.Prefix;
-import org.batfish.dataplane.ibdp.RouteAdvertisement.Reason;
+import org.batfish.dataplane.rib.RouteAdvertisement.Reason;
 
 /**
  * Used to store the routes, supports longest prefix match operation.

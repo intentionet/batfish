@@ -1,8 +1,9 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import org.batfish.common.BatfishException;
 import org.batfish.datamodel.RipRoute;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.dataplane.ibdp.VirtualRouter;
 
 /** A {@link Rib} for storing RIP routes */
 public class RipRib extends AbstractRib<RipRoute> {

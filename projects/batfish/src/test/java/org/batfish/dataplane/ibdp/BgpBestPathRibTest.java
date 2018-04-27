@@ -13,6 +13,7 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.dataplane.rib.BgpBestPathRib;
 import org.junit.Before;
 import org.junit.Test;
 

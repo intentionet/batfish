@@ -1,7 +1,7 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import static org.batfish.datamodel.Prefix.MAX_PREFIX_LENGTH;
-import static org.batfish.dataplane.ibdp.RouteAdvertisement.Reason.REPLACE;
+import static org.batfish.dataplane.rib.RouteAdvertisement.Reason.REPLACE;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
@@ -18,8 +18,8 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.IpWildcardSetIpSpace;
 import org.batfish.datamodel.Prefix;
-import org.batfish.dataplane.ibdp.RibDelta.Builder;
-import org.batfish.dataplane.ibdp.RouteAdvertisement.Reason;
+import org.batfish.dataplane.rib.RibDelta.Builder;
+import org.batfish.dataplane.rib.RouteAdvertisement.Reason;
 
 /**
  * RibTree is constructed from nodes of this type. A node has a prefix, a set of routes that match

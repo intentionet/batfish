@@ -22,6 +22,7 @@ import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.answers.Answer;
 import org.batfish.datamodel.answers.BdpAnswerElement;
 import org.batfish.datamodel.collections.IbgpTopology;
+import org.batfish.dataplane.TraceRouteEngineImpl;
 
 @AutoService(Plugin.class)
 public class IncrementalDataPlanePlugin extends DataPlanePlugin {
@@ -57,7 +58,7 @@ public class IncrementalDataPlanePlugin extends DataPlanePlugin {
         dp.getNodes()
             .values()
             .stream()
-            .flatMap(n -> n._virtualRouters.values().stream())
+            .flatMap(n -> n.getVirtualRouters().values().stream())
             .mapToInt(vr -> vr._mainRib.getRoutes().size())
             .average()
             .orElse(0.00d);
@@ -81,7 +82,7 @@ public class IncrementalDataPlanePlugin extends DataPlanePlugin {
     Set<BgpAdvertisement> adverts = new LinkedHashSet<>();
     IncrementalDataPlane dp = loadDataPlane();
     for (Node node : dp._nodes.values()) {
-      for (VirtualRouter vrf : node._virtualRouters.values()) {
+      for (VirtualRouter vrf : node.getVirtualRouters().values()) {
         adverts.addAll(vrf._receivedBgpAdvertisements);
         adverts.addAll(vrf._sentBgpAdvertisements);
       }
@@ -128,7 +129,8 @@ public class IncrementalDataPlanePlugin extends DataPlanePlugin {
   public void processFlows(Set<Flow> flows, DataPlane dataPlane, boolean ignoreAcls) {
     _flowTraces.put(
         (IncrementalDataPlane) dataPlane,
-        _engine.processFlows((IncrementalDataPlane) dataPlane, flows, ignoreAcls));
+        TraceRouteEngineImpl.getInstance()
+            .processFlows(dataPlane, flows, dataPlane.getFibs(), ignoreAcls));
   }
 
   private IncrementalDataPlane loadDataPlane() {

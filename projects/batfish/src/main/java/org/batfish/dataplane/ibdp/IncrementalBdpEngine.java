@@ -1,34 +1,25 @@
 package org.batfish.dataplane.ibdp;
 
 import static org.batfish.common.util.CommonUtil.initBgpTopology;
-import static org.batfish.dataplane.ibdp.AbstractRib.importRib;
+import static org.batfish.dataplane.rib.AbstractRib.importRib;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Ordering;
 import com.google.common.graph.Network;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
-import javax.annotation.Nullable;
-import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.BdpOscillationException;
 import org.batfish.common.Version;
-import org.batfish.common.plugin.FlowProcessor;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.BgpAdvertisement;
@@ -37,81 +28,20 @@ import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.BgpSession;
 import org.batfish.datamodel.Configuration;
-import org.batfish.datamodel.DataPlane;
-import org.batfish.datamodel.Edge;
-import org.batfish.datamodel.FilterResult;
-import org.batfish.datamodel.Flow;
-import org.batfish.datamodel.FlowDisposition;
-import org.batfish.datamodel.FlowTrace;
-import org.batfish.datamodel.FlowTraceHop;
-import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.IpAccessList;
-import org.batfish.datamodel.IpSpace;
-import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.OspfExternalType1Route;
 import org.batfish.datamodel.OspfExternalType2Route;
-import org.batfish.datamodel.Route;
-import org.batfish.datamodel.SourceNat;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.answers.BdpAnswerElement;
-import org.batfish.datamodel.collections.NodeInterfacePair;
+import org.batfish.dataplane.TraceRouteEngineImpl;
 import org.batfish.dataplane.ibdp.schedule.IbdpSchedule;
 import org.batfish.dataplane.ibdp.schedule.IbdpSchedule.Schedule;
+import org.batfish.dataplane.rib.BgpMultipathRib;
+import org.batfish.dataplane.rib.RibDelta;
 
-public class IncrementalBdpEngine implements FlowProcessor {
-
-  private static final String TRACEROUTE_INGRESS_NODE_INTERFACE_NAME =
-      "traceroute_source_interface";
-
-  private static final String TRACEROUTE_INGRESS_NODE_NAME = "traceroute_source_node";
+public class IncrementalBdpEngine {
 
   private int _numIterations;
-
-  /**
-   * Applies the given list of source NAT rules to the given flow and returns the new transformed
-   * flow. If {@code sourceNats} is null, empty, or does not contain any ACL rules matching the
-   * {@link Flow}, the original flow is returned.
-   *
-   * <p>Each {@link SourceNat} is expected to be valid: it must have a NAT IP or pool.
-   */
-  static Flow applySourceNat(
-      Flow flow,
-      @Nullable String srcInterface,
-      Map<String, IpAccessList> aclDefinitions,
-      Map<String, IpSpace> namedIpSpaces,
-      @Nullable List<SourceNat> sourceNats) {
-    if (CommonUtil.isNullOrEmpty(sourceNats)) {
-      return flow;
-    }
-    Optional<SourceNat> matchingSourceNat =
-        sourceNats
-            .stream()
-            .filter(
-                sourceNat ->
-                    sourceNat.getAcl() != null
-                        && sourceNat
-                                .getAcl()
-                                .filter(flow, srcInterface, aclDefinitions, namedIpSpaces)
-                                .getAction()
-                            != LineAction.REJECT)
-            .findFirst();
-    if (!matchingSourceNat.isPresent()) {
-      // No NAT rule matched.
-      return flow;
-    }
-    SourceNat sourceNat = matchingSourceNat.get();
-    Ip natPoolStartIp = sourceNat.getPoolIpFirst();
-    if (natPoolStartIp == null) {
-      throw new BatfishException(
-          String.format(
-              "Error processing Source NAT rule %s: missing NAT address or pool", sourceNat));
-    }
-    Flow.Builder transformedFlowBuilder = new Flow.Builder(flow);
-    transformedFlowBuilder.setSrcIp(natPoolStartIp);
-    return transformedFlowBuilder.build();
-  }
 
   private final BatfishLogger _bfLogger;
 
@@ -126,188 +56,6 @@ public class IncrementalBdpEngine implements FlowProcessor {
     _settings = settings;
     _bfLogger = logger;
     _newBatch = newBatch;
-  }
-
-  private void collectFlowTraces(
-      IncrementalDataPlane dp,
-      String currentNodeName,
-      Set<Edge> visitedEdges,
-      List<FlowTraceHop> hopsSoFar,
-      Set<FlowTrace> flowTraces,
-      Flow originalFlow,
-      Flow transformedFlow,
-      boolean ignoreAcls) {
-    Ip dstIp = transformedFlow.getDstIp();
-    Set<String> dstIpOwners = dp._ipOwners.get(dstIp);
-    if (dstIpOwners != null && dstIpOwners.contains(currentNodeName)) {
-      FlowTrace trace =
-          new FlowTrace(FlowDisposition.ACCEPTED, hopsSoFar, FlowDisposition.ACCEPTED.toString());
-      flowTraces.add(trace);
-    } else {
-      Node currentNode = dp._nodes.get(currentNodeName);
-      Map<String, IpAccessList> aclDefinitions = currentNode._c.getIpAccessLists();
-      Map<String, IpSpace> namedIpSpaces = currentNode._c.getIpSpaces();
-      String vrfName;
-      String srcInterface;
-      if (hopsSoFar.isEmpty()) {
-        vrfName = transformedFlow.getIngressVrf();
-        srcInterface = null;
-      } else {
-        FlowTraceHop lastHop = hopsSoFar.get(hopsSoFar.size() - 1);
-        srcInterface = lastHop.getEdge().getInt2();
-        vrfName = currentNode._c.getInterfaces().get(srcInterface).getVrf().getName();
-      }
-      VirtualRouter currentVirtualRouter = currentNode._virtualRouters.get(vrfName);
-      Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> nextHopInterfacesByRoute =
-          currentVirtualRouter._fib.getNextHopInterfacesByRoute(dstIp);
-      Map<String, Map<Ip, Set<AbstractRoute>>> nextHopInterfacesWithRoutes =
-          currentVirtualRouter._fib.getNextHopInterfaces(dstIp);
-      if (!nextHopInterfacesWithRoutes.isEmpty()) {
-        for (String nextHopInterfaceName : nextHopInterfacesWithRoutes.keySet()) {
-          // SortedSet<String> routesForThisNextHopInterface = new
-          // TreeSet<>(
-          // nextHopInterfacesWithRoutes.get(nextHopInterfaceName)
-          // .stream().map(ar -> ar.toString())
-          // .collect(Collectors.toSet()));
-          SortedSet<String> routesForThisNextHopInterface = new TreeSet<>();
-          Ip finalNextHopIp = null;
-          for (Entry<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> e :
-              nextHopInterfacesByRoute.entrySet()) {
-            AbstractRoute routeCandidate = e.getKey();
-            Map<String, Map<Ip, Set<AbstractRoute>>> routeCandidateNextHopInterfaces = e.getValue();
-            if (routeCandidateNextHopInterfaces.containsKey(nextHopInterfaceName)) {
-              Ip nextHopIp = routeCandidate.getNextHopIp();
-              if (!nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
-                Set<Ip> finalNextHopIps =
-                    routeCandidateNextHopInterfaces.get(nextHopInterfaceName).keySet();
-                if (finalNextHopIps.size() > 1) {
-                  throw new BatfishException(
-                      "Can not currently handle multiple final next hop ips across multiple "
-                          + "routes leading to one next hop interface");
-                }
-                Ip newFinalNextHopIp = finalNextHopIps.iterator().next();
-                if (finalNextHopIp != null && !newFinalNextHopIp.equals(finalNextHopIp)) {
-                  throw new BatfishException(
-                      "Can not currently handle multiple final next hop ips for same next hop "
-                          + "interface");
-                }
-                finalNextHopIp = newFinalNextHopIp;
-              }
-              routesForThisNextHopInterface.add(routeCandidate + "_fnhip:" + finalNextHopIp);
-            }
-          }
-          NodeInterfacePair nextHopInterface =
-              new NodeInterfacePair(currentNodeName, nextHopInterfaceName);
-          if (nextHopInterfaceName.equals(Interface.NULL_INTERFACE_NAME)) {
-            List<FlowTraceHop> newHops = new ArrayList<>(hopsSoFar);
-            Edge newEdge =
-                new Edge(
-                    nextHopInterface,
-                    new NodeInterfacePair(
-                        Configuration.NODE_NONE_NAME, Interface.NULL_INTERFACE_NAME));
-            FlowTraceHop newHop =
-                new FlowTraceHop(
-                    newEdge, routesForThisNextHopInterface, hopFlow(originalFlow, transformedFlow));
-            newHops.add(newHop);
-            FlowTrace nullRouteTrace =
-                new FlowTrace(
-                    FlowDisposition.NULL_ROUTED, newHops, FlowDisposition.NULL_ROUTED.toString());
-            flowTraces.add(nullRouteTrace);
-          } else {
-            Interface outgoingInterface =
-                dp._nodes
-                    .get(nextHopInterface.getHostname())
-                    ._c
-                    .getInterfaces()
-                    .get(nextHopInterface.getInterface());
-
-            // Apply any relevant source NAT rules.
-            transformedFlow =
-                applySourceNat(
-                    transformedFlow,
-                    srcInterface,
-                    aclDefinitions,
-                    namedIpSpaces,
-                    outgoingInterface.getSourceNats());
-
-            SortedSet<Edge> edges = dp._topology.getInterfaceEdges().get(nextHopInterface);
-            if (edges != null) {
-              boolean continueToNextNextHopInterface = false;
-              continueToNextNextHopInterface =
-                  processCurrentNextHopInterfaceEdges(
-                      dp,
-                      currentNodeName,
-                      visitedEdges,
-                      hopsSoFar,
-                      flowTraces,
-                      originalFlow,
-                      transformedFlow,
-                      srcInterface,
-                      aclDefinitions,
-                      namedIpSpaces,
-                      dstIp,
-                      dstIpOwners,
-                      nextHopInterfaceName,
-                      routesForThisNextHopInterface,
-                      finalNextHopIp,
-                      nextHopInterface,
-                      edges,
-                      true,
-                      ignoreAcls);
-              if (continueToNextNextHopInterface) {
-                continue;
-              }
-            } else {
-              /*
-               * Should only get here for delta environment where
-               * non-flow-sink interface from base has no edges in delta
-               */
-              Edge neighborUnreachbleEdge =
-                  new Edge(
-                      nextHopInterface,
-                      new NodeInterfacePair(
-                          Configuration.NODE_NONE_NAME, Interface.NULL_INTERFACE_NAME));
-              FlowTraceHop neighborUnreachableHop =
-                  new FlowTraceHop(
-                      neighborUnreachbleEdge,
-                      routesForThisNextHopInterface,
-                      hopFlow(originalFlow, transformedFlow));
-              List<FlowTraceHop> newHops = new ArrayList<>(hopsSoFar);
-              newHops.add(neighborUnreachableHop);
-              /* Check if denied out. If not, make standard neighbor-unreachable trace. */
-              IpAccessList outFilter = outgoingInterface.getOutgoingFilter();
-              boolean denied = false;
-              if (outFilter != null) {
-                FlowDisposition disposition = FlowDisposition.DENIED_OUT;
-                denied =
-                    flowTraceDeniedHelper(
-                        flowTraces,
-                        originalFlow,
-                        transformedFlow,
-                        srcInterface,
-                        aclDefinitions,
-                        namedIpSpaces,
-                        newHops,
-                        outFilter,
-                        disposition);
-              }
-              if (!denied) {
-                FlowTrace trace =
-                    new FlowTrace(
-                        FlowDisposition.NEIGHBOR_UNREACHABLE_OR_EXITS_NETWORK,
-                        newHops,
-                        FlowDisposition.NEIGHBOR_UNREACHABLE_OR_EXITS_NETWORK.toString());
-                flowTraces.add(trace);
-              }
-            }
-          }
-        }
-      } else {
-        FlowTrace trace =
-            new FlowTrace(FlowDisposition.NO_ROUTE, hopsSoFar, FlowDisposition.NO_ROUTE.toString());
-        flowTraces.add(trace);
-      }
-    }
   }
 
   IncrementalDataPlane computeDataPlane(
@@ -343,7 +91,8 @@ public class IncrementalBdpEngine implements FlowProcessor {
     computeFibs(nodes);
 
     Network<BgpNeighbor, BgpSession> bgpTopology =
-        initBgpTopology(configurations, dp.getIpOwners(), false, true, this, dp);
+        initBgpTopology(
+            configurations, dp.getIpOwners(), false, true, TraceRouteEngineImpl.getInstance(), dp);
     boolean isOscillating =
         computeNonMonotonicPortionOfDataPlane(
             nodes, topology, dp, externalAdverts, ae, true, bgpTopology);
@@ -354,7 +103,14 @@ public class IncrementalBdpEngine implements FlowProcessor {
 
     if (_settings.getCheckBgpSessionReachability()) {
       computeFibs(nodes);
-      bgpTopology = initBgpTopology(configurations, dp.getIpOwners(), false, true, this, dp);
+      bgpTopology =
+          initBgpTopology(
+              configurations,
+              dp.getIpOwners(),
+              false,
+              true,
+              TraceRouteEngineImpl.getInstance(),
+              dp);
       // Update queues (if necessary) based on new neighbor relationships
       final Network<BgpNeighbor, BgpSession> finalBgpTopology = bgpTopology;
       nodes
@@ -407,7 +163,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
 
                 /*
                  * For RIBs that do not require comparison to previous version, just re-init
@@ -426,7 +182,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 vr.activateStaticRoutes();
               }
               recomputeStaticCompleted.incrementAndGet();
@@ -441,7 +197,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 vr.recomputeGeneratedRoutes();
               }
               recomputeAggregateCompleted.incrementAndGet();
@@ -454,7 +210,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 vr.initOspfExports();
               }
             });
@@ -477,7 +233,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   Entry<RibDelta<OspfExternalType1Route>, RibDelta<OspfExternalType2Route>> p =
                       vr.propagateOspfExternalRoutes(allNodes, topology);
                   if (p != null && vr.unstageOspfExternalRoutes(p.getKey(), p.getValue())) {
@@ -504,7 +260,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 if (vr._vrf.getBgpProcess() != null) {
                   vr.initBgpAggregateRoutes();
                 }
@@ -517,7 +273,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 BgpProcess proc = vr._vrf.getBgpProcess();
                 if (proc == null) {
                   continue;
@@ -547,7 +303,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 vr.computeFib();
               }
               completed.incrementAndGet();
@@ -579,7 +335,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 vr.initForIgpComputation();
               }
               initialCompleted.incrementAndGet();
@@ -599,7 +355,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 importRib(vr._mainRib, vr._independentRib);
                 vr.activateStaticRoutes();
               }
@@ -641,9 +397,8 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
-                  vr.initForEgpComputation(
-                      dp.getIpOwners(), externalAdverts, nodes, topology, bgpTopology);
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
+                  vr.initForEgpComputation(externalAdverts, nodes, topology, bgpTopology);
                 }
                 setupCompleted.incrementAndGet();
               });
@@ -655,7 +410,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   vr.initBaseBgpRibs(externalAdverts, dp.getIpOwners(), nodes, bgpTopology);
                   vr.queueInitialBgpMessages(bgpTopology, nodes);
                 }
@@ -734,7 +489,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 vr.computeBgpAdvertisementsToOutside(dp.getIpOwners());
               }
               computeBgpAdvertisementsToOutsideCompleted.incrementAndGet();
@@ -754,7 +509,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 if (vr.hasOutstandingRoutes()) {
                   dependentRoutesChanged.set(true);
                 }
@@ -781,7 +536,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 if (!vr.hasProcessedAllMessages(bgpTopology)) {
                   areEmpty.set(false);
                 }
@@ -813,15 +568,15 @@ public class IncrementalBdpEngine implements FlowProcessor {
         nodes
             .values()
             .stream()
-            .flatMap(n -> n._virtualRouters.values().stream())
-            .mapToInt(vr -> vr._bgpBestPathRib.getRoutes().size())
+            .flatMap(n -> n.getVirtualRouters().values().stream())
+            .mapToInt(vr -> vr.getBgpBestPathRib().getRoutes().size())
             .sum();
     ae.getBgpBestPathRibRoutesByIteration().put(dependentRoutesIterations, numBgpBestPathRibRoutes);
     int numBgpMultipathRibRoutes =
         nodes
             .values()
             .stream()
-            .flatMap(n -> n._virtualRouters.values().stream())
+            .flatMap(n -> n.getVirtualRouters().values().stream())
             .mapToInt(vr -> vr._bgpMultipathRib.getRoutes().size())
             .sum();
     ae.getBgpMultipathRibRoutesByIteration()
@@ -830,56 +585,10 @@ public class IncrementalBdpEngine implements FlowProcessor {
         nodes
             .values()
             .stream()
-            .flatMap(n -> n._virtualRouters.values().stream())
+            .flatMap(n -> n.getVirtualRouters().values().stream())
             .mapToInt(vr -> vr._mainRib.getRoutes().size())
             .sum();
     ae.getMainRibRoutesByIteration().put(dependentRoutesIterations, numMainRibRoutes);
-  }
-
-  private boolean flowTraceDeniedHelper(
-      Set<FlowTrace> flowTraces,
-      Flow originalFlow,
-      Flow transformedFlow,
-      String srcInterface,
-      Map<String, IpAccessList> aclDefinitions,
-      Map<String, IpSpace> namedIpSpaces,
-      List<FlowTraceHop> newHops,
-      IpAccessList filter,
-      FlowDisposition disposition) {
-    boolean out = disposition == FlowDisposition.DENIED_OUT;
-    FilterResult outResult =
-        filter.filter(transformedFlow, srcInterface, aclDefinitions, namedIpSpaces);
-    boolean denied = outResult.getAction() == LineAction.REJECT;
-    if (denied) {
-      String outFilterName = filter.getName();
-      Integer matchLine = outResult.getMatchLine();
-      String lineDesc;
-      if (matchLine != null) {
-        lineDesc = filter.getLines().get(matchLine).getName();
-        if (lineDesc == null) {
-          lineDesc = "line:" + matchLine;
-        }
-      } else {
-        lineDesc = "no-match";
-      }
-      String notes = disposition + "{" + outFilterName + "}{" + lineDesc + "}";
-      if (out) {
-        FlowTraceHop lastHop = newHops.get(newHops.size() - 1);
-        newHops.remove(newHops.size() - 1);
-        Edge lastEdge = lastHop.getEdge();
-        Edge deniedOutEdge =
-            new Edge(
-                lastEdge.getFirst(),
-                new NodeInterfacePair(Configuration.NODE_NONE_NAME, Interface.NULL_INTERFACE_NAME));
-        FlowTraceHop deniedOutHop =
-            new FlowTraceHop(
-                deniedOutEdge, lastHop.getRoutes(), hopFlow(originalFlow, transformedFlow));
-        newHops.add(deniedOutHop);
-      }
-      FlowTrace trace = new FlowTrace(disposition, newHops, notes);
-      flowTraces.add(trace);
-    }
-    return denied;
   }
 
   SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> getRoutes(
@@ -889,7 +598,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
     for (Entry<String, Node> e : dp._nodes.entrySet()) {
       String hostname = e.getKey();
       Node node = e.getValue();
-      for (Entry<String, VirtualRouter> e2 : node._virtualRouters.entrySet()) {
+      for (Entry<String, VirtualRouter> e2 : node.getVirtualRouters().entrySet()) {
         String vrfName = e2.getKey();
         VirtualRouter vrf = e2.getValue();
         for (AbstractRoute route : vrf._mainRib.getRoutes()) {
@@ -902,15 +611,6 @@ public class IncrementalBdpEngine implements FlowProcessor {
       }
     }
     return routesByHostname;
-  }
-
-  @Nullable
-  private Flow hopFlow(Flow originalFlow, Flow transformedFlow) {
-    if (originalFlow == transformedFlow) {
-      return null;
-    } else {
-      return transformedFlow;
-    }
   }
 
   /**
@@ -936,7 +636,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   if (vr.computeInterAreaSummaries()) {
                     ospfInternalChanged.set(true);
                   }
@@ -951,7 +651,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   if (vr.propagateOspfInternalRoutes(nodes, topology)) {
                     ospfInternalChanged.set(true);
                   }
@@ -966,7 +666,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   vr.unstageOspfInternalRoutes();
                 }
                 ospfInternalUnstageCompleted.incrementAndGet();
@@ -979,7 +679,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 vr.importOspfInternalRoutes();
               }
               ospfInternalImportCompleted.incrementAndGet();
@@ -1013,7 +713,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   if (vr.propagateRipInternalRoutes(nodes, topology)) {
                     ripInternalChanged.set(true);
                   }
@@ -1028,7 +728,7 @@ public class IncrementalBdpEngine implements FlowProcessor {
           .parallelStream()
           .forEach(
               n -> {
-                for (VirtualRouter vr : n._virtualRouters.values()) {
+                for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   vr.unstageRipInternalRoutes();
                 }
                 ripInternalUnstageCompleted.incrementAndGet();
@@ -1041,273 +741,12 @@ public class IncrementalBdpEngine implements FlowProcessor {
         .parallelStream()
         .forEach(
             n -> {
-              for (VirtualRouter vr : n._virtualRouters.values()) {
+              for (VirtualRouter vr : n.getVirtualRouters().values()) {
                 importRib(vr._ripRib, vr._ripInternalRib);
                 importRib(vr._independentRib, vr._ripRib);
               }
               ripInternalImportCompleted.incrementAndGet();
             });
     return ripInternalIterations;
-  }
-
-  private FlowTrace neighborUnreachableTrace(
-      List<FlowTraceHop> completedHops,
-      NodeInterfacePair srcInterface,
-      SortedSet<String> routes,
-      Flow originalFlow,
-      Flow transformedFlow) {
-    Edge neighborUnreachbleEdge =
-        new Edge(
-            srcInterface,
-            new NodeInterfacePair(Configuration.NODE_NONE_NAME, Interface.NULL_INTERFACE_NAME));
-    FlowTraceHop neighborUnreachableHop =
-        new FlowTraceHop(neighborUnreachbleEdge, routes, hopFlow(originalFlow, transformedFlow));
-    List<FlowTraceHop> newHops = new ArrayList<>(completedHops);
-    newHops.add(neighborUnreachableHop);
-    FlowTrace trace =
-        new FlowTrace(
-            FlowDisposition.NEIGHBOR_UNREACHABLE_OR_EXITS_NETWORK,
-            newHops,
-            FlowDisposition.NEIGHBOR_UNREACHABLE_OR_EXITS_NETWORK.toString());
-    return trace;
-  }
-
-  private boolean processCurrentNextHopInterfaceEdges(
-      IncrementalDataPlane dp,
-      String currentNodeName,
-      Set<Edge> visitedEdges,
-      List<FlowTraceHop> hopsSoFar,
-      Set<FlowTrace> flowTraces,
-      Flow originalFlow,
-      Flow transformedFlow,
-      String srcInterface,
-      Map<String, IpAccessList> aclDefinitions,
-      Map<String, IpSpace> namedIpSpaces,
-      Ip dstIp,
-      Set<String> dstIpOwners,
-      @Nullable String nextHopInterfaceName,
-      SortedSet<String> routesForThisNextHopInterface,
-      @Nullable Ip finalNextHopIp,
-      @Nullable NodeInterfacePair nextHopInterface,
-      SortedSet<Edge> edges,
-      boolean arp,
-      boolean ignoreAcls) {
-    boolean continueToNextNextHopInterface = false;
-    int unreachableNeighbors = 0;
-    int potentialNeighbors = 0;
-    for (Edge edge : edges) {
-      if (!edge.getNode1().equals(currentNodeName)) {
-        continue;
-      }
-      potentialNeighbors++;
-      List<FlowTraceHop> newHops = new ArrayList<>(hopsSoFar);
-      Set<Edge> newVisitedEdges = new LinkedHashSet<>(visitedEdges);
-      FlowTraceHop newHop =
-          new FlowTraceHop(
-              edge, routesForThisNextHopInterface, hopFlow(originalFlow, transformedFlow));
-      newVisitedEdges.add(edge);
-      newHops.add(newHop);
-      /*
-       * Check to see whether neighbor would refrain from sending ARP reply
-       * (NEIGHBOR_UNREACHABLE)
-       *
-       * This occurs if:
-       *
-       * - Using interface-only route
-       *
-       * AND
-       *
-       * - Neighbor does not own arpIp
-       *
-       * AND EITHER
-       *
-       * -- Neighbor not using proxy-arp
-       *
-       * - OR
-       *
-       * -- Subnet of neighbor's receiving-interface contains arpIp
-       */
-      if (arp) {
-        Ip arpIp;
-        Set<String> arpIpOwners;
-        if (finalNextHopIp == null) {
-          arpIp = dstIp;
-          arpIpOwners = dstIpOwners;
-        } else {
-          arpIp = finalNextHopIp;
-          arpIpOwners = dp._ipOwners.get(arpIp);
-        }
-        // using interface-only route
-        String node2 = edge.getNode2();
-        if (arpIpOwners == null || !arpIpOwners.contains(node2)) {
-          // neighbor does not own arpIp
-          String int2Name = edge.getInt2();
-          Interface int2 = dp._nodes.get(node2)._c.getInterfaces().get(int2Name);
-          boolean neighborUnreachable = false;
-          Boolean proxyArp = int2.getProxyArp();
-          if (proxyArp == null || !proxyArp) {
-            // TODO: proxyArp probably shouldn't be null
-            neighborUnreachable = true;
-          } else {
-            for (InterfaceAddress address : int2.getAllAddresses()) {
-              if (address.getPrefix().containsIp(arpIp)) {
-                neighborUnreachable = true;
-                break;
-              }
-            }
-          }
-          if (neighborUnreachable) {
-            unreachableNeighbors++;
-            continue;
-          }
-        }
-      }
-      if (visitedEdges.contains(edge)) {
-        FlowTrace trace =
-            new FlowTrace(FlowDisposition.LOOP, newHops, FlowDisposition.LOOP.toString());
-        flowTraces.add(trace);
-        potentialNeighbors--;
-        continue;
-      }
-      String nextNodeName = edge.getNode2();
-      // now check output filter and input filter
-      if (nextHopInterfaceName != null) {
-        IpAccessList outFilter =
-            dp._nodes
-                .get(currentNodeName)
-                ._c
-                .getInterfaces()
-                .get(nextHopInterfaceName)
-                .getOutgoingFilter();
-        if (!ignoreAcls && outFilter != null) {
-          FlowDisposition disposition = FlowDisposition.DENIED_OUT;
-          boolean denied =
-              flowTraceDeniedHelper(
-                  flowTraces,
-                  originalFlow,
-                  transformedFlow,
-                  srcInterface,
-                  aclDefinitions,
-                  namedIpSpaces,
-                  newHops,
-                  outFilter,
-                  disposition);
-          if (denied) {
-            potentialNeighbors--;
-            continue;
-          }
-        }
-      }
-      IpAccessList inFilter =
-          dp._nodes.get(nextNodeName)._c.getInterfaces().get(edge.getInt2()).getIncomingFilter();
-      if (!ignoreAcls && inFilter != null) {
-        FlowDisposition disposition = FlowDisposition.DENIED_IN;
-        boolean denied =
-            flowTraceDeniedHelper(
-                flowTraces,
-                originalFlow,
-                transformedFlow,
-                srcInterface,
-                aclDefinitions,
-                namedIpSpaces,
-                newHops,
-                inFilter,
-                disposition);
-        if (denied) {
-          potentialNeighbors--;
-          continue;
-        }
-      }
-      // recurse
-      collectFlowTraces(
-          dp,
-          nextNodeName,
-          newVisitedEdges,
-          newHops,
-          flowTraces,
-          originalFlow,
-          transformedFlow,
-          ignoreAcls);
-    }
-    if (arp && unreachableNeighbors > 0 && unreachableNeighbors == potentialNeighbors) {
-      FlowTrace trace =
-          neighborUnreachableTrace(
-              hopsSoFar,
-              nextHopInterface,
-              routesForThisNextHopInterface,
-              originalFlow,
-              transformedFlow);
-      flowTraces.add(trace);
-      continueToNextNextHopInterface = true;
-    }
-    return continueToNextNextHopInterface;
-  }
-
-  @Override
-  public SortedMap<Flow, Set<FlowTrace>> processFlows(
-      DataPlane dataPlane, Set<Flow> flows, boolean ignoreAcls) {
-    Map<Flow, Set<FlowTrace>> flowTraces = new ConcurrentHashMap<>();
-    IncrementalDataPlane dp = (IncrementalDataPlane) dataPlane;
-    flows
-        .parallelStream()
-        .forEach(
-            flow -> {
-              Set<FlowTrace> currentFlowTraces = new TreeSet<>();
-              flowTraces.put(flow, currentFlowTraces);
-              String ingressNodeName = flow.getIngressNode();
-              if (ingressNodeName == null) {
-                throw new BatfishException(
-                    "Cannot construct flow trace since ingressNode is not specified");
-              }
-              Ip dstIp = flow.getDstIp();
-              if (dstIp == null) {
-                throw new BatfishException(
-                    "Cannot construct flow trace since dstIp is not specified");
-              }
-              Set<Edge> visitedEdges = Collections.emptySet();
-              List<FlowTraceHop> hops = new ArrayList<>();
-              Set<String> dstIpOwners = dp._ipOwners.get(dstIp);
-              SortedSet<Edge> edges = new TreeSet<>();
-              String ingressInterfaceName = flow.getIngressInterface();
-              if (ingressInterfaceName != null) {
-                edges.add(
-                    new Edge(
-                        TRACEROUTE_INGRESS_NODE_NAME,
-                        TRACEROUTE_INGRESS_NODE_INTERFACE_NAME,
-                        ingressNodeName,
-                        ingressInterfaceName));
-                processCurrentNextHopInterfaceEdges(
-                    dp,
-                    TRACEROUTE_INGRESS_NODE_NAME,
-                    visitedEdges,
-                    hops,
-                    currentFlowTraces,
-                    flow,
-                    flow,
-                    ingressInterfaceName,
-                    dp._nodes.get(ingressNodeName)._c.getIpAccessLists(),
-                    dp._nodes.get(ingressNodeName)._c.getIpSpaces(),
-                    dstIp,
-                    dstIpOwners,
-                    null,
-                    new TreeSet<>(),
-                    null,
-                    null,
-                    edges,
-                    false,
-                    ignoreAcls);
-              } else {
-                collectFlowTraces(
-                    dp,
-                    ingressNodeName,
-                    visitedEdges,
-                    hops,
-                    currentFlowTraces,
-                    flow,
-                    flow,
-                    ignoreAcls);
-              }
-            });
-    return new TreeMap<>(flowTraces);
   }
 }

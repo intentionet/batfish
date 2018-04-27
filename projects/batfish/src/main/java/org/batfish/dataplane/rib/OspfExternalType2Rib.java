@@ -1,14 +1,14 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import java.util.Map;
 import java.util.SortedSet;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.OspfExternalType2Route;
 import org.batfish.datamodel.Prefix;
+import org.batfish.dataplane.ibdp.VirtualRouter;
 
 public class OspfExternalType2Rib extends AbstractRib<OspfExternalType2Route> {
 
-  /** */
   private static final long serialVersionUID = 1L;
 
   public OspfExternalType2Rib(
@@ -30,7 +30,8 @@ public class OspfExternalType2Rib extends AbstractRib<OspfExternalType2Route> {
   @Nullable
   public RibDelta<OspfExternalType2Route> mergeRouteGetDelta(OspfExternalType2Route route) {
     String advertiser = route.getAdvertiser();
-    if (route.getCostToAdvertiser() != 0 && _owner._c.getHostname().equals(advertiser)) {
+    if (route.getCostToAdvertiser() != 0
+        && _owner.getConfiguration().getHostname().equals(advertiser)) {
       return null;
     } else {
       return super.mergeRouteGetDelta(route);

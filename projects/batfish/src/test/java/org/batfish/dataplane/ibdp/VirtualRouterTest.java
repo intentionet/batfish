@@ -73,8 +73,12 @@ import org.batfish.datamodel.routing_policy.expr.LiteralOrigin;
 import org.batfish.datamodel.routing_policy.statement.SetOrigin;
 import org.batfish.datamodel.routing_policy.statement.Statement;
 import org.batfish.datamodel.routing_policy.statement.Statements;
-import org.batfish.dataplane.ibdp.RibDelta.Builder;
-import org.batfish.dataplane.ibdp.RouteAdvertisement.Reason;
+import org.batfish.dataplane.rib.BgpBestPathRib;
+import org.batfish.dataplane.rib.BgpMultipathRib;
+import org.batfish.dataplane.rib.RibDelta;
+import org.batfish.dataplane.rib.RibDelta.Builder;
+import org.batfish.dataplane.rib.RouteAdvertisement;
+import org.batfish.dataplane.rib.RouteAdvertisement.Reason;
 import org.batfish.main.BatfishTestUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,7 +140,8 @@ public class VirtualRouterTest {
             .setOriginType(OriginType.INCOMPLETE)
             .setOriginatorIp(TEST_SRC_IP);
     _ipOwners = ImmutableMap.of(TEST_SRC_IP, ImmutableSet.of(TEST_VIRTUAL_ROUTER_NAME));
-    _routingPolicyBuilder = nf.routingPolicyBuilder().setOwner(_testVirtualRouter._c);
+    _routingPolicyBuilder =
+        nf.routingPolicyBuilder().setOwner(_testVirtualRouter.getConfiguration());
   }
 
   private static void addInterfaces(
@@ -156,7 +161,7 @@ public class VirtualRouterTest {
 
   private static VirtualRouter makeIosVirtualRouter(String hostname) {
     Node n = TestUtils.makeIosRouter(hostname);
-    return n._virtualRouters.get(Configuration.DEFAULT_VRF_NAME);
+    return n.getVirtualRouters().get(Configuration.DEFAULT_VRF_NAME);
   }
 
   @Test
@@ -422,7 +427,7 @@ public class VirtualRouterTest {
   public void testInitConnectedRib() {
     // Setup
     VirtualRouter vr = makeIosVirtualRouter(null);
-    addInterfaces(vr._c, exampleInterfaceAddresses);
+    addInterfaces(vr.getConfiguration(), exampleInterfaceAddresses);
     vr.initRibs();
 
     // Test
@@ -430,7 +435,7 @@ public class VirtualRouterTest {
 
     // Assert that all interface prefixes have been processed
     assertThat(
-        vr._connectedRib.getRoutes(),
+        vr.getConnectedRib().getRoutes(),
         containsInAnyOrder(
             exampleInterfaceAddresses
                 .entrySet()
@@ -448,7 +453,7 @@ public class VirtualRouterTest {
     vr.initRibs();
 
     // Simple RIBs
-    assertThat(vr._connectedRib.getRoutes(), is(emptyIterableOf(ConnectedRoute.class)));
+    assertThat(vr.getConnectedRib().getRoutes(), is(emptyIterableOf(ConnectedRoute.class)));
     assertThat(vr._staticRib.getRoutes(), is(emptyIterableOf(StaticRoute.class)));
     assertThat(vr._staticInterfaceRib.getRoutes(), is(emptyIterableOf(StaticRoute.class)));
     assertThat(vr._independentRib.getRoutes(), is(emptyIterableOf(AbstractRoute.class)));
@@ -510,31 +515,32 @@ public class VirtualRouterTest {
             .collect(
                 ImmutableMap.toImmutableMap(
                     Entry::getKey,
-                    e -> e.getValue()._virtualRouters.get(Configuration.DEFAULT_VRF_NAME)));
+                    e -> e.getValue().getVirtualRouters().get(Configuration.DEFAULT_VRF_NAME)));
     VirtualRouter testRouter = routers.get(testRouterName);
     VirtualRouter exportingRouter = routers.get(exportingRouterName);
     testRouter.initRibs();
     exportingRouter.initRibs();
-    addInterfaces(testRouter._c, exampleInterfaceAddresses);
+    addInterfaces(testRouter.getConfiguration(), exampleInterfaceAddresses);
     addInterfaces(
-        exportingRouter._c,
+        exportingRouter.getConfiguration(),
         ImmutableMap.of(exportingRouterInterfaceName, new InterfaceAddress("10.4.0.0/16")));
     int adminCost =
-        RoutingProtocol.OSPF.getDefaultAdministrativeCost(testRouter._c.getConfigurationFormat());
+        RoutingProtocol.OSPF.getDefaultAdministrativeCost(
+            testRouter.getConfiguration().getConfigurationFormat());
 
     Prefix prefix = Prefix.parse("7.7.7.0/24");
     OspfIntraAreaRoute route = new OspfIntraAreaRoute(prefix, new Ip("7.7.1.1"), adminCost, 20, 1);
     exportingRouter._ospfIntraAreaRib.mergeRoute(route);
 
     // Set interaces on router 1 to be OSPF passive
-    testRouter._c.getInterfaces().forEach((name, iface) -> iface.setActive(false));
+    testRouter.getConfiguration().getInterfaces().forEach((name, iface) -> iface.setActive(false));
 
     // Test 1
     testRouter.propagateOspfInternalRoutesFromNeighbor(
         testRouter._vrf.getOspfProcess(),
         nodes.get("R2"),
-        testRouter._c.getInterfaces().firstEntry().getValue(),
-        exportingRouter._c.getInterfaces().get(exportingRouterInterfaceName),
+        testRouter.getConfiguration().getInterfaces().firstEntry().getValue(),
+        exportingRouter.getConfiguration().getInterfaces().get(exportingRouterInterfaceName),
         adminCost);
 
     assertThat(
@@ -545,15 +551,18 @@ public class VirtualRouterTest {
         is(emptyIterableOf(OspfIntraAreaRoute.class)));
 
     // Flip interfaces on router 2 to be passive now
-    testRouter._c.getInterfaces().forEach((name, iface) -> iface.setActive(true));
-    exportingRouter._c.getInterfaces().forEach((name, iface) -> iface.setActive(false));
+    testRouter.getConfiguration().getInterfaces().forEach((name, iface) -> iface.setActive(true));
+    exportingRouter
+        .getConfiguration()
+        .getInterfaces()
+        .forEach((name, iface) -> iface.setActive(false));
 
     // Test 2
     testRouter.propagateOspfInternalRoutesFromNeighbor(
         testRouter._vrf.getOspfProcess(),
         nodes.get("R2"),
-        testRouter._c.getInterfaces().firstEntry().getValue(),
-        exportingRouter._c.getInterfaces().get(exportingRouterInterfaceName),
+        testRouter.getConfiguration().getInterfaces().firstEntry().getValue(),
+        exportingRouter.getConfiguration().getInterfaces().get(exportingRouterInterfaceName),
         adminCost);
 
     assertThat(
@@ -569,7 +578,7 @@ public class VirtualRouterTest {
   public void testRipInitialization() {
     // Incomplete Setup
     VirtualRouter vr = makeIosVirtualRouter(null);
-    addInterfaces(vr._c, exampleInterfaceAddresses);
+    addInterfaces(vr.getConfiguration(), exampleInterfaceAddresses);
     vr.initRibs();
     vr.initBaseRipRoutes();
 
@@ -595,7 +604,7 @@ public class VirtualRouterTest {
                             address.getPrefix(),
                             null,
                             RoutingProtocol.RIP.getDefaultAdministrativeCost(
-                                vr._c.getConfigurationFormat()),
+                                vr.getConfiguration().getConfigurationFormat()),
                             RipProcess.DEFAULT_RIP_COST))
                 .collect(Collectors.toList())
                 .toArray(new RipInternalRoute[] {})));
@@ -693,9 +702,13 @@ public class VirtualRouterTest {
   public void testInitQueuesAndDeltaBuilders() {
     Node n1 = TestUtils.makeIosRouter("r1");
     Node n2 = TestUtils.makeIosRouter("r2");
-    addInterfaces(n1._c, ImmutableMap.of("eth1", new InterfaceAddress("1.1.1.0/24")));
-    addInterfaces(n2._c, ImmutableMap.of("eth1", new InterfaceAddress("1.1.1.0/24")));
-    Topology topology = synthesizeTopology(ImmutableMap.of("r1", n1._c, "r2", n2._c));
+    addInterfaces(
+        n1.getConfiguration(), ImmutableMap.of("eth1", new InterfaceAddress("1.1.1.0/24")));
+    addInterfaces(
+        n2.getConfiguration(), ImmutableMap.of("eth1", new InterfaceAddress("1.1.1.0/24")));
+    Topology topology =
+        synthesizeTopology(
+            ImmutableMap.of("r1", n1.getConfiguration(), "r2", n2.getConfiguration()));
 
     Map<String, Configuration> configs =
         ImmutableMap.of("r1", n1.getConfiguration(), "r2", n2.getConfiguration());
@@ -707,11 +720,13 @@ public class VirtualRouterTest {
         nodes
             .values()
             .stream()
-            .map(n -> n._virtualRouters.get(Configuration.DEFAULT_VRF_NAME))
-            .collect(ImmutableMap.toImmutableMap(vr -> vr._c.getHostname(), Function.identity()));
+            .map(n -> n.getVirtualRouters().get(Configuration.DEFAULT_VRF_NAME))
+            .collect(
+                ImmutableMap.toImmutableMap(
+                    vr -> vr.getConfiguration().getHostname(), Function.identity()));
 
     for (Node n : nodes.values()) {
-      n._virtualRouters
+      n.getVirtualRouters()
           .get(Configuration.DEFAULT_VRF_NAME)
           .initQueuesAndDeltaBuilders(nodes, topology, bgpTopology);
     }
@@ -724,12 +739,18 @@ public class VirtualRouterTest {
             });
 
     // Set bgp
-    n1._c.getVrfs().get(Configuration.DEFAULT_VRF_NAME).setBgpProcess(new BgpProcess());
-    n2._c.getVrfs().get(Configuration.DEFAULT_VRF_NAME).setBgpProcess(new BgpProcess());
+    n1.getConfiguration()
+        .getVrfs()
+        .get(Configuration.DEFAULT_VRF_NAME)
+        .setBgpProcess(new BgpProcess());
+    n2.getConfiguration()
+        .getVrfs()
+        .get(Configuration.DEFAULT_VRF_NAME)
+        .setBgpProcess(new BgpProcess());
 
     // Re-run
     for (Node n : nodes.values()) {
-      n._virtualRouters
+      n.getVirtualRouters()
           .get(Configuration.DEFAULT_VRF_NAME)
           .initQueuesAndDeltaBuilders(nodes, topology, bgpTopology);
     }

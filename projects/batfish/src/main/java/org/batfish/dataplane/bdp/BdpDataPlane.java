@@ -37,6 +37,15 @@ public class BdpDataPlane implements Serializable, DataPlane {
 
   Topology _topology;
 
+  @Override
+  public Map<String, Configuration> getConfigurations() {
+    return _nodes
+        .entrySet()
+        .stream()
+        .collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue().getConfiguration()));
+  }
+
+  @Override
   public Map<Ip, Set<String>> getIpOwners() {
     return _ipOwners;
   }
@@ -65,6 +74,11 @@ public class BdpDataPlane implements Serializable, DataPlane {
           ribs.put(hostname, byVrf.build());
         });
     return ribs.build();
+  }
+
+  @Override
+  public Topology getTopology() {
+    return _topology;
   }
 
   @Override

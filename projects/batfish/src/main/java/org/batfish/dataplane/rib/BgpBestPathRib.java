@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
@@ -12,7 +12,8 @@ import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.BgpTieBreaker;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
-import org.batfish.dataplane.ibdp.exceptions.BestPathSelectionException;
+import org.batfish.dataplane.exceptions.BestPathSelectionException;
+import org.batfish.dataplane.ibdp.VirtualRouter;
 
 public class BgpBestPathRib extends AbstractRib<BgpRoute> {
 
@@ -26,7 +27,7 @@ public class BgpBestPathRib extends AbstractRib<BgpRoute> {
    * @param owner The virtual router context for this RIB
    * @param backupRoutes a set of alternative (non-best routes)
    */
-  BgpBestPathRib(
+  public BgpBestPathRib(
       VirtualRouter owner,
       BgpTieBreaker tieBreaker,
       @Nullable Map<Prefix, SortedSet<BgpRoute>> backupRoutes) {
@@ -182,7 +183,7 @@ public class BgpBestPathRib extends AbstractRib<BgpRoute> {
       return res;
     }
     if (lhs.equals(rhs)) {
-      // This is ok, because routes are Sets
+      // This is ok, because routes are stored in sets
       return 0;
     } else {
       return 1;
@@ -222,11 +223,18 @@ public class BgpBestPathRib extends AbstractRib<BgpRoute> {
     }
   }
 
+  /**
+   * Attempt to calculate the cost to reach given routes next hop IP.
+   *
+   * @param route bgp route
+   * @return if next hop IP matches a route we have, returns the metric for that route; otherwise
+   *     {@link Long#MAX_VALUE}
+   */
   private long getIgpCostToNextHopIp(BgpRoute route) {
-    if (_owner == null || _owner._mainRib == null) {
+    if (_owner == null || _owner.getMainRib() == null) {
       return Long.MAX_VALUE;
     }
-    Set<AbstractRoute> s = _owner._mainRib.longestPrefixMatch(route.getNextHopIp());
+    Set<AbstractRoute> s = _owner.getMainRib().longestPrefixMatch(route.getNextHopIp());
     return s == null || s.isEmpty() ? Long.MAX_VALUE : s.iterator().next().getMetric();
   }
 }

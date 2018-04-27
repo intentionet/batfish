@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.graph.Network;
 import com.google.common.graph.NetworkBuilder;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -79,9 +80,20 @@ public class MockDataPlane implements DataPlane {
     return _fibs;
   }
 
+  /** Return the map of Ip owners (as computed during dataplane computation). Map structure */
+  @Override
+  public Map<Ip, Set<String>> getIpOwners() {
+    return null;
+  }
+
   @Override
   public SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> getRibs() {
     return _ribs;
+  }
+
+  @Override
+  public Topology getTopology() {
+    return null;
   }
 
   @Override
@@ -92,5 +104,10 @@ public class MockDataPlane implements DataPlane {
   @Override
   public Network<BgpNeighbor, BgpSession> getBgpTopology() {
     return _bgpTopology;
+  }
+
+  @Override
+  public Map<String, Configuration> getConfigurations() {
+    return null;
   }
 }

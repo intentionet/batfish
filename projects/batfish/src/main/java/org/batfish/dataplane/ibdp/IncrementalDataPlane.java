@@ -21,7 +21,6 @@ import org.batfish.datamodel.Fib;
 import org.batfish.datamodel.GenericRib;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Topology;
-import org.batfish.datamodel.collections.NodeInterfacePair;
 
 public class IncrementalDataPlane implements Serializable, DataPlane {
 
@@ -29,15 +28,13 @@ public class IncrementalDataPlane implements Serializable, DataPlane {
 
   private transient Network<BgpNeighbor, BgpSession> _bgpTopology;
 
-  Set<NodeInterfacePair> _flowSinks;
-
-  Map<Ip, Set<String>> _ipOwners;
+  private Map<Ip, Set<String>> _ipOwners;
 
   private Map<Ip, String> _ipOwnersSimple;
 
   Map<String, Node> _nodes;
 
-  Topology _topology;
+  private Topology _topology;
 
   @Override
   public Map<String, Map<String, Fib>> getFibs() {
@@ -50,14 +47,15 @@ public class IncrementalDataPlane implements Serializable, DataPlane {
                 eNode ->
                     eNode
                         .getValue()
-                        ._virtualRouters
+                        .getVirtualRouters()
                         .entrySet()
                         .stream()
                         .collect(
                             ImmutableMap.toImmutableMap(
-                                Entry::getKey, eVr -> eVr.getValue()._fib))));
+                                Entry::getKey, eVr -> eVr.getValue().getFib()))));
   }
 
+  @Override
   public Map<Ip, Set<String>> getIpOwners() {
     return _ipOwners;
   }
@@ -78,14 +76,20 @@ public class IncrementalDataPlane implements Serializable, DataPlane {
         (hostname, node) -> {
           ImmutableSortedMap.Builder<String, GenericRib<AbstractRoute>> byVrf =
               new ImmutableSortedMap.Builder<>(naturalOrder());
-          node._virtualRouters.forEach(
-              (vrf, virtualRouter) -> {
-                GenericRib<AbstractRoute> rib = virtualRouter._mainRib;
-                byVrf.put(vrf, rib);
-              });
+          node.getVirtualRouters()
+              .forEach(
+                  (vrf, virtualRouter) -> {
+                    GenericRib<AbstractRoute> rib = virtualRouter.getMainRib();
+                    byVrf.put(vrf, rib);
+                  });
           ribs.put(hostname, byVrf.build());
         });
     return ribs.build();
+  }
+
+  @Override
+  public Topology getTopology() {
+    return _topology;
   }
 
   @Override
@@ -99,10 +103,6 @@ public class IncrementalDataPlane implements Serializable, DataPlane {
       Map<Ip, String> ipOwnersSimple) {
     setIpOwners(ipOwners);
     setIpOwnersSimple(ipOwnersSimple);
-  }
-
-  public void setFlowSinks(Set<NodeInterfacePair> flowSinks) {
-    _flowSinks = flowSinks;
   }
 
   public void setIpOwners(Map<Ip, Set<String>> ipOwners) {
@@ -124,6 +124,14 @@ public class IncrementalDataPlane implements Serializable, DataPlane {
   @Override
   public Network<BgpNeighbor, BgpSession> getBgpTopology() {
     return _bgpTopology;
+  }
+
+  @Override
+  public Map<String, Configuration> getConfigurations() {
+    return _nodes
+        .entrySet()
+        .stream()
+        .collect(ImmutableMap.toImmutableMap(Entry::getKey, e -> e.getValue().getConfiguration()));
   }
 
   void setBgpTopology(Network<BgpNeighbor, BgpSession> bgpTopology) {

@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.Prefix;
-import org.batfish.dataplane.ibdp.RouteAdvertisement.Reason;
+import org.batfish.dataplane.rib.RouteAdvertisement.Reason;
 
 /**
  * Represents a change in RIB state
@@ -24,14 +24,16 @@ public class RibDelta<R extends AbstractRoute> {
 
   private ImmutableMap<Prefix, ImmutableList<RouteAdvertisement<R>>> _actions;
   /** The "owner"/parent RIB */
-  private AbstractRib<R> _rib;
+  @Nullable private AbstractRib<R> _rib;
 
-  private RibDelta(AbstractRib<R> rib, Map<Prefix, ImmutableList<RouteAdvertisement<R>>> actions) {
+  private RibDelta(
+      @Nullable AbstractRib<R> rib, Map<Prefix, ImmutableList<RouteAdvertisement<R>>> actions) {
     this._actions = ImmutableMap.copyOf(actions);
     this._rib = rib;
   }
 
   /** Get the owner RIB of this RibDelta */
+  @Nullable
   public AbstractRib<R> getRib() {
     return _rib;
   }
@@ -43,7 +45,6 @@ public class RibDelta<R extends AbstractRoute> {
    *     are returned
    * @return a list of {@link RouteAdvertisement}
    */
-  @Nullable
   public List<RouteAdvertisement<R>> getActions(@Nullable Prefix p) {
     if (p == null) {
       return _actions
@@ -52,7 +53,8 @@ public class RibDelta<R extends AbstractRoute> {
           .flatMap(List::stream)
           .collect(ImmutableList.toImmutableList());
     }
-    return _actions.get(p);
+    List<RouteAdvertisement<R>> r = _actions.get(p);
+    return r == null ? ImmutableList.of() : r;
   }
 
   /**
@@ -94,7 +96,7 @@ public class RibDelta<R extends AbstractRoute> {
     private AbstractRib<R> _rib;
 
     /** Initialize a new RibDelta builder */
-    Builder(AbstractRib<R> rib) {
+    public Builder(@Nullable AbstractRib<R> rib) {
       _actions = new LinkedHashMap<>();
       _rib = rib;
     }
@@ -210,7 +212,7 @@ public class RibDelta<R extends AbstractRoute> {
    */
   @VisibleForTesting
   @Nullable
-  static <U extends AbstractRoute, T extends U> RibDelta<U> importRibDelta(
+  public static <U extends AbstractRoute, T extends U> RibDelta<U> importRibDelta(
       @Nonnull AbstractRib<U> importingRib, @Nullable RibDelta<T> delta) {
     if (delta == null) {
       return null;
@@ -241,7 +243,7 @@ public class RibDelta<R extends AbstractRoute> {
    */
   @VisibleForTesting
   @Nullable
-  static <U extends AbstractRoute, T extends U> RibDelta<U> importRibDelta(
+  public static <U extends AbstractRoute, T extends U> RibDelta<U> importRibDelta(
       @Nonnull AbstractRib<U> importingRib, @Nullable RibDelta<T> delta, Prefix p) {
     if (delta == null || delta.getActions(p) == null) {
       return null;

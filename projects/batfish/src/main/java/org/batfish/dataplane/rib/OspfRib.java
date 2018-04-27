@@ -1,8 +1,9 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import org.batfish.common.BatfishException;
 import org.batfish.datamodel.OspfRoute;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.dataplane.ibdp.VirtualRouter;
 
 public class OspfRib extends AbstractRib<OspfRoute> {
 

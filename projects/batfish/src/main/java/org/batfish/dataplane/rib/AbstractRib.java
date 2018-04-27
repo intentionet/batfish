@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -16,7 +16,8 @@ import org.batfish.datamodel.GenericRib;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.Prefix;
-import org.batfish.dataplane.ibdp.RouteAdvertisement.Reason;
+import org.batfish.dataplane.ibdp.VirtualRouter;
+import org.batfish.dataplane.rib.RouteAdvertisement.Reason;
 
 /**
  * Implements general RIB (Routing Information Base) semantics. RIB stores routes for different
@@ -39,11 +40,11 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
   /** Map to keep track when routes were merged in. */
   protected Map<R, Long> _logicalArrivalTime;
 
-  protected VirtualRouter _owner;
+  @Nullable protected VirtualRouter _owner;
 
   private RibTree<R> _tree;
 
-  private Set<R> _allRoutes;
+  @Nullable private Set<R> _allRoutes;
 
   /**
    * Keep a Sorted Set of alternative routes. Used to update the RIB if best routes are withdrawn
@@ -69,7 +70,8 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
    * @param <T> type of route (must be more specific than {@link U}
    * @return a {@link RibDelta}
    */
-  static <U extends AbstractRoute, T extends U> RibDelta<U> importRib(
+  @Nullable
+  public static <U extends AbstractRoute, T extends U> RibDelta<U> importRib(
       AbstractRib<U> importingRib, AbstractRib<T> exportingRib) {
     RibDelta.Builder<U> builder = new RibDelta.Builder<>(importingRib);
     for (T route : exportingRib.getRoutes()) {
@@ -78,7 +80,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
     return builder.build();
   }
 
-  final boolean containsRoute(R route) {
+  public final boolean containsRoute(R route) {
     return _tree.containsRoute(route);
   }
 
@@ -100,7 +102,6 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
     return _allRoutes;
   }
 
-  @Nullable
   public final Set<R> getRoutes(Prefix p) {
     // Collect routes that match the prefix
     return getRoutes()
@@ -125,7 +126,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
    *     was discarded due to preference comparisons.
    */
   @Nullable
-  RibDelta<R> mergeRouteGetDelta(R route) {
+  public RibDelta<R> mergeRouteGetDelta(R route) {
     RibDelta<R> delta = _tree.mergeRoute(route);
     if (delta != null) {
       // A change to routes has been made
@@ -157,9 +158,9 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
    *     route was not present in the RIB
    */
   @Nullable
-  RibDelta<R> removeRouteGetDelta(R route, Reason reason) {
+  public RibDelta<R> removeRouteGetDelta(R route, Reason reason) {
     RibDelta<R> delta = _tree.removeRouteGetDelta(route, reason);
-    if (delta != null) {
+    if (delta != null && delta.getActions() != null) {
       // A change to routes has been made
       _allRoutes = null;
       delta
@@ -174,7 +175,8 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
     return delta;
   }
 
-  RibDelta<R> removeRouteGetDelta(R route) {
+  @Nullable
+  public RibDelta<R> removeRouteGetDelta(R route) {
     return removeRouteGetDelta(route, Reason.WITHDRAW);
   }
 
@@ -184,7 +186,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
    * @param route route to remove
    * @return True if the route was located and removed
    */
-  boolean removeRoute(R route) {
+  public boolean removeRoute(R route) {
     return removeRouteGetDelta(route, Reason.WITHDRAW) != null;
   }
 
@@ -198,7 +200,7 @@ public abstract class AbstractRib<R extends AbstractRoute> implements GenericRib
    *
    * @param prefix the {@link Prefix} for which the routes should be cleared.
    */
-  RibDelta<R> clearRoutes(Prefix prefix) {
+  public RibDelta<R> clearRoutes(Prefix prefix) {
     RibDelta<R> d = _tree.clearRoutes(prefix);
     if (d != null) {
       _allRoutes = null;

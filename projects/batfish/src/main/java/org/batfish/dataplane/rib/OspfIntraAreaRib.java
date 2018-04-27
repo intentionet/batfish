@@ -1,6 +1,7 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import org.batfish.datamodel.OspfIntraAreaRoute;
+import org.batfish.dataplane.ibdp.VirtualRouter;
 
 public class OspfIntraAreaRib extends AbstractRib<OspfIntraAreaRoute> {
 

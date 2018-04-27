@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import java.util.Collections;
 import java.util.Map;
@@ -10,6 +10,7 @@ import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.dataplane.ibdp.VirtualRouter;
 
 public class BgpMultipathRib extends AbstractRib<BgpRoute> {
 

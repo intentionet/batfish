@@ -80,7 +80,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BfConsts;
 import org.batfish.common.Pair;
-import org.batfish.common.plugin.FlowProcessor;
+import org.batfish.common.plugin.ITraceRouteEngine;
 import org.batfish.datamodel.BgpNeighbor;
 import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.BgpSession;
@@ -686,7 +686,7 @@ public class CommonUtil {
   private static boolean isReachableBgpNeighbor(
       BgpNeighbor src,
       BgpNeighbor dst,
-      @Nullable FlowProcessor flowProcessor,
+      @Nullable ITraceRouteEngine tracerouteEngine,
       @Nullable DataPlane dp) {
     Ip srcAddress = src.getLocalIp();
     Ip dstAddress = src.getAddress();
@@ -694,7 +694,7 @@ public class CommonUtil {
       return false;
     }
     boolean isEbgp = !src.getLocalAs().equals(src.getRemoteAs());
-    if (flowProcessor == null || dp == null) {
+    if (tracerouteEngine == null || dp == null) {
       throw new BatfishException("Cannot compute neighbor reachability without a dataplane");
     }
 
@@ -715,7 +715,7 @@ public class CommonUtil {
 
     // Execute the "initiate connection" traceroute
     SortedMap<Flow, Set<FlowTrace>> traces =
-        flowProcessor.processFlows(dp, ImmutableSet.of(forwardFlow), false);
+        tracerouteEngine.processFlows(dp, ImmutableSet.of(forwardFlow), dp.getFibs(), false);
 
     SortedSet<FlowTrace> acceptedFlows =
         traces
@@ -752,7 +752,7 @@ public class CommonUtil {
     fb.setSrcPort(forwardFlow.getDstPort());
     fb.setDstPort(forwardFlow.getSrcPort());
     Flow backwardFlow = fb.build();
-    traces = flowProcessor.processFlows(dp, ImmutableSet.of(backwardFlow), false);
+    traces = tracerouteEngine.processFlows(dp, ImmutableSet.of(backwardFlow), dp.getFibs(), false);
 
     /*
      * If backward traceroutes fail, do not consider the neighbor reachable
@@ -771,7 +771,7 @@ public class CommonUtil {
 
   /**
    * Compute the BGP topology -- a network of {@link BgpNeighbor}s connected by {@link BgpSession}s.
-   * See {@link #initBgpTopology(Map, Map, boolean, boolean, FlowProcessor, DataPlane)} for more
+   * See {@link #initBgpTopology(Map, Map, boolean, boolean, ITraceRouteEngine, DataPlane)} for more
    * details.
    *
    * @param configurations configuration keyed by hostname
@@ -800,7 +800,7 @@ public class CommonUtil {
    *     reachable and sessions can be established correctly. <b>Note:</b> this is different from
    *     {@code keepInvalid=false}, which only does filters invalid neighbors at the control-plane
    *     level
-   * @param flowProcessor an instance of {@link FlowProcessor} for doing reachability checks.
+   * @param tracerouteEngine an instance of {@link ITraceRouteEngine} for doing reachability checks.
    * @param dp (partially) computed dataplane.
    * @return A graph ({@link Network}) representing all BGP peerings.
    */
@@ -809,7 +809,7 @@ public class CommonUtil {
       Map<Ip, Set<String>> ipOwners,
       boolean keepInvalid,
       boolean checkReachability,
-      @Nullable FlowProcessor flowProcessor,
+      @Nullable ITraceRouteEngine tracerouteEngine,
       @Nullable DataPlane dp) {
 
     // TODO: handle duplicate ips on different vrfs
@@ -895,7 +895,7 @@ public class CommonUtil {
          * Perform reachability checks.
          */
         if (checkReachability) {
-          if (isReachableBgpNeighbor(neighbor, candidateNeighbor, flowProcessor, dp)) {
+          if (isReachableBgpNeighbor(neighbor, candidateNeighbor, tracerouteEngine, dp)) {
             graph.addEdge(neighbor, candidateNeighbor, new BgpSession(neighbor, candidateNeighbor));
           }
         } else {

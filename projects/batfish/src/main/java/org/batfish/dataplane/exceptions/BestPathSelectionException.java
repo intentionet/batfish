@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp.exceptions;
+package org.batfish.dataplane.exceptions;
 
 import org.batfish.common.BatfishException;
 
@@ -7,11 +7,6 @@ public class BestPathSelectionException extends BatfishException {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Constructs a BatfishException with a detail message
-   *
-   * @param msg The detail message
-   */
   public BestPathSelectionException(String msg) {
     super(msg);
   }

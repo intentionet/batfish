@@ -10,6 +10,7 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RipInternalRoute;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.dataplane.rib.RipInternalRib;
 import org.junit.Test;
 
 public class RipInternalRibTest {
