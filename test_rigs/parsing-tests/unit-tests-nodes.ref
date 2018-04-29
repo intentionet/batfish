@@ -4262,6 +4262,11 @@
         "defaultCrossZoneAction" : "ACCEPT",
         "defaultInboundAction" : "ACCEPT",
         "deviceType" : "SWITCH",
+        "ipAccessLists" : {
+          "~ZONE_OUTGOING_ACL~z2~" : {
+            "name" : "~ZONE_OUTGOING_ACL~z2~"
+          }
+        },
         "vendorFamily" : {
           "cisco" : {
             "hostname" : "cisco-zone",
@@ -8695,6 +8700,11 @@
         "defaultCrossZoneAction" : "ACCEPT",
         "defaultInboundAction" : "ACCEPT",
         "deviceType" : "SWITCH",
+        "ipAccessLists" : {
+          "~INSPECT_POLICY_MAP_ACL~pminspect~" : {
+            "name" : "~INSPECT_POLICY_MAP_ACL~pminspect~"
+          }
+        },
         "ipSpaces" : {
           "dns_servers" : {
             "class" : "org.batfish.datamodel.IpWildcardSetIpSpace"
