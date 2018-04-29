@@ -69,6 +69,17 @@ final class InterfaceMatchersImpl {
     }
   }
 
+  static final class HasOutgoingFilterName extends FeatureMatcher<Interface, String> {
+    HasOutgoingFilterName(@Nonnull Matcher<? super String> subMatcher) {
+      super(subMatcher, "an Interface with outgoingFilterName:", "outgoingFilterName");
+    }
+
+    @Override
+    protected String featureValueOf(Interface actual) {
+      return actual.getOutgoingFilterName();
+    }
+  }
+
   static final class HasSourceNats extends FeatureMatcher<Interface, List<SourceNat>> {
     HasSourceNats(@Nonnull Matcher<? super List<SourceNat>> subMatcher) {
       super(subMatcher, "an Interface with sourceNats:", "sourceNats");

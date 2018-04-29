@@ -738,6 +738,7 @@ import org.batfish.representation.cisco.RoutePolicySetVarMetricType;
 import org.batfish.representation.cisco.RoutePolicySetWeight;
 import org.batfish.representation.cisco.RoutePolicyStatement;
 import org.batfish.representation.cisco.SecurityZone;
+import org.batfish.representation.cisco.SecurityZonePair;
 import org.batfish.representation.cisco.ServiceObjectGroup;
 import org.batfish.representation.cisco.ServiceObjectGroupServiceSpecifier;
 import org.batfish.representation.cisco.SimpleExtendedAccessListServiceSpecifier;
@@ -1042,6 +1043,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   private InspectPolicyMap _currentInspectPolicyMap;
 
   private InspectPolicyMapInspectClass _currentInspectPolicyMapInspectClass;
+
+  private SecurityZonePair _currentSecurityZonePair;
 
   public CiscoControlPlaneExtractor(
       String text,
@@ -2784,7 +2787,9 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void exitS_zone_pair(S_zone_pairContext ctx) {
+  public void enterS_zone_pair(S_zone_pairContext ctx) {
+    String name = ctx.name.getText();
+    int definitionLine = ctx.name.getStart().getLine();
     String srcName = ctx.source.getText();
     int srcLine = ctx.source.getStart().getLine();
     _configuration.referenceStructure(
@@ -2799,6 +2804,17 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
         dstName,
         CiscoStructureUsage.ZONE_PAIR_DESTINATION_ZONE,
         dstLine);
+    _currentSecurityZonePair =
+        _configuration
+            .getSecurityZonePairs()
+            .computeIfAbsent(dstName, n -> new TreeMap<>())
+            .computeIfAbsent(
+                srcName, n -> new SecurityZonePair(name, definitionLine, srcName, dstName));
+  }
+
+  @Override
+  public void exitS_zone_pair(S_zone_pairContext ctx) {
+    _currentSecurityZonePair = null;
   }
 
   @Override
@@ -2810,6 +2826,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
         name,
         CiscoStructureUsage.ZONE_PAIR_INSPECT_SERVICE_POLICY,
         line);
+    _currentSecurityZonePair.setInspectPolicyMap(name);
   }
 
   @Override
@@ -2854,13 +2871,13 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       return InspectClassMapProtocol.HTTP;
     } else if (ctx.HTTPS() != null) {
       return InspectClassMapProtocol.HTTPS;
-    } else if (ctx.HTTPS() != null) {
+    } else if (ctx.ICMP() != null) {
       return InspectClassMapProtocol.ICMP;
-    } else if (ctx.HTTPS() != null) {
+    } else if (ctx.TCP() != null) {
       return InspectClassMapProtocol.TCP;
-    } else if (ctx.HTTPS() != null) {
+    } else if (ctx.TFTP() != null) {
       return InspectClassMapProtocol.TFTP;
-    } else if (ctx.HTTPS() != null) {
+    } else if (ctx.UDP() != null) {
       return InspectClassMapProtocol.UDP;
     } else {
       throw convError(InspectClassMapProtocol.class, ctx);

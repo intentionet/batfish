@@ -1,0 +1,43 @@
+!
+hostname ios-inspection
+!
+policy-map type inspect pmi
+ class type inspect ci
+  inspect
+!
+class-map type inspect match-all ci
+ match access-group name inspectacl
+ match protocol tcp
+!
+object-group service ogs
+ tcp eq 80
+!
+object-group network ogn1
+ host 1.1.1.1
+!
+object-group network ogn2
+ host 2.2.2.2
+!
+ip access-list extended inspectacl
+ permit object-group ogs object-group ogn1 object-group ogn2
+!
+ip route 1.1.1.1 255.255.255.255 10.0.0.1
+ip route 2.2.2.2 255.255.255.255 10.0.1.1
+!
+zone security z1
+zone security z2
+!
+zone-pair security zp source z1 destination z2
+ service-policy type inspect pmi
+!
+interface Ethernet1
+ ip address 10.0.0.0 255.255.255.0
+ no shutdown
+ zone-member security z1
+!
+interface Ethernet2
+ ip address 10.0.1.0 255.255.255.0
+ no shutdown
+ zone-member security z2
+!
+!

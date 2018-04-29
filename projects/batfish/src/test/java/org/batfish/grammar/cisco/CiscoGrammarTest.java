@@ -13,6 +13,7 @@ import static org.batfish.datamodel.matchers.DataModelMatchers.hasAclName;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasIpProtocols;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasMemberInterfaces;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasName;
+import static org.batfish.datamodel.matchers.DataModelMatchers.hasOutgoingFilterName;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasSrcOrDstPorts;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasUndefinedReference;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasUnusedStructure;
@@ -313,6 +314,12 @@ public class CiscoGrammarTest {
             CiscoStructureType.NETWORK_OBJECT_GROUP,
             "ognfake1",
             CiscoStructureUsage.EXTENDED_ACCESS_LIST_NETWORK_OBJECT_GROUP));
+  }
+
+  @Test
+  public void testIosInspection() throws IOException {
+    Configuration c = parseConfig("ios-inspection");
+    assertThat(c, hasInterface("Ethernet2", hasOutgoingFilterName(not(nullValue()))));
   }
 
   @Test
