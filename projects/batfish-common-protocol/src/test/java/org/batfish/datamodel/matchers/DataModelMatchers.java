@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.batfish.datamodel.BgpNeighbor;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.HeaderSpace;
@@ -50,6 +51,14 @@ public final class DataModelMatchers {
   public static @Nonnull Matcher<Interface> hasOutgoingFilterName(
       @Nonnull Matcher<? super String> subMatcher) {
     return new InterfaceMatchersImpl.HasOutgoingFilterName(subMatcher);
+  }
+
+  /**
+   * Provides a matcher that matches if the {@link Interface}'s {@code outgoingFilterName} is equal
+   * to {@code expectedName}.
+   */
+  public static @Nonnull Matcher<Interface> hasOutgoingFilterName(@Nullable String expectedName) {
+    return new InterfaceMatchersImpl.HasOutgoingFilterName(equalTo(expectedName));
   }
 
   /**

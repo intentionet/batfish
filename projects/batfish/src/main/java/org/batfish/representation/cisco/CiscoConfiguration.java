@@ -2355,51 +2355,40 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private void applyZoneFilter(
       Interface iface, org.batfish.datamodel.Interface newIface, Configuration c) {
-    String dstZoneName = iface.getSecurityZone();
-    if (dstZoneName == null) {
+    String zoneName = iface.getSecurityZone();
+    if (zoneName == null) {
       return;
     }
-    SecurityZone dstSecurityZone = _securityZones.get(dstZoneName);
-    if (dstSecurityZone == null) {
+    SecurityZone securityZone = _securityZones.get(zoneName);
+    if (securityZone == null) {
       return;
     }
-    Map<String, SecurityZonePair> zonePairsBySrcZone = _securityZonePairs.get(dstZoneName);
-    if (zonePairsBySrcZone == null) {
+    String zoneOutgoingAclName = computeZoneOutgoingAclName(zoneName);
+    IpAccessList zoneOutgoingAcl = c.getIpAccessLists().get(zoneOutgoingAclName);
+    if (zoneOutgoingAcl == null) {
       return;
     }
-    zonePairsBySrcZone.forEach(
-        (srcZoneName, zonePair) -> {
-          SecurityZone srcSecurityZone = _securityZones.get(srcZoneName);
-          if (srcSecurityZone == null) {
-            return;
-          }
-          String zonePairAclName = computeZonePairAclName(srcZoneName, dstZoneName);
-          IpAccessList zonePairAcl = c.getIpAccessLists().get(zonePairAclName);
-          if (zonePairAcl == null) {
-            return;
-          }
-          String oldOutgoingFilterName = newIface.getOutgoingFilterName();
-          if (oldOutgoingFilterName != null) {
-            String combinedOutgoingAclName = computeCombinedOutgoingAclName(newIface.getName());
-            IpAccessList combinedOutgoingAcl =
-                IpAccessList.builder()
-                    .setOwner(c)
-                    .setName(combinedOutgoingAclName)
-                    .setLines(
-                        ImmutableList.of(
-                            IpAccessListLine.accepting()
-                                .setMatchCondition(
-                                    new AndMatchExpr(
-                                        ImmutableList.of(
-                                            new PermittedByAcl(oldOutgoingFilterName),
-                                            new PermittedByAcl(zonePairAclName))))
-                                .build()))
-                    .build();
-            newIface.setOutgoingFilter(combinedOutgoingAcl);
-          } else {
-            newIface.setOutgoingFilter(zonePairAcl);
-          }
-        });
+    String oldOutgoingFilterName = newIface.getOutgoingFilterName();
+    if (oldOutgoingFilterName != null) {
+      String combinedOutgoingAclName = computeCombinedOutgoingAclName(newIface.getName());
+      IpAccessList combinedOutgoingAcl =
+          IpAccessList.builder()
+              .setOwner(c)
+              .setName(combinedOutgoingAclName)
+              .setLines(
+                  ImmutableList.of(
+                      IpAccessListLine.accepting()
+                          .setMatchCondition(
+                              new AndMatchExpr(
+                                  ImmutableList.of(
+                                      new PermittedByAcl(oldOutgoingFilterName),
+                                      new PermittedByAcl(zoneOutgoingAclName))))
+                          .build()))
+              .build();
+      newIface.setOutgoingFilter(combinedOutgoingAcl);
+    } else {
+      newIface.setOutgoingFilter(zoneOutgoingAcl);
+    }
   }
 
   public static String computeCombinedOutgoingAclName(String interfaceName) {
@@ -4111,6 +4100,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
           if (!_securityZones.containsKey(dstZoneName)) {
             return;
           }
+          ImmutableList.Builder<PermittedByAcl> zonePairPermits = ImmutableList.builder();
           zonePairsBySrcZoneName.forEach(
               (srcZoneName, zonePair) -> {
                 if (!_securityZones.containsKey(srcZoneName)) {
@@ -4141,8 +4131,28 @@ public final class CiscoConfiguration extends VendorConfiguration {
                                             matchSrcZoneInterface, permittedByPolicyMap)))
                                 .build()))
                     .build();
+                zonePairPermits.add(new PermittedByAcl(zonePairAclName));
               });
+          String zoneOutgoingAclName = computeZoneOutgoingAclName(dstZoneName);
+          IpAccessList.builder()
+              .setName(zoneOutgoingAclName)
+              .setOwner(c)
+              .setLines(
+                  zonePairPermits
+                      .build()
+                      .stream()
+                      .map(
+                          permittedByAcl ->
+                              IpAccessListLine.accepting()
+                                  .setMatchCondition(permittedByAcl)
+                                  .build())
+                      .collect(ImmutableList.toImmutableList()))
+              .build();
         });
+  }
+
+  public static String computeZoneOutgoingAclName(@Nonnull String zoneName) {
+    return String.format("~ZONE_OUTGOING_ACL~%s~", zoneName);
   }
 
   public static String computeZonePairAclName(

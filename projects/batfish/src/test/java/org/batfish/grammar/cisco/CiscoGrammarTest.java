@@ -6,6 +6,7 @@ import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasDefaultVrf
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterface;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterfaces;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpAccessList;
+import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpAccessLists;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpSpace;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVendorFamily;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrfs;
@@ -30,7 +31,9 @@ import static org.batfish.datamodel.matchers.InterfaceMatchers.isOspfPassive;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.isOspfPointToPoint;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.isProxyArp;
 import static org.batfish.datamodel.matchers.IpAccessListLineMatchers.hasMatchCondition;
+import static org.batfish.datamodel.matchers.IpAccessListMatchers.accepts;
 import static org.batfish.datamodel.matchers.IpAccessListMatchers.hasLines;
+import static org.batfish.datamodel.matchers.IpAccessListMatchers.rejects;
 import static org.batfish.datamodel.matchers.IpSpaceMatchers.containsIp;
 import static org.batfish.datamodel.matchers.MatchHeaderSpaceMatchers.hasHeaderSpace;
 import static org.batfish.datamodel.matchers.MatchHeaderSpaceMatchers.isMatchHeaderSpaceThat;
@@ -45,7 +48,11 @@ import static org.batfish.datamodel.matchers.VrfMatchers.hasOspfProcess;
 import static org.batfish.datamodel.vendor_family.VendorFamilyMatchers.hasCisco;
 import static org.batfish.datamodel.vendor_family.cisco.CiscoFamilyMatchers.hasLogging;
 import static org.batfish.datamodel.vendor_family.cisco.LoggingMatchers.isOn;
+import static org.batfish.representation.cisco.CiscoConfiguration.computeCombinedOutgoingAclName;
+import static org.batfish.representation.cisco.CiscoConfiguration.computeInspectClassMapAclName;
+import static org.batfish.representation.cisco.CiscoConfiguration.computeInspectPolicyMapAclName;
 import static org.batfish.representation.cisco.CiscoConfiguration.computeServiceObjectGroupAclName;
+import static org.batfish.representation.cisco.CiscoConfiguration.computeZonePairAclName;
 import static org.batfish.representation.cisco.OspfProcess.getReferenceOspfBandwidth;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -88,10 +95,12 @@ import org.batfish.datamodel.BgpSession;
 import org.batfish.datamodel.CommunityList;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
+import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.NamedPort;
@@ -106,6 +115,7 @@ import org.batfish.dataplane.bdp.BdpDataPlanePlugin;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.main.TestrigText;
+import org.batfish.representation.cisco.CiscoConfiguration;
 import org.batfish.representation.cisco.CiscoStructureType;
 import org.batfish.representation.cisco.CiscoStructureUsage;
 import org.hamcrest.Matchers;
@@ -319,7 +329,87 @@ public class CiscoGrammarTest {
   @Test
   public void testIosInspection() throws IOException {
     Configuration c = parseConfig("ios-inspection");
-    assertThat(c, hasInterface("Ethernet2", hasOutgoingFilterName(not(nullValue()))));
+
+    String zone1Name = "z1";
+    String zone2Name = "z2";
+    String inspectAclName = "inspectacl";
+    String inspectClassMapName = "ci";
+    String inspectPolicyMapName = "pmi";
+    String eth0Name = "Ethernet0";
+    String eth1Name = "Ethernet1";
+    String eth2Name = "Ethernet2";
+    String eth3Name = "Ethernet3";
+    String eth3OriginalAclName = "acl3out";
+    String eth3CombinedAclName = computeCombinedOutgoingAclName(eth3Name);
+    String zonePairAclName = computeZonePairAclName(zone1Name, zone2Name);
+    String zone2OutgoingAclName = CiscoConfiguration.computeZoneOutgoingAclName(zone2Name);
+
+    /* Check for expected generated ACLs */
+    assertThat(c, hasIpAccessLists(hasKey(inspectAclName)));
+    assertThat(c, hasIpAccessLists(hasKey(computeInspectClassMapAclName(inspectClassMapName))));
+    assertThat(c, hasIpAccessLists(hasKey(computeInspectPolicyMapAclName(inspectPolicyMapName))));
+    assertThat(c, hasIpAccessLists(hasKey(zonePairAclName)));
+    assertThat(c, hasIpAccessLists(hasKey(eth3OriginalAclName)));
+    assertThat(c, hasIpAccessLists(hasKey(eth3CombinedAclName)));
+    assertThat(c, hasIpAccessLists(hasKey(zone2OutgoingAclName)));
+
+    /* Check that interfaces have correct ACLs assigned */
+    assertThat(c, hasInterface(eth2Name, hasOutgoingFilterName(zone2OutgoingAclName)));
+    assertThat(c, hasInterface(eth3Name, hasOutgoingFilterName(eth3CombinedAclName)));
+
+    IpAccessList eth2Acl = c.getInterfaces().get(eth2Name).getOutgoingFilter();
+    IpAccessList eth3Acl = c.getInterfaces().get(eth3Name).getOutgoingFilter();
+
+    /* Check that expected traffic is permitted/denied */
+    Flow permittedByBoth =
+        Flow.builder()
+            .setSrcIp(new Ip("1.1.1.1"))
+            .setDstIp(new Ip("2.2.2.2"))
+            .setIpProtocol(IpProtocol.TCP)
+            .setDstPort(80)
+            .setIngressNode("internet")
+            .setTag("none")
+            .build();
+    assertThat(eth2Acl, accepts(permittedByBoth, eth0Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(eth2Acl, accepts(permittedByBoth, eth1Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(eth3Acl, accepts(permittedByBoth, eth0Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(eth3Acl, accepts(permittedByBoth, eth1Name, c.getIpAccessLists(), c.getIpSpaces()));
+
+    Flow permittedThroughEth2Only =
+        Flow.builder()
+            .setSrcIp(new Ip("1.1.1.2"))
+            .setDstIp(new Ip("2.2.2.2"))
+            .setIpProtocol(IpProtocol.TCP)
+            .setDstPort(80)
+            .setIngressNode("internet")
+            .setTag("none")
+            .build();
+    assertThat(
+        eth2Acl,
+        accepts(permittedThroughEth2Only, eth0Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(
+        eth2Acl,
+        accepts(permittedThroughEth2Only, eth1Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(
+        eth3Acl,
+        rejects(permittedThroughEth2Only, eth0Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(
+        eth3Acl,
+        rejects(permittedThroughEth2Only, eth1Name, c.getIpAccessLists(), c.getIpSpaces()));
+
+    Flow deniedByBoth =
+        Flow.builder()
+            .setSrcIp(new Ip("1.1.1.1"))
+            .setDstIp(new Ip("2.2.2.2"))
+            .setIpProtocol(IpProtocol.TCP)
+            .setDstPort(81)
+            .setIngressNode("internet")
+            .setTag("none")
+            .build();
+    assertThat(eth2Acl, rejects(deniedByBoth, eth0Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(eth2Acl, rejects(deniedByBoth, eth1Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(eth3Acl, rejects(deniedByBoth, eth0Name, c.getIpAccessLists(), c.getIpSpaces()));
+    assertThat(eth3Acl, rejects(deniedByBoth, eth1Name, c.getIpAccessLists(), c.getIpSpaces()));
   }
 
   @Test

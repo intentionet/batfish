@@ -14,29 +14,45 @@ object-group service ogs
 !
 object-group network ogn1
  host 1.1.1.1
+ host 1.1.1.2
 !
 object-group network ogn2
  host 2.2.2.2
 !
+ip access-list extended acl3out
+ permit ip host 1.1.1.1 any
+!
 ip access-list extended inspectacl
  permit object-group ogs object-group ogn1 object-group ogn2
 !
-ip route 1.1.1.1 255.255.255.255 10.0.0.1
-ip route 2.2.2.2 255.255.255.255 10.0.1.1
-!
+zone security z0
 zone security z1
 zone security z2
 !
-zone-pair security zp source z1 destination z2
+zone-pair security zp0-2 source z0 destination z2
  service-policy type inspect pmi
 !
-interface Ethernet1
+zone-pair security zp1-2 source z1 destination z2
+ service-policy type inspect pmi
+!
+interface Ethernet0
  ip address 10.0.0.0 255.255.255.0
+ no shutdown
+ zone-member security z0
+!
+interface Ethernet1
+ ip address 10.0.1.0 255.255.255.0
  no shutdown
  zone-member security z1
 !
 interface Ethernet2
- ip address 10.0.1.0 255.255.255.0
+ ip address 10.0.2.0 255.255.255.0
+ no shutdown
+ zone-member security z2
+!
+interface Ethernet3
+ ip address 10.0.3.0 255.255.255.0
+ ip access-group acl3out out
  no shutdown
  zone-member security z2
 !
