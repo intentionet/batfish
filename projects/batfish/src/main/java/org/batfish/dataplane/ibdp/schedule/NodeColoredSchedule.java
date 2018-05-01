@@ -84,7 +84,6 @@ public class NodeColoredSchedule extends IbdpSchedule {
     _graph = new DefaultDirectedGraph<>((src, dst) -> new DefaultEdge());
     nodes.keySet().forEach(n -> _graph.addVertex(n));
 
-    // TODO: see if we can cache graph/coloring, as not to recompute each iteration
     // Process BGP connections
     for (BgpSession session : bgpTopology.edges()) {
       _graph.addEdge(

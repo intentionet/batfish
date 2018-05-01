@@ -91,6 +91,7 @@ public class IncrementalBdpEngine {
     Network<BgpNeighbor, BgpSession> bgpTopology =
         initBgpTopology(
             configurations, dp.getIpOwners(), false, true, TracerouteEngineImpl.getInstance(), dp);
+
     boolean isOscillating =
         computeNonMonotonicPortionOfDataPlane(
             nodes, topology, dp, externalAdverts, ae, true, bgpTopology);

@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.batfish.common.BatfishLogger;
+import org.batfish.common.plugin.DataPlanePlugin;
 import org.batfish.common.plugin.DataPlanePlugin.ComputeDataPlaneResult;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AsPath;
@@ -104,9 +105,8 @@ public class IncrementalDataPlanePluginTest {
     configurations.put(
         "h2", BatfishTestUtils.createTestConfiguration("h2", ConfigurationFormat.HOST, "e0"));
     Batfish batfish = BatfishTestUtils.getBatfish(configurations, _folder);
-    IncrementalDataPlanePlugin dataPlanePlugin = new IncrementalDataPlanePlugin();
-    dataPlanePlugin.initialize(batfish);
-
+    batfish.getSettings().setDataplaneEngineName(IncrementalDataPlanePlugin.PLUGIN_NAME);
+    DataPlanePlugin dataPlanePlugin = batfish.getDataPlanePlugin();
     // Test that compute Data Plane finishes in a finite time
     dataPlanePlugin.computeDataPlane(false);
   }
@@ -396,8 +396,8 @@ public class IncrementalDataPlanePluginTest {
                 .setConfigurationText(TESTRIGS_PREFIX + testrigName, configurationNames)
                 .build(),
             _folder);
-    IncrementalDataPlanePlugin dataPlanePlugin = new IncrementalDataPlanePlugin();
-    dataPlanePlugin.initialize(batfish);
+    batfish.getSettings().setDataplaneEngineName(IncrementalDataPlanePlugin.PLUGIN_NAME);
+    DataPlanePlugin dataPlanePlugin = batfish.getDataPlanePlugin();
 
     // Really just test that no exception is thrown
     dataPlanePlugin.computeDataPlane(false);
@@ -597,8 +597,8 @@ public class IncrementalDataPlanePluginTest {
                 .setConfigurationText(TESTRIGS_PREFIX + testrigName, configurationNames)
                 .build(),
             _folder);
-    IncrementalDataPlanePlugin dataPlanePlugin = new IncrementalDataPlanePlugin();
-    dataPlanePlugin.initialize(batfish);
+    batfish.getSettings().setDataplaneEngineName(IncrementalDataPlanePlugin.PLUGIN_NAME);
+    DataPlanePlugin dataPlanePlugin = batfish.getDataPlanePlugin();
     ComputeDataPlaneResult dp = dataPlanePlugin.computeDataPlane(false);
     SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> routes =
         dataPlanePlugin.getRoutes(dp._dataPlane);
@@ -634,8 +634,9 @@ public class IncrementalDataPlanePluginTest {
                 .setConfigurationText(TESTRIGS_PREFIX + testrigName, configurationNames)
                 .build(),
             _folder);
-    IncrementalDataPlanePlugin dataPlanePlugin = new IncrementalDataPlanePlugin();
-    dataPlanePlugin.initialize(batfish);
+
+    batfish.getSettings().setDataplaneEngineName(IncrementalDataPlanePlugin.PLUGIN_NAME);
+    DataPlanePlugin dataPlanePlugin = batfish.getDataPlanePlugin();
     ComputeDataPlaneResult dp = dataPlanePlugin.computeDataPlane(false);
     SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> routes =
         dataPlanePlugin.getRoutes(dp._dataPlane);
@@ -668,8 +669,8 @@ public class IncrementalDataPlanePluginTest {
                 .setRoutingTablesText(testrigResourcePrefix, routingTableNames)
                 .build(),
             _folder);
-    IncrementalDataPlanePlugin dataPlanePlugin = new IncrementalDataPlanePlugin();
-    dataPlanePlugin.initialize(batfish);
+    batfish.getSettings().setDataplaneEngineName(IncrementalDataPlanePlugin.PLUGIN_NAME);
+    DataPlanePlugin dataPlanePlugin = batfish.getDataPlanePlugin();
     ComputeDataPlaneResult dp = dataPlanePlugin.computeDataPlane(false);
     SortedMap<String, RoutesByVrf> environmentRoutes = batfish.loadEnvironmentRoutingTables();
     SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> routes =
@@ -746,8 +747,8 @@ public class IncrementalDataPlanePluginTest {
     SortedMap<String, Configuration> configs = generateNetworkWithDuplicates();
 
     Batfish batfish = BatfishTestUtils.getBatfish(configs, _folder);
-    IncrementalDataPlanePlugin dataPlanePlugin = new IncrementalDataPlanePlugin();
-    dataPlanePlugin.initialize(batfish);
+    batfish.getSettings().setDataplaneEngineName(IncrementalDataPlanePlugin.PLUGIN_NAME);
+    DataPlanePlugin dataPlanePlugin = batfish.getDataPlanePlugin();
     DataPlane dp = dataPlanePlugin.computeDataPlane(false)._dataPlane;
 
     Network<BgpNeighbor, BgpSession> bgpTopology = dp.getBgpTopology();

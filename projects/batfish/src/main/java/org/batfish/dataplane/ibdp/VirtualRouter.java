@@ -6,6 +6,7 @@ import static org.batfish.dataplane.ibdp.RibDelta.importRibDelta;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.graph.Network;
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -93,7 +93,8 @@ public class VirtualRouter extends ComparableStructure<String> {
   transient BgpBestPathRib _bgpBestPathRib;
 
   /** Incoming messages into this router from each bgp neighbor (indexed by prefix) */
-  transient SortedMap<Prefix, Queue<RouteAdvertisement<AbstractRoute>>> _bgpIncomingRoutes;
+  transient SortedMap<UndirectedBgpSession, Queue<RouteAdvertisement<AbstractRoute>>>
+      _bgpIncomingRoutes;
 
   /** Builder for constructing {@link RibDelta} as pertains to the multipath BGP RIB */
   private transient RibDelta.Builder<BgpRoute> _bgpMultiPathDeltaBuilder;
@@ -147,8 +148,6 @@ public class VirtualRouter extends ComparableStructure<String> {
 
   /** Keeps track of changes to the main RIB */
   private transient RibDelta.Builder<AbstractRoute> _mainRibRouteDeltaBuiler;
-
-  private transient Set<BgpSession> _newBgpSessions = new HashSet<>();
 
   transient OspfExternalType1Rib _ospfExternalType1Rib;
 
@@ -293,7 +292,13 @@ public class VirtualRouter extends ComparableStructure<String> {
       _vrf.getBgpProcess()
           .getNeighbors()
           .values()
-          .forEach(n -> _bgpIncomingRoutes.put(n.getPrefix(), new ConcurrentLinkedQueue<>()));
+          .forEach(
+              n -> {
+                for (BgpSession session : bgpTopology.incidentEdges(n)) {
+                  _bgpIncomingRoutes.computeIfAbsent(
+                      UndirectedBgpSession.from(session), s -> new ConcurrentLinkedQueue<>());
+                }
+              });
     }
   }
 
@@ -1329,24 +1334,12 @@ public class VirtualRouter extends ComparableStructure<String> {
       if (!bgpTopology.nodes().contains(neighbor)) {
         continue;
       }
-      for (BgpSession session : bgpTopology.inEdges(neighbor)) {
-        BgpNeighbor remoteBgpNeighbor = session.getSrc();
-
-        // Check that we can process something from this neighbor
-        if (remoteBgpNeighbor == null) {
-          continue;
-        }
-
+      for (BgpNeighbor remoteBgpNeighbor : bgpTopology.adjacentNodes(neighbor)) {
         Ip localIp = neighbor.getLocalIp();
-        Set<String> localIpOwners = ipOwners.get(localIp);
         String hostname = _c.getHostname();
 
-        if (localIpOwners == null || !localIpOwners.contains(hostname)) {
-          continue;
-        }
-
         Queue<RouteAdvertisement<AbstractRoute>> queue =
-            _bgpIncomingRoutes.get(neighbor.getPrefix());
+            _bgpIncomingRoutes.get(UndirectedBgpSession.from(neighbor, remoteBgpNeighbor));
 
         // Setup helper vars
         Configuration remoteConfig = remoteBgpNeighbor.getOwner();
@@ -1356,7 +1349,7 @@ public class VirtualRouter extends ComparableStructure<String> {
         RoutingPolicy remoteExportPolicy =
             remoteConfig.getRoutingPolicies().get(remoteBgpNeighbor.getExportPolicy());
         int remoteAs = neighbor.getRemoteAs();
-        boolean ebgpSession = session.isEbgp();
+        boolean ebgpSession = !neighbor.getLocalAs().equals(neighbor.getRemoteAs());
         BgpMultipathRib targetRib = ebgpSession ? _ebgpStagingRib : _ibgpStagingRib;
         RoutingProtocol targetProtocol = ebgpSession ? RoutingProtocol.BGP : RoutingProtocol.IBGP;
 
@@ -2243,20 +2236,24 @@ public class VirtualRouter extends ComparableStructure<String> {
       if (!bgpTopology.nodes().contains(neighbor)) {
         continue;
       }
-      for (BgpSession session : bgpTopology.incidentEdges(neighbor)) {
-        BgpNeighbor remoteNeighbor = session.getSrc();
-        if (neighbor == remoteNeighbor) {
-          continue;
-        }
-
+      for (BgpNeighbor remoteNeighbor : bgpTopology.adjacentNodes(neighbor)) {
         // Queue for this neighbor
-        VirtualRouter remoteVirtualRouter = getRemoteBgpNeighborVR(session, allNodes);
+        VirtualRouter remoteVirtualRouter = getRemoteBgpNeighborVR(remoteNeighbor, allNodes);
         if (remoteVirtualRouter == null) {
           continue;
         }
 
+        Set<BgpSession> sessions = bgpTopology.edgesConnecting(neighbor, remoteNeighbor);
+        if (sessions.isEmpty()) {
+          sessions = bgpTopology.edgesConnecting(remoteNeighbor, neighbor);
+          if (sessions.isEmpty()) {
+            continue;
+          }
+        }
+        BgpSession session = sessions.iterator().next();
         Queue<RouteAdvertisement<AbstractRoute>> queue =
-            remoteVirtualRouter._bgpIncomingRoutes.get(remoteNeighbor.getPrefix());
+            remoteVirtualRouter._bgpIncomingRoutes.get(
+                UndirectedBgpSession.from(neighbor, remoteNeighbor));
 
         Builder<AbstractRoute> finalBuilder = new Builder<>(null);
 
@@ -2465,12 +2462,6 @@ public class VirtualRouter extends ComparableStructure<String> {
     _bgpMultiPathDeltaBuilder = new RibDelta.Builder<>(_bgpMultipathRib);
     _ospfExternalDeltaBuiler = new RibDelta.Builder<>(null);
 
-    // Initial round of messages to the new neighbors
-    for (BgpSession bgpSession : _newBgpSessions) {
-      newBgpSessionEstablishedHook(bgpSession, allNodes);
-    }
-    _newBgpSessions.clear();
-
     /*
      * RIBs not read from can just be re-initialized
      */
@@ -2537,10 +2528,15 @@ public class VirtualRouter extends ComparableStructure<String> {
     // Check the BGP message queues
     if (_vrf.getBgpProcess() != null) {
       for (BgpNeighbor neighbor : _vrf.getBgpProcess().getNeighbors().values()) {
-        Queue<RouteAdvertisement<AbstractRoute>> queue =
-            _bgpIncomingRoutes.get(neighbor.getPrefix());
-        if (!queue.isEmpty()) {
-          return false;
+        if (!bgpTopology.nodes().contains(neighbor)) {
+          continue;
+        }
+        for (BgpSession session : bgpTopology.incidentEdges(neighbor)) {
+          Queue<RouteAdvertisement<AbstractRoute>> queue =
+              _bgpIncomingRoutes.get(UndirectedBgpSession.from(session));
+          if (!queue.isEmpty()) {
+            return false;
+          }
         }
       }
     }
@@ -2572,48 +2568,52 @@ public class VirtualRouter extends ComparableStructure<String> {
       if (!bgpTopology.nodes().contains(neighbor)) {
         continue;
       }
-      for (BgpSession session : bgpTopology.inEdges(neighbor)) {
-        newBgpSessionEstablishedHook(session, allNodes);
+      for (BgpSession session : bgpTopology.incidentEdges(neighbor)) {
+        newBgpSessionEstablishedHook(UndirectedBgpSession.from(session), allNodes);
       }
     }
   }
 
-  void newBgpSessionEstablishedHook(BgpSession session, Map<String, Node> allNodes) {
-    VirtualRouter remoteVr = getRemoteBgpNeighborVR(session, allNodes);
-    if (remoteVr == null) {
-      return;
-    }
-
-    Queue<RouteAdvertisement<AbstractRoute>> queue =
-        remoteVr._bgpIncomingRoutes.get(session.getSrc().getPrefix());
-    if (queue == null) {
-      return;
-    }
-
+  private void enqueBgpMessages(
+      final UndirectedBgpSession session, final Set<AbstractRoute> routes) {
     /*
      * Add route advertisement.
      * Note: export filtering is done in the processBgpMessages, here we queue everything from the
      * main RIB
      */
-    for (AbstractRoute route : _mainRib.getRoutes()) {
-      queue.add(new RouteAdvertisement<>(route));
+    _bgpIncomingRoutes
+        .get(session)
+        .addAll(
+            routes.stream().map(RouteAdvertisement::new).collect(ImmutableSet.toImmutableSet()));
+  }
+
+  private void newBgpSessionEstablishedHook(
+      UndirectedBgpSession session, Map<String, Node> allNodes) {
+    BgpNeighbor remoteNeighbor =
+        !_vrf.getBgpProcess().getNeighbors().values().contains(session.getFirst())
+            ? session.getFirst()
+            : session.getSecond();
+    VirtualRouter remoteVr = getRemoteBgpNeighborVR(remoteNeighbor, allNodes);
+    if (remoteVr == null) {
+      return;
     }
+
+    // Call this on the neighbor's VR!
+    remoteVr.enqueBgpMessages(session, _mainRib.getRoutes());
   }
 
   /**
    * Lookup the VirtualRouter owner of a remote BGP neighbor.
    *
-   * @param session the {@link BgpSession}, where our end of the connection is {@code
-   *     session.getDst()}
+   * @param remoteBgpNeighbor the {@link BgpNeighbor} that belongs to a different {@link
+   *     VirtualRouter}
    * @param allNodes map containing all network nodes
    * @return a {@link VirtualRouter} that owns the {@code neighbor.getRemoteBgpNeighbor()}
    */
   @Nullable
   @VisibleForTesting
   static VirtualRouter getRemoteBgpNeighborVR(
-      @Nonnull BgpSession session, final Map<String, Node> allNodes) {
-
-    BgpNeighbor remoteBgpNeighbor = session.getSrc();
+      @Nonnull BgpNeighbor remoteBgpNeighbor, final Map<String, Node> allNodes) {
     String remoteHostname = remoteBgpNeighbor.getOwner().getHostname();
     String remoteVrfName = remoteBgpNeighbor.getVrf();
     return allNodes.get(remoteHostname).getVirtualRouters().get(remoteVrfName);
@@ -2628,7 +2628,7 @@ public class VirtualRouter extends ComparableStructure<String> {
    */
   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
-    _bgpIncomingRoutes = null;
+    _bgpIncomingRoutes = ImmutableSortedMap.of();
   }
 
   /**

@@ -1,4 +1,4 @@
-package org.batfish.dataplane.bdp;
+package org.batfish.dataplane;
 
 import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasPrefix;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,6 +9,8 @@ import static org.hamcrest.Matchers.not;
 import com.google.common.collect.ImmutableList;
 import com.google.common.graph.Network;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.BgpNeighbor;
@@ -23,11 +25,23 @@ import org.batfish.main.TestrigText;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class DynamicBgpTest {
   private static final String TESTRIGS_PREFIX = "org/batfish/grammar/cisco/testrigs/";
 
   @Rule public TemporaryFolder _folder = new TemporaryFolder();
+
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"bdp"}, {"ibdp"}});
+  }
+
+  @Parameter public String dpEngine;
 
   /** Test correct handling of dynamic BGP sessions */
   @Test
@@ -53,8 +67,8 @@ public class DynamicBgpTest {
                 .build(),
             _folder);
 
+    batfish.getSettings().setDataplaneEngineName(dpEngine);
     batfish.computeDataPlane(false); // compute and cache the dataPlane
-
     DataPlane dp = batfish.loadDataPlane();
     Network<BgpNeighbor, BgpSession> bgpTopology = dp.getBgpTopology();
 
@@ -85,6 +99,7 @@ public class DynamicBgpTest {
                 .build(),
             _folder);
 
+    batfish.getSettings().setDataplaneEngineName(dpEngine);
     batfish.computeDataPlane(false); // compute and cache the dataPlane
 
     DataPlane dp = batfish.loadDataPlane();
@@ -128,6 +143,7 @@ public class DynamicBgpTest {
                 .build(),
             _folder);
 
+    batfish.getSettings().setDataplaneEngineName(dpEngine);
     batfish.computeDataPlane(false); // compute and cache the dataPlane
 
     DataPlane dp = batfish.loadDataPlane();

@@ -1,10 +1,12 @@
-package org.batfish.dataplane.bdp;
+package org.batfish.dataplane;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -20,11 +22,23 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class RipAndBgpTest {
 
   @Rule public TemporaryFolder _folder = new TemporaryFolder();
   @Rule public ExpectedException _thrown = ExpectedException.none();
+
+  @Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{"bdp"}, {"ibdp"}});
+  }
+
+  @Parameter public String dpEngine;
 
   private static String TESTRIGS_PREFIX = "org/batfish/grammar/cisco/testrigs/";
 
@@ -39,6 +53,7 @@ public class RipAndBgpTest {
                 .setConfigurationText(testrigResourcePrefix, configurations)
                 .build(),
             _folder);
+    batfish.getSettings().setDataplaneEngineName(dpEngine);
     batfish.computeDataPlane(false);
     DataPlanePlugin dataPlanePlugin = batfish.getDataPlanePlugin();
     SortedMap<String, SortedMap<String, SortedSet<AbstractRoute>>> routes =

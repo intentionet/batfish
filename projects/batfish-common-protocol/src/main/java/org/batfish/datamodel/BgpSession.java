@@ -1,5 +1,6 @@
 package org.batfish.datamodel;
 
+import java.util.Comparator;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
@@ -8,8 +9,8 @@ public class BgpSession implements Comparable<BgpSession> {
 
   private final boolean _isEbgp;
 
-  private BgpNeighbor _src;
-  private BgpNeighbor _dst;
+  @Nonnull private BgpNeighbor _src;
+  @Nonnull private BgpNeighbor _dst;
 
   /**
    * Create a new session
@@ -60,8 +61,11 @@ public class BgpSession implements Comparable<BgpSession> {
   }
 
   @Override
-  public int compareTo(BgpSession o) {
-    return 0;
+  public int compareTo(@Nonnull BgpSession o) {
+    return Comparator.comparing((BgpSession s) -> s.getSrc().getPrefix())
+        .thenComparing(s -> s.getSrc().getOwner())
+        .thenComparing(s -> s.getDst().getOwner())
+        .compare(this, o);
   }
 
   @Override

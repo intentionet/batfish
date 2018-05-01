@@ -560,6 +560,7 @@ public class BdpDataPlanePluginTest {
                 .build(),
             _folder);
     Settings settings = batfish.getSettings();
+    settings.setDataplaneEngineName(BdpDataPlanePlugin.PLUGIN_NAME);
     settings.setBdpDetail(bdpSettings.getBdpDetail());
     settings.setBdpMaxOscillationRecoveryAttempts(
         bdpSettings.getBdpMaxOscillationRecoveryAttempts());
