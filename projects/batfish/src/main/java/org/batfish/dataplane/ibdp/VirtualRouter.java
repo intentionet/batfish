@@ -294,9 +294,11 @@ public class VirtualRouter extends ComparableStructure<String> {
           .values()
           .forEach(
               n -> {
-                for (BgpSession session : bgpTopology.incidentEdges(n)) {
-                  _bgpIncomingRoutes.computeIfAbsent(
-                      UndirectedBgpSession.from(session), s -> new ConcurrentLinkedQueue<>());
+                if (bgpTopology.nodes().contains(n)) {
+                  for (BgpSession session : bgpTopology.incidentEdges(n)) {
+                    _bgpIncomingRoutes.computeIfAbsent(
+                        UndirectedBgpSession.from(session), s -> new ConcurrentLinkedQueue<>());
+                  }
                 }
               });
     }
