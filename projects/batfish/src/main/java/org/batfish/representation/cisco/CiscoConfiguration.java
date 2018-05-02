@@ -1456,7 +1456,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
       BgpAggregateIpv6Network aggNet = e.getValue();
       boolean summaryOnly = aggNet.getSummaryOnly();
       int prefixLength = prefix6.getPrefixLength();
-      SubRange prefixRange = new SubRange(prefixLength + 1, Prefix.MAX_PREFIX_LENGTH);
+      SubRange prefixRange = new SubRange(prefixLength + 1, Prefix6.MAX_PREFIX_LENGTH);
       if (summaryOnly) {
         summaryOnlyIpv6Networks.add(aggNet);
       }
