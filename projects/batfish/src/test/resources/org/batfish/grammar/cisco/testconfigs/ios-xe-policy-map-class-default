@@ -1,0 +1,14 @@
+!
+hostname ios-xe-policy-map-class-default
+!
+policy-map type inspect ppass
+ class class-default
+  pass
+!
+policy-map type inspect pdrop
+ class class-default
+  drop
+!
+policy-map type inspect punspecified
+!
+!
