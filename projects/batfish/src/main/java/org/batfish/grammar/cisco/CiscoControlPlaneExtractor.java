@@ -414,6 +414,8 @@ import org.batfish.grammar.cisco.CiscoParser.Passive_interface_is_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Peer_group_assignment_rb_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Peer_group_creation_rb_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Peer_sa_filterContext;
+import org.batfish.grammar.cisco.CiscoParser.Pi_iosicd_dropContext;
+import org.batfish.grammar.cisco.CiscoParser.Pi_iosicd_passContext;
 import org.batfish.grammar.cisco.CiscoParser.Pim_accept_registerContext;
 import org.batfish.grammar.cisco.CiscoParser.Pim_accept_rpContext;
 import org.batfish.grammar.cisco.CiscoParser.Pim_rp_addressContext;
@@ -5601,6 +5603,16 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void exitPm_iosi_class_type_inspect(Pm_iosi_class_type_inspectContext ctx) {
     _currentInspectPolicyMapInspectClass = null;
+  }
+
+  @Override
+  public void exitPi_iosicd_drop(Pi_iosicd_dropContext ctx) {
+    _currentInspectPolicyMap.setClassDefaultAction(LineAction.REJECT);
+  }
+
+  @Override
+  public void exitPi_iosicd_pass(Pi_iosicd_passContext ctx) {
+    _currentInspectPolicyMap.setClassDefaultAction(LineAction.ACCEPT);
   }
 
   @Override

@@ -503,17 +503,17 @@ pm_ios_inspect
 :
    INSPECT name = variable NEWLINE
    (
-      pm_iosi_class
+      pm_iosi_class_default
       | pm_iosi_class_type_inspect
    )*
 ;
 
-pm_iosi_class
+pm_iosi_class_default
 :
    CLASS CLASS_DEFAULT NEWLINE
    (
-      pi_iosic_drop
-      | pi_iosic_pass
+      pi_iosicd_drop
+      | pi_iosicd_pass
    )*
 ;
 
@@ -527,12 +527,12 @@ pm_iosi_class_type_inspect
    )*
 ;
 
-pi_iosic_drop
+pi_iosicd_drop
 :
    DROP LOG? NEWLINE
 ;
 
-pi_iosic_pass
+pi_iosicd_pass
 :
    PASS NEWLINE
 ;

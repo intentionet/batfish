@@ -81,6 +81,7 @@ import org.batfish.datamodel.acl.MatchSrcInterface;
 import org.batfish.datamodel.acl.OrMatchExpr;
 import org.batfish.datamodel.acl.OriginatingFromDevice;
 import org.batfish.datamodel.acl.PermittedByAcl;
+import org.batfish.datamodel.acl.TrueExpr;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.routing_policy.expr.BooleanExpr;
 import org.batfish.datamodel.routing_policy.expr.BooleanExprs;
@@ -3525,6 +3526,14 @@ public final class CiscoConfiguration extends VendorConfiguration {
                         return;
                     }
                   });
+          policyMapAclLines.add(
+              IpAccessListLine.builder()
+                  .setAction(inspectPolicyMap.getClassDefaultAction())
+                  .setMatchCondition(TrueExpr.INSTANCE)
+                  .setName(
+                      String.format(
+                          "class-default action: %s", inspectPolicyMap.getClassDefaultAction()))
+                  .build());
           IpAccessList.builder()
               .setOwner(c)
               .setName(inspectPolicyMapAclName)
