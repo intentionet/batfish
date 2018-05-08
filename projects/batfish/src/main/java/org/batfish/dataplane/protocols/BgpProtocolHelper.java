@@ -1,5 +1,6 @@
 package org.batfish.dataplane.protocols;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -18,22 +19,19 @@ import org.batfish.dataplane.exceptions.BgpRoutePropagationException;
 public class BgpProtocolHelper {
 
   /**
-   * Perform BGP export transformations on a given route when preparing to send an advertisement
-   * from {@code fromNeighbor} to {@code toNeighbor}
-   *
-   * @param fromNeighbor
-   * @param toNeighbor
-   * @return
+   * Perform BGP export transformations on a given route when sending an advertisement from {@code
+   * fromNeighbor} to {@code toNeighbor}
    */
   @Nullable
-  public static BgpRoute.Builder exportBgpRoute(
+  public static BgpRoute.Builder transformBgpRouteOnExport(
       BgpNeighbor fromNeighbor, BgpNeighbor toNeighbor, Vrf fromVrf, Vrf toVrf, AbstractRoute route)
       throws BgpRoutePropagationException {
 
     BgpRoute.Builder transformedOutgoingRouteBuilder = new BgpRoute.Builder();
+
     transformedOutgoingRouteBuilder.setReceivedFromIp(fromNeighbor.getLocalIp());
     RoutingProtocol remoteRouteProtocol = route.getProtocol();
-    boolean ebgpSession = !fromNeighbor.getLocalAs().equals(fromNeighbor.getRemoteAs());
+    boolean ebgpSession = !Objects.equals(fromNeighbor.getLocalAs(), fromNeighbor.getRemoteAs());
     boolean remoteRouteIsBgp =
         remoteRouteProtocol == RoutingProtocol.IBGP || remoteRouteProtocol == RoutingProtocol.BGP;
     RoutingProtocol targetProtocol = ebgpSession ? RoutingProtocol.BGP : RoutingProtocol.IBGP;
@@ -144,8 +142,7 @@ public class BgpProtocolHelper {
       transformedOutgoingRouteBuilder.setMetric(route.getMetric());
     }
 
-    // Outgoing nextHopIp
-    // Outgoing localPreference
+    // Outgoing nextHopIp & localPreference
     Ip nextHopIp;
     int localPreference;
     if (ebgpSession || !remoteRouteIsBgp) {
@@ -171,5 +168,40 @@ public class BgpProtocolHelper {
     // Outgoing srcProtocol
     transformedOutgoingRouteBuilder.setSrcProtocol(route.getProtocol());
     return transformedOutgoingRouteBuilder;
+  }
+
+  /** Perform BGP import transformations on a given route after receiving an advertisement */
+  @Nullable
+  public static BgpRoute.Builder transformBgpRouteOnImport(
+      BgpNeighbor fromNeighbor, BgpNeighbor toNeighbor, BgpRoute route) {
+
+    if (route.getAsPath().containsAs(toNeighbor.getLocalAs()) && !toNeighbor.getAllowLocalAsIn()) {
+      // skip routes containing peer's AS unless
+      // disable-peer-as-check (getAllowRemoteAsOut) is set
+      return null;
+    }
+    boolean ebgpSession = !fromNeighbor.getLocalAs().equals(fromNeighbor.getRemoteAs());
+    RoutingProtocol targetProtocol = ebgpSession ? RoutingProtocol.BGP : RoutingProtocol.IBGP;
+
+    BgpRoute.Builder transformedIncomingRouteBuilder = new BgpRoute.Builder();
+    transformedIncomingRouteBuilder.setOriginatorIp(route.getOriginatorIp());
+    transformedIncomingRouteBuilder.setReceivedFromIp(route.getReceivedFromIp());
+    transformedIncomingRouteBuilder.getClusterList().addAll(route.getClusterList());
+    transformedIncomingRouteBuilder.setReceivedFromRouteReflectorClient(
+        route.getReceivedFromRouteReflectorClient());
+    transformedIncomingRouteBuilder.setAsPath(route.getAsPath().getAsSets());
+    transformedIncomingRouteBuilder.getCommunities().addAll(route.getCommunities());
+    transformedIncomingRouteBuilder.setProtocol(targetProtocol);
+    transformedIncomingRouteBuilder.setNetwork(route.getNetwork());
+    transformedIncomingRouteBuilder.setNextHopIp(route.getNextHopIp());
+    transformedIncomingRouteBuilder.setLocalPreference(route.getLocalPreference());
+    transformedIncomingRouteBuilder.setAdmin(
+        targetProtocol.getDefaultAdministrativeCost(
+            toNeighbor.getOwner().getConfigurationFormat()));
+    transformedIncomingRouteBuilder.setMetric(route.getMetric());
+    transformedIncomingRouteBuilder.setOriginType(route.getOriginType());
+    transformedIncomingRouteBuilder.setSrcProtocol(targetProtocol);
+
+    return transformedIncomingRouteBuilder;
   }
 }

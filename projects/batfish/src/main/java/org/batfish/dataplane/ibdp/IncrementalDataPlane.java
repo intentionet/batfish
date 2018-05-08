@@ -137,4 +137,28 @@ public class IncrementalDataPlane implements Serializable, DataPlane {
   void setBgpTopology(Network<BgpNeighbor, BgpSession> bgpTopology) {
     this._bgpTopology = bgpTopology;
   }
+
+  public SortedMap<String, SortedMap<String, PrefixTracer>> getPrefixTracingInfo() {
+    /*
+     * Iterate over nodes, then virtual routers, and extract prefix tracer from each.
+     * Sort hostnames and VRF names
+     */
+    return _nodes
+        .entrySet()
+        .stream()
+        .collect(
+            ImmutableSortedMap.toImmutableSortedMap(
+                String::compareTo,
+                Entry::getKey,
+                e ->
+                    e.getValue()
+                        .getVirtualRouters()
+                        .entrySet()
+                        .stream()
+                        .collect(
+                            ImmutableSortedMap.toImmutableSortedMap(
+                                String::compareTo,
+                                Entry::getKey,
+                                e2 -> e2.getValue().getPrefixTracer()))));
+  }
 }
