@@ -30,7 +30,6 @@ import org.batfish.datamodel.FlowDisposition;
 import org.batfish.datamodel.FlowTrace;
 import org.batfish.datamodel.FlowTraceHop;
 import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpSpace;
@@ -79,7 +78,6 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
               }
               Set<Edge> visitedEdges = Collections.emptySet();
               List<FlowTraceHop> hops = new ArrayList<>();
-              Set<String> dstIpOwners = dataPlane.getIpOwners().get(dstIp);
               SortedSet<Edge> edges = new TreeSet<>();
               String ingressInterfaceName = flow.getIngressInterface();
               if (ingressInterfaceName != null) {
@@ -103,7 +101,6 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
                     configurations.get(ingressNodeName).getIpAccessLists(),
                     configurations.get(ingressNodeName).getIpSpaces(),
                     dstIp,
-                    dstIpOwners,
                     null,
                     new TreeSet<>(),
                     null,
@@ -142,7 +139,6 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
       Map<String, IpAccessList> aclDefinitions,
       Map<String, IpSpace> namedIpSpaces,
       Ip dstIp,
-      Set<String> dstIpOwners,
       @Nullable String nextHopInterfaceName,
       SortedSet<String> routesForThisNextHopInterface,
       @Nullable Ip finalNextHopIp,
@@ -190,36 +186,13 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
        * -- Subnet of neighbor's receiving-interface contains arpIp
        */
       if (arp) {
-        Ip arpIp;
-        Set<String> arpIpOwners;
-        if (finalNextHopIp == null) {
-          arpIp = dstIp;
-          arpIpOwners = dstIpOwners;
-        } else {
-          arpIp = finalNextHopIp;
-          arpIpOwners = dp.getIpOwners().get(arpIp);
-        }
-        // using interface-only route
-        String node2 = edge.getNode2();
-        if (arpIpOwners == null || !arpIpOwners.contains(node2)) {
-          // neighbor does not own arpIp
-          String int2Name = edge.getInt2();
-          Interface int2 = configurations.get(node2).getInterfaces().get(int2Name);
-          boolean neighborUnreachable = false;
-          if (!int2.getProxyArp()) {
-            neighborUnreachable = true;
-          } else {
-            for (InterfaceAddress address : int2.getAllAddresses()) {
-              if (address.getPrefix().containsIp(arpIp)) {
-                neighborUnreachable = true;
-                break;
-              }
-            }
-          }
-          if (neighborUnreachable) {
-            unreachableNeighbors++;
-            continue;
-          }
+        Ip arpIp = finalNextHopIp != null ? finalNextHopIp : dstIp;
+        boolean neighborUnreachable =
+            interfaceRepliesToArpRequestForIp(
+                dp, configurations.get(edge.getNode2()).getInterfaces().get(edge.getInt2()), arpIp);
+        if (neighborUnreachable) {
+          unreachableNeighbors++;
+          continue;
         }
       }
       if (visitedEdges.contains(edge)) {
@@ -304,6 +277,23 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
     return continueToNextNextHopInterface;
   }
 
+  @VisibleForTesting
+  static boolean interfaceRepliesToArpRequestForIp(DataPlane dp, Interface iface, Ip arpIp) {
+    // TODO this is wrong. without proxy-arp, only reply to the interface's owned IPs.
+    Set<String> arpIpOwners = dp.getIpOwners().get(arpIp);
+    if (arpIpOwners != null && arpIpOwners.contains(iface.getOwner().getHostname())) {
+      // neighbor owns arpIp
+      return true;
+    }
+
+
+    // neighbor does not own arpIp. Request succeeds if proxy-arp is enabled and the destination
+    // is not on the incoming edge.
+    // TODO _AND_ the VRF has a route to arpIp!
+    return iface.getProxyArp()
+        && iface.getAllAddresses().stream().noneMatch(addr -> addr.getPrefix().containsIp(arpIp));
+  }
+
   /**
    * Applies the given list of source NAT rules to the given flow and returns the new transformed
    * flow. If {@code sourceNats} is null, empty, or does not contain any ACL rules matching the
@@ -363,6 +353,7 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
     Ip dstIp = transformedFlow.getDstIp();
     Set<String> dstIpOwners = dp.getIpOwners().get(dstIp);
     Configuration currentConfiguration = configurations.get(currentNodeName);
+    // TODO: ipVrfOwners
     if (dstIpOwners != null && dstIpOwners.contains(currentNodeName)) {
       FlowTrace trace =
           new FlowTrace(FlowDisposition.ACCEPTED, hopsSoFar, FlowDisposition.ACCEPTED.toString());
@@ -457,8 +448,7 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
 
             SortedSet<Edge> edges = dp.getTopology().getInterfaceEdges().get(nextHopInterface);
             if (edges != null) {
-              boolean continueToNextNextHopInterface = false;
-              continueToNextNextHopInterface =
+              boolean continueToNextNextHopInterface =
                   processCurrentNextHopInterfaceEdges(
                       dp,
                       configurations,
@@ -473,7 +463,6 @@ public class TracerouteEngineImpl implements ITracerouteEngine {
                       aclDefinitions,
                       namedIpSpaces,
                       dstIp,
-                      dstIpOwners,
                       nextHopInterfaceName,
                       routesForThisNextHopInterface,
                       finalNextHopIp,

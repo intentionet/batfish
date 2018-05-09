@@ -69,7 +69,7 @@ public final class Interface extends ComparableStructure<String> {
 
     private ImmutableSortedMap<Integer, VrrpGroup> _vrrpGroups;
 
-    Builder(NetworkFactory networkFactory) {
+    public Builder(NetworkFactory networkFactory) {
       super(networkFactory, Interface.class);
       _additionalArpIps = ImmutableSortedSet.of();
       _declaredNames = ImmutableSortedSet.of();

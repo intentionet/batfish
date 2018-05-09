@@ -23,7 +23,7 @@ public class Vrf extends ComparableStructure<String> {
 
     private Configuration _owner;
 
-    Builder(NetworkFactory networkFactory) {
+    public Builder(NetworkFactory networkFactory) {
       super(networkFactory, Vrf.class);
     }
 
