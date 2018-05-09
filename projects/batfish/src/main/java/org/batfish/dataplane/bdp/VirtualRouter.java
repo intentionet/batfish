@@ -229,16 +229,19 @@ public class VirtualRouter extends ComparableStructure<String> {
     boolean changed = false;
     for (StaticRoute sr : _staticRib.getRoutes()) {
       // See if we had (in the previous RIB) any routes matching this route's next hop IP
+      // TODO: prev rib not the same as RIB. equality check broken. needs nexthop check as well?
       Set<AbstractRoute> matchingRoutes = _prevMainRib.longestPrefixMatch(sr.getNextHopIp());
-      Prefix staticRoutePrefix = sr.getNetwork();
-
       for (AbstractRoute matchingRoute : matchingRoutes) {
-        Prefix matchingRoutePrefix = matchingRoute.getNetwork();
-        // check to make sure matching route's prefix does not totally
-        // contain this static route's prefix
-        if (!matchingRoutePrefix.containsPrefix(staticRoutePrefix)) {
-          changed |= _mainRib.mergeRoute(sr);
-          break; // break out of the inner loop but continue processing static routes
+        if (matchingRoute.getNetwork().equals(sr.getNetwork()) && !matchingRoute.equals(sr)) {
+          /*
+           * Do not activate if the route to get to next-hop-ip has the same prefix as static route,
+           * it would be a self-loop, unless we are copying over an already-installed route
+           */
+          continue;
+        }
+        changed |= _mainRib.mergeRoute(sr);
+        if (changed) {
+          break;
         }
       }
     }

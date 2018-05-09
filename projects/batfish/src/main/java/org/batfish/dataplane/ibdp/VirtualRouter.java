@@ -410,19 +410,14 @@ public class VirtualRouter extends ComparableStructure<String> {
   void activateStaticRoutes() {
     for (StaticRoute sr : _staticRib.getRoutes()) {
       // See if we have any routes matching this route's next hop IP
+      // remote static route
       Set<AbstractRoute> matchingRoutes = _mainRib.longestPrefixMatch(sr.getNextHopIp());
-      Prefix staticRoutePrefix = sr.getNetwork();
-
       for (AbstractRoute matchingRoute : matchingRoutes) {
-        Prefix matchingRoutePrefix = matchingRoute.getNetwork();
-        /*
-         * check to make sure matching route's prefix does not totally
-         * contain this static route's prefix
-         */
-        if (!matchingRoutePrefix.containsPrefix(staticRoutePrefix)) {
-          _mainRibRouteDeltaBuiler.from(_mainRib.mergeRouteGetDelta(sr));
-          break; // break out of the inner loop but continue processing static routes
+        if (matchingRoute.getNetwork().equals(sr.getNetwork())) {
+          // Do not activate if the route to get to next-hop-ip has the same prefix as static route
+          continue;
         }
+        _mainRibRouteDeltaBuiler.from(_mainRib.mergeRouteGetDelta(sr));
       }
     }
   }

@@ -3,9 +3,12 @@ package org.batfish.datamodel.matchers;
 import static org.hamcrest.Matchers.equalTo;
 
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.AbstractRoute;
+import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.matchers.AbstractRouteMatchersImpl.HasMetric;
+import org.batfish.datamodel.matchers.AbstractRouteMatchersImpl.HasNextHopIp;
 import org.batfish.datamodel.matchers.AbstractRouteMatchersImpl.HasPrefix;
 import org.batfish.datamodel.matchers.AbstractRouteMatchersImpl.HasProtocol;
 import org.hamcrest.Matcher;
@@ -26,6 +29,14 @@ public final class AbstractRouteMatchers {
    */
   public static HasMetric hasMetric(@Nonnull Matcher<? super Long> subMatcher) {
     return new HasMetric(subMatcher);
+  }
+
+  /**
+   * Provides a matcher that matches when the {@code nextHopIp} is equal to the {@link
+   * AbstractRoute}'s protocol.
+   */
+  public static HasNextHopIp hasNextHopIp(Ip nextHopIp) {
+    return new HasNextHopIp(equalTo(nextHopIp));
   }
 
   /**
