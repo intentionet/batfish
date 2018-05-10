@@ -32,7 +32,7 @@ public class RoutePolicyPrefixSetName extends RoutePolicyPrefixSet {
       return null;
     } else if (!cc.getPrefix6Lists().containsKey(_name)) {
       cc.undefined(
-          CiscoStructureType.PREFIX6_LIST,
+          CiscoStructureType.PREFIX_SET,
           _name,
           CiscoStructureUsage.ROUTE_POLICY_PREFIX_SET,
           _expressionLine);
@@ -50,7 +50,7 @@ public class RoutePolicyPrefixSetName extends RoutePolicyPrefixSet {
       return null;
     } else if (!cc.getPrefixLists().containsKey(_name)) {
       cc.undefined(
-          CiscoStructureType.PREFIX_LIST,
+          CiscoStructureType.PREFIX_SET,
           _name,
           CiscoStructureUsage.ROUTE_POLICY_PREFIX_SET,
           _expressionLine);

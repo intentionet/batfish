@@ -115,7 +115,6 @@ import org.batfish.datamodel.routing_policy.statement.Statements;
 import org.batfish.datamodel.vendor_family.cisco.Aaa;
 import org.batfish.datamodel.vendor_family.cisco.AaaAuthentication;
 import org.batfish.datamodel.vendor_family.cisco.AaaAuthenticationLogin;
-import org.batfish.datamodel.vendor_family.cisco.Cable;
 import org.batfish.datamodel.vendor_family.cisco.CiscoFamily;
 import org.batfish.datamodel.vendor_family.cisco.Line;
 import org.batfish.representation.cisco.Tunnel.TunnelMode;
@@ -1079,108 +1078,116 @@ public final class CiscoConfiguration extends VendorConfiguration {
   }
 
   private void markAcls(CiscoStructureUsage usage) {
-    markStructure(
+    markAbstractStructure(
         CiscoStructureType.IP_ACCESS_LIST,
         usage,
-        Arrays.asList(
-            _extendedAccessLists,
-            _standardAccessLists,
-            _extendedIpv6AccessLists,
-            _standardIpv6AccessLists));
+        ImmutableList.of(
+            CiscoStructureType.IP_ACCESS_LIST_STANDARD,
+            CiscoStructureType.IP_ACCESS_LIST_EXTENDED,
+            CiscoStructureType.IPV6_ACCESS_LIST_STANDARD,
+            CiscoStructureType.IPV6_ACCESS_LIST_EXTENDED));
   }
 
   private void markDepiClasses(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.DEPI_CLASS, usage, _cf.getDepiClasses());
+    markConcreteStructure(CiscoStructureType.DEPI_CLASS, usage);
   }
 
   private void markDepiTunnels(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.DEPI_TUNNEL, usage, _cf.getDepiTunnels());
+    markConcreteStructure(CiscoStructureType.DEPI_TUNNEL, usage);
   }
 
   private void markDocsisPolicies(CiscoStructureUsage usage) {
-    Cable cable = _cf.getCable();
-    markStructure(
-        CiscoStructureType.DOCSIS_POLICY, usage, cable != null ? cable.getDocsisPolicies() : null);
+    markConcreteStructure(CiscoStructureType.DOCSIS_POLICY, usage);
   }
 
   private void markDocsisPolicyRules(CiscoStructureUsage usage) {
-    Cable cable = _cf.getCable();
-    markStructure(
-        CiscoStructureType.DOCSIS_POLICY_RULE,
-        usage,
-        cable != null ? cable.getDocsisPolicyRules() : null);
+    markConcreteStructure(CiscoStructureType.DOCSIS_POLICY_RULE, usage);
   }
 
   private void markInspectClassMaps(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.INSPECT_CLASS_MAP, usage, _inspectClassMaps);
+    markConcreteStructure(CiscoStructureType.INSPECT_CLASS_MAP, usage);
   }
 
   private void markInspectPolicyMaps(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.INSPECT_POLICY_MAP, usage, _inspectPolicyMaps);
+    markConcreteStructure(CiscoStructureType.INSPECT_POLICY_MAP, usage);
   }
 
   private void markIpOrMacAcls(CiscoStructureUsage usage) {
-    markStructure(
+    markAbstractStructure(
         CiscoStructureType.ACCESS_LIST,
         usage,
         Arrays.asList(
-            _extendedAccessLists,
-            _standardAccessLists,
-            _extendedIpv6AccessLists,
-            _macAccessLists,
-            _standardIpv6AccessLists));
+            CiscoStructureType.IP_ACCESS_LIST_EXTENDED,
+            CiscoStructureType.IP_ACCESS_LIST_STANDARD,
+            CiscoStructureType.IPV6_ACCESS_LIST_EXTENDED,
+            CiscoStructureType.IPV6_ACCESS_LIST_STANDARD,
+            CiscoStructureType.MAC_ACCESS_LIST));
   }
 
   private void markIpsecProfiles(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.IPSEC_PROFILE, usage, _ipsecProfiles);
+    markConcreteStructure(CiscoStructureType.IPSEC_PROFILE, usage);
   }
 
   private void markIpsecTransformSets(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.IPSEC_TRANSFORM_SET, usage, _ipsecTransformSets);
+    markConcreteStructure(CiscoStructureType.IPSEC_TRANSFORM_SET, usage);
   }
 
   private void markIpv4Acls(CiscoStructureUsage usage) {
-    markStructure(
+    markAbstractStructure(
         CiscoStructureType.IPV4_ACCESS_LIST,
         usage,
-        Arrays.asList(_extendedAccessLists, _standardAccessLists));
+        ImmutableList.of(
+            CiscoStructureType.IP_ACCESS_LIST_STANDARD,
+            CiscoStructureType.IP_ACCESS_LIST_EXTENDED));
   }
 
   private void markIpv6Acls(CiscoStructureUsage usage) {
-    markStructure(
+    markAbstractStructure(
         CiscoStructureType.IPV6_ACCESS_LIST,
         usage,
-        Arrays.asList(_extendedIpv6AccessLists, _standardIpv6AccessLists));
+        ImmutableList.of(
+            CiscoStructureType.IPV6_ACCESS_LIST_STANDARD,
+            CiscoStructureType.IPV6_ACCESS_LIST_EXTENDED));
   }
 
   private void markKeyrings(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.KEYRING, usage, _keyrings);
+    markConcreteStructure(CiscoStructureType.KEYRING, usage);
   }
 
   private void markL2tpClasses(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.L2TP_CLASS, usage, _cf.getL2tpClasses());
+    markConcreteStructure(CiscoStructureType.L2TP_CLASS, usage);
   }
 
   private void markNetworkObjectGroups(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.NETWORK_OBJECT_GROUP, usage, _networkObjectGroups);
+    markConcreteStructure(CiscoStructureType.NETWORK_OBJECT_GROUP, usage);
+  }
+
+  private void markPrefixLists(CiscoStructureUsage usage) {
+    markConcreteStructure(CiscoStructureType.PREFIX_LIST, usage);
+  }
+
+  private void markPrefix6Lists(CiscoStructureUsage usage) {
+    markConcreteStructure(CiscoStructureType.PREFIX6_LIST, usage);
+  }
+
+  private void markPrefixSets(CiscoStructureUsage usage) {
+    markConcreteStructure(CiscoStructureType.PREFIX_SET, usage);
   }
 
   private void markRouteMaps(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.ROUTE_MAP, usage, _routeMaps);
+    markConcreteStructure(CiscoStructureType.ROUTE_MAP, usage);
   }
 
   private void markSecurityZones(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.SECURITY_ZONE, usage, _securityZones);
+    markConcreteStructure(CiscoStructureType.SECURITY_ZONE, usage);
   }
 
   private void markServiceClasses(CiscoStructureUsage usage) {
-    Cable cable = _cf.getCable();
-    markStructure(
-        CiscoStructureType.SERVICE_CLASS, usage, cable != null ? cable.getServiceClasses() : null);
+    markConcreteStructure(CiscoStructureType.SERVICE_CLASS, usage);
   }
 
   private void markServiceObjectGroups(CiscoStructureUsage usage) {
-    markStructure(CiscoStructureType.SERVICE_OBJECT_GROUP, usage, _serviceObjectGroups);
+    markConcreteStructure(CiscoStructureType.SERVICE_OBJECT_GROUP, usage);
   }
 
   private void processFailoverSettings() {
@@ -3365,6 +3372,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
     // mark references to mac-ACLs that may not appear in data model
     // TODO: fill in
 
+    markPrefixLists(CiscoStructureUsage.ROUTE_MAP_MATCH_IP_PREFIX_LIST);
+    markPrefix6Lists(CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_PREFIX_LIST);
+
+    markPrefixSets(CiscoStructureUsage.ROUTE_POLICY_PREFIX_SET);
+
     // mark references to route-maps that may not appear in data model
     markRouteMaps(CiscoStructureUsage.BGP_NEIGHBOR_REMOTE_AS_ROUTE_MAP);
     markRouteMaps(CiscoStructureUsage.BGP_REDISTRIBUTE_OSPFV3_MAP);
@@ -3417,13 +3429,13 @@ public final class CiscoConfiguration extends VendorConfiguration {
     recordStructure(_ipsecProfiles, CiscoStructureType.IPSEC_PROFILE);
     recordStructure(_ipsecTransformSets, CiscoStructureType.IPSEC_TRANSFORM_SET);
     recordIpv6AccessLists();
-    recordKeyrings();
-    recordStructure(_cf.getL2tpClasses(), CiscoStructureType.L2TP_CLASS);
-    recordStructure(_macAccessLists, CiscoStructureType.MAC_ACCESS_LIST);
+    //    recordKeyrings();
+    //    recordStructure(_cf.getL2tpClasses(), CiscoStructureType.L2TP_CLASS);
+    //    recordStructure(_macAccessLists, CiscoStructureType.MAC_ACCESS_LIST);
     recordStructure(_natPools, CiscoStructureType.NAT_POOL);
     recordStructure(_networkObjectGroups, CiscoStructureType.NETWORK_OBJECT_GROUP);
-    recordStructure(_prefixLists, CiscoStructureType.PREFIX_LIST);
-    recordStructure(_prefix6Lists, CiscoStructureType.PREFIX6_LIST);
+    //    recordStructure(_prefixLists, CiscoStructureType.PREFIX_LIST);
+    //    recordStructure(_prefix6Lists, CiscoStructureType.PREFIX6_LIST);
     recordPeerGroups();
     recordPeerSessions();
     recordStructure(_routeMaps, CiscoStructureType.ROUTE_MAP);

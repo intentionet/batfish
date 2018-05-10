@@ -5120,6 +5120,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     Set<String> names = new TreeSet<>();
     for (Variable_access_listContext v : ctx.name_list) {
       names.add(v.getText());
+      _configuration.referenceStructure(
+          CiscoStructureType.IP_ACCESS_LIST,
+          v.getText(),
+          CiscoStructureUsage.ROUTE_MAP_MATCH_IP_ACCESS_LIST,
+          v.getStart().getLine());
     }
     RouteMapMatchIpAccessListLine line = new RouteMapMatchIpAccessListLine(names, statementLine);
     _currentRouteMapClause.addMatchLine(line);
@@ -5131,6 +5136,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     Set<String> names = new TreeSet<>();
     for (VariableContext t : ctx.name_list) {
       names.add(t.getText());
+      _configuration.referenceStructure(
+          CiscoStructureType.PREFIX_LIST,
+          t.getText(),
+          CiscoStructureUsage.ROUTE_MAP_MATCH_IP_PREFIX_LIST,
+          t.getStart().getLine());
     }
     RouteMapMatchIpPrefixListLine line = new RouteMapMatchIpPrefixListLine(names, statementLine);
     _currentRouteMapClause.addMatchLine(line);
@@ -5142,6 +5152,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     Set<String> names = new TreeSet<>();
     for (Variable_access_listContext v : ctx.name_list) {
       names.add(v.getText());
+      _configuration.referenceStructure(
+          CiscoStructureType.IPV6_ACCESS_LIST,
+          v.getText(),
+          CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_ACCESS_LIST,
+          v.getStart().getLine());
     }
     RouteMapMatchIpv6AccessListLine line =
         new RouteMapMatchIpv6AccessListLine(names, statementLine);
@@ -5154,6 +5169,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     Set<String> names = new TreeSet<>();
     for (VariableContext t : ctx.name_list) {
       names.add(t.getText());
+      _configuration.referenceStructure(
+          CiscoStructureType.PREFIX6_LIST,
+          t.getText(),
+          CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_PREFIX_LIST,
+          t.getStart().getLine());
     }
     RouteMapMatchIpv6PrefixListLine line =
         new RouteMapMatchIpv6PrefixListLine(names, statementLine);
@@ -5692,7 +5712,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
                 .getPrefixLists()
                 .computeIfAbsent(name, n -> new PrefixList(n, _currentPrefixSetDefinitionLine));
         _configuration.defineStructure(
-            CiscoStructureType.PREFIX_LIST, name, _currentPrefixSetDefinitionLine);
+            CiscoStructureType.PREFIX_SET, name, _currentPrefixSetDefinitionLine);
         Prefix prefix;
         if (ctx.ipa != null) {
           prefix = new Prefix(toIp(ctx.ipa), Prefix.MAX_PREFIX_LENGTH);
@@ -8301,6 +8321,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       // named
       String name = ctx.name.getText();
       int expressionLine = ctx.name.getStart().getLine();
+      _configuration.referenceStructure(
+          CiscoStructureType.PREFIX_SET,
+          name,
+          CiscoStructureUsage.ROUTE_POLICY_PREFIX_SET,
+          expressionLine);
       return new RoutePolicyPrefixSetName(name, expressionLine);
     } else {
       // inline

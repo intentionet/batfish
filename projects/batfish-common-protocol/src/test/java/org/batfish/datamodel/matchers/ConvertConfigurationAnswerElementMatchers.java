@@ -198,7 +198,10 @@ final class ConvertConfigurationAnswerElementMatchers {
         mismatchDescription.appendText(
             String.format(
                 "On host '%s', defined structure of type '%s' named '%s' has %d referrers",
-                _hostname, _type, _structureName, _numReferrers));
+                _hostname,
+                _type,
+                _structureName,
+                byStructureName.get(_structureName).getNumReferrers()));
         return false;
       }
       return true;

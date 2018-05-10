@@ -627,14 +627,6 @@
           ]
         }
       },
-      "unused:ipv4 prefix-list:default_route" : {
-        "description" : "Unused structure of type: 'ipv4 prefix-list' with name: 'default_route'",
-        "files" : {
-          "ios_xr_prefix_set" : [
-            4
-          ]
-        }
-      },
       "unused:ipv4 prefix-list:foo" : {
         "description" : "Unused structure of type: 'ipv4 prefix-list' with name: 'foo'",
         "files" : {
@@ -650,14 +642,6 @@
           "prefix_list_ipv4" : [
             4,
             5
-          ]
-        }
-      },
-      "unused:ipv4 prefix-list:ucla_networks" : {
-        "description" : "Unused structure of type: 'ipv4 prefix-list' with name: 'ucla_networks'",
-        "files" : {
-          "ios_xr_prefix_set" : [
-            7
           ]
         }
       },
@@ -856,6 +840,22 @@
         "files" : {
           "juniper_route_filter" : [
             11
+          ]
+        }
+      },
+      "unused:prefix-set:default_route" : {
+        "description" : "Unused structure of type: 'prefix-set' with name: 'default_route'",
+        "files" : {
+          "ios_xr_prefix_set" : [
+            4
+          ]
+        }
+      },
+      "unused:prefix-set:ucla_networks" : {
+        "description" : "Unused structure of type: 'prefix-set' with name: 'ucla_networks'",
+        "files" : {
+          "ios_xr_prefix_set" : [
+            7
           ]
         }
       },
@@ -2174,7 +2174,7 @@
         }
       },
       "preSet" : {
-        "ipv4 prefix-list" : {
+        "prefix-set" : {
           "default_route" : [
             4
           ],

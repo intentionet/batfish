@@ -1,12 +1,16 @@
 package org.batfish.vendor;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -119,6 +123,53 @@ public abstract class VendorConfiguration implements Serializable, GenericConfig
             }
           });
     }
+  }
+
+  /**
+   * Updates referrers and/or warns for undefined structures based on references to an abstract
+   * {@link StructureType}: a reference type that may refer to one of a number of defined structure
+   * types passed in {@code structureTypesToCheck}.
+   *
+   * <p>For example using Cisco devices, see {@code CiscoStructureType.ACCESS_LIST} and how it
+   * expands to a list containing many types of IPv4 and IPv6 access lists.
+   */
+  protected void markAbstractStructure(
+      StructureType type, StructureUsage usage, Collection<StructureType> structureTypesToCheck) {
+    Map<String, SortedMap<StructureUsage, SortedSet<Integer>>> references =
+        firstNonNull(_structureReferences.get(type), Collections.emptyMap());
+    references.forEach(
+        (name, byUsage) -> {
+          Set<Integer> lines = firstNonNull(byUsage.get(usage), Collections.emptySet());
+          List<DefinedStructureInfo> matchingStructures =
+              structureTypesToCheck
+                  .stream()
+                  .map(t -> _structureDefinitions.get(t.getDescription()))
+                  .filter(Objects::nonNull)
+                  .map(m -> m.get(name))
+                  .filter(Objects::nonNull)
+                  .collect(ImmutableList.toImmutableList());
+          if (matchingStructures.isEmpty()) {
+            for (int line : lines) {
+              undefined(type, name, usage, line);
+            }
+          } else {
+            matchingStructures.forEach(
+                info ->
+                    info.setNumReferrers(
+                        info.getNumReferrers() == DefinedStructureInfo.UNKNOWN_NUM_REFERRERS
+                            ? DefinedStructureInfo.UNKNOWN_NUM_REFERRERS
+                            : info.getNumReferrers() + lines.size()));
+          }
+        });
+  }
+
+  /**
+   * Updates referrers and/or warns for undefined structures based on references to then given
+   * {@link StructureType}. Compared to {@link #markAbstractStructure}, this function is used when
+   * the reference type and the structure type are guaranteed to match.
+   */
+  protected void markConcreteStructure(StructureType type, StructureUsage usage) {
+    markAbstractStructure(type, usage, ImmutableList.of(type));
   }
 
   protected void markStructure(

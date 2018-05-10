@@ -996,7 +996,7 @@
           }
         },
         "n3" : {
-          "ipv4 prefix-list" : {
+          "prefix-set" : {
             "bgp_sub2_route_filter" : {
               "definitionLines" : [
                 63

@@ -53886,7 +53886,7 @@
         "pim" : { },
         "pim_snooping" : { },
         "preSet" : {
-          "ipv4 prefix-list" : {
+          "prefix-set" : {
             "default_route" : {
               "definitionLines" : [
                 4
@@ -54805,7 +54805,7 @@
               ]
             }
           },
-          "ipv4 prefix-list" : {
+          "prefix-set" : {
             "EBGP-PEER-BOGONS" : {
               "route-policy prefix-set" : [
                 78
@@ -54861,7 +54861,7 @@
           }
         },
         "route_policy_as_path_set" : {
-          "ipv4 prefix-list" : {
+          "prefix-set" : {
             "CENIC_DC_Internal" : {
               "route-policy prefix-set" : [
                 25
@@ -54875,7 +54875,7 @@
           }
         },
         "route_policy_metric_type" : {
-          "ipv4 prefix-list" : {
+          "prefix-set" : {
             "DC_Internal" : {
               "route-policy prefix-set" : [
                 7
@@ -54884,7 +54884,7 @@
           }
         },
         "route_policy_param" : {
-          "ipv4 prefix-list" : {
+          "prefix-set" : {
             "$cust_v4_pfx" : {
               "route-policy prefix-set" : [
                 5

@@ -655,8 +655,8 @@ public class CiscoGrammarTest {
     /*
      * We expected the only unused zone to be zunreferenced
      */
-    assertThat(ccae, hasNumReferrers(hostname, CiscoStructureType.SECURITY_ZONE, "z1", 1));
-    assertThat(ccae, hasNumReferrers(hostname, CiscoStructureType.SECURITY_ZONE, "z2", 1));
+    assertThat(ccae, hasNumReferrers(hostname, CiscoStructureType.SECURITY_ZONE, "z1", 4));
+    assertThat(ccae, hasNumReferrers(hostname, CiscoStructureType.SECURITY_ZONE, "z2", 2));
     assertThat(ccae, hasNumReferrers(hostname, CiscoStructureType.SECURITY_ZONE, "zempty", 1));
     assertThat(
         ccae, hasNumReferrers(hostname, CiscoStructureType.SECURITY_ZONE, "zunreferenced", 0));

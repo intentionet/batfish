@@ -323,120 +323,6 @@
           ]
         }
       },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:$cust_v4_pfx" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named '$cust_v4_pfx'",
-        "files" : {
-          "route_policy_param" : [
-            5
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:CENIC_DC_Internal" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'CENIC_DC_Internal'",
-        "files" : {
-          "route_policy_as_path" : [
-            25
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:DC_Internal" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'DC_Internal'",
-        "files" : {
-          "route_policy_metric_type" : [
-            7
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:EBGP-PEER-BOGONS" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'EBGP-PEER-BOGONS'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            78
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:EBGP-PEER-OTHER-UNDESIRABLES" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'EBGP-PEER-OTHER-UNDESIRABLES'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            78
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:EBGP-PEER-TOO-SPECIFIC" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'EBGP-PEER-TOO-SPECIFIC'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            80
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:barbar_blackhole_routes" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'barbar_blackhole_routes'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            5,
-            51
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:barbar_networks_ipv4" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'barbar_networks_ipv4'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            51
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:barbar_networks_ipv6" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'barbar_networks_ipv6'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            21
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:bippetyboppety_ipv4" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'bippetyboppety_ipv4'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            44,
-            51
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:classful_default" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'classful_default'",
-        "files" : {
-          "route_policy_as_path" : [
-            14
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:local-peer-aggregates" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'local-peer-aggregates'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            68
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:null" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'null'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            114
-          ]
-        }
-      },
-      "undefined:ipv4 prefix-list:usage:route-policy prefix-set:remote-router-loopbacks" : {
-        "description" : "Undefined reference to structure of type: 'ipv4 prefix-list' with usage: 'route-policy prefix-set' named 'remote-router-loopbacks'",
-        "files" : {
-          "ios_xr_route_policy" : [
-            66
-          ]
-        }
-      },
       "undefined:ipv4/6 acl:usage:cops listener access-list:cops-acl" : {
         "description" : "Undefined reference to structure of type: 'ipv4/6 acl' with usage: 'cops listener access-list' named 'cops-acl'",
         "files" : {
@@ -836,6 +722,120 @@
         "files" : {
           "juniper_snmp" : [
             5
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:$cust_v4_pfx" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named '$cust_v4_pfx'",
+        "files" : {
+          "route_policy_param" : [
+            5
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:CENIC_DC_Internal" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'CENIC_DC_Internal'",
+        "files" : {
+          "route_policy_as_path" : [
+            25
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:DC_Internal" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'DC_Internal'",
+        "files" : {
+          "route_policy_metric_type" : [
+            7
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:EBGP-PEER-BOGONS" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'EBGP-PEER-BOGONS'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            78
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:EBGP-PEER-OTHER-UNDESIRABLES" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'EBGP-PEER-OTHER-UNDESIRABLES'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            78
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:EBGP-PEER-TOO-SPECIFIC" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'EBGP-PEER-TOO-SPECIFIC'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            80
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:barbar_blackhole_routes" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'barbar_blackhole_routes'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            5,
+            51
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:barbar_networks_ipv4" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'barbar_networks_ipv4'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            51
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:barbar_networks_ipv6" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'barbar_networks_ipv6'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            21
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:bippetyboppety_ipv4" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'bippetyboppety_ipv4'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            44,
+            51
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:classful_default" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'classful_default'",
+        "files" : {
+          "route_policy_as_path" : [
+            14
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:local-peer-aggregates" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'local-peer-aggregates'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            68
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:null" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'null'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            114
+          ]
+        }
+      },
+      "undefined:prefix-set:usage:route-policy prefix-set:remote-router-loopbacks" : {
+        "description" : "Undefined reference to structure of type: 'prefix-set' with usage: 'route-policy prefix-set' named 'remote-router-loopbacks'",
+        "files" : {
+          "ios_xr_route_policy" : [
+            66
           ]
         }
       },
@@ -1792,7 +1792,7 @@
             ]
           }
         },
-        "ipv4 prefix-list" : {
+        "prefix-set" : {
           "EBGP-PEER-BOGONS" : {
             "route-policy prefix-set" : [
               78
@@ -1848,7 +1848,7 @@
         }
       },
       "route_policy_as_path_set" : {
-        "ipv4 prefix-list" : {
+        "prefix-set" : {
           "CENIC_DC_Internal" : {
             "route-policy prefix-set" : [
               25
@@ -1862,7 +1862,7 @@
         }
       },
       "route_policy_metric_type" : {
-        "ipv4 prefix-list" : {
+        "prefix-set" : {
           "DC_Internal" : {
             "route-policy prefix-set" : [
               7
@@ -1871,7 +1871,7 @@
         }
       },
       "route_policy_param" : {
-        "ipv4 prefix-list" : {
+        "prefix-set" : {
           "$cust_v4_pfx" : {
             "route-policy prefix-set" : [
               5
