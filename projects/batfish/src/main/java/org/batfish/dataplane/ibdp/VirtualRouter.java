@@ -417,6 +417,7 @@ public class VirtualRouter extends ComparableStructure<String> {
           // Do not activate if the route to get to next-hop-ip has the same prefix as static route
           continue;
         }
+        // TODO: issue https://github.com/batfish/batfish/issues/1375
         _mainRibRouteDeltaBuiler.from(_mainRib.mergeRouteGetDelta(sr));
       }
     }
