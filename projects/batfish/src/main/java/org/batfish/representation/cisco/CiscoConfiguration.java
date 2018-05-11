@@ -2955,15 +2955,15 @@ public final class CiscoConfiguration extends VendorConfiguration {
       switch (rmClause.getAction()) {
         case ACCEPT:
           if (continueStatement == null) {
-            onMatchStatements.add(Statements.ReturnTrue.toStaticStatement());
+            onMatchStatements.add(Statements.ExitAccept.toStaticStatement());
           } else {
-            onMatchStatements.add(Statements.SetLocalDefaultActionAccept.toStaticStatement());
+            onMatchStatements.add(Statements.SetDefaultActionAccept.toStaticStatement());
             onMatchStatements.add(new CallStatement(continueTargetPolicy.getName()));
           }
           break;
 
         case REJECT:
-          onMatchStatements.add(Statements.ReturnFalse.toStaticStatement());
+          onMatchStatements.add(Statements.ExitReject.toStaticStatement());
           break;
 
         default:
