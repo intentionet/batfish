@@ -1,0 +1,39 @@
+!
+hostname exporter
+!
+interface Ethernet1
+  ip address 1.1.1.2 255.255.255.254
+  no shutdown
+  speed auto
+!
+interface Loopback0
+  ip address 1.1.1.1 255.255.255.255
+!
+! GOAL: /32 route gets exported, /31 does not
+!
+! Allow loopback route, forbid connected route
+ip prefix-list LIST_ALLOWED 
+  permit 1.1.1.1/32 
+!
+! This routemap should permit our loopback /32 route.
+! It intentionally has a continue statement
+! Match + continue should jump to clause 30
+! No match (/31 route) means no continue and we fall through to 20 and return deny
+route-map TEST_EXPORT permit 10
+  match ip address LIST_ALLOWED
+  continue 30 
+!
+! If we fall through to here, block everything
+route-map TEST_EXPORT deny 20
+!
+! And this is a no-op to check that ExitAccept percolates all the way up to 
+! enclosing routing policy
+route-map TEST_EXPORT permit 30
+!
+!
+router bgp 1
+  router-id 1.1.1.1
+  neighbor 1.1.1.3 remote-as 2
+  neighbor 1.1.1.3 route-map TEST_EXPORT out
+  redistribute connected
+!

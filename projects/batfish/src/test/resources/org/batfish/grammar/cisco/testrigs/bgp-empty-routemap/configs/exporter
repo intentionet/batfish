@@ -1,0 +1,24 @@
+!
+hostname exporter
+!
+interface Ethernet1
+  ip address 1.1.1.2 255.255.255.248
+  no shutdown
+  speed auto
+!
+interface Loopback0
+  ip address 1.1.1.1 255.255.255.255
+!
+! This routemap should permit everything
+route-map TEST_EXPORT_PERMIT permit 10
+!
+! Whereas this routemap should deny everything
+route-map TEST_EXPORT_DENY deny 10
+!
+router bgp 1
+  router-id 1.1.1.1
+  neighbor 1.1.1.3 remote-as 2
+  neighbor 1.1.1.3 route-map TEST_EXPORT_PERMIT out
+  neighbor 1.1.1.4 remote-as 3
+  neighbor 1.1.1.4 route-map TEST_EXPORT_DENY out
+  network 1.1.1.1/32
