@@ -684,6 +684,11 @@ AMON
    'amon'
 ;
 
+AMT
+:
+   'amt'
+;
+
 AND
 :
    'and'
@@ -1109,6 +1114,11 @@ AUTO_CERT_PROV
 AUTO_COST
 :
    'auto-cost'
+;
+
+AUTO_DISCARD
+:
+   'auto-discard'
 ;
 
 AUTO_IMPORT

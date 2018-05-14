@@ -1,0 +1,10 @@
+!
+hostname nxos-vrf-context
+!
+feature bgp
+!
+vrf context management
+  ip amt relay
+  ip domain-name foo.bar.com
+  ip route 0.0.0.0/0 null0
+!

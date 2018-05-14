@@ -4290,6 +4290,11 @@ vpn_null
    ) null_rest_of_line
 ;
 
+vrfc_ip_auto_discard
+:
+   IP AUTO_DISCARD NEWLINE
+;
+
 vrfc_ip_route
 :
    IP ROUTE ip_route_tail
@@ -4302,7 +4307,15 @@ vrfc_null
       (
          IP
          (
-            PIM
+            AMT
+            | AUTO_DISCARD
+            | DOMAIN_LIST
+            | DOMAIN_NAME
+            | IGMP
+            | MROUTE
+            | MSDP
+            | NAME_SERVER
+            | PIM
          )
       )
       | MDT
