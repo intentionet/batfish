@@ -20,6 +20,7 @@ public class CiscoNxBgpVrfAddressFamilyConfiguration implements Serializable {
 
   public CiscoNxBgpVrfAddressFamilyConfiguration() {
     _aggregateNetworks = new HashMap<>();
+    _aggregateNetworks6 = new HashMap<>();
     _clientToClientReflection = false; // disabled by default
     _defaultMetric = null; // there is no default, and metric must be set to redistribute routes
     _defaultInformationOriginate = false; // disabled by default
@@ -42,6 +43,12 @@ public class CiscoNxBgpVrfAddressFamilyConfiguration implements Serializable {
   public CiscoNxBgpVrfAddressFamilyAggregateNetworkConfiguration getOrCreateAggregateNetwork(
       Prefix prefix) {
     return _aggregateNetworks.computeIfAbsent(
+        prefix, p -> new CiscoNxBgpVrfAddressFamilyAggregateNetworkConfiguration());
+  }
+
+  public CiscoNxBgpVrfAddressFamilyAggregateNetworkConfiguration getOrCreateAggregateNetwork(
+      Prefix6 prefix) {
+    return _aggregateNetworks6.computeIfAbsent(
         prefix, p -> new CiscoNxBgpVrfAddressFamilyAggregateNetworkConfiguration());
   }
 
@@ -148,6 +155,8 @@ public class CiscoNxBgpVrfAddressFamilyConfiguration implements Serializable {
 
   private final Map<Prefix, CiscoNxBgpVrfAddressFamilyAggregateNetworkConfiguration>
       _aggregateNetworks;
+  private final Map<Prefix6, CiscoNxBgpVrfAddressFamilyAggregateNetworkConfiguration>
+      _aggregateNetworks6;
   private boolean _clientToClientReflection;
   @Nullable private Long _defaultMetric;
   private boolean _defaultInformationOriginate;

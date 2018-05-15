@@ -2204,14 +2204,19 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterRbnx_af_aggregate_address(Rbnx_af_aggregate_addressContext ctx) {
-    Prefix prefix;
     if (ctx.prefix != null) {
-      prefix = Prefix.parse(ctx.prefix.getText());
-    } else {
-      prefix = new Prefix(toIp(ctx.network), toIp(ctx.subnet));
+      Prefix prefix = Prefix.parse(ctx.prefix.getText());
+      _currentBgpNxVrfAddressFamilyAggregateNetwork =
+          _currentBgpNxVrfAddressFamily.getOrCreateAggregateNetwork(prefix);
+    } else if (ctx.network != null && ctx.subnet != null) {
+      Prefix prefix = new Prefix(toIp(ctx.network), toIp(ctx.subnet));
+      _currentBgpNxVrfAddressFamilyAggregateNetwork =
+          _currentBgpNxVrfAddressFamily.getOrCreateAggregateNetwork(prefix);
+    } else if (ctx.prefix6 != null) {
+      Prefix6 prefix = new Prefix6(ctx.prefix6.getText());
+      _currentBgpNxVrfAddressFamilyAggregateNetwork =
+          _currentBgpNxVrfAddressFamily.getOrCreateAggregateNetwork(prefix);
     }
-    _currentBgpNxVrfAddressFamilyAggregateNetwork =
-        _currentBgpNxVrfAddressFamily.getOrCreateAggregateNetwork(prefix);
   }
 
   @Override

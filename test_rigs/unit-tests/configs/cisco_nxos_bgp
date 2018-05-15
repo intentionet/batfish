@@ -17,6 +17,8 @@ router bgp 1
   graceful-restart restart-time 120
   graceful-restart stalepath-time 300
   address-family ipv4 unicast
+  address-family ipv6 unicast
+    aggregate-address fe80::/10 advertise-map AGG6_MAP
   neighbor 2.2.2.2 remote-as 6600
     local-as 65500 no-prepend replace-as
     no shutdown
