@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.grammar.cisco;
 
 import static org.batfish.dataplane.matchers.PrefixTracerMatchers.fromHostname;
 import static org.batfish.dataplane.matchers.PrefixTracerMatchers.toHostname;
@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.List;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Prefix;
+import org.batfish.dataplane.ibdp.IncrementalDataPlane;
+import org.batfish.dataplane.ibdp.PrefixTracer;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.main.TestrigText;
