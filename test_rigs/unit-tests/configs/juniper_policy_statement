@@ -1,0 +1,6 @@
+#
+set system host-name juniper_policy_statement
+#
+set policy-options policy-statement POLICY-NAME term TERM from protocol static
+set policy-options policy-statement POLICY-NAME term TERM then preference 100
+#

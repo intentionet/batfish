@@ -221,6 +221,7 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_local_preferenceC
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_metricContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_next_hopContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_next_policyContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_preferenceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_rejectContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.PortContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Proposal_set_typeContext;
@@ -436,6 +437,7 @@ import org.batfish.representation.juniper.PsThenLocalPreference;
 import org.batfish.representation.juniper.PsThenMetric;
 import org.batfish.representation.juniper.PsThenNextHopIp;
 import org.batfish.representation.juniper.PsThenNextPolicy;
+import org.batfish.representation.juniper.PsThenPreference;
 import org.batfish.representation.juniper.PsThenReject;
 import org.batfish.representation.juniper.Route4FilterLine;
 import org.batfish.representation.juniper.Route4FilterLineExact;
@@ -3601,6 +3603,13 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void exitPopst_next_policy(Popst_next_policyContext ctx) {
     _currentPsThens.add(PsThenNextPolicy.INSTANCE);
+  }
+
+  @Override
+  public void exitPopst_preference(Popst_preferenceContext ctx) {
+    int preference = toInt(ctx.preference);
+    PsThenPreference then = new PsThenPreference(preference);
+    _currentPsThens.add(then);
   }
 
   @Override

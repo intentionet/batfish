@@ -827,6 +827,14 @@
           ]
         }
       },
+      "unused:policy-statement:POLICY-NAME" : {
+        "description" : "Unused structure of type: 'policy-statement' with name: 'POLICY-NAME'",
+        "files" : {
+          "juniper_policy_statement" : [
+            4
+          ]
+        }
+      },
       "unused:policy-statement:route-filter-test-v4" : {
         "description" : "Unused structure of type: 'policy-statement' with name: 'route-filter-test-v4'",
         "files" : {
@@ -1283,7 +1291,7 @@
     "summary" : {
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 129
+      "numResults" : 130
     },
     "unusedStructures" : {
       "aggAddress" : {
@@ -1926,6 +1934,13 @@
           ],
           "test2" : [
             26
+          ]
+        }
+      },
+      "juniper_policy_statement" : {
+        "policy-statement" : {
+          "POLICY-NAME" : [
+            4
           ]
         }
       },

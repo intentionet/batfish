@@ -184,6 +184,7 @@
         "juniper_misc" : "juniper_misc",
         "juniper_ntp" : "juniper_ntp",
         "juniper_passwords" : "juniper_passwords",
+        "juniper_policy_statement" : "juniper_policy_statement",
         "juniper_relay" : "juniper_relay",
         "juniper_route_filter" : "juniper_route_filter",
         "juniper_routing_options" : "juniper_routing_options",
@@ -430,6 +431,7 @@
         "juniper_misc" : "PASSED",
         "juniper_ntp" : "PASSED",
         "juniper_passwords" : "PASSED",
+        "juniper_policy_statement" : "PASSED",
         "juniper_relay" : "PASSED",
         "juniper_route_filter" : "PASSED",
         "juniper_routing_options" : "PASSED",
@@ -43180,6 +43182,70 @@
             "  EOF:<EOF>  <== mode:DEFAULT_MODE)"
           ]
         },
+        "juniper_policy_statement" : {
+          "sentences" : [
+            "(flat_juniper_configuration",
+            "  (set_line",
+            "    SET:'set'  <== mode:DEFAULT_MODE",
+            "    (set_line_tail",
+            "      (statement",
+            "        (s_common",
+            "          (s_system",
+            "            SYSTEM:'system'  <== mode:DEFAULT_MODE",
+            "            (sy_host_name",
+            "              HOST_NAME:'host-name'  <== mode:DEFAULT_MODE",
+            "              (variable",
+            "                VARIABLE:'juniper_policy_statement'  <== mode:DEFAULT_MODE))))))",
+            "    NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "  (set_line",
+            "    SET:'set'  <== mode:DEFAULT_MODE",
+            "    (set_line_tail",
+            "      (statement",
+            "        (s_common",
+            "          (s_policy_options",
+            "            POLICY_OPTIONS:'policy-options'  <== mode:DEFAULT_MODE",
+            "            (po_policy_statement",
+            "              POLICY_STATEMENT:'policy-statement'  <== mode:DEFAULT_MODE",
+            "              (variable",
+            "                VARIABLE:'POLICY-NAME'  <== mode:DEFAULT_MODE)",
+            "              (pops_term",
+            "                TERM:'term'  <== mode:DEFAULT_MODE",
+            "                (variable",
+            "                  VARIABLE:'TERM'  <== mode:DEFAULT_MODE)",
+            "                (pops_common",
+            "                  (pops_from",
+            "                    FROM:'from'  <== mode:DEFAULT_MODE",
+            "                    (popsf_protocol",
+            "                      PROTOCOL:'protocol'  <== mode:DEFAULT_MODE",
+            "                      (routing_protocol",
+            "                        STATIC:'static'  <== mode:DEFAULT_MODE))))))))))",
+            "    NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "  (set_line",
+            "    SET:'set'  <== mode:DEFAULT_MODE",
+            "    (set_line_tail",
+            "      (statement",
+            "        (s_common",
+            "          (s_policy_options",
+            "            POLICY_OPTIONS:'policy-options'  <== mode:DEFAULT_MODE",
+            "            (po_policy_statement",
+            "              POLICY_STATEMENT:'policy-statement'  <== mode:DEFAULT_MODE",
+            "              (variable",
+            "                VARIABLE:'POLICY-NAME'  <== mode:DEFAULT_MODE)",
+            "              (pops_term",
+            "                TERM:'term'  <== mode:DEFAULT_MODE",
+            "                (variable",
+            "                  VARIABLE:'TERM'  <== mode:DEFAULT_MODE)",
+            "                (pops_common",
+            "                  (pops_then",
+            "                    THEN:'then'  <== mode:DEFAULT_MODE",
+            "                    (popst_common",
+            "                      (popst_preference",
+            "                        PREFERENCE:'preference'  <== mode:DEFAULT_MODE",
+            "                        DEC:'100'  <== mode:DEFAULT_MODE))))))))))",
+            "    NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "  EOF:<EOF>  <== mode:DEFAULT_MODE)"
+          ]
+        },
         "juniper_relay" : {
           "sentences" : [
             "(flat_juniper_configuration",
@@ -53595,6 +53661,16 @@
         "juniper_misc" : { },
         "juniper_ntp" : { },
         "juniper_passwords" : { },
+        "juniper_policy_statement" : {
+          "policy-statement" : {
+            "POLICY-NAME" : {
+              "definitionLines" : [
+                4
+              ],
+              "numReferrers" : 0
+            }
+          }
+        },
         "juniper_relay" : {
           "dhcp-relay server-group" : {
             "site-dhcp" : {
@@ -55326,6 +55402,7 @@
         "juniper_misc" : "PASSED",
         "juniper_ntp" : "PASSED",
         "juniper_passwords" : "PASSED",
+        "juniper_policy_statement" : "PASSED",
         "juniper_relay" : "PASSED",
         "juniper_route_filter" : "PASSED",
         "juniper_routing_options" : "PASSED",
