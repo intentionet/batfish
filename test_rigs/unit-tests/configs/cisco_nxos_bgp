@@ -19,6 +19,7 @@ router bgp 1
   address-family ipv4 unicast
   neighbor 2.2.2.2 remote-as 6600
     local-as 65500 no-prepend replace-as
+    no shutdown
     timers 1 3
     address-family ipv4 unicast
       soft-reconfiguration inbound always

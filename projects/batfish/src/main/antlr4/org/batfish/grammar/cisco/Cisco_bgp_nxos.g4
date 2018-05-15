@@ -340,6 +340,7 @@ rbnx_n_common
     | rbnx_n_local_as
     | rbnx_n_low_memory
     | rbnx_n_maximum_peers
+    | rbnx_n_no_shutdown
     | rbnx_n_password
     | rbnx_n_remote_as
     | rbnx_n_remove_private_as
@@ -558,6 +559,11 @@ rbnx_n_low_memory
 rbnx_n_maximum_peers
 :
     MAXIMUM_PEERS max = DEC NEWLINE
+;
+
+rbnx_n_no_shutdown
+:
+    NO SHUTDOWN NEWLINE
 ;
 
 rbnx_n_password

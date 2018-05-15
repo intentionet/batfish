@@ -619,6 +619,7 @@ import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_descriptionContext;
 import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_ebgp_multihopContext;
 import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_inheritContext;
 import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_local_asContext;
+import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_no_shutdownContext;
 import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_remote_asContext;
 import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_remove_private_asContext;
 import org.batfish.grammar.cisco.CiscoParser.Rbnx_n_shutdownContext;
@@ -2647,6 +2648,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   public void exitRbnx_n_local_as(Rbnx_n_local_asContext ctx) {
     long asn = toAsNum(ctx.bgp_asn());
     _currentBgpNxVrfNeighbor.setLocalAs(asn);
+  }
+
+  @Override
+  public void exitRbnx_n_no_shutdown(Rbnx_n_no_shutdownContext ctx) {
+    _currentBgpNxVrfNeighbor.setShutdown(false);
   }
 
   @Override
