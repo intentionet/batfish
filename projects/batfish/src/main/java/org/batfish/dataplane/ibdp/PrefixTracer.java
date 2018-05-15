@@ -1,5 +1,6 @@
 package org.batfish.dataplane.ibdp;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSortedSet;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -81,19 +82,12 @@ public class PrefixTracer implements Serializable {
 
     @Override
     public String toString() {
-      return "Neighbor{"
-          + "_hostname='"
-          + _hostname
-          + '\''
-          + ", _ip="
-          + _ip
-          + ", _routingPolicy='"
-          + _routingPolicy
-          + '\''
-          + ", _vrfName='"
-          + _vrfName
-          + '\''
-          + '}';
+      return MoreObjects.toStringHelper(this)
+          .add("hostname", _hostname)
+          .add("ip", _ip)
+          .add("routingPolicy", _routingPolicy)
+          .add("vrfName", _vrfName)
+          .toString();
     }
   }
 
