@@ -1166,6 +1166,8 @@ public final class Settings extends BaseSettings implements BdpSettings, Grammar
 
     addBooleanOption(ARG_DISABLE_Z3_SIMPLIFICATION, "disable z3 simplification");
 
+    addBooleanOption(BfConsts.ARG_ENABLE_CISCO_NX_PARSER, "use the rewritten BGP parser for Cisco NX-OS devices");
+
     addOption(BfConsts.ARG_ENVIRONMENT_NAME, "name of environment to use", "name");
 
     addBooleanOption(
