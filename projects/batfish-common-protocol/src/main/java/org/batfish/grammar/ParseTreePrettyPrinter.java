@@ -1,5 +1,6 @@
 package org.batfish.grammar;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -86,15 +87,27 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
     for (int i = 0; i < _indent; i++) {
       _ptSentences.appendToLastSentence("  ");
     }
-    _indent++;
     String ruleName = _ruleNames.get(ctx.getRuleIndex());
+
+    if (ctx.getParent() != null) {
+      for (Field f : ctx.getParent().getClass().getFields()) {
+        try {
+          if (!f.getName().equals(ruleName) && f.get(ctx.getParent()) == ctx) {
+            _ptSentences.appendToLastSentence(f.getName() + " = ");
+          }
+        } catch (Throwable t) {
+          // Ignore the error and continue.
+        }
+      }
+    }
     _ptSentences.appendToLastSentence("(" + ruleName);
+    _indent++;
   }
 
   @Override
   public void exitEveryRule(ParserRuleContext ctx) {
-    _ptSentences.appendToLastSentence(")");
     _indent--;
+    _ptSentences.appendToLastSentence(")");
   }
 
   @Override
@@ -134,8 +147,26 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
     } else {
       mode = _combinedParser.getLexer().getModeNames()[modeAsInt];
     }
+
+    // If the parent context has a named field pointing to the token, it is because the user
+    // has a defined name. Add it to the output message.
+    for (Field f : ctx.getParent().getClass().getFields()) {
+      if (f.getName().equals("start")
+          || f.getName().equals("stop")
+          || f.getName().startsWith("_t")) {
+        continue;
+      }
+      try {
+        if (f.get(ctx.getParent()) == ctx.getSymbol()) {
+          _ptSentences.appendToLastSentence(f.getName() + " = ");
+        }
+      } catch (Throwable thrown) {
+        // Ignore the error and continue.
+      }
+    }
+
     String tokenName;
-    if (tokenType == -1) {
+    if (tokenType == Token.EOF) {
       tokenName = "EOF";
       _ptSentences.appendToLastSentence(tokenName + ":" + nodeText);
     } else {
