@@ -1,5 +1,6 @@
 package org.batfish.grammar;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -129,10 +130,20 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
     int tokenType = t.getType();
     int modeAsInt = _combinedParser.getTokenMode(t);
     String mode;
-    if (modeAsInt == -1) {
+    if (modeAsInt == Token.EOF) {
       mode = "<MANUAL/UNKNOWN>";
     } else {
       mode = _combinedParser.getLexer().getModeNames()[modeAsInt];
+    }
+    for (Field f : ctx.getParent().getClass().getFields()) {
+      try {
+        if (f.isAccessible() && f.get(ctx.getParent()) == ctx) {
+          _ptSentences.appendToLastSentence(f.getName() + " = ");
+          break;
+        }
+      } catch (IllegalAccessException e) {
+        // Should not be reachable, because we check that it's accessible.
+      }
     }
     String tokenName;
     if (tokenType == -1) {
