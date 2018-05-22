@@ -88,6 +88,18 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
       _ptSentences.appendToLastSentence("  ");
     }
     _indent++;
+    if (ctx.getParent() != null) {
+      for (Field f : ctx.getParent().getClass().getFields()) {
+        try {
+          if (f.get(ctx.getParent()) == ctx) {
+            _ptSentences.appendToLastSentence(f.getName() + " = ");
+            break;
+          }
+        } catch (IllegalAccessException e) {
+          // Should not be reachable, because we check that it's accessible.
+        }
+      }
+    }
     String ruleName = _ruleNames.get(ctx.getRuleIndex());
     _ptSentences.appendToLastSentence("(" + ruleName);
   }
@@ -141,8 +153,8 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
           _ptSentences.appendToLastSentence(f.getName() + " = ");
           break;
         }
-      } catch (IllegalAccessException e) {
-        // Should not be reachable, because we check that it's accessible.
+      } catch (Throwable e) {
+        // Ignore and continue
       }
     }
     String tokenName;
