@@ -111,6 +111,8 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.LINE_ACCESS_C
 import static org.batfish.representation.cisco.CiscoStructureUsage.MANAGEMENT_SSH_ACCESS_GROUP;
 import static org.batfish.representation.cisco.CiscoStructureUsage.MANAGEMENT_TELNET_ACCESS_GROUP;
 import static org.batfish.representation.cisco.CiscoStructureUsage.MSDP_PEER_SA_LIST;
+import static org.batfish.representation.cisco.CiscoStructureUsage.NETWORK_OBJECT_GROUP_GROUP_OBJECT;
+import static org.batfish.representation.cisco.CiscoStructureUsage.NETWORK_OBJECT_GROUP_NETWORK_OBJECT;
 import static org.batfish.representation.cisco.CiscoStructureUsage.NTP_ACCESS_GROUP;
 import static org.batfish.representation.cisco.CiscoStructureUsage.OSPF_AREA_FILTER_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.OSPF_DEFAULT_ORIGINATE_ROUTE_MAP;
@@ -193,6 +195,8 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.Ip6Wildcard;
 import org.batfish.datamodel.IpProtocol;
+import org.batfish.datamodel.IpSpace;
+import org.batfish.datamodel.IpSpaceReference;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.IpsecAuthenticationAlgorithm;
 import org.batfish.datamodel.IpsecProposal;
@@ -2206,24 +2210,50 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitOgn_group_object(Ogn_group_objectContext ctx) {
-    _w.redFlag("Unimplemented object-group network line: " + getFullText(ctx));
+    String name = ctx.name.getText();
+    _currentNetworkObjectGroup.getLines().add(new IpSpaceReference(name));
+    _configuration.referenceStructure(
+        NETWORK_OBJECT_GROUP, name, NETWORK_OBJECT_GROUP_GROUP_OBJECT, ctx.name.start.getLine());
   }
 
   @Override
   public void exitOgn_host_ip(Ogn_host_ipContext ctx) {
-    _currentNetworkObjectGroup.getLines().add(new IpWildcard(toIp(ctx.ip)));
+    _currentNetworkObjectGroup.getLines().add(new IpWildcard(toIp(ctx.ip)).toIpSpace());
   }
 
   @Override
   public void exitOgn_ip_with_mask(Ogn_ip_with_maskContext ctx) {
     Ip ip = toIp(ctx.ip);
     Ip mask = toIp(ctx.mask);
-    _currentNetworkObjectGroup.getLines().add(new IpWildcard(new Prefix(ip, mask)));
+    _currentNetworkObjectGroup.getLines().add(new IpWildcard(new Prefix(ip, mask)).toIpSpace());
   }
 
   @Override
   public void exitOgn_network_object(Ogn_network_objectContext ctx) {
-    _w.redFlag("Unimplemented object-group network line: " + getFullText(ctx));
+    IpSpace ipSpace = null;
+    if (ctx.prefix != null) {
+      ipSpace = new IpWildcard(ctx.prefix.getText()).toIpSpace();
+    } else if (ctx.wildcard_address != null && ctx.wildcard_mask != null) {
+      // Mask needs to be inverted since zeros are don't-cares in this context
+      ipSpace =
+          new IpWildcard(toIp(ctx.wildcard_address), toIp(ctx.wildcard_mask).inverted())
+              .toIpSpace();
+    } else if (ctx.address != null) {
+      ipSpace = new IpWildcard(ctx.address.getText()).toIpSpace();
+    } else if (ctx.name != null) {
+      String name = ctx.name.getText();
+      ipSpace = new IpSpaceReference(name);
+      _configuration.referenceStructure(
+          NETWORK_OBJECT_GROUP,
+          name,
+          NETWORK_OBJECT_GROUP_NETWORK_OBJECT,
+          ctx.name.start.getLine());
+    }
+    if (ipSpace == null) {
+      _w.redFlag("Unimplemented object-group network line: " + getFullText(ctx));
+    } else {
+      _currentNetworkObjectGroup.getLines().add(ipSpace);
+    }
   }
 
   @Override

@@ -2,17 +2,27 @@
 hostname ios-object-group-network
 !
 !
-object-group network ogn1
+object-group network ogn_wildcard
  1.0.0.0 255.0.0.0
 !
-object-group network ogn2
- host 2.0.0.0
+object-group network ogn_host
  host 2.0.0.1
 !
-object-group network ogn3
+object-group network ogn_indirect
+ group-object ogn_wildcard
+!
+object-group network ogn_network_object
+ network-object host 2.0.0.1
+ network-object 1.0.0.0 255.0.0.0
+!
+object-group network ogn_network_object_indirect
+ network-object object ogn_host
+ network-object object ogn_indirect
+ network-object object ogn_undef
+!
+object-group network ogn_unused
 !
 !
-ip access-list extended ACL
-  permit ip object-group ogn1 object-group ogn2
-  permit ip object-group ogn_undef object-group ogn1
+ip access-list extended acl_wildcard
+ permit ip object-group ogn_wildcard any
 !

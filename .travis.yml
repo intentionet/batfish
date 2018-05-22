@@ -4,16 +4,58 @@ sudo: true
 jdk:
   - oraclejdk8
 
-install: ./.travis/install.sh
+env:
+  - BF_BUILDER="mvn"
+  - BF_BUILDER="bazel" V="0.13.0"
+matrix:
+  fast_finish: true
+  allow_failures:
+  - env: BF_BUILDER="bazel" V="0.13.0"
+
+before_install:
+  - rm -rf $HOME/.cache/bazel/_bazel_$USER/install
+  - .travis/fix_java_format.sh
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      OS=darwin
+    else
+      sysctl kernel.unprivileged_userns_clone=1
+      OS=linux
+    fi
+    URL="https://github.com/bazelbuild/bazel/releases/download/${V}/bazel-${V}-installer-${OS}-x86_64.sh"
+    wget -O install.sh "${URL}"
+    chmod +x install.sh
+    ./install.sh --user
+    rm -f install.sh
+
+install:
+  - .travis/install.sh
+
 script:
-  - .travis/fix_java_format.sh && .travis/build.sh
+  - if [ ${BF_BUILDER} == "mvn" ]; then .travis/build.sh ; fi
+  - |
+    if [ ${BF_BUILDER} == "bazel" ]; then
+      bazel \
+      --output_base=$HOME/.cache/bazel \
+      --batch \
+      --host_jvm_args=-Xmx500m \
+      --host_jvm_args=-Xms500m \
+      test \
+      --jobs=4 \
+      --curses=no \
+      --verbose_failures \
+      --experimental_repository_cache="$HOME/.bazel_repository_cache" \
+      //...
+    fi
 
 
 # Cache the Maven dependencies installed.
 cache:
   directories:
-  - $HOME/.m2
   - $HOME/.batfish_z3_cache
+  - $HOME/.bazel_repository_cache
+  - $HOME/.cache/bazel
+  - $HOME/.m2
 
 # Delete the batfish jars, which change every build, from the cache.
 # Also delete the locally-built jars, which are installed every build.
@@ -25,3 +67,4 @@ before_cache:
   - rm -rf $HOME/.m2/repository/com/microsoft/z3/z3/
   - rm -rf $HOME/.m2/repository/net/sf/javabdd/bdd/
   - rm -rf $HOME/.m2/repository/org/batfish
+  - rm -rf $HOME/.cache/bazel/_bazel_$USER/install

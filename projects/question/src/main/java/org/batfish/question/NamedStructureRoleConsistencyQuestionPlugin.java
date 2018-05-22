@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.annotation.Nullable;
 import org.batfish.common.Answerer;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.plugin.Plugin;
@@ -19,7 +20,6 @@ import org.batfish.question.OutliersQuestionPlugin.OutliersAnswerElement;
 import org.batfish.question.OutliersQuestionPlugin.OutliersQuestion;
 import org.batfish.question.PerRoleQuestionPlugin.PerRoleAnswerElement;
 import org.batfish.question.PerRoleQuestionPlugin.PerRoleQuestion;
-import org.batfish.role.NodeRoleDimension;
 import org.batfish.role.OutliersHypothesis;
 
 @AutoService(Plugin.class)
@@ -116,7 +116,7 @@ public class NamedStructureRoleConsistencyQuestionPlugin extends QuestionPlugin 
 
     private static final String PROP_HYPOTHESIS = "hypothesis";
 
-    private String _roleDimension;
+    @Nullable private String _roleDimension;
 
     private String _structType;
 
@@ -129,8 +129,7 @@ public class NamedStructureRoleConsistencyQuestionPlugin extends QuestionPlugin 
         @JsonProperty(PROP_ROLE_DIMENSION) String roleDimension) {
       _structType = structType;
       _hypothesis = hypothesis;
-      _roleDimension =
-          roleDimension == null ? NodeRoleDimension.AUTO_DIMENSION_PRIMARY : roleDimension;
+      _roleDimension = roleDimension;
     }
 
     @Override

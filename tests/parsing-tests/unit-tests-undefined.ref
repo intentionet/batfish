@@ -684,7 +684,7 @@
         "description" : "Undefined reference to structure of type: 'object-group network' with usage: 'extended access-list network object-group' named 'drawbridge_hosts'",
         "files" : {
           "asa_acl" : [
-            6
+            7
           ]
         }
       },
@@ -1077,7 +1077,7 @@
         "object-group network" : {
           "drawbridge_hosts" : {
             "extended access-list network object-group" : [
-              6
+              7
             ]
           }
         }

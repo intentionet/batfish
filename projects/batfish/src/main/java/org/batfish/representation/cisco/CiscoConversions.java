@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.util.CommonUtil;
+import org.batfish.datamodel.AclIpSpace;
 import org.batfish.datamodel.AsPathAccessList;
 import org.batfish.datamodel.AsPathAccessListLine;
 import org.batfish.datamodel.CommunityList;
@@ -32,7 +33,6 @@ import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpWildcard;
-import org.batfish.datamodel.IpWildcardSetIpSpace;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
@@ -204,7 +204,7 @@ class CiscoConversions {
   }
 
   static IpSpace toIpSpace(NetworkObjectGroup networkObjectGroup) {
-    return IpWildcardSetIpSpace.builder().including(networkObjectGroup.getLines()).build();
+    return AclIpSpace.union(networkObjectGroup.getLines());
   }
 
   static org.batfish.datamodel.IsisProcess toIsisProcess(

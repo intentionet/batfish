@@ -444,7 +444,12 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
 
       if (question.getStyle() == EdgeStyle.ROLE) {
         NodeRoleDimension roleDimension =
-            _batfish.getNodeRoleDimension(question.getRoleDimension());
+            _batfish
+                .getNodeRoleDimension(question.getRoleDimension())
+                .orElseThrow(
+                    () ->
+                        new BatfishException(
+                            "No role dimension found for " + question.getRoleDimension()));
         _nodeRolesMap = roleDimension.createNodeRolesMap(configurations.keySet());
       }
 
@@ -819,8 +824,7 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
       _node2Regex = nodes2 == null ? NodesSpecifier.ALL : nodes2;
       _neighborTypes = neighborTypes == null ? new TreeSet<>() : neighborTypes;
       _style = style == null ? EdgeStyle.SUMMARY : style;
-      _roleDimension =
-          roleDimension == null ? NodeRoleDimension.AUTO_DIMENSION_PRIMARY : roleDimension;
+      _roleDimension = roleDimension;
     }
 
     @Override

@@ -51,8 +51,9 @@ public class IpSpaceReference extends IpSpace {
   }
 
   @Override
-  public boolean containsIp(Ip ip, Map<String, IpSpace> namedIpSpaces) {
-    return namedIpSpaces.get(_name).containsIp(ip, namedIpSpaces);
+  public boolean containsIp(@Nonnull Ip ip, @Nonnull Map<String, IpSpace> namedIpSpaces) {
+    return namedIpSpaces.containsKey(_name)
+        && namedIpSpaces.get(_name).containsIp(ip, namedIpSpaces);
   }
 
   @Override

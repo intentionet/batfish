@@ -26,3 +26,7 @@ tasks.xml
 #Eclipse project file that oscillates for some reason and gets generated anyway
 org.eclipse.core.resources.prefs
 
+# Ignore all bazel-* symlinks. There is no full list since this can change
+# based on the name of the directory bazel is cloned into.
+/bazel-*
+

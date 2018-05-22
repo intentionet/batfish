@@ -47,7 +47,7 @@ public class NodesSpecifierTest {
             .add(dim1)
             .add(dim2)
             .build();
-    return new NodeRolesData(null, roleDimensions);
+    return new NodeRolesData(null, null, roleDimensions);
   }
 
   @Test

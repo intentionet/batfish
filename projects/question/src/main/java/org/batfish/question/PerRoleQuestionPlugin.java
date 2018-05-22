@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
 import org.batfish.common.plugin.IBatfish;
@@ -80,7 +81,14 @@ public class PerRoleQuestionPlugin extends QuestionPlugin {
       // collect the desired nodes in a list
       Set<String> includeNodes = question.getNodeRegex().getMatchingNodes(_batfish);
 
-      NodeRoleDimension roleDimension = _batfish.getNodeRoleDimension(question.getRoleDimension());
+      NodeRoleDimension roleDimension =
+          _batfish
+              .getNodeRoleDimension(question.getRoleDimension())
+              .orElseThrow(
+                  () ->
+                      new BatfishException(
+                          "No role dimension found for " + question.getRoleDimension()));
+
       SortedMap<String, SortedSet<String>> roleNodeMap =
           roleDimension.createRoleNodesMap(includeNodes);
 
@@ -154,7 +162,7 @@ public class PerRoleQuestionPlugin extends QuestionPlugin {
 
     private List<String> _roles;
 
-    @Nonnull private String _roleDimension;
+    @Nullable private String _roleDimension;
 
     @JsonCreator
     public PerRoleQuestion(
@@ -164,8 +172,7 @@ public class PerRoleQuestionPlugin extends QuestionPlugin {
         @JsonProperty(PROP_ROLES) List<String> roles) {
       _nodeRegex = nodeRegex == null ? NodesSpecifier.ALL : nodeRegex;
       _question = question;
-      _roleDimension =
-          roleDimension == null ? NodeRoleDimension.AUTO_DIMENSION_PRIMARY : roleDimension;
+      _roleDimension = roleDimension;
       _roles = roles;
     }
 

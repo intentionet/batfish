@@ -8836,10 +8836,27 @@
         },
         "ipSpaces" : {
           "dns_servers" : {
-            "class" : "org.batfish.datamodel.IpWildcardSetIpSpace"
+            "class" : "org.batfish.datamodel.IpWildcardIpSpace",
+            "ipWildcard" : "1.2.2.1"
           },
           "ntp_servers" : {
-            "class" : "org.batfish.datamodel.IpWildcardSetIpSpace"
+            "class" : "org.batfish.datamodel.AclIpSpace",
+            "lines" : [
+              {
+                "action" : "ACCEPT",
+                "ipSpace" : {
+                  "class" : "org.batfish.datamodel.IpWildcardIpSpace",
+                  "ipWildcard" : "1.1.1.1"
+                }
+              },
+              {
+                "action" : "ACCEPT",
+                "ipSpace" : {
+                  "class" : "org.batfish.datamodel.IpWildcardIpSpace",
+                  "ipWildcard" : "1.1.1.1"
+                }
+              }
+            ]
           }
         },
         "vendorFamily" : {

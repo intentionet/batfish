@@ -6,7 +6,6 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -237,11 +236,10 @@ public class NodesSpecifier {
       case NAME:
         return getMatchingNodesByName(nodes);
       case ROLE:
-        try {
-          NodeRoleDimension roleDimension = batfish.getNodeRoleDimension(_roleDimension);
-          return getMatchingNodesByRole(roleDimension, nodes);
-        } catch (NoSuchElementException e) {
-          batfish.getLogger().error("Role dimension " + _roleDimension + " not found");
+        Optional<NodeRoleDimension> roleDimension = batfish.getNodeRoleDimension(_roleDimension);
+        if (roleDimension.isPresent()) {
+          return getMatchingNodesByRole(roleDimension.get(), nodes);
+        } else {
           return Collections.emptySet();
         }
       default:

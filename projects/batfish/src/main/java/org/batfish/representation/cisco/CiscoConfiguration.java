@@ -1170,8 +1170,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
     markConcreteStructure(CiscoStructureType.L2TP_CLASS, usage);
   }
 
-  private void markNetworkObjectGroups(CiscoStructureUsage usage) {
-    markConcreteStructure(CiscoStructureType.NETWORK_OBJECT_GROUP, usage);
+  private void markNetworkObjectGroups(CiscoStructureUsage... usages) {
+    markConcreteStructure(CiscoStructureType.NETWORK_OBJECT_GROUP, usages);
   }
 
   private void markPrefixSets(CiscoStructureUsage usage) {
@@ -3693,7 +3693,10 @@ public final class CiscoConfiguration extends VendorConfiguration {
     markInspectPolicyMaps(CiscoStructureUsage.ZONE_PAIR_INSPECT_SERVICE_POLICY);
 
     // object-group
-    markNetworkObjectGroups(CiscoStructureUsage.EXTENDED_ACCESS_LIST_NETWORK_OBJECT_GROUP);
+    markNetworkObjectGroups(
+        CiscoStructureUsage.EXTENDED_ACCESS_LIST_NETWORK_OBJECT_GROUP,
+        CiscoStructureUsage.NETWORK_OBJECT_GROUP_GROUP_OBJECT,
+        CiscoStructureUsage.NETWORK_OBJECT_GROUP_NETWORK_OBJECT);
     markAbstractStructure(
         CiscoStructureType.PROTOCOL_OR_SERVICE_OBJECT_GROUP,
         CiscoStructureUsage.EXTENDED_ACCESS_LIST_PROTOCOL_OR_SERVICE_OBJECT_GROUP,

@@ -3,6 +3,6 @@ hostname asa_acl
 !
 access-list outside_in extended permit udp any4 host 1.2.3.4 eq tftp
 access-list Local_LAN_Access standard permit host 0.0.0.0 
+access-list outside remark some-remark with multiple words and 1 or 2 numbers
 access-list outside extended permit tcp object-group drawbridge_hosts interface outside eq https 
 !
-

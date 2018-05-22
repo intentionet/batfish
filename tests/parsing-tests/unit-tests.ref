@@ -7577,6 +7577,15 @@
             "          IP_ADDRESS:'0.0.0.0'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  (stanza",
+            "    (s_null",
+            "      (null_single",
+            "        ACCESS_LIST:'access-list'  <== mode:DEFAULT_MODE",
+            "        (variable_aclname",
+            "          OUTSIDE:'outside'  <== mode:DEFAULT_MODE)",
+            "        REMARK:'remark'  <== mode:DEFAULT_MODE",
+            "        M_REMARK_REMARK:' some-remark with multiple words and 1 or 2 numbers'  <== mode:M_REMARK",
+            "        NEWLINE:'\\n'  <== mode:M_REMARK)))",
+            "  (stanza",
             "    (extended_access_list_stanza",
             "      ACCESS_LIST:'access-list'  <== mode:DEFAULT_MODE",
             "      (variable_aclname",
@@ -52394,13 +52403,6 @@
             "1" : "MISCELLANEOUS: Ignoring reference to undeclared peer group: '10.0.0.1'"
           }
         },
-        "cisco_qos" : {
-          "Red flags" : {
-            "1" : "MISCELLANEOUS: Unimplemented object-group network line: network-object host 1.2.2.1\n",
-            "2" : "MISCELLANEOUS: Unimplemented object-group network line: network-object host 1.1.1.1\n",
-            "3" : "MISCELLANEOUS: Unimplemented object-group network line: network-object 1.1.1.1 255.255.255.255\n"
-          }
-        },
         "cisco_style_acl1" : {
           "Red flags" : {
             "1" : "MISCELLANEOUS: No hostname set in file: 'testrig/configs/cisco_style_acl1'\n"
@@ -52579,7 +52581,7 @@
           "extended ip access-list" : {
             "outside" : {
               "definitionLines" : [
-                6
+                7
               ],
               "numReferrers" : 0
             },
@@ -54350,7 +54352,7 @@
           "object-group network" : {
             "drawbridge_hosts" : {
               "extended access-list network object-group" : [
-                6
+                7
               ]
             }
           }

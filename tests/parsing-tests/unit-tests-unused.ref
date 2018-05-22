@@ -462,7 +462,7 @@
         "description" : "Unused structure of type: 'extended ip access-list' with name: 'outside'",
         "files" : {
           "asa_acl" : [
-            6
+            7
           ]
         }
       },
@@ -1312,7 +1312,7 @@
       "asa_acl" : {
         "extended ip access-list" : {
           "outside" : [
-            6
+            7
           ],
           "outside_in" : [
             4

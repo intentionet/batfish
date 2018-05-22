@@ -27,14 +27,31 @@ public class FibImpl implements Fib {
     _rib = rib;
     _nextHopInterfaces = new HashMap<>();
     for (AbstractRoute route : rib.getRoutes()) {
-      Map<String, Map<Ip, Set<AbstractRoute>>> nextHopInterfaces = new TreeMap<>();
-      collectNextHopInterfaces(
-          route, Route.UNSET_ROUTE_NEXT_HOP_IP, nextHopInterfaces, new HashSet<>(), 0);
+      Map<String, Map<Ip, Set<AbstractRoute>>> nextHopInterfaces =
+          collectNextHopInterfaces(_rib, route);
       _nextHopInterfaces.put(route, nextHopInterfaces);
     }
   }
 
-  private void collectNextHopInterfaces(
+  /**
+   * Attempt to resolve a RIB route down to an interface route.
+   *
+   * @param rib {@link GenericRib} for which to do the resolution.
+   * @param route {@link AbstractRoute} with a next hop IP to be resolved.
+   * @return A map (interface name -> last hop IP -> last taken route) for
+   * @throws BatfishException if resolution depth is exceeded (high likelihood of a routing loop) OR
+   *     an invalid route in the RIB has been encountered.
+   */
+  public static Map<String, Map<Ip, Set<AbstractRoute>>> collectNextHopInterfaces(
+      GenericRib<AbstractRoute> rib, AbstractRoute route) {
+    Map<String, Map<Ip, Set<AbstractRoute>>> nextHopInterfaces = new HashMap<>();
+    collectNextHopInterfaces(
+        rib, route, Route.UNSET_ROUTE_NEXT_HOP_IP, nextHopInterfaces, new HashSet<>(), 0);
+    return ImmutableMap.copyOf(nextHopInterfaces);
+  }
+
+  private static void collectNextHopInterfaces(
+      GenericRib<AbstractRoute> rib,
       AbstractRoute route,
       Ip mostRecentNextHopIp,
       Map<String, Map<Ip, Set<AbstractRoute>>> nextHopInterfaces,
@@ -51,9 +68,10 @@ public class FibImpl implements Fib {
     }
     Ip nextHopIp = route.getNextHopIp();
     if (!nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
-      Set<AbstractRoute> nextHopLongestPrefixMatchRoutes = _rib.longestPrefixMatch(nextHopIp);
+      Set<AbstractRoute> nextHopLongestPrefixMatchRoutes = rib.longestPrefixMatch(nextHopIp);
       for (AbstractRoute nextHopLongestPrefixMatchRoute : nextHopLongestPrefixMatchRoutes) {
         collectNextHopInterfaces(
+            rib,
             nextHopLongestPrefixMatchRoute,
             nextHopIp,
             nextHopInterfaces,
@@ -63,7 +81,6 @@ public class FibImpl implements Fib {
     } else {
       String nextHopInterface = route.getNextHopInterface();
       if (!Route.UNSET_NEXT_HOP_INTERFACE.equals(nextHopInterface)) {
-
         Map<Ip, Set<AbstractRoute>> nextHopInterfaceRoutesByFinalNextHopIp =
             nextHopInterfaces.computeIfAbsent(nextHopInterface, k -> new HashMap<>());
         Set<AbstractRoute> nextHopInterfaceRoutes =

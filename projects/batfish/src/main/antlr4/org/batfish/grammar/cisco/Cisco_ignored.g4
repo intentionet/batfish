@@ -556,7 +556,7 @@ null_single
             (
                (
                   DEC
-                  | VARIABLE
+                  | variable_aclname
                )
                (
                   EXTENDED

@@ -37,6 +37,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -1917,19 +1918,17 @@ public class Batfish extends PluginConsumer implements IBatfish {
    * Gets the {@link NodeRoleDimension} object give dimension name
    *
    * @param dimension The dimension name
-   * @return The {@link NodeRoleDimension} object. Throws {@link java.util.NoSuchElementException}
-   *     if the dimension with the provided name does not exist
+   * @return An {@link Optional} that has the requested NodeRoleDimension or empty otherwise.
    */
   @Override
-  public NodeRoleDimension getNodeRoleDimension(String dimension) {
+  public Optional<NodeRoleDimension> getNodeRoleDimension(String dimension) {
     Path nodeRoleDataPath = _settings.getContainerDir().resolve(BfConsts.RELPATH_NODE_ROLES_PATH);
-    NodeRoleDimension nodeRoleDimension = null;
     try {
-      nodeRoleDimension = NodeRolesData.getNodeRoleDimensionByName(nodeRoleDataPath, dimension);
+      return NodeRolesData.getNodeRoleDimension(nodeRoleDataPath, dimension);
     } catch (IOException e) {
       _logger.errorf("Could not read roles data from %s: %s", nodeRoleDataPath, e);
+      return Optional.empty();
     }
-    return nodeRoleDimension;
   }
 
   @Override
@@ -3972,7 +3971,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
         new InferRoles(configurations.keySet(), configurations, this).call();
     Path nodeRoleDataPath = _settings.getContainerDir().resolve(BfConsts.RELPATH_NODE_ROLES_PATH);
     try {
-      NodeRolesData.mergeNodeRoleDimensions(nodeRoleDataPath, autoRoles, true);
+      NodeRolesData.mergeNodeRoleDimensions(nodeRoleDataPath, autoRoles, null, true);
     } catch (IOException e) {
       _logger.warnf("Could not update node roles in %s: %s", nodeRoleDataPath, e);
     }
