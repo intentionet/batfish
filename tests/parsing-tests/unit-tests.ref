@@ -19453,7 +19453,7 @@
             "      (og_ip_address",
             "        IP:'ip'  <== mode:M_ObjectGroup",
             "        ADDRESS:'address'  <== mode:DEFAULT_MODE",
-            "        (variable",
+            "        (variable_permissive",
             "          VARIABLE:'_anonymized_'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (ogipa_ip_addresses",
@@ -19466,7 +19466,7 @@
             "      (og_ip_address",
             "        IP:'ip'  <== mode:M_ObjectGroup",
             "        ADDRESS:'address'  <== mode:DEFAULT_MODE",
-            "        (variable",
+            "        (variable_permissive",
             "          VARIABLE:'_anonymized2_'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (ogipa_host_info",
@@ -27418,7 +27418,7 @@
             "      OBJECT_GROUP:'object-group'  <== mode:DEFAULT_MODE",
             "      (og_service",
             "        SERVICE:'service'  <== mode:M_ObjectGroup",
-            "        (variable",
+            "        (variable_permissive",
             "          VARIABLE:'SVCGRP-ICMP'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (ogs_service_object",
@@ -30072,7 +30072,7 @@
             "      (og_ip_address",
             "        IP:'ip'  <== mode:M_ObjectGroup",
             "        ADDRESS:'address'  <== mode:DEFAULT_MODE",
-            "        (variable",
+            "        (variable_permissive",
             "          VARIABLE:'BIPPETY'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (ogipa_ip_addresses",
@@ -30093,7 +30093,7 @@
             "      OBJECT:'object'  <== mode:DEFAULT_MODE",
             "      (o_network",
             "        NETWORK:'network'  <== mode:DEFAULT_MODE",
-            "        (variable",
+            "        (variable_permissive",
             "          VARIABLE:'obj_any'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (on_subnet",
@@ -30106,7 +30106,22 @@
             "      OBJECT_GROUP:'object-group'  <== mode:DEFAULT_MODE",
             "      (og_network",
             "        NETWORK:'network'  <== mode:M_ObjectGroup",
-            "        (variable",
+            "        (variable_permissive",
+            "          IP_ADDRESS:'1.2.3.4'  <== mode:DEFAULT_MODE",
+            "          DASH:'-'  <== mode:DEFAULT_MODE",
+            "          DEC:'24'  <== mode:DEFAULT_MODE)",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
+            "        (ogn_network_object",
+            "          NETWORK_OBJECT:'network-object'  <== mode:DEFAULT_MODE",
+            "          IP_ADDRESS:'1.2.3.4'  <== mode:DEFAULT_MODE",
+            "          IP_ADDRESS:'255.255.255.0'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
+            "  (stanza",
+            "    (s_object_group",
+            "      OBJECT_GROUP:'object-group'  <== mode:DEFAULT_MODE",
+            "      (og_network",
+            "        NETWORK:'network'  <== mode:M_ObjectGroup",
+            "        (variable_permissive",
             "          VARIABLE:'dns_servers'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (ogn_description",
@@ -30124,7 +30139,7 @@
             "      OBJECT_GROUP:'object-group'  <== mode:DEFAULT_MODE",
             "      (og_network",
             "        NETWORK:'network'  <== mode:M_ObjectGroup",
-            "        (variable",
+            "        (variable_permissive",
             "          VARIABLE:'ntp_servers'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (ogn_description",
@@ -30148,7 +30163,7 @@
             "      TYPE:'type'  <== mode:DEFAULT_MODE",
             "      (pm_ios_inspect",
             "        INSPECT:'inspect'  <== mode:DEFAULT_MODE",
-            "        (variable",
+            "        (variable_permissive",
             "          VARIABLE:'pminspect'  <== mode:DEFAULT_MODE)",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
             "        (pm_iosi_class_type_inspect",
@@ -52384,9 +52399,10 @@
         },
         "cisco_qos" : {
           "Red flags" : {
-            "1" : "MISCELLANEOUS: Unimplemented object-group network line: network-object host 1.2.2.1\n",
-            "2" : "MISCELLANEOUS: Unimplemented object-group network line: network-object host 1.1.1.1\n",
-            "3" : "MISCELLANEOUS: Unimplemented object-group network line: network-object 1.1.1.1 255.255.255.255\n"
+            "1" : "MISCELLANEOUS: Unimplemented object-group network line: network-object 1.2.3.4 255.255.255.0\n",
+            "2" : "MISCELLANEOUS: Unimplemented object-group network line: network-object host 1.2.2.1\n",
+            "3" : "MISCELLANEOUS: Unimplemented object-group network line: network-object host 1.1.1.1\n",
+            "4" : "MISCELLANEOUS: Unimplemented object-group network line: network-object 1.1.1.1 255.255.255.255\n"
           }
         },
         "cisco_style_acl1" : {
@@ -53296,20 +53312,27 @@
         "cisco_privilege" : { },
         "cisco_qos" : {
           "object-group network" : {
-            "dns_servers" : {
+            "1.2.3.4-24" : {
               "definitionLines" : [
                 26,
-                27,
-                28
+                27
+              ],
+              "numReferrers" : 0
+            },
+            "dns_servers" : {
+              "definitionLines" : [
+                28,
+                29,
+                30
               ],
               "numReferrers" : 0
             },
             "ntp_servers" : {
               "definitionLines" : [
-                29,
-                30,
                 31,
-                32
+                32,
+                33,
+                34
               ],
               "numReferrers" : 0
             }
@@ -53317,12 +53340,12 @@
           "policy-map type inspect" : {
             "pminspect" : {
               "definitionLines" : [
-                33,
-                34,
                 35,
                 36,
                 37,
-                38
+                38,
+                39,
+                40
               ],
               "numReferrers" : 0
             }
@@ -54697,7 +54720,7 @@
           "class-map type inspect" : {
             "cinspect" : {
               "policy-map type inspect class type inspect" : [
-                34
+                36
               ]
             }
           }

@@ -126,7 +126,7 @@
         "description" : "Undefined reference to structure of type: 'class-map type inspect' with usage: 'policy-map type inspect class type inspect' named 'cinspect'",
         "files" : {
           "cisco_qos" : [
-            34
+            36
           ]
         }
       },
@@ -1436,7 +1436,7 @@
         "class-map type inspect" : {
           "cinspect" : {
             "policy-map type inspect class type inspect" : [
-              34
+              36
             ]
           }
         }

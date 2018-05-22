@@ -218,7 +218,7 @@ match_semantics
 
 o_network
 :
-   NETWORK name = variable NEWLINE
+   NETWORK name = variable_permissive NEWLINE
    (
       on_description
       | on_fqdn
@@ -231,7 +231,7 @@ o_network
 
 o_service
 :
-   SERVICE name = variable NEWLINE
+   SERVICE name = variable_permissive NEWLINE
    (
       os_description
       | os_service
@@ -240,7 +240,7 @@ o_service
 
 og_icmp_type
 :
-   ICMP_TYPE name = variable NEWLINE
+   ICMP_TYPE name = variable_permissive NEWLINE
    (
       ogit_group_object
       | ogit_icmp_object
@@ -249,7 +249,7 @@ og_icmp_type
 
 og_ip_address
 :
-   IP ADDRESS name = variable NEWLINE
+   IP ADDRESS name = variable_permissive NEWLINE
    (
       ogipa_host_info
       | ogipa_ip_addresses
@@ -258,7 +258,7 @@ og_ip_address
 
 og_network
 :
-   NETWORK name = variable NEWLINE
+   NETWORK name = variable_permissive NEWLINE
    (
       ogn_description
       | ogn_group_object
@@ -270,7 +270,7 @@ og_network
 
 og_protocol
 :
-   PROTOCOL name = variable NEWLINE
+   PROTOCOL name = variable_permissive NEWLINE
    (
       ogp_description
       | ogp_group_object
@@ -280,7 +280,7 @@ og_protocol
 
 og_service
 :
-   SERVICE name = variable NEWLINE
+   SERVICE name = variable_permissive NEWLINE
    (
       ogs_description
       | ogs_group_object
@@ -293,7 +293,7 @@ og_service
 
 og_user
 :
-   USER name = variable NEWLINE
+   USER name = variable_permissive NEWLINE
    (
       ogu_description
       | ogu_group_object
@@ -324,7 +324,7 @@ ogipa_ip_addresses
 
 ogit_group_object
 :
-   GROUP_OBJECT name = variable NEWLINE
+   GROUP_OBJECT name = variable_permissive NEWLINE
 ;
 
 ogit_icmp_object
@@ -339,7 +339,7 @@ ogn_description
 
 ogn_group_object
 :
-   GROUP_OBJECT name = variable NEWLINE
+   GROUP_OBJECT name = variable_permissive NEWLINE
 ;
 
 ogn_host_ip
@@ -365,14 +365,14 @@ ogn_network_object
          (
             address = IP_ADDRESS
             | address6 = IPV6_ADDRESS
-            | host = variable
+            | host = variable_permissive
          )
       )
       |
       (
-         OBJECT name = variable
+         OBJECT name = variable_permissive
       )
-      | host = variable
+      | host = variable_permissive
    ) NEWLINE
 ;
 
@@ -383,7 +383,7 @@ ogp_description
 
 ogp_group_object
 :
-   GROUP_OBJECT name = variable NEWLINE
+   GROUP_OBJECT name = variable_permissive NEWLINE
 ;
 
 ogp_protocol_object
@@ -398,7 +398,7 @@ ogs_description
 
 ogs_group_object
 :
-   GROUP_OBJECT name = variable NEWLINE
+   GROUP_OBJECT name = variable_permissive NEWLINE
 ;
 
 ogs_icmp
@@ -437,17 +437,17 @@ ogu_description
 
 ogu_group_object
 :
-   GROUP_OBJECT name = variable NEWLINE
+   GROUP_OBJECT name = variable_permissive NEWLINE
 ;
 
 ogu_user
 :
-   USER name = variable NEWLINE
+   USER name = variable_permissive NEWLINE
 ;
 
 ogu_user_group
 :
-   name = variable NEWLINE
+   name = variable_permissive NEWLINE
 ;
 
 on_description
@@ -461,7 +461,7 @@ on_fqdn
    (
       V4
       | V6
-   )? fqdn = variable NEWLINE
+   )? fqdn = variable_permissive NEWLINE
 ;
 
 on_host
@@ -523,7 +523,7 @@ pm_end_policy_map
 
 pm_ios_inspect
 :
-   INSPECT name = variable NEWLINE
+   INSPECT name = variable_permissive NEWLINE
    (
       pm_iosi_class_default
       | pm_iosi_class_type_inspect

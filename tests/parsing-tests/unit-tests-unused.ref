@@ -749,13 +749,22 @@
           ]
         }
       },
+      "unused:object-group network:1.2.3.4-24" : {
+        "description" : "Unused structure of type: 'object-group network' with name: '1.2.3.4-24'",
+        "files" : {
+          "cisco_qos" : [
+            26,
+            27
+          ]
+        }
+      },
       "unused:object-group network:dns_servers" : {
         "description" : "Unused structure of type: 'object-group network' with name: 'dns_servers'",
         "files" : {
           "cisco_qos" : [
-            26,
-            27,
-            28
+            28,
+            29,
+            30
           ]
         }
       },
@@ -763,10 +772,10 @@
         "description" : "Unused structure of type: 'object-group network' with name: 'ntp_servers'",
         "files" : {
           "cisco_qos" : [
-            29,
-            30,
             31,
-            32
+            32,
+            33,
+            34
           ]
         }
       },
@@ -783,12 +792,12 @@
         "description" : "Unused structure of type: 'policy-map type inspect' with name: 'pminspect'",
         "files" : {
           "cisco_qos" : [
-            33,
-            34,
             35,
             36,
             37,
-            38
+            38,
+            39,
+            40
           ]
         }
       },
@@ -1269,7 +1278,7 @@
     "summary" : {
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 127
+      "numResults" : 128
     },
     "unusedStructures" : {
       "aggAddress" : {
@@ -1670,26 +1679,30 @@
       },
       "cisco_qos" : {
         "object-group network" : {
-          "dns_servers" : [
+          "1.2.3.4-24" : [
             26,
-            27,
-            28
+            27
+          ],
+          "dns_servers" : [
+            28,
+            29,
+            30
           ],
           "ntp_servers" : [
-            29,
-            30,
             31,
-            32
+            32,
+            33,
+            34
           ]
         },
         "policy-map type inspect" : {
           "pminspect" : [
-            33,
-            34,
             35,
             36,
             37,
-            38
+            38,
+            39,
+            40
           ]
         }
       },
