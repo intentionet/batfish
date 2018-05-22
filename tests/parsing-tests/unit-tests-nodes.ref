@@ -8835,6 +8835,10 @@
           }
         },
         "ipSpaces" : {
+          "1.2.3.4-24" : {
+            "class" : "org.batfish.datamodel.IpWildcardIpSpace",
+            "ipWildcard" : "1.2.3.0/24"
+          },
           "dns_servers" : {
             "class" : "org.batfish.datamodel.IpWildcardIpSpace",
             "ipWildcard" : "1.2.2.1"
