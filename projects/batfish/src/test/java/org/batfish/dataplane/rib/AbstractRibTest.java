@@ -1,4 +1,4 @@
-package org.batfish.dataplane.ibdp;
+package org.batfish.dataplane.rib;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.contains;
@@ -22,13 +22,8 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RipInternalRoute;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.StaticRoute;
-import org.batfish.dataplane.rib.AbstractRib;
-import org.batfish.dataplane.rib.OspfIntraAreaRib;
-import org.batfish.dataplane.rib.RibDelta;
-import org.batfish.dataplane.rib.RipInternalRib;
-import org.batfish.dataplane.rib.RouteAdvertisement;
+import org.batfish.dataplane.ibdp.VirtualRouter;
 import org.batfish.dataplane.rib.RouteAdvertisement.Reason;
-import org.batfish.dataplane.rib.StaticRib;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -292,7 +287,7 @@ public class AbstractRibTest {
   }
 
   /**
-   * Test that {@link VirtualRouter::removeRoute} actually removes the route and returns correct
+   * Test that {@link VirtualRouter ::removeRoute} actually removes the route and returns correct
    * {@link RibDelta}
    */
   @Test
