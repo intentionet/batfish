@@ -270,6 +270,7 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.Ros_routeContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Rosr_discardContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Rosr_metricContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Rosr_next_hopContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Rosr_preferenceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Rosr_rejectContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Rosr_tagContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Routing_protocolContext;
@@ -3847,6 +3848,11 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       initInterface(ctx.interface_id());
       _currentStaticRoute.setNextHopInterface(ctx.interface_id().getText());
     }
+  }
+
+  @Override
+  public void exitRosr_preference(Rosr_preferenceContext ctx) {
+    _currentStaticRoute.setDistance(toInt(ctx.pref));
   }
 
   @Override

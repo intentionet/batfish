@@ -1841,7 +1841,6 @@ public final class JuniperConfiguration extends VendorConfiguration {
   }
 
   private org.batfish.datamodel.StaticRoute toStaticRoute(StaticRoute route) {
-    Prefix prefix = route.getPrefix();
     Ip nextHopIp = route.getNextHopIp();
     if (nextHopIp == null) {
       nextHopIp = Route.UNSET_ROUTE_NEXT_HOP_IP;
@@ -1850,18 +1849,18 @@ public final class JuniperConfiguration extends VendorConfiguration {
         route.getDrop()
             ? org.batfish.datamodel.Interface.NULL_INTERFACE_NAME
             : route.getNextHopInterface();
-    int administrativeCost = route.getMetric();
-    Integer oldTag = route.getTag();
-    int tag;
-    tag = oldTag != null ? oldTag : -1;
+    int tag = route.getTag() != null ? route.getTag() : -1;
+
     org.batfish.datamodel.StaticRoute newStaticRoute =
         org.batfish.datamodel.StaticRoute.builder()
-            .setNetwork(prefix)
+            .setNetwork(route.getPrefix())
             .setNextHopIp(nextHopIp)
             .setNextHopInterface(nextHopInterface)
-            .setAdministrativeCost(administrativeCost)
+            .setAdministrativeCost(route.getDistance())
+            .setMetric(route.getMetric())
             .setTag(tag)
             .build();
+
     return newStaticRoute;
   }
 

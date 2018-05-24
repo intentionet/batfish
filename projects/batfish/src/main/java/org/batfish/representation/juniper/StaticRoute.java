@@ -11,6 +11,8 @@ public class StaticRoute implements Serializable {
   /** */
   private static final long serialVersionUID = 1L;
 
+  private int _distance;
+
   private boolean _drop;
 
   private int _metric;
@@ -28,6 +30,10 @@ public class StaticRoute implements Serializable {
   public StaticRoute(Prefix prefix) {
     _prefix = prefix;
     _policies = new ArrayList<>();
+  }
+
+  public int getDistance() {
+    return _distance;
   }
 
   public boolean getDrop() {
@@ -56,6 +62,10 @@ public class StaticRoute implements Serializable {
 
   public Integer getTag() {
     return _tag;
+  }
+
+  public void setDistance(int distance) {
+    _distance = distance;
   }
 
   public void setDrop(boolean drop) {

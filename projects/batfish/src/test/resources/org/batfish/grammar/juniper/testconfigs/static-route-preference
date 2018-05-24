@@ -1,0 +1,5 @@
+
+set system host-name static-route-preference
+
+set routing-options static route 0.0.0.0/0 next-hop 10.0.0.1
+set routing-options static route 0.0.0.0/0 preference 250
