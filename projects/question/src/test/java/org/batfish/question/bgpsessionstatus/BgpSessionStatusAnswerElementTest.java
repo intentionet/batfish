@@ -27,8 +27,8 @@ public class BgpSessionStatusAnswerElementTest {
             SessionType.EBGP_SINGLEHOP,
             "vrfName");
 
-    Row row = BgpSessionStatusAnswerElement.toRow(session);
-    BgpSessionInfo session2 = BgpSessionStatusAnswerElement.fromRow(row);
+    Row row = BgpSessionStatusAnswerer.toRow(session);
+    BgpSessionInfo session2 = BgpSessionStatusAnswerer.fromRow(row);
 
     // session2 and session should be identical
     assertThat(session, equalTo(session2));
