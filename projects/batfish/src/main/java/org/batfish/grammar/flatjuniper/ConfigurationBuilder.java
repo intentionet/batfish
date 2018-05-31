@@ -221,6 +221,7 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_as_path_groupCont
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_colorContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_communityContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_familyContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_instanceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_interfaceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_local_preferenceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsf_metricContext;
@@ -3578,6 +3579,14 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       throw new BatfishException("Unsupported family: " + ctx.getText());
     }
     _currentPsTerm.getFroms().add(from);
+  }
+
+  @Override
+  public void exitPopsf_instance(Popsf_instanceContext ctx) {
+    _w.redFlag(
+        String.format(
+            "unimplemented 'policy-options policy-statement term' from clause: %s",
+            getFullText(ctx)));
   }
 
   @Override

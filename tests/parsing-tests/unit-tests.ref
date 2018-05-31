@@ -43819,6 +43819,29 @@
             "                (pops_common",
             "                  (pops_from",
             "                    FROM:'from'  <== mode:DEFAULT_MODE",
+            "                    (popsf_instance",
+            "                      INSTANCE:'instance'  <== mode:DEFAULT_MODE",
+            "                      name = (variable",
+            "                        text = VARIABLE:'FORWARDING'  <== mode:DEFAULT_MODE))))))))))",
+            "    NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "  (set_line",
+            "    SET:'set'  <== mode:DEFAULT_MODE",
+            "    (set_line_tail",
+            "      (statement",
+            "        (s_common",
+            "          (s_policy_options",
+            "            POLICY_OPTIONS:'policy-options'  <== mode:DEFAULT_MODE",
+            "            (po_policy_statement",
+            "              POLICY_STATEMENT:'policy-statement'  <== mode:DEFAULT_MODE",
+            "              name = (variable",
+            "                text = VARIABLE:'POLICY-NAME'  <== mode:DEFAULT_MODE)",
+            "              (pops_term",
+            "                TERM:'term'  <== mode:DEFAULT_MODE",
+            "                name = (variable",
+            "                  text = VARIABLE:'TERM'  <== mode:DEFAULT_MODE)",
+            "                (pops_common",
+            "                  (pops_from",
+            "                    FROM:'from'  <== mode:DEFAULT_MODE",
             "                    (popsf_protocol",
             "                      PROTOCOL:'protocol'  <== mode:DEFAULT_MODE",
             "                      protocol = (routing_protocol",
@@ -52950,7 +52973,8 @@
         },
         "juniper_policy_statement" : {
           "Red flags" : {
-            "1" : "MISCELLANEOUS: unimplemented 'policy-options policy-statement term' from clause: as-path-group AS_PATH_GROUP"
+            "1" : "MISCELLANEOUS: unimplemented 'policy-options policy-statement term' from clause: as-path-group AS_PATH_GROUP",
+            "2" : "MISCELLANEOUS: unimplemented 'policy-options policy-statement term' from clause: instance FORWARDING"
           }
         },
         "juniper_tacplus" : {
