@@ -2,9 +2,9 @@ package org.batfish.representation.cisco;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.batfish.common.util.DefinedStructure;
+import org.batfish.common.util.ComparableStructure;
 
-public class ExtendedAccessList extends DefinedStructure<String> {
+public class ExtendedAccessList extends ComparableStructure<String> {
 
   private static final long serialVersionUID = 1L;
 
@@ -12,8 +12,8 @@ public class ExtendedAccessList extends DefinedStructure<String> {
 
   private StandardAccessList _parent;
 
-  public ExtendedAccessList(String id, int definitionLine) {
-    super(id, definitionLine);
+  public ExtendedAccessList(String id) {
+    super(id);
     _lines = new ArrayList<>();
   }
 

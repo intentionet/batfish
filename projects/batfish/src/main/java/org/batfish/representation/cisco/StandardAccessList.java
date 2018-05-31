@@ -2,16 +2,16 @@ package org.batfish.representation.cisco;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.batfish.common.util.DefinedStructure;
+import org.batfish.common.util.ComparableStructure;
 
-public class StandardAccessList extends DefinedStructure<String> {
+public class StandardAccessList extends ComparableStructure<String> {
 
   private static final long serialVersionUID = 1L;
 
   private List<StandardAccessListLine> _lines;
 
-  public StandardAccessList(String id, int definitionLine) {
-    super(id, definitionLine);
+  public StandardAccessList(String id) {
+    super(id);
     _lines = new ArrayList<>();
   }
 
@@ -24,7 +24,7 @@ public class StandardAccessList extends DefinedStructure<String> {
   }
 
   public ExtendedAccessList toExtendedAccessList() {
-    ExtendedAccessList eal = new ExtendedAccessList(_key, getDefinitionLine());
+    ExtendedAccessList eal = new ExtendedAccessList(_key);
     eal.setParent(this);
     eal.getLines().clear();
     for (StandardAccessListLine sall : _lines) {

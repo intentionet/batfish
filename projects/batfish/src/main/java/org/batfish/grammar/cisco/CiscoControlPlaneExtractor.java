@@ -1799,41 +1799,31 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void enterExtended_access_list_stanza(Extended_access_list_stanzaContext ctx) {
     String name;
-    int definitionLine;
     if (ctx.name != null) {
       name = ctx.name.getText();
-      definitionLine = ctx.name.getStart().getLine();
     } else if (ctx.shortname != null) {
       name = ctx.shortname.getText();
-      definitionLine = ctx.shortname.getStart().getLine();
     } else if (ctx.num != null) {
       name = ctx.num.getText();
-      definitionLine = ctx.num.getLine();
     } else {
       throw new BatfishException("Could not determine acl name");
     }
     ExtendedAccessList list =
-        _configuration
-            .getExtendedAcls()
-            .computeIfAbsent(name, n -> new ExtendedAccessList(n, definitionLine));
-    defineStructure(IPV4_ACCESS_LIST_EXTENDED, name, ctx);
+        _configuration.getExtendedAcls().computeIfAbsent(name, ExtendedAccessList::new);
     _currentExtendedAcl = list;
+    defineStructure(IPV4_ACCESS_LIST_EXTENDED, name, ctx);
   }
 
   @Override
   public void enterExtended_ipv6_access_list_stanza(Extended_ipv6_access_list_stanzaContext ctx) {
     String name;
-    int definitionLine;
     if (ctx.name != null) {
       name = ctx.name.getText();
-      definitionLine = ctx.name.getStart().getLine();
     } else {
       throw new BatfishException("Could not determine acl name");
     }
     ExtendedIpv6AccessList list =
-        _configuration
-            .getExtendedIpv6Acls()
-            .computeIfAbsent(name, n -> new ExtendedIpv6AccessList(n, definitionLine));
+        _configuration.getExtendedIpv6Acls().computeIfAbsent(name, ExtendedIpv6AccessList::new);
     _currentExtendedIpv6Acl = list;
     defineStructure(IPV6_ACCESS_LIST_EXTENDED, name, ctx);
   }
@@ -3386,20 +3376,15 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void enterStandard_access_list_stanza(Standard_access_list_stanzaContext ctx) {
     String name;
-    int definitionLine;
     if (ctx.name != null) {
       name = ctx.name.getText();
-      definitionLine = ctx.name.getStart().getLine();
     } else if (ctx.num != null) {
       name = ctx.num.getText();
-      definitionLine = ctx.num.getLine();
     } else {
       throw new BatfishException("Invalid standard access-list name");
     }
     StandardAccessList list =
-        _configuration
-            .getStandardAcls()
-            .computeIfAbsent(name, n -> new StandardAccessList(n, definitionLine));
+        _configuration.getStandardAcls().computeIfAbsent(name, StandardAccessList::new);
     _currentStandardAcl = list;
     defineStructure(IPV4_ACCESS_LIST_STANDARD, name, ctx);
   }
@@ -3407,17 +3392,13 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void enterStandard_ipv6_access_list_stanza(Standard_ipv6_access_list_stanzaContext ctx) {
     String name;
-    int definitionLine;
     if (ctx.name != null) {
       name = ctx.name.getText();
-      definitionLine = ctx.name.getStart().getLine();
     } else {
       throw new BatfishException("Invalid standard access-list name");
     }
     StandardIpv6AccessList list =
-        _configuration
-            .getStandardIpv6Acls()
-            .computeIfAbsent(name, n -> new StandardIpv6AccessList(n, definitionLine));
+        _configuration.getStandardIpv6Acls().computeIfAbsent(name, StandardIpv6AccessList::new);
     _currentStandardIpv6Acl = list;
     defineStructure(IPV6_ACCESS_LIST_STANDARD, name, ctx);
   }
