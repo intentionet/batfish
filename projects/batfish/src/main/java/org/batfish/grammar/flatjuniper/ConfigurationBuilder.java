@@ -23,9 +23,11 @@ import static org.batfish.representation.juniper.JuniperStructureUsage.SECURITY_
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,6 +67,7 @@ import org.batfish.datamodel.IsisOption;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NamedPort;
+import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.OspfArea;
 import org.batfish.datamodel.OspfAreaSummary;
 import org.batfish.datamodel.Prefix;
@@ -240,13 +243,19 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsfrf_thenContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsfrf_throughContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popsfrf_uptoContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_acceptContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_as_path_prependContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_community_addContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_community_deleteContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_community_setContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_externalContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_local_preferenceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_metricContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_metric_addContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_next_hopContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_next_hop_selfContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_next_policyContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_next_termContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_originContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_preferenceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Popst_rejectContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.PortContext;
@@ -463,13 +472,17 @@ import org.batfish.representation.juniper.PsFromTag;
 import org.batfish.representation.juniper.PsTerm;
 import org.batfish.representation.juniper.PsThen;
 import org.batfish.representation.juniper.PsThenAccept;
+import org.batfish.representation.juniper.PsThenAsPathPrepend;
 import org.batfish.representation.juniper.PsThenCommunityAdd;
 import org.batfish.representation.juniper.PsThenCommunityDelete;
 import org.batfish.representation.juniper.PsThenCommunitySet;
 import org.batfish.representation.juniper.PsThenLocalPreference;
 import org.batfish.representation.juniper.PsThenMetric;
+import org.batfish.representation.juniper.PsThenMetricAdd;
 import org.batfish.representation.juniper.PsThenNextHopIp;
+import org.batfish.representation.juniper.PsThenNextHopSelf;
 import org.batfish.representation.juniper.PsThenNextPolicy;
+import org.batfish.representation.juniper.PsThenOrigin;
 import org.batfish.representation.juniper.PsThenPreference;
 import org.batfish.representation.juniper.PsThenReject;
 import org.batfish.representation.juniper.Route4FilterLine;
@@ -3703,6 +3716,24 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   }
 
   @Override
+  public void exitPopst_as_path_prepend(Popst_as_path_prependContext ctx) {
+    List<Long> asPaths = new LinkedList<>();
+    if (ctx.DEC() != null) {
+      asPaths.add(toLong(ctx.DEC()));
+    } else if (ctx.DOUBLE_QUOTED_STRING() != null) {
+      String[] unquoted = unquote(ctx.DOUBLE_QUOTED_STRING().getText()).split("\\s+");
+      Arrays.stream(unquoted).map(Long::parseLong).forEach(asPaths::add);
+    } else {
+      _w.redFlag(
+          String.format(
+              "unimplemented 'policy-options policy-statement term' then clause: %s",
+              getFullText(ctx)));
+      return;
+    }
+    _currentPsThens.add(new PsThenAsPathPrepend(asPaths));
+  }
+
+  @Override
   public void exitPopst_community_add(Popst_community_addContext ctx) {
     String name = ctx.name.getText();
     PsThenCommunityAdd then = new PsThenCommunityAdd(name, _configuration);
@@ -3724,6 +3755,14 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   }
 
   @Override
+  public void exitPopst_external(Popst_externalContext ctx) {
+    _w.redFlag(
+        String.format(
+            "unimplemented 'policy-options policy-statement term' then clause: %s",
+            getFullText(ctx)));
+  }
+
+  @Override
   public void exitPopst_local_preference(Popst_local_preferenceContext ctx) {
     int localPreference = toInt(ctx.localpref);
     PsThenLocalPreference then = new PsThenLocalPreference(localPreference);
@@ -3735,6 +3774,12 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     int metric = toInt(ctx.metric);
     PsThenMetric then = new PsThenMetric(metric);
     _currentPsThens.add(then);
+  }
+
+  @Override
+  public void exitPopst_metric_add(Popst_metric_addContext ctx) {
+    int metric = toInt(ctx.metric);
+    _currentPsThens.add(new PsThenMetricAdd(metric));
   }
 
   @Override
@@ -3751,8 +3796,37 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   }
 
   @Override
+  public void exitPopst_next_hop_self(Popst_next_hop_selfContext ctx) {
+    _currentPsThens.add(PsThenNextHopSelf.INSTANCE);
+  }
+
+  @Override
   public void exitPopst_next_policy(Popst_next_policyContext ctx) {
     _currentPsThens.add(PsThenNextPolicy.INSTANCE);
+  }
+
+  @Override
+  public void exitPopst_next_term(Popst_next_termContext ctx) {
+    _w.redFlag(
+        String.format(
+            "unimplemented 'policy-options policy-statement term' then clause: %s",
+            getFullText(ctx)));
+  }
+
+  @Override
+  public void exitPopst_origin(Popst_originContext ctx) {
+    OriginType origin;
+    if (ctx.EGP() != null) {
+      origin = OriginType.EGP;
+    } else if (ctx.IGP() != null) {
+      origin = OriginType.IGP;
+    } else if (ctx.INCOMPLETE() != null) {
+      origin = OriginType.INCOMPLETE;
+    } else {
+      _w.redFlag(String.format("unimplemented origin type: %s", getFullText(ctx)));
+      return;
+    }
+    _currentPsThens.add(new PsThenOrigin(origin));
   }
 
   @Override
