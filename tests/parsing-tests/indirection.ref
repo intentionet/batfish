@@ -944,7 +944,14 @@
           ]
         }
       },
-      "version" : "0.36.0"
+      "version" : "0.36.0",
+      "warnings" : {
+        "n1" : {
+          "Red flags" : {
+            "1" : "MISCELLANEOUS: unimplemented 'policy-options policy-statement term' then clause: next term"
+          }
+        }
+      }
     },
     {
       "class" : "org.batfish.datamodel.answers.ConvertConfigurationAnswerElement",

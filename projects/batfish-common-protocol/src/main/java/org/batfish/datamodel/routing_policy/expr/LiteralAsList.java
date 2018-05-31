@@ -62,6 +62,6 @@ public class LiteralAsList extends AsPathListExpr {
   }
 
   public void setList(List<AsExpr> list) {
-    _list = list;
+    _list = ImmutableList.copyOf(list);
   }
 }
