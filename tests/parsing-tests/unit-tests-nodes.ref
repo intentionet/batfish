@@ -14024,6 +14024,62 @@
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralInt",
                       "value" : 100
                     }
+                  },
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.SetOrigin",
+                    "originType" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.LiteralOrigin",
+                      "originType" : "igp"
+                    }
+                  },
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.SetNextHop",
+                    "destinationVrf" : false,
+                    "expr" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.SelfNextHop"
+                    }
+                  },
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.SetMetric",
+                    "metric" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.IncrementMetric",
+                      "addend" : 20
+                    }
+                  },
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.SetMetric",
+                    "metric" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.LiteralLong",
+                      "value" : 10
+                    }
+                  },
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.PrependAsPath",
+                    "expr" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.LiteralAsList",
+                      "list" : [
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitAs",
+                          "as" : 456
+                        },
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitAs",
+                          "as" : 789
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.PrependAsPath",
+                    "expr" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.LiteralAsList",
+                      "list" : [
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitAs",
+                          "as" : 123
+                        }
+                      ]
+                    }
                   }
                 ]
               },
