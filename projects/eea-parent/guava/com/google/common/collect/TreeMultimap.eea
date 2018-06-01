@@ -1,0 +1,10 @@
+class com/google/common/collect/TreeMultimap
+create
+ <K::Ljava/lang/Comparable;V::Ljava/lang/Comparable;>()Lcom/google/common/collect/TreeMultimap<TK;TV;>;
+ <K::Ljava/lang/Comparable;V::Ljava/lang/Comparable;>()L1com/google/common/collect/TreeMultimap<TK;TV;>;
+create
+ <K::Ljava/lang/Comparable;V::Ljava/lang/Comparable;>(Lcom/google/common/collect/Multimap<+TK;+TV;>;)Lcom/google/common/collect/TreeMultimap<TK;TV;>;
+ <K::Ljava/lang/Comparable;V::Ljava/lang/Comparable;>(Lcom/google/common/collect/Multimap<+TK;+TV;>;)L1com/google/common/collect/TreeMultimap<TK;TV;>;
+create
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Comparator<-TK;>;Ljava/util/Comparator<-TV;>;)Lcom/google/common/collect/TreeMultimap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Comparator<-TK;>;Ljava/util/Comparator<-TV;>;)L1com/google/common/collect/TreeMultimap<TK;TV;>;

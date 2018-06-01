@@ -1,0 +1,19 @@
+class com/google/common/collect/ImmutableMultimap
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Lcom/google/common/collect/ImmutableMultimap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1com/google/common/collect/ImmutableMultimap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)Lcom/google/common/collect/ImmutableMultimap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;)L1com/google/common/collect/ImmutableMultimap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableMultimap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableMultimap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableMultimap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableMultimap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableMultimap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableMultimap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;TK;TV;TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableMultimap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;T1K;T1V;T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableMultimap<TK;TV;>;

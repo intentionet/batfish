@@ -1,0 +1,4 @@
+class javax/swing/DefaultListCellRenderer
+getListCellRendererComponent
+ (Ljavax/swing/JList<*>;Ljava/lang/Object;IZZ)Ljava/awt/Component;
+ (L1javax/swing/JList<*>;Ljava/lang/Object;IZZ)Ljava/awt/Component;

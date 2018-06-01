@@ -1,0 +1,7 @@
+class java/util/TreeMap
+get
+ (Ljava/lang/Object;)TV;
+ (Ljava/lang/Object;)T0V;
+put
+ (TK;TV;)TV;
+ (TK;TV;)T0V;

@@ -1,0 +1,22 @@
+class com/google/common/collect/Iterators
+concat
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+Ljava/util/Iterator<+TT;>;>;)Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+Ljava/util/Iterator<+TT;>;>;)L1java/util/Iterator<TT;>;
+concat
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;)Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;)L1java/util/Iterator<TT;>;
+concat
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;)Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;)L1java/util/Iterator<TT;>;
+concat
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;)Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;Ljava/util/Iterator<+TT;>;)L1java/util/Iterator<TT;>;
+concat
+ <T:Ljava/lang/Object;>([Ljava/util/Iterator<+TT;>;)Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>([Ljava/util/Iterator<+TT;>;)L1java/util/Iterator<TT;>;
+cycle
+ <T:Ljava/lang/Object;>(Ljava/lang/Iterable<TT;>;)Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/lang/Iterable<TT;>;)L1java/util/Iterator<TT;>;
+cycle
+ <T:Ljava/lang/Object;>([TT;)Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>([TT;)L1java/util/Iterator<TT;>;

@@ -1,0 +1,4 @@
+class javax/swing/ListModel
+getElementAt
+ (I)TE;
+ (I)T0E;

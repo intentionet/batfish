@@ -1,0 +1,13 @@
+class java/lang/Class
+getAnnotation
+ <A::Ljava/lang/annotation/Annotation;>(Ljava/lang/Class<TA;>;)TA;
+ <A::Ljava/lang/annotation/Annotation;>(Ljava/lang/Class<TA;>;)T0A;
+getCanonicalName
+ ()Ljava/lang/String;
+ ()L0java/lang/String;
+getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getSimpleName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

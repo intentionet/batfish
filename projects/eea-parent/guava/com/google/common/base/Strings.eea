@@ -1,0 +1,28 @@
+class com/google/common/base/Strings
+commonPrefix
+ (Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
+ (L1java/lang/CharSequence;L1java/lang/CharSequence;)L1java/lang/String;
+commonSuffix
+ (Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
+ (L1java/lang/CharSequence;L1java/lang/CharSequence;)L1java/lang/String;
+emptyToNull
+ (Ljava/lang/String;)Ljava/lang/String;
+ (L0java/lang/String;)L1java/lang/String;
+isNullOrEmpty
+ (Ljava/lang/String;)Z
+ (L0java/lang/String;)Z
+nullToEmpty
+ (Ljava/lang/String;)Ljava/lang/String;
+ (L0java/lang/String;)L1java/lang/String;
+padEnd
+ (Ljava/lang/String;IC)Ljava/lang/String;
+ (L1java/lang/String;IC)L1java/lang/String;
+padStart
+ (Ljava/lang/String;IC)Ljava/lang/String;
+ (L1java/lang/String;IC)L1java/lang/String;
+repeat
+ (Ljava/lang/String;I)Ljava/lang/String;
+ (L1java/lang/String;I)L1java/lang/String;
+validSurrogatePairAt
+ (Ljava/lang/CharSequence;I)Z
+ (L1java/lang/CharSequence;I)Z

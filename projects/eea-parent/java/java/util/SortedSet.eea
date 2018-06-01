@@ -1,0 +1,16 @@
+class java/util/SortedSet
+comparator
+ ()Ljava/util/Comparator<-TE;>;
+ ()L0java/util/Comparator<-TE;>;
+headSet
+ (TE;)Ljava/util/SortedSet<TE;>;
+ (TE;)L1java/util/SortedSet<TE;>;
+spliterator
+ ()Ljava/util/Spliterator<TE;>;
+ ()L1java/util/Spliterator<TE;>;
+subSet
+ (TE;TE;)Ljava/util/SortedSet<TE;>;
+ (TE;TE;)L1java/util/SortedSet<TE;>;
+tailSet
+ (TE;)Ljava/util/SortedSet<TE;>;
+ (TE;)L1java/util/SortedSet<TE;>;

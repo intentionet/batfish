@@ -1,0 +1,4 @@
+class com/google/common/collect/Table
+get
+ (Ljava/lang/Object;Ljava/lang/Object;)TV;
+ (Ljava/lang/Object;Ljava/lang/Object;)T0V;

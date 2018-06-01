@@ -1,0 +1,4 @@
+class com/google/common/base/MoreObjects
+firstNonNull
+ <T:Ljava/lang/Object;>(TT;TT;)TT;
+ <T:Ljava/lang/Object;>(TT;TT;)T1T;

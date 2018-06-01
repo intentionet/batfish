@@ -23,8 +23,11 @@ tasks.xml
 *.iml
 /.idea/modules.xml
 
-#Eclipse project file that oscillates for some reason and gets generated anyway
+#Eclipse project files that oscillate for some reason and get generated anyway
 org.eclipse.core.resources.prefs
+.classpath
+.factorypath
+
 
 # Ignore all bazel-* symlinks. There is no full list since this can change
 # based on the name of the directory bazel is cloned into.

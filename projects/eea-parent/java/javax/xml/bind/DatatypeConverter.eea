@@ -1,0 +1,10 @@
+class javax/xml/bind/DatatypeConverter
+parseDate
+ (Ljava/lang/String;)Ljava/util/Calendar;
+ (L1java/lang/String;)L1java/util/Calendar; 
+printDateTime
+ (Ljava/util/Calendar;)Ljava/lang/String;
+ (L1java/util/Calendar;)L1java/lang/String;
+printBase64Binary
+ ([B)Ljava/lang/String;
+ ([B)L1java/lang/String;

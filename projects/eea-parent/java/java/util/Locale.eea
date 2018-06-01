@@ -1,0 +1,73 @@
+class java/util/Locale
+CANADA
+ Ljava/util/Locale;
+ L1java/util/Locale;
+CANADA_FRENCH
+ Ljava/util/Locale;
+ L1java/util/Locale;
+CHINA
+ Ljava/util/Locale;
+ L1java/util/Locale;
+CHINESE
+ Ljava/util/Locale;
+ L1java/util/Locale;
+ENGLISH
+ Ljava/util/Locale;
+ L1java/util/Locale;
+FRANCE
+ Ljava/util/Locale;
+ L1java/util/Locale;
+FRENCH
+ Ljava/util/Locale;
+ L1java/util/Locale;
+GERMAN
+ Ljava/util/Locale;
+ L1java/util/Locale;
+GERMANY
+ Ljava/util/Locale;
+ L1java/util/Locale;
+ITALIAN
+ Ljava/util/Locale;
+ L1java/util/Locale;
+ITALY
+ Ljava/util/Locale;
+ L1java/util/Locale;
+JAPAN
+ Ljava/util/Locale;
+ L1java/util/Locale;
+JAPANESE
+ Ljava/util/Locale;
+ L1java/util/Locale;
+KOREA
+ Ljava/util/Locale;
+ L1java/util/Locale;
+KOREAN
+ Ljava/util/Locale;
+ L1java/util/Locale;
+PRC
+ Ljava/util/Locale;
+ L1java/util/Locale;
+ROOT
+ Ljava/util/Locale;
+ L1java/util/Locale;
+SIMPLIFIED_CHINESE
+ Ljava/util/Locale;
+ L1java/util/Locale;
+TAIWAN
+ Ljava/util/Locale;
+ L1java/util/Locale;
+TRADITIONAL_CHINESE
+ Ljava/util/Locale;
+ L1java/util/Locale;
+UK
+ Ljava/util/Locale;
+ L1java/util/Locale;
+US
+ Ljava/util/Locale;
+ L1java/util/Locale;
+forLanguageTag
+ (Ljava/lang/String;)Ljava/util/Locale;
+ (L1java/lang/String;)L1java/util/Locale;
+getDefault
+ ()Ljava/util/Locale;
+ ()L1java/util/Locale;

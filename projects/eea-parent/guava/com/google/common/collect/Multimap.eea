@@ -1,0 +1,10 @@
+class com/google/common/collect/Multimap
+get
+ (TK;)Ljava/util/Collection<TV;>;
+ (TK;)L1java/util/Collection<TV;>;
+keySet
+ ()Ljava/util/Set<TK;>;
+ ()L1java/util/Set<TK;>;
+values
+ ()Ljava/util/Collection<TV;>;
+ ()L1java/util/Collection<TV;>;

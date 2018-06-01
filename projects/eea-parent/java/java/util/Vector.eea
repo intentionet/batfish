@@ -1,0 +1,4 @@
+class java/util/Vector
+get
+ (I)TE;
+ (I)T+E;

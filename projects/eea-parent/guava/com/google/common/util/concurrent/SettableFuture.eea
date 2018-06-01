@@ -1,0 +1,13 @@
+class com/google/common/util/concurrent/SettableFuture
+create
+ <V:Ljava/lang/Object;>()Lcom/google/common/util/concurrent/SettableFuture<TV;>;
+ <V:Ljava/lang/Object;>()L1com/google/common/util/concurrent/SettableFuture<TV;>;
+set
+ (TV;)Z
+ (T0V;)Z
+setException
+ (Ljava/lang/Throwable;)Z
+ (L1java/lang/Throwable;)Z
+setFuture
+ (Lcom/google/common/util/concurrent/ListenableFuture<+TV;>;)Z
+ (L1com/google/common/util/concurrent/ListenableFuture<+TV;>;)Z

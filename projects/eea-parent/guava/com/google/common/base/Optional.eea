@@ -1,0 +1,28 @@
+class com/google/common/base/Optional
+absent
+ <T:Ljava/lang/Object;>()Lcom/google/common/base/Optional<TT;>;
+ <T:Ljava/lang/Object;>()L1com/google/common/base/Optional<TT;>;
+asSet
+ ()Ljava/util/Set<TT;>;
+ ()L1java/util/Set<TT;>;
+fromNullable
+ <T:Ljava/lang/Object;>(TT;)Lcom/google/common/base/Optional<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1com/google/common/base/Optional<TT;>;
+get
+ ()TT;
+ ()T1T;
+of
+ <T:Ljava/lang/Object;>(TT;)Lcom/google/common/base/Optional<TT;>;
+ <T:Ljava/lang/Object;>(T1T;)L1com/google/common/base/Optional<TT;>;
+or
+ (Lcom/google/common/base/Optional<+TT;>;)Lcom/google/common/base/Optional<TT;>;
+ (L1com/google/common/base/Optional<+TT;>;)L1com/google/common/base/Optional<TT;>;
+or
+ (Lcom/google/common/base/Supplier<+TT;>;)TT;
+ (L1com/google/common/base/Supplier<+TT;>;)T1T;
+or
+ (TT;)TT;
+ (T1T;)T1T;
+transform
+ <V:Ljava/lang/Object;>(Lcom/google/common/base/Function<-TT;TV;>;)Lcom/google/common/base/Optional<TV;>;
+ <V:Ljava/lang/Object;>(L1com/google/common/base/Function<-TT;TV;>;)L1com/google/common/base/Optional<TV;>;

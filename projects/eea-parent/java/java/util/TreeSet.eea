@@ -1,0 +1,4 @@
+class java/util/TreeSet
+pollFirst
+ ()TE;
+ ()T0E;

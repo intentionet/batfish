@@ -1,0 +1,16 @@
+class java/nio/ByteBuffer
+allocate
+ (I)Ljava/nio/ByteBuffer;
+ (I)L1java/nio/ByteBuffer;
+allocateDirect
+ (I)Ljava/nio/ByteBuffer;
+ (I)L1java/nio/ByteBuffer;
+array
+ ()[B
+ ()[1B
+wrap
+ ([B)Ljava/nio/ByteBuffer;
+ ([B)L1java/nio/ByteBuffer;
+wrap
+ ([BII)Ljava/nio/ByteBuffer;
+ ([BII)L1java/nio/ByteBuffer;

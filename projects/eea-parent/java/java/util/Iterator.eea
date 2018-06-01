@@ -1,0 +1,7 @@
+class java/util/Iterator
+forEachRemaining
+ (Ljava/util/function/Consumer<-TE;>;)V
+ (L1java/util/function/Consumer<-TE;>;)V
+next
+ ()TE;
+ ()T+E;

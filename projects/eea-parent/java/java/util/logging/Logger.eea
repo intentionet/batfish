@@ -1,0 +1,5 @@
+class java/util/logging/Logger
+getLogger
+ (Ljava/lang/String;)Ljava/util/logging/Logger;
+ (Ljava/lang/String;)L1java/util/logging/Logger;
+ 

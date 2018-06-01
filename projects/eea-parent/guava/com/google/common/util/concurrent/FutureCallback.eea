@@ -1,0 +1,7 @@
+class com/google/common/util/concurrent/FutureCallback
+onFailure
+ (Ljava/lang/Throwable;)V
+ (L1java/lang/Throwable;)V
+onSuccess
+ (TV;)V
+ (T0V;)V

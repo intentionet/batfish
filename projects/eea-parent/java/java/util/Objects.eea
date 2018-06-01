@@ -1,0 +1,13 @@
+class java/util/Objects
+equals
+ (Ljava/lang/Object;Ljava/lang/Object;)Z
+ (L0java/lang/Object;L0java/lang/Object;)Z
+requireNonNull
+ <T:Ljava/lang/Object;>(TT;)TT;
+ <T:Ljava/lang/Object;>(TT;)T1T;
+requireNonNull
+ <T:Ljava/lang/Object;>(TT;Ljava/lang/String;)TT;
+ <T:Ljava/lang/Object;>(TT;Ljava/lang/String;)T1T;
+requireNonNull
+ <T:Ljava/lang/Object;>(TT;Ljava/util/function/Supplier<Ljava/lang/String;>;)TT;
+ <T:Ljava/lang/Object;>(TT;Ljava/util/function/Supplier<Ljava/lang/String;>;)T1T;

@@ -1,0 +1,7 @@
+class java/util/stream/Stream
+filter
+ (Ljava/util/function/Predicate<-TT;>;)Ljava/util/stream/Stream<TT;>;
+ (Ljava/util/function/Predicate<-TT;>;)L1java/util/stream/Stream<TT;>;
+map
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TR;>;)Ljava/util/stream/Stream<TR;>;
+ <R:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TR;>;)L1java/util/stream/Stream<TR;>;

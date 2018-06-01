@@ -1,0 +1,13 @@
+class java/lang/Integer
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+toString
+ (I)Ljava/lang/String;
+ (I)L1java/lang/String;
+toString
+ (II)Ljava/lang/String;
+ (II)L1java/lang/String;
+valueOf
+ (I)Ljava/lang/Integer;
+ (I)L1java/lang/Integer;

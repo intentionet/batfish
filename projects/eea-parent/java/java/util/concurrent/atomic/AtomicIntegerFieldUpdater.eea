@@ -1,0 +1,52 @@
+class java/util/concurrent/atomic/AtomicIntegerFieldUpdater
+accumulateAndGet
+ (TT;ILjava/util/function/IntBinaryOperator;)I
+ (T1T;IL1java/util/function/IntBinaryOperator;)I
+addAndGet
+ (TT;I)I
+ (T1T;I)I
+compareAndSet
+ (TT;II)Z
+ (T1T;II)Z
+decrementAndGet
+ (TT;)I
+ (T1T;)I
+get
+ (TT;)I
+ (T1T;)I
+getAndAccumulate
+ (TT;ILjava/util/function/IntBinaryOperator;)I
+ (T1T;IL1java/util/function/IntBinaryOperator;)I
+getAndAdd
+ (TT;I)I
+ (T1T;I)I
+getAndDecrement
+ (TT;)I
+ (T1T;)I
+getAndIncrement
+ (TT;)I
+ (T1T;)I
+getAndSet
+ (TT;I)I
+ (T1T;I)I
+getAndUpdate
+ (TT;Ljava/util/function/IntUnaryOperator;)I
+ (T1T;Ljava/util/function/IntUnaryOperator;)I
+incrementAndGet
+ (TT;)I
+ (T1T;)I
+lazySet
+ (TT;I)V
+ (T1T;I)V
+newUpdater
+ <U:Ljava/lang/Object;>(Ljava/lang/Class<TU;>;Ljava/lang/String;)Ljava/util/concurrent/atomic/AtomicIntegerFieldUpdater<TU;>;
+ <U:Ljava/lang/Object;>(L1java/lang/Class<TU;>;L1java/lang/String;)L1java/util/concurrent/atomic/AtomicIntegerFieldUpdater<T1U;>;
+set
+ (TT;I)V
+ (T1T;I)V
+updateAndGet
+ (TT;Ljava/util/function/IntUnaryOperator;)I
+ (T1T;L1java/util/function/IntUnaryOperator;)I
+weakCompareAndSet
+ (TT;II)Z
+ (T1T;II)Z

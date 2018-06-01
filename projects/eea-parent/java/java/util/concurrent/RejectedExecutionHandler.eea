@@ -1,0 +1,4 @@
+class java/util/concurrent/RejectedExecutionHandler
+rejectedExecution
+ (Ljava/lang/Runnable;Ljava/util/concurrent/ThreadPoolExecutor;)V
+ (L1java/lang/Runnable;L1java/util/concurrent/ThreadPoolExecutor;)V

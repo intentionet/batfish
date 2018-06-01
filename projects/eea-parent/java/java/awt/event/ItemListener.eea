@@ -1,0 +1,4 @@
+class java/awt/event/ItemListener
+itemStateChanged
+ (Ljava/awt/event/ItemEvent;)V
+ (L1java/awt/event/ItemEvent;)V

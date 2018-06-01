@@ -1,0 +1,19 @@
+class java/util/UUID
+UUID
+ ([B)V
+ ([1B)V
+digits
+ (JI)Ljava/lang/String;
+ (JI)L1java/lang/String;
+fromString
+ (Ljava/lang/String;)Ljava/util/UUID;
+ (L1java/lang/String;)L1java/util/UUID;
+nameUUIDFromBytes
+ ([B)Ljava/util/UUID;
+ ([1B)L1java/util/UUID;
+randomUUID
+ ()Ljava/util/UUID;
+ ()L1java/util/UUID;
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

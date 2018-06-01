@@ -1,0 +1,4 @@
+class com/google/common/collect/ImmutableSet$Builder
+build
+ ()Lcom/google/common/collect/ImmutableSet<TE;>;
+ ()L1com/google/common/collect/ImmutableSet<TE;>;

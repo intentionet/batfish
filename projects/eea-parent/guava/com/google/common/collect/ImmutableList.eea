@@ -1,0 +1,58 @@
+class com/google/common/collect/ImmutableList
+EMPTY
+ Lcom/google/common/collect/ImmutableList<Ljava/lang/Object;>;
+ L1com/google/common/collect/ImmutableList<Ljava/lang/Object;>;
+builder
+ <E:Ljava/lang/Object;>()Lcom/google/common/collect/ImmutableList$Builder<TE;>;
+ <E:Ljava/lang/Object;>()L1com/google/common/collect/ImmutableList$Builder<TE;>;
+copyOf
+ <E:Ljava/lang/Object;>(Ljava/lang/Iterable<+TE;>;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(L1java/lang/Iterable<+TE;>;)L1com/google/common/collect/ImmutableList<TE;>;
+copyOf
+ <E:Ljava/lang/Object;>(Ljava/util/Collection<+TE;>;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(L1java/util/Collection<+TE;>;)L1com/google/common/collect/ImmutableList<TE;>;
+copyOf
+ <E:Ljava/lang/Object;>(Ljava/util/Iterator<+TE;>;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(L1java/util/Iterator<+TE;>;)L1com/google/common/collect/ImmutableList<TE;>;
+copyOf
+ <E:Ljava/lang/Object;>([TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>([1TE;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>()Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>()L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;TE;TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;TE;TE;TE;TE;TE;TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;)L1com/google/common/collect/ImmutableList<TE;>;
+of
+ <E:Ljava/lang/Object;>(TE;TE;TE;TE;TE;TE;TE;TE;TE;TE;TE;TE;[TE;)Lcom/google/common/collect/ImmutableList<TE;>;
+ <E:Ljava/lang/Object;>(T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;T1E;[TE;)L1com/google/common/collect/ImmutableList<TE;>;

@@ -1,0 +1,25 @@
+class java/util/Map
+containsKey
+ (Ljava/lang/Object;)Z
+ (L0java/lang/Object;)Z
+containsValue
+ (Ljava/lang/Object;)Z
+ (L0java/lang/Object;)Z
+entrySet
+ ()Ljava/util/Set<Ljava/util/Map$Entry<TK;TV;>;>;
+ ()Ljava/util/Set<L1java/util/Map$Entry<TK;TV;>;>;
+get
+ (Ljava/lang/Object;)TV;
+ (L0java/lang/Object;)T0V;
+put
+ (TK;TV;)TV;
+ (TK;TV;)T0V;
+putAll
+ (Ljava/util/Map<+TK;+TV;>;)V
+ (L1java/util/Map<+TK;+TV;>;)V
+remove
+ (Ljava/lang/Object;)TV;
+ (L0java/lang/Object;)T0V;
+values
+ ()Ljava/util/Collection<TV;>;
+ ()L1java/util/Collection<T+V;>;

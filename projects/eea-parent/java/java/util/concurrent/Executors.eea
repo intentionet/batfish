@@ -1,0 +1,67 @@
+class java/util/concurrent/Executors
+callable
+ (Ljava/lang/Runnable;)Ljava/util/concurrent/Callable<Ljava/lang/Object;>;
+ (L1java/lang/Runnable;)L1java/util/concurrent/Callable<Ljava/lang/Object;>;
+callable
+ (Ljava/security/PrivilegedAction<*>;)Ljava/util/concurrent/Callable<Ljava/lang/Object;>;
+ (L1java/security/PrivilegedAction<*>;)L1java/util/concurrent/Callable<Ljava/lang/Object;>;
+callable
+ (Ljava/security/PrivilegedExceptionAction<*>;)Ljava/util/concurrent/Callable<Ljava/lang/Object;>;
+ (L1java/security/PrivilegedExceptionAction<*>;)L1java/util/concurrent/Callable<Ljava/lang/Object;>;
+callable
+ <T:Ljava/lang/Object;>(Ljava/lang/Runnable;TT;)Ljava/util/concurrent/Callable<TT;>;
+ <T:Ljava/lang/Object;>(L1java/lang/Runnable;TT;)L1java/util/concurrent/Callable<TT;>;
+defaultThreadFactory
+ ()Ljava/util/concurrent/ThreadFactory;
+ ()L1java/util/concurrent/ThreadFactory;
+newCachedThreadPool
+ ()Ljava/util/concurrent/ExecutorService;
+ ()L1java/util/concurrent/ExecutorService;
+newCachedThreadPool
+ (Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ExecutorService;
+ (L1java/util/concurrent/ThreadFactory;)L1java/util/concurrent/ExecutorService;
+newFixedThreadPool
+ (I)Ljava/util/concurrent/ExecutorService;
+ (I)L1java/util/concurrent/ExecutorService;
+newFixedThreadPool
+ (ILjava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ExecutorService;
+ (IL1java/util/concurrent/ThreadFactory;)L1java/util/concurrent/ExecutorService;
+newScheduledThreadPool
+ (I)Ljava/util/concurrent/ScheduledExecutorService;
+ (I)L1java/util/concurrent/ScheduledExecutorService;
+newScheduledThreadPool
+ (ILjava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ScheduledExecutorService;
+ (IL1java/util/concurrent/ThreadFactory;)L1java/util/concurrent/ScheduledExecutorService;
+newSingleThreadExecutor
+ ()Ljava/util/concurrent/ExecutorService;
+ ()L1java/util/concurrent/ExecutorService;
+newSingleThreadExecutor
+ (Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ExecutorService;
+ (L1java/util/concurrent/ThreadFactory;)L1java/util/concurrent/ExecutorService;
+newSingleThreadScheduledExecutor
+ ()Ljava/util/concurrent/ScheduledExecutorService;
+ ()L1java/util/concurrent/ScheduledExecutorService;
+newSingleThreadScheduledExecutor
+ (Ljava/util/concurrent/ThreadFactory;)Ljava/util/concurrent/ScheduledExecutorService;
+ (L1java/util/concurrent/ThreadFactory;)L1java/util/concurrent/ScheduledExecutorService;
+newWorkStealingPool
+ ()Ljava/util/concurrent/ExecutorService;
+ ()L1java/util/concurrent/ExecutorService;
+newWorkStealingPool
+ (I)Ljava/util/concurrent/ExecutorService;
+ (I)L1java/util/concurrent/ExecutorService;
+privilegedCallable
+ <T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;)Ljava/util/concurrent/Callable<TT;>;
+ <T:Ljava/lang/Object;>(L1java/util/concurrent/Callable<TT;>;)L1java/util/concurrent/Callable<TT;>;
+privilegedCallableUsingCurrentClassLoader
+ <T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;)Ljava/util/concurrent/Callable<TT;>;
+ <T:Ljava/lang/Object;>(L1java/util/concurrent/Callable<TT;>;)L1java/util/concurrent/Callable<TT;>;
+privilegedThreadFactory
+ ()Ljava/util/concurrent/ThreadFactory;
+ ()L1java/util/concurrent/ThreadFactory;
+unconfigurableExecutorService
+ (Ljava/util/concurrent/ExecutorService;)Ljava/util/concurrent/ExecutorService;
+ (L1java/util/concurrent/ExecutorService;)L1java/util/concurrent/ExecutorService;
+unconfigurableScheduledExecutorService
+ (Ljava/util/concurrent/ScheduledExecutorService;)Ljava/util/concurrent/ScheduledExecutorService;
+ (L1java/util/concurrent/ScheduledExecutorService;)L1java/util/concurrent/ScheduledExecutorService;

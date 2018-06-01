@@ -1,0 +1,4 @@
+class com/google/common/collect/ImmutableCollection
+asList
+ ()Lcom/google/common/collect/ImmutableList<TE;>;
+ ()L1com/google/common/collect/ImmutableList<TE;>;

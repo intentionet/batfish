@@ -1,0 +1,4 @@
+class com/google/common/collect/ImmutableMap$Builder
+build
+ ()Lcom/google/common/collect/ImmutableMap<TK;TV;>;
+ ()L1com/google/common/collect/ImmutableMap<TK;TV;>;

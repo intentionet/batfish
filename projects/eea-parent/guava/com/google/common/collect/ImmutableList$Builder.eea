@@ -1,0 +1,4 @@
+class com/google/common/collect/ImmutableList$Builder
+build
+ ()Lcom/google/common/collect/ImmutableList<TE;>;
+ ()L1com/google/common/collect/ImmutableList<TE;>;

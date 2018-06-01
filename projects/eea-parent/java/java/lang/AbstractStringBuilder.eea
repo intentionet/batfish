@@ -1,0 +1,7 @@
+class java/lang/AbstractStringBuilder
+substring
+ (I)Ljava/lang/String;
+ (I)L1java/lang/String;
+substring
+ (II)Ljava/lang/String;
+ (II)L1java/lang/String;

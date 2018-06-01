@@ -1,0 +1,13 @@
+class java/lang/Boolean
+FALSE
+ Ljava/lang/Boolean;
+ L1java/lang/Boolean; 
+TRUE
+ Ljava/lang/Boolean;
+ L1java/lang/Boolean; 
+valueOf
+ (Z)Ljava/lang/Boolean;
+ (Z)L1java/lang/Boolean;
+valueOf
+ (Ljava/lang/String;)Ljava/lang/Boolean;
+ (L0java/lang/String;)L1java/lang/Boolean;

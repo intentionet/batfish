@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- TODO This file should be auto-generated from a template, based on directory, not hand-maintained -->
+
+  <parent>
+    <groupId>org.batfish</groupId>
+    <artifactId>eea-parent</artifactId>
+    <version>0.36.0</version>
+  </parent>
+
+  <artifactId>jdk-eea</artifactId>
+  <version>0.36.0</version>
+
+  <!-- Do NOT use a <version> of the JAR for which this is an EEA here,
+       but version the EEA itself.  Put the version of the lib into
+       the EEA's name, if at all.-->
+
+</project>

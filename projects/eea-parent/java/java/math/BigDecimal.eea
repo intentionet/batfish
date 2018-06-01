@@ -1,0 +1,31 @@
+class java/math/BigDecimal
+ZERO
+ Ljava/math/BigDecimal;
+ L1java/math/BigDecimal;
+ONE
+ Ljava/math/BigDecimal;
+ L1java/math/BigDecimal;
+TEN
+ Ljava/math/BigDecimal;
+ L1java/math/BigDecimal;
+divide
+ (Ljava/math/BigDecimal;Ljava/math/MathContext;)Ljava/math/BigDecimal;
+ (Ljava/math/BigDecimal;Ljava/math/MathContext;)L1java/math/BigDecimal;
+multiply
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (Ljava/math/BigDecimal;)L1java/math/BigDecimal;
+multiply
+ (Ljava/math/BigDecimal;Ljava/math/MathContext;)Ljava/math/BigDecimal;
+ (Ljava/math/BigDecimal;Ljava/math/MathContext;)L1java/math/BigDecimal;
+subtract
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (Ljava/math/BigDecimal;)L1java/math/BigDecimal;
+valueOf
+ (D)Ljava/math/BigDecimal;
+ (D)L1java/math/BigDecimal;
+valueOf
+ (J)Ljava/math/BigDecimal;
+ (J)L1java/math/BigDecimal;
+add
+ (Ljava/math/BigDecimal;)Ljava/math/BigDecimal;
+ (L1java/math/BigDecimal;)L1java/math/BigDecimal;

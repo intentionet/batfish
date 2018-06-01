@@ -74,11 +74,15 @@
     <lz4.version>1.4.1</lz4.version>
     <opentracing-jaxrs2.version>0.0.9</opentracing-jaxrs2.version>
     <opentracing.version>0.30.0</opentracing.version>
+    <org.eclipse.jdt.annotation.version>2.1.150</org.eclipse.jdt.annotation.version>
     <puppycrawl.version>8.0</puppycrawl.version>
     <slf4j.version>1.7.25</slf4j.version>
     <sqlite-jdbc.version>3.21.0</sqlite-jdbc.version>
     <xstream.version>1.4.7</xstream.version>
     <z3.version>2018-01-12-450f3c9b459d128135abb5bbd4fa0508fe26bfae</z3.version>
+
+    <!-- Annotation path for Eclipse -->
+    <m2e.jdt.annotationpath>${project.basedir}/../eea-parent/eea-all/target/eea-all-${version}.jar</m2e.jdt.annotationpath>
   </properties>
 
 
@@ -524,6 +528,12 @@
 
       <dependency>
         <groupId>org.batfish</groupId>
+        <artifactId>eea-all</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.batfish</groupId>
         <artifactId>question</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -754,6 +764,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.annotation</artifactId>
+        <version>${org.eclipse.jdt.annotation.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.glassfish.grizzly</groupId>
         <artifactId>grizzly-framework</artifactId>
         <version>${grizzly.version}</version>
@@ -858,6 +874,7 @@
     <module>batfish-common-protocol</module>
     <module>build-tools</module>
     <module>coordinator</module>
+    <module>eea-parent</module>
     <module>question</module>
   </modules>
 </project>

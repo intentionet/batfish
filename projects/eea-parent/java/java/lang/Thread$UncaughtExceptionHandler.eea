@@ -1,0 +1,4 @@
+class java/lang/Thread$UncaughtExceptionHandler
+uncaughtException
+ (Ljava/lang/Thread;Ljava/lang/Throwable;)V
+ (L1java/lang/Thread;L1java/lang/Throwable;)V

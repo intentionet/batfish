@@ -1,0 +1,10 @@
+class com/google/common/collect/HashBiMap
+create
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Lcom/google/common/collect/HashBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1com/google/common/collect/HashBiMap<TK;TV;>;
+create
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(II)Lcom/google/common/collect/HashBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(II)L1com/google/common/collect/HashBiMap<TK;TV;>;
+create
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<+TK;+TV;>;)Lcom/google/common/collect/HashBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<+TK;+TV;>;)L1com/google/common/collect/HashBiMap<TK;TV;>;

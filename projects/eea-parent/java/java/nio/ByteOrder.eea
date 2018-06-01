@@ -1,0 +1,10 @@
+class java/nio/ByteOrder
+BIG_ENDIAN
+ Ljava/nio/ByteOrder;
+ L1java/nio/ByteOrder;
+LITTLE_ENDIAN
+ Ljava/nio/ByteOrder;
+ L1java/nio/ByteOrder;
+nativeOrder
+ ()Ljava/nio/ByteOrder;
+ ()L1java/nio/ByteOrder;

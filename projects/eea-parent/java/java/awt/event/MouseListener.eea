@@ -1,0 +1,7 @@
+class java/awt/event/MouseListener
+mouseClicked
+ (Ljava/awt/event/MouseEvent;)V
+ (L1java/awt/event/MouseEvent;)V
+mousePressed
+ (Ljava/awt/event/MouseEvent;)V
+ (L1java/awt/event/MouseEvent;)V

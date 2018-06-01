@@ -1,0 +1,157 @@
+class java/lang/String
+compareTo
+ (Ljava/lang/String;)I
+ (L1java/lang/String;)I
+compareToIgnoreCase
+ (Ljava/lang/String;)I
+ (L1java/lang/String;)I
+concat
+ (Ljava/lang/String;)Ljava/lang/String;
+ (L1java/lang/String;)L1java/lang/String;
+contains
+ (Ljava/lang/CharSequence;)Z
+ (L1java/lang/CharSequence;)Z
+contentEquals
+ (Ljava/lang/CharSequence;)Z
+ (L0java/lang/CharSequence;)Z
+contentEquals
+ (Ljava/lang/StringBuffer;)Z
+ (L1java/lang/StringBuffer;)Z
+copyValueOf
+ ([C)Ljava/lang/String;
+ ([1C)L1java/lang/String;
+copyValueOf
+ ([CII)Ljava/lang/String;
+ ([1CII)L1java/lang/String;
+endsWith
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+equals
+ (Ljava/lang/Object;)Z
+ (L0java/lang/Object;)Z
+equalsIgnoreCase
+ (Ljava/lang/String;)Z
+ (L0java/lang/String;)Z
+format
+ (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+ (L1java/lang/String;[Ljava/lang/Object;)L1java/lang/String;
+format
+ (Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+ (L1java/util/Locale;L1java/lang/String;[Ljava/lang/Object;)L1java/lang/String;
+getBytes
+ (Ljava/lang/String;)[B
+ (L1java/lang/String;)[B
+getBytes
+ (Ljava/nio/charset/Charset;)[B
+ (L1java/nio/charset/Charset;)[B
+indexOf
+ (Ljava/lang/String;)I
+ (L1java/lang/String;)I
+indexOf
+ (Ljava/lang/String;I)I
+ (L1java/lang/String;I)I
+intern
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+join
+ (Ljava/lang/CharSequence;Ljava/lang/Iterable<+Ljava/lang/CharSequence;>;)Ljava/lang/String;
+ (L1java/lang/CharSequence;L1java/lang/Iterable<+1L1java/lang/CharSequence;>;)L1java/lang/String;
+join
+ (Ljava/lang/CharSequence;[Ljava/lang/CharSequence;)Ljava/lang/String;
+ (L1java/lang/CharSequence;[L1java/lang/CharSequence;)L1java/lang/String;
+lastIndexOf
+ (Ljava/lang/String;)I
+ (L1java/lang/String;)I
+lastIndexOf
+ (Ljava/lang/String;I)I
+ (L1java/lang/String;I)I
+matches
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+regionMatches
+ (ILjava/lang/String;II)Z
+ (IL1java/lang/String;II)Z
+regionMatches
+ (ZILjava/lang/String;II)Z
+ (ZIL1java/lang/String;II)Z
+replace
+ (CC)Ljava/lang/String;
+ (CC)L1java/lang/String;
+replace
+ (Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;
+ (L1java/lang/CharSequence;L1java/lang/CharSequence;)L1java/lang/String;
+replaceAll
+ (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ (L1java/lang/String;L1java/lang/String;)L1java/lang/String;
+replaceFirst
+ (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ (L1java/lang/String;L1java/lang/String;)L1java/lang/String;
+split
+ (Ljava/lang/String;)[Ljava/lang/String;
+ (L1java/lang/String;)[1L1java/lang/String;
+split
+ (Ljava/lang/String;I)[Ljava/lang/String;
+ (L1java/lang/String;I)[1L1java/lang/String;
+startsWith
+ (Ljava/lang/String;)Z
+ (L1java/lang/String;)Z
+startsWith
+ (Ljava/lang/String;I)Z
+ (L1java/lang/String;I)Z
+subSequence
+ (II)Ljava/lang/CharSequence;
+ (II)L1java/lang/CharSequence;
+substring
+ (I)Ljava/lang/String;
+ (I)L1java/lang/String;
+substring
+ (II)Ljava/lang/String;
+ (II)L1java/lang/String;
+toCharArray
+ ()[C
+ ()[1C
+toLowerCase
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+toLowerCase
+ (Ljava/util/Locale;)Ljava/lang/String;
+ (L1java/util/Locale;)L1java/lang/String;
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+toUpperCase
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+toUpperCase
+ (Ljava/util/Locale;)Ljava/lang/String;
+ (L1java/util/Locale;)L1java/lang/String;
+trim
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+valueOf
+ (C)Ljava/lang/String;
+ (C)L1java/lang/String;
+valueOf
+ (D)Ljava/lang/String;
+ (D)L1java/lang/String;
+valueOf
+ (F)Ljava/lang/String;
+ (F)L1java/lang/String;
+valueOf
+ (I)Ljava/lang/String;
+ (I)L1java/lang/String;
+valueOf
+ (J)Ljava/lang/String;
+ (J)L1java/lang/String;
+valueOf
+ (Ljava/lang/Object;)Ljava/lang/String;
+ (L0java/lang/Object;)L1java/lang/String;
+valueOf
+ (Z)Ljava/lang/String;
+ (Z)L1java/lang/String;
+valueOf
+ ([C)Ljava/lang/String;
+ ([1C)L1java/lang/String;
+valueOf
+ ([CII)Ljava/lang/String;
+ ([1CII)L1java/lang/String;

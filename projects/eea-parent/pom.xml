@@ -1,0 +1,185 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.batfish</groupId>
+  <artifactId>eea-parent</artifactId>
+  <version>0.36.0</version>
+  <packaging>pom</packaging>
+
+  <name>Eclipse External null Annotations (EEA) for Batfish</name>
+  <description>JARs of *.eea for the JDK and common Java libraries</description>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License v1.0</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <!-- copied from source material for credit-->
+  <developers>
+    <developer>
+      <id>vorburger</id>
+      <name>Michael Vorburger</name>
+      <email>mike@vorburger.ch</email>
+      <url>http://www.vorburger.ch</url>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Please see https://github.com/lastnpe/eclipse-null-eea-augments/graphs/contributors</name>
+    </contributor>
+  </contributors>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>${project.basedir}</directory>
+        <excludes>
+          <exclude>.*</exclude>
+          <exclude>pom.xml</exclude>
+          <exclude>target/</exclude>
+          <exclude>.settings/</exclude>
+        </excludes>
+        <includes>
+          <include>**/*</include>
+          <include>eea-*.*</include>
+        </includes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.1</version>
+        <!-- Disable src/test/resources, not needed for creating EEA JARs -->
+        <executions>
+          <execution>
+            <id>default-testResources</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <!-- Disable Surefire, not needed for creating EEA JARs -->
+        <executions>
+          <execution>
+            <id>default-test</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Intentionally no maven-source-plugin & maven-javadoc-plugin; as not needed for EEA here! -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>not-m2e</id>
+      <activation>
+        <property>
+          <name>!m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.5.1</version>
+            <!-- Disable Java compilation, not needed for creating EEA JARs.
+                 This mainly just leads to shorter mvn build logs.. ;-) and
+                 may help a little bit in build perf. when there will be many.
+
+                 NB: This is a !m2e profile because in-IDE we CANNOT do this;
+                 because that would cause M2E to create a non-Java Eclipse project
+                 and then workspace dependency resolution to EEA wouldn't work anymore!
+             -->
+            <executions>
+              <execution>
+                <id>default-compile</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>default-testCompile</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>gpg</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                <!-- specify a 1.8 java version to avoid eclipse warnings about missing 1.5 J2SE -->
+                <source>${java.version}</source>
+                <target>${java.version}</target>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
+  <modules>
+    <module>eea-all</module>
+    <module>java</module>
+    <module>guava</module>
+  </modules>
+</project>

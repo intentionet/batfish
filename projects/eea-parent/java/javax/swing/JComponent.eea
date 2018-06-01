@@ -1,0 +1,4 @@
+class javax/swing/JComponent
+getToolTipText
+ (Ljava/awt/event/MouseEvent;)Ljava/lang/String;
+ (L1java/awt/event/MouseEvent;)Ljava/lang/String;

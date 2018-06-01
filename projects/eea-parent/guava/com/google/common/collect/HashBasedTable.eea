@@ -1,0 +1,10 @@
+class com/google/common/collect/HashBasedTable
+create
+ <R:Ljava/lang/Object;C:Ljava/lang/Object;V:Ljava/lang/Object;>()Lcom/google/common/collect/HashBasedTable<TR;TC;TV;>;
+ <R:Ljava/lang/Object;C:Ljava/lang/Object;V:Ljava/lang/Object;>()L1com/google/common/collect/HashBasedTable<TR;TC;TV;>;
+create
+ <R:Ljava/lang/Object;C:Ljava/lang/Object;V:Ljava/lang/Object;>(II)Lcom/google/common/collect/HashBasedTable<TR;TC;TV;>;
+ <R:Ljava/lang/Object;C:Ljava/lang/Object;V:Ljava/lang/Object;>(II)L1com/google/common/collect/HashBasedTable<TR;TC;TV;>;
+create
+ <R:Ljava/lang/Object;C:Ljava/lang/Object;V:Ljava/lang/Object;>(Lcom/google/common/collect/Table<+TR;+TC;+TV;>;)Lcom/google/common/collect/HashBasedTable<TR;TC;TV;>;
+ <R:Ljava/lang/Object;C:Ljava/lang/Object;V:Ljava/lang/Object;>(Lcom/google/common/collect/Table<+TR;+TC;+TV;>;)L1com/google/common/collect/HashBasedTable<TR;TC;TV;>;

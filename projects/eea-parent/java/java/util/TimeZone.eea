@@ -1,0 +1,7 @@
+class java/util/TimeZone
+getDefault
+ ()Ljava/util/TimeZone;
+ ()L1java/util/TimeZone;
+getTimeZone
+ (Ljava/lang/String;)Ljava/util/TimeZone;
+ (L1java/lang/String;)L1java/util/TimeZone;

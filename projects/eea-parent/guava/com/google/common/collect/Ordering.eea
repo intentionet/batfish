@@ -1,0 +1,7 @@
+class com/google/common/collect/Ordering
+compound
+ <T:Ljava/lang/Object;>(Ljava/lang/Iterable<+Ljava/util/Comparator<-TT;>;>;)Lcom/google/common/collect/Ordering<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/lang/Iterable<+Ljava/util/Comparator<-TT;>;>;)L1com/google/common/collect/Ordering<TT;>;
+compound
+ <U:TT;>(Ljava/util/Comparator<-TU;>;)Lcom/google/common/collect/Ordering<TU;>;
+ <U:TT;>(Ljava/util/Comparator<-TU;>;)L1com/google/common/collect/Ordering<TU;>;

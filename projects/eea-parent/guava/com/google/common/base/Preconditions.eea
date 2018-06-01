@@ -1,0 +1,10 @@
+class com/google/common/base/Preconditions
+checkNotNull
+ <T:Ljava/lang/Object;>(TT;)TT;
+ <T:Ljava/lang/Object;>(TT;)T1T;
+checkNotNull
+ <T:Ljava/lang/Object;>(TT;Ljava/lang/Object;)TT;
+ <T:Ljava/lang/Object;>(TT;Ljava/lang/Object;)T1T;
+checkNotNull
+ <T:Ljava/lang/Object;>(TT;Ljava/lang/String;[Ljava/lang/Object;)TT;
+ <T:Ljava/lang/Object;>(TT;Ljava/lang/String;[Ljava/lang/Object;)T1T;

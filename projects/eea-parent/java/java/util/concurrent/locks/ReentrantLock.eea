@@ -1,0 +1,4 @@
+class java/util/concurrent/locks/ReentrantLock
+newCondition
+ ()Ljava/util/concurrent/locks/Condition;
+ ()L1java/util/concurrent/locks/Condition;

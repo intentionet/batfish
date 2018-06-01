@@ -1,0 +1,7 @@
+class java/io/File
+getAbsolutePath
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+getName
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

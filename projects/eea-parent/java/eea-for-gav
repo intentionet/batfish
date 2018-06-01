@@ -1,0 +1,2 @@
+# This isn't a real Maven GAV, but a convention to mean Java JDK rt.jar
+java:java

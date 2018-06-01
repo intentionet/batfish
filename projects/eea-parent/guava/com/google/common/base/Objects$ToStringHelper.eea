@@ -1,0 +1,4 @@
+class com/google/common/base/Objects$ToStringHelper
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

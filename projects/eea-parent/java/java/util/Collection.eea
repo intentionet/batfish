@@ -1,0 +1,13 @@
+class java/util/Collection
+parallelStream
+ ()Ljava/util/stream/Stream<TE;>;
+ ()Ljava/util/stream/Stream<T+E;>;
+stream
+ ()Ljava/util/stream/Stream<TE;>;
+ ()Ljava/util/stream/Stream<T+E;>;
+toArray
+ ()[Ljava/lang/Object;
+ ()[1Ljava/lang/Object;
+toArray
+ <T:Ljava/lang/Object;>([TT;)[TT;
+ <T:Ljava/lang/Object;>([1TT;)[1TT;

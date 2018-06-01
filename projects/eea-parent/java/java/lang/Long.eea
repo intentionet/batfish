@@ -1,0 +1,7 @@
+class java/lang/Long
+toUnsignedString
+ (JI)Ljava/lang/String;
+ (JI)L1java/lang/String;
+valueOf
+ (J)Ljava/lang/Long;
+ (J)L1java/lang/Long;

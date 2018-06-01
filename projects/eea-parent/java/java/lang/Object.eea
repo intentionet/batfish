@@ -1,0 +1,13 @@
+class java/lang/Object
+clone
+ ()Ljava/lang/Object;
+ ()L1java/lang/Object;
+equals
+ (Ljava/lang/Object;)Z
+ (L0java/lang/Object;)Z
+getClass
+ ()Ljava/lang/Class<*>;
+ ()L1java/lang/Class<*1>;
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

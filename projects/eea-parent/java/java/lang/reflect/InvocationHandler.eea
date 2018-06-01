@@ -1,0 +1,4 @@
+class java/lang/reflect/InvocationHandler
+invoke
+ (Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+ (Ljava/lang/Object;L1java/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;

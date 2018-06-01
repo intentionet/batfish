@@ -1,0 +1,151 @@
+class java/util/concurrent/CompletableFuture
+acceptEither
+ (Ljava/util/concurrent/CompletionStage<+TT;>;Ljava/util/function/Consumer<-TT;>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<+TT;>;L1java/util/function/Consumer<-TT;>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+acceptEitherAsync
+ (Ljava/util/concurrent/CompletionStage<+TT;>;Ljava/util/function/Consumer<-TT;>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<+TT;>;L1java/util/function/Consumer<-TT;>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+acceptEitherAsync
+ (Ljava/util/concurrent/CompletionStage<+TT;>;Ljava/util/function/Consumer<-TT;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<+TT;>;L1java/util/function/Consumer<-TT;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+allOf
+ ([Ljava/util/concurrent/CompletableFuture<*>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ ([L1java/util/concurrent/CompletableFuture<*>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+anyOf
+ ([Ljava/util/concurrent/CompletableFuture<*>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Object;>;
+ ([L1java/util/concurrent/CompletableFuture<*>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Object;>;
+applyToEither
+ <U:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TT;>;Ljava/util/function/Function<-TT;TU;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TT;>;L1java/util/function/Function<-TT;TU;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+applyToEitherAsync
+ <U:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TT;>;Ljava/util/function/Function<-TT;TU;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TT;>;L1java/util/function/Function<-TT;TU;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+applyToEitherAsync
+ <U:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TT;>;Ljava/util/function/Function<-TT;TU;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TT;>;L1java/util/function/Function<-TT;TU;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<TU;>;
+complete
+ (TT;)Z
+ (T0T;)Z
+completeExceptionally
+ (Ljava/lang/Throwable;)Z
+ (L1java/lang/Throwable;)Z
+completedFuture
+ <U:Ljava/lang/Object;>(TU;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(T0U;)L1java/util/concurrent/CompletableFuture<TU;>;
+exceptionally
+ (Ljava/util/function/Function<Ljava/lang/Throwable;+TT;>;)Ljava/util/concurrent/CompletableFuture<TT;>;
+ (L1java/util/function/Function<Ljava/lang/Throwable;+TT;>;)L1java/util/concurrent/CompletableFuture<TT;>;
+get
+ (JLjava/util/concurrent/TimeUnit;)TT;
+ (JL1java/util/concurrent/TimeUnit;)TT;
+handle
+ <U:Ljava/lang/Object;>(Ljava/util/function/BiFunction<-TT;Ljava/lang/Throwable;+TU;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/BiFunction<-TT;Ljava/lang/Throwable;+TU;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+handleAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/BiFunction<-TT;Ljava/lang/Throwable;+TU;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/BiFunction<-TT;Ljava/lang/Throwable;+TU;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+handleAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/BiFunction<-TT;Ljava/lang/Throwable;+TU;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(Ljava/util/function/BiFunction<-TT;Ljava/lang/Throwable;+TU;>;Ljava/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<TU;>;
+obtrudeException
+ (Ljava/lang/Throwable;)V
+ (L1java/lang/Throwable;)V
+runAfterBoth
+ (Ljava/util/concurrent/CompletionStage<*>;Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<*>;L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+runAfterBothAsync
+ (Ljava/util/concurrent/CompletionStage<*>;Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<*>;L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+runAfterBothAsync
+ (Ljava/util/concurrent/CompletionStage<*>;Ljava/lang/Runnable;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<*>;L1java/lang/Runnable;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+runAfterEither
+ (Ljava/util/concurrent/CompletionStage<*>;Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<*>;L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+runAfterEitherAsync
+ (Ljava/util/concurrent/CompletionStage<*>;Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<*>;L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+runAfterEitherAsync
+ (Ljava/util/concurrent/CompletionStage<*>;Ljava/lang/Runnable;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/concurrent/CompletionStage<*>;L1java/lang/Runnable;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+runAsync
+ (Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+runAsync
+ (Ljava/lang/Runnable;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/lang/Runnable;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+supplyAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/Supplier<TU;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Supplier<TU;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+supplyAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/Supplier<TU;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Supplier<TU;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<TU;>;
+thenAccept
+ (Ljava/util/function/Consumer<-TT;>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/function/Consumer<-TT;>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenAcceptAsync
+ (Ljava/util/function/Consumer<-TT;>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/function/Consumer<-TT;>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenAcceptAsync
+ (Ljava/util/function/Consumer<-TT;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/util/function/Consumer<-TT;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenAcceptBoth
+ <U:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TU;>;Ljava/util/function/BiConsumer<-TT;-TU;>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ <U:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TU;>;L1java/util/function/BiConsumer<-TT;-TU;>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenAcceptBothAsync
+ <U:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TU;>;Ljava/util/function/BiConsumer<-TT;-TU;>;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ <U:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TU;>;L1java/util/function/BiConsumer<-TT;-TU;>;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenAcceptBothAsync
+ <U:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TU;>;Ljava/util/function/BiConsumer<-TT;-TU;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ <U:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TU;>;L1java/util/function/BiConsumer<-TT;-TU;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenApply
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TU;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+TU;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+thenApplyAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TU;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+TU;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+thenApplyAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+TU;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+TU;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<TU;>;
+thenCombine
+ <U:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TU;>;Ljava/util/function/BiFunction<-TT;-TU;+TV;>;)Ljava/util/concurrent/CompletableFuture<TV;>;
+ <U:Ljava/lang/Object;V:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TU;>;L1java/util/function/BiFunction<-TT;-TU;+TV;>;)L1java/util/concurrent/CompletableFuture<TV;>;
+thenCombineAsync
+ <U:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TU;>;Ljava/util/function/BiFunction<-TT;-TU;+TV;>;)Ljava/util/concurrent/CompletableFuture<TV;>;
+ <U:Ljava/lang/Object;V:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TU;>;L1java/util/function/BiFunction<-TT;-TU;+TV;>;)L1java/util/concurrent/CompletableFuture<TV;>;
+thenCombineAsync
+ <U:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/concurrent/CompletionStage<+TU;>;Ljava/util/function/BiFunction<-TT;-TU;+TV;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<TV;>;
+ <U:Ljava/lang/Object;V:Ljava/lang/Object;>(L1java/util/concurrent/CompletionStage<+TU;>;L1java/util/function/BiFunction<-TT;-TU;+TV;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<TV;>;
+thenCompose
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/concurrent/CompletionStage<TU;>;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+Ljava/util/concurrent/CompletionStage<TU;>;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+thenComposeAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/concurrent/CompletionStage<TU;>;>;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+Ljava/util/concurrent/CompletionStage<TU;>;>;)L1java/util/concurrent/CompletableFuture<TU;>;
+thenComposeAsync
+ <U:Ljava/lang/Object;>(Ljava/util/function/Function<-TT;+Ljava/util/concurrent/CompletionStage<TU;>;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<TU;>;
+ <U:Ljava/lang/Object;>(L1java/util/function/Function<-TT;+Ljava/util/concurrent/CompletionStage<TU;>;>;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<TU;>;
+thenRun
+ (Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenRunAsync
+ (Ljava/lang/Runnable;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/lang/Runnable;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+thenRunAsync
+ (Ljava/lang/Runnable;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+ (L1java/lang/Runnable;L1java/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<Ljava/lang/Void;>;
+toCompletableFuture
+ ()Ljava/util/concurrent/CompletableFuture<TT;>;
+ ()L1java/util/concurrent/CompletableFuture<TT;>;
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;
+whenComplete
+ (Ljava/util/function/BiConsumer<-TT;-Ljava/lang/Throwable;>;)Ljava/util/concurrent/CompletableFuture<TT;>;
+ (L1java/util/function/BiConsumer<-TT;-Ljava/lang/Throwable;>;)L1java/util/concurrent/CompletableFuture<TT;>;
+whenCompleteAsync
+ (Ljava/util/function/BiConsumer<-TT;-Ljava/lang/Throwable;>;)Ljava/util/concurrent/CompletableFuture<TT;>;
+ (L1java/util/function/BiConsumer<-TT;-Ljava/lang/Throwable;>;)L1java/util/concurrent/CompletableFuture<TT;>;
+whenCompleteAsync
+ (Ljava/util/function/BiConsumer<-TT;-Ljava/lang/Throwable;>;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture<TT;>;
+ (L1java/util/function/BiConsumer<-TT;-Ljava/lang/Throwable;>;Ljava/util/concurrent/Executor;)L1java/util/concurrent/CompletableFuture<TT;>;

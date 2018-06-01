@@ -1,0 +1,25 @@
+class com/google/common/collect/ImmutableBiMap
+builder
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Lcom/google/common/collect/ImmutableBiMap$Builder<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1com/google/common/collect/ImmutableBiMap$Builder<TK;TV;>;
+copyOf
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<+TK;+TV;>;)Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(L1java/util/Map<+TK;+TV;>;)L1com/google/common/collect/ImmutableBiMap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1com/google/common/collect/ImmutableBiMap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;)L1com/google/common/collect/ImmutableBiMap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableBiMap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableBiMap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableBiMap<TK;TV;>;
+of
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;TK;TV;TK;TV;TK;TV;TK;TV;)Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(T1K;T1V;T1K;T1V;T1K;T1V;T1K;T1V;T1K;T1V;)L1com/google/common/collect/ImmutableBiMap<TK;TV;>;

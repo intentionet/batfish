@@ -1,0 +1,4 @@
+class java/sql/Driver
+connect
+ (Ljava/lang/String;Ljava/util/Properties;)Ljava/sql/Connection;
+ (L1java/lang/String;Ljava/util/Properties;)Ljava/sql/Connection;

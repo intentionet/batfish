@@ -1,0 +1,25 @@
+class java/util/stream/StreamSupport
+doubleStream
+ (Ljava/util/Spliterator$OfDouble;Z)Ljava/util/stream/DoubleStream;
+ (Ljava/util/Spliterator$OfDouble;Z)L1java/util/stream/DoubleStream;
+doubleStream
+ (Ljava/util/function/Supplier<+Ljava/util/Spliterator$OfDouble;>;IZ)Ljava/util/stream/DoubleStream;
+ (Ljava/util/function/Supplier<+Ljava/util/Spliterator$OfDouble;>;IZ)L1java/util/stream/DoubleStream;
+intStream
+ (Ljava/util/Spliterator$OfInt;Z)Ljava/util/stream/IntStream;
+ (Ljava/util/Spliterator$OfInt;Z)L1java/util/stream/IntStream;
+intStream
+ (Ljava/util/function/Supplier<+Ljava/util/Spliterator$OfInt;>;IZ)Ljava/util/stream/IntStream;
+ (Ljava/util/function/Supplier<+Ljava/util/Spliterator$OfInt;>;IZ)L1java/util/stream/IntStream;
+longStream
+ (Ljava/util/Spliterator$OfLong;Z)Ljava/util/stream/LongStream;
+ (Ljava/util/Spliterator$OfLong;Z)L1java/util/stream/LongStream;
+longStream
+ (Ljava/util/function/Supplier<+Ljava/util/Spliterator$OfLong;>;IZ)Ljava/util/stream/LongStream;
+ (Ljava/util/function/Supplier<+Ljava/util/Spliterator$OfLong;>;IZ)L1java/util/stream/LongStream;
+stream
+ <T:Ljava/lang/Object;>(Ljava/util/Spliterator<TT;>;Z)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Spliterator<TT;>;Z)L1java/util/stream/Stream<TT;>;
+stream
+ <T:Ljava/lang/Object;>(Ljava/util/function/Supplier<+Ljava/util/Spliterator<TT;>;>;IZ)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/function/Supplier<+Ljava/util/Spliterator<TT;>;>;IZ)L1java/util/stream/Stream<TT;>;

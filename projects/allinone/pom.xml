@@ -108,6 +108,11 @@
 
     <dependency>
       <groupId>org.batfish</groupId>
+      <artifactId>eea-all</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.batfish</groupId>
       <artifactId>question</artifactId>
     </dependency>
 

@@ -1,0 +1,7 @@
+class java/util/Map$Entry
+getKey
+ ()TK;
+ ()T+K;
+getValue
+ ()TV;
+ ()T+V;

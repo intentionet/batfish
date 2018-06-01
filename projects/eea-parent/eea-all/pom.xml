@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.batfish</groupId>
+    <artifactId>eea-parent</artifactId>
+    <version>0.36.0</version>
+  </parent>
+
+  <groupId>org.batfish</groupId>
+  <artifactId>eea-all</artifactId>
+  <version>0.36.0</version>
+  <packaging>jar</packaging>
+
+  <name>Eclipse External null Annotations (EEA) all-in-one</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>eea-for-gav</exclude>
+                    <exclude>dependency-reduced-pom.xml</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.batfish</groupId>
+      <artifactId>jdk-eea</artifactId>
+      <version>0.36.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.batfish</groupId>
+      <artifactId>guava-eea</artifactId>
+      <version>0.36.0</version>
+    </dependency>
+  </dependencies>
+
+</project>

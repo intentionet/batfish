@@ -1,0 +1,28 @@
+class java/util/List
+contains
+ (Ljava/lang/Object;)Z
+ (L0java/lang/Object;)Z
+equals
+ (Ljava/lang/Object;)Z
+ (L0java/lang/Object;)Z
+get
+ (I)TE;
+ (I)T+E;
+subList
+ (II)Ljava/util/List<TE;>;
+ (II)L1java/util/List<TE;>;
+indexOf
+ (Ljava/lang/Object;)I
+ (L0java/lang/Object;)I
+lastIndexOf
+ (Ljava/lang/Object;)I
+ (L0java/lang/Object;)I
+remove
+ (Ljava/lang/Object;)Z
+ (L0java/lang/Object;)Z
+toArray
+ ()[Ljava/lang/Object;
+ ()[1Ljava/lang/Object;
+toArray
+ <T:Ljava/lang/Object;>([TT;)[TT;
+ <T:Ljava/lang/Object;>([1TT;)[1TT;

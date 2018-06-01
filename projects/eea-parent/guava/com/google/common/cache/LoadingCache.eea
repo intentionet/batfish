@@ -1,0 +1,7 @@
+class com/google/common/cache/LoadingCache
+asMap
+ ()Ljava/util/concurrent/ConcurrentMap<TK;TV;>;
+ ()L1java/util/concurrent/ConcurrentMap<TK;TV;>;
+getAll
+ (Ljava/lang/Iterable<+TK;>;)Lcom/google/common/collect/ImmutableMap<TK;TV;>;
+ (Ljava/lang/Iterable<+TK;>;)L1com/google/common/collect/ImmutableMap<TK;TV;>;

@@ -1,0 +1,10 @@
+class java/util/stream/Collectors
+toCollection
+ <T:Ljava/lang/Object;C::Ljava/util/Collection<TT;>;>(Ljava/util/function/Supplier<TC;>;)Ljava/util/stream/Collector<TT;*TC;>;
+ <T:Ljava/lang/Object;C::Ljava/util/Collection<TT;>;>(Ljava/util/function/Supplier<TC;>;)Ljava/util/stream/Collector<TT;*T1C;>;
+toList
+ <T:Ljava/lang/Object;>()Ljava/util/stream/Collector<TT;*Ljava/util/List<TT;>;>;
+ <T:Ljava/lang/Object;>()Ljava/util/stream/Collector<TT;*L1java/util/List<TT;>;>;
+toSet
+ <T:Ljava/lang/Object;>()Ljava/util/stream/Collector<TT;*Ljava/util/Set<TT;>;>;
+ <T:Ljava/lang/Object;>()Ljava/util/stream/Collector<TT;*L1java/util/Set<TT;>;>;

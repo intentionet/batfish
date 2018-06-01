@@ -1,0 +1,4 @@
+class java/lang/StringBuilder
+toString
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

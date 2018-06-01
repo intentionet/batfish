@@ -1,0 +1,7 @@
+class java/util/regex/Pattern
+compile
+ (Ljava/lang/String;)Ljava/util/regex/Pattern;
+ (Ljava/lang/String;)L1java/util/regex/Pattern;
+compile
+ (Ljava/lang/String;I)Ljava/util/regex/Pattern;
+ (Ljava/lang/String;I)L1java/util/regex/Pattern;

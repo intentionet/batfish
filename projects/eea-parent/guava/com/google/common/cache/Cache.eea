@@ -1,0 +1,16 @@
+class com/google/common/cache/Cache
+asMap
+ ()Ljava/util/concurrent/ConcurrentMap<TK;TV;>;
+ ()L1java/util/concurrent/ConcurrentMap<TK;TV;>;
+get
+ (TK;Ljava/util/concurrent/Callable<+TV;>;)TV;
+ (TK;Ljava/util/concurrent/Callable<+1TV;>;)T1V;
+getAllPresent
+ (Ljava/lang/Iterable<*>;)Lcom/google/common/collect/ImmutableMap<TK;TV;>;
+ (Ljava/lang/Iterable<*>;)L1com/google/common/collect/ImmutableMap<TK;TV;>;
+getIfPresent
+ (Ljava/lang/Object;)TV;
+ (Ljava/lang/Object;)T0V;
+putAll
+ (Ljava/util/Map<+TK;+TV;>;)V
+ (L1java/util/Map<+TK;+TV;>;)V

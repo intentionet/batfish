@@ -1,0 +1,40 @@
+class java/util/NavigableSet
+ceiling
+ (TE;)TE;
+ (TE;)T0E;
+descendingIterator
+ ()Ljava/util/Iterator<TE;>;
+ ()L1java/util/Iterator<TE;>;
+descendingSet
+ ()Ljava/util/NavigableSet<TE;>;
+ ()L1java/util/NavigableSet<TE;>;
+floor
+ (TE;)TE;
+ (TE;)T0E;
+headSet
+ (TE;)Ljava/util/SortedSet<TE;>;
+ (TE;)L1java/util/SortedSet<TE;>;
+headSet
+ (TE;Z)Ljava/util/NavigableSet<TE;>;
+ (TE;Z)L1java/util/NavigableSet<TE;>;
+higher
+ (TE;)TE;
+ (TE;)T0E;
+iterator
+ ()Ljava/util/Iterator<TE;>;
+ ()L1java/util/Iterator<TE;>;
+lower
+ (TE;)TE;
+ (TE;)T0E;
+subSet
+ (TE;TE;)Ljava/util/SortedSet<TE;>;
+ (TE;TE;)L1java/util/SortedSet<TE;>;
+subSet
+ (TE;ZTE;Z)Ljava/util/NavigableSet<TE;>;
+ (TE;ZTE;Z)L1java/util/NavigableSet<TE;>;
+tailSet
+ (TE;)Ljava/util/SortedSet<TE;>;
+ (TE;)L1java/util/SortedSet<TE;>;
+tailSet
+ (TE;Z)Ljava/util/NavigableSet<TE;>;
+ (TE;Z)L1java/util/NavigableSet<TE;>;

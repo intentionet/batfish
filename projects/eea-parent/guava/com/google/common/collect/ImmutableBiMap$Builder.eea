@@ -1,0 +1,4 @@
+class com/google/common/collect/ImmutableBiMap$Builder
+build
+ ()Lcom/google/common/collect/ImmutableBiMap<TK;TV;>;
+ ()L1com/google/common/collect/ImmutableBiMap<TK;TV;>;

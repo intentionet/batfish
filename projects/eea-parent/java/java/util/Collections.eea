@@ -1,0 +1,112 @@
+class java/util/Collections
+EMPTY_LIST
+ Ljava/util/List;
+ L1java/util/List;
+EMPTY_MAP
+ Ljava/util/Map;
+ L1java/util/Map;
+EMPTY_SET
+ Ljava/util/Set;
+ L1java/util/Set;
+emptyEnumeration
+ <T:Ljava/lang/Object;>()Ljava/util/Enumeration<TT;>;
+ <T:Ljava/lang/Object;>()L1java/util/Enumeration<TT;>;
+emptyIterator
+ <T:Ljava/lang/Object;>()Ljava/util/Iterator<TT;>;
+ <T:Ljava/lang/Object;>()L1java/util/Iterator<TT;>;
+emptyList
+ <T:Ljava/lang/Object;>()Ljava/util/List<TT;>;
+ <T:Ljava/lang/Object;>()L1java/util/List<TT;>;
+emptyListIterator
+ <T:Ljava/lang/Object;>()Ljava/util/ListIterator<TT;>;
+ <T:Ljava/lang/Object;>()L1java/util/ListIterator<TT;>;
+emptyMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Ljava/util/Map<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1java/util/Map<TK;TV;>;
+emptyNavigableMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Ljava/util/NavigableMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1java/util/NavigableMap<TK;TV;>;
+emptyNavigableSet
+ <E:Ljava/lang/Object;>()Ljava/util/NavigableSet<TE;>;
+ <E:Ljava/lang/Object;>()L1java/util/NavigableSet<TE;>;
+emptySet
+ <T:Ljava/lang/Object;>()Ljava/util/Set<TT;>;
+ <T:Ljava/lang/Object;>()L1java/util/Set<TT;>;
+emptySortedMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()Ljava/util/SortedMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>()L1java/util/SortedMap<TK;TV;>;
+emptySortedSet
+ <E:Ljava/lang/Object;>()Ljava/util/SortedSet<TE;>;
+ <E:Ljava/lang/Object;>()L1java/util/SortedSet<TE;>;
+singleton
+ <T:Ljava/lang/Object;>(TT;)Ljava/util/Set<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1java/util/Set<TT;>;
+singletonIterator
+ <E:Ljava/lang/Object;>(TE;)Ljava/util/Iterator<TE;>;
+ <E:Ljava/lang/Object;>(TE;)L1java/util/Iterator<TE;>;
+singletonList
+ <T:Ljava/lang/Object;>(TT;)Ljava/util/List<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1java/util/List<TT;>;
+singletonMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)Ljava/util/Map<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(TK;TV;)L1java/util/Map<TK;TV;>;
+singletonSpliterator
+ <T:Ljava/lang/Object;>(TT;)Ljava/util/Spliterator<TT;>;
+ <T:Ljava/lang/Object;>(TT;)L1java/util/Spliterator<TT;>;
+synchronizedCollection
+ <T:Ljava/lang/Object;>(Ljava/util/Collection<TT;>;)Ljava/util/Collection<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Collection<TT;>;)L1java/util/Collection<TT;>;
+synchronizedCollection
+ <T:Ljava/lang/Object;>(Ljava/util/Collection<TT;>;Ljava/lang/Object;)Ljava/util/Collection<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Collection<TT;>;Ljava/lang/Object;)L1java/util/Collection<TT;>;
+synchronizedList
+ <T:Ljava/lang/Object;>(Ljava/util/List<TT;>;)Ljava/util/List<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/List<TT;>;)L1java/util/List<TT;>;
+synchronizedList
+ <T:Ljava/lang/Object;>(Ljava/util/List<TT;>;Ljava/lang/Object;)Ljava/util/List<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/List<TT;>;Ljava/lang/Object;)L1java/util/List<TT;>;
+synchronizedMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<TK;TV;>;)Ljava/util/Map<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<TK;TV;>;)L1java/util/Map<TK;TV;>;
+synchronizedNavigableMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/NavigableMap<TK;TV;>;)Ljava/util/NavigableMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/NavigableMap<TK;TV;>;)L1java/util/NavigableMap<TK;TV;>;
+synchronizedNavigableSet
+ <T:Ljava/lang/Object;>(Ljava/util/NavigableSet<TT;>;)Ljava/util/NavigableSet<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/NavigableSet<TT;>;)L1java/util/NavigableSet<TT;>;
+synchronizedSet
+ <T:Ljava/lang/Object;>(Ljava/util/Set<TT;>;)Ljava/util/Set<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Set<TT;>;)L1java/util/Set<TT;>;
+synchronizedSet
+ <T:Ljava/lang/Object;>(Ljava/util/Set<TT;>;Ljava/lang/Object;)Ljava/util/Set<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Set<TT;>;Ljava/lang/Object;)L1java/util/Set<TT;>;
+synchronizedSortedMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/SortedMap<TK;TV;>;)Ljava/util/SortedMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/SortedMap<TK;TV;>;)L1java/util/SortedMap<TK;TV;>;
+synchronizedSortedSet
+ <T:Ljava/lang/Object;>(Ljava/util/SortedSet<TT;>;)Ljava/util/SortedSet<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/SortedSet<TT;>;)L1java/util/SortedSet<TT;>;
+unmodifiableCollection
+ <T:Ljava/lang/Object;>(Ljava/util/Collection<+TT;>;)Ljava/util/Collection<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Collection<+TT;>;)L1java/util/Collection<TT;>;
+unmodifiableList
+ <T:Ljava/lang/Object;>(Ljava/util/List<+TT;>;)Ljava/util/List<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/List<+TT;>;)L1java/util/List<TT;>;
+unmodifiableMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<+TK;+TV;>;)Ljava/util/Map<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<+TK;+TV;>;)L1java/util/Map<TK;TV;>;
+unmodifiableNavigableMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/NavigableMap<TK;+TV;>;)Ljava/util/NavigableMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/NavigableMap<TK;+TV;>;)L1java/util/NavigableMap<TK;TV;>;
+unmodifiableNavigableSet
+ <T:Ljava/lang/Object;>(Ljava/util/NavigableSet<TT;>;)Ljava/util/NavigableSet<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/NavigableSet<TT;>;)L1java/util/NavigableSet<TT;>;
+unmodifiableSet
+ <T:Ljava/lang/Object;>(Ljava/util/Set<+TT;>;)Ljava/util/Set<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/Set<+TT;>;)L1java/util/Set<TT;>;
+unmodifiableSortedMap
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/SortedMap<TK;+TV;>;)Ljava/util/SortedMap<TK;TV;>;
+ <K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/SortedMap<TK;+TV;>;)L1java/util/SortedMap<TK;TV;>;
+unmodifiableSortedSet
+ <T:Ljava/lang/Object;>(Ljava/util/SortedSet<TT;>;)Ljava/util/SortedSet<TT;>;
+ <T:Ljava/lang/Object;>(Ljava/util/SortedSet<TT;>;)L1java/util/SortedSet<TT;>;

@@ -1,0 +1,4 @@
+class javax/swing/JTable
+prepareRenderer
+ (Ljavax/swing/table/TableCellRenderer;II)Ljava/awt/Component;
+ (L1javax/swing/table/TableCellRenderer;II)L1java/awt/Component;

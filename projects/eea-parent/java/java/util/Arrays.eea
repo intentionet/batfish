@@ -1,0 +1,28 @@
+class java/util/Arrays
+asList
+ <T:Ljava/lang/Object;>([TT;)Ljava/util/List<TT;>;
+ <T:Ljava/lang/Object;>([TT;)L1java/util/List<TT;>;
+stream
+ ([D)Ljava/util/stream/DoubleStream;
+ ([D)L1java/util/stream/DoubleStream;
+stream
+ ([DII)Ljava/util/stream/DoubleStream;
+ ([DII)L1java/util/stream/DoubleStream;
+stream
+ ([I)Ljava/util/stream/IntStream;
+ ([I)L1java/util/stream/IntStream;
+stream
+ ([III)Ljava/util/stream/IntStream;
+ ([III)L1java/util/stream/IntStream;
+stream
+ ([J)Ljava/util/stream/LongStream;
+ ([J)L1java/util/stream/LongStream;
+stream
+ ([JII)Ljava/util/stream/LongStream;
+ ([JII)L1java/util/stream/LongStream;
+stream
+ <T:Ljava/lang/Object;>([TT;)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>([TT;)L1java/util/stream/Stream<TT;>;
+stream
+ <T:Ljava/lang/Object;>([TT;II)Ljava/util/stream/Stream<TT;>;
+ <T:Ljava/lang/Object;>([TT;II)L1java/util/stream/Stream<TT;>;
