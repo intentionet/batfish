@@ -3557,8 +3557,6 @@ public final class CiscoConfiguration extends VendorConfiguration {
     recordDocsisPolicies();
     recordDocsisPolicyRules();
     recordStructure(_asPathAccessLists, CiscoStructureType.AS_PATH_ACCESS_LIST);
-    recordStructure(_ipsecProfiles, CiscoStructureType.IPSEC_PROFILE);
-    recordStructure(_ipsecTransformSets, CiscoStructureType.IPSEC_TRANSFORM_SET);
     recordPeerGroups();
     recordPeerSessions();
     recordServiceClasses();

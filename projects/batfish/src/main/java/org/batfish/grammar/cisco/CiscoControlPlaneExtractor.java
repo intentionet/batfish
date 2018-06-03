@@ -1526,7 +1526,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     if (_currentIpsecProfile != null) {
       throw new BatfishException("IpsecProfile should be null!");
     }
-    _currentIpsecProfile = new IpsecProfile(ctx.name.getText(), ctx.getStart().getLine());
+    _currentIpsecProfile = new IpsecProfile(ctx.name.getText());
     defineStructure(IPSEC_PROFILE, ctx.name.getText(), ctx);
   }
 
@@ -1535,7 +1535,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     if (_currentIpsecTransformSet != null) {
       throw new BatfishException("IpsecTransformSet should be null!");
     }
-    _currentIpsecTransformSet = new IpsecTransformSet(ctx.name.getText(), ctx.getStart().getLine());
+    _currentIpsecTransformSet = new IpsecTransformSet(ctx.name.getText());
     defineStructure(IPSEC_TRANSFORM_SET, ctx.name.getText(), ctx);
     IpsecProposal proposal = _currentIpsecTransformSet.getProposal();
     proposal.setEncryptionAlgorithm(toEncryptionAlgorithm(ctx.ipsec_encryption()));

@@ -1,9 +1,9 @@
 package org.batfish.representation.cisco;
 
-import org.batfish.common.util.DefinedStructure;
+import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.DiffieHellmanGroup;
 
-public class IpsecProfile extends DefinedStructure<String> {
+public class IpsecProfile extends ComparableStructure<String> {
 
   private static final long serialVersionUID = 1L;
 
@@ -13,8 +13,8 @@ public class IpsecProfile extends DefinedStructure<String> {
 
   private String _transformSet;
 
-  public IpsecProfile(String name, int definitionLine) {
-    super(name, definitionLine);
+  public IpsecProfile(String name) {
+    super(name);
   }
 
   public String getIsakmpProfile() {
