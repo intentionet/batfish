@@ -17,6 +17,7 @@ java_library(
         "//projects/batfish-common-protocol:common",
         "//projects/lib/jsonpath",
         "@auto_service//:compile",
+        "@commons_lang3//:compile",
         "@jackson_annotations//:compile",
         "@jackson_core//:compile",
         "@jackson_databind//:compile",
