@@ -2447,7 +2447,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   public void enterSeip_proposal(Seip_proposalContext ctx) {
     String name = ctx.name.getText();
     _currentIpsecProposal =
-        _configuration.getIpsecProposals().computeIfAbsent(name, n -> new IpsecProposal(n));
+        _configuration.getIpsecProposals().computeIfAbsent(name, n -> new IpsecProposal(n, -1));
   }
 
   @Override

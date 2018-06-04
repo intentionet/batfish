@@ -219,7 +219,7 @@ public class VpnConnection implements AwsVpcEntity, Serializable {
       IpsecPolicy ipsecPolicy = new IpsecPolicy(vpnId);
       vpnGatewayCfgNode.getIpsecPolicies().put(vpnId, ipsecPolicy);
       ipsecVpn.setIpsecPolicy(ipsecPolicy);
-      IpsecProposal ipsecProposal = new IpsecProposal(vpnId);
+      IpsecProposal ipsecProposal = new IpsecProposal(vpnId, -1);
       vpnGatewayCfgNode.getIpsecProposals().put(vpnId, ipsecProposal);
       ipsecPolicy.getProposals().put(vpnId, ipsecProposal);
       IkeGateway ikeGateway = new IkeGateway(vpnId);

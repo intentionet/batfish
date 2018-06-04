@@ -1,6 +1,8 @@
 package org.batfish.datamodel;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.batfish.common.util.ComparableStructure;
 
 public class IpsecProposal extends ComparableStructure<String> {
@@ -80,9 +82,15 @@ public class IpsecProposal extends ComparableStructure<String> {
 
   private IpsecProtocol _protocol;
 
-  public IpsecProposal(String name) {
+  @JsonCreator
+  private IpsecProposal(@JsonProperty(PROP_NAME) String name) {
     super(name);
     _definitionLine = -1;
+  }
+
+  public IpsecProposal(String name, int definitionLine) {
+    super(name);
+    _definitionLine = definitionLine;
   }
 
   public boolean compatibleWith(IpsecProposal rhs) {

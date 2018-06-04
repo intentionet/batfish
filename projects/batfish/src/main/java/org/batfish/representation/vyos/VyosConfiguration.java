@@ -213,7 +213,7 @@ public class VyosConfiguration extends VendorConfiguration {
           String newIpsecProposalName =
               espGroupName + ":" + Integer.toString(espProposalEntry.getKey());
           EspProposal espProposal = espProposalEntry.getValue();
-          IpsecProposal newIpsecProposal = new IpsecProposal(newIpsecProposalName);
+          IpsecProposal newIpsecProposal = new IpsecProposal(newIpsecProposalName, -1);
           _c.getIpsecProposals().put(newIpsecProposalName, newIpsecProposal);
           newIpsecPolicy.getProposals().put(newIpsecProposalName, newIpsecProposal);
           newIpsecProposal.setAuthenticationAlgorithm(
