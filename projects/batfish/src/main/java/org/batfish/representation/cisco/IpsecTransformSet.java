@@ -15,7 +15,7 @@ public class IpsecTransformSet extends ComparableStructure<String> {
     super(name);
     _proposal = new IpsecProposal(name, -1);
   }
-ß
+
   public String getMode() {
     return _mode;
   }
