@@ -8036,9 +8036,9 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   private EncryptionAlgorithm toEncryptionAlgorithm(Ipsec_encryptionContext ctx) {
-    int strength;
+
     if (ctx.ESP_AES() != null) {
-      strength = ctx.strength == null ? 128 : toInteger(ctx.strength);
+      int strength = ctx.strength == null ? 128 : toInteger(ctx.strength);
       switch (strength) {
         case 128:
           return EncryptionAlgorithm.AES_128_CBC;
@@ -8054,7 +8054,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     } else if (ctx.ESP_3DES() != null) {
       return EncryptionAlgorithm.THREEDES_CBC;
     } else if (ctx.ESP_GCM() != null) {
-      strength = ctx.strength == null ? 128 : toInteger(ctx.strength);
+      int strength = ctx.strength == null ? 128 : toInteger(ctx.strength);
       switch (strength) {
         case 128:
           return EncryptionAlgorithm.AES_128_GCM;
@@ -8066,7 +8066,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
           throw convError(EncryptionAlgorithm.class, ctx);
       }
     } else if (ctx.ESP_GMAC() != null) {
-      strength = ctx.strength == null ? 128 : toInteger(ctx.strength);
+      int strength = ctx.strength == null ? 128 : toInteger(ctx.strength);
       switch (strength) {
         case 128:
           return EncryptionAlgorithm.AES_128_GMAC;
@@ -8080,7 +8080,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     } else if (ctx.ESP_NULL() != null) {
       return EncryptionAlgorithm.NULL;
     } else if (ctx.ESP_SEAL() != null) {
-      return EncryptionAlgorithm.AES_SEAL_160;
+      return EncryptionAlgorithm.SEAL_160;
     } else {
       throw convError(EncryptionAlgorithm.class, ctx);
     }

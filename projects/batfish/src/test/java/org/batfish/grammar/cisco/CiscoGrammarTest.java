@@ -1849,7 +1849,7 @@ public class CiscoGrammarTest {
             allOf(
                 IpsecProposalMatchers.hasAuthenticationAlgorithm(
                     IpsecAuthenticationAlgorithm.HMAC_MD5_96),
-                IpsecProposalMatchers.hasEncryptionAlgorithm(EncryptionAlgorithm.AES_SEAL_160),
+                IpsecProposalMatchers.hasEncryptionAlgorithm(EncryptionAlgorithm.SEAL_160),
                 hasProtocols(ImmutableSortedSet.of(IpsecProtocol.ESP)))));
     assertThat(
         c,

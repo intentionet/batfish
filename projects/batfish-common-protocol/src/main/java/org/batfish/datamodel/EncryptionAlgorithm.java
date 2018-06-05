@@ -12,6 +12,6 @@ public enum EncryptionAlgorithm {
   AES_256_GMAC,
   DES_CBC,
   NULL,
-  AES_SEAL_160,
+  SEAL_160,
   THREEDES_CBC
 }
