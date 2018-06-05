@@ -3,7 +3,6 @@ package org.batfish.question;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.service.AutoService;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -13,7 +12,6 @@ import javax.annotation.Nonnull;
 import org.batfish.common.Answerer;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.plugin.Plugin;
-import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.questions.NodesSpecifier;
 import org.batfish.datamodel.questions.Question;
@@ -64,12 +62,11 @@ public class InferRolesQuestionPlugin extends QuestionPlugin {
       InferRolesQuestion question = (InferRolesQuestion) _question;
       InferRolesAnswerElement answerElement = new InferRolesAnswerElement(null, null);
 
-      Map<String, Configuration> configurations = _batfish.loadConfigurations();
       // collect relevant nodes in a list.
       Set<String> nodes = question.getNodeRegex().getMatchingNodes(_batfish);
 
       SortedSet<NodeRoleDimension> roleDimensions =
-          new InferRoles(nodes, configurations, _batfish).call();
+          new InferRoles(nodes, _batfish.getEnvironmentTopology()).inferRoles();
       answerElement.getRoleDimensions().addAll(roleDimensions);
 
       for (NodeRoleDimension dimension : roleDimensions) {

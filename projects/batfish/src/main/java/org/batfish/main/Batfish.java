@@ -4106,7 +4106,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
     // Compute new auto role data and updates existing auto data with it
     SortedSet<NodeRoleDimension> autoRoles =
-        new InferRoles(configurations.keySet(), configurations, this).call();
+        new InferRoles(configurations.keySet(), envTopology).inferRoles();
     Path nodeRoleDataPath = _settings.getContainerDir().resolve(BfConsts.RELPATH_NODE_ROLES_PATH);
     try {
       NodeRolesData.mergeNodeRoleDimensions(nodeRoleDataPath, autoRoles, null, true);
