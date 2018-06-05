@@ -1,14 +1,18 @@
 package org.batfish.datamodel.table;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.answers.Schema;
 
-public class ColumnMetadata {
+@ParametersAreNonnullByDefault
+public final class ColumnMetadata {
   private static final String PROP_DESCRIPTION = "description";
   private static final String PROP_IS_KEY = "isKey";
   private static final String PROP_IS_VALUE = "isValue";
@@ -30,21 +34,24 @@ public class ColumnMetadata {
   }
 
   @JsonCreator
+  private static ColumnMetadata jsonCreator(
+      @Nullable @JsonProperty(PROP_NAME) String name,
+      @Nullable @JsonProperty(PROP_SCHEMA) Schema schema,
+      @Nullable @JsonProperty(PROP_DESCRIPTION) String description,
+      @Nullable @JsonProperty(PROP_IS_KEY) Boolean isKey,
+      @Nullable @JsonProperty(PROP_IS_VALUE) Boolean isValue) {
+    checkArgument(name != null, "'name' cannot be null for ColumnMetadata");
+    checkArgument(description != null, "'description' cannot be null for ColumnMetadata");
+    checkArgument(schema != null, "'schema' cannot be null for ColumnMetadata");
+    return new ColumnMetadata(name, schema, description, isKey, isValue);
+  }
+
   public ColumnMetadata(
-      @Nonnull @JsonProperty(PROP_NAME) String name,
-      @Nonnull @JsonProperty(PROP_SCHEMA) Schema schema,
-      @Nonnull @JsonProperty(PROP_DESCRIPTION) String description,
-      @JsonProperty(PROP_IS_KEY) Boolean isKey,
-      @JsonProperty(PROP_IS_VALUE) Boolean isValue) {
-    if (name == null) {
-      throw new IllegalArgumentException("'name' cannot be null for ColumnMetadata");
-    }
-    if (description == null) {
-      throw new IllegalArgumentException("'description' cannot be null for ColumnMetadata");
-    }
-    if (schema == null) {
-      throw new IllegalArgumentException("'schema' cannot be null for ColumnMetadata");
-    }
+      String name,
+      Schema schema,
+      String description,
+      @Nullable Boolean isKey,
+      @Nullable Boolean isValue) {
     if (!isLegalColumnName(name)) {
       throw new IllegalArgumentException(
           String.format(
