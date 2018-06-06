@@ -91,6 +91,10 @@ public abstract class BatfishCombinedParser<P extends BatfishParser, L extends B
     }
   }
 
+  public static String escape(String offendingTokenText) {
+    return offendingTokenText.replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r");
+  }
+
   public List<String> getErrors() {
     return _errors;
   }

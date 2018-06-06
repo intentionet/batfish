@@ -9,7 +9,7 @@ java_library(
         ":MrvParserListener.java",
     ],
     deps = [
-        "//projects/batfish-common-protocol:common",
+        "//projects/batfish-common-protocol:parser_common",
         "@antlr4_runtime//:compile",
     ],
 )

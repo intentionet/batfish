@@ -736,10 +736,6 @@ public class CommonUtil {
     return differenceSet;
   }
 
-  public static String escape(String offendingTokenText) {
-    return offendingTokenText.replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r");
-  }
-
   public static String extractBits(long l, int start, int end) {
     StringBuilder s = new StringBuilder();
     for (int pos = end; pos >= start; pos--) {

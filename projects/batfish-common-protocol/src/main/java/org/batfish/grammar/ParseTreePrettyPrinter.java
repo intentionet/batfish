@@ -14,7 +14,6 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.batfish.common.ParseTreeSentences;
-import org.batfish.common.util.CommonUtil;
 
 public class ParseTreePrettyPrinter implements ParseTreeListener {
 
@@ -112,7 +111,7 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
 
   @Override
   public void visitErrorNode(ErrorNode ctx) {
-    String nodeText = CommonUtil.escape(ctx.getText());
+    String nodeText = BatfishCombinedParser.escape(ctx.getText());
     // _sb.append("\n");
     _ptSentences.getSentences().add("");
     for (int i = 0; i < _indent; i++) {
@@ -133,7 +132,7 @@ public class ParseTreePrettyPrinter implements ParseTreeListener {
 
   @Override
   public void visitTerminal(TerminalNode ctx) {
-    String nodeText = CommonUtil.escape(ctx.getText());
+    String nodeText = BatfishCombinedParser.escape(ctx.getText());
     _ptSentences.getSentences().add("");
     for (int i = 0; i < _indent; i++) {
       _ptSentences.appendToLastSentence("  ");
