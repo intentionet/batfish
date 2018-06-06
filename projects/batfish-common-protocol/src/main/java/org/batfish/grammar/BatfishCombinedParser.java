@@ -91,6 +91,10 @@ public abstract class BatfishCombinedParser<P extends BatfishParser, L extends B
     }
   }
 
+  /**
+   * Escapes certain whitespace {@code \n, \r, \t} in the given token text. This is typically used
+   * when printing token text for debugging purposes.
+   */
   public static String escape(String offendingTokenText) {
     return offendingTokenText.replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r");
   }
