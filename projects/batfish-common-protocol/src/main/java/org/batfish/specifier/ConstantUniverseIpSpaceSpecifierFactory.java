@@ -4,10 +4,12 @@ import com.google.auto.service.AutoService;
 import org.batfish.datamodel.UniverseIpSpace;
 
 @AutoService(IpSpaceSpecifierFactory.class)
-public class ConstantUniverseIpSpaceSpecifierFactory implements IpSpaceSpecifierFactory {
+public final class ConstantUniverseIpSpaceSpecifierFactory implements IpSpaceSpecifierFactory {
+  public static final String NAME = ConstantUniverseIpSpaceSpecifierFactory.class.getSimpleName();
+
   @Override
   public String getName() {
-    return getClass().getSimpleName();
+    return NAME;
   }
 
   @Override
