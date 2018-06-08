@@ -12,6 +12,7 @@ import static org.batfish.representation.juniper.JuniperStructureType.VLAN;
 import static org.batfish.representation.juniper.JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION;
 import static org.batfish.representation.juniper.JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION_SET;
 import static org.batfish.representation.juniper.JuniperStructureUsage.AUTHENTICATION_KEY_CHAINS_POLICY;
+import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_ALLOW;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_NEIGHBOR;
 import static org.batfish.representation.juniper.JuniperStructureUsage.FIREWALL_FILTER_DESTINATION_PREFIX_LIST;
 import static org.batfish.representation.juniper.JuniperStructureUsage.FIREWALL_FILTER_PREFIX_LIST;
@@ -1790,6 +1791,10 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void enterB_allow(B_allowContext ctx) {
+    if (_currentBgpGroup.getGroupName() != null) {
+      _configuration.referenceStructure(
+          BGP_GROUP, _currentBgpGroup.getGroupName(), BGP_ALLOW, ctx.getStart().getLine());
+    }
     if (ctx.IPV6_PREFIX() != null) {
       _currentBgpGroup.setIpv6(true);
       _currentBgpGroup = DUMMY_BGP_GROUP;

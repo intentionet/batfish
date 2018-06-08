@@ -75,16 +75,6 @@
           ]
         }
       },
-      "unused:bgp group:GROUP" : {
-        "description" : "Unused structure of type: 'bgp group' with name: 'GROUP'",
-        "files" : {
-          "juniper_bgp_allow" : [
-            6,
-            7,
-            8
-          ]
-        }
-      },
       "unused:bgp group:NEIGH" : {
         "description" : "Unused structure of type: 'bgp group' with name: 'NEIGH'",
         "files" : {
@@ -1418,15 +1408,6 @@
         "standard ipv4 access-list" : {
           "Local_LAN_Access" : [
             5
-          ]
-        }
-      },
-      "bgp-allow" : {
-        "bgp group" : {
-          "GROUP" : [
-            6,
-            7,
-            8
           ]
         }
       },

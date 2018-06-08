@@ -210,8 +210,6 @@ public final class JuniperConfiguration extends VendorConfiguration {
 
   private transient Set<String> _unimplementedFeatures;
 
-  private transient Set<String> _unreferencedBgpGroups;
-
   private ConfigurationFormat _vendor;
 
   private final Map<String, Vlan> _vlanNameToVlan;
@@ -319,21 +317,6 @@ public final class JuniperConfiguration extends VendorConfiguration {
     }
     for (IpBgpGroup ig : routingInstance.getIpBgpGroups().values()) {
       ig.cascadeInheritance();
-    }
-    _unreferencedBgpGroups = new TreeSet<>();
-    int fakeIpCounter = 0;
-    for (Entry<String, NamedBgpGroup> e : routingInstance.getNamedBgpGroups().entrySet()) {
-      fakeIpCounter++;
-      String name = e.getKey();
-      NamedBgpGroup group = e.getValue();
-      if (!group.getIpv6() && !group.getInherited()) {
-        _unreferencedBgpGroups.add(name);
-        Prefix fakeIp = new Prefix(new Ip(-1 * fakeIpCounter), Prefix.MAX_PREFIX_LENGTH);
-        IpBgpGroup dummy = new IpBgpGroup(fakeIp);
-        dummy.setParent(group);
-        dummy.cascadeInheritance();
-        routingInstance.getIpBgpGroups().put(fakeIp, dummy);
-      }
     }
     for (Entry<Prefix, IpBgpGroup> e : routingInstance.getIpBgpGroups().entrySet()) {
       Prefix prefix = e.getKey();
@@ -576,9 +559,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
       } else {
         neighbor.setLocalIp(localIp);
       }
-      if (neighbor.getGroup() == null || !_unreferencedBgpGroups.contains(neighbor.getGroup())) {
-        proc.getNeighbors().put(neighbor.getPrefix(), neighbor);
-      }
+      proc.getNeighbors().put(neighbor.getPrefix(), neighbor);
     }
     proc.setMultipathEbgp(multipathEbgpSet);
     proc.setMultipathIbgp(multipathIbgp);
@@ -2279,7 +2260,10 @@ public final class JuniperConfiguration extends VendorConfiguration {
     markConcreteStructure(
         JuniperStructureType.APPLICATION_SET,
         JuniperStructureUsage.APPLICATION_SET_MEMBER_APPLICATION_SET);
-    markConcreteStructure(JuniperStructureType.BGP_GROUP, JuniperStructureUsage.BGP_NEIGHBOR);
+    markConcreteStructure(
+        JuniperStructureType.BGP_GROUP,
+        JuniperStructureUsage.BGP_ALLOW,
+        JuniperStructureUsage.BGP_NEIGHBOR);
     markConcreteStructure(
         JuniperStructureType.FIREWALL_FILTER, JuniperStructureUsage.INTERFACE_FILTER);
     markConcreteStructure(
