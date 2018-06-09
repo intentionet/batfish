@@ -1655,10 +1655,9 @@ public class Client extends AbstractClient implements IClient {
         return;
     }
 
-    String workMgr = _settings.getCoordinatorHost() + ":" + _settings.getCoordinatorWorkPort();
-    String poolMgr = _settings.getCoordinatorHost() + ":" + _settings.getCoordinatorPoolPort();
+    _workHelper = new BfCoordWorkHelper(_logger, _settings);
 
-    _workHelper = new BfCoordWorkHelper(workMgr, _logger, _settings);
+    String poolMgr = _settings.getCoordinatorHost() + ":" + _settings.getCoordinatorPoolPort();
     _poolHelper = new BfCoordPoolHelper(poolMgr);
 
     int numTries = 0;

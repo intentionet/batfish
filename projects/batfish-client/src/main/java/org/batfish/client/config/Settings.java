@@ -33,6 +33,7 @@ public class Settings extends BaseSettings {
   public static final String ARG_SERVICE_NAME = "servicename";
   private static final String ARG_SERVICE_POOL_PORT = "coordinatorpoolport";
   private static final String ARG_SERVICE_WORK_PORT = "coordinatorworkport";
+  private static final String ARG_SERVICE_WORK_V2_PORT = "coordinatorworkv2port";
   public static final String ARG_TESTRIG_DIR = "testrigdir";
   public static final String ARG_TESTRIG_ID = "testrigid";
   private static final String ARG_TRACING_AGENT_HOST = "tracingagenthost";
@@ -47,6 +48,7 @@ public class Settings extends BaseSettings {
   private String _coordinatorHost;
   private int _coordinatorPoolPort;
   private int _coordinatorWorkPort;
+  private int _coordinatorWorkV2Port;
   private String _datamodelDir;
   private String _logFile;
   private String _logLevel;
@@ -108,6 +110,10 @@ public class Settings extends BaseSettings {
 
   public int getCoordinatorWorkPort() {
     return _coordinatorWorkPort;
+  }
+
+  public int getCoordinatorWorkV2Port() {
+    return _coordinatorWorkV2Port;
   }
 
   public String getDatamodelDir() {
@@ -208,6 +214,7 @@ public class Settings extends BaseSettings {
     setDefaultProperty(ARG_SERVICE_NAME, "client-service");
     setDefaultProperty(ARG_SERVICE_POOL_PORT, CoordConsts.SVC_CFG_POOL_PORT);
     setDefaultProperty(ARG_SERVICE_WORK_PORT, CoordConsts.SVC_CFG_WORK_PORT);
+    setDefaultProperty(ARG_SERVICE_WORK_V2_PORT, CoordConsts.SVC_CFG_WORK_V2_PORT);
     setDefaultProperty(BfConsts.ARG_SSL_DISABLE, CoordConsts.SVC_CFG_WORK_SSL_DISABLE);
     setDefaultProperty(BfConsts.ARG_SSL_KEYSTORE_FILE, null);
     setDefaultProperty(BfConsts.ARG_SSL_KEYSTORE_PASSWORD, null);
@@ -313,6 +320,7 @@ public class Settings extends BaseSettings {
     _coordinatorHost = getStringOptionValue(ARG_COORDINATOR_HOST);
     _coordinatorPoolPort = getIntegerOptionValue(ARG_SERVICE_POOL_PORT);
     _coordinatorWorkPort = getIntegerOptionValue(ARG_SERVICE_WORK_PORT);
+    _coordinatorWorkV2Port = getIntegerOptionValue(ARG_SERVICE_WORK_V2_PORT);
   }
 
   public void setBatfishLogLevel(String logLevel) {
@@ -325,6 +333,10 @@ public class Settings extends BaseSettings {
 
   public void setCoordinatorWorkPort(int coordinatorWorkPort) {
     _coordinatorWorkPort = coordinatorWorkPort;
+  }
+
+  public void setCoordinatorWorkV2Port(int port) {
+    _coordinatorWorkV2Port = port;
   }
 
   public void setLogLevel(String logLevel) {

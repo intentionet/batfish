@@ -22,6 +22,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
@@ -232,7 +233,10 @@ public class Main {
   }
 
   private static void startWorkManagerService(
-      Class<?> serviceClass, List<Class<?>> features, int port, BindPortFutures bindPortFutures) {
+      Class<?> serviceClass,
+      List<Class<?>> features,
+      int port,
+      CompletableFuture<Integer> portFuture) {
     ResourceConfig rcWork =
         new ResourceConfig(serviceClass)
             .register(ExceptionMapper.class)
@@ -275,8 +279,8 @@ public class Main {
             .port(selectedListenPort)
             .build();
     _logger.infof("Started work manager at %s\n", actualWorkMgrUri);
-    if (!bindPortFutures.getWorkPort().isDone()) {
-      bindPortFutures.getWorkPort().complete(selectedListenPort);
+    if (!portFuture.isDone()) {
+      portFuture.complete(selectedListenPort);
     }
   }
 
@@ -302,7 +306,7 @@ public class Main {
         WorkMgrService.class,
         Lists.newArrayList(JettisonFeature.class, MultiPartFeature.class),
         _settings.getServiceWorkPort(),
-        bindPortFutures);
+        bindPortFutures.getWorkPort());
     // Initialize and start the work manager service using the v2 RESTful API and Jackson.
 
     startWorkManagerService(
@@ -313,7 +317,7 @@ public class Main {
             ApiKeyAuthenticationFilter.class,
             VersionCompatibilityFilter.class),
         _settings.getServiceWorkV2Port(),
-        bindPortFutures);
+        bindPortFutures.getWorkV2Port());
   }
 
   public static void main(String[] args, BindPortFutures portFutures) {
@@ -334,6 +338,10 @@ public class Main {
     int configuredWorkPort = _settings.getServiceWorkPort();
     if (configuredWorkPort > 0) {
       portFutures.getWorkPort().complete(configuredWorkPort);
+    }
+    int configuredWorkV2Port = _settings.getServiceWorkV2Port();
+    if (configuredWorkV2Port > 0) {
+      portFutures.getWorkV2Port().complete(configuredWorkV2Port);
     }
 
     _logger = logger;

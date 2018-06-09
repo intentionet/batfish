@@ -50,11 +50,11 @@ public class BfCoordWorkHelper {
   private Settings _settings;
   private Client _client;
 
-  public BfCoordWorkHelper(String workMgr, BatfishLogger logger, Settings settings) {
-    _coordWorkMgr = workMgr;
+  public BfCoordWorkHelper(BatfishLogger logger, Settings settings) {
+    _coordWorkMgr = _settings.getCoordinatorHost() + ":" + _settings.getCoordinatorWorkPort();
+    _coordWorkMgrV2 = _settings.getCoordinatorHost() + ":" + _settings.getCoordinatorWorkV2Port();
     _logger = logger;
     _settings = settings;
-    _coordWorkMgrV2 = _settings.getCoordinatorHost() + ":" + CoordConsts.SVC_CFG_WORK_V2_PORT;
     try {
       _client = getClientBuilder().build();
     } catch (Exception e) {
