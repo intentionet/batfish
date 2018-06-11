@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.SortedSet;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.batfish.datamodel.ForwardingAction;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.questions.Question;
@@ -60,7 +62,7 @@ public final class SpecifiersReachabilityQuestion extends Question {
       "requiredTransitNodesNodeSpecifierInput";
 
   private static LocationSpecifier getLocationSpecifier(
-      String factoryName, String input, LocationSpecifier def) {
+      @Nullable String factoryName, @Nullable String input, @Nonnull LocationSpecifier def) {
     if (factoryName == null && input == null) {
       return def;
     }
@@ -72,7 +74,7 @@ public final class SpecifiersReachabilityQuestion extends Question {
   }
 
   private static IpSpaceSpecifier getIpSpaceSpecifier(
-      String factoryName, String input, InferFromLocationIpSpaceSpecifier def) {
+      @Nullable String factoryName, @Nullable String input, @Nonnull IpSpaceSpecifier def) {
     if (factoryName == null && input == null) {
       return def;
     }
@@ -84,7 +86,7 @@ public final class SpecifiersReachabilityQuestion extends Question {
   }
 
   private static NodeSpecifier getNodeSpecifier(
-      String factoryName, String input, NodeSpecifier def) {
+      @Nullable String factoryName, @Nullable String input, @Nonnull NodeSpecifier def) {
     if (factoryName == null && input == null) {
       return def;
     }
@@ -231,7 +233,7 @@ public final class SpecifiersReachabilityQuestion extends Question {
   }
 
   @JsonProperty(PROP_ACTIONS)
-  public void setActions(SortedSet<ForwardingAction> actionSet) {
+  public void setActions(Iterable<ForwardingAction> actionSet) {
     _actions = ImmutableSortedSet.copyOf(actionSet);
   }
 

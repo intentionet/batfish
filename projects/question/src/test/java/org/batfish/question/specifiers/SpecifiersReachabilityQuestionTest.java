@@ -56,10 +56,11 @@ public class SpecifiersReachabilityQuestionTest {
 
   @Test
   public void getFinalNodes_factoryNonNull_exception() {
-    exception.expect(BatfishException.class);
-    exception.expectMessage("Could not find NodeSpecifierFactory with name foo");
     SpecifiersReachabilityQuestion question = new SpecifiersReachabilityQuestion();
     question.setFinalNodesSpecifierFactory("foo");
+
+    exception.expect(BatfishException.class);
+    exception.expectMessage("Could not find NodeSpecifierFactory with name foo");
     question.getFinalNodesSpecifier();
   }
 
