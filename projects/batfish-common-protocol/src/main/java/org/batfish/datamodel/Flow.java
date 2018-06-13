@@ -2,6 +2,7 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 import java.io.Serializable;
 import org.batfish.common.BatfishException;
 
@@ -618,73 +619,30 @@ public final class Flow implements Comparable<Flow>, Serializable {
       return false;
     }
     Flow other = (Flow) o;
-    if (_dscp != other._dscp) {
-      return false;
-    }
-    if (!_dstIp.equals(other._dstIp)) {
-      return false;
-    }
-    if (_dstPort != other._dstPort) {
-      return false;
-    }
-    if (_ecn != other._ecn) {
-      return false;
-    }
-    if (_fragmentOffset != other._fragmentOffset) {
-      return false;
-    }
-    if (!_ingressNode.equals(other._ingressNode)) {
-      return false;
-    }
-    if (!_ingressVrf.equals(other._ingressVrf)) {
-      return false;
-    }
-    if (_ipProtocol != other._ipProtocol) {
-      return false;
-    }
-    if (!_srcIp.equals(other._srcIp)) {
-      return false;
-    }
-    if (_srcPort != other._srcPort) {
-      return false;
-    }
-    if (_icmpType != other._icmpType) {
-      return false;
-    }
-    if (_icmpCode != other._icmpCode) {
-      return false;
-    }
-    if (_packetLength != other._packetLength) {
-      return false;
-    }
-    if (_state != other._state) {
-      return false;
-    }
-    if (_tcpFlagsCwr != other._tcpFlagsCwr) {
-      return false;
-    }
-    if (_tcpFlagsEce != other._tcpFlagsEce) {
-      return false;
-    }
-    if (_tcpFlagsUrg != other._tcpFlagsUrg) {
-      return false;
-    }
-    if (_tcpFlagsAck != other._tcpFlagsAck) {
-      return false;
-    }
-    if (_tcpFlagsPsh != other._tcpFlagsPsh) {
-      return false;
-    }
-    if (_tcpFlagsRst != other._tcpFlagsRst) {
-      return false;
-    }
-    if (_tcpFlagsSyn != other._tcpFlagsSyn) {
-      return false;
-    }
-    if (_tcpFlagsFin != other._tcpFlagsFin) {
-      return false;
-    }
-    return _tag.equals(other._tag);
+    return _dscp == other._dscp
+        && Objects.equal(_dstIp, other._dstIp)
+        && Objects.equal(_dstPort, other._dstPort)
+        && _ecn == other._ecn
+        && _fragmentOffset == other._fragmentOffset
+        && Objects.equal(_icmpCode, other._icmpCode)
+        && Objects.equal(_icmpType, other._icmpType)
+        && Objects.equal(_ingressInterface, other._ingressInterface)
+        && Objects.equal(_ingressNode, other._ingressNode)
+        && Objects.equal(_ingressVrf, other._ingressVrf)
+        && Objects.equal(_ipProtocol, other._ipProtocol)
+        && _packetLength == other._packetLength
+        && Objects.equal(_srcIp, other._srcIp)
+        && Objects.equal(_srcPort, other._srcPort)
+        && Objects.equal(_state, other._state)
+        && Objects.equal(_tag, other._tag)
+        && _tcpFlagsAck == other._tcpFlagsAck
+        && _tcpFlagsCwr == other._tcpFlagsCwr
+        && _tcpFlagsEce == other._tcpFlagsEce
+        && _tcpFlagsFin == other._tcpFlagsFin
+        && _tcpFlagsPsh == other._tcpFlagsPsh
+        && _tcpFlagsRst == other._tcpFlagsRst
+        && _tcpFlagsSyn == other._tcpFlagsSyn
+        && _tcpFlagsUrg == other._tcpFlagsUrg;
   }
 
   @JsonProperty(PROP_DSCP)
@@ -809,32 +767,31 @@ public final class Flow implements Comparable<Flow>, Serializable {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + _dscp;
-    result = prime * result + _dstIp.hashCode();
-    result = prime * result + _dstPort;
-    result = prime * result + _ecn;
-    result = prime * result + _fragmentOffset;
-    result = prime * result + _ingressNode.hashCode();
-    result = prime * result + _ingressVrf.hashCode();
-    result = prime * result + _ipProtocol.ordinal();
-    result = prime * result + _srcIp.hashCode();
-    result = prime * result + _srcPort;
-    result = prime * result + _icmpType;
-    result = prime * result + _icmpCode;
-    result = prime * result + _packetLength;
-    result = prime * result + _state.ordinal();
-    result = prime * result + _tag.hashCode();
-    result = prime * result + _tcpFlagsCwr;
-    result = prime * result + _tcpFlagsEce;
-    result = prime * result + _tcpFlagsUrg;
-    result = prime * result + _tcpFlagsAck;
-    result = prime * result + _tcpFlagsPsh;
-    result = prime * result + _tcpFlagsRst;
-    result = prime * result + _tcpFlagsSyn;
-    result = prime * result + _tcpFlagsFin;
-    return result;
+    return Objects.hashCode(
+        _dscp,
+        _dstIp,
+        _dstPort,
+        _ecn,
+        _fragmentOffset,
+        _icmpCode,
+        _icmpType,
+        _ingressInterface,
+        _ingressNode,
+        _ingressVrf,
+        _ipProtocol,
+        _packetLength,
+        _srcIp,
+        _srcPort,
+        _state,
+        _tag,
+        _tcpFlagsAck,
+        _tcpFlagsCwr,
+        _tcpFlagsEce,
+        _tcpFlagsFin,
+        _tcpFlagsPsh,
+        _tcpFlagsRst,
+        _tcpFlagsSyn,
+        _tcpFlagsUrg);
   }
 
   public String prettyPrint(String prefixString) {
@@ -873,8 +830,8 @@ public final class Flow implements Comparable<Flow>, Serializable {
     return prefixString
         + "Flow: ingress:"
         + _ingressNode
-        + " vrf:"
-        + _ingressVrf
+        + (_ingressVrf != null ? " vrf:" + _ingressVrf : "")
+        + (_ingressInterface != null ? " iface:" + _ingressInterface : "")
         + " "
         + _srcIp
         + "->"
@@ -936,8 +893,8 @@ public final class Flow implements Comparable<Flow>, Serializable {
     }
     return "Flow<ingressNode:"
         + _ingressNode
-        + " ingressVrf:"
-        + _ingressVrf
+        + (_ingressVrf != null ? " vrf:" + _ingressVrf : "")
+        + (_ingressInterface != null ? " iface:" + _ingressInterface : "")
         + " srcIp:"
         + _srcIp
         + " dstIp:"
