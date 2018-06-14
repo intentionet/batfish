@@ -151,6 +151,7 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.POLICY_MAP_EV
 import static org.batfish.representation.cisco.CiscoStructureUsage.QOS_ENFORCE_RULE_SERVICE_CLASS;
 import static org.batfish.representation.cisco.CiscoStructureUsage.RIP_DISTRIBUTE_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTER_ISIS_DISTRIBUTE_LIST_ACL;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTER_VRRP_INTERFACE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_PREFIX_LIST;
@@ -3463,6 +3464,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   public void enterVrrp_interface(Vrrp_interfaceContext ctx) {
     String ifaceName = ctx.iface.getText();
     _currentVrrpInterface = getCanonicalInterfaceName(ifaceName);
+    _configuration.referenceStructure(
+        INTERFACE, _currentVrrpInterface, ROUTER_VRRP_INTERFACE, ctx.iface.getStart().getLine());
   }
 
   @Override
@@ -7562,13 +7565,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitUpdate_source_bgp_tail(Update_source_bgp_tailContext ctx) {
+    String source = toInterfaceName(ctx.source);
+    _configuration.referenceStructure(
+        INTERFACE, source, BGP_UPDATE_SOURCE_INTERFACE, ctx.getStart().getLine());
+
     if (_currentPeerGroup == null) {
       return;
     } else {
-      String source = toInterfaceName(ctx.source);
-      int line = ctx.source.getStart().getLine();
       _currentPeerGroup.setUpdateSource(source);
-      _currentPeerGroup.setUpdateSourceLine(line);
     }
   }
 

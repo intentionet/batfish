@@ -95,8 +95,6 @@ public abstract class BgpPeerGroup implements Serializable {
 
   protected String _updateSource;
 
-  protected int _updateSourceLine;
-
   public BgpPeerGroup() {}
 
   public Boolean getActive() {
@@ -316,10 +314,6 @@ public abstract class BgpPeerGroup implements Serializable {
 
   public String getUpdateSource() {
     return _updateSource;
-  }
-
-  public int getUpdateSourceLine() {
-    return _updateSourceLine;
   }
 
   private void inheritUnsetFields(BgpPeerGroup pg) {
@@ -609,9 +603,5 @@ public abstract class BgpPeerGroup implements Serializable {
 
   public void setUpdateSource(String updateSource) {
     _updateSource = updateSource;
-  }
-
-  public void setUpdateSourceLine(int updateSourceLine) {
-    _updateSourceLine = updateSourceLine;
   }
 }

@@ -56903,6 +56903,14 @@
           }
         },
         "cadant_bgp" : {
+          "interface" : {
+            "Loopback15" : {
+              "update-source interface" : [
+                12,
+                17
+              ]
+            }
+          },
           "route-map" : {
             "blarp" : {
               "bgp outbound route-map" : [
@@ -57464,12 +57472,17 @@
           "interface" : {
             "GigabitEthernet0/0/0/19" : {
               "router vrrp interface" : [
-                16
+                14
+              ]
+            },
+            "ManagementEthernet0/RSP0/CPU0/0" : {
+              "router vrrp interface" : [
+                24
               ]
             },
             "ManagementEthernet0/RSP1/CPU0/0" : {
               "router vrrp interface" : [
-                28
+                26
               ]
             }
           }
@@ -57487,7 +57500,7 @@
           "interface" : {
             "Loopback1" : {
               "update-source interface" : [
-                0
+                16
               ]
             }
           }
@@ -57533,7 +57546,11 @@
           "interface" : {
             "Loopback0" : {
               "update-source interface" : [
-                0
+                22,
+                36,
+                48,
+                58,
+                69
               ]
             }
           }
@@ -57712,6 +57729,13 @@
           }
         },
         "peer_template" : {
+          "interface" : {
+            "Loopback1" : {
+              "update-source interface" : [
+                16
+              ]
+            }
+          },
           "route-map" : {
             "PROTECT-LEAF" : {
               "bgp inbound route-map" : [

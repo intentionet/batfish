@@ -508,12 +508,6 @@ public final class CiscoConfiguration extends VendorConfiguration {
                       }
                       iface.getVrrpGroups().put(groupNum, newGroup);
                     });
-          } else {
-            undefined(
-                CiscoStructureType.INTERFACE,
-                ifaceName,
-                CiscoStructureUsage.ROUTER_VRRP_INTERFACE,
-                vrrpInterface.getDefinitionLine());
           }
         });
   }
@@ -921,12 +915,6 @@ public final class CiscoConfiguration extends VendorConfiguration {
                     + updateSourceInterface
                     + "' not assigned an ip address");
           }
-        } else {
-          undefined(
-              CiscoStructureType.INTERFACE,
-              updateSourceInterface,
-              CiscoStructureUsage.BGP_UPDATE_SOURCE_INTERFACE,
-              lpg.getUpdateSourceLine());
         }
       } else {
         if (lpg instanceof DynamicIpBgpPeerGroup) {
@@ -3363,7 +3351,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
           e.getValue());
     }
 
-    markConcreteStructure(CiscoStructureType.INTERFACE, CiscoStructureUsage.INTERFACE_SELF_REF);
+    markConcreteStructure(
+        CiscoStructureType.INTERFACE,
+        CiscoStructureUsage.BGP_UPDATE_SOURCE_INTERFACE,
+        CiscoStructureUsage.INTERFACE_SELF_REF,
+        CiscoStructureUsage.ROUTER_VRRP_INTERFACE);
 
     // mark references to ACLs that may not appear in data model
     markIpOrMacAcls(
