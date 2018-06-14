@@ -6738,27 +6738,22 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       return;
     }
     String mapName = ctx.name.getText();
-    int line = ctx.name.getStart().getLine();
     boolean ipv6 = _inIpv6BgpPeer || _currentIpv6PeerGroup != null;
     CiscoStructureUsage usage;
     if (ctx.IN() != null) {
       if (ipv6) {
         _currentPeerGroup.setInboundRoute6Map(mapName);
-        _currentPeerGroup.setInboundRoute6MapLine(line);
         usage = BGP_INBOUND_ROUTE6_MAP;
       } else {
         _currentPeerGroup.setInboundRouteMap(mapName);
-        _currentPeerGroup.setInboundRouteMapLine(line);
         usage = BGP_INBOUND_ROUTE_MAP;
       }
     } else if (ctx.OUT() != null) {
       if (ipv6) {
         _currentPeerGroup.setOutboundRoute6Map(mapName);
-        _currentPeerGroup.setOutboundRoute6MapLine(line);
         usage = BGP_OUTBOUND_ROUTE6_MAP;
       } else {
         _currentPeerGroup.setOutboundRouteMap(mapName);
-        _currentPeerGroup.setOutboundRouteMapLine(line);
         usage = BGP_OUTBOUND_ROUTE_MAP;
       }
     } else {
