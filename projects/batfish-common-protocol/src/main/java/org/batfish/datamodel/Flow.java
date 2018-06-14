@@ -2,8 +2,8 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
 import java.io.Serializable;
+import java.util.Objects;
 import org.batfish.common.BatfishException;
 
 public final class Flow implements Comparable<Flow>, Serializable {
@@ -620,21 +620,21 @@ public final class Flow implements Comparable<Flow>, Serializable {
     }
     Flow other = (Flow) o;
     return _dscp == other._dscp
-        && Objects.equal(_dstIp, other._dstIp)
-        && Objects.equal(_dstPort, other._dstPort)
+        && Objects.equals(_dstIp, other._dstIp)
+        && Objects.equals(_dstPort, other._dstPort)
         && _ecn == other._ecn
         && _fragmentOffset == other._fragmentOffset
-        && Objects.equal(_icmpCode, other._icmpCode)
-        && Objects.equal(_icmpType, other._icmpType)
-        && Objects.equal(_ingressInterface, other._ingressInterface)
-        && Objects.equal(_ingressNode, other._ingressNode)
-        && Objects.equal(_ingressVrf, other._ingressVrf)
-        && Objects.equal(_ipProtocol, other._ipProtocol)
+        && Objects.equals(_icmpCode, other._icmpCode)
+        && Objects.equals(_icmpType, other._icmpType)
+        && Objects.equals(_ingressInterface, other._ingressInterface)
+        && Objects.equals(_ingressNode, other._ingressNode)
+        && Objects.equals(_ingressVrf, other._ingressVrf)
+        && Objects.equals(_ipProtocol, other._ipProtocol)
         && _packetLength == other._packetLength
-        && Objects.equal(_srcIp, other._srcIp)
-        && Objects.equal(_srcPort, other._srcPort)
-        && Objects.equal(_state, other._state)
-        && Objects.equal(_tag, other._tag)
+        && Objects.equals(_srcIp, other._srcIp)
+        && Objects.equals(_srcPort, other._srcPort)
+        && Objects.equals(_state, other._state)
+        && Objects.equals(_tag, other._tag)
         && _tcpFlagsAck == other._tcpFlagsAck
         && _tcpFlagsCwr == other._tcpFlagsCwr
         && _tcpFlagsEce == other._tcpFlagsEce
@@ -767,7 +767,7 @@ public final class Flow implements Comparable<Flow>, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hashCode(
+    return Objects.hash(
         _dscp,
         _dstIp,
         _dstPort,
