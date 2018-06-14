@@ -41,8 +41,6 @@ public abstract class BgpPeerGroup implements Serializable {
 
   protected String _inboundPrefixList;
 
-  protected Integer _inboundPrefixListLine;
-
   private String _inboundRoute6Map;
 
   protected String _inboundRouteMap;
@@ -62,8 +60,6 @@ public abstract class BgpPeerGroup implements Serializable {
   private Boolean _nextHopSelf;
 
   protected String _outboundPrefixList;
-
-  protected Integer _outboundPrefixListLine;
 
   protected String _outboundRoute6Map;
 
@@ -157,10 +153,6 @@ public abstract class BgpPeerGroup implements Serializable {
     return _inboundPrefixList;
   }
 
-  public Integer getInboundPrefixListLine() {
-    return _inboundPrefixListLine;
-  }
-
   public String getInboundRoute6Map() {
     return _inboundRoute6Map;
   }
@@ -201,10 +193,6 @@ public abstract class BgpPeerGroup implements Serializable {
 
   public String getOutboundPrefixList() {
     return _outboundPrefixList;
-  }
-
-  public Integer getOutboundPrefixListLine() {
-    return _outboundPrefixListLine;
   }
 
   public String getOutboundRoute6Map() {
@@ -332,7 +320,6 @@ public abstract class BgpPeerGroup implements Serializable {
     }
     if (_inboundPrefixList == null) {
       _inboundPrefixList = pg.getInboundPrefixList();
-      _inboundPrefixListLine = pg.getInboundPrefixListLine();
     }
     if (_inboundRouteMap == null) {
       _inboundRouteMap = pg.getInboundRouteMap();
@@ -360,7 +347,6 @@ public abstract class BgpPeerGroup implements Serializable {
     }
     if (_outboundPrefixList == null) {
       _outboundPrefixList = pg.getOutboundPrefixList();
-      _outboundPrefixListLine = pg.getOutboundPrefixListLine();
     }
     if (_outboundRouteMap == null) {
       _outboundRouteMap = pg.getOutboundRouteMap();
@@ -473,10 +459,6 @@ public abstract class BgpPeerGroup implements Serializable {
     _inboundPrefixList = inboundPrefixList;
   }
 
-  public void setInboundPrefixListLine(Integer inboundPrefixListLine) {
-    _inboundPrefixListLine = inboundPrefixListLine;
-  }
-
   public void setInboundRoute6Map(String inboundRoute6Map) {
     _inboundRoute6Map = inboundRoute6Map;
   }
@@ -511,10 +493,6 @@ public abstract class BgpPeerGroup implements Serializable {
 
   public void setOutboundPrefixList(String listName) {
     _outboundPrefixList = listName;
-  }
-
-  public void setOutboundPrefixListLine(Integer outboundPrefixListLine) {
-    _outboundPrefixListLine = outboundPrefixListLine;
   }
 
   public void setOutboundRoute6Map(String outboundRoute6Map) {

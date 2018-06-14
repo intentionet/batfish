@@ -6182,11 +6182,9 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     CiscoStructureUsage usage;
     if (ctx.IN() != null) {
       _currentPeerGroup.setInboundPrefixList(listName);
-      _currentPeerGroup.setInboundPrefixListLine(line);
       usage = _inIpv6BgpPeer ? BGP_INBOUND_PREFIX6_LIST : BGP_INBOUND_PREFIX_LIST;
     } else if (ctx.OUT() != null) {
       _currentPeerGroup.setOutboundPrefixList(listName);
-      _currentPeerGroup.setOutboundPrefixListLine(line);
       usage = _inIpv6BgpPeer ? BGP_OUTBOUND_PREFIX6_LIST : BGP_OUTBOUND_PREFIX_LIST;
     } else {
       throw new BatfishException("bad direction");
