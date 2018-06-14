@@ -45,11 +45,7 @@ public abstract class BgpPeerGroup implements Serializable {
 
   private String _inboundRoute6Map;
 
-  protected Integer _inboundRoute6MapLine;
-
   protected String _inboundRouteMap;
-
-  protected Integer _inboundRouteMapLine;
 
   private transient boolean _inherited;
 
@@ -71,11 +67,7 @@ public abstract class BgpPeerGroup implements Serializable {
 
   protected String _outboundRoute6Map;
 
-  protected Integer _outboundRoute6MapLine;
-
   protected String _outboundRouteMap;
-
-  protected Integer _outboundRouteMapLine;
 
   private String _peerSession;
 
@@ -173,16 +165,8 @@ public abstract class BgpPeerGroup implements Serializable {
     return _inboundRoute6Map;
   }
 
-  public Integer getInboundRoute6MapLine() {
-    return _inboundRoute6MapLine;
-  }
-
   public String getInboundRouteMap() {
     return _inboundRouteMap;
-  }
-
-  public Integer getInboundRouteMapLine() {
-    return _inboundRouteMapLine;
   }
 
   public boolean getInherited() {
@@ -227,16 +211,8 @@ public abstract class BgpPeerGroup implements Serializable {
     return _outboundRoute6Map;
   }
 
-  public Integer getOutboundRoute6MapLine() {
-    return _outboundRoute6MapLine;
-  }
-
   public String getOutboundRouteMap() {
     return _outboundRouteMap;
-  }
-
-  public Integer getOutboundRouteMapLine() {
-    return _outboundRouteMapLine;
   }
 
   protected final BgpPeerGroup getParentGroup(BgpProcess proc, CiscoConfiguration cv) {
@@ -360,11 +336,9 @@ public abstract class BgpPeerGroup implements Serializable {
     }
     if (_inboundRouteMap == null) {
       _inboundRouteMap = pg.getInboundRouteMap();
-      _inboundRouteMapLine = pg.getInboundRouteMapLine();
     }
     if (_inboundRoute6Map == null) {
       _inboundRoute6Map = pg.getInboundRoute6Map();
-      _inboundRoute6MapLine = pg.getInboundRoute6MapLine();
     }
     if (_localAs == null) {
       _localAs = pg.getLocalAs();
@@ -390,11 +364,9 @@ public abstract class BgpPeerGroup implements Serializable {
     }
     if (_outboundRouteMap == null) {
       _outboundRouteMap = pg.getOutboundRouteMap();
-      _outboundRouteMapLine = pg.getOutboundRouteMapLine();
     }
     if (_outboundRoute6Map == null) {
       _outboundRoute6Map = pg.getOutboundRoute6Map();
-      _outboundRoute6MapLine = pg.getOutboundRoute6MapLine();
     }
     if (_remoteAs == null) {
       _remoteAs = pg.getRemoteAs();
@@ -509,16 +481,8 @@ public abstract class BgpPeerGroup implements Serializable {
     _inboundRoute6Map = inboundRoute6Map;
   }
 
-  public void setInboundRoute6MapLine(Integer inboundRoute6MapLine) {
-    _inboundRoute6MapLine = inboundRoute6MapLine;
-  }
-
   public void setInboundRouteMap(String name) {
     _inboundRouteMap = name;
-  }
-
-  public void setInboundRouteMapLine(Integer inboundRouteMapLine) {
-    _inboundRouteMapLine = inboundRouteMapLine;
   }
 
   public void setLocalAs(Long localAs) {
@@ -557,16 +521,8 @@ public abstract class BgpPeerGroup implements Serializable {
     _outboundRoute6Map = outboundRoute6Map;
   }
 
-  public void setOutboundRoute6MapLine(Integer outboundRoute6MapLine) {
-    _outboundRoute6MapLine = outboundRoute6MapLine;
-  }
-
   public void setOutboundRouteMap(String name) {
     _outboundRouteMap = name;
-  }
-
-  public void setOutboundRouteMapLine(Integer outboundRouteMapLine) {
-    _outboundRouteMapLine = outboundRouteMapLine;
   }
 
   public void setPeerSession(String peerSession) {
