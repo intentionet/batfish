@@ -5,6 +5,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -179,6 +180,19 @@ public class OspfProcess extends ComparableStructure<String> {
     }
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof OspfProcess)) {
+      return false;
+    }
+    OspfProcess other = (OspfProcess) o;
+    // TODO: compare all fields
+    return _name.equals(other._name);
+  }
+
   public Set<String> getActiveInterfaceList() {
     return _interfaceWhitelist;
   }
@@ -269,6 +283,12 @@ public class OspfProcess extends ComparableStructure<String> {
 
   public Set<OspfWildcardNetwork> getWildcardNetworks() {
     return _wildcardNetworks;
+  }
+
+  @Override
+  public int hashCode() {
+    // TODO: hash all fields
+    return Objects.hash(_name);
   }
 
   public void setDefaultInformationMetric(int metric) {

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -137,6 +138,19 @@ public class Interface extends ComparableStructure<String> {
     _allowedVlans.addAll(ranges);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Interface)) {
+      return false;
+    }
+    Interface other = (Interface) o;
+    // TODO: compare all fields
+    return _name.equals(other._name);
+  }
+
   public String getAccessVlan() {
     return _accessVlan;
   }
@@ -255,6 +269,12 @@ public class Interface extends ComparableStructure<String> {
 
   public SortedMap<Integer, VrrpGroup> getVrrpGroups() {
     return _vrrpGroups;
+  }
+
+  @Override
+  public int hashCode() {
+    // TODO: hash all fields
+    return Objects.hash(_name);
   }
 
   public void inheritUnsetFields() {

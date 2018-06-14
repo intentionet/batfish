@@ -1,5 +1,6 @@
 package org.batfish.representation.juniper;
 
+import java.util.Objects;
 import org.batfish.common.util.ComparableStructure;
 
 public final class IpsecVpn extends ComparableStructure<String> {
@@ -21,6 +22,19 @@ public final class IpsecVpn extends ComparableStructure<String> {
     super(name);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof IpsecVpn)) {
+      return false;
+    }
+    IpsecVpn other = (IpsecVpn) o;
+    // TODO: compare all fields
+    return _name.equals(other._name);
+  }
+
   public Interface getBindInterface() {
     return _bindInterface;
   }
@@ -39,6 +53,12 @@ public final class IpsecVpn extends ComparableStructure<String> {
 
   public int getIpsecPolicyLine() {
     return _ipsecPolicyLine;
+  }
+
+  @Override
+  public int hashCode() {
+    // TODO: hash all fields
+    return Objects.hash(_name);
   }
 
   public void setBindInterface(Interface iface) {

@@ -15,7 +15,29 @@ public class RouteMap extends ComparableStructure<String> {
     _clauses = new TreeMap<>();
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+
+    if (!(o instanceof RouteMap)) {
+      return false;
+    }
+
+    RouteMap other = (RouteMap) o;
+
+    // TODO: replace with a sensible implementation
+    return _name.equals(other._name);
+  }
+
   public NavigableMap<Integer, RouteMapClause> getClauses() {
     return _clauses;
+  }
+
+  @Override
+  public int hashCode() {
+    // TODO: replace with a sensible implementation
+    return _name.hashCode();
   }
 }

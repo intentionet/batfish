@@ -1,5 +1,6 @@
 package org.batfish.representation.juniper;
 
+import java.util.Objects;
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.Ip;
 
@@ -22,6 +23,19 @@ public class IkeGateway extends ComparableStructure<String> {
     super(name);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof IkeGateway)) {
+      return false;
+    }
+    IkeGateway other = (IkeGateway) o;
+    // TODO: compare all fields
+    return _name.equals(other._name);
+  }
+
   public Ip getAddress() {
     return _address;
   }
@@ -40,6 +54,12 @@ public class IkeGateway extends ComparableStructure<String> {
 
   public Ip getLocalAddress() {
     return _localAddress;
+  }
+
+  @Override
+  public int hashCode() {
+    // TODO: hash all fields
+    return Objects.hash(_name);
   }
 
   public void setAddress(Ip address) {
