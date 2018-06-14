@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -95,35 +94,6 @@ public class CiscoConfigurationTest {
     _config.setHostname("host");
     _config.setAnswerElement(new ConvertConfigurationAnswerElement());
     _interface = new Interface("iface", _config);
-  }
-
-  @Test
-  public void processSourceNatDropsRuleMissingAcl() {
-    CiscoSourceNat nat = new CiscoSourceNat();
-    nat.setAclName(ACL);
-    nat.setNatPool(POOL);
-
-    assertThat(_config.processSourceNat(nat, _interface, Collections.emptyMap()), nullValue());
-    assertUndefined(
-        CiscoStructureType.IP_ACCESS_LIST, ACL, CiscoStructureUsage.IP_NAT_SOURCE_ACCESS_LIST);
-    assertUndefined(CiscoStructureType.NAT_POOL, POOL, CiscoStructureUsage.IP_NAT_SOURCE_POOL);
-  }
-
-  @Test
-  public void processSourceNatDropsRuleMissingPool() {
-    CiscoSourceNat nat = new CiscoSourceNat();
-    nat.setAclName(ACL);
-    nat.setNatPool(POOL);
-
-    assertThat(
-        _config.processSourceNat(
-            nat,
-            _interface,
-            Collections.singletonMap(ACL, new IpAccessList(ACL, Collections.emptyList()))),
-        nullValue());
-    assertDefined(
-        CiscoStructureType.IP_ACCESS_LIST, ACL, CiscoStructureUsage.IP_NAT_SOURCE_ACCESS_LIST);
-    assertUndefined(CiscoStructureType.NAT_POOL, POOL, CiscoStructureUsage.IP_NAT_SOURCE_POOL);
   }
 
   @Test

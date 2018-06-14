@@ -766,14 +766,6 @@
           ]
         }
       },
-      "undefined:ipv4/6 acl:usage:ip nat source dynamic access-list:def" : {
-        "description" : "Undefined reference to structure of type: 'ipv4/6 acl' with usage: 'ip nat source dynamic access-list' named 'def'",
-        "files" : {
-          "cisco_interface" : [
-            90
-          ]
-        }
-      },
       "undefined:ipv4/6 acl:usage:ip wccp group-list:wccp-cachelist" : {
         "description" : "Undefined reference to structure of type: 'ipv4/6 acl' with usage: 'ip wccp group-list' named 'wccp-cachelist'",
         "files" : {
@@ -1289,7 +1281,7 @@
     "summary" : {
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 159
+      "numResults" : 158
     },
     "undefinedReferences" : {
       "IosXrMultiCast" : {
@@ -1611,11 +1603,6 @@
           "1" : {
             "interface igmp access-group acl" : [
               77
-            ]
-          },
-          "def" : {
-            "ip nat source dynamic access-list" : [
-              90
             ]
           }
         },

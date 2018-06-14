@@ -57129,11 +57129,6 @@
               "interface igmp access-group acl" : [
                 77
               ]
-            },
-            "def" : {
-              "ip nat source dynamic access-list" : [
-                90
-              ]
             }
           },
           "nat pool" : {
