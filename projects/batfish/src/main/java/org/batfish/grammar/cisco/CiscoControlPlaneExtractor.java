@@ -8872,9 +8872,9 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     if (ctx.name != null) {
       // named
       String name = ctx.name.getText();
-      int expressionLine = ctx.name.getStart().getLine();
-      _configuration.referenceStructure(PREFIX_SET, name, ROUTE_POLICY_PREFIX_SET, expressionLine);
-      return new RoutePolicyPrefixSetName(name, expressionLine);
+      _configuration.referenceStructure(
+          PREFIX_SET, name, ROUTE_POLICY_PREFIX_SET, ctx.name.getStart().getLine());
+      return new RoutePolicyPrefixSetName(name);
     } else {
       // inline
       PrefixSpace prefixSpace = new PrefixSpace();
