@@ -162,6 +162,7 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MAT
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_PREFIX_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_SET_COMMUNITY;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_POLICY_AS_PATH_IN;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_POLICY_PREFIX_SET;
 import static org.batfish.representation.cisco.CiscoStructureUsage.SNMP_SERVER_COMMUNITY_ACL4;
 import static org.batfish.representation.cisco.CiscoStructureUsage.SNMP_SERVER_COMMUNITY_ACL6;
@@ -8636,8 +8637,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   private RoutePolicyBoolean toRoutePolicyBoolean(Boolean_as_path_in_rp_stanzaContext ctx) {
     AsPathSetExpr asPathSetExpr = toAsPathSetExpr(ctx.expr);
-    int expressionLine = ctx.expr.getStart().getLine();
-    return new RoutePolicyBooleanAsPathIn(asPathSetExpr, expressionLine);
+    if (asPathSetExpr instanceof NamedAsPathSet) {
+      _configuration.referenceStructure(
+          AS_PATH_SET,
+          ((NamedAsPathSet) asPathSetExpr).getName(),
+          ROUTE_POLICY_AS_PATH_IN,
+          ctx.expr.getStart().getLine());
+    }
+    return new RoutePolicyBooleanAsPathIn(asPathSetExpr);
   }
 
   private RoutePolicyBoolean toRoutePolicyBoolean(Boolean_as_path_is_local_rp_stanzaContext ctx) {
