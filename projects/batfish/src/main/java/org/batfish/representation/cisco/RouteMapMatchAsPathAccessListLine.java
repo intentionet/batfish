@@ -15,11 +15,8 @@ public class RouteMapMatchAsPathAccessListLine extends RouteMapMatchLine {
 
   private final Set<String> _listNames;
 
-  private final int _statementLine;
-
-  public RouteMapMatchAsPathAccessListLine(Set<String> names, int statementLine) {
+  public RouteMapMatchAsPathAccessListLine(Set<String> names) {
     _listNames = names;
-    _statementLine = statementLine;
   }
 
   public Set<String> getListNames() {
@@ -35,12 +32,6 @@ public class RouteMapMatchAsPathAccessListLine extends RouteMapMatchLine {
       if (list != null) {
         list.getReferers().put(this, "route-map match ip as-path access-list");
         disjuncts.add(new MatchAsPath(new NamedAsPathSet(listName)));
-      } else {
-        cc.undefined(
-            CiscoStructureType.AS_PATH_ACCESS_LIST,
-            listName,
-            CiscoStructureUsage.ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST,
-            _statementLine);
       }
     }
     return d.simplify();

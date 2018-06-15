@@ -3296,6 +3296,12 @@ public final class CiscoConfiguration extends VendorConfiguration {
         CiscoStructureUsage.WCCP_REDIRECT_LIST,
         CiscoStructureUsage.WCCP_SERVICE_LIST);
 
+    markCommunityLists(
+        CiscoStructureUsage.ROUTE_MAP_ADD_COMMUNITY,
+        CiscoStructureUsage.ROUTE_MAP_DELETE_COMMUNITY,
+        CiscoStructureUsage.ROUTE_MAP_MATCH_COMMUNITY_LIST,
+        CiscoStructureUsage.ROUTE_MAP_SET_COMMUNITY);
+
     markConcreteStructure(
         CiscoStructureType.PREFIX_LIST,
         CiscoStructureUsage.BGP_INBOUND_PREFIX_LIST,
@@ -3437,7 +3443,6 @@ public final class CiscoConfiguration extends VendorConfiguration {
         CiscoStructureUsage.ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST);
 
     // record references to defined structures
-    recordCommunityLists();
     recordDocsisPolicies();
     recordDocsisPolicyRules();
     recordPeerGroups();
@@ -3888,9 +3893,15 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return false;
   }
 
-  private void recordCommunityLists() {
-    recordStructure(_expandedCommunityLists, CiscoStructureType.COMMUNITY_LIST_EXPANDED);
-    recordStructure(_standardCommunityLists, CiscoStructureType.COMMUNITY_LIST_STANDARD);
+  private void markCommunityLists(CiscoStructureUsage... usages) {
+    for (CiscoStructureUsage usage : usages) {
+      markAbstractStructure(
+          CiscoStructureType.COMMUNITY_LIST,
+          usage,
+          ImmutableList.of(
+              CiscoStructureType.COMMUNITY_LIST_EXPANDED,
+              CiscoStructureType.COMMUNITY_LIST_STANDARD));
+    }
   }
 
   private void recordDocsisPolicies() {

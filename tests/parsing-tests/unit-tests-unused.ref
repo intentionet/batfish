@@ -1341,14 +1341,6 @@
           ]
         }
       },
-      "unused:standard community-list:COMM_LIST_NAME" : {
-        "description" : "Unused structure of type: 'standard community-list' with name: 'COMM_LIST_NAME'",
-        "files" : {
-          "community_list_named" : [
-            6
-          ]
-        }
-      },
       "unused:standard ipv4 access-list:1" : {
         "description" : "Unused structure of type: 'standard ipv4 access-list' with name: '1'",
         "files" : {
@@ -1409,7 +1401,7 @@
     "summary" : {
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 138
+      "numResults" : 137
     },
     "unusedStructures" : {
       "aggAddress" : {
@@ -2009,11 +2001,6 @@
             8,
             9,
             10
-          ]
-        },
-        "standard community-list" : {
-          "COMM_LIST_NAME" : [
-            6
           ]
         }
       },

@@ -13,6 +13,7 @@ import static org.batfish.representation.cisco.CiscoStructureType.BGP_TEMPLATE_P
 import static org.batfish.representation.cisco.CiscoStructureType.BGP_TEMPLATE_PEER_POLICY;
 import static org.batfish.representation.cisco.CiscoStructureType.BGP_TEMPLATE_PEER_SESSION;
 import static org.batfish.representation.cisco.CiscoStructureType.CLASS_MAP;
+import static org.batfish.representation.cisco.CiscoStructureType.COMMUNITY_LIST;
 import static org.batfish.representation.cisco.CiscoStructureType.COMMUNITY_LIST_EXPANDED;
 import static org.batfish.representation.cisco.CiscoStructureType.COMMUNITY_LIST_STANDARD;
 import static org.batfish.representation.cisco.CiscoStructureType.DEPI_CLASS;
@@ -152,11 +153,15 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.QOS_ENFORCE_R
 import static org.batfish.representation.cisco.CiscoStructureUsage.RIP_DISTRIBUTE_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTER_ISIS_DISTRIBUTE_LIST_ACL;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTER_VRRP_INTERFACE;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_ADD_COMMUNITY;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_DELETE_COMMUNITY;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_COMMUNITY_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_PREFIX_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_PREFIX_LIST;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_SET_COMMUNITY;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_POLICY_PREFIX_SET;
 import static org.batfish.representation.cisco.CiscoStructureUsage.SNMP_SERVER_COMMUNITY_ACL4;
 import static org.batfish.representation.cisco.CiscoStructureUsage.SNMP_SERVER_COMMUNITY_ACL6;
@@ -5600,7 +5605,6 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void exitMatch_as_path_access_list_rm_stanza(
       Match_as_path_access_list_rm_stanzaContext ctx) {
-    int statementLine = ctx.getStart().getLine();
     Set<String> names = new TreeSet<>();
     for (VariableContext name : ctx.name_list) {
       names.add(name.getText());
@@ -5608,19 +5612,22 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
           AS_PATH_ACCESS_LIST, name.getText(),
           ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST, name.getStart().getLine());
     }
-    RouteMapMatchAsPathAccessListLine line =
-        new RouteMapMatchAsPathAccessListLine(names, statementLine);
+    RouteMapMatchAsPathAccessListLine line = new RouteMapMatchAsPathAccessListLine(names);
     _currentRouteMapClause.addMatchLine(line);
   }
 
   @Override
   public void exitMatch_community_list_rm_stanza(Match_community_list_rm_stanzaContext ctx) {
-    int statementLine = ctx.getStart().getLine();
     Set<String> names = new TreeSet<>();
     for (VariableContext name : ctx.name_list) {
       names.add(name.getText());
+      _configuration.referenceStructure(
+          COMMUNITY_LIST,
+          name.getText(),
+          ROUTE_MAP_MATCH_COMMUNITY_LIST,
+          name.getStart().getLine());
     }
-    RouteMapMatchCommunityListLine line = new RouteMapMatchCommunityListLine(names, statementLine);
+    RouteMapMatchCommunityListLine line = new RouteMapMatchCommunityListLine(names);
     _currentRouteMapClause.addMatchLine(line);
   }
 
@@ -7135,9 +7142,10 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void exitSet_comm_list_delete_rm_stanza(Set_comm_list_delete_rm_stanzaContext ctx) {
     String name = ctx.name.getText();
-    int statementLine = ctx.getStart().getLine();
-    RouteMapSetDeleteCommunityLine line = new RouteMapSetDeleteCommunityLine(name, statementLine);
+    RouteMapSetDeleteCommunityLine line = new RouteMapSetDeleteCommunityLine(name);
     _currentRouteMapClause.addSetLine(line);
+    _configuration.referenceStructure(
+        COMMUNITY_LIST, name, ROUTE_MAP_DELETE_COMMUNITY, ctx.getStart().getLine());
   }
 
   @Override
@@ -7154,27 +7162,34 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void exitSet_community_list_additive_rm_stanza(
       Set_community_list_additive_rm_stanzaContext ctx) {
-    int statementLine = ctx.getStart().getLine();
     Set<String> communityLists = new LinkedHashSet<>();
     for (VariableContext communityListCtx : ctx.comm_lists) {
       String communityList = communityListCtx.getText();
       communityLists.add(communityList);
+      _configuration.referenceStructure(
+          COMMUNITY_LIST,
+          communityList,
+          ROUTE_MAP_ADD_COMMUNITY,
+          communityListCtx.getStart().getLine());
     }
     RouteMapSetAdditiveCommunityListLine line =
-        new RouteMapSetAdditiveCommunityListLine(communityLists, statementLine);
+        new RouteMapSetAdditiveCommunityListLine(communityLists);
     _currentRouteMapClause.addSetLine(line);
   }
 
   @Override
   public void exitSet_community_list_rm_stanza(Set_community_list_rm_stanzaContext ctx) {
     Set<String> communityLists = new LinkedHashSet<>();
-    int statementLine = ctx.getStart().getLine();
     for (VariableContext communityListCtx : ctx.comm_lists) {
       String communityList = communityListCtx.getText();
       communityLists.add(communityList);
+      _configuration.referenceStructure(
+          COMMUNITY_LIST,
+          communityList,
+          ROUTE_MAP_SET_COMMUNITY,
+          communityListCtx.getStart().getLine());
     }
-    RouteMapSetCommunityListLine line =
-        new RouteMapSetCommunityListLine(communityLists, statementLine);
+    RouteMapSetCommunityListLine line = new RouteMapSetCommunityListLine(communityLists);
     _currentRouteMapClause.addSetLine(line);
   }
 
