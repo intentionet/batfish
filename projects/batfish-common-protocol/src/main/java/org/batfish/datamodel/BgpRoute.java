@@ -446,7 +446,7 @@ public class BgpRoute extends AbstractRoute {
   }
 
   @Override
-  public int routeCompare(AbstractRoute rhs) {
+  public int routeCompare(@Nonnull AbstractRoute rhs) {
     if (getClass() != rhs.getClass()) {
       return 0;
     }

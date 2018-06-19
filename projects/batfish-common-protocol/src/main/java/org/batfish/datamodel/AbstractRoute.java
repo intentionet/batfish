@@ -1,41 +1,46 @@
 package org.batfish.datamodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.batfish.common.BatfishException;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "class")
+@ParametersAreNonnullByDefault
 public abstract class AbstractRoute implements Serializable, Comparable<AbstractRoute> {
 
   private static final long serialVersionUID = 1L;
 
-  protected static final String PROP_ADMINISTRATIVE_COST = "administrativeCost";
-
-  protected static final String PROP_METRIC = "metric";
-
-  protected static final String PROP_NETWORK = "network";
-
-  protected static final String PROP_NEXT_HOP_INTERFACE = "nextHopInterface";
-
-  protected static final String PROP_NEXT_HOP_IP = "nextHopIp";
-
-  private static final String PROP_NEXT_HOP = "nextHop";
-
   public static final int NO_TAG = -1;
 
-  private static final String PROP_NODE = "node";
+  static final String PROP_ADMINISTRATIVE_COST = "administrativeCost";
 
-  protected static final String PROP_PROTOCOL = "protocol";
+  static final String PROP_METRIC = "metric";
 
-  protected static final String PROP_TAG = "tag";
+  static final String PROP_NETWORK = "network";
 
-  private static final String PROP_VRF = "vrf";
+  static final String PROP_NEXT_HOP_INTERFACE = "nextHopInterface";
+
+  static final String PROP_NEXT_HOP_IP = "nextHopIp";
+
+  static final String PROP_NEXT_HOP = "nextHop";
+
+  static final String PROP_NODE = "node";
+
+  static final String PROP_PROTOCOL = "protocol";
+
+  static final String PROP_TAG = "tag";
+
+  static final String PROP_VRF = "vrf";
 
   protected final Prefix _network;
 
@@ -48,76 +53,20 @@ public abstract class AbstractRoute implements Serializable, Comparable<Abstract
   private String _vrf;
 
   @JsonCreator
-  public AbstractRoute(@JsonProperty(PROP_NETWORK) Prefix network) {
-    if (network == null) {
-      throw new BatfishException("Cannot construct AbstractRoute with null network");
-    }
-    _network = network;
+  protected AbstractRoute(@Nullable @JsonProperty(PROP_NETWORK) Prefix network) {
+    _network = requireNonNull(network, "Cannot crate a route without a network");
   }
 
   @Override
-  public final int compareTo(AbstractRoute rhs) {
-    int ret;
-    ret = _network.compareTo(rhs._network);
-    if (ret != 0) {
-      return ret;
-    }
-    ret = Integer.compare(getAdministrativeCost(), rhs.getAdministrativeCost());
-    if (ret != 0) {
-      return ret;
-    }
-    Long lhsMetric = getMetric();
-    Long rhsMetric = rhs.getMetric();
-    if (lhsMetric == null) {
-      if (rhsMetric != null) {
-        ret = -1;
-      } else {
-        ret = 0;
-      }
-    } else if (rhsMetric == null) {
-      ret = 1;
-    } else {
-      ret = Long.compare(lhsMetric, rhsMetric);
-    }
-    if (ret != 0) {
-      return ret;
-    }
-    ret = routeCompare(rhs);
-    if (ret != 0) {
-      return ret;
-    }
-    Ip lhsNextHopIp = getNextHopIp();
-    Ip rhsNextHopIp = rhs.getNextHopIp();
-    if (Route.UNSET_ROUTE_NEXT_HOP_IP.equals(lhsNextHopIp)) {
-      if (!Route.UNSET_ROUTE_NEXT_HOP_IP.equals(rhsNextHopIp)) {
-        ret = -1;
-      } else {
-        ret = 0;
-      }
-    } else if (Route.UNSET_ROUTE_NEXT_HOP_IP.equals(rhsNextHopIp)) {
-      ret = 1;
-    } else {
-      ret = lhsNextHopIp.compareTo(rhsNextHopIp);
-    }
-    if (ret != 0) {
-      return ret;
-    }
-    String nextHopInterface = getNextHopInterface();
-    String rhsNextHopInterface = rhs.getNextHopInterface();
-    if (Route.UNSET_NEXT_HOP_INTERFACE.equals(nextHopInterface)) {
-      if (!Route.UNSET_NEXT_HOP_INTERFACE.equals(rhsNextHopInterface)) {
-        ret = -1;
-      } else {
-        ret = 0;
-      }
-    } else {
-      ret = nextHopInterface.compareTo(rhsNextHopInterface);
-    }
-    if (ret != 0) {
-      return ret;
-    }
-    ret = Integer.compare(getTag(), rhs.getTag());
-    return ret;
+  public final int compareTo(@Nonnull AbstractRoute rhs) {
+    return Comparator.comparing(AbstractRoute::getNetwork)
+        .thenComparingInt(AbstractRoute::getAdministrativeCost)
+        .thenComparing(AbstractRoute::getMetric)
+        .thenComparing(AbstractRoute::routeCompare)
+        .thenComparing(AbstractRoute::getNextHopIp)
+        .thenComparing(AbstractRoute::getNextHopInterface)
+        .thenComparingInt(AbstractRoute::getTag)
+        .compare(this, rhs);
   }
 
   @Override
@@ -125,29 +74,25 @@ public abstract class AbstractRoute implements Serializable, Comparable<Abstract
 
   public final String fullString() {
     String nhnode = _nextHop;
-    Ip nextHopIp = getNextHopIp();
-    String nhip;
-    String tag;
-    int tagInt = getTag();
-    if (tagInt == Route.UNSET_ROUTE_TAG) {
-      tag = "none";
-    } else {
-      tag = Integer.toString(tagInt);
-    }
-    String nhint = getNextHopInterface();
-    if (!nhint.equals(Route.UNSET_NEXT_HOP_INTERFACE)
-        && nextHopIp.equals(Route.UNSET_ROUTE_NEXT_HOP_IP)) {
+    if (!Route.UNSET_NEXT_HOP_INTERFACE.equals(getNextHopInterface())
+        && Route.UNSET_ROUTE_NEXT_HOP_IP.equals(getNextHopIp())) {
       // static interface with no next hop ip
       nhnode = "N/A";
     }
-    nhip = !Route.UNSET_ROUTE_NEXT_HOP_IP.equals(nextHopIp) ? nextHopIp.toString() : "N/A";
-    String net = getNetwork().toString();
-    String admin = Integer.toString(getAdministrativeCost());
-    String cost = Long.toString(getMetric());
-    String protocol = getProtocol().protocolName();
+
     return String.format(
         "%s vrf:%s net:%s nhip:%s nhint:%s nhnode:%s admin:%s cost:%s tag:%s prot:%s %s",
-        _node, _vrf, net, nhip, nhint, nhnode, admin, cost, tag, protocol, protocolRouteString());
+        _node,
+        _vrf,
+        _network,
+        getNextHopIp(),
+        getNextHopInterface(),
+        nhnode,
+        getAdministrativeCost(),
+        getMetric(),
+        getTag() == Route.UNSET_ROUTE_TAG ? "none" : getTag(),
+        getProtocol(),
+        protocolRouteString());
   }
 
   @JsonIgnore
@@ -163,16 +108,15 @@ public abstract class AbstractRoute implements Serializable, Comparable<Abstract
   }
 
   @JsonProperty(PROP_NEXT_HOP)
+  @JsonPropertyDescription("Next hop node, if known")
   public String getNextHop() {
     return _nextHop;
   }
 
   @JsonIgnore
-  @Nonnull
   public abstract String getNextHopInterface();
 
   @JsonIgnore
-  @Nonnull
   public abstract Ip getNextHopIp();
 
   @JsonProperty(PROP_NODE)

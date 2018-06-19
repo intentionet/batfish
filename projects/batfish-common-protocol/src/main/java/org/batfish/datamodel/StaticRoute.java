@@ -114,7 +114,7 @@ public class StaticRoute extends AbstractRoute {
   }
 
   @Override
-  public int routeCompare(AbstractRoute rhs) {
+  public int routeCompare(@Nonnull AbstractRoute rhs) {
     return 0;
   }
 

@@ -66,7 +66,7 @@ public class RipInternalRoute extends RipRoute {
   }
 
   @Override
-  public int routeCompare(AbstractRoute rhs) {
+  public int routeCompare(@Nonnull AbstractRoute rhs) {
     /*
      * TODO: In case we implement RipExternalRoute or something like that, we need class
      * comparison. Need to remove if that won't happen.

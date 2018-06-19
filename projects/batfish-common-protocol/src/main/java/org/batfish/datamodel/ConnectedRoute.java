@@ -82,7 +82,7 @@ public class ConnectedRoute extends AbstractRoute {
   }
 
   @Override
-  public int routeCompare(AbstractRoute rhs) {
+  public int routeCompare(@Nonnull AbstractRoute rhs) {
     return 0;
   }
 }

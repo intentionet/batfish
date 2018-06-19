@@ -66,7 +66,8 @@ public class LocalRoute extends AbstractRoute {
     return _nextHopInterface;
   }
 
-  @Nonnull @Override
+  @Nonnull
+  @Override
   public Ip getNextHopIp() {
     return Route.UNSET_ROUTE_NEXT_HOP_IP;
   }
@@ -97,7 +98,7 @@ public class LocalRoute extends AbstractRoute {
   }
 
   @Override
-  public int routeCompare(AbstractRoute rhs) {
+  public int routeCompare(@Nonnull AbstractRoute rhs) {
     if (getClass() != rhs.getClass()) {
       return 0;
     }

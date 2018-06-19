@@ -2,6 +2,7 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class OspfIntraAreaRoute extends OspfInternalRoute {
@@ -51,7 +52,7 @@ public class OspfIntraAreaRoute extends OspfInternalRoute {
   }
 
   @Override
-  public int routeCompare(AbstractRoute rhs) {
+  public int routeCompare(@Nonnull AbstractRoute rhs) {
     if (getClass() != rhs.getClass()) {
       return 0;
     }
