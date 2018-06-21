@@ -10,25 +10,25 @@ import static org.batfish.symbolic.smt.matchers.VerificationResultMatchers.hasIs
 import static org.batfish.symbolic.smt.matchers.VerificationResultMatchers.hasPacketModel;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.question.SmtReachabilityQuestionPlugin.ReachabilityQuestion;
 import org.batfish.symbolic.answers.SmtReachabilityAnswerElement;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
-/** A simple two-node network with two links between them. Tests that */
+/** Tests the smt-reachability question on a simple two-node network with two links between them. */
 @RunWith(Parameterized.class)
 public class SmtReachabilityTwoLinkPerDstIpTest {
   @Parameter public Ip _dstIp;
@@ -58,7 +58,7 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
         DST_PREFIX_2.getStartIp());
   }
 
-  /** Verify that with no failures, source can reach each dest IP. */
+  /** Verify that with no failures, source can reach the dest IP. */
   @Test
   public void testNoFailures() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
@@ -177,16 +177,8 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
     final AnswerElement answer = _network._batfish.smtReachability(question);
     assertThat(answer, instanceOf(SmtReachabilityAnswerElement.class));
 
-    Matcher<String> matchAnyIpOtherThanDstIp =
-        anyOf(
-            dstIps()
-                .stream()
-                .filter(ip -> !ip.equals(_dstIp))
-                .map(Ip::toString)
-                .map(Matchers::equalTo)
-                .collect(ImmutableList.toImmutableList()));
-
     final SmtReachabilityAnswerElement smtAnswer = (SmtReachabilityAnswerElement) answer;
+    List<String> dstIps = dstIps().stream().map(Ip::toString).collect(Collectors.toList());
     assertThat(
         smtAnswer,
         hasVerificationResult(
@@ -196,7 +188,8 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
                  * For some reason, when we use setNotDstIps we get a packetModel, whereas if we
                  * use setDstIps we don't.
                  */
-                hasPacketModel(hasEntry(equalTo("dstIp"), matchAnyIpOtherThanDstIp)),
+                hasPacketModel(
+                    hasEntry(equalTo("dstIp"), allOf(in(dstIps), not(equalTo(_dstIp.toString()))))),
                 hasFailures(
                     contains(
                         String.format(
