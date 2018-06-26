@@ -5,6 +5,7 @@ import static org.batfish.common.CoordConstsV2.HTTP_HEADER_BATFISH_APIKEY;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -12,6 +13,7 @@ import javax.ws.rs.ext.Provider;
 import org.batfish.common.CoordConsts;
 
 /** This filter verifies the apiKey provided in request header is a valid work apikey. */
+@PreMatching
 @Provider
 public class ApiKeyAuthenticationFilter implements ContainerRequestFilter {
   @Override

@@ -6,13 +6,15 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import org.batfish.common.CoordConstsV2;
 
 /** Allow the system to serve xhr level 2 from all cross domain site */
-@Provider
+@PreMatching
 @Priority(-1) /* Highest priority to set the CORS filter as the first one to run. */
+@Provider
 public class CrossDomainFilter implements ContainerRequestFilter, ContainerResponseFilter {
   /**
    * Recognizes a CORS preflight request, and return OK without any further downstream processing in
