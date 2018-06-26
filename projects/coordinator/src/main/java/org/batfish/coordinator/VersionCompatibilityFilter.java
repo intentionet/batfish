@@ -5,6 +5,7 @@ import static org.batfish.common.CoordConstsV2.HTTP_HEADER_BATFISH_VERSION;
 import com.google.common.base.Strings;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -14,6 +15,7 @@ import org.batfish.common.Version;
 /**
  * This filter verifies that the client's version is compatible with the version of Batfish service.
  */
+@PreMatching
 @Provider
 public class VersionCompatibilityFilter implements ContainerRequestFilter {
 
