@@ -242,9 +242,11 @@ public class Main {
             .register(ExceptionMapper.class)
             .register(CrossDomainFilter.class);
     if (_settings.getTracingEnable()) {
+      _logger.infof("Registering feature %s", ServerTracingDynamicFeature.class.getSimpleName());
       rcWork.register(ServerTracingDynamicFeature.class);
     }
     for (Class<?> feature : features) {
+      _logger.infof("Registering feature %s", feature.getSimpleName());
       rcWork.register(feature);
     }
 

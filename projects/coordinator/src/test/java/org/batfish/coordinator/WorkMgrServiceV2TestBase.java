@@ -16,6 +16,8 @@ public class WorkMgrServiceV2TestBase extends JerseyTest {
         .register(ServiceObjectMapper.class)
         .register(ExceptionMapper.class)
         .register(JacksonFeature.class)
+        .register(ApiKeyAuthenticationFilter.class)
+        .register(VersionCompatibilityFilter.class)
         .register(CrossDomainFilter.class);
   }
 

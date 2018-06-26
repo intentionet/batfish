@@ -31,8 +31,7 @@ public class CrossDomainFilter implements ContainerRequestFilter, ContainerRespo
    * Add the cross domain data to the output if needed
    *
    * @param creq The container request (input)
-   * @param cres The container request (output)
-   * @return The output request with cross domain if needed
+   * @param cres The container response (output)
    */
   @Override
   public void filter(ContainerRequestContext creq, ContainerResponseContext cres) {
