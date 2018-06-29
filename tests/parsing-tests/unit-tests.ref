@@ -42218,6 +42218,7 @@
             "                MEMBERS:'members'  <== mode:DEFAULT_MODE",
             "                (community_regex",
             "                  (base_community_regex",
+            "                    UNDERSCORE:'_'  <== mode:M_Members",
             "                    DEC:'8075'  <== mode:M_Members",
             "                    COLON:':'  <== mode:M_Members",
             "                    OPEN_BRACKET:'['  <== mode:M_Members",

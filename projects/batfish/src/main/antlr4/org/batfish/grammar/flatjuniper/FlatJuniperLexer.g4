@@ -6034,6 +6034,11 @@ M_Members_TARGET
    'target' -> type ( TARGET )
 ;
 
+M_Members_UNDERSCORE
+:
+   '_' -> type ( UNDERSCORE )
+;
+
 M_Members_WS
 :
    F_WhitespaceChar+ -> channel ( HIDDEN )
