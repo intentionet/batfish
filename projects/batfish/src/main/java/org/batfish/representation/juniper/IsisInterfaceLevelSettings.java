@@ -2,7 +2,7 @@ package org.batfish.representation.juniper;
 
 import java.io.Serializable;
 import javax.annotation.Nullable;
-import org.batfish.datamodel.IsisHelloAuthenticationType;
+import org.batfish.datamodel.isis.IsisHelloAuthenticationType;
 
 public class IsisInterfaceLevelSettings implements Serializable {
 

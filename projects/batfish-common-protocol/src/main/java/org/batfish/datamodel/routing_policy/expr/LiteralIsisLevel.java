@@ -1,7 +1,7 @@
 package org.batfish.datamodel.routing_policy.expr;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import org.batfish.datamodel.IsisLevel;
+import org.batfish.datamodel.isis.IsisLevel;
 import org.batfish.datamodel.routing_policy.Environment;
 
 public class LiteralIsisLevel extends IsisLevelExpr {

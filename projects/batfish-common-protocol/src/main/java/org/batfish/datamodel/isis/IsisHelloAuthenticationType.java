@@ -1,4 +1,4 @@
-package org.batfish.datamodel;
+package org.batfish.datamodel.isis;
 
 public enum IsisHelloAuthenticationType {
   MD5,

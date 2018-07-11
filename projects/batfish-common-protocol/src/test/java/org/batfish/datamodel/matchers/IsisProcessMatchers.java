@@ -4,8 +4,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.batfish.datamodel.IsisLevelSettings;
-import org.batfish.datamodel.IsisProcess;
+import org.batfish.datamodel.isis.IsisLevelSettings;
+import org.batfish.datamodel.isis.IsisProcess;
 import org.batfish.datamodel.matchers.IsisProcessMatchersImpl.HasLevel1;
 import org.batfish.datamodel.matchers.IsisProcessMatchersImpl.HasLevel2;
 import org.batfish.datamodel.matchers.IsisProcessMatchersImpl.HasOverloadTimeout;

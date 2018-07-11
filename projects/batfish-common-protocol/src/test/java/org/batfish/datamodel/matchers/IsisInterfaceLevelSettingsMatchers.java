@@ -4,10 +4,10 @@ import static org.hamcrest.Matchers.equalTo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.batfish.datamodel.IsisHelloAuthenticationType;
-import org.batfish.datamodel.IsisInterfaceLevelSettings;
-import org.batfish.datamodel.IsisInterfaceMode;
-import org.batfish.datamodel.IsisInterfaceSettings;
+import org.batfish.datamodel.isis.IsisHelloAuthenticationType;
+import org.batfish.datamodel.isis.IsisInterfaceLevelSettings;
+import org.batfish.datamodel.isis.IsisInterfaceMode;
+import org.batfish.datamodel.isis.IsisInterfaceSettings;
 import org.batfish.datamodel.matchers.IsisInterfaceLevelSettingsMatchersImpl.HasCost;
 import org.batfish.datamodel.matchers.IsisInterfaceLevelSettingsMatchersImpl.HasHelloAuthenticationType;
 import org.batfish.datamodel.matchers.IsisInterfaceLevelSettingsMatchersImpl.HasHelloInterval;

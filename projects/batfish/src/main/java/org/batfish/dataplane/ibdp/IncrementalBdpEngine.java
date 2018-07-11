@@ -7,17 +7,12 @@ import static org.batfish.common.util.CommonUtil.initBgpTopology;
 import static org.batfish.common.util.CommonUtil.toImmutableSortedMap;
 import static org.batfish.dataplane.rib.AbstractRib.importRib;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.graph.ImmutableNetwork;
-import com.google.common.graph.MutableNetwork;
 import com.google.common.graph.Network;
-import com.google.common.graph.NetworkBuilder;
 import com.google.common.graph.ValueGraph;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -43,13 +38,14 @@ import org.batfish.datamodel.OspfExternalType1Route;
 import org.batfish.datamodel.OspfExternalType2Route;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.answers.IncrementalBdpAnswerElement;
+import org.batfish.datamodel.isis.IsisEdge;
+import org.batfish.datamodel.isis.IsisNode;
+import org.batfish.datamodel.isis.IsisTopology;
 import org.batfish.dataplane.TracerouteEngineImpl;
 import org.batfish.dataplane.ibdp.schedule.IbdpSchedule;
 import org.batfish.dataplane.ibdp.schedule.IbdpSchedule.Schedule;
 import org.batfish.dataplane.rib.BgpMultipathRib;
 import org.batfish.dataplane.rib.RibDelta;
-import org.batfish.dataplane.topology.IsisEdge;
-import org.batfish.dataplane.topology.IsisNode;
 
 class IncrementalBdpEngine {
 
@@ -109,7 +105,8 @@ class IncrementalBdpEngine {
         initBgpTopology(
             configurations, ipOwners, false, true, TracerouteEngineImpl.getInstance(), dp);
 
-    Network<IsisNode, IsisEdge> isisTopology = initIsisTopology(configurations, topology);
+    Network<IsisNode, IsisEdge> isisTopology =
+        IsisTopology.initIsisTopology(configurations, topology);
 
     boolean isOscillating =
         computeNonMonotonicPortionOfDataPlane(
@@ -161,29 +158,6 @@ class IncrementalBdpEngine {
     answerElement.setVersion(Version.getVersion());
     _bfLogger.printElapsedTime();
     return new ComputeDataPlaneResult(answerElement, dp);
-  }
-
-  static Network<IsisNode, IsisEdge> initIsisTopology(
-      Map<String, Configuration> configurations, Topology topology) {
-    Set<IsisEdge> edges =
-        topology
-            .getEdges()
-            .stream()
-            .map(edge -> IsisEdge.edgeIfCircuit(edge, configurations))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(ImmutableSet.toImmutableSet());
-    MutableNetwork<IsisNode, IsisEdge> graph =
-        NetworkBuilder.directed().allowsParallelEdges(false).allowsSelfLoops(false).build();
-    ImmutableSet.Builder<IsisNode> nodes = ImmutableSet.builder();
-    edges.forEach(
-        edge -> {
-          nodes.add(edge.getNode1());
-          nodes.add(edge.getNode2());
-        });
-    nodes.build().forEach(graph::addNode);
-    edges.forEach(edge -> graph.addEdge(edge.getNode1(), edge.getNode2(), edge));
-    return ImmutableNetwork.copyOf(graph);
   }
 
   /**
@@ -254,7 +228,7 @@ class IncrementalBdpEngine {
         .forEach(
             n -> {
               for (VirtualRouter vr : n.getVirtualRouters().values()) {
-                vr.initIsisExports(allNodes);
+                vr.initIsisExports(allNodes, networkConfigurations);
               }
             });
     // IS-IS route propagation
@@ -277,8 +251,10 @@ class IncrementalBdpEngine {
               n -> {
                 for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   Entry<RibDelta<IsisRoute>, RibDelta<IsisRoute>> p =
-                      vr.propagateIsisRoutes(allNodes);
-                  if (p != null && vr.unstageIsisRoutes(allNodes, p.getKey(), p.getValue())) {
+                      vr.propagateIsisRoutes(allNodes, networkConfigurations);
+                  if (p != null
+                      && vr.unstageIsisRoutes(
+                          allNodes, networkConfigurations, p.getKey(), p.getValue())) {
                     isisChanged.set(true);
                   }
                 }

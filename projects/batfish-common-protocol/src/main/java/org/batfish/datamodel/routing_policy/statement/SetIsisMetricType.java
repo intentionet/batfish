@@ -1,7 +1,7 @@
 package org.batfish.datamodel.routing_policy.statement;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import org.batfish.datamodel.IsisMetricType;
+import org.batfish.datamodel.isis.IsisMetricType;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.Result;
 

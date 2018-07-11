@@ -1,9 +1,9 @@
 package org.batfish.dataplane.protocols;
 
 import java.util.Optional;
-import org.batfish.datamodel.IsisLevel;
 import org.batfish.datamodel.IsisRoute;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.datamodel.isis.IsisLevel;
 
 /** Helper class that implements various IS-IS protocol logic. */
 public class IsisProtocolHelper {

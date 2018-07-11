@@ -3,6 +3,7 @@ package org.batfish.datamodel;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import org.batfish.datamodel.isis.IsisLevel;
 import org.junit.Test;
 
 /** Tests of {@link IsisRoute} */

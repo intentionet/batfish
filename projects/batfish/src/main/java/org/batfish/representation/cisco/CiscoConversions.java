@@ -59,7 +59,6 @@ import org.batfish.datamodel.IpsecPolicy;
 import org.batfish.datamodel.IpsecProposal;
 import org.batfish.datamodel.IpsecStaticPeerConfig;
 import org.batfish.datamodel.IpsecVpn;
-import org.batfish.datamodel.IsisLevelSettings;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
@@ -75,6 +74,7 @@ import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.AndMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
+import org.batfish.datamodel.isis.IsisLevelSettings;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.routing_policy.expr.AsPathSetElem;
 import org.batfish.datamodel.routing_policy.expr.BooleanExpr;
@@ -842,10 +842,10 @@ class CiscoConversions {
     return ipsecVpns;
   }
 
-  static org.batfish.datamodel.IsisProcess toIsisProcess(
+  static org.batfish.datamodel.isis.IsisProcess toIsisProcess(
       IsisProcess proc, Configuration c, CiscoConfiguration oldConfig) {
-    org.batfish.datamodel.IsisProcess.Builder newProcess =
-        org.batfish.datamodel.IsisProcess.builder();
+    org.batfish.datamodel.isis.IsisProcess.Builder newProcess =
+        org.batfish.datamodel.isis.IsisProcess.builder();
     if (proc.getNetAddress() == null) {
       oldConfig.getWarnings().redFlag("Cannot create IS-IS process without specifying net-address");
       return null;

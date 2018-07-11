@@ -3,9 +3,9 @@ package org.batfish.representation.cisco;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
-import org.batfish.datamodel.IsisLevel;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.datamodel.isis.IsisLevel;
 
 public class IsisProcess implements Serializable {
 

@@ -3,6 +3,8 @@ package org.batfish.datamodel;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.batfish.common.util.ComparableStructure;
+import org.batfish.datamodel.isis.IsisAuthenticationAlgorithm;
+import org.batfish.datamodel.isis.IsisOption;
 
 public class AuthenticationKey extends ComparableStructure<String> {
 

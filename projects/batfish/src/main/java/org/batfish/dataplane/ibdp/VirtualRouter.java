@@ -61,12 +61,6 @@ import org.batfish.datamodel.GeneratedRoute;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.IsisInterfaceLevelSettings;
-import org.batfish.datamodel.IsisInterfaceMode;
-import org.batfish.datamodel.IsisInterfaceSettings;
-import org.batfish.datamodel.IsisLevel;
-import org.batfish.datamodel.IsisLevelSettings;
-import org.batfish.datamodel.IsisProcess;
 import org.batfish.datamodel.IsisRoute;
 import org.batfish.datamodel.LocalRoute;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
@@ -87,6 +81,14 @@ import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.isis.IsisEdge;
+import org.batfish.datamodel.isis.IsisInterfaceLevelSettings;
+import org.batfish.datamodel.isis.IsisInterfaceMode;
+import org.batfish.datamodel.isis.IsisInterfaceSettings;
+import org.batfish.datamodel.isis.IsisLevel;
+import org.batfish.datamodel.isis.IsisLevelSettings;
+import org.batfish.datamodel.isis.IsisNode;
+import org.batfish.datamodel.isis.IsisProcess;
 import org.batfish.datamodel.ospf.OspfArea;
 import org.batfish.datamodel.ospf.OspfAreaSummary;
 import org.batfish.datamodel.ospf.OspfMetricType;
@@ -118,8 +120,6 @@ import org.batfish.dataplane.rib.RouteAdvertisement;
 import org.batfish.dataplane.rib.RouteAdvertisement.Reason;
 import org.batfish.dataplane.rib.StaticRib;
 import org.batfish.dataplane.topology.BgpEdgeId;
-import org.batfish.dataplane.topology.IsisEdge;
-import org.batfish.dataplane.topology.IsisNode;
 
 public class VirtualRouter extends ComparableStructure<String> {
 
@@ -1078,7 +1078,7 @@ public class VirtualRouter extends ComparableStructure<String> {
     return outputRoute;
   }
 
-  void initIsisExports(Map<String, Node> allNodes) {
+  void initIsisExports(Map<String, Node> allNodes, NetworkConfigurations nc) {
     /* TODO: https://github.com/batfish/batfish/issues/1703 */
     IsisProcess proc = _vrf.getIsisProcess();
     if (proc == null) {
@@ -1118,7 +1118,7 @@ public class VirtualRouter extends ComparableStructure<String> {
       d1.from(_isisL1Rib.mergeRouteGetDelta(defaultRoute));
     }
 
-    queueOutgoingIsisRoutes(allNodes, d1.build(), d2.build());
+    queueOutgoingIsisRoutes(allNodes, nc, d1.build(), d2.build());
   }
 
   /**
@@ -1711,7 +1711,7 @@ public class VirtualRouter extends ComparableStructure<String> {
   }
 
   public @Nullable Entry<RibDelta<IsisRoute>, RibDelta<IsisRoute>> propagateIsisRoutes(
-      final Map<String, Node> nodes) {
+      final Map<String, Node> nodes, NetworkConfigurations nc) {
     if (_vrf.getIsisProcess() == null) {
       return null;
     }
@@ -1722,8 +1722,8 @@ public class VirtualRouter extends ComparableStructure<String> {
     int l2Admin = RoutingProtocol.ISIS_L2.getDefaultAdministrativeCost(_c.getConfigurationFormat());
     _isisIncomingRoutes.forEach(
         (edge, queue) -> {
-          Ip nextHopIp = edge.getNode2().getInterface(nodes).getAddress().getIp();
-          Interface iface = edge.getNode1().getInterface(nodes);
+          Ip nextHopIp = edge.getNode2().getInterface(nc).getAddress().getIp();
+          Interface iface = edge.getNode1().getInterface(nc);
           routeBuilder.setNextHopIp(nextHopIp);
           while (queue.peek() != null) {
             RouteAdvertisement<IsisRoute> routeAdvert = queue.remove();
@@ -2385,6 +2385,7 @@ public class VirtualRouter extends ComparableStructure<String> {
 
   private void queueOutgoingIsisRoutes(
       @Nonnull Map<String, Node> allNodes,
+      NetworkConfigurations nc,
       @Nullable RibDelta<IsisRoute> l1delta,
       @Nullable RibDelta<IsisRoute> l2delta) {
     if (_vrf.getIsisProcess() == null || _isisIncomingRoutes == null) {
@@ -2399,7 +2400,7 @@ public class VirtualRouter extends ComparableStructure<String> {
                   allNodes
                       .get(edge.getNode1().getHostname())
                       .getVirtualRouters()
-                      .get(edge.getNode1().getInterface(allNodes).getVrfName());
+                      .get(edge.getNode1().getInterface(nc).getVrfName());
               Queue<RouteAdvertisement<IsisRoute>> queue =
                   remoteVr._isisIncomingRoutes.get(edge.reverse());
               IsisLevel circuitType = edge.getCircuitType();
@@ -2532,10 +2533,13 @@ public class VirtualRouter extends ComparableStructure<String> {
    * @return true if any routes from given deltas were merged into the combined IS-IS RIB.
    */
   boolean unstageIsisRoutes(
-      Map<String, Node> allNodes, RibDelta<IsisRoute> l1Delta, RibDelta<IsisRoute> l2Delta) {
+      Map<String, Node> allNodes,
+      NetworkConfigurations nc,
+      RibDelta<IsisRoute> l1Delta,
+      RibDelta<IsisRoute> l2Delta) {
     RibDelta<IsisRoute> d1 = importRibDelta(_isisL1Rib, l1Delta);
     RibDelta<IsisRoute> d2 = importRibDelta(_isisL2Rib, l2Delta);
-    queueOutgoingIsisRoutes(allNodes, d1, d2);
+    queueOutgoingIsisRoutes(allNodes, nc, d1, d2);
     Builder<IsisRoute> isisDeltaBuilder = new Builder<>(_isisRib);
     isisDeltaBuilder.from(importRibDelta(_isisRib, d1));
     isisDeltaBuilder.from(importRibDelta(_isisRib, d2));

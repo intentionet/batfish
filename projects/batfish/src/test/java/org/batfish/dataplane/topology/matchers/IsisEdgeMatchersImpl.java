@@ -1,8 +1,8 @@
 package org.batfish.dataplane.topology.matchers;
 
 import javax.annotation.Nonnull;
-import org.batfish.datamodel.IsisLevel;
-import org.batfish.dataplane.topology.IsisEdge;
+import org.batfish.datamodel.isis.IsisEdge;
+import org.batfish.datamodel.isis.IsisLevel;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 

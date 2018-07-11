@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Comparator;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.isis.IsisLevel;
 
 public class IsisRoute extends AbstractRoute {
 

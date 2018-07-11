@@ -1,10 +1,10 @@
-package org.batfish.dataplane.topology;
+package org.batfish.datamodel.isis;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Optional.empty;
-import static org.batfish.datamodel.IsisLevel.LEVEL_1;
-import static org.batfish.datamodel.IsisLevel.LEVEL_1_2;
-import static org.batfish.datamodel.IsisLevel.LEVEL_2;
+import static org.batfish.datamodel.isis.IsisLevel.LEVEL_1;
+import static org.batfish.datamodel.isis.IsisLevel.LEVEL_1_2;
+import static org.batfish.datamodel.isis.IsisLevel.LEVEL_2;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,9 +16,6 @@ import javax.annotation.Nullable;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Edge;
 import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.IsisInterfaceSettings;
-import org.batfish.datamodel.IsisLevel;
-import org.batfish.datamodel.IsisProcess;
 import org.batfish.datamodel.Vrf;
 
 public final class IsisEdge implements Comparable<IsisEdge> {

@@ -3,7 +3,7 @@ package org.batfish.datamodel.matchers;
 import static org.hamcrest.Matchers.equalTo;
 
 import javax.annotation.Nonnull;
-import org.batfish.datamodel.IsisLevelSettings;
+import org.batfish.datamodel.isis.IsisLevelSettings;
 import org.batfish.datamodel.matchers.IsisLevelSettingsMatchersImpl.HasWideMetricsOnly;
 import org.hamcrest.Matcher;
 

@@ -1,6 +1,6 @@
 package org.batfish.datamodel.matchers;
 
-import org.batfish.datamodel.IsisLevelSettings;
+import org.batfish.datamodel.isis.IsisLevelSettings;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 

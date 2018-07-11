@@ -1,4 +1,4 @@
-package org.batfish.datamodel;
+package org.batfish.datamodel.isis;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.Objects.requireNonNull;
@@ -13,6 +13,9 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.batfish.datamodel.GeneratedRoute;
+import org.batfish.datamodel.IsoAddress;
+import org.batfish.datamodel.Vrf;
 
 @JsonSchemaDescription("An IS-IS routing process")
 public class IsisProcess implements Serializable {

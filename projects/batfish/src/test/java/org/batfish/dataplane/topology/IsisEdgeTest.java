@@ -1,8 +1,8 @@
 package org.batfish.dataplane.topology;
 
 import static org.batfish.common.util.CommonUtil.synthesizeTopology;
-import static org.batfish.datamodel.IsisLevel.LEVEL_1_2;
-import static org.batfish.datamodel.IsisLevel.LEVEL_2;
+import static org.batfish.datamodel.isis.IsisLevel.LEVEL_1_2;
+import static org.batfish.datamodel.isis.IsisLevel.LEVEL_2;
 import static org.batfish.dataplane.topology.matchers.IsisEdgeMatchers.hasCircuitType;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -19,15 +19,16 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
-import org.batfish.datamodel.IsisInterfaceLevelSettings;
-import org.batfish.datamodel.IsisInterfaceMode;
-import org.batfish.datamodel.IsisInterfaceSettings;
-import org.batfish.datamodel.IsisLevelSettings;
-import org.batfish.datamodel.IsisProcess;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.isis.IsisEdge;
+import org.batfish.datamodel.isis.IsisInterfaceLevelSettings;
+import org.batfish.datamodel.isis.IsisInterfaceMode;
+import org.batfish.datamodel.isis.IsisInterfaceSettings;
+import org.batfish.datamodel.isis.IsisLevelSettings;
+import org.batfish.datamodel.isis.IsisProcess;
 import org.junit.Test;
 
 public final class IsisEdgeTest {

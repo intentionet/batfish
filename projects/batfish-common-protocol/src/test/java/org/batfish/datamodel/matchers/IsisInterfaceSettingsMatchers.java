@@ -4,9 +4,9 @@ import static org.hamcrest.Matchers.equalTo;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.batfish.datamodel.IsisInterfaceLevelSettings;
-import org.batfish.datamodel.IsisInterfaceSettings;
 import org.batfish.datamodel.IsoAddress;
+import org.batfish.datamodel.isis.IsisInterfaceLevelSettings;
+import org.batfish.datamodel.isis.IsisInterfaceSettings;
 import org.batfish.datamodel.matchers.IsisInterfaceSettingsMatchersImpl.HasBfdLivenessDetectionMinimumInterval;
 import org.batfish.datamodel.matchers.IsisInterfaceSettingsMatchersImpl.HasBfdLivenessDetectionMultiplier;
 import org.batfish.datamodel.matchers.IsisInterfaceSettingsMatchersImpl.HasIsoAddress;

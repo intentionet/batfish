@@ -1,15 +1,13 @@
-package org.batfish.dataplane.topology;
+package org.batfish.datamodel.isis;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.IsisProcess;
-import org.batfish.dataplane.ibdp.Node;
+import org.batfish.datamodel.NetworkConfigurations;
 
 public final class IsisNode implements Comparable<IsisNode> {
 
@@ -45,24 +43,16 @@ public final class IsisNode implements Comparable<IsisNode> {
     return _hostname;
   }
 
-  public @Nullable Interface getInterface(@Nonnull Map<String, Node> nodes) {
-    Node n = nodes.get(_hostname);
-    if (n == null) {
-      return null;
-    }
-    return n.getConfiguration().getInterfaces().get(_interfaceName);
+  public @Nullable Interface getInterface(@Nonnull NetworkConfigurations nc) {
+    return nc.getInterface(_hostname, _interfaceName);
   }
 
   public @Nonnull String getInterfaceName() {
     return _interfaceName;
   }
 
-  public @Nullable IsisProcess getIsisProcess(@Nonnull Map<String, Node> nodes) {
-    Node n = nodes.get(_hostname);
-    if (n == null) {
-      return null;
-    }
-    Interface i = n.getConfiguration().getInterfaces().get(_interfaceName);
+  public @Nullable IsisProcess getIsisProcess(@Nonnull NetworkConfigurations nc) {
+    Interface i = getInterface(nc);
     if (i == null) {
       return null;
     }

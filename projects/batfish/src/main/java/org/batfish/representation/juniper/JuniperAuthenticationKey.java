@@ -1,8 +1,8 @@
 package org.batfish.representation.juniper;
 
 import org.batfish.common.util.ComparableStructure;
-import org.batfish.datamodel.IsisAuthenticationAlgorithm;
-import org.batfish.datamodel.IsisOption;
+import org.batfish.datamodel.isis.IsisAuthenticationAlgorithm;
+import org.batfish.datamodel.isis.IsisOption;
 
 public class JuniperAuthenticationKey extends ComparableStructure<String> {
 

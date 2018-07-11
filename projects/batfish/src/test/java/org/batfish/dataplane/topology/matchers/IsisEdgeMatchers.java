@@ -3,8 +3,8 @@ package org.batfish.dataplane.topology.matchers;
 import static org.hamcrest.Matchers.equalTo;
 
 import javax.annotation.Nonnull;
-import org.batfish.datamodel.IsisLevel;
-import org.batfish.dataplane.topology.IsisEdge;
+import org.batfish.datamodel.isis.IsisEdge;
+import org.batfish.datamodel.isis.IsisLevel;
 import org.batfish.dataplane.topology.matchers.IsisEdgeMatchersImpl.HasCircuitType;
 import org.hamcrest.Matcher;
 

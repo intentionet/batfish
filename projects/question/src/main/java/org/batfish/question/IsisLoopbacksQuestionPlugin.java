@@ -1,8 +1,8 @@
 package org.batfish.question;
 
-import static org.batfish.datamodel.IsisInterfaceMode.ACTIVE;
-import static org.batfish.datamodel.IsisInterfaceMode.PASSIVE;
-import static org.batfish.datamodel.IsisInterfaceMode.UNSET;
+import static org.batfish.datamodel.isis.IsisInterfaceMode.ACTIVE;
+import static org.batfish.datamodel.isis.IsisInterfaceMode.PASSIVE;
+import static org.batfish.datamodel.isis.IsisInterfaceMode.UNSET;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.service.AutoService;
@@ -17,9 +17,9 @@ import org.batfish.common.Answerer;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.plugin.Plugin;
 import org.batfish.datamodel.Configuration;
-import org.batfish.datamodel.IsisInterfaceMode;
-import org.batfish.datamodel.IsisInterfaceSettings;
 import org.batfish.datamodel.answers.AnswerElement;
+import org.batfish.datamodel.isis.IsisInterfaceMode;
+import org.batfish.datamodel.isis.IsisInterfaceSettings;
 import org.batfish.datamodel.questions.NodesSpecifier;
 import org.batfish.datamodel.questions.Question;
 

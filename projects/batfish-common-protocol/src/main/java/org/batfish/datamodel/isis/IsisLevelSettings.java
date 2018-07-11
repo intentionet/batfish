@@ -1,4 +1,4 @@
-package org.batfish.datamodel;
+package org.batfish.datamodel.isis;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;

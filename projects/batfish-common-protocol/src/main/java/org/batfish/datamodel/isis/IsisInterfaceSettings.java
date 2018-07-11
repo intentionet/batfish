@@ -1,10 +1,11 @@
-package org.batfish.datamodel;
+package org.batfish.datamodel.isis;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.batfish.datamodel.IsoAddress;
 
 public class IsisInterfaceSettings implements Serializable {
 

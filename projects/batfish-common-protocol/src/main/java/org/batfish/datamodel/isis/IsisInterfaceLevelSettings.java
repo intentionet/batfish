@@ -1,8 +1,8 @@
-package org.batfish.datamodel;
+package org.batfish.datamodel.isis;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.Objects.requireNonNull;
-import static org.batfish.datamodel.IsisInterfaceMode.UNSET;
+import static org.batfish.datamodel.isis.IsisInterfaceMode.UNSET;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

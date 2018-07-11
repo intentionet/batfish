@@ -3,7 +3,7 @@ package org.batfish.representation.cisco;
 import java.util.List;
 import org.batfish.common.Warnings;
 import org.batfish.datamodel.Configuration;
-import org.batfish.datamodel.IsisMetricType;
+import org.batfish.datamodel.isis.IsisMetricType;
 import org.batfish.datamodel.routing_policy.statement.SetIsisMetricType;
 import org.batfish.datamodel.routing_policy.statement.Statement;
 
