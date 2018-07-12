@@ -107,12 +107,12 @@ public class BDDNetwork {
 
         // Incoming ACL
         if (in != null) {
-          BDDAcl x = BDDAcl.create(in);
+          BDDAcl x = BDDAcl.create(in, conf.getIpAccessLists(), conf.getIpSpaces());
           _inAcls.put(ge, x);
         }
         // Outgoing ACL
         if (out != null) {
-          BDDAcl x = BDDAcl.create(out);
+          BDDAcl x = BDDAcl.create(out, conf.getIpAccessLists(), conf.getIpSpaces());
           _outAcls.put(ge, x);
         }
       }

@@ -6,16 +6,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 import net.sf.javabdd.BDD;
+import org.batfish.common.BatfishException;
+import org.batfish.common.util.NonReentrantSupplier;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
+import org.batfish.datamodel.acl.PermittedByAcl;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class AclLineMatchExprToBDDTest {
+  @Rule public ExpectedException exception = ExpectedException.none();
+
   private AclLineMatchExprToBDD _toBDD;
 
   private BDDPacket _pkt;
@@ -23,7 +34,8 @@ public class AclLineMatchExprToBDDTest {
   @Before
   public void setup() {
     _pkt = new BDDPacket();
-    _toBDD = new AclLineMatchExprToBDD(BDDPacket.factory, _pkt);
+    _toBDD =
+        new AclLineMatchExprToBDD(BDDPacket.factory, _pkt, ImmutableMap.of(), ImmutableMap.of());
   }
 
   @Test
@@ -77,5 +89,38 @@ public class AclLineMatchExprToBDDTest {
     BDDInteger srcPort = _pkt.getSrcPort();
     BDD srcPortBDD = srcPort.leq(20).and(srcPort.geq(10));
     assertThat(bdd, equalTo(dstPortBDD.or(srcPortBDD)));
+  }
+
+  @Test
+  public void testPermittedByAcl() {
+    Ip fooIp = new Ip("1.1.1.1");
+    BDD fooIpBDD = _pkt.getSrcIp().value(fooIp.asLong());
+    PermittedByAcl permittedByAcl = new PermittedByAcl("foo");
+    Map<String, Supplier<BDD>> namedAclBDDs = ImmutableMap.of("foo", () -> fooIpBDD);
+    AclLineMatchExprToBDD toBDD =
+        new AclLineMatchExprToBDD(BDDPacket.factory, _pkt, namedAclBDDs, ImmutableMap.of());
+    assertThat(permittedByAcl.accept(toBDD), equalTo(fooIpBDD));
+  }
+
+  @Test
+  public void testPermittedByAcl_undefined() {
+    PermittedByAcl permittedByAcl = new PermittedByAcl("foo");
+    AclLineMatchExprToBDD toBDD =
+        new AclLineMatchExprToBDD(BDDPacket.factory, _pkt, ImmutableMap.of(), ImmutableMap.of());
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("Undefined PermittedByAcl reference: foo");
+    permittedByAcl.accept(toBDD);
+  }
+
+  @Test
+  public void testPermittedByAcl_circular() {
+    PermittedByAcl permittedByAcl = new PermittedByAcl("foo");
+    Map<String, Supplier<BDD>> namedAclBDDs = new HashMap<>();
+    namedAclBDDs.put("foo", new NonReentrantSupplier<>(() -> namedAclBDDs.get("foo").get()));
+    AclLineMatchExprToBDD toBDD =
+        new AclLineMatchExprToBDD(BDDPacket.factory, _pkt, namedAclBDDs, ImmutableMap.of());
+    exception.expect(BatfishException.class);
+    exception.expectMessage("Circular PermittedByAcl reference: foo");
+    permittedByAcl.accept(toBDD);
   }
 }
