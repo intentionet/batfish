@@ -1,6 +1,6 @@
 parser grammar PaloAlto_shared;
 
-import PaloAlto_common, PaloAlto_service;
+import PaloAlto_common, PaloAlto_service, PaloAlto_service_group;
 
 options {
     tokenVocab = PaloAltoLexer;
@@ -18,6 +18,7 @@ s_shared
 ss_common
 :
     s_service
+    | s_service_group
     | ss_log_settings
 ;
 

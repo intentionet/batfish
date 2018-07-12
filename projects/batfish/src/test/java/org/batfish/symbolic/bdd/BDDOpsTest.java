@@ -2,6 +2,7 @@ package org.batfish.symbolic.bdd;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
@@ -49,6 +50,27 @@ public class BDDOpsTest {
   }
 
   @Test
+  public void testAndNull_null() {
+    assertThat(BDDOps.andNull(), nullValue());
+    assertThat(BDDOps.andNull(null, null), nullValue());
+  }
+
+  @Test
+  public void testAndNull_one() {
+    _factory.setVarNum(1);
+    BDD var = _factory.ithVar(0);
+    assertThat(BDDOps.andNull(var, null), equalTo(var));
+  }
+
+  @Test
+  public void testAndNull_two() {
+    _factory.setVarNum(2);
+    BDD var1 = _factory.ithVar(0);
+    BDD var2 = _factory.ithVar(1);
+    assertThat(BDDOps.andNull(var1, var2, null), equalTo(var1.and(var2)));
+  }
+
+  @Test
   public void testOr_one() {
     _factory.setVarNum(1);
     BDD var = _factory.ithVar(0);
@@ -73,5 +95,26 @@ public class BDDOpsTest {
     _factory.setVarNum(1);
     BDD var = _factory.ithVar(0);
     assertThat(_bddOps.or(var, _factory.zero()), equalTo(var));
+  }
+
+  @Test
+  public void testOrNull_null() {
+    assertThat(BDDOps.orNull(), nullValue());
+    assertThat(BDDOps.orNull(null, null), nullValue());
+  }
+
+  @Test
+  public void testOrNull_one() {
+    _factory.setVarNum(1);
+    BDD var = _factory.ithVar(0);
+    assertThat(BDDOps.orNull(var, null), equalTo(var));
+  }
+
+  @Test
+  public void testOrNull_two() {
+    _factory.setVarNum(2);
+    BDD var1 = _factory.ithVar(0);
+    BDD var2 = _factory.ithVar(1);
+    assertThat(BDDOps.orNull(null, var1, var2), equalTo(var1.or(var2)));
   }
 }

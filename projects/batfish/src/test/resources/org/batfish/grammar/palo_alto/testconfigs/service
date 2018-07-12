@@ -2,5 +2,8 @@ set deviceconfig system hostname service
 set service SERVICE1 description "long description"
 set service SERVICE1 protocol tcp port 1
 set service SERVICE2 protocol udp source-port 4
-set service SERVICE3 protocol udp port 5,6,7 source-port 8,9,10
+set service SERVICE3 protocol udp port 5,6 source-port 9,10
 set service SERVICE4 protocol sctp
+
+set service-group SG1 members [ SERVICE1 SERVICE2 ]
+set service-group SG2 members [ SG1 SERVICE_UNDEFINED ]

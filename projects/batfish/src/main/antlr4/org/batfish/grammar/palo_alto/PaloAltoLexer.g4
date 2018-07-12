@@ -110,6 +110,11 @@ LOG_SETTINGS
     'log-settings'
 ;
 
+MEMBERS
+:
+    'members'
+;
+
 METRIC
 :
     'metric'
@@ -198,6 +203,11 @@ SERVERS
 SERVICE
 :
     'service'
+;
+
+SERVICE_GROUP
+:
+    'service-group'
 ;
 
 SET

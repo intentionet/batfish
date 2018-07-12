@@ -50,13 +50,13 @@ public class RoutesAnswerer extends Answerer {
   // Present sometimes
   static final String COL_NEXT_HOP = "NextHop";
   static final String COL_PROTOCOL = "Protocol";
+  static final String COL_METRIC = "Metric";
 
   // Main RIB
   static final String COL_ADMIN_DISTANCE = "AdminDistance";
 
   // BGP only
   static final String COL_AS_PATH = "AsPath";
-  static final String COL_METRIC = "Metric";
   static final String COL_LOCAL_PREF = "LocalPref";
   static final String COL_COMMUNITIES = "Communities";
   static final String COL_ORIGIN_PROTOCOL = "OriginProtocol";
@@ -159,6 +159,7 @@ public class RoutesAnswerer extends Answerer {
                     .put(COL_PROTOCOL, route.getProtocol())
                     .put(COL_TAG, route.getTag())
                     .put(COL_ADMIN_DISTANCE, route.getAdministrativeCost())
+                    .put(COL_METRIC, route.getMetric())
                     .build())
         .collect(toImmutableList());
   }
@@ -260,6 +261,9 @@ public class RoutesAnswerer extends Answerer {
                 "Route's admin distance",
                 Boolean.FALSE,
                 Boolean.TRUE));
+        columnBuilder.add(
+            new ColumnMetadata(
+                COL_METRIC, Schema.INTEGER, "Route's metric", Boolean.FALSE, Boolean.TRUE));
     }
     DisplayHints dh = new DisplayHints();
     dh.setTextDesc("Display RIB routes");

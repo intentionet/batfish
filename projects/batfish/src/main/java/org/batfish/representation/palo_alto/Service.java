@@ -1,11 +1,10 @@
 package org.batfish.representation.palo_alto;
 
-import java.io.Serializable;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.batfish.datamodel.IpProtocol;
 
-public final class Service implements Serializable {
+public final class Service implements ServiceGroupMember {
   private static final long serialVersionUID = 1L;
 
   private String _description;

@@ -147,6 +147,26 @@ public class RoutesAnswererTest {
   }
 
   @Test
+  public void testHasMetric() {
+    SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs =
+        ImmutableSortedMap.of(
+            "n1",
+            ImmutableSortedMap.of(
+                Configuration.DEFAULT_VRF_NAME,
+                new MockRib<>(
+                    ImmutableSet.of(
+                        StaticRoute.builder()
+                            .setNetwork(Prefix.parse("1.1.1.0/24"))
+                            .setNextHopInterface("Null")
+                            .setMetric(111)
+                            .build()))));
+
+    Multiset<Row> actual = getMainRibRoutes(ribs, ImmutableSet.of("n1"), ".*", null);
+
+    assertThat(actual.iterator().next().get(COL_METRIC, Schema.INTEGER), equalTo(111));
+  }
+
+  @Test
   public void testGetTableMetadataProtocolAll() {
     List<ColumnMetadata> columnMetadata = getTableMetadata(RibProtocol.ALL).getColumnMetadata();
 
@@ -163,7 +183,8 @@ public class RoutesAnswererTest {
             COL_TAG,
             COL_NEXT_HOP_IP,
             COL_NEXT_HOP,
-            COL_ADMIN_DISTANCE));
+            COL_ADMIN_DISTANCE,
+            COL_METRIC));
 
     assertThat(
         columnMetadata
@@ -178,6 +199,7 @@ public class RoutesAnswererTest {
             Schema.INTEGER,
             Schema.IP,
             Schema.STRING,
+            Schema.INTEGER,
             Schema.INTEGER));
   }
 

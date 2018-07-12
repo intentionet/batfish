@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
@@ -26,6 +27,7 @@ import org.batfish.datamodel.acl.OriginatingFromDevice;
 import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.acl.TrueExpr;
 
+/** Visit an {@link AclLineMatchExpr} and convert it to a BDD. */
 public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD> {
 
   private final BDDOps _bddOps;
@@ -52,7 +54,7 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
     }
   }
 
-  public BDD toBDD(AclLineMatchExpr expr) {
+  public @Nonnull BDD toBDD(AclLineMatchExpr expr) {
     return expr.accept(this);
   }
 
@@ -151,8 +153,14 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
     return _bddOps.and(
         toBDD(headerSpace.getDstIps(), _packet.getDstIp()),
         toBDD(headerSpace.getSrcIps(), _packet.getSrcIp()),
+        BDDOps.orNull(
+            toBDD(headerSpace.getSrcOrDstIps(), _packet.getDstIp()),
+            toBDD(headerSpace.getSrcOrDstIps(), _packet.getSrcIp())),
         toBDD(headerSpace.getDstPorts(), _packet.getDstPort()),
         toBDD(headerSpace.getSrcPorts(), _packet.getSrcPort()),
+        BDDOps.orNull(
+            toBDD(headerSpace.getSrcOrDstPorts(), _packet.getSrcPort()),
+            toBDD(headerSpace.getSrcOrDstPorts(), _packet.getDstPort())),
         toBDD(headerSpace.getTcpFlags()),
         toBDD(headerSpace.getIcmpCodes(), _packet.getIcmpCode()),
         toBDD(headerSpace.getIcmpTypes(), _packet.getIcmpType()),

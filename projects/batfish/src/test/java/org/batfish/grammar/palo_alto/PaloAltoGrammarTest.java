@@ -298,38 +298,31 @@ public class PaloAltoGrammarTest {
   }
 
   @Test
-  public void testService() throws IOException {
+  public void testServiceReference() throws IOException {
     String hostname = "service";
 
     Batfish batfish = getBatfishForConfigurationNames(hostname);
     ConvertConfigurationAnswerElement ccae =
         batfish.loadConvertConfigurationAnswerElementOrReparse();
 
+    String service1Name = computeObjectName(DEFAULT_VSYS_NAME, "SERVICE1");
+    String service2Name = computeObjectName(DEFAULT_VSYS_NAME, "SERVICE2");
+    String service3Name = computeObjectName(DEFAULT_VSYS_NAME, "SERVICE3");
+    String service4Name = computeObjectName(DEFAULT_VSYS_NAME, "SERVICE4");
+    String serviceGroup1Name = computeObjectName(DEFAULT_VSYS_NAME, "SG1");
+    String serviceGroup2Name = computeObjectName(DEFAULT_VSYS_NAME, "SG2");
+
     // Confirm structure definitions are tracked
+    assertThat(ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, service1Name));
+    assertThat(ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, service2Name));
+    assertThat(ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, service3Name));
+    assertThat(ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, service4Name));
     assertThat(
         ccae,
-        hasDefinedStructure(
-            hostname,
-            PaloAltoStructureType.SERVICE,
-            computeObjectName(DEFAULT_VSYS_NAME, "SERVICE1")));
+        hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE_GROUP, serviceGroup1Name));
     assertThat(
         ccae,
-        hasDefinedStructure(
-            hostname,
-            PaloAltoStructureType.SERVICE,
-            computeObjectName(DEFAULT_VSYS_NAME, "SERVICE2")));
-    assertThat(
-        ccae,
-        hasDefinedStructure(
-            hostname,
-            PaloAltoStructureType.SERVICE,
-            computeObjectName(DEFAULT_VSYS_NAME, "SERVICE3")));
-    assertThat(
-        ccae,
-        hasDefinedStructure(
-            hostname,
-            PaloAltoStructureType.SERVICE,
-            computeObjectName(DEFAULT_VSYS_NAME, "SERVICE4")));
+        hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE_GROUP, serviceGroup2Name));
   }
 
   @Test
@@ -343,11 +336,11 @@ public class PaloAltoGrammarTest {
   }
 
   @Test
-  public void testVsysService() throws IOException {
+  public void testVsysServiceReference() throws IOException {
     String hostname = "vsys-service";
-    String vsys1Name = "vsys1";
-    String vsys2Name = "vsys2";
-    String serviceName = "SERVICE1";
+    String vsys1ServiceName = computeObjectName("vsys1", "SERVICE1");
+    String vsys2ServiceName = computeObjectName("vsys2", "SERVICE1");
+    String sharedServiceName = computeObjectName(SHARED_VSYS_NAME, "SERVICE1");
 
     Batfish batfish = getBatfishForConfigurationNames(hostname);
     ConvertConfigurationAnswerElement ccae =
@@ -355,19 +348,11 @@ public class PaloAltoGrammarTest {
 
     // Confirm structure definitions are tracked separately for each vsys
     assertThat(
-        ccae,
-        hasDefinedStructure(
-            hostname, PaloAltoStructureType.SERVICE, computeObjectName(vsys1Name, serviceName)));
+        ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, vsys1ServiceName));
     assertThat(
-        ccae,
-        hasDefinedStructure(
-            hostname, PaloAltoStructureType.SERVICE, computeObjectName(vsys2Name, serviceName)));
+        ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, vsys2ServiceName));
     assertThat(
-        ccae,
-        hasDefinedStructure(
-            hostname,
-            PaloAltoStructureType.SERVICE,
-            computeObjectName(SHARED_VSYS_NAME, serviceName)));
+        ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, sharedServiceName));
   }
 
   @Test
