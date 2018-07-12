@@ -267,7 +267,7 @@ public final class SynthesizerInputImpl implements SynthesizerInput {
                 _namedIpSpaces,
                 Entry::getKey,
                 namedIpSpacesEntry ->
-                    new IpAccessListSpecializer(headerSpace, namedIpSpacesEntry.getValue()))
+                    new IpSpaceIpAccessListSpecializer(headerSpace, namedIpSpacesEntry.getValue()))
             : ImmutableMap.of();
     _disabledInterfaces = ImmutableMap.copyOf(builder._disabledInterfaces);
     _disabledNodes = ImmutableSet.copyOf(builder._disabledNodes);

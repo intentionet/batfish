@@ -15,25 +15,25 @@ import org.junit.Test;
 
 public class IpAccessListSpecializerTest {
   private static final IpAccessListSpecializer TRIVIAL_SPECIALIZER =
-      new IpAccessListSpecializer(new HeaderSpace(), ImmutableMap.of());
+      new IpSpaceIpAccessListSpecializer(new HeaderSpace(), ImmutableMap.of());
 
   private static final IpAccessListSpecializer BLACKLIST_ANY_DST_SPECIALIZER =
-      new IpAccessListSpecializer(
+      new IpSpaceIpAccessListSpecializer(
           HeaderSpace.builder().setNotDstIps(ImmutableSet.of(IpWildcard.ANY)).build(),
           ImmutableMap.of());
 
   private static final IpAccessListSpecializer BLACKLIST_ANY_SRC_SPECIALIZER =
-      new IpAccessListSpecializer(
+      new IpSpaceIpAccessListSpecializer(
           HeaderSpace.builder().setNotSrcIps(ImmutableSet.of(IpWildcard.ANY)).build(),
           ImmutableMap.of());
 
   private static final IpAccessListSpecializer WHITELIST_ANY_DST_SPECIALIZER =
-      new IpAccessListSpecializer(
+      new IpSpaceIpAccessListSpecializer(
           HeaderSpace.builder().setDstIps(ImmutableSet.of(IpWildcard.ANY)).build(),
           ImmutableMap.of());
 
   private static final IpAccessListSpecializer WHITELIST_ANY_SRC_SPECIALIZER =
-      new IpAccessListSpecializer(
+      new IpSpaceIpAccessListSpecializer(
           HeaderSpace.builder().setSrcIps(ImmutableSet.of(IpWildcard.ANY)).build(),
           ImmutableMap.of());
 
@@ -64,7 +64,7 @@ public class IpAccessListSpecializerTest {
 
     // specialize to a headerspace that whitelists part of the dstIp
     IpAccessListSpecializer specializer =
-        new IpAccessListSpecializer(
+        new IpSpaceIpAccessListSpecializer(
             HeaderSpace.builder().setDstIps(ImmutableSet.of(new IpWildcard("1.2.3.4"))).build(),
             ImmutableMap.of());
     assertThat(
@@ -75,7 +75,7 @@ public class IpAccessListSpecializerTest {
 
     // specialize to a headerspace that blacklists part of the dstIp
     specializer =
-        new IpAccessListSpecializer(
+        new IpSpaceIpAccessListSpecializer(
             HeaderSpace.builder().setNotDstIps(new IpWildcard("1.2.3.4").toIpSpace()).build(),
             ImmutableMap.of());
     assertThat(specializer.specialize(ipAccessListLine), equalTo(Optional.of(ipAccessListLine)));
@@ -103,7 +103,7 @@ public class IpAccessListSpecializerTest {
 
     // specialize to a headerspace that whitelists part of the srcIp
     IpAccessListSpecializer specializer =
-        new IpAccessListSpecializer(
+        new IpSpaceIpAccessListSpecializer(
             HeaderSpace.builder().setSrcIps(ImmutableSet.of(new IpWildcard("1.2.3.4"))).build(),
             ImmutableMap.of());
     assertThat(
@@ -112,7 +112,7 @@ public class IpAccessListSpecializerTest {
 
     // specialize to a headerspace that blacklists part of the srcIp
     specializer =
-        new IpAccessListSpecializer(
+        new IpSpaceIpAccessListSpecializer(
             HeaderSpace.builder().setNotSrcIps(ImmutableSet.of(new IpWildcard("1.2.3.4"))).build(),
             ImmutableMap.of());
     assertThat(specializer.specialize(ipAccessListLine), equalTo(Optional.of(ipAccessListLine)));
