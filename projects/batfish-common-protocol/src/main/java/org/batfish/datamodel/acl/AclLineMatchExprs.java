@@ -14,27 +14,27 @@ public final class AclLineMatchExprs {
 
   public static final TrueExpr TRUE = TrueExpr.INSTANCE;
 
-  public static AclLineMatchExpr and(AclLineMatchExpr... exprs) {
+  public static AndMatchExpr and(AclLineMatchExpr... exprs) {
     return and(Arrays.asList(exprs));
   }
 
-  public static AclLineMatchExpr and(List<AclLineMatchExpr> exprs) {
+  public static AndMatchExpr and(List<AclLineMatchExpr> exprs) {
     return new AndMatchExpr(exprs);
   }
 
-  public static AclLineMatchExpr match(HeaderSpace headerSpace) {
+  public static MatchHeaderSpace match(HeaderSpace headerSpace) {
     return new MatchHeaderSpace(headerSpace);
   }
 
-  public static AclLineMatchExpr not(AclLineMatchExpr expr) {
+  public static NotMatchExpr not(AclLineMatchExpr expr) {
     return new NotMatchExpr(expr);
   }
 
-  public static AclLineMatchExpr or(AclLineMatchExpr... exprs) {
+  public static OrMatchExpr or(AclLineMatchExpr... exprs) {
     return or(Arrays.asList(exprs));
   }
 
-  public static AclLineMatchExpr or(List<AclLineMatchExpr> exprs) {
+  public static OrMatchExpr or(List<AclLineMatchExpr> exprs) {
     return new OrMatchExpr(exprs);
   }
 }
