@@ -47,7 +47,23 @@ public class BDDPacket {
     pairing = factory.makePair();
   }
 
+  private static final int DSCP_LENGTH = 6;
+
+  private static final int ICMP_CODE_LENGTH = 8;
+
+  private static final int ICMP_TYPE_LENGTH = 8;
+
+  private static final int IP_LENGTH = 32;
+
+  private static final int IP_PROTOCOL_LENGTH = 8;
+
+  private static final int PORT_LENGTH = 16;
+
+  private static final int TCP_FLAG_LENGTH = 1;
+
   private Map<Integer, String> _bitNames;
+
+  private BDDInteger _dscp;
 
   private BDDInteger _dstIp;
 
@@ -87,7 +103,14 @@ public class BDDPacket {
 
     // Make sure we have the right number of variables
     int numVars = factory.varNum();
-    int numNeeded = 32 * 2 + 16 * 2 + 8 * 3 + 8;
+    int numNeeded =
+        IP_LENGTH * 2
+            + PORT_LENGTH * 2
+            + IP_PROTOCOL_LENGTH
+            + ICMP_CODE_LENGTH
+            + ICMP_TYPE_LENGTH
+            + TCP_FLAG_LENGTH * 8
+            + DSCP_LENGTH;
     if (numVars < numNeeded) {
       factory.setVarNum(numNeeded);
     }
@@ -96,50 +119,53 @@ public class BDDPacket {
 
     // Initialize integer values
     int idx = 0;
-    _ipProtocol = BDDInteger.makeFromIndex(factory, 8, idx, false);
-    addBitNames("ipProtocol", 8, idx, false);
-    idx += 8;
-    _dstIp = BDDInteger.makeFromIndex(factory, 32, idx, true);
-    addBitNames("dstIp", 32, idx, true);
-    idx += 32;
-    _srcIp = BDDInteger.makeFromIndex(factory, 32, idx, true);
-    addBitNames("srcIp", 32, idx, true);
-    idx += 32;
-    _dstPort = BDDInteger.makeFromIndex(factory, 16, idx, false);
-    addBitNames("dstPort", 16, idx, false);
-    idx += 16;
-    _srcPort = BDDInteger.makeFromIndex(factory, 16, idx, false);
-    addBitNames("srcPort", 16, idx, false);
-    idx += 16;
-    _icmpCode = BDDInteger.makeFromIndex(factory, 8, idx, false);
-    addBitNames("icmpCode", 8, idx, false);
-    idx += 8;
-    _icmpType = BDDInteger.makeFromIndex(factory, 8, idx, false);
-    addBitNames("icmpType", 8, idx, false);
-    idx += 8;
+    _ipProtocol = BDDInteger.makeFromIndex(factory, IP_PROTOCOL_LENGTH, idx, false);
+    addBitNames("ipProtocol", IP_PROTOCOL_LENGTH, idx, false);
+    idx += IP_PROTOCOL_LENGTH;
+    _dstIp = BDDInteger.makeFromIndex(factory, IP_LENGTH, idx, true);
+    addBitNames("dstIp", IP_LENGTH, idx, true);
+    idx += IP_LENGTH;
+    _srcIp = BDDInteger.makeFromIndex(factory, IP_LENGTH, idx, true);
+    addBitNames("srcIp", IP_LENGTH, idx, true);
+    idx += IP_LENGTH;
+    _dstPort = BDDInteger.makeFromIndex(factory, PORT_LENGTH, idx, false);
+    addBitNames("dstPort", PORT_LENGTH, idx, false);
+    idx += PORT_LENGTH;
+    _srcPort = BDDInteger.makeFromIndex(factory, PORT_LENGTH, idx, false);
+    addBitNames("srcPort", PORT_LENGTH, idx, false);
+    idx += PORT_LENGTH;
+    _icmpCode = BDDInteger.makeFromIndex(factory, ICMP_CODE_LENGTH, idx, false);
+    addBitNames("icmpCode", ICMP_CODE_LENGTH, idx, false);
+    idx += ICMP_CODE_LENGTH;
+    _icmpType = BDDInteger.makeFromIndex(factory, ICMP_TYPE_LENGTH, idx, false);
+    addBitNames("icmpType", ICMP_TYPE_LENGTH, idx, false);
+    idx += ICMP_TYPE_LENGTH;
     _tcpAck = factory.ithVar(idx);
     _bitNames.put(idx, "tcpAck");
-    idx += 1;
+    idx += TCP_FLAG_LENGTH;
     _tcpCwr = factory.ithVar(idx);
     _bitNames.put(idx, "tcpCwr");
-    idx += 1;
+    idx += TCP_FLAG_LENGTH;
     _tcpEce = factory.ithVar(idx);
     _bitNames.put(idx, "tcpEce");
-    idx += 1;
+    idx += TCP_FLAG_LENGTH;
     _tcpFin = factory.ithVar(idx);
     _bitNames.put(idx, "tcpFin");
-    idx += 1;
+    idx += TCP_FLAG_LENGTH;
     _tcpPsh = factory.ithVar(idx);
     _bitNames.put(idx, "tcpPsh");
-    idx += 1;
+    idx += TCP_FLAG_LENGTH;
     _tcpRst = factory.ithVar(idx);
     _bitNames.put(idx, "tcpRst");
-    idx += 1;
+    idx += TCP_FLAG_LENGTH;
     _tcpSyn = factory.ithVar(idx);
     _bitNames.put(idx, "tcpSyn");
-    idx += 1;
+    idx += TCP_FLAG_LENGTH;
     _tcpUrg = factory.ithVar(idx);
     _bitNames.put(idx, "tcpUrg");
+    idx += TCP_FLAG_LENGTH;
+    _dscp = BDDInteger.makeFromIndex(factory, DSCP_LENGTH, idx, false);
+    addBitNames("dscp", DSCP_LENGTH, idx, false);
   }
 
   /*
@@ -162,6 +188,7 @@ public class BDDPacket {
     _tcpRst = other._tcpRst;
     _tcpSyn = other._tcpSyn;
     _tcpUrg = other._tcpUrg;
+    _dscp = new BDDInteger(other._dscp);
   }
 
   /*
@@ -257,8 +284,14 @@ public class BDDPacket {
     fb.setTcpFlagsFin(_tcpFin.and(satAssignment).isZero() ? 0 : 1);
     fb.setTcpFlagsPsh(_tcpPsh.and(satAssignment).isZero() ? 0 : 1);
     fb.setTcpFlagsRst(_tcpRst.and(satAssignment).isZero() ? 0 : 1);
+    fb.setTcpFlagsSyn(_tcpSyn.and(satAssignment).isZero() ? 0 : 1);
     fb.setTcpFlagsUrg(_tcpUrg.and(satAssignment).isZero() ? 0 : 1);
+    fb.setDscp(_dscp.satAssignmentToLong(satAssignment).intValue());
     return Optional.of(fb);
+  }
+
+  public BDDInteger getDscp() {
+    return _dscp;
   }
 
   public BDDInteger getDstIp() {
@@ -398,6 +431,7 @@ public class BDDPacket {
     result = 31 * result + (_tcpRst != null ? _tcpRst.hashCode() : 0);
     result = 31 * result + (_tcpSyn != null ? _tcpSyn.hashCode() : 0);
     result = 31 * result + (_tcpUrg != null ? _tcpUrg.hashCode() : 0);
+    result = 31 * result + (_dscp != null ? _dscp.hashCode() : 0);
     return result;
   }
 
@@ -422,7 +456,8 @@ public class BDDPacket {
         && Objects.equals(_tcpPsh, other._tcpPsh)
         && Objects.equals(_tcpRst, other._tcpRst)
         && Objects.equals(_tcpSyn, other._tcpSyn)
-        && Objects.equals(_tcpUrg, other._tcpUrg);
+        && Objects.equals(_tcpUrg, other._tcpUrg)
+        && Objects.equals(_dscp, other._dscp);
   }
 
   public BDD restrict(BDD bdd, Prefix pfx) {

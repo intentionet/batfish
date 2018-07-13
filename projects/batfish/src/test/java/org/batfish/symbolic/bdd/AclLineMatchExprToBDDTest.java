@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.sf.javabdd.BDD;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Ip;
@@ -77,5 +78,20 @@ public class AclLineMatchExprToBDDTest {
     BDDInteger srcPort = _pkt.getSrcPort();
     BDD srcPortBDD = srcPort.leq(20).and(srcPort.geq(10));
     assertThat(bdd, equalTo(dstPortBDD.or(srcPortBDD)));
+  }
+
+  @Test
+  public void testMatchHeaderSpace_dscps() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setDscps(ImmutableSet.of(1, 2, 3))
+            .setNotDscps(ImmutableSet.of(3, 4, 5))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.toBDD(matchExpr);
+
+    BDDInteger dscp = _pkt.getDscp();
+    BDD dscpBDD = dscp.value(1).or(dscp.value(2));
+    assertThat(bdd, equalTo(dscpBDD));
   }
 }

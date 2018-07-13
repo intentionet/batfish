@@ -36,6 +36,14 @@ public final class BDDOps {
     return result;
   }
 
+  /** Returns bdd.not() or {@code null} if given {@link BDD} is null. */
+  public static BDD notDefaultNull(BDD bdd) {
+    if (bdd == null) {
+      return bdd;
+    }
+    return bdd.not();
+  }
+
   public BDD or(BDD... disjuncts) {
     return or(Arrays.asList(disjuncts));
   }

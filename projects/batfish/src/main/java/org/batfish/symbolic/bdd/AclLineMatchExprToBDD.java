@@ -1,6 +1,7 @@
 package org.batfish.symbolic.bdd;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -9,7 +10,6 @@ import javax.annotation.Nullable;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import org.batfish.common.BatfishException;
-import org.batfish.datamodel.EmptyIpSpace;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpSpace;
@@ -48,14 +48,15 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
     }
   }
 
-  private static void forbidHeaderSpaceField(String fieldName, IpSpace fieldValue) {
-    if (fieldValue != null && fieldValue != EmptyIpSpace.INSTANCE) {
-      throw new BatfishException("unsupported HeaderSpace field " + fieldName);
-    }
-  }
-
   public @Nonnull BDD toBDD(AclLineMatchExpr expr) {
     return expr.accept(this);
+  }
+
+  private @Nullable BDD toBDD(Collection<Integer> ints, BDDInteger var) {
+    if (ints == null || ints.isEmpty()) {
+      return null;
+    }
+    return _bddOps.or(ints.stream().map(var::value).collect(Collectors.toList()));
   }
 
   private @Nullable BDD toBDD(@Nullable IpSpace ipSpace, BDDInteger var) {
@@ -135,24 +136,22 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
   @Override
   public BDD visitMatchHeaderSpace(MatchHeaderSpace matchHeaderSpace) {
     HeaderSpace headerSpace = matchHeaderSpace.getHeaderspace();
-    forbidHeaderSpaceField("dscps", headerSpace.getDscps());
     forbidHeaderSpaceField("ecns", headerSpace.getEcns());
     forbidHeaderSpaceField("fragmentOffsets", headerSpace.getFragmentOffsets());
-    forbidHeaderSpaceField("notDscps", headerSpace.getNotDscps());
-    forbidHeaderSpaceField("notDstIps", headerSpace.getNotDstIps());
     forbidHeaderSpaceField("notDstPorts", headerSpace.getNotDstPorts());
     forbidHeaderSpaceField("notEcns", headerSpace.getNotEcns());
     forbidHeaderSpaceField("notFragmentOffsets", headerSpace.getNotFragmentOffsets());
     forbidHeaderSpaceField("notIcmpCodes", headerSpace.getNotIcmpCodes());
     forbidHeaderSpaceField("notIcmpTypes", headerSpace.getNotIcmpTypes());
     forbidHeaderSpaceField("notIpProtocols", headerSpace.getNotIpProtocols());
-    forbidHeaderSpaceField("notSrcIps", headerSpace.getNotSrcIps());
     forbidHeaderSpaceField("notSrcPorts", headerSpace.getNotSrcPorts());
     forbidHeaderSpaceField("states", headerSpace.getStates());
 
     return _bddOps.and(
         toBDD(headerSpace.getDstIps(), _packet.getDstIp()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotDstIps(), _packet.getDstIp())),
         toBDD(headerSpace.getSrcIps(), _packet.getSrcIp()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotSrcIps(), _packet.getSrcIp())),
         BDDOps.orNull(
             toBDD(headerSpace.getSrcOrDstIps(), _packet.getDstIp()),
             toBDD(headerSpace.getSrcOrDstIps(), _packet.getSrcIp())),
@@ -164,7 +163,9 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
         toBDD(headerSpace.getTcpFlags()),
         toBDD(headerSpace.getIcmpCodes(), _packet.getIcmpCode()),
         toBDD(headerSpace.getIcmpTypes(), _packet.getIcmpType()),
-        toBDD(headerSpace.getIpProtocols()));
+        toBDD(headerSpace.getIpProtocols()),
+        toBDD(headerSpace.getDscps(), _packet.getDscp()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotDscps(), _packet.getDscp())));
   }
 
   @Override
