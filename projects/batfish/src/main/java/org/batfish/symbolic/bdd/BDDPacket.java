@@ -49,6 +49,8 @@ public class BDDPacket {
 
   private static final int DSCP_LENGTH = 6;
 
+  private static final int ECN_LENGTH = 2;
+
   private static final int ICMP_CODE_LENGTH = 8;
 
   private static final int ICMP_TYPE_LENGTH = 8;
@@ -68,6 +70,8 @@ public class BDDPacket {
   private BDDInteger _dstIp;
 
   private BDDInteger _dstPort;
+
+  private BDDInteger _ecn;
 
   private BDDInteger _icmpCode;
 
@@ -110,7 +114,8 @@ public class BDDPacket {
             + ICMP_CODE_LENGTH
             + ICMP_TYPE_LENGTH
             + TCP_FLAG_LENGTH * 8
-            + DSCP_LENGTH;
+            + DSCP_LENGTH
+            + ECN_LENGTH;
     if (numVars < numNeeded) {
       factory.setVarNum(numNeeded);
     }
@@ -166,6 +171,9 @@ public class BDDPacket {
     idx += TCP_FLAG_LENGTH;
     _dscp = BDDInteger.makeFromIndex(factory, DSCP_LENGTH, idx, false);
     addBitNames("dscp", DSCP_LENGTH, idx, false);
+    idx += DSCP_LENGTH;
+    _ecn = BDDInteger.makeFromIndex(factory, ECN_LENGTH, idx, false);
+    addBitNames("ecn", ECN_LENGTH, idx, false);
   }
 
   /*
@@ -189,6 +197,7 @@ public class BDDPacket {
     _tcpSyn = other._tcpSyn;
     _tcpUrg = other._tcpUrg;
     _dscp = new BDDInteger(other._dscp);
+    _ecn = new BDDInteger(other._ecn);
   }
 
   /*
@@ -287,11 +296,16 @@ public class BDDPacket {
     fb.setTcpFlagsSyn(_tcpSyn.and(satAssignment).isZero() ? 0 : 1);
     fb.setTcpFlagsUrg(_tcpUrg.and(satAssignment).isZero() ? 0 : 1);
     fb.setDscp(_dscp.satAssignmentToLong(satAssignment).intValue());
+    fb.setEcn(_ecn.satAssignmentToLong(satAssignment).intValue());
     return Optional.of(fb);
   }
 
   public BDDInteger getDscp() {
     return _dscp;
+  }
+
+  public void setDscp(BDDInteger x) {
+    this._dscp = x;
   }
 
   public BDDInteger getDstIp() {
@@ -308,6 +322,14 @@ public class BDDPacket {
 
   public void setDstPort(BDDInteger x) {
     this._dstPort = x;
+  }
+
+  public BDDInteger getEcn() {
+    return _ecn;
+  }
+
+  public void setEcn(BDDInteger x) {
+    this._ecn = x;
   }
 
   public BDDInteger getIcmpCode() {
@@ -432,6 +454,7 @@ public class BDDPacket {
     result = 31 * result + (_tcpSyn != null ? _tcpSyn.hashCode() : 0);
     result = 31 * result + (_tcpUrg != null ? _tcpUrg.hashCode() : 0);
     result = 31 * result + (_dscp != null ? _dscp.hashCode() : 0);
+    result = 31 * result + (_ecn != null ? _ecn.hashCode() : 0);
     return result;
   }
 
@@ -457,7 +480,8 @@ public class BDDPacket {
         && Objects.equals(_tcpRst, other._tcpRst)
         && Objects.equals(_tcpSyn, other._tcpSyn)
         && Objects.equals(_tcpUrg, other._tcpUrg)
-        && Objects.equals(_dscp, other._dscp);
+        && Objects.equals(_dscp, other._dscp)
+        && Objects.equals(_ecn, other._ecn);
   }
 
   public BDD restrict(BDD bdd, Prefix pfx) {

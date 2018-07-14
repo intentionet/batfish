@@ -94,4 +94,19 @@ public class AclLineMatchExprToBDDTest {
     BDD dscpBDD = dscp.value(1).or(dscp.value(2));
     assertThat(bdd, equalTo(dscpBDD));
   }
+
+  @Test
+  public void testMatchHeaderSpace_ecns() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setEcns(ImmutableSet.of(0, 1))
+            .setNotEcns(ImmutableSet.of(1, 2))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.toBDD(matchExpr);
+
+    BDDInteger ecn = _pkt.getEcn();
+    BDD ecnBDD = ecn.value(0);
+    assertThat(bdd, equalTo(ecnBDD));
+  }
 }

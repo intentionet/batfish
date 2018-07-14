@@ -136,15 +136,8 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
   @Override
   public BDD visitMatchHeaderSpace(MatchHeaderSpace matchHeaderSpace) {
     HeaderSpace headerSpace = matchHeaderSpace.getHeaderspace();
-    forbidHeaderSpaceField("ecns", headerSpace.getEcns());
     forbidHeaderSpaceField("fragmentOffsets", headerSpace.getFragmentOffsets());
-    forbidHeaderSpaceField("notDstPorts", headerSpace.getNotDstPorts());
-    forbidHeaderSpaceField("notEcns", headerSpace.getNotEcns());
     forbidHeaderSpaceField("notFragmentOffsets", headerSpace.getNotFragmentOffsets());
-    forbidHeaderSpaceField("notIcmpCodes", headerSpace.getNotIcmpCodes());
-    forbidHeaderSpaceField("notIcmpTypes", headerSpace.getNotIcmpTypes());
-    forbidHeaderSpaceField("notIpProtocols", headerSpace.getNotIpProtocols());
-    forbidHeaderSpaceField("notSrcPorts", headerSpace.getNotSrcPorts());
     forbidHeaderSpaceField("states", headerSpace.getStates());
 
     return _bddOps.and(
@@ -156,16 +149,23 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
             toBDD(headerSpace.getSrcOrDstIps(), _packet.getDstIp()),
             toBDD(headerSpace.getSrcOrDstIps(), _packet.getSrcIp())),
         toBDD(headerSpace.getDstPorts(), _packet.getDstPort()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotDstPorts(), _packet.getDstPort())),
         toBDD(headerSpace.getSrcPorts(), _packet.getSrcPort()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotSrcPorts(), _packet.getSrcPort())),
         BDDOps.orNull(
             toBDD(headerSpace.getSrcOrDstPorts(), _packet.getSrcPort()),
             toBDD(headerSpace.getSrcOrDstPorts(), _packet.getDstPort())),
         toBDD(headerSpace.getTcpFlags()),
         toBDD(headerSpace.getIcmpCodes(), _packet.getIcmpCode()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotIcmpCodes(), _packet.getIcmpCode())),
         toBDD(headerSpace.getIcmpTypes(), _packet.getIcmpType()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getIcmpTypes(), _packet.getIcmpType())),
         toBDD(headerSpace.getIpProtocols()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotIpProtocols())),
         toBDD(headerSpace.getDscps(), _packet.getDscp()),
-        BDDOps.notDefaultNull(toBDD(headerSpace.getNotDscps(), _packet.getDscp())));
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotDscps(), _packet.getDscp())),
+        toBDD(headerSpace.getEcns(), _packet.getEcn()),
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotEcns(), _packet.getEcn())));
   }
 
   @Override
