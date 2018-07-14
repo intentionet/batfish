@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableSet;
 import net.sf.javabdd.BDD;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.State;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
@@ -108,5 +109,34 @@ public class AclLineMatchExprToBDDTest {
     BDDInteger ecn = _pkt.getEcn();
     BDD ecnBDD = ecn.value(0);
     assertThat(bdd, equalTo(ecnBDD));
+  }
+
+  @Test
+  public void testMatchHeaderSpace_fragmentOffsets() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setFragmentOffsets(ImmutableSet.of(new SubRange(0, 5)))
+            .setNotFragmentOffsets(ImmutableSet.of(new SubRange(2, 6)))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.toBDD(matchExpr);
+
+    BDDInteger fragmentOffset = _pkt.getFragmentOffset();
+    BDD fragmentOffsetBDD = fragmentOffset.value(0).or(fragmentOffset.value(1));
+    assertThat(bdd, equalTo(fragmentOffsetBDD));
+  }
+
+  @Test
+  public void testMatchHeaderSpace_state() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setStates(ImmutableSet.of(State.fromNum(0), State.fromNum(1)))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.toBDD(matchExpr);
+
+    BDDInteger state = _pkt.getState();
+    BDD stateBDD = state.value(0).or(state.value(1));
+    assertThat(bdd, equalTo(stateBDD));
   }
 }

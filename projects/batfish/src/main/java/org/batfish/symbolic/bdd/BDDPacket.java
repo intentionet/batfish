@@ -16,6 +16,7 @@ import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.State;
 
 /**
  * A collection of attributes describing an packet, represented using BDDs
@@ -51,6 +52,8 @@ public class BDDPacket {
 
   private static final int ECN_LENGTH = 2;
 
+  private static final int FRAGMENT_OFFSET_LENGTH = 13;
+
   private static final int ICMP_CODE_LENGTH = 8;
 
   private static final int ICMP_TYPE_LENGTH = 8;
@@ -60,6 +63,8 @@ public class BDDPacket {
   private static final int IP_PROTOCOL_LENGTH = 8;
 
   private static final int PORT_LENGTH = 16;
+
+  private static final int STATE_LENGTH = 2;
 
   private static final int TCP_FLAG_LENGTH = 1;
 
@@ -73,6 +78,8 @@ public class BDDPacket {
 
   private BDDInteger _ecn;
 
+  private BDDInteger _fragmentOffset;
+
   private BDDInteger _icmpCode;
 
   private BDDInteger _icmpType;
@@ -82,6 +89,8 @@ public class BDDPacket {
   private BDDInteger _srcIp;
 
   private BDDInteger _srcPort;
+
+  private BDDInteger _state;
 
   private BDD _tcpAck;
 
@@ -115,7 +124,9 @@ public class BDDPacket {
             + ICMP_TYPE_LENGTH
             + TCP_FLAG_LENGTH * 8
             + DSCP_LENGTH
-            + ECN_LENGTH;
+            + ECN_LENGTH
+            + FRAGMENT_OFFSET_LENGTH
+            + STATE_LENGTH;
     if (numVars < numNeeded) {
       factory.setVarNum(numNeeded);
     }
@@ -174,6 +185,12 @@ public class BDDPacket {
     idx += DSCP_LENGTH;
     _ecn = BDDInteger.makeFromIndex(factory, ECN_LENGTH, idx, false);
     addBitNames("ecn", ECN_LENGTH, idx, false);
+    idx += ECN_LENGTH;
+    _fragmentOffset = BDDInteger.makeFromIndex(factory, FRAGMENT_OFFSET_LENGTH, idx, false);
+    addBitNames("fragmentOffset", FRAGMENT_OFFSET_LENGTH, idx, false);
+    idx += FRAGMENT_OFFSET_LENGTH;
+    _state = BDDInteger.makeFromIndex(factory, STATE_LENGTH, idx, false);
+    addBitNames("state", STATE_LENGTH, idx, false);
   }
 
   /*
@@ -198,6 +215,8 @@ public class BDDPacket {
     _tcpUrg = other._tcpUrg;
     _dscp = new BDDInteger(other._dscp);
     _ecn = new BDDInteger(other._ecn);
+    _fragmentOffset = new BDDInteger(other._fragmentOffset);
+    _state = new BDDInteger(other._state);
   }
 
   /*
@@ -297,6 +316,8 @@ public class BDDPacket {
     fb.setTcpFlagsUrg(_tcpUrg.and(satAssignment).isZero() ? 0 : 1);
     fb.setDscp(_dscp.satAssignmentToLong(satAssignment).intValue());
     fb.setEcn(_ecn.satAssignmentToLong(satAssignment).intValue());
+    fb.setFragmentOffset(_fragmentOffset.satAssignmentToLong(satAssignment).intValue());
+    fb.setState(State.fromNum(_state.satAssignmentToLong(satAssignment).intValue()));
     return Optional.of(fb);
   }
 
@@ -330,6 +351,14 @@ public class BDDPacket {
 
   public void setEcn(BDDInteger x) {
     this._ecn = x;
+  }
+
+  public BDDInteger getFragmentOffset() {
+    return _fragmentOffset;
+  }
+
+  public void setFragmentOffset(BDDInteger x) {
+    this._fragmentOffset = x;
   }
 
   public BDDInteger getIcmpCode() {
@@ -370,6 +399,14 @@ public class BDDPacket {
 
   public void setSrcPort(BDDInteger x) {
     this._srcPort = x;
+  }
+
+  public BDDInteger getState() {
+    return _state;
+  }
+
+  public void setState(BDDInteger x) {
+    this._state = x;
   }
 
   public BDD getTcpAck() {
@@ -455,6 +492,8 @@ public class BDDPacket {
     result = 31 * result + (_tcpUrg != null ? _tcpUrg.hashCode() : 0);
     result = 31 * result + (_dscp != null ? _dscp.hashCode() : 0);
     result = 31 * result + (_ecn != null ? _ecn.hashCode() : 0);
+    result = 31 * result + (_fragmentOffset != null ? _fragmentOffset.hashCode() : 0);
+    result = 31 * result + (_state != null ? _state.hashCode() : 0);
     return result;
   }
 
@@ -481,7 +520,9 @@ public class BDDPacket {
         && Objects.equals(_tcpSyn, other._tcpSyn)
         && Objects.equals(_tcpUrg, other._tcpUrg)
         && Objects.equals(_dscp, other._dscp)
-        && Objects.equals(_ecn, other._ecn);
+        && Objects.equals(_ecn, other._ecn)
+        && Objects.equals(_fragmentOffset, other._fragmentOffset)
+        && Objects.equals(_state, other._state);
   }
 
   public BDD restrict(BDD bdd, Prefix pfx) {

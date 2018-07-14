@@ -42,12 +42,6 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
     _packet = packet;
   }
 
-  private static <T> void forbidHeaderSpaceField(String fieldName, Set<T> fieldValue) {
-    if (fieldValue != null && !fieldValue.isEmpty()) {
-      throw new BatfishException("unsupported HeaderSpace field " + fieldName);
-    }
-  }
-
   public @Nonnull BDD toBDD(AclLineMatchExpr expr) {
     return expr.accept(this);
   }
@@ -136,10 +130,6 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
   @Override
   public BDD visitMatchHeaderSpace(MatchHeaderSpace matchHeaderSpace) {
     HeaderSpace headerSpace = matchHeaderSpace.getHeaderspace();
-    forbidHeaderSpaceField("fragmentOffsets", headerSpace.getFragmentOffsets());
-    forbidHeaderSpaceField("notFragmentOffsets", headerSpace.getNotFragmentOffsets());
-    forbidHeaderSpaceField("states", headerSpace.getStates());
-
     return _bddOps.and(
         toBDD(headerSpace.getDstIps(), _packet.getDstIp()),
         BDDOps.notDefaultNull(toBDD(headerSpace.getNotDstIps(), _packet.getDstIp())),
@@ -165,7 +155,13 @@ public class AclLineMatchExprToBDD implements GenericAclLineMatchExprVisitor<BDD
         toBDD(headerSpace.getDscps(), _packet.getDscp()),
         BDDOps.notDefaultNull(toBDD(headerSpace.getNotDscps(), _packet.getDscp())),
         toBDD(headerSpace.getEcns(), _packet.getEcn()),
-        BDDOps.notDefaultNull(toBDD(headerSpace.getNotEcns(), _packet.getEcn())));
+        BDDOps.notDefaultNull(toBDD(headerSpace.getNotEcns(), _packet.getEcn())),
+        toBDD(headerSpace.getFragmentOffsets(), _packet.getFragmentOffset()),
+        BDDOps.notDefaultNull(
+            toBDD(headerSpace.getNotFragmentOffsets(), _packet.getFragmentOffset())),
+        toBDD(
+            headerSpace.getStates().stream().map(s -> s.number()).collect(Collectors.toList()),
+            _packet.getState()));
   }
 
   @Override
