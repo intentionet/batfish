@@ -1,4 +1,9 @@
 set deviceconfig system hostname vsys-service
-set vsys vsys1 service SERVICE1 protocol tcp port 1
-set vsys vsys2 service SERVICE1 protocol udp source-port 2
+set vsys vsys1 service SERVICE1 protocol udp port 1
+set vsys vsys2 service SERVICE1 protocol udp port 2
 set shared service SERVICE1 protocol udp port 3
+set shared service SERVICE2 protocol udp port 4
+
+set vsys vsys1 service-group SG1 members [ SERVICE1 SERVICE2 ]
+set vsys vsys2 service-group SG1 members [ SERVICE1 SERVICE2 ]
+set shared service-group SG1 members [ SERVICE1 SERVICE2 ]

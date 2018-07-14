@@ -3,6 +3,7 @@ package org.batfish.specifier;
 import static org.batfish.datamodel.matchers.IpSpaceMatchers.containsIp;
 import static org.batfish.specifier.IpSpaceAssignmentMatchers.hasEntry;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -48,7 +49,13 @@ public class IpSpaceSpecifierTest {
     _c1 = cb.build();
     ib.setOwner(_c1);
 
-    _i1 = ib.setAddress(new InterfaceAddress("1.0.0.0/24")).build();
+    /*
+     * The /30 is not considered to be a host network (for historical reasons; see the comment on
+     * NodeNameRegexConnectedHostsIpSpaceSpecifier.HOST_SUBNET_MAX_PREFIX_LENGTH).
+     */
+    _i1 =
+        ib.setAddresses(new InterfaceAddress("1.0.0.0/24"), new InterfaceAddress("2.0.0.0/30"))
+            .build();
 
     // another interface on _i1's subnet
     ib.setAddress(new InterfaceAddress("1.0.0.3/24")).build();
@@ -105,7 +112,18 @@ public class IpSpaceSpecifierTest {
     assertThat(
         assignment,
         hasEntry(
-            allOf(containsIp(new Ip("1.0.0.1")), not(containsIp(new Ip("1.0.0.0")))),
+            allOf(
+                // contains a host IP
+                containsIp(new Ip("1.0.0.1")),
+                // does not contain the interface IP
+                not(containsIp(new Ip("1.0.0.0"))),
+                // does not include any IPs from 2.0.0.0/30 because it's not a host subnet.
+                not(
+                    anyOf(
+                        containsIp(new Ip("2.0.0.0")),
+                        containsIp(new Ip("2.0.0.1")),
+                        containsIp(new Ip("2.0.0.2")),
+                        containsIp(new Ip("2.0.0.3"))))),
             contains(new InterfaceLinkLocation(_i1.getOwner().getName(), _i1.getName()))));
 
     // Locations that don't own any ipspace are assigned EmptyIpSpace.
@@ -122,7 +140,7 @@ public class IpSpaceSpecifierTest {
   }
 
   @Test
-  public void testNodeNameRegexInterfaceLinksIpSpaceSpecifier() {
+  public void testNodeNameRegexConnectedHostsIpSpaceSpecifier() {
     Pattern pattern = Pattern.compile(_c1.getName());
     IpSpaceAssignment assignment =
         new NodeNameRegexConnectedHostsIpSpaceSpecifier(pattern).resolve(_allLocations, _context);
@@ -135,7 +153,14 @@ public class IpSpaceSpecifierTest {
                 // does not include _i1's IP.
                 not(containsIp(new Ip("1.0.0.0"))),
                 // does not include the IP of the other interface on _i1's subnet
-                not(containsIp(new Ip("1.0.0.3")))),
+                not(containsIp(new Ip("1.0.0.3"))),
+                // does not include any IPs from 2.0.0.0/30 because it's not a host subnet.
+                not(
+                    anyOf(
+                        containsIp(new Ip("2.0.0.0")),
+                        containsIp(new Ip("2.0.0.1")),
+                        containsIp(new Ip("2.0.0.2")),
+                        containsIp(new Ip("2.0.0.3"))))),
             equalTo(_allLocations)));
   }
 }

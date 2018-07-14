@@ -37,6 +37,14 @@ public final class InferFromLocationIpSpaceSpecifier implements IpSpaceSpecifier
           AclIpSpace.union(
               interfaceAddresses(node, iface)
                   .stream()
+                  /*
+                   * Only include addresses on networks that might have hosts.
+                   */
+                  .filter(
+                      address ->
+                          address.getNetworkBits()
+                              <= NodeNameRegexConnectedHostsIpSpaceSpecifier
+                                  .HOST_SUBNET_MAX_PREFIX_LENGTH)
                   .map(address -> address.getPrefix().toIpSpace())
                   .collect(Collectors.toList()));
 

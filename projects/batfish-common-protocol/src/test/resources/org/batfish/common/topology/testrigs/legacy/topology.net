@@ -1,0 +1,14 @@
+[
+  {
+    "node1": "c1",
+    "node1interface": "i1",
+    "node2": "c2",
+    "node2interface": "i2"
+  },
+  {
+    "node1": "c2",
+    "node1interface": "i2",
+    "node2": "c1",
+    "node2interface": "i1"
+  }
+]

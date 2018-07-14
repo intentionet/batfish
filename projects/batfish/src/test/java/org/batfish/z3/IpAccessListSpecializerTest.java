@@ -1,120 +1,113 @@
 package org.batfish.z3;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.FALSE;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.ORIGINATING_FROM_DEVICE;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.TRUE;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.and;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.match;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.not;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.or;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
+import com.google.common.collect.ImmutableList;
+import org.batfish.datamodel.EmptyIpSpace;
 import org.batfish.datamodel.HeaderSpace;
-import org.batfish.datamodel.IpAccessListLine;
-import org.batfish.datamodel.IpWildcard;
-import org.batfish.datamodel.acl.MatchHeaderSpace;
-import org.batfish.datamodel.acl.TrueExpr;
+import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.UniverseIpSpace;
+import org.batfish.datamodel.acl.AclLineMatchExpr;
+import org.batfish.datamodel.acl.MatchSrcInterface;
+import org.batfish.datamodel.acl.PermittedByAcl;
 import org.junit.Test;
 
-public class IpAccessListSpecializerTest {
-  private static final IpAccessListSpecializer TRIVIAL_SPECIALIZER =
-      new IpAccessListSpecializer(new HeaderSpace(), ImmutableMap.of());
+public final class IpAccessListSpecializerTest {
+  private static final IpAccessListSpecializer specializer =
+      new IpAccessListSpecializer() {
+        @Override
+        protected boolean canSpecialize() {
+          return true;
+        }
 
-  private static final IpAccessListSpecializer BLACKLIST_ANY_DST_SPECIALIZER =
-      new IpAccessListSpecializer(
-          HeaderSpace.builder().setNotDstIps(ImmutableSet.of(IpWildcard.ANY)).build(),
-          ImmutableMap.of());
+        @Override
+        protected HeaderSpace specialize(HeaderSpace headerSpace) {
+          return headerSpace;
+        }
+      };
 
-  private static final IpAccessListSpecializer BLACKLIST_ANY_SRC_SPECIALIZER =
-      new IpAccessListSpecializer(
-          HeaderSpace.builder().setNotSrcIps(ImmutableSet.of(IpWildcard.ANY)).build(),
-          ImmutableMap.of());
-
-  private static final IpAccessListSpecializer WHITELIST_ANY_DST_SPECIALIZER =
-      new IpAccessListSpecializer(
-          HeaderSpace.builder().setDstIps(ImmutableSet.of(IpWildcard.ANY)).build(),
-          ImmutableMap.of());
-
-  private static final IpAccessListSpecializer WHITELIST_ANY_SRC_SPECIALIZER =
-      new IpAccessListSpecializer(
-          HeaderSpace.builder().setSrcIps(ImmutableSet.of(IpWildcard.ANY)).build(),
-          ImmutableMap.of());
-
-  @Test
-  public void testSpecializeIpAccessListLine_singleDst() {
-    IpAccessListLine ipAccessListLine =
-        IpAccessListLine.accepting()
-            .setMatchCondition(
-                new MatchHeaderSpace(
-                    HeaderSpace.builder()
-                        .setDstIps(new IpWildcard("1.2.3.0/24").toIpSpace())
-                        .build()))
-            .build();
-
-    assertThat(
-        TRIVIAL_SPECIALIZER.specialize(ipAccessListLine), equalTo(Optional.of(ipAccessListLine)));
-    assertThat(
-        BLACKLIST_ANY_DST_SPECIALIZER.specialize(ipAccessListLine), equalTo(Optional.empty()));
-    assertThat(
-        WHITELIST_ANY_DST_SPECIALIZER.specialize(ipAccessListLine),
-        equalTo(Optional.of(ipAccessListLine)));
-    assertThat(
-        BLACKLIST_ANY_SRC_SPECIALIZER.specialize(ipAccessListLine),
-        equalTo(Optional.of(ipAccessListLine)));
-    assertThat(
-        WHITELIST_ANY_SRC_SPECIALIZER.specialize(ipAccessListLine),
-        equalTo(Optional.of(ipAccessListLine)));
-
-    // specialize to a headerspace that whitelists part of the dstIp
-    IpAccessListSpecializer specializer =
-        new IpAccessListSpecializer(
-            HeaderSpace.builder().setDstIps(ImmutableSet.of(new IpWildcard("1.2.3.4"))).build(),
-            ImmutableMap.of());
-    assertThat(
-        specializer.specialize(ipAccessListLine),
-        equalTo(
-            Optional.of(
-                IpAccessListLine.accepting().setMatchCondition(TrueExpr.INSTANCE).build())));
-
-    // specialize to a headerspace that blacklists part of the dstIp
-    specializer =
-        new IpAccessListSpecializer(
-            HeaderSpace.builder().setNotDstIps(new IpWildcard("1.2.3.4").toIpSpace()).build(),
-            ImmutableMap.of());
-    assertThat(specializer.specialize(ipAccessListLine), equalTo(Optional.of(ipAccessListLine)));
+  private static AclLineMatchExpr specialize(AclLineMatchExpr expr) {
+    return specializer.visit(expr);
   }
 
   @Test
-  public void testSpecializeIpAccessListLine_singleSrc() {
-    IpAccessListLine ipAccessListLine =
-        IpAccessListLine.acceptingHeaderSpace(
-            HeaderSpace.builder().setSrcIps(new IpWildcard("1.2.3.0/24").toIpSpace()).build());
+  public void visitAndMatchExpr() {
+    assertThat(specialize(and()), equalTo(TRUE));
+    assertThat(specialize(and(TRUE, TRUE, TRUE)), equalTo(TRUE));
+    assertThat(specialize(and(TRUE, TRUE, FALSE)), equalTo(FALSE));
+  }
 
-    assertThat(
-        TRIVIAL_SPECIALIZER.specialize(ipAccessListLine), equalTo(Optional.of(ipAccessListLine)));
-    assertThat(
-        BLACKLIST_ANY_DST_SPECIALIZER.specialize(ipAccessListLine),
-        equalTo(Optional.of(ipAccessListLine)));
-    assertThat(
-        WHITELIST_ANY_DST_SPECIALIZER.specialize(ipAccessListLine),
-        equalTo(Optional.of(ipAccessListLine)));
-    assertThat(
-        BLACKLIST_ANY_SRC_SPECIALIZER.specialize(ipAccessListLine), equalTo(Optional.empty()));
-    assertThat(
-        WHITELIST_ANY_SRC_SPECIALIZER.specialize(ipAccessListLine),
-        equalTo(Optional.of(ipAccessListLine)));
+  @Test
+  public void visitFalseExpr() {
+    assertThat(specialize(FALSE), equalTo(FALSE));
+  }
 
-    // specialize to a headerspace that whitelists part of the srcIp
-    IpAccessListSpecializer specializer =
-        new IpAccessListSpecializer(
-            HeaderSpace.builder().setSrcIps(ImmutableSet.of(new IpWildcard("1.2.3.4"))).build(),
-            ImmutableMap.of());
-    assertThat(
-        specializer.specialize(ipAccessListLine),
-        equalTo(Optional.of(IpAccessListLine.ACCEPT_ALL)));
+  @Test
+  public void visitMatchHeaderSpace_False() {
+    HeaderSpace dstEmpty = HeaderSpace.builder().setDstIps(EmptyIpSpace.INSTANCE).build();
+    HeaderSpace notDstUniverse =
+        HeaderSpace.builder().setNotDstIps(UniverseIpSpace.INSTANCE).build();
+    HeaderSpace srcEmpty = HeaderSpace.builder().setSrcIps(EmptyIpSpace.INSTANCE).build();
+    HeaderSpace notSrcUniverse =
+        HeaderSpace.builder().setNotSrcIps(UniverseIpSpace.INSTANCE).build();
+    HeaderSpace srcOrDstEmpty = HeaderSpace.builder().setSrcOrDstIps(EmptyIpSpace.INSTANCE).build();
 
-    // specialize to a headerspace that blacklists part of the srcIp
-    specializer =
-        new IpAccessListSpecializer(
-            HeaderSpace.builder().setNotSrcIps(ImmutableSet.of(new IpWildcard("1.2.3.4"))).build(),
-            ImmutableMap.of());
-    assertThat(specializer.specialize(ipAccessListLine), equalTo(Optional.of(ipAccessListLine)));
+    assertThat(specialize(match(dstEmpty)), equalTo(FALSE));
+    assertThat(specialize(match(notDstUniverse)), equalTo(FALSE));
+    assertThat(specialize(match(srcEmpty)), equalTo(FALSE));
+    assertThat(specialize(match(notSrcUniverse)), equalTo(FALSE));
+    assertThat(specialize(match(srcOrDstEmpty)), equalTo(FALSE));
+  }
+
+  @Test
+  public void visitMatchHeaderSpace() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder().setDstIps(new Ip("1.1.1.1").toIpSpace()).build();
+    assertThat(specialize(match(headerSpace)), equalTo(match(headerSpace)));
+  }
+
+  @Test
+  public void visitMatchSrcInterface() {
+    AclLineMatchExpr expr = new MatchSrcInterface(ImmutableList.of("foo"));
+    assertThat(specialize(expr), equalTo(expr));
+  }
+
+  @Test
+  public void visitNotMatchExpr() {
+    assertThat(specialize(not(TRUE)), equalTo(FALSE));
+    assertThat(specialize(not(FALSE)), equalTo(TRUE));
+    assertThat(specialize(not(not(TRUE))), equalTo(TRUE));
+    assertThat(specialize(not(ORIGINATING_FROM_DEVICE)), equalTo(not(ORIGINATING_FROM_DEVICE)));
+  }
+
+  @Test
+  public void visitOriginatingFromDevice() {
+    assertThat(specialize(ORIGINATING_FROM_DEVICE), equalTo(ORIGINATING_FROM_DEVICE));
+  }
+
+  @Test
+  public void visitOrMatchExpr() {
+    assertThat(specialize(or()), equalTo(FALSE));
+    assertThat(specialize(or(FALSE, FALSE, FALSE)), equalTo(FALSE));
+    assertThat(specialize(or(FALSE, TRUE, FALSE)), equalTo(TRUE));
+  }
+
+  @Test
+  public void visitPermittedByAcl() {
+    PermittedByAcl permittedByAcl = new PermittedByAcl("foo");
+    assertThat(specialize(permittedByAcl), equalTo(permittedByAcl));
+  }
+
+  @Test
+  public void visitTrueExpr() {
+    assertThat(specialize(TRUE), equalTo(TRUE));
   }
 }

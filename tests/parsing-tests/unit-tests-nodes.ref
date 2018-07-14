@@ -904,6 +904,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 1,
             "vrf" : "mgmt",
             "vrrpGroups" : {
               "1" : {
@@ -6754,6 +6755,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 1,
             "vrf" : "default"
           },
           "Vlan1005" : {
@@ -6779,6 +6781,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 1005,
             "vrf" : "default"
           },
           "Vlan1006" : {
@@ -6804,6 +6807,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 1006,
             "vrf" : "default"
           },
           "Vlan111" : {
@@ -6829,6 +6833,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 111,
             "vrf" : "default"
           },
           "Vlan1234" : {
@@ -6854,6 +6859,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 1234,
             "vrf" : "default"
           },
           "Vlan2" : {
@@ -6879,6 +6885,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 2,
             "vrf" : "default"
           },
           "Vlan3" : {
@@ -6904,6 +6911,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 3,
             "vrf" : "default"
           },
           "Vlan4094" : {
@@ -6929,6 +6937,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 4094,
             "vrf" : "default"
           },
           "Vxlan1" : {
@@ -11664,6 +11673,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 303,
             "vrf" : "default"
           },
           "Vlan803" : {
@@ -11697,6 +11707,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 803,
             "vrf" : "default"
           }
         },
@@ -11823,6 +11834,7 @@
             "switchportMode" : "NONE",
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "VLAN",
+            "vlan" : 100,
             "vrf" : "default"
           }
         },

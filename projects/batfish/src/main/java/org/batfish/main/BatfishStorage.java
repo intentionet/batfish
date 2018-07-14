@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.jpountz.lz4.LZ4FrameInputStream;
 import net.jpountz.lz4.LZ4FrameOutputStream;
@@ -31,8 +33,11 @@ import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
 import org.batfish.common.Version;
 import org.batfish.common.plugin.PluginConsumer.Format;
+import org.batfish.common.topology.Layer1Topology;
+import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
 
 /** A utility class that abstracts the underlying file system storage used by {@link Batfish}. */
@@ -118,6 +123,48 @@ final class BatfishStorage {
       _logger.errorf(
           "Failed to deserialize ConvertConfigurationAnswerElement: %s",
           Throwables.getStackTraceAsString(e));
+      return null;
+    }
+  }
+
+  public @Nullable Topology loadLegacyTopology(@Nonnull String testrig) {
+    Path path =
+        getTestrigDir(testrig)
+            .resolve(
+                Paths.get(
+                    BfConsts.RELPATH_TEST_RIG_DIR, BfConsts.RELPATH_TESTRIG_LEGACY_TOPOLOGY_PATH));
+    if (!Files.exists(path)) {
+      return null;
+    }
+    _newBatch.apply("Reading legacy topology", 0);
+    String topologyFileText = CommonUtil.readFile(path);
+    try {
+      return BatfishObjectMapper.mapper().readValue(topologyFileText, Topology.class);
+    } catch (IOException e) {
+      _logger.warnf(
+          "Unexpected exception caught while loading legacy testrig topology for testrig %s: %s",
+          testrig, Throwables.getStackTraceAsString(e));
+      return null;
+    }
+  }
+
+  public @Nullable Layer1Topology loadLayer1Topology(@Nonnull String testrig) {
+    Path path =
+        getTestrigDir(testrig)
+            .resolve(
+                Paths.get(
+                    BfConsts.RELPATH_TEST_RIG_DIR, BfConsts.RELPATH_TESTRIG_L1_TOPOLOGY_PATH));
+    if (!Files.exists(path)) {
+      return null;
+    }
+    _newBatch.apply("Reading layer-1 topology", 0);
+    String topologyFileText = CommonUtil.readFile(path);
+    try {
+      return BatfishObjectMapper.mapper().readValue(topologyFileText, Layer1Topology.class);
+    } catch (IOException e) {
+      _logger.warnf(
+          "Unexpected exception caught while loading layer-1 topology for testrig %s: %s",
+          testrig, Throwables.getStackTraceAsString(e));
       return null;
     }
   }

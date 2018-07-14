@@ -421,7 +421,7 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
   public void exitSservgrp_members(Sservgrp_membersContext ctx) {
     for (Variable_list_itemContext var : ctx.variable_list().variable_list_item()) {
       String name = getText(var);
-      _currentServiceGroup.getMembers().add(new ServiceOrServiceGroupReference(name));
+      _currentServiceGroup.getReferences().add(new ServiceOrServiceGroupReference(name));
 
       // Use constructed object name so same-named refs across vsys are unique
       String uniqueName = computeObjectName(_currentVsys.getName(), name);

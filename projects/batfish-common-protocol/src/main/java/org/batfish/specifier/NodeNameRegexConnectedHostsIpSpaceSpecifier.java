@@ -28,7 +28,7 @@ public final class NodeNameRegexConnectedHostsIpSpaceSpecifier implements IpSpac
    * point-to-point connections. Eventually /31s were allowed, but we assume here that any /30s are
    * hold-over point-to-point connections in the legacy model.
    */
-  private static final int HOST_SUBNET_MAX_PREFIX_LENGTH = 29;
+  public static final int HOST_SUBNET_MAX_PREFIX_LENGTH = 29;
 
   private final Pattern _pattern;
 

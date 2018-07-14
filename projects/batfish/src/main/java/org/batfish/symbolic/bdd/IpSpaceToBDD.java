@@ -1,13 +1,20 @@
 package org.batfish.symbolic.bdd;
 
+import static org.batfish.common.util.CommonUtil.toImmutableMap;
+
 import com.google.common.base.Preconditions;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+import org.batfish.common.BatfishException;
+import org.batfish.common.util.NonRecursiveSupplier;
+import org.batfish.common.util.NonRecursiveSupplier.NonRecursiveSupplierException;
 import org.batfish.datamodel.AclIpSpace;
 import org.batfish.datamodel.AclIpSpaceLine;
 import org.batfish.datamodel.EmptyIpSpace;
@@ -24,7 +31,11 @@ import org.batfish.datamodel.PrefixIpSpace;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.datamodel.visitors.GenericIpSpaceVisitor;
 
-public class IpSpaceToBDD implements GenericIpSpaceVisitor<BDD> {
+/**
+ * Visitor that converts an {@link IpSpace} to a {@link BDD}. Its constructor takes a {@link
+ * BDDInteger} that should will be constrained to be in the space.
+ */
+public final class IpSpaceToBDD implements GenericIpSpaceVisitor<BDD> {
 
   private final BDDInteger _bddInteger;
 
@@ -32,15 +43,12 @@ public class IpSpaceToBDD implements GenericIpSpaceVisitor<BDD> {
 
   private final BDDFactory _factory;
 
-  private final Map<String, IpSpace> _namedIpSpaces;
-
-  private final Map<String, BDD> _namedIpSpaceBDDs;
+  private final Map<String, Supplier<BDD>> _namedIpSpaceBDDs;
 
   public IpSpaceToBDD(BDDFactory factory, BDDInteger var) {
     _bddInteger = var;
     _bddOps = new BDDOps(factory);
     _factory = factory;
-    _namedIpSpaces = ImmutableMap.of();
     _namedIpSpaceBDDs = ImmutableMap.of();
   }
 
@@ -48,8 +56,12 @@ public class IpSpaceToBDD implements GenericIpSpaceVisitor<BDD> {
     _bddInteger = var;
     _bddOps = new BDDOps(factory);
     _factory = factory;
-    _namedIpSpaces = ImmutableMap.copyOf(namedIpSpaces);
-    _namedIpSpaceBDDs = new HashMap<>();
+    _namedIpSpaceBDDs =
+        toImmutableMap(
+            namedIpSpaces,
+            Entry::getKey,
+            entry ->
+                Suppliers.memoize(new NonRecursiveSupplier<>(() -> this.visit(entry.getValue()))));
   }
 
   @Override
@@ -148,8 +160,12 @@ public class IpSpaceToBDD implements GenericIpSpaceVisitor<BDD> {
   public BDD visitIpSpaceReference(IpSpaceReference ipSpaceReference) {
     String name = ipSpaceReference.getName();
     Preconditions.checkArgument(
-        _namedIpSpaces.containsKey(name), "Undefined IpSpace reference: %s", name);
-    return _namedIpSpaceBDDs.computeIfAbsent(name, k -> _namedIpSpaces.get(name).accept(this));
+        _namedIpSpaceBDDs.containsKey(name), "Undefined IpSpace reference: %s", name);
+    try {
+      return _namedIpSpaceBDDs.get(name).get();
+    } catch (NonRecursiveSupplierException e) {
+      throw new BatfishException("Circular IpSpaceReference: " + name);
+    }
   }
 
   @Override

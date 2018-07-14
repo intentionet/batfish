@@ -10,6 +10,8 @@ public enum NeighborType {
   EBGP("ebgp"),
   IBGP("ibgp"),
   LAN("lan"),
+  LAYER1("layer1"),
+  LAYER2("layer2"),
   OSPF("ospf"),
   RIP("rip");
 

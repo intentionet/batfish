@@ -131,16 +131,43 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     return String.format("%s~%s", vsysName, objectName);
   }
 
+  // Visible for testing
+  /**
+   * Generate IpAccessList name for the specified serviceGroupMemberName in the specified vsysName
+   */
+  public static String computeServiceGroupMemberAclName(
+      String vsysName, String serviceGroupMemberName) {
+    return String.format("~%s~SERVICE_GROUP_MEMBER~%s~", vsysName, serviceGroupMemberName);
+  }
+
   /** Convert vsys components to vendor independent model */
   private void convertVirtualSystems() {
     NavigableSet<String> loggingServers = new TreeSet<>();
 
     for (Vsys vsys : _virtualSystems.values()) {
       loggingServers.addAll(vsys.getSyslogServerAddresses());
+      String vsysName = vsys.getName();
+
+      // Zones
       for (Entry<String, Zone> zoneEntry : vsys.getZones().entrySet()) {
         Zone zone = zoneEntry.getValue();
-        String zoneName = computeObjectName(vsys.getName(), zone.getName());
+        String zoneName = computeObjectName(vsysName, zone.getName());
         _c.getZones().put(zoneName, toZone(zoneName, zone));
+      }
+
+      // Services
+      for (Service service : vsys.getServices().values()) {
+        String serviceGroupAclName = computeServiceGroupMemberAclName(vsysName, service.getName());
+        _c.getIpAccessLists()
+            .put(serviceGroupAclName, service.toIpAccessList(LineAction.ACCEPT, this, vsys));
+      }
+
+      // Service groups
+      for (ServiceGroup serviceGroup : vsys.getServiceGroups().values()) {
+        String serviceGroupAclName =
+            computeServiceGroupMemberAclName(vsysName, serviceGroup.getName());
+        _c.getIpAccessLists()
+            .put(serviceGroupAclName, serviceGroup.toIpAccessList(LineAction.ACCEPT, this, vsys));
       }
     }
     _c.setLoggingServers(loggingServers);

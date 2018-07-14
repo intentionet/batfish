@@ -82,6 +82,13 @@ public final class UnzipUtility {
               throw new IOException("Unable to make directory " + outputPath);
             }
           } else {
+            // Make sure parent directories exist, in case the zip does not contain dir entries
+            File parentDir = outputPath.toFile().getParentFile();
+            if (!parentDir.exists()) {
+              if (!parentDir.mkdirs()) {
+                throw new IOException("Unable to make directory " + parentDir.getPath());
+              }
+            }
             // Extract the file.
             extractFile(zipIn, outputPath);
           }

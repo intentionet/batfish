@@ -46,7 +46,6 @@ public class UnzipUtilityTest {
     File directoriesMissing = _folder.newFile("directories_missing");
     try (FileOutputStream fos = new FileOutputStream(directoriesMissing);
         ZipOutputStream out = new ZipOutputStream(fos)) {
-      out.putNextEntry(new ZipEntry("missing_dir/child_dir/"));
       out.putNextEntry(new ZipEntry("missing_dir/child_dir/file.txt"));
       out.write(contents);
     }
