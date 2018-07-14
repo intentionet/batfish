@@ -152,6 +152,7 @@ public class AclLineMatchExprToBDDTest {
     assertThat(bdd, equalTo(stateBDD));
   }
 
+  @Test
   public void testPermittedByAcl() {
     Ip fooIp = new Ip("1.1.1.1");
     BDD fooIpBDD = _pkt.getSrcIp().value(fooIp.asLong());
