@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.batfish.common.BatfishException;
 
 public final class SubRange implements Serializable, Comparable<SubRange> {
@@ -59,6 +60,10 @@ public final class SubRange implements Serializable, Comparable<SubRange> {
     }
   }
 
+  public IntStream asStream() {
+    return IntStream.range(_start, _end + 1);
+  }
+
   @Override
   public int compareTo(SubRange rhs) {
     int ret = Integer.compare(_start, rhs._start);
@@ -102,6 +107,10 @@ public final class SubRange implements Serializable, Comparable<SubRange> {
     return result;
   }
 
+  public boolean includes(int integer) {
+    return _start <= integer && integer <= _end;
+  }
+
   @JsonValue
   public String serializedForm() {
     return String.format("%d-%d", _start, _end);
@@ -110,9 +119,5 @@ public final class SubRange implements Serializable, Comparable<SubRange> {
   @Override
   public String toString() {
     return "[" + _start + "," + _end + "]";
-  }
-
-  public boolean includes(int integer) {
-    return _start <= integer && integer <= _end;
   }
 }

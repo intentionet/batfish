@@ -98,6 +98,9 @@ public final class IpAccessListSpecializerTest {
     List<State> stateList = ImmutableList.of(State.NEW);
     List<SubRange> subRangeList = ImmutableList.of(new SubRange(0, 0));
     List<TcpFlags> tcpFlagsList = ImmutableList.of(TcpFlags.ACK_TCP_FLAG);
+    /* If the initial headerspace has non-empty disjunctions that become empty after specialization,
+     * the entire match expression is FALSE.
+     */
     assertThat(
         constantSpecialize(match(HeaderSpace.builder().setDscps(integerList).build())),
         equalTo(FALSE));
@@ -134,6 +137,8 @@ public final class IpAccessListSpecializerTest {
     assertThat(
         constantSpecialize(match(HeaderSpace.builder().setTcpFlags(tcpFlagsList).build())),
         equalTo(FALSE));
+    // if we started with empty disjunctions, they are interpreted as "unconstrained", i.e. TRUE
+    assertThat(constantSpecialize(match(HeaderSpace.builder().build())), equalTo(TRUE));
   }
 
   @Test

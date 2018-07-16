@@ -1,0 +1,13 @@
+{
+  "hostname":"c1",
+  "hostInterfaces":{
+    "i1":{
+      "name":"i1",
+      "prefix":"1.0.0.0/31"
+    },
+    "i3":{
+      "name":"i3",
+      "prefix":"2.0.0.0/31"
+    }
+  }
+}

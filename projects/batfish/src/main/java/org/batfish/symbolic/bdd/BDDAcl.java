@@ -99,7 +99,7 @@ public class BDDAcl {
     Collections.reverse(lines);
 
     for (IpAccessListLine line : lines) {
-      BDD lineBDD = aclLineMatchExprToBDD.toBDD(line.getMatchCondition());
+      BDD lineBDD = aclLineMatchExprToBDD.visit(line.getMatchCondition());
       BDD actionBDD = line.getAction() == LineAction.ACCEPT ? _factory.one() : _factory.zero();
       _bdd = lineBDD.ite(actionBDD, _bdd);
     }

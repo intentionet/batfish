@@ -382,6 +382,22 @@ public class PaloAltoGrammarTest {
     assertThat(
         ccae,
         hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE_GROUP, serviceGroup2Name));
+
+    // Confirm structure references are tracked
+    assertThat(ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, service1Name, 1));
+    assertThat(ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, service2Name, 1));
+    assertThat(ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, service3Name, 0));
+    assertThat(ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, service4Name, 0));
+    assertThat(
+        ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE_GROUP, serviceGroup1Name, 1));
+    assertThat(
+        ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE_GROUP, serviceGroup2Name, 0));
+
+    // Confirm undefined reference shows up as such
+    assertThat(
+        ccae,
+        hasUndefinedReference(
+            hostname, PaloAltoStructureType.SERVICE_OR_SERVICE_GROUP, "SERVICE_UNDEFINED"));
   }
 
   @Test
@@ -466,6 +482,14 @@ public class PaloAltoGrammarTest {
         ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, sharedServiceName));
     assertThat(
         ccae, hasDefinedStructure(hostname, PaloAltoStructureType.SERVICE, sharedOnlyServiceName));
+
+    // Confirm structure references are tracked separately for each vsys
+    assertThat(ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, vsys1ServiceName, 1));
+    assertThat(ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, vsys2ServiceName, 1));
+    assertThat(
+        ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, sharedServiceName, 1));
+    assertThat(
+        ccae, hasNumReferrers(hostname, PaloAltoStructureType.SERVICE, sharedOnlyServiceName, 3));
   }
 
   @Test

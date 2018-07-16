@@ -164,6 +164,8 @@ public class BfConsts {
   public static final String RELPATH_STANDARD_DIR = "standard";
   public static final String RELPATH_SYNC_TESTRIGS_DIR = "testrig_sync";
   public static final String RELPATH_TEST_RIG_DIR = "testrig";
+  public static final String RELPATH_TESTRIG_L1_TOPOLOGY_PATH = "testrig_layer1_topology";
+  public static final String RELPATH_TESTRIG_LEGACY_TOPOLOGY_PATH = "topology.net";
   public static final String RELPATH_TESTRIG_TOPOLOGY_PATH = "testrig_topology";
   public static final String RELPATH_TESTRIGS_DIR = "testrigs";
   public static final String RELPATH_VALIDATE_ENVIRONMENT_ANSWER = "venv_answer";

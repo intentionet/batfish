@@ -18,7 +18,7 @@ public class TopologyMatchers {
 
   /**
    * Provides a matcher that matches if the provided {@code subMatcher} matches the {@link
-   * NodeInterfacePair} formed by qualifiying the interface name to be matched with the provided
+   * NodeInterfacePair} formed by qualifying the interface name to be matched with the provided
    * {@code node}.
    */
   public static WithNode withNode(String node, Matcher<? super NodeInterfacePair> subMatcher) {

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -15,6 +16,7 @@ import org.batfish.common.BatfishException;
 import org.batfish.common.util.NonRecursiveSupplier;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.State;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
@@ -40,14 +42,14 @@ public class AclLineMatchExprToBDDTest {
 
   @Test
   public void testMatchHeaderSpace_unconstrained() {
-    assertThat(_toBDD.toBDD(new MatchHeaderSpace(HeaderSpace.builder().build())), isOne());
+    assertThat(_toBDD.visit(new MatchHeaderSpace(HeaderSpace.builder().build())), isOne());
   }
 
   @Test
   public void testMatchHeaderSpace_srcOrDstIps() {
     Ip srcOrDstIp = new Ip("1.2.3.4");
     HeaderSpace headerSpace = HeaderSpace.builder().setSrcOrDstIps(srcOrDstIp.toIpSpace()).build();
-    BDD bdd = _toBDD.toBDD(new MatchHeaderSpace(headerSpace));
+    BDD bdd = _toBDD.visit(new MatchHeaderSpace(headerSpace));
 
     BDD dstIpBDD = _pkt.getDstIp().value(srcOrDstIp.asLong());
     BDD srcIpBDD = _pkt.getSrcIp().value(srcOrDstIp.asLong());
@@ -60,7 +62,7 @@ public class AclLineMatchExprToBDDTest {
             .setDstIps(dstIp.toIpSpace())
             .setSrcOrDstIps(srcOrDstIp.toIpSpace())
             .build();
-    bdd = _toBDD.toBDD(new MatchHeaderSpace(headerSpace));
+    bdd = _toBDD.visit(new MatchHeaderSpace(headerSpace));
     dstIpBDD = _pkt.getDstIp().value(dstIp.asLong());
     assertThat(bdd, equalTo(srcIpBDD.and(dstIpBDD)));
 
@@ -72,7 +74,7 @@ public class AclLineMatchExprToBDDTest {
             .setSrcIps(srcIp.toIpSpace())
             .setSrcOrDstIps(srcOrDstIp.toIpSpace())
             .build();
-    bdd = _toBDD.toBDD(new MatchHeaderSpace(headerSpace));
+    bdd = _toBDD.visit(new MatchHeaderSpace(headerSpace));
     assertThat(bdd, isZero());
   }
 
@@ -82,7 +84,7 @@ public class AclLineMatchExprToBDDTest {
     HeaderSpace headerSpace =
         HeaderSpace.builder().setSrcOrDstPorts(ImmutableList.of(portRange)).build();
     AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
-    BDD bdd = _toBDD.toBDD(matchExpr);
+    BDD bdd = _toBDD.visit(matchExpr);
 
     BDDInteger dstPort = _pkt.getDstPort();
     BDD dstPortBDD = dstPort.leq(20).and(dstPort.geq(10));
@@ -122,5 +124,64 @@ public class AclLineMatchExprToBDDTest {
     exception.expect(BatfishException.class);
     exception.expectMessage("Circular PermittedByAcl reference: foo");
     permittedByAcl.accept(toBDD);
+  }
+
+  @Test
+  public void testMatchHeaderSpace_dscps() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setDscps(ImmutableSet.of(1, 2, 3))
+            .setNotDscps(ImmutableSet.of(3, 4, 5))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.visit(matchExpr);
+
+    BDDInteger dscp = _pkt.getDscp();
+    BDD dscpBDD = dscp.value(1).or(dscp.value(2));
+    assertThat(bdd, equalTo(dscpBDD));
+  }
+
+  @Test
+  public void testMatchHeaderSpace_ecns() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setEcns(ImmutableSet.of(0, 1))
+            .setNotEcns(ImmutableSet.of(1, 2))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.visit(matchExpr);
+
+    BDDInteger ecn = _pkt.getEcn();
+    BDD ecnBDD = ecn.value(0);
+    assertThat(bdd, equalTo(ecnBDD));
+  }
+
+  @Test
+  public void testMatchHeaderSpace_fragmentOffsets() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setFragmentOffsets(ImmutableSet.of(new SubRange(0, 5)))
+            .setNotFragmentOffsets(ImmutableSet.of(new SubRange(2, 6)))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.visit(matchExpr);
+
+    BDDInteger fragmentOffset = _pkt.getFragmentOffset();
+    BDD fragmentOffsetBDD = fragmentOffset.value(0).or(fragmentOffset.value(1));
+    assertThat(bdd, equalTo(fragmentOffsetBDD));
+  }
+
+  @Test
+  public void testMatchHeaderSpace_state() {
+    HeaderSpace headerSpace =
+        HeaderSpace.builder()
+            .setStates(ImmutableSet.of(State.fromNum(0), State.fromNum(1)))
+            .build();
+    AclLineMatchExpr matchExpr = new MatchHeaderSpace(headerSpace);
+    BDD bdd = _toBDD.visit(matchExpr);
+
+    BDDInteger state = _pkt.getState();
+    BDD stateBDD = state.value(0).or(state.value(1));
+    assertThat(bdd, equalTo(stateBDD));
   }
 }

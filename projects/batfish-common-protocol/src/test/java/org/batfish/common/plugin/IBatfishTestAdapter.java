@@ -14,6 +14,8 @@ import org.apache.commons.configuration2.ImmutableConfiguration;
 import org.batfish.common.Answerer;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.Directory;
+import org.batfish.common.topology.Layer1Topology;
+import org.batfish.common.topology.Layer2Topology;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.Configuration;
@@ -123,12 +125,29 @@ public class IBatfishTestAdapter implements IBatfish {
   }
 
   @Override
-  public NodeRolesData getNodeRolesData() {
+  public Layer1Topology getLayer1Topology() {
+    throw new UnsupportedOperationException(
+        "no implementation for generated method"); // TODO Auto-generated method stub
+  }
+
+  @Override
+  public Layer2Topology getLayer2Topology() {
+    throw new UnsupportedOperationException(
+        "no implementation for generated method"); // TODO Auto-generated method stub
+  }
+
+  @Override
+  public BatfishLogger getLogger() {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public Optional<NodeRoleDimension> getNodeRoleDimension(String roleDimension) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public NodeRolesData getNodeRolesData() {
     throw new UnsupportedOperationException();
   }
 
@@ -220,6 +239,12 @@ public class IBatfishTestAdapter implements IBatfish {
   }
 
   @Override
+  public Set<BgpAdvertisement> loadExternalBgpAnnouncements(
+      Map<String, Configuration> configurations) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public ParseEnvironmentBgpTablesAnswerElement loadParseEnvironmentBgpTablesAnswerElement() {
     throw new UnsupportedOperationException();
   }
@@ -252,12 +277,6 @@ public class IBatfishTestAdapter implements IBatfish {
 
   @Override
   public void popEnvironment() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Set<BgpAdvertisement> loadExternalBgpAnnouncements(
-      Map<String, Configuration> configurations) {
     throw new UnsupportedOperationException();
   }
 
@@ -378,11 +397,6 @@ public class IBatfishTestAdapter implements IBatfish {
 
   @Override
   public void writeDataPlane(DataPlane dp, DataPlaneAnswerElement ae) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public BatfishLogger getLogger() {
     throw new UnsupportedOperationException();
   }
 }

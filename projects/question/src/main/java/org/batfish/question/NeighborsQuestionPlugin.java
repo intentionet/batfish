@@ -19,6 +19,9 @@ import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.plugin.Plugin;
+import org.batfish.common.topology.Layer1Topology;
+import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.TopologyUtil;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.BgpPeerConfig;
 import org.batfish.datamodel.BgpPeerConfigId;
@@ -102,6 +105,10 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
 
     private static final String PROP_LAN_NEIGHBORS = "lanNeighbors";
 
+    private static final String PROP_LAYER1_NEIGHBORS = "layer1Neighbors";
+
+    private static final String PROP_LAYER2_NEIGHBORS = "layer2Neighbors";
+
     private static final String PROP_OSPF_NEIGHBORS = "ospfNeighbors";
 
     private static final String PROP_RIP_NEIGHBORS = "ripNeighbors";
@@ -131,6 +138,10 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
     private SortedSet<IpEdge> _ibgpNeighbors;
 
     private SortedSet<Edge> _lanNeighbors;
+
+    private Layer1Topology _layer1Neighbors;
+
+    private Layer2Topology _layer2Neighbors;
 
     private SortedSet<IpEdge> _ospfNeighbors;
 
@@ -173,6 +184,16 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
     @JsonProperty(PROP_LAN_NEIGHBORS)
     public SortedSet<Edge> getLanNeighbors() {
       return _lanNeighbors;
+    }
+
+    @JsonProperty(PROP_LAYER1_NEIGHBORS)
+    public Layer1Topology getLayer1Neighbors() {
+      return _layer1Neighbors;
+    }
+
+    @JsonProperty(PROP_LAYER2_NEIGHBORS)
+    public Layer2Topology getLayer2Neighbors() {
+      return _layer2Neighbors;
     }
 
     @JsonProperty(PROP_OSPF_NEIGHBORS)
@@ -363,6 +384,16 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
     @JsonProperty(PROP_LAN_NEIGHBORS)
     public void setLanNeighbors(SortedSet<Edge> lanNeighbors) {
       _lanNeighbors = lanNeighbors;
+    }
+
+    @JsonProperty(PROP_LAYER1_NEIGHBORS)
+    public void setLayer1Neighbors(Layer1Topology layer1Neighbors) {
+      _layer1Neighbors = layer1Neighbors;
+    }
+
+    @JsonProperty(PROP_LAYER2_NEIGHBORS)
+    public void setLayer2Neighbors(Layer2Topology layer2Neighbors) {
+      _layer2Neighbors = layer2Neighbors;
     }
 
     @JsonProperty(PROP_OSPF_NEIGHBORS)
@@ -706,6 +737,19 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
         }
       }
 
+      Layer1Topology layer1Topology;
+      boolean layer1 = question.getNeighborTypes().contains(NeighborType.LAYER1);
+      boolean layer2 = question.getNeighborTypes().contains(NeighborType.LAYER2);
+      if (layer1 || layer2) {
+        layer1Topology = _batfish.getLayer1Topology();
+        if (layer1) {
+          answerElement.setLayer1Neighbors(layer1Topology);
+        }
+        if (layer2) {
+          answerElement.setLayer2Neighbors(
+              TopologyUtil.computeLayer2Topology(layer1Topology, configurations));
+        }
+      }
       return answerElement;
     }
 
