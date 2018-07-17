@@ -268,6 +268,13 @@ public class BDDReachabilityAnalysis {
     return _leafStates;
   }
 
+  public Set<Flow> multipathInconsistencies(String flowTag) {
+    return computeMultipathInconsistencies()
+        .stream()
+        .map(violation -> multipathInconsistencyToFlow(violation, flowTag))
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
   @VisibleForTesting
   Flow multipathInconsistencyToFlow(MultipathInconsistency violation, String flowTag) {
     Builder fb =

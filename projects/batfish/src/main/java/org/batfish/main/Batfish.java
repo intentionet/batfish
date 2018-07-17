@@ -60,6 +60,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.configuration2.ImmutableConfiguration;
 import org.apache.commons.lang3.SerializationUtils;
+import org.batfish.bddreachability.BDDReachabilityAnalysis;
+import org.batfish.bddreachability.BDDReachabilityAnalysisFactory;
 import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishException.BatfishStackTrace;
@@ -103,6 +105,7 @@ import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.FlowHistory;
 import org.batfish.datamodel.FlowTrace;
 import org.batfish.datamodel.ForwardingAction;
+import org.batfish.datamodel.ForwardingAnalysis;
 import org.batfish.datamodel.GenericConfigObject;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Interface;
@@ -175,11 +178,15 @@ import org.batfish.representation.iptables.IptablesVendorConfiguration;
 import org.batfish.role.InferRoles;
 import org.batfish.role.NodeRoleDimension;
 import org.batfish.role.NodeRolesData;
+import org.batfish.specifier.AllInterfaceLinksLocationSpecifier;
+import org.batfish.specifier.AllInterfacesLocationSpecifier;
+import org.batfish.specifier.InferFromLocationIpSpaceSpecifier;
 import org.batfish.specifier.InterfaceLocation;
 import org.batfish.specifier.IpSpaceAssignment;
 import org.batfish.specifier.Location;
 import org.batfish.specifier.SpecifierContext;
 import org.batfish.specifier.SpecifierContextImpl;
+import org.batfish.specifier.UnionLocationSpecifier;
 import org.batfish.symbolic.abstraction.BatfishCompressor;
 import org.batfish.symbolic.abstraction.Roles;
 import org.batfish.symbolic.smt.PropertyChecker;
@@ -4306,6 +4313,29 @@ public class Batfish extends PluginConsumer implements IBatfish {
         ImmutableSet.of(),
         IpSpaceAssignment.empty(),
         false);
+  }
+
+  @Override
+  public Set<Flow> bddMultipathConsistency() {
+    Map<String, Configuration> configurations = loadConfigurations();
+    DataPlane dataPlane = loadDataPlane();
+    ForwardingAnalysis forwardingAnalysis = dataPlane.getForwardingAnalysis();
+    SpecifierContextImpl specifierContext = new SpecifierContextImpl(this, configurations);
+    String tag = getFlowTag();
+    Set<Location> locations =
+        new UnionLocationSpecifier(
+                AllInterfacesLocationSpecifier.INSTANCE,
+                AllInterfaceLinksLocationSpecifier.INSTANCE)
+            .resolve(specifierContext);
+    IpSpaceAssignment sourceIpAssignment =
+        InferFromLocationIpSpaceSpecifier.INSTANCE.resolve(locations, specifierContext);
+
+    BDDReachabilityAnalysisFactory analysisFactory =
+        new BDDReachabilityAnalysisFactory(configurations, forwardingAnalysis);
+    BDDReachabilityAnalysis bddReachabilityAnalysis =
+        analysisFactory.bddReachabilityAnalysis(sourceIpAssignment);
+
+    return bddReachabilityAnalysis.multipathInconsistencies(tag);
   }
 
   @Nonnull

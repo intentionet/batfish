@@ -92,7 +92,7 @@ public final class TracerouteAnswerer extends Answerer {
     return table;
   }
 
-  private static TableMetadata createMetadata() {
+  public static TableMetadata createMetadata() {
     List<ColumnMetadata> columnMetadata =
         ImmutableList.of(
             new ColumnMetadata(COL_NODE, Schema.NODE, "Ingress node", true, false),
@@ -143,7 +143,7 @@ public final class TracerouteAnswerer extends Answerer {
    * Converts a flowHistory object into a set of Rows. Expects that the traces correspond to only
    * one environment.
    */
-  private static Multiset<Row> flowHistoryToRows(FlowHistory flowHistory) {
+  public static Multiset<Row> flowHistoryToRows(FlowHistory flowHistory) {
     Multiset<Row> rows = LinkedHashMultiset.create();
     for (FlowHistoryInfo historyInfo : flowHistory.getTraces().values()) {
       rows.add(flowHistoryToRow(historyInfo));
