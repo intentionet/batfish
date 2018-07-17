@@ -75,5 +75,16 @@ final class AbstractRouteMatchersImpl {
     }
   }
 
+  static final class IsNonRouting extends FeatureMatcher<AbstractRoute, Boolean> {
+    IsNonRouting(@Nonnull Matcher<? super Boolean> subMatcher) {
+      super(subMatcher, "An AbstractRoute with nonRouting:", "nonRouting");
+    }
+
+    @Override
+    protected Boolean featureValueOf(AbstractRoute actual) {
+      return actual.getNonRouting();
+    }
+  }
+
   private AbstractRouteMatchersImpl() {}
 }

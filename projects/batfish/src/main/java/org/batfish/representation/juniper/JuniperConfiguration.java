@@ -1901,6 +1901,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
             .setTag(tag)
             .build();
 
+    newStaticRoute.setNonRouting(firstNonNull(route.getNoInstall(), Boolean.FALSE));
     return newStaticRoute;
   }
 

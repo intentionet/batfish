@@ -481,6 +481,7 @@ rosr_common
    | rosr_community
    | rosr_discard
    | rosr_install
+   | rosr_no_install
    | rosr_metric
    | rosr_next_hop
    | rosr_next_table
@@ -531,6 +532,11 @@ rosr_next_hop
 rosr_next_table
 :
    NEXT_TABLE name = variable
+;
+
+rosr_no_install
+:
+   NO_INSTALL
 ;
 
 rosr_no_readvertise

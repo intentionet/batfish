@@ -3,6 +3,7 @@ package org.batfish.representation.juniper;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
 
@@ -30,6 +31,8 @@ public class StaticRoute implements Serializable {
 
   private Integer _tag;
 
+  private Boolean _noInstall;
+
   public StaticRoute(Prefix prefix) {
     _prefix = prefix;
     _policies = new ArrayList<>();
@@ -55,6 +58,11 @@ public class StaticRoute implements Serializable {
 
   public Ip getNextHopIp() {
     return _nextHopIp;
+  }
+
+  @Nullable
+  public Boolean getNoInstall() {
+    return _noInstall;
   }
 
   public List<String> getPolicies() {
@@ -87,6 +95,10 @@ public class StaticRoute implements Serializable {
 
   public void setNextHopIp(Ip nextHopIp) {
     _nextHopIp = nextHopIp;
+  }
+
+  public void setNoInstall(@Nullable Boolean noInstall) {
+    _noInstall = noInstall;
   }
 
   public void setTag(int tag) {

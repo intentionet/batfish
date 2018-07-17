@@ -3,4 +3,5 @@ set system host-name static-routes
 #
 set routing-options static route 1.0.0.0/8 next-hop 10.0.0.1
 set routing-instances ri2 routing-options static route 2.0.0.0/8 next-hop 10.0.0.2
+set routing-options static route 3.0.0.0/8 no-install
 #

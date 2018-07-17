@@ -1,6 +1,7 @@
 package org.batfish.grammar.flatjuniper;
 
 import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasPrefix;
+import static org.batfish.datamodel.matchers.AbstractRouteMatchers.isNonRouting;
 import static org.batfish.datamodel.matchers.BgpNeighborMatchers.hasClusterId;
 import static org.batfish.datamodel.matchers.BgpNeighborMatchers.hasEnforceFirstAs;
 import static org.batfish.datamodel.matchers.BgpNeighborMatchers.hasLocalAs;
@@ -2520,6 +2521,11 @@ public class FlatJuniperGrammarTest {
 
     assertThat(c, hasDefaultVrf(hasStaticRoutes(hasItem(hasPrefix(Prefix.parse("1.0.0.0/8"))))));
     assertThat(c, hasVrf("ri2", hasStaticRoutes(hasItem(hasPrefix(Prefix.parse("2.0.0.0/8"))))));
+    assertThat(
+        c,
+        hasDefaultVrf(
+            hasStaticRoutes(
+                hasItem(allOf(hasPrefix(Prefix.parse("3.0.0.0/8")), isNonRouting(true))))));
   }
 
   @Test
