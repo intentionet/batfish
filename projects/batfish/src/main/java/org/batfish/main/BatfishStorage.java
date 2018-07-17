@@ -127,6 +127,7 @@ final class BatfishStorage {
     }
   }
 
+  @SuppressWarnings("ReturnValueIgnored")
   public @Nullable Topology loadLegacyTopology(@Nonnull String testrig) {
     Path path =
         getTestrigDir(testrig)
@@ -148,6 +149,7 @@ final class BatfishStorage {
     }
   }
 
+  @SuppressWarnings("ReturnValueIgnored")
   public @Nullable Layer1Topology loadLayer1Topology(@Nonnull String testrig) {
     Path path =
         getTestrigDir(testrig)
