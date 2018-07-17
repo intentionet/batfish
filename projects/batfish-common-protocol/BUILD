@@ -100,6 +100,9 @@ java_library(
         ],
         exclude = ["src/test/java/**/*Test.java"],
     ),
+    resources = glob([
+        "src/test/resources/**",
+    ]),
     deps = [
         ":common",
         ":recovery_grammar",
