@@ -44,6 +44,7 @@ import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVendorFami
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrfs;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasAclName;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasBandwidth;
+import static org.batfish.datamodel.matchers.DataModelMatchers.hasDefinedStructure;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasIpProtocols;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasMemberInterfaces;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasName;
@@ -2831,6 +2832,21 @@ public class CiscoGrammarTest {
     String[] names =
         Arrays.stream(configurationNames).map(s -> TESTCONFIGS_PREFIX + s).toArray(String[]::new);
     return BatfishTestUtils.parseTextConfigs(_folder, names);
+  }
+
+  @Test
+  public void testPrefixListNameParsing() throws IOException {
+    String hostname = "prefix-list-name-parsing";
+    String prefixListName = "SET_COMMUNITY_65535:200";
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse();
+
+    /* Confirm prefix-list with correct name was defined */
+    assertThat(ccae, hasDefinedStructure(hostname, CiscoStructureType.PREFIX_LIST, prefixListName));
+
+    /* Confirm prefix-list is referenced */
+    assertThat(ccae, hasNumReferrers(hostname, CiscoStructureType.PREFIX_LIST, prefixListName, 1));
   }
 
   @Test

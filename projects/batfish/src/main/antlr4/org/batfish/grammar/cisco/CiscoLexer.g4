@@ -9007,6 +9007,13 @@ PREFIX_LENGTH
 PREFIX_LIST
 :
    'prefix-list'
+   {
+     if (lastTokenType == ADDRESS) {
+       pushMode(M_Words);
+     } else {
+       pushMode(M_Name);
+     }
+   }
 ;
 
 PREFIX_PEER_TIMEOUT
@@ -15153,3 +15160,21 @@ M_VacantMessage_NEWLINE
 :
    F_Newline+ -> type ( NEWLINE ) , popMode
 ;
+
+mode M_Words;
+
+M_Words_WORD
+:
+   F_NonWhitespace+ -> type ( VARIABLE )
+;
+
+M_Words_NEWLINE
+:
+   F_Newline+ -> type ( NEWLINE ) , popMode
+;
+
+M_Words_WS
+:
+   F_Whitespace+ -> channel ( HIDDEN )
+;
+

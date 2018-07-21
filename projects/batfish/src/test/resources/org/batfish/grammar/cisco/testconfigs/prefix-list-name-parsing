@@ -1,0 +1,27 @@
+!
+version 15.1
+hostname prefix-list-name-parsing
+router bgp 65000
+ !
+ neighbor 10.10.10.10 remote-as 65535
+ neighbor 10.10.10.10 description eBGP peer
+ neighbor 10.10.10.10 version 4
+ !
+ address-family ipv4
+  neighbor 10.10.10.10 route-map SET_LOCALPREF200_eBGP in
+ exit-address-family
+!
+ip bgp-community new-format
+!
+ip prefix-list SET_COMMUNITY_65535:200 seq 10 permit 10.0.0.0/8
+!
+ip prefix-list DEFINED_BUT_NOT_USED seq 10 permit 10.0.0.0/8
+!
+!
+route-map SET_LOCALPREF200_eBGP permit 10
+ match ip address prefix-list SET_COMMUNITY_65535:200
+ set local-preference 200
+ match ip address prefix-list USED_BUT_NOT_DEFINED
+ set local-preference 50
+!
+end
