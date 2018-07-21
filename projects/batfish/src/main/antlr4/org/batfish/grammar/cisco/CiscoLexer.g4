@@ -10910,7 +10910,7 @@ SNMP
 SNMP_SERVER_COMMUNITY
 :
    F_Whitespace* 'snmp-server' F_Whitespace+
-   {(lastTokenType == NEWLINE || lastTokenType == -1) && lookAheadString("community".length()).equals("community")}? ->
+   {(lastTokenType == NEWLINE || lastTokenType == -1) && lookAheadString("community ".length()).equals("community ")}? ->
    type ( SNMP_SERVER ) , pushMode ( M_SnmpServerCommunity )
 ;
 
