@@ -4,18 +4,22 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import java.io.Serializable;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import org.batfish.common.util.ComparableStructure;
 
-public final class IkePolicy extends ComparableStructure<String> {
+public final class IkePolicy implements Serializable {
+
+  private static final String PROP_NAME = "name";
 
   private static final String PROP_PROPOSALS = "proposals";
 
   /** */
   private static final long serialVersionUID = 1L;
+
+  private final String _name;
 
   private String _preSharedKeyHash;
 
@@ -25,7 +29,7 @@ public final class IkePolicy extends ComparableStructure<String> {
 
   @JsonCreator
   public IkePolicy(@JsonProperty(PROP_NAME) String name) {
-    super(name);
+    _name = name;
     _proposals = new TreeMap<>();
   }
 
@@ -33,6 +37,11 @@ public final class IkePolicy extends ComparableStructure<String> {
       "SHA-256 hash of salted version of pre-shared-key stored in original configuration")
   public String getPreSharedKeyHash() {
     return _preSharedKeyHash;
+  }
+
+  @JsonProperty(PROP_NAME)
+  public String getName() {
+    return _name;
   }
 
   @JsonProperty(PROP_PROPOSALS)
