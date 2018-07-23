@@ -4,15 +4,17 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import org.batfish.common.util.ComparableStructure;
+import java.io.Serializable;
 
-public class IkeGateway extends ComparableStructure<String> {
+public class IkeGateway implements Serializable {
 
   private static final String PROP_EXTERNAL_INTERFACE = "externalInterface";
 
   private static final String PROP_IKE_POLICY = "ikePolicy";
 
   private static final String PROP_LOCAL_ADDRESS = "localAddress";
+
+  private static final String PROP_NAME = "name";
 
   /** */
   private static final long serialVersionUID = 1L;
@@ -31,11 +33,13 @@ public class IkeGateway extends ComparableStructure<String> {
 
   private String _localId;
 
+  private final String _name;
+
   private String _remoteId;
 
   @JsonCreator
   public IkeGateway(@JsonProperty(PROP_NAME) String name) {
-    super(name);
+    _name = name;
   }
 
   @Override
@@ -114,6 +118,11 @@ public class IkeGateway extends ComparableStructure<String> {
   @JsonPropertyDescription("Local IKE ID used in connection to IKE gateway.")
   public String getLocalId() {
     return _localId;
+  }
+
+  @JsonProperty(PROP_NAME)
+  public String getName() {
+    return _name;
   }
 
   @JsonPropertyDescription("Remote IKE ID of IKE gateway.")
