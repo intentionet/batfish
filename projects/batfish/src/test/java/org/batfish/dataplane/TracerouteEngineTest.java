@@ -213,16 +213,16 @@ public class TracerouteEngineTest {
 
     SortedMap<String, Configuration> configurations =
         ImmutableSortedMap.<String, Configuration>naturalOrder()
-            .put(source.getName(), source)
-            .put(dst.getName(), dst)
-            .put(other.getName(), other)
+            .put(source.getHostname(), source)
+            .put(dst.getHostname(), dst)
+            .put(other.getHostname(), other)
             .build();
     Batfish batfish = BatfishTestUtils.getBatfish(configurations, _tempFolder);
     batfish.computeDataPlane(false);
     DataPlane dp = batfish.loadDataPlane();
     Flow flow =
         Flow.builder()
-            .setIngressNode(source.getName())
+            .setIngressNode(source.getHostname())
             .setSrcIp(new Ip("10.0.0.1"))
             .setDstIp(new Ip("10.0.0.2"))
             .setTag("tag")
@@ -328,12 +328,12 @@ public class TracerouteEngineTest {
         .setAddress(new InterfaceAddress("1.0.0.0/24"))
         .setOutgoingFilter(outgoingFilter)
         .build();
-    SortedMap<String, Configuration> configurations = ImmutableSortedMap.of(c.getName(), c);
+    SortedMap<String, Configuration> configurations = ImmutableSortedMap.of(c.getHostname(), c);
     Batfish b = BatfishTestUtils.getBatfish(configurations, _tempFolder);
     b.computeDataPlane(false);
     Flow flow =
         Flow.builder()
-            .setIngressNode(c.getName())
+            .setIngressNode(c.getHostname())
             .setTag(Batfish.BASE_TESTRIG_TAG)
             .setDstIp(new Ip("1.0.0.1"))
             .build();
@@ -376,12 +376,12 @@ public class TracerouteEngineTest {
         .build();
 
     SortedMap<String, Configuration> configurations =
-        ImmutableSortedMap.of(c1.getName(), c1, c2.getName(), c2);
+        ImmutableSortedMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
     Batfish b = BatfishTestUtils.getBatfish(configurations, _tempFolder);
     b.computeDataPlane(false);
     Flow flow =
         Flow.builder()
-            .setIngressNode(c1.getName())
+            .setIngressNode(c1.getHostname())
             .setTag(Batfish.BASE_TESTRIG_TAG)
             .setDstIp(new Ip("1.0.0.1"))
             .build();
@@ -402,7 +402,7 @@ public class TracerouteEngineTest {
         nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS);
     Configuration c1 = cb.build();
     Batfish batfish =
-        BatfishTestUtils.getBatfish(ImmutableSortedMap.of(c1.getName(), c1), _tempFolder);
+        BatfishTestUtils.getBatfish(ImmutableSortedMap.of(c1.getHostname(), c1), _tempFolder);
     batfish.computeDataPlane(false);
     DataPlane dp = batfish.loadDataPlane();
     TracerouteEngineImpl.getInstance()

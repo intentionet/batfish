@@ -47,7 +47,7 @@ public class CompareSameNameTest {
 
     Batfish batfish =
         BatfishTestUtils.getBatfish(
-            ImmutableSortedMap.of(c1.getName(), c1, c2.getName(), c2), _folder);
+            ImmutableSortedMap.of(c1.getHostname(), c1, c2.getHostname(), c2), _folder);
 
     CompareSameNameQuestion csnQuestion =
         new CompareSameNameQuestion(

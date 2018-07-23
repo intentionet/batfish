@@ -127,7 +127,7 @@ public class NodJobAclTest {
     srcVrf.getStaticRoutes().add(bld.setNextHopIp(new Ip("2.0.0.1")).build());
 
     ImmutableSortedMap<String, Configuration> configs =
-        ImmutableSortedMap.of(srcNode.getName(), srcNode, dstNode.getName(), dstNode);
+        ImmutableSortedMap.of(srcNode.getHostname(), srcNode, dstNode.getHostname(), dstNode);
 
     /* set up data plane */
     TemporaryFolder tmp = new TemporaryFolder();
@@ -262,7 +262,8 @@ public class NodJobAclTest {
         .setOutgoingFilter(matchSrcInterfaceAcl)
         .build();
 
-    ImmutableSortedMap<String, Configuration> configs = ImmutableSortedMap.of(node.getName(), node);
+    ImmutableSortedMap<String, Configuration> configs =
+        ImmutableSortedMap.of(node.getHostname(), node);
 
     /* set up data plane */
     TemporaryFolder tmp = new TemporaryFolder();
@@ -293,8 +294,8 @@ public class NodJobAclTest {
 
     Map<IngressLocation, BooleanExpr> srcIpConstraints =
         ImmutableMap.of(
-            IngressLocation.interfaceLink(node.getName(), iface1), TrueExpr.INSTANCE,
-            IngressLocation.interfaceLink(node.getName(), iface2), TrueExpr.INSTANCE);
+            IngressLocation.interfaceLink(node.getHostname(), iface1), TrueExpr.INSTANCE,
+            IngressLocation.interfaceLink(node.getHostname(), iface2), TrueExpr.INSTANCE);
 
     StandardReachabilityQuerySynthesizer querySynthesizer =
         StandardReachabilityQuerySynthesizer.builder()
@@ -394,7 +395,8 @@ public class NodJobAclTest {
         .setOutgoingFilter(outgoingFilter)
         .build();
 
-    ImmutableSortedMap<String, Configuration> configs = ImmutableSortedMap.of(node.getName(), node);
+    ImmutableSortedMap<String, Configuration> configs =
+        ImmutableSortedMap.of(node.getHostname(), node);
 
     /* set up data plane */
     TemporaryFolder tmp = new TemporaryFolder();

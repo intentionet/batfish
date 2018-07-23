@@ -1078,9 +1078,9 @@ public class PropertyChecker {
       BoolExpr required;
       if (strict) {
         SymbolicRoute best1 =
-            e1.getMainSlice().getSymbolicDecisions().getBestNeighbor().get(conf1.getName());
+            e1.getMainSlice().getSymbolicDecisions().getBestNeighbor().get(conf1.getHostname());
         SymbolicRoute best2 =
-            e2.getMainSlice().getSymbolicDecisions().getBestNeighbor().get(conf2.getName());
+            e2.getMainSlice().getSymbolicDecisions().getBestNeighbor().get(conf2.getHostname());
         // Just pick some protocol for defaults, shouldn't matter for best choice
         required = equal(e2, conf2, best1, best2);
       } else {

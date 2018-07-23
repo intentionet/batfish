@@ -474,7 +474,7 @@ class AbstractionBuilder {
     SortedSet<BgpActivePeerConfig> bgpPeerConfigs =
         new TreeSet<>(Comparator.comparing(BgpActivePeerConfig::getPeerAddress));
 
-    List<GraphEdge> edges = _graph.getEdgeMap().get(conf.getName());
+    List<GraphEdge> edges = _graph.getEdgeMap().get(conf.getHostname());
     for (GraphEdge ge : edges) {
       boolean leavesNetwork = (ge.getPeer() == null);
       if (leavesNetwork

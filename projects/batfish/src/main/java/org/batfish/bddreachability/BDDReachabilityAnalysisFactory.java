@@ -412,7 +412,7 @@ public final class BDDReachabilityAnalysisFactory {
         .map(
             iface -> {
               String aclName = iface.getIncomingFilterName();
-              String nodeName = iface.getOwner().getName();
+              String nodeName = iface.getOwner().getHostname();
               String ifaceName = iface.getName();
 
               BDD aclDenyBDD = _aclDenyBDDs.get(nodeName).get(aclName);
@@ -432,7 +432,7 @@ public final class BDDReachabilityAnalysisFactory {
         .map(
             iface -> {
               String aclName = iface.getIncomingFilterName();
-              String nodeName = iface.getOwner().getName();
+              String nodeName = iface.getOwner().getHostname();
               String vrfName = iface.getVrfName();
               String ifaceName = iface.getName();
 

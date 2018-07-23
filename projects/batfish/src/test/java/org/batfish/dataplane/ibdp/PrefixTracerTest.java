@@ -134,7 +134,7 @@ public class PrefixTracerTest {
         .setRemoteAs(1L)
         .setExportPolicy(policy.getName())
         .build();
-    return ImmutableSortedMap.of(c1.getName(), c1, c2.getName(), c2);
+    return ImmutableSortedMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
   }
 
   /** Test initialization */

@@ -81,7 +81,7 @@ public class PathDiffTest {
       vB.getStaticRoutes().add(rb.setNetwork(pA).setNextHopIp(pAB.getStartIp()).build());
     }
 
-    return ImmutableSortedMap.of(cA.getName(), cA, cB.getName(), cB);
+    return ImmutableSortedMap.of(cA.getHostname(), cA, cB.getHostname(), cB);
   }
 
   @Test

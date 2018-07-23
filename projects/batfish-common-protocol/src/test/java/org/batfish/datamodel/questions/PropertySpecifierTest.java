@@ -59,7 +59,7 @@ public class PropertySpecifierTest {
             new PropertyDescriptor<Configuration>(null, Schema.list(Schema.STRING)));
     assertThat(propertyValueMap, equalTo(ImmutableSet.of("k1", "k2")));
 
-    // other objects should be mapped to their names
+    // other objects should be mapped to their string forms
     Object propertyValueObject =
         PropertySpecifier.convertTypeIfNeeded(
             new Configuration("cname", ConfigurationFormat.CISCO_IOS),

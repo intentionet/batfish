@@ -97,11 +97,11 @@ public class BatfishCompressionTest {
 
     return new TreeMap<>(
         ImmutableSortedMap.of(
-            _compressedNode1.getName(),
+            _compressedNode1.getHostname(),
             _compressedNode1,
-            _compressedNode2.getName(),
+            _compressedNode2.getHostname(),
             _compressedNode2,
-            _compressedNode3.getName(),
+            _compressedNode3.getHostname(),
             _compressedNode3));
   }
 
@@ -196,10 +196,10 @@ public class BatfishCompressionTest {
 
     return new TreeMap<>(
         ImmutableSortedMap.of(
-            cA.getName(), cA,
-            cB.getName(), cB,
-            cC.getName(), cC,
-            cD.getName(), cD));
+            cA.getHostname(), cA,
+            cB.getHostname(), cB,
+            cC.getHostname(), cC,
+            cD.getHostname(), cD));
   }
 
   private DataPlane getDataPlane(SortedMap<String, Configuration> configs) throws IOException {
@@ -244,7 +244,7 @@ public class BatfishCompressionTest {
     v3.getStaticRoutes().add(s31);
 
     return new TreeMap<>(
-        ImmutableSortedMap.of(c1.getName(), c1, c2.getName(), c2, c3.getName(), c3));
+        ImmutableSortedMap.of(c1.getHostname(), c1, c2.getHostname(), c2, c3.getHostname(), c3));
   }
 
   /**

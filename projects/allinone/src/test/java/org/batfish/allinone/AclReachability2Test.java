@@ -91,7 +91,8 @@ public class AclReachability2Test {
     Multiset<Row> expected =
         ImmutableMultiset.of(
             Row.builder()
-                .put(AclLines2Rows.COL_SOURCES, ImmutableList.of(_c1.getName() + ": acl1, acl2"))
+                .put(
+                    AclLines2Rows.COL_SOURCES, ImmutableList.of(_c1.getHostname() + ": acl1, acl2"))
                 .put(AclLines2Rows.COL_LINES, null)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, null)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, null)
@@ -146,7 +147,7 @@ public class AclReachability2Test {
             Row.builder()
                 .put(
                     AclLines2Rows.COL_SOURCES,
-                    ImmutableList.of(_c1.getName() + ": acl0, acl1, acl2"))
+                    ImmutableList.of(_c1.getHostname() + ": acl0, acl1, acl2"))
                 .put(AclLines2Rows.COL_LINES, null)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, null)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, null)
@@ -171,7 +172,7 @@ public class AclReachability2Test {
     Multiset<Row> expected =
         ImmutableMultiset.of(
             Row.builder()
-                .put(AclLines2Rows.COL_SOURCES, ImmutableList.of(_c1.getName() + ": acl"))
+                .put(AclLines2Rows.COL_SOURCES, ImmutableList.of(_c1.getHostname() + ": acl"))
                 .put(AclLines2Rows.COL_LINES, ImmutableList.of(aclLine.toString()))
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, 0)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, ImmutableList.of())
@@ -224,7 +225,7 @@ public class AclReachability2Test {
             Row.builder()
                 .put(
                     AclLines2Rows.COL_SOURCES,
-                    ImmutableList.of(_c1.getName() + ": " + acl.getName()))
+                    ImmutableList.of(_c1.getHostname() + ": " + acl.getName()))
                 .put(AclLines2Rows.COL_LINES, lineNames)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, 1)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, ImmutableList.of(0))
@@ -272,7 +273,7 @@ public class AclReachability2Test {
             Row.builder()
                 .put(
                     AclLines2Rows.COL_SOURCES,
-                    ImmutableList.of(_c1.getName() + ": " + acl.getName()))
+                    ImmutableList.of(_c1.getHostname() + ": " + acl.getName()))
                 .put(AclLines2Rows.COL_LINES, lineNames)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, 2)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, ImmutableList.of())
@@ -319,7 +320,7 @@ public class AclReachability2Test {
             Row.builder()
                 .put(
                     AclLines2Rows.COL_SOURCES,
-                    ImmutableList.of(_c1.getName() + ": " + acl.getName()))
+                    ImmutableList.of(_c1.getHostname() + ": " + acl.getName()))
                 .put(AclLines2Rows.COL_LINES, lineNames)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, 1)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, ImmutableList.of(0))
@@ -334,7 +335,7 @@ public class AclReachability2Test {
             Row.builder()
                 .put(
                     AclLines2Rows.COL_SOURCES,
-                    ImmutableList.of(_c1.getName() + ": " + acl.getName()))
+                    ImmutableList.of(_c1.getHostname() + ": " + acl.getName()))
                 .put(AclLines2Rows.COL_LINES, lineNames)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, 2)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, ImmutableList.of())
@@ -348,7 +349,7 @@ public class AclReachability2Test {
             Row.builder()
                 .put(
                     AclLines2Rows.COL_SOURCES,
-                    ImmutableList.of(_c1.getName() + ": " + acl.getName()))
+                    ImmutableList.of(_c1.getHostname() + ": " + acl.getName()))
                 .put(AclLines2Rows.COL_LINES, lineNames)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, 3)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, ImmutableList.of(0))
@@ -425,7 +426,7 @@ public class AclReachability2Test {
             Row.builder()
                 .put(
                     AclLines2Rows.COL_SOURCES,
-                    ImmutableList.of(_c1.getName() + ": " + acl.getName()))
+                    ImmutableList.of(_c1.getHostname() + ": " + acl.getName()))
                 .put(AclLines2Rows.COL_LINES, lineNames)
                 .put(AclLines2Rows.COL_BLOCKED_LINE_NUM, 1)
                 .put(AclLines2Rows.COL_BLOCKING_LINE_NUMS, ImmutableList.of(0))
@@ -444,7 +445,7 @@ public class AclReachability2Test {
   private TableAnswerElement answer(AclReachability2Question q) throws IOException {
     Batfish batfish =
         BatfishTestUtils.getBatfish(
-            ImmutableSortedMap.of(_c1.getName(), _c1, _c2.getName(), _c2), _folder);
+            ImmutableSortedMap.of(_c1.getHostname(), _c1, _c2.getHostname(), _c2), _folder);
     AclReachability2Answerer answerer = new AclReachability2Answerer(q, batfish);
     return answerer.answer();
   }

@@ -54,8 +54,8 @@ public class SpecifiersQuestionTest {
             .setOwner(c)
             .setAddress(new InterfaceAddress(new Ip("10.0.0.0"), Prefix.MAX_PREFIX_LENGTH))
             .build();
-    _interfaceLocation = new InterfaceLocation(iface.getOwner().getName(), iface.getName());
-    _configs = ImmutableSortedMap.of(c.getName(), c);
+    _interfaceLocation = new InterfaceLocation(iface.getOwner().getHostname(), iface.getName());
+    _configs = ImmutableSortedMap.of(c.getHostname(), c);
     _batfish = BatfishTestUtils.getBatfish(_configs, _folder);
   }
 

@@ -35,7 +35,7 @@ public class SmtReachabilityTwoLinkTest {
     SortedMap<String, Configuration> configs = _batfish.loadConfigurations();
     _dstNode = configs.get(TwoNodeNetworkWithTwoLinks.DST_NODE);
     _srcNode = configs.get(TwoNodeNetworkWithTwoLinks.SRC_NODE);
-    _failureDesc = String.format("link(%s,%s)", _dstNode.getName(), _srcNode.getName());
+    _failureDesc = String.format("link(%s,%s)", _dstNode.getHostname(), _srcNode.getHostname());
   }
 
   /**
@@ -45,8 +45,8 @@ public class SmtReachabilityTwoLinkTest {
   @Test
   public void testOneFailure() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setFailures(1);
 
     final AnswerElement answer = _batfish.smtReachability(question);
@@ -69,8 +69,8 @@ public class SmtReachabilityTwoLinkTest {
   @Test
   public void testOneFailure_negate() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setFailures(1);
     question.setNegate(true);
 
@@ -86,12 +86,12 @@ public class SmtReachabilityTwoLinkTest {
   @Test
   public void testOneFailure_notFailNode1() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setFailures(1);
 
     // Dont allow edges connected to _srcNode to fail
-    question.setNotFailNode1Regex(_srcNode.getName());
+    question.setNotFailNode1Regex(_srcNode.getHostname());
     question.setNotFailNode2Regex(".*");
 
     final AnswerElement answer = _batfish.smtReachability(question);
@@ -105,13 +105,13 @@ public class SmtReachabilityTwoLinkTest {
   @Test
   public void testOneFailure_notFailNode2() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setFailures(1);
 
     // Dont allow edges connected to _srcNode to fail
     question.setNotFailNode1Regex(".*");
-    question.setNotFailNode2Regex(_srcNode.getName());
+    question.setNotFailNode2Regex(_srcNode.getHostname());
 
     final AnswerElement answer = _batfish.smtReachability(question);
     assertThat(answer, instanceOf(SmtReachabilityAnswerElement.class));

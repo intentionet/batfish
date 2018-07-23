@@ -81,7 +81,8 @@ public class NodJobTest {
   }
 
   private NodJob getNodJob(HeaderSpace headerSpace, SrcNattedConstraint srcNatted) {
-    IngressLocation ingressLocation = IngressLocation.vrf(_srcNode.getName(), _srcVrf.getName());
+    IngressLocation ingressLocation =
+        IngressLocation.vrf(_srcNode.getHostname(), _srcVrf.getName());
     Map<IngressLocation, BooleanExpr> srcIpConstraints =
         ImmutableMap.of(ingressLocation, TrueExpr.INSTANCE);
     StandardReachabilityQuerySynthesizer querySynthesizer =
@@ -161,8 +162,8 @@ public class NodJobTest {
 
     _configs =
         ImmutableSortedMap.of(
-            _srcNode.getName(), _srcNode,
-            _dstNode.getName(), _dstNode);
+            _srcNode.getHostname(), _srcNode,
+            _dstNode.getHostname(), _dstNode);
   }
 
   private void setupDataPlane() throws IOException {

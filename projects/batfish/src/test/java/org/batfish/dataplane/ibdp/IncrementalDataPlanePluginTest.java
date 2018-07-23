@@ -728,7 +728,7 @@ public class IncrementalDataPlanePluginTest {
     Topology topology = new Topology(Collections.emptySortedSet());
     ComputeDataPlaneResult dp =
         engine.computeDataPlane(
-            false, ImmutableMap.of(c.getName(), c), topology, Collections.emptySet());
+            false, ImmutableMap.of(c.getHostname(), c), topology, Collections.emptySet());
 
     // generating fibs should not crash
     dp._dataPlane.getFibs();

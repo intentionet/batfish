@@ -30,7 +30,7 @@ public class NodeSpecifierTest {
     Configuration n2 = cb.build();
     Configuration n3 = cb.build();
 
-    _configs = ImmutableMap.of(n1.getName(), n1, n2.getName(), n2, n3.getName(), n3);
+    _configs = ImmutableMap.of(n1.getHostname(), n1, n2.getHostname(), n2, n3.getHostname(), n3);
 
     // create a role that matches just n1
     String roleName = "testRole";
@@ -53,7 +53,7 @@ public class NodeSpecifierTest {
 
   @Test
   public void testDifferenceNodeSpecifier() {
-    String excludedNodeName = _roleNode.getName();
+    String excludedNodeName = _roleNode.getHostname();
     assertThat(
         new DifferenceNodeSpecifier(
                 AllNodesNodeSpecifier.INSTANCE,
@@ -64,7 +64,7 @@ public class NodeSpecifierTest {
 
   @Test
   public void testNameRegexNodeSpecifier() {
-    String name = _roleNode.getName();
+    String name = _roleNode.getHostname();
     Pattern pattern = Pattern.compile(name);
     assertThat(
         new NameRegexNodeSpecifier(pattern).resolve(_context), equalTo(ImmutableSet.of(name)));
@@ -74,6 +74,6 @@ public class NodeSpecifierTest {
   public void testRoleRegexNodeSpecifier() {
     assertThat(
         new RoleRegexNodeSpecifier(_rolePattern, _roleDim).resolve(_context),
-        equalTo(ImmutableSet.of(_roleNode.getName())));
+        equalTo(ImmutableSet.of(_roleNode.getHostname())));
   }
 }

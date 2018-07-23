@@ -44,7 +44,9 @@ public class TestMultipathQuestion {
             contains(
                 allOf(
                     hasColumn(
-                        "node", equalTo(new Node(_testNetwork._srcNode.getName())), Schema.NODE),
+                        "node",
+                        equalTo(new Node(_testNetwork._srcNode.getHostname())),
+                        Schema.NODE),
                     hasColumn(
                         "dstIp", equalTo(TestNetwork.DST_PREFIX_2.getStartIp()), Schema.IP)))));
   }

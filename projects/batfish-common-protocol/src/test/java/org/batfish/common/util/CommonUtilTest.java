@@ -144,17 +144,17 @@ public class CommonUtilTest {
         interfaceOwners,
         hasEntry(
             equalTo(_i1.getAddress().getIp()),
-            hasEntry(equalTo(_i1.getOwner().getName()), contains(_i1.getName()))));
+            hasEntry(equalTo(_i1.getOwner().getHostname()), contains(_i1.getName()))));
     assertThat(
         interfaceOwners,
         hasEntry(
             equalTo(_i2.getAddress().getIp()),
-            hasEntry(equalTo(_i2.getOwner().getName()), contains(_i2.getName()))));
+            hasEntry(equalTo(_i2.getOwner().getHostname()), contains(_i2.getName()))));
     assertThat(
         interfaceOwners,
         hasEntry(
             equalTo(_virtInterfaceAddr.getIp()),
-            hasEntry(equalTo(_i2.getOwner().getName()), contains(_i2.getName()))));
+            hasEntry(equalTo(_i2.getOwner().getHostname()), contains(_i2.getName()))));
   }
 
   /**

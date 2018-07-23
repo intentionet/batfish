@@ -137,9 +137,9 @@ public class NodJobChunkingTest {
 
     _configs =
         ImmutableSortedMap.of(
-            _srcNode1.getName(), _srcNode1,
-            _srcNode2.getName(), _srcNode2,
-            _dstNode.getName(), _dstNode);
+            _srcNode1.getHostname(), _srcNode1,
+            _srcNode2.getHostname(), _srcNode2,
+            _dstNode.getHostname(), _dstNode);
   }
 
   private void setupDataPlane() throws IOException {

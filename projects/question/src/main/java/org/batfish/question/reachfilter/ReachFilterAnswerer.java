@@ -4,6 +4,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class ReachFilterAnswerer extends Answerer {
   @Override
   public AnswerElement answer() {
     ReachFilterQuestion question = (ReachFilterQuestion) _question;
-    List<Pair<Configuration, IpAccessList>> acls = getQueryAcls(question);
+    List<Pair<String, IpAccessList>> acls = getQueryAcls(question);
     if (acls.isEmpty()) {
       throw new BatfishException("No matching filters");
     }
@@ -45,10 +46,11 @@ public class ReachFilterAnswerer extends Answerer {
      * Concatenate the answers for all flows into one big table.
      */
     TableAnswerElement answer = null;
-    for (Pair<Configuration, IpAccessList> pair : acls) {
+    Map<String, Configuration> configurations = _batfish.loadConfigurations();
+    for (Pair<String, IpAccessList> pair : acls) {
       Optional<Flow> result = null;
       try {
-        result = _batfish.reachFilter(pair.getFirst().getName(), pair.getSecond());
+        result = _batfish.reachFilter(pair.getFirst(), pair.getSecond());
       } catch (Throwable t) {
         _batfish.getLogger().warn(t.getMessage());
         continue;
@@ -56,7 +58,7 @@ public class ReachFilterAnswerer extends Answerer {
       if (!result.isPresent()) {
         continue;
       }
-      Configuration config = pair.getFirst();
+      Configuration config = configurations.get(pair.getFirst());
       IpAccessList acl = pair.getSecond();
       Flow flow = result.get();
       if (answer == null) {
@@ -69,9 +71,9 @@ public class ReachFilterAnswerer extends Answerer {
   }
 
   @VisibleForTesting
-  List<Pair<Configuration, IpAccessList>> getQueryAcls(ReachFilterQuestion question) {
+  List<Pair<String, IpAccessList>> getQueryAcls(ReachFilterQuestion question) {
     SortedMap<String, Configuration> configs = _batfish.loadConfigurations();
-    List<Pair<Configuration, IpAccessList>> acls =
+    List<Pair<String, IpAccessList>> acls =
         question
             .getNodesSpecifier()
             .getMatchingNodes(_batfish)
@@ -84,7 +86,7 @@ public class ReachFilterAnswerer extends Answerer {
                         .values()
                         .stream()
                         .filter(acl -> question.getFiltersSpecifier().matches(acl, config))
-                        .map(acl -> new Pair<>(config, acl)))
+                        .map(acl -> new Pair<>(config.getHostname(), acl)))
             .collect(Collectors.toList());
     switch (question.getType()) {
       case PERMIT:
@@ -150,7 +152,7 @@ public class ReachFilterAnswerer extends Answerer {
   TableAnswerElement traceFilter(Configuration config, IpAccessList acl, Flow flow) {
     TraceFiltersQuestion traceFiltersQuestion =
         new TraceFiltersQuestion(
-            new NodesSpecifier(config.getName()), new FiltersSpecifier(acl.getName()));
+            new NodesSpecifier(config.getHostname()), new FiltersSpecifier(acl.getName()));
     traceFiltersQuestion.setDscp(flow.getDscp());
     traceFiltersQuestion.setDst(flow.getDstIp().toString());
     traceFiltersQuestion.setDstPort(flow.getDstPort());

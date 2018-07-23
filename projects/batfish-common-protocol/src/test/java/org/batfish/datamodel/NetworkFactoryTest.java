@@ -28,9 +28,9 @@ public class NetworkFactoryTest {
     Configuration c1 = cb.build();
     Configuration c2 = cb.build();
 
-    assertThat(c1.getName(), is(notNullValue()));
-    assertThat(c2.getName(), is(notNullValue()));
-    assertThat(c1.getName(), not(equalTo(c2.getName())));
+    assertThat(c1.getHostname(), is(notNullValue()));
+    assertThat(c2.getHostname(), is(notNullValue()));
+    assertThat(c1.getHostname(), not(equalTo(c2.getHostname())));
   }
 
   @Test

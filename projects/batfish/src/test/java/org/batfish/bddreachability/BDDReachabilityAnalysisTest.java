@@ -121,7 +121,7 @@ public final class BDDReachabilityAnalysisTest {
     IpSpaceAssignment assignment =
         IpSpaceAssignment.builder()
             .assign(
-                new InterfaceLocation(_net._srcNode.getName(), _net._link1Src.getName()),
+                new InterfaceLocation(_net._srcNode.getHostname(), _net._link1Src.getName()),
                 UniverseIpSpace.INSTANCE)
             .build();
     _graph = _graphFactory.bddReachabilityAnalysis(assignment);
@@ -363,7 +363,7 @@ public final class BDDReachabilityAnalysisTest {
     IpSpaceAssignment assignment =
         IpSpaceAssignment.builder()
             .assign(
-                new InterfaceLocation(_net._srcNode.getName(), _net._link1Src.getName()),
+                new InterfaceLocation(_net._srcNode.getHostname(), _net._link1Src.getName()),
                 SOURCE_NAT_ACL_IP.toIpSpace())
             .build();
 
@@ -392,7 +392,7 @@ public final class BDDReachabilityAnalysisTest {
     IpSpaceAssignment assignment =
         IpSpaceAssignment.builder()
             .assign(
-                new InterfaceLocation(_net._srcNode.getName(), _net._link1Src.getName()),
+                new InterfaceLocation(_net._srcNode.getHostname(), _net._link1Src.getName()),
                 Ip.MAX.toIpSpace())
             .build();
 

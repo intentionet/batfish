@@ -66,7 +66,8 @@ public class OspfNeighborTest {
         .setOspfPassive(true)
         .build();
 
-    Map<String, Configuration> configurations = ImmutableMap.of(c1.getName(), c1, c2.getName(), c2);
+    Map<String, Configuration> configurations =
+        ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
     Map<Ip, Set<String>> ipOwners = CommonUtil.computeIpNodeOwners(configurations, true);
     Topology topology = CommonUtil.synthesizeTopology(configurations);
     CommonUtil.initRemoteOspfNeighbors(configurations, ipOwners, topology);

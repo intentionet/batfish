@@ -149,6 +149,7 @@ public final class TestNetwork {
             bld.setNetwork(DST_PREFIX_2).setNextHopIp(LINK_1_NETWORK.getEndIp()).build(),
             bld.setNetwork(DST_PREFIX_2).setNextHopIp(LINK_2_NETWORK.getEndIp()).build()));
 
-    _configs = ImmutableSortedMap.of(_srcNode.getName(), _srcNode, _dstNode.getName(), _dstNode);
+    _configs =
+        ImmutableSortedMap.of(_srcNode.getHostname(), _srcNode, _dstNode.getHostname(), _dstNode);
   }
 }

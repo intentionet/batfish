@@ -32,7 +32,7 @@ public class Edge extends Pair<NodeInterfacePair, NodeInterfacePair> {
   }
 
   public Edge(Interface i1, Interface i2) {
-    this(i1.getOwner().getName(), i1.getName(), i2.getOwner().getName(), i2.getName());
+    this(i1.getOwner().getHostname(), i1.getName(), i2.getOwner().getHostname(), i2.getName());
   }
 
   @JsonProperty(PROP_INT1)

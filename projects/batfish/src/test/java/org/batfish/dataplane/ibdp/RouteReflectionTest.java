@@ -210,9 +210,9 @@ public class RouteReflectionTest {
 
     SortedMap<String, Configuration> configurations =
         new ImmutableSortedMap.Builder<String, Configuration>(String::compareTo)
-            .put(edge1.getName(), edge1)
-            .put(rr.getName(), rr)
-            .put(edge2.getName(), edge2)
+            .put(edge1.getHostname(), edge1)
+            .put(rr.getHostname(), rr)
+            .put(edge2.getHostname(), edge2)
             .build();
     IncrementalBdpEngine engine =
         new IncrementalBdpEngine(
@@ -228,7 +228,7 @@ public class RouteReflectionTest {
             ImmutableSet.of(
                 _ab.setAsPath(AsPath.ofSingletonAsSets(1L))
                     .setDstIp(edge1EbgpIfaceIp)
-                    .setDstNode(edge1.getName())
+                    .setDstNode(edge1.getHostname())
                     .setNetwork(AS1_PREFIX)
                     .setNextHopIp(as1PeeringIp)
                     .setOriginatorIp(as1PeeringIp)
@@ -237,7 +237,7 @@ public class RouteReflectionTest {
                     .build(),
                 _ab.setAsPath(AsPath.ofSingletonAsSets(3L))
                     .setDstIp(edge2EbgpIfaceIp)
-                    .setDstNode(edge2.getName())
+                    .setDstNode(edge2.getHostname())
                     .setNetwork(AS3_PREFIX)
                     .setNextHopIp(as3PeeringIp)
                     .setOriginatorIp(as3PeeringIp)
@@ -337,9 +337,9 @@ public class RouteReflectionTest {
 
     SortedMap<String, Configuration> configurations =
         new ImmutableSortedMap.Builder<String, Configuration>(String::compareTo)
-            .put(edge1.getName(), edge1)
-            .put(rr1.getName(), rr1)
-            .put(rr2.getName(), rr2)
+            .put(edge1.getHostname(), edge1)
+            .put(rr1.getHostname(), rr1)
+            .put(rr2.getHostname(), rr2)
             .build();
     IncrementalBdpEngine engine =
         new IncrementalBdpEngine(
@@ -356,7 +356,7 @@ public class RouteReflectionTest {
                     ImmutableSet.of(
                         _ab.setAsPath(AsPath.ofSingletonAsSets(1L))
                             .setDstIp(edge1EbgpIfaceIp)
-                            .setDstNode(edge1.getName())
+                            .setDstNode(edge1.getHostname())
                             .setNetwork(AS1_PREFIX)
                             .setNextHopIp(as1PeeringIp)
                             .setOriginatorIp(as1PeeringIp)

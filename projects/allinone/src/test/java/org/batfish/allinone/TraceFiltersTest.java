@@ -91,7 +91,8 @@ public class TraceFiltersTest {
             .setName("acl2")
             .build();
 
-    Batfish batfish = BatfishTestUtils.getBatfish(ImmutableSortedMap.of(_c.getName(), _c), _folder);
+    Batfish batfish =
+        BatfishTestUtils.getBatfish(ImmutableSortedMap.of(_c.getHostname(), _c), _folder);
 
     assertThat(_c, hasIpAccessLists(hasEntry(referencedAcl.getName(), referencedAcl)));
     assertThat(_c, hasIpAccessLists(hasEntry(acl.getName(), acl)));
@@ -147,7 +148,8 @@ public class TraceFiltersTest {
 
     Batfish batfish =
         BatfishTestUtils.getBatfish(
-            ImmutableSortedMap.of(c1.getName(), c1, c2.getName(), c2, c3.getName(), c3), _folder);
+            ImmutableSortedMap.of(c1.getHostname(), c1, c2.getHostname(), c2, c3.getHostname(), c3),
+            _folder);
     TraceFiltersQuestion question =
         new TraceFiltersQuestion(NodesSpecifier.ALL, FiltersSpecifier.ALL);
     TraceFiltersAnswerer answerer = new TraceFiltersAnswerer(question, batfish);

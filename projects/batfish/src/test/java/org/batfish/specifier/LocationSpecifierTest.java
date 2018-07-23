@@ -172,7 +172,7 @@ public class LocationSpecifierTest {
   public void testNodeNameRegexInterfaceLocationSpecifiers() {
     Configuration config = _testConfigs.values().iterator().next();
     List<Interface> ifaces = ImmutableList.copyOf(config.getInterfaces().values());
-    Pattern pat = Pattern.compile(config.getName());
+    Pattern pat = Pattern.compile(config.getHostname());
 
     assertThat(
         new NodeNameRegexInterfaceLocationSpecifier(pat).resolve(_context),

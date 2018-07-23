@@ -243,10 +243,10 @@ public class OspfTest {
 
     SortedMap<String, Configuration> configurations =
         new ImmutableSortedMap.Builder<String, Configuration>(String::compareTo)
-            .put(c1.getName(), c1)
-            .put(c2.getName(), c2)
-            .put(c3.getName(), c3)
-            .put(c4.getName(), c4)
+            .put(c1.getHostname(), c1)
+            .put(c2.getHostname(), c2)
+            .put(c3.getHostname(), c3)
+            .put(c4.getHostname(), c4)
             .build();
     IncrementalBdpEngine engine =
         new IncrementalBdpEngine(

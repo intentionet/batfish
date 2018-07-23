@@ -118,7 +118,7 @@ public class SynthesizerInputImplTest {
     SynthesizerInput inputWithoutDataPlane =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(srcNode.getName(), srcNode, nextHop.getName(), nextHop))
+                ImmutableMap.of(srcNode.getHostname(), srcNode, nextHop.getHostname(), nextHop))
             .build();
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
@@ -150,18 +150,18 @@ public class SynthesizerInputImplTest {
         hasAclActions(
             equalTo(
                 ImmutableMap.of(
-                    srcNode.getName(),
+                    srcNode.getHostname(),
                     expectedSrcNodeWithoutDataPlane,
-                    nextHop.getName(),
+                    nextHop.getHostname(),
                     expectedNextHop))));
     assertThat(
         inputWithoutDataPlane,
         hasAclActions(
             equalTo(
                 ImmutableMap.of(
-                    srcNode.getName(),
+                    srcNode.getHostname(),
                     expectedSrcNodeWithoutDataPlane,
-                    nextHop.getName(),
+                    nextHop.getHostname(),
                     expectedNextHop))));
   }
 
@@ -188,7 +188,7 @@ public class SynthesizerInputImplTest {
     _ib.setOutgoingFilter(null);
 
     SynthesizerInput input =
-        _inputBuilder.setConfigurations(ImmutableMap.of(c.getName(), c)).build();
+        _inputBuilder.setConfigurations(ImmutableMap.of(c.getHostname(), c)).build();
     AclLineMatchExprToBooleanExpr aclLineMatchExprToBooleanExpr =
         new AclLineMatchExprToBooleanExpr(
             ImmutableMap.of(), ImmutableMap.of(), null, ImmutableMap.of());
@@ -198,7 +198,7 @@ public class SynthesizerInputImplTest {
         hasAclConditions(
             equalTo(
                 ImmutableMap.of(
-                    c.getName(),
+                    c.getHostname(),
                     ImmutableMap.of(
                         aclWithoutLines.getName(),
                         ImmutableList.of(),
@@ -239,7 +239,7 @@ public class SynthesizerInputImplTest {
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(srcNode.getName(), srcNode, nextHop.getName(), nextHop))
+                ImmutableMap.of(srcNode.getHostname(), srcNode, nextHop.getHostname(), nextHop))
             .setForwardingAnalysis(MockForwardingAnalysis.builder().build())
             .setTopology(
                 new Topology(
@@ -251,11 +251,11 @@ public class SynthesizerInputImplTest {
         hasAclConditions(
             equalTo(
                 ImmutableMap.of(
-                    srcNode.getName(),
+                    srcNode.getHostname(),
                     ImmutableMap.of(
                         sourceNat1Acl.getName(), ImmutableList.of(),
                         sourceNat2Acl.getName(), ImmutableList.of()),
-                    nextHop.getName(),
+                    nextHop.getHostname(),
                     ImmutableMap.of()))));
   }
 
@@ -280,7 +280,7 @@ public class SynthesizerInputImplTest {
         new Edge(srcNode.getHostname(), srcInterface.getName(), nextHop2, nextHopInterface2);
 
     SynthesizerInput inputWithoutDataPlane =
-        _inputBuilder.setConfigurations(ImmutableMap.of(srcNode.getName(), srcNode)).build();
+        _inputBuilder.setConfigurations(ImmutableMap.of(srcNode.getHostname(), srcNode)).build();
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
             .setForwardingAnalysis(
@@ -322,7 +322,7 @@ public class SynthesizerInputImplTest {
     SynthesizerInput inputWithoutDataPlane =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(srcNode.getName(), srcNode, nextHop.getName(), nextHop))
+                ImmutableMap.of(srcNode.getHostname(), srcNode, nextHop.getHostname(), nextHop))
             .build();
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
@@ -354,36 +354,40 @@ public class SynthesizerInputImplTest {
     SynthesizerInput input =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(cEnabled.getName(), cEnabled, cDisabled.getName(), cDisabled))
-            .setDisabledNodes(ImmutableSet.of(cDisabled.getName()))
+                ImmutableMap.of(
+                    cEnabled.getHostname(), cEnabled, cDisabled.getHostname(), cDisabled))
+            .setDisabledNodes(ImmutableSet.of(cDisabled.getHostname()))
             .setDisabledVrfs(
-                ImmutableMap.of(cEnabled.getName(), ImmutableSet.of(vDisabledViaVrf.getName())))
+                ImmutableMap.of(cEnabled.getHostname(), ImmutableSet.of(vDisabledViaVrf.getName())))
             .setDisabledInterfaces(
                 ImmutableMap.of(
-                    cEnabled.getName(), ImmutableSet.of(iDisabledViaInterface.getName())))
+                    cEnabled.getHostname(), ImmutableSet.of(iDisabledViaInterface.getName())))
             .build();
 
     assertThat(
         input,
-        hasEnabledInterfaces(hasEntry(equalTo(cEnabled.getName()), hasItem(iEnabled.getName()))));
-    assertThat(
-        input,
         hasEnabledInterfaces(
-            hasEntry(equalTo(cEnabled.getName()), not(hasItem(iDisabledViaInactive.getName())))));
+            hasEntry(equalTo(cEnabled.getHostname()), hasItem(iEnabled.getName()))));
     assertThat(
         input,
         hasEnabledInterfaces(
             hasEntry(
-                equalTo(cEnabled.getName()), not(hasItem(iDisabledViaBlacklisted.getName())))));
+                equalTo(cEnabled.getHostname()), not(hasItem(iDisabledViaInactive.getName())))));
     assertThat(
         input,
         hasEnabledInterfaces(
-            hasEntry(equalTo(cEnabled.getName()), not(hasItem(iDisabledViaInterface.getName())))));
+            hasEntry(
+                equalTo(cEnabled.getHostname()), not(hasItem(iDisabledViaBlacklisted.getName())))));
     assertThat(
         input,
         hasEnabledInterfaces(
-            hasEntry(equalTo(cEnabled.getName()), not(hasItem(iDisabledViaVrf.getName())))));
-    assertThat(input, hasEnabledInterfaces(not(hasKey(cDisabled.getName()))));
+            hasEntry(
+                equalTo(cEnabled.getHostname()), not(hasItem(iDisabledViaInterface.getName())))));
+    assertThat(
+        input,
+        hasEnabledInterfaces(
+            hasEntry(equalTo(cEnabled.getHostname()), not(hasItem(iDisabledViaVrf.getName())))));
+    assertThat(input, hasEnabledInterfaces(not(hasKey(cDisabled.getHostname()))));
   }
 
   @Test
@@ -393,12 +397,13 @@ public class SynthesizerInputImplTest {
     SynthesizerInput input =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(cEnabled.getName(), cEnabled, cDisabled.getName(), cDisabled))
-            .setDisabledNodes(ImmutableSet.of(cDisabled.getName()))
+                ImmutableMap.of(
+                    cEnabled.getHostname(), cEnabled, cDisabled.getHostname(), cDisabled))
+            .setDisabledNodes(ImmutableSet.of(cDisabled.getHostname()))
             .build();
 
-    assertThat(input, hasEnabledNodes(hasItem(cEnabled.getName())));
-    assertThat(input, hasEnabledNodes(not(hasItem(cDisabled.getName()))));
+    assertThat(input, hasEnabledNodes(hasItem(cEnabled.getHostname())));
+    assertThat(input, hasEnabledNodes(not(hasItem(cDisabled.getHostname()))));
   }
 
   @Test
@@ -412,19 +417,21 @@ public class SynthesizerInputImplTest {
     SynthesizerInput input =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(cEnabled.getName(), cEnabled, cDisabled.getName(), cDisabled))
-            .setDisabledNodes(ImmutableSet.of(cDisabled.getName()))
+                ImmutableMap.of(
+                    cEnabled.getHostname(), cEnabled, cDisabled.getHostname(), cDisabled))
+            .setDisabledNodes(ImmutableSet.of(cDisabled.getHostname()))
             .setDisabledVrfs(
-                ImmutableMap.of(cEnabled.getName(), ImmutableSet.of(vDisabledViaVrf.getName())))
+                ImmutableMap.of(cEnabled.getHostname(), ImmutableSet.of(vDisabledViaVrf.getName())))
             .build();
 
     assertThat(
-        input, hasEnabledVrfs(hasEntry(equalTo(cEnabled.getName()), hasItem(vEnabled.getName()))));
+        input,
+        hasEnabledVrfs(hasEntry(equalTo(cEnabled.getHostname()), hasItem(vEnabled.getName()))));
     assertThat(
         input,
         hasEnabledVrfs(
-            hasEntry(equalTo(cEnabled.getName()), not(hasItem(vDisabledViaVrf.getName())))));
-    assertThat(input, hasEnabledVrfs(not(hasKey(cDisabled.getName()))));
+            hasEntry(equalTo(cEnabled.getHostname()), not(hasItem(vDisabledViaVrf.getName())))));
+    assertThat(input, hasEnabledVrfs(not(hasKey(cDisabled.getHostname()))));
   }
 
   @Test
@@ -447,7 +454,7 @@ public class SynthesizerInputImplTest {
         .setActive(false)
         .build();
     SynthesizerInput inputWithoutDataPlane =
-        _inputBuilder.setConfigurations(ImmutableMap.of(c.getName(), c)).build();
+        _inputBuilder.setConfigurations(ImmutableMap.of(c.getHostname(), c)).build();
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
             .setForwardingAnalysis(MockForwardingAnalysis.builder().build())
@@ -458,7 +465,7 @@ public class SynthesizerInputImplTest {
     assertThat(
         inputWithDataPlane,
         hasIpsByHostname(
-            equalTo(ImmutableMap.of(c.getName(), ImmutableSet.of(ipEnabled1, ipEnabled2)))));
+            equalTo(ImmutableMap.of(c.getHostname(), ImmutableSet.of(ipEnabled1, ipEnabled2)))));
   }
 
   /** Hosts that own no IPs should be assigned an empty set by computeIpsByHostname */
@@ -470,13 +477,13 @@ public class SynthesizerInputImplTest {
 
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
-            .setConfigurations(ImmutableMap.of(c.getName(), c))
+            .setConfigurations(ImmutableMap.of(c.getHostname(), c))
             .setForwardingAnalysis(MockForwardingAnalysis.builder().build())
             .setTopology(new Topology(ImmutableSortedSet.of()))
             .build();
     assertThat(
         inputWithDataPlane,
-        hasIpsByHostname(equalTo(ImmutableMap.of(c.getName(), ImmutableSet.of()))));
+        hasIpsByHostname(equalTo(ImmutableMap.of(c.getHostname(), ImmutableSet.of()))));
   }
 
   @Test
@@ -493,14 +500,14 @@ public class SynthesizerInputImplTest {
         dstIpSpace.accept(new IpSpaceBooleanExprTransformer(ImmutableMap.of(), Field.DST_IP));
 
     SynthesizerInput inputWithoutDataPlane =
-        _inputBuilder.setConfigurations(ImmutableMap.of(node.getName(), node)).build();
+        _inputBuilder.setConfigurations(ImmutableMap.of(node.getHostname(), node)).build();
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
             .setForwardingAnalysis(
                 MockForwardingAnalysis.builder()
                     .setNeighborUnreachable(
                         ImmutableMap.of(
-                            node.getName(),
+                            node.getHostname(),
                             ImmutableMap.of(
                                 vrf.getName(),
                                 ImmutableMap.of(
@@ -553,7 +560,7 @@ public class SynthesizerInputImplTest {
     SynthesizerInput inputWithoutDataPlane =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(srcNode.getName(), srcNode, nextHop.getName(), nextHop))
+                ImmutableMap.of(srcNode.getHostname(), srcNode, nextHop.getHostname(), nextHop))
             .build();
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
@@ -568,20 +575,20 @@ public class SynthesizerInputImplTest {
         inputWithDataPlane,
         hasSourceNats(
             hasEntry(
-                equalTo(srcNode.getName()),
+                equalTo(srcNode.getHostname()),
                 hasEntry(
                     equalTo(srcInterfaceZeroSourceNats.getName()), equalTo(ImmutableList.of())))));
     assertThat(
         inputWithDataPlane,
         hasSourceNats(
             hasEntry(
-                equalTo(srcNode.getName()),
+                equalTo(srcNode.getHostname()),
                 hasEntry(
                     equalTo(srcInterfaceOneSourceNat.getName()),
                     equalTo(
                         ImmutableList.of(
                             immutableEntry(
-                                new AclPermit(srcNode.getName(), sourceNat1Acl.getName()),
+                                new AclPermit(srcNode.getHostname(), sourceNat1Acl.getName()),
                                 new RangeMatchExpr(
                                     new TransformedVarIntExpr(Field.SRC_IP),
                                     Field.SRC_IP.getSize(),
@@ -591,19 +598,19 @@ public class SynthesizerInputImplTest {
         inputWithDataPlane,
         hasSourceNats(
             hasEntry(
-                equalTo(srcNode.getName()),
+                equalTo(srcNode.getHostname()),
                 hasEntry(
                     equalTo(srcInterfaceTwoSourceNats.getName()),
                     equalTo(
                         ImmutableList.of(
                             immutableEntry(
-                                new AclPermit(srcNode.getName(), sourceNat1Acl.getName()),
+                                new AclPermit(srcNode.getHostname(), sourceNat1Acl.getName()),
                                 new RangeMatchExpr(
                                     new TransformedVarIntExpr(Field.SRC_IP),
                                     Field.SRC_IP.getSize(),
                                     ImmutableSet.of(Range.closed(ip11.asLong(), ip12.asLong())))),
                             immutableEntry(
-                                new AclPermit(srcNode.getName(), sourceNat2Acl.getName()),
+                                new AclPermit(srcNode.getHostname(), sourceNat2Acl.getName()),
                                 new RangeMatchExpr(
                                     new TransformedVarIntExpr(Field.SRC_IP),
                                     Field.SRC_IP.getSize(),
@@ -626,7 +633,7 @@ public class SynthesizerInputImplTest {
     SynthesizerInput inputWithoutDataPlane =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(srcNode.getName(), srcNode, nextHop.getName(), nextHop))
+                ImmutableMap.of(srcNode.getHostname(), srcNode, nextHop.getHostname(), nextHop))
             .build();
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
@@ -637,15 +644,15 @@ public class SynthesizerInputImplTest {
     assertThat(
         inputWithDataPlane,
         hasTopologyInterfaces(
-            hasEntry(equalTo(srcNode.getName()), hasItem(srcInterface.getName()))));
+            hasEntry(equalTo(srcNode.getHostname()), hasItem(srcInterface.getName()))));
     assertThat(
         inputWithDataPlane,
         hasTopologyInterfaces(
-            hasEntry(equalTo(srcNode.getName()), not(hasItem(iNoEdge.getName())))));
+            hasEntry(equalTo(srcNode.getHostname()), not(hasItem(iNoEdge.getName())))));
     assertThat(
         inputWithDataPlane,
         hasTopologyInterfaces(
-            hasEntry(equalTo(nextHop.getName()), hasItem(nextHopInterface.getName()))));
+            hasEntry(equalTo(nextHop.getHostname()), hasItem(nextHopInterface.getName()))));
     assertThat(inputWithoutDataPlane, hasTopologyInterfaces(nullValue()));
   }
 
@@ -662,9 +669,9 @@ public class SynthesizerInputImplTest {
     assertThat(config, hasIpAccessLists(hasEntry(equalTo("acl1"), equalTo(acl1))));
     assertThat(config, hasIpAccessLists(hasEntry(equalTo("acl2"), equalTo(acl2))));
 
-    Map<String, Configuration> configurations = ImmutableMap.of(config.getName(), config);
+    Map<String, Configuration> configurations = ImmutableMap.of(config.getHostname(), config);
     Map<String, Set<String>> enabledAcls =
-        ImmutableMap.of(config.getName(), ImmutableSet.of(acl1.getName()));
+        ImmutableMap.of(config.getHostname(), ImmutableSet.of(acl1.getName()));
     SynthesizerInputImpl inputImpl =
         SynthesizerInputImpl.builder()
             .setConfigurations(configurations)
@@ -674,13 +681,13 @@ public class SynthesizerInputImplTest {
     // ACL actions and ACL conditions should both contain acl1 and not acl2.
     assertThat(
         inputImpl.getAclActions(),
-        hasEntry(equalTo(config.getName()), hasKey(equalTo(acl1.getName()))));
-    assertThat(inputImpl.getAclActions().get(config.getName()).size(), equalTo(1));
+        hasEntry(equalTo(config.getHostname()), hasKey(equalTo(acl1.getName()))));
+    assertThat(inputImpl.getAclActions().get(config.getHostname()).size(), equalTo(1));
 
     assertThat(
         inputImpl.getAclConditions(),
-        hasEntry(equalTo(config.getName()), hasKey(equalTo(acl1.getName()))));
-    assertThat(inputImpl.getAclConditions().get(config.getName()).size(), equalTo(1));
+        hasEntry(equalTo(config.getHostname()), hasKey(equalTo(acl1.getName()))));
+    assertThat(inputImpl.getAclConditions().get(config.getHostname()).size(), equalTo(1));
   }
 
   /**
@@ -705,7 +712,7 @@ public class SynthesizerInputImplTest {
     SynthesizerInput inputWithDataPlane =
         _inputBuilder
             .setConfigurations(
-                ImmutableMap.of(srcNode.getName(), srcNode, nextHop.getName(), nextHop))
+                ImmutableMap.of(srcNode.getHostname(), srcNode, nextHop.getHostname(), nextHop))
             .setForwardingAnalysis(MockForwardingAnalysis.builder().build())
             .setTopology(new Topology(ImmutableSortedSet.of(forwardEdge, backEdge)))
             .build();
@@ -715,7 +722,7 @@ public class SynthesizerInputImplTest {
         inputWithDataPlane,
         hasSourceNats(
             hasEntry(
-                equalTo(srcNode.getName()),
+                equalTo(srcNode.getHostname()),
                 hasEntry(
                     equalTo(srcInterfaceOneSourceNat.getName()),
                     equalTo(

@@ -64,10 +64,11 @@ public class Utils {
       if (securityGroup == null) {
         warnings.pedantic(
             String.format(
-                "Security group \"%s\" for \"%s\" not found", sGroupId, configuration.getName()));
+                "Security group \"%s\" for \"%s\" not found",
+                sGroupId, configuration.getHostname()));
         continue;
       }
-      region.updateConfigurationSecurityGroups(configuration.getName(), securityGroup);
+      region.updateConfigurationSecurityGroups(configuration.getHostname(), securityGroup);
 
       securityGroup.updateConfigIps(configuration);
     }

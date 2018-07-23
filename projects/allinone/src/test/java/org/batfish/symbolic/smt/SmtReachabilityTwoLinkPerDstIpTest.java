@@ -63,7 +63,7 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
     _dstNode = configs.get(TwoNodeNetworkWithTwoLinks.DST_NODE);
     _srcNode = configs.get(TwoNodeNetworkWithTwoLinks.SRC_NODE);
 
-    _failureDesc = String.format("link(%s,%s)", _dstNode.getName(), _srcNode.getName());
+    _failureDesc = String.format("link(%s,%s)", _dstNode.getHostname(), _srcNode.getHostname());
   }
 
   private static final List<Ip> DST_IPS =
@@ -85,8 +85,8 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
   @Test
   public void testNoFailures() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setDstIps(ImmutableSet.of(new IpWildcard(_dstIp)));
     final AnswerElement answer = _batfish.smtReachability(question);
     assertThat(answer, instanceOf(SmtReachabilityAnswerElement.class));
@@ -105,8 +105,8 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
   @Test
   public void testNoFailures_negate() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
 
     // verify unreachability, which is false (we'll get a counterexample).
     question.setNegate(true);
@@ -136,8 +136,8 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
   @Test
   public void testOneFailure() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setDstIps(ImmutableSet.of(new IpWildcard(_dstIp)));
     question.setFailures(1); // at most 1 failure
 
@@ -160,8 +160,8 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
   @Test
   public void testOneFailure_negate() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setDstIps(ImmutableSet.of(new IpWildcard(_dstIp)));
     question.setFailures(1);
     question.setNegate(true);
@@ -178,8 +178,8 @@ public class SmtReachabilityTwoLinkPerDstIpTest {
   @Test
   public void testOneFailure_notDstIp() {
     final ReachabilityQuestion question = new ReachabilityQuestion();
-    question.setIngressNodeRegex(_srcNode.getName());
-    question.setFinalNodeRegex(_dstNode.getName());
+    question.setIngressNodeRegex(_srcNode.getHostname());
+    question.setFinalNodeRegex(_dstNode.getHostname());
     question.setNotDstIps(ImmutableSet.of(new IpWildcard(_dstIp)));
     question.setFailures(1);
 

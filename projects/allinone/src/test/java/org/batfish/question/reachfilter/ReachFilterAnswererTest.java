@@ -154,7 +154,7 @@ public final class ReachFilterAnswererTest {
         .putAll(ImmutableMap.of(ACL.getName(), ACL, BLOCKED_LINE_ACL.getName(), BLOCKED_LINE_ACL));
 
     SortedMap<String, Configuration> configurationMap =
-        ImmutableSortedMap.of(_config.getName(), _config);
+        ImmutableSortedMap.of(_config.getHostname(), _config);
 
     _batfish = BatfishTestUtils.getBatfish(configurationMap, _tmp);
   }
@@ -166,11 +166,11 @@ public final class ReachFilterAnswererTest {
     question.setNodesSpecifier(new NodesSpecifier(".*"));
     question.setFiltersSpecifier(new FiltersSpecifier(ACL.getName()));
     ReachFilterAnswerer answerer = new ReachFilterAnswerer(question, _batfish);
-    List<Pair<Configuration, IpAccessList>> queryAcls = answerer.getQueryAcls(question);
+    List<Pair<String, IpAccessList>> queryAcls = answerer.getQueryAcls(question);
     assertThat(queryAcls, hasSize(1));
-    Configuration queryConfig = queryAcls.get(0).getFirst();
+    String queryConfig = queryAcls.get(0).getFirst();
     IpAccessList queryAcl = queryAcls.get(0).getSecond();
-    assertThat(queryConfig, is(_config));
+    assertThat(queryConfig, equalTo(_config.getHostname()));
     assertThat(queryAcl, is(ACL));
   }
 
@@ -181,11 +181,11 @@ public final class ReachFilterAnswererTest {
     question.setNodesSpecifier(new NodesSpecifier(".*"));
     question.setFiltersSpecifier(new FiltersSpecifier(ACL.getName()));
     ReachFilterAnswerer answerer = new ReachFilterAnswerer(question, _batfish);
-    List<Pair<Configuration, IpAccessList>> queryAcls = answerer.getQueryAcls(question);
+    List<Pair<String, IpAccessList>> queryAcls = answerer.getQueryAcls(question);
     assertThat(queryAcls, hasSize(1));
-    Configuration queryConfig = queryAcls.get(0).getFirst();
+    String queryConfig = queryAcls.get(0).getFirst();
     IpAccessList queryAcl = queryAcls.get(0).getSecond();
-    assertThat(queryConfig, is(_config));
+    assertThat(queryConfig, equalTo(_config.getHostname()));
     assertThat(queryAcl, is(DENY_ACL));
   }
 
@@ -196,67 +196,69 @@ public final class ReachFilterAnswererTest {
     question.setNodesSpecifier(new NodesSpecifier(".*"));
     question.setFiltersSpecifier(new FiltersSpecifier(ACL.getName()));
     ReachFilterAnswerer answerer = new ReachFilterAnswerer(question, _batfish);
-    List<Pair<Configuration, IpAccessList>> queryAcls = answerer.getQueryAcls(question);
+    List<Pair<String, IpAccessList>> queryAcls = answerer.getQueryAcls(question);
     assertThat(queryAcls, hasSize(1));
-    Configuration queryConfig = queryAcls.get(0).getFirst();
+    String queryConfig = queryAcls.get(0).getFirst();
     IpAccessList queryAcl = queryAcls.get(0).getSecond();
-    assertThat(queryConfig, is(_config));
+    assertThat(queryConfig, equalTo(_config.getHostname()));
     assertThat(queryAcl, is(MATCH_LINE2_ACL));
   }
 
   @Test
   public void testReachFilter_deny_ACCEPT_ALL() {
-    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getName(), toDenyAcl(ACCEPT_ALL_ACL));
+    Optional<Flow> permitFlow =
+        _batfish.reachFilter(_config.getHostname(), toDenyAcl(ACCEPT_ALL_ACL));
     assertThat("Should not find permitted flow", !permitFlow.isPresent());
   }
 
   @Test
   public void testReachFilter_deny_REJECT_ALL() {
-    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getName(), toDenyAcl(REJECT_ALL_ACL));
+    Optional<Flow> permitFlow =
+        _batfish.reachFilter(_config.getHostname(), toDenyAcl(REJECT_ALL_ACL));
     assertThat("Should find permitted flow", permitFlow.isPresent());
   }
 
   @Test
   public void testReachFilter_permit_ACCEPT_ALL() {
-    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getName(), ACCEPT_ALL_ACL);
+    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getHostname(), ACCEPT_ALL_ACL);
     assertThat("Should find permitted flow", permitFlow.isPresent());
   }
 
   @Test
   public void testReachFilter_permit_REJECT_ALL() {
-    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getName(), REJECT_ALL_ACL);
+    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getHostname(), REJECT_ALL_ACL);
     assertThat(permitFlow, equalTo(Optional.empty()));
   }
 
   @Test
   public void testReachFilter_permit() {
-    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getName(), ACL);
+    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getHostname(), ACL);
     assertThat("Should find permitted flow", permitFlow.isPresent());
     assertThat(permitFlow.get(), hasDstIp(oneOf(IP0, IP3)));
   }
 
   @Test
   public void testReachFilter_deny() {
-    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getName(), toDenyAcl(ACL));
+    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getHostname(), toDenyAcl(ACL));
     assertThat("Should find permitted flow", permitFlow.isPresent());
     assertThat(permitFlow.get(), hasDstIp(not(oneOf(IP0, IP3))));
   }
 
   @Test
   public void testReachFilter_matchLine() {
-    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getName(), toMatchLineAcl(0, ACL));
+    Optional<Flow> permitFlow = _batfish.reachFilter(_config.getHostname(), toMatchLineAcl(0, ACL));
     assertThat("Should find permitted flow", permitFlow.isPresent());
     assertThat(permitFlow.get(), hasDstIp(IP0));
 
-    permitFlow = _batfish.reachFilter(_config.getName(), toMatchLineAcl(1, ACL));
+    permitFlow = _batfish.reachFilter(_config.getHostname(), toMatchLineAcl(1, ACL));
     assertThat("Should find permitted flow", permitFlow.isPresent());
     assertThat(permitFlow.get(), hasDstIp(IP1));
 
-    permitFlow = _batfish.reachFilter(_config.getName(), toMatchLineAcl(2, ACL));
+    permitFlow = _batfish.reachFilter(_config.getHostname(), toMatchLineAcl(2, ACL));
     assertThat("Should find permitted flow", permitFlow.isPresent());
     assertThat(permitFlow.get(), hasDstIp(IP2));
 
-    permitFlow = _batfish.reachFilter(_config.getName(), toMatchLineAcl(3, ACL));
+    permitFlow = _batfish.reachFilter(_config.getHostname(), toMatchLineAcl(3, ACL));
     assertThat("Should find permitted flow", permitFlow.isPresent());
     assertThat(permitFlow.get(), hasDstIp(IP3));
   }
@@ -264,7 +266,7 @@ public final class ReachFilterAnswererTest {
   @Test
   public void testReachFilter_matchLine_blocked() {
     Optional<Flow> permitFlow =
-        _batfish.reachFilter(_config.getName(), toMatchLineAcl(2, BLOCKED_LINE_ACL));
+        _batfish.reachFilter(_config.getHostname(), toMatchLineAcl(2, BLOCKED_LINE_ACL));
     assertThat("Should not find permitted flow", !permitFlow.isPresent());
   }
 
@@ -272,7 +274,7 @@ public final class ReachFilterAnswererTest {
   public void testTraceFilter() {
     ReachFilterQuestion question = new ReachFilterQuestion();
     Flow flow =
-        Flow.builder().setIngressNode(_config.getName()).setDstIp(IP2).setTag("tag").build();
+        Flow.builder().setIngressNode(_config.getHostname()).setDstIp(IP2).setTag("tag").build();
     ReachFilterAnswerer answerer = new ReachFilterAnswerer(question, _batfish);
     TableAnswerElement ae = answerer.traceFilter(_config, ACL, flow);
     assertThat(

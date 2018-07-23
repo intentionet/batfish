@@ -769,7 +769,7 @@ public class VirtualRouterTest {
     Network<IsisNode, IsisEdge> isisTopology = initIsisTopology(configs, topology);
 
     Map<String, Node> nodes =
-        ImmutableMap.of(c1.getName(), new Node(c1), c2.getName(), new Node(c2));
+        ImmutableMap.of(c1.getHostname(), new Node(c1), c2.getHostname(), new Node(c2));
 
     Map<String, VirtualRouter> vrs =
         nodes
@@ -861,12 +861,13 @@ public class VirtualRouterTest {
     Interface i2 =
         ib.setOwner(c2).setVrf(v2).setAddress(new InterfaceAddress("10.0.0.1/31")).build();
 
-    Map<String, Configuration> configs = ImmutableMap.of(c1.getName(), c1, c2.getName(), c2);
+    Map<String, Configuration> configs =
+        ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
     Topology topology = synthesizeTopology(configs);
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
         ImmutableValueGraph.copyOf(ValueGraphBuilder.directed().allowsSelfLoops(false).build());
     Map<String, Node> nodes =
-        ImmutableMap.of(c1.getName(), new Node(c1), c2.getName(), new Node(c2));
+        ImmutableMap.of(c1.getHostname(), new Node(c1), c2.getHostname(), new Node(c2));
     Map<String, VirtualRouter> vrs =
         nodes
             .values()
@@ -899,7 +900,7 @@ public class VirtualRouterTest {
 
     // Assert that queues are initialized
     assertThat(
-        vrs.get(c1.getName())._isisIncomingRoutes.keySet(),
+        vrs.get(c1.getHostname())._isisIncomingRoutes.keySet(),
         equalTo(
             ImmutableSet.of(
                 new IsisEdge(
@@ -907,7 +908,7 @@ public class VirtualRouterTest {
                     new IsisNode(c2.getHostname(), i2.getName()),
                     new IsisNode(c1.getHostname(), i1.getName())))));
     assertThat(
-        vrs.get(c2.getName())._isisIncomingRoutes.keySet(),
+        vrs.get(c2.getHostname())._isisIncomingRoutes.keySet(),
         equalTo(
             ImmutableSet.of(
                 new IsisEdge(

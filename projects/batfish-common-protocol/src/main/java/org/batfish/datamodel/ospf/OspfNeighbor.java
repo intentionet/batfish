@@ -29,7 +29,7 @@ public class OspfNeighbor extends ComparableStructure<IpLink> {
     private final String _vrf;
 
     public OspfNeighborSummary(OspfNeighbor ospfNeighbor) {
-      super(ospfNeighbor.getOwner().getName() + ":" + ospfNeighbor._key);
+      super(ospfNeighbor.getOwner().getHostname() + ":" + ospfNeighbor._key);
       _localIp = ospfNeighbor._key.getIp1();
       _remoteIp = ospfNeighbor._key.getIp2();
       _vrf = ospfNeighbor._vrf;

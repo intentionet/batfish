@@ -194,7 +194,7 @@ class TransferSSA {
    */
   private Map<Prefix, Boolean> aggregateRoutes() {
     Map<Prefix, Boolean> acc = new HashMap<>();
-    String name = _conf.getName();
+    String name = _conf.getHostname();
     List<GeneratedRoute> aggregates = _enc.getOptimizations().getRelevantAggregates().get(name);
     Set<Prefix> suppressed = _enc.getOptimizations().getSuppressedAggregates().get(name);
     for (GeneratedRoute gr : aggregates) {
@@ -255,7 +255,7 @@ class TransferSSA {
           int end = r.getLengthRange().getEnd();
           Prefix pfx = r.getPrefix();
           if (start == end && start == pfx.getPrefixLength()) {
-            String router = _conf.getName();
+            String router = _conf.getHostname();
             Set<Prefix> origin = _enc.getOriginatedNetworks().get(router, Protocol.BGP);
             if (origin != null && origin.contains(pfx)) {
               // Compute static and connected routes
@@ -1405,7 +1405,7 @@ class TransferSSA {
       ArithExpr sum = _enc.mkSum(p.getData().getMetric(), cost);
       if (_proto.isBgp()) {
         BoolExpr isBGP;
-        String router = _conf.getName();
+        String router = _conf.getHostname();
         boolean hasProtocolVar = _other.getProtocolHistory() != null;
         boolean onlyBGP = _enc.getOptimizations().getSliceHasSingleProtocol().contains(router);
         if (hasProtocolVar) {

@@ -43,7 +43,7 @@ public final class NodeNameRegexConnectedHostsIpSpaceSpecifier implements IpSpac
     ctxt.getConfigs()
         .values()
         .stream()
-        .filter(node -> _pattern.matcher(node.getName()).matches())
+        .filter(node -> _pattern.matcher(node.getHostname()).matches())
         .flatMap(node -> node.getInterfaces().values().stream())
         .flatMap(iface -> iface.getAllAddresses().stream())
         .filter(

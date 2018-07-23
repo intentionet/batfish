@@ -1244,7 +1244,7 @@ class EncoderSlice {
     equalId = equalIds(best, vars, proto, e);
     equalHistory = equalHistories(best, vars);
     equalBgpInternal = equalBgpInternal(best, vars);
-    equalClientIds = equalClientIds(conf.getName(), best, vars);
+    equalClientIds = equalClientIds(conf.getHostname(), best, vars);
     equalCommunities = (compareCommunities ? equalCommunities(best, vars) : mkTrue());
 
     return mkAnd(

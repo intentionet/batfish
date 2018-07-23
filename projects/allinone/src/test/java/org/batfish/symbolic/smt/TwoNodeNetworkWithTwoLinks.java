@@ -86,7 +86,7 @@ public class TwoNodeNetworkWithTwoLinks {
             bld.setNetwork(DST_PREFIX_2).setNextHopIp(LINK_2_NETWORK.getEndIp()).build()));
 
     SortedMap<String, Configuration> configs =
-        ImmutableSortedMap.of(srcNode.getName(), srcNode, dstNode.getName(), dstNode);
+        ImmutableSortedMap.of(srcNode.getHostname(), srcNode, dstNode.getHostname(), dstNode);
     return BatfishTestUtils.getBatfish(configs, temp);
   }
 }

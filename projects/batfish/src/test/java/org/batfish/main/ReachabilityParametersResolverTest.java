@@ -41,7 +41,7 @@ public class ReachabilityParametersResolverTest {
     Configuration config = nf.configurationBuilder().setConfigurationFormat(CISCO_IOS).build();
     Vrf vrf = nf.vrfBuilder().setOwner(config).build();
     nf.interfaceBuilder().setOwner(config).setVrf(vrf).build();
-    SortedMap<String, Configuration> configs = ImmutableSortedMap.of(config.getName(), config);
+    SortedMap<String, Configuration> configs = ImmutableSortedMap.of(config.getHostname(), config);
     _batfish = BatfishTestUtils.getBatfish(configs, _tempFolder);
     _batfish.computeDataPlane(false);
     _snapshot = _batfish.getNetworkSnapshot();

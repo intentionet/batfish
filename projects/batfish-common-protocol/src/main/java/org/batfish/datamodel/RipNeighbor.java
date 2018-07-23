@@ -26,7 +26,7 @@ public class RipNeighbor extends ComparableStructure<Pair<Ip, Ip>> {
     private final String _vrf;
 
     public RipNeighborSummary(RipNeighbor ripNeighbor) {
-      super(ripNeighbor.getOwner().getName() + ":" + ripNeighbor._key);
+      super(ripNeighbor.getOwner().getHostname() + ":" + ripNeighbor._key);
       _localIp = ripNeighbor._key.getFirst();
       _remoteIp = ripNeighbor._key.getSecond();
       _vrf = ripNeighbor._vrf;

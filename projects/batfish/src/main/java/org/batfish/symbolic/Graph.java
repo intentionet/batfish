@@ -1066,7 +1066,7 @@ public class Graph {
 
     // Only use specified edges from static routes
     if (proto.isStatic()) {
-      List<StaticRoute> srs = getStaticRoutes().get(conf.getName(), iface.getName());
+      List<StaticRoute> srs = getStaticRoutes().get(conf.getHostname(), iface.getName());
       return iface.getActive() && srs != null && !srs.isEmpty();
     }
 

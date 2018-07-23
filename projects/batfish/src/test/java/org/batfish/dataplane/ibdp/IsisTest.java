@@ -203,15 +203,15 @@ public class IsisTest {
 
     SortedMap<String, Configuration> configurations =
         ImmutableSortedMap.of(
-            r1.getName(),
+            r1.getHostname(),
             r1,
-            r2.getName(),
+            r2.getHostname(),
             r2,
-            r3.getName(),
+            r3.getHostname(),
             r3,
-            r4.getName(),
+            r4.getHostname(),
             r4,
-            r5.getName(),
+            r5.getHostname(),
             r5);
     IncrementalBdpEngine engine =
         new IncrementalBdpEngine(

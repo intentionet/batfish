@@ -122,8 +122,8 @@ public class NodeColoredScheduleTest {
 
     SortedMap<String, Configuration> configurations =
         new ImmutableSortedMap.Builder<String, Configuration>(String::compareTo)
-            .put(r1.getName(), r1)
-            .put(r2.getName(), r2)
+            .put(r1.getHostname(), r1)
+            .put(r2.getHostname(), r2)
             .build();
 
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =

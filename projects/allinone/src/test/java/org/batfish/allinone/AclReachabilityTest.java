@@ -115,25 +115,25 @@ public class AclReachabilityTest {
     AclLinesAnswerElement answer = answer(new AclReachabilityQuestion());
 
     // Should find 3 cycle results for ACLs 0, 1, and 2.
-    assertThat(answer.getUnreachableLines().keySet(), equalTo(ImmutableSet.of(_c1.getName())));
+    assertThat(answer.getUnreachableLines().keySet(), equalTo(ImmutableSet.of(_c1.getHostname())));
     assertThat(
-        answer.getUnreachableLines().get(_c1.getName()).keySet(),
+        answer.getUnreachableLines().get(_c1.getHostname()).keySet(),
         equalTo(ImmutableSet.of("acl0", "acl1", "acl2")));
 
     AclReachabilityEntry entry0 =
-        answer.getUnreachableLines().get(_c1.getName()).get("acl0").first();
+        answer.getUnreachableLines().get(_c1.getHostname()).get("acl0").first();
     assertThat(entry0.getEarliestMoreGeneralLineIndex(), equalTo(-1));
     assertThat(
         entry0.getEarliestMoreGeneralLineName(),
         equalTo("This line contains a reference that is part of a circular chain of references."));
     AclReachabilityEntry entry1 =
-        answer.getUnreachableLines().get(_c1.getName()).get("acl1").first();
+        answer.getUnreachableLines().get(_c1.getHostname()).get("acl1").first();
     assertThat(entry1.getEarliestMoreGeneralLineIndex(), equalTo(-1));
     assertThat(
         entry1.getEarliestMoreGeneralLineName(),
         equalTo("This line contains a reference that is part of a circular chain of references."));
     AclReachabilityEntry entry2 =
-        answer.getUnreachableLines().get(_c1.getName()).get("acl2").first();
+        answer.getUnreachableLines().get(_c1.getHostname()).get("acl2").first();
     assertThat(entry2.getEarliestMoreGeneralLineIndex(), equalTo(-1));
     assertThat(
         entry2.getEarliestMoreGeneralLineName(),
@@ -157,9 +157,9 @@ public class AclReachabilityTest {
     // Should find an undefined ACL result.
     assertThat(
         answer.getUnreachableLines(),
-        hasEntry(equalTo(_c1.getName()), hasEntry(equalTo(acl.getName()), hasSize(1))));
+        hasEntry(equalTo(_c1.getHostname()), hasEntry(equalTo(acl.getName()), hasSize(1))));
     AclReachabilityEntry entry0 =
-        answer.getUnreachableLines().get(_c1.getName()).get("acl").first();
+        answer.getUnreachableLines().get(_c1.getHostname()).get("acl").first();
     assertThat(entry0.getEarliestMoreGeneralLineIndex(), equalTo(-1));
     assertThat(
         entry0.getEarliestMoreGeneralLineName(),
@@ -210,9 +210,9 @@ public class AclReachabilityTest {
     // Tests for general ACL reachability answer
     assertThat(
         answer.getUnreachableLines(),
-        hasEntry(equalTo(_c1.getName()), hasEntry(equalTo(acl.getName()), hasSize(1))));
+        hasEntry(equalTo(_c1.getHostname()), hasEntry(equalTo(acl.getName()), hasSize(1))));
     AclReachabilityEntry blockedLine =
-        answer.getUnreachableLines().get(_c1.getName()).get(acl.getName()).first();
+        answer.getUnreachableLines().get(_c1.getHostname()).get(acl.getName()).first();
     assertThat("Line 0 is blocking", blockedLine.getEarliestMoreGeneralLineIndex(), equalTo(0));
     assertThat("Line 1 is blocked", blockedLine.getIndex(), equalTo(1));
     assertThat("Same action", blockedLine.getDifferentAction(), equalTo(false));
@@ -220,9 +220,9 @@ public class AclReachabilityTest {
     // Tests for ACL reachability of main ACL specifically
     assertThat(
         specificAnswer.getUnreachableLines(),
-        hasEntry(equalTo(_c1.getName()), hasEntry(equalTo(acl.getName()), hasSize(1))));
+        hasEntry(equalTo(_c1.getHostname()), hasEntry(equalTo(acl.getName()), hasSize(1))));
     blockedLine =
-        specificAnswer.getUnreachableLines().get(_c1.getName()).get(acl.getName()).first();
+        specificAnswer.getUnreachableLines().get(_c1.getHostname()).get(acl.getName()).first();
     assertThat("Line 0 is blocking", blockedLine.getEarliestMoreGeneralLineIndex(), equalTo(0));
     assertThat("Line 1 is blocked", blockedLine.getIndex(), equalTo(1));
     assertThat("Same action", blockedLine.getDifferentAction(), equalTo(false));
@@ -253,9 +253,9 @@ public class AclReachabilityTest {
 
     assertThat(
         answer.getUnreachableLines(),
-        hasEntry(equalTo(_c1.getName()), hasEntry(equalTo(aclName), hasSize(1))));
+        hasEntry(equalTo(_c1.getHostname()), hasEntry(equalTo(aclName), hasSize(1))));
     AclReachabilityEntry multipleBlockingLinesEntry =
-        answer.getUnreachableLines().get(_c1.getName()).get(aclName).first();
+        answer.getUnreachableLines().get(_c1.getHostname()).get(aclName).first();
     assertThat(multipleBlockingLinesEntry.getEarliestMoreGeneralLineIndex(), equalTo(-1));
     assertThat(
         multipleBlockingLinesEntry.getEarliestMoreGeneralLineName(),
@@ -293,10 +293,10 @@ public class AclReachabilityTest {
 
     assertThat(
         answer.getUnreachableLines(),
-        hasEntry(equalTo(_c1.getName()), hasEntry(equalTo(aclName), hasSize(3))));
+        hasEntry(equalTo(_c1.getHostname()), hasEntry(equalTo(aclName), hasSize(3))));
 
     SortedSet<AclReachabilityEntry> unreachableLines =
-        answer.getUnreachableLines().get(_c1.getName()).get(aclName);
+        answer.getUnreachableLines().get(_c1.getHostname()).get(aclName);
     assertThat(
         "Lines 1, 2, and 3 are unreachable",
         unreachableLines.stream().map(entry -> entry.getIndex()).collect(Collectors.toSet()),
@@ -367,8 +367,9 @@ public class AclReachabilityTest {
     /* Line 1 should be blocked by line 0. */
     assertThat(
         answer.getUnreachableLines(),
-        hasEntry(equalTo(_c1.getName()), hasEntry(equalTo(acl.getName()), hasSize(1))));
-    AclReachabilityEntry entry = answer.getUnreachableLines().get(_c1.getName()).get("acl").first();
+        hasEntry(equalTo(_c1.getHostname()), hasEntry(equalTo(acl.getName()), hasSize(1))));
+    AclReachabilityEntry entry =
+        answer.getUnreachableLines().get(_c1.getHostname()).get("acl").first();
     assertThat("Line 0 is blocking", entry.getEarliestMoreGeneralLineIndex(), equalTo(0));
     assertThat("Line 1 is blocked", entry.getIndex(), equalTo(1));
     assertThat("Same action", entry.getDifferentAction(), equalTo(false));
@@ -377,7 +378,7 @@ public class AclReachabilityTest {
   private AclLinesAnswerElement answer(AclReachabilityQuestion q) throws IOException {
     Batfish batfish =
         BatfishTestUtils.getBatfish(
-            ImmutableSortedMap.of(_c1.getName(), _c1, _c2.getName(), _c2), _folder);
+            ImmutableSortedMap.of(_c1.getHostname(), _c1, _c2.getHostname(), _c2), _folder);
     AclReachabilityAnswerer answerer = new AclReachabilityAnswerer(q, batfish);
     return (AclLinesAnswerElement) answerer.answer();
   }

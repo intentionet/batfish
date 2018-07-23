@@ -66,7 +66,7 @@ public class IptablesVendorConfiguration extends IptablesConfiguration {
     if (!configuration.getIpAccessLists().isEmpty()) {
       throw new BatfishException(
           "Merging iptables rules for "
-              + configuration.getName()
+              + configuration.getHostname()
               + ": only mangle tables are supported");
     }
 

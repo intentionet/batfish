@@ -325,7 +325,7 @@ class TransferBDD {
     } else if (expr instanceof CallExpr) {
       p.debug("CallExpr");
       CallExpr c = (CallExpr) expr;
-      String router = _conf.getName();
+      String router = _conf.getHostname();
       String name = c.getCalledPolicyName();
       TransferResult<TransferReturn, BDD> r = CACHE.get(router, name);
       if (r != null) {

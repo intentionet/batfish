@@ -276,7 +276,7 @@ public class RoutesAnswererTest {
     Vrf vrf = nf.vrfBuilder().setOwner(c).build();
     SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs =
         ImmutableSortedMap.of(
-            c.getName(),
+            c.getHostname(),
             ImmutableSortedMap.of(
                 vrf.getName(),
                 new MockRib<>(
@@ -285,7 +285,7 @@ public class RoutesAnswererTest {
                             .setNetwork(Prefix.parse("1.1.1.1/32"))
                             .setNextHopInterface("Null")
                             .build()))));
-    NetworkConfigurations nc = NetworkConfigurations.of(ImmutableMap.of(c.getName(), c));
+    NetworkConfigurations nc = NetworkConfigurations.of(ImmutableMap.of(c.getHostname(), c));
 
     AnswerElement el =
         new RoutesAnswerer(

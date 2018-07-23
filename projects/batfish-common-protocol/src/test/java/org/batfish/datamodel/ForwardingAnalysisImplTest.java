@@ -133,21 +133,22 @@ public class ForwardingAnalysisImplTest {
     IpSpace ipsRoutedOutI1 =
         IpWildcardSetIpSpace.builder().including(new IpWildcard(P1), new IpWildcard(P3)).build();
     IpSpace ipsRoutedOutI2 = IpWildcardSetIpSpace.builder().including(new IpWildcard(P2)).build();
-    Map<String, Configuration> configurations = ImmutableMap.of(c1.getName(), c1, c2.getName(), c2);
+    Map<String, Configuration> configurations =
+        ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
     SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs =
         ImmutableSortedMap.of(
-            c1.getName(),
+            c1.getHostname(),
             ImmutableSortedMap.of(
                 vrf1.getName(), MockRib.builder().setRoutableIps(UniverseIpSpace.INSTANCE).build()),
-            c2.getName(),
+            c2.getHostname(),
             ImmutableSortedMap.of(
                 vrf2.getName(),
                 MockRib.builder().setRoutableIps(UniverseIpSpace.INSTANCE).build()));
     _ipsRoutedOutInterfaces =
         ImmutableMap.of(
-            c1.getName(),
+            c1.getHostname(),
             ImmutableMap.of(i1.getName(), ipsRoutedOutI1),
-            c2.getName(),
+            c2.getHostname(),
             ImmutableMap.of(i2.getName(), ipsRoutedOutI2));
     _interfaceOwnedIps = CommonUtil.computeInterfaceOwnedIps(configs, false);
     ForwardingAnalysisImpl forwardingAnalysisImpl = initForwardingAnalysisImpl();
@@ -158,40 +159,43 @@ public class ForwardingAnalysisImplTest {
     assertThat(
         result,
         hasEntry(
-            equalTo(c1.getName()), hasEntry(equalTo(i1.getName()), containsIp(P1.getStartIp()))));
+            equalTo(c1.getHostname()),
+            hasEntry(equalTo(i1.getName()), containsIp(P1.getStartIp()))));
     assertThat(
         result,
         hasEntry(
-            equalTo(c1.getName()),
+            equalTo(c1.getHostname()),
             hasEntry(equalTo(i1.getName()), not(containsIp(P1.getEndIp())))));
     assertThat(
         result,
         hasEntry(
-            equalTo(c1.getName()),
+            equalTo(c1.getHostname()),
             hasEntry(equalTo(i1.getName()), not(containsIp(P3.getStartIp())))));
     assertThat(
         result,
         hasEntry(
-            equalTo(c1.getName()), hasEntry(equalTo(i1.getName()), containsIp(P2.getStartIp()))));
+            equalTo(c1.getHostname()),
+            hasEntry(equalTo(i1.getName()), containsIp(P2.getStartIp()))));
     /* No proxy-arp: just match interface ip*/
     assertThat(
         result,
         hasEntry(
-            equalTo(c2.getName()), hasEntry(equalTo(i2.getName()), containsIp(P2.getStartIp()))));
+            equalTo(c2.getHostname()),
+            hasEntry(equalTo(i2.getName()), containsIp(P2.getStartIp()))));
     assertThat(
         result,
         hasEntry(
-            equalTo(c2.getName()),
+            equalTo(c2.getHostname()),
             hasEntry(equalTo(i2.getName()), not(containsIp(P2.getEndIp())))));
     assertThat(
         result,
         hasEntry(
-            equalTo(c2.getName()),
+            equalTo(c2.getHostname()),
             hasEntry(equalTo(i2.getName()), not(containsIp(P3.getStartIp())))));
     assertThat(
         result,
         hasEntry(
-            equalTo(c2.getName()),
+            equalTo(c2.getHostname()),
             hasEntry(equalTo(i2.getName()), not(containsIp(P1.getStartIp())))));
   }
 
@@ -328,10 +332,11 @@ public class ForwardingAnalysisImplTest {
     Interface i1 = _ib.setOwner(c1).setVrf(vrf1).build();
     Ip i2Ip = new Ip(P1.getStartIp().asLong() + 1);
     Interface i2 = _ib.setOwner(c2).setVrf(vrf2).build();
-    Map<String, Configuration> configurations = ImmutableMap.of(c1.getName(), c1, c2.getName(), c2);
+    Map<String, Configuration> configurations =
+        ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
     SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs =
         ImmutableSortedMap.of(
-            c1.getName(),
+            c1.getHostname(),
             ImmutableSortedMap.of(
                 vrf1.getName(),
                 MockRib.builder()
@@ -343,12 +348,12 @@ public class ForwardingAnalysisImplTest {
                                 .thenPermitting(P1.toIpSpace())
                                 .build()))
                     .build()));
-    Edge edge = new Edge(c1.getName(), i1.getName(), c2.getName(), i2.getName());
+    Edge edge = new Edge(c1.getHostname(), i1.getName(), c2.getHostname(), i2.getName());
     _routesWithDestIpEdge =
         ImmutableMap.of(edge, ImmutableSet.of(new ConnectedRoute(P1, i1.getName())));
     _arpReplies =
         ImmutableMap.of(
-            c2.getName(),
+            c2.getHostname(),
             ImmutableMap.of(
                 i2.getName(),
                 AclIpSpace.permitting(i2Ip.toIpSpace())
@@ -383,11 +388,12 @@ public class ForwardingAnalysisImplTest {
             .setVrf(vrf2)
             .setAddress(new InterfaceAddress(i2Ip, P1.getPrefixLength()))
             .build();
-    Edge edge = new Edge(c1.getName(), i1.getName(), c2.getName(), i2.getName());
-    Map<String, Configuration> configurations = ImmutableMap.of(c1.getName(), c1, c2.getName(), c2);
+    Edge edge = new Edge(c1.getHostname(), i1.getName(), c2.getHostname(), i2.getName());
+    Map<String, Configuration> configurations =
+        ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
     SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs =
         ImmutableSortedMap.of(
-            c1.getName(),
+            c1.getHostname(),
             ImmutableSortedMap.of(
                 vrf1.getName(),
                 MockRib.builder()
@@ -737,7 +743,7 @@ public class ForwardingAnalysisImplTest {
             .build();
     IpSpace ipSpace = IpWildcardSetIpSpace.builder().including(new IpWildcard("1.0.0.0/8")).build();
     v.setStaticRoutes(ImmutableSortedSet.of(nullRoute));
-    SortedMap<String, Configuration> configs = ImmutableSortedMap.of(c.getName(), c);
+    SortedMap<String, Configuration> configs = ImmutableSortedMap.of(c.getHostname(), c);
     MockRib mockRib =
         MockRib.builder()
             .setRoutes(ImmutableSet.of(nullRoute))
@@ -757,9 +763,9 @@ public class ForwardingAnalysisImplTest {
             .build();
 
     SortedMap<String, SortedMap<String, GenericRib<AbstractRoute>>> ribs =
-        ImmutableSortedMap.of(c.getName(), ImmutableSortedMap.of(v.getName(), mockRib));
+        ImmutableSortedMap.of(c.getHostname(), ImmutableSortedMap.of(v.getName(), mockRib));
     Map<String, Map<String, Fib>> fibs =
-        ImmutableMap.of(c.getName(), ImmutableMap.of(v.getName(), mockFib));
+        ImmutableMap.of(c.getHostname(), ImmutableMap.of(v.getName(), mockFib));
 
     ForwardingAnalysisImpl forwardingAnalysisImpl =
         new ForwardingAnalysisImpl(configs, ribs, fibs, new Topology(ImmutableSortedSet.of()));
@@ -770,7 +776,7 @@ public class ForwardingAnalysisImplTest {
     assertThat(
         neighborUnreachable,
         hasEntry(
-            equalTo(c.getName()),
+            equalTo(c.getHostname()),
             hasEntry(equalTo(v.getName()), not(hasKey(Interface.NULL_INTERFACE_NAME)))));
   }
 

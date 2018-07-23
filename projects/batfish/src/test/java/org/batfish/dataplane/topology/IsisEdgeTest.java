@@ -85,7 +85,7 @@ public final class IsisEdgeTest {
         .setNetAddress(generateAddress(sameArea ? AREA1 : AREA2, sameSystem ? SYSTEM1 : SYSTEM2))
         .build();
     ib.setOwner(c2).setVrf(v2).setAddress(new InterfaceAddress("10.0.0.1/31")).build();
-    return ImmutableMap.of(c1.getName(), c1, c2.getName(), c2);
+    return ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
   }
 
   @Test

@@ -1448,7 +1448,7 @@ public final class Interface extends ComparableStructure<String> {
 
   public JSONObject toJSONObject() throws JSONException {
     JSONObject iface = new JSONObject();
-    iface.put("node", _owner.getName());
+    iface.put("node", _owner.getHostname());
     iface.put("name", _key);
     iface.put(PROP_PREFIX, _address.toString());
     iface.put(PROP_INTERFACE_TYPE, _interfaceType.toString());
