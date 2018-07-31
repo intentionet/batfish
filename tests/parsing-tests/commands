@@ -1,43 +1,11 @@
-#this file assumes that we are running from top-level source directory
-
 add-batfish-option ppt
 add-batfish-option verboseparse
 add-batfish-option haltonconverterror
 add-batfish-option haltonparseerror
 add-batfish-option disableunrecognized
 
-#dc-as-reuse
-test -compareall tests/parsing-tests/dc-as-reuse.ref init-testrig test_rigs/dc-as-reuse
-
-#disable-as-suppression
-test -compareall tests/parsing-tests/disable-as-suppression.ref init-testrig test_rigs/disable-as-suppression
-
-#example
-test -compareall tests/parsing-tests/example.ref init-testrig test_rigs/example
-
-#example-juniper
-test -compareall tests/parsing-tests/example-juniper.ref init-testrig test_rigs/example-juniper
-
-#indirection
-test -compareall tests/parsing-tests/indirection.ref init-testrig test_rigs/indirection
-
-#ios_rt
-test -compareall tests/parsing-tests/ios_rt.ref init-testrig test_rigs/ios_rt
-test -compareall tests/parsing-tests/ios_rt-initInfo.ref get initInfo environmentRoutes=true
-
-#isis
-test -compareall tests/parsing-tests/isis.ref init-testrig test_rigs/isis
-
-#policy-routing
-test -compareall tests/parsing-tests/policy-routing.ref init-testrig test_rigs/policy-routing
-
-#snat
-test -compareall tests/parsing-tests/snat.ref init-testrig test_rigs/snat
-
-#srx-testbed
-test -compareall tests/parsing-tests/srx-testbed.ref init-testrig test_rigs/srx-testbed
-
-#unit-tests
+# Ensure that every line in the `unit-tests` network parses, that Batfish tracks
+# the right references and extract the right node properties.
 test -compareall tests/parsing-tests/unit-tests.ref init-testrig tests/parsing-tests/networks/unit-tests
 test tests/parsing-tests/unit-tests-undefined.ref get undefinedreferences
 test tests/parsing-tests/unit-tests-unused.ref get unusedstructures
