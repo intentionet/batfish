@@ -10,3 +10,6 @@ test -compareall tests/parsing-tests/unit-tests.ref init-testrig tests/parsing-t
 test tests/parsing-tests/unit-tests-undefined.ref get undefinedreferences
 test tests/parsing-tests/unit-tests-unused.ref get unusedstructures
 test tests/parsing-tests/unit-tests-nodes.ref get nodes summary=false
+
+# The srx-testbed currently has a bunch of stuff not in unit-tests. Keep testing it for now.
+test -compareall tests/parsing-tests/srx-testbed.ref init-testrig test_rigs/srx-testbed
