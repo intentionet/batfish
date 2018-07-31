@@ -1,5 +1,8 @@
 load-questions questions/stable
 
+# validate fileParseStatus
+test -raw tests/questions/stable/fileParseStatus.ref validate-template fileParseStatus
+
 # validate ipOwners
 test -raw tests/questions/stable/ipOwners.ref validate-template ipOwners duplicatesOnly=false
 
