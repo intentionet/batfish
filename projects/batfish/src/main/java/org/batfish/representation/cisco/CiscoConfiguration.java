@@ -2099,10 +2099,15 @@ public final class CiscoConfiguration extends VendorConfiguration {
        * Some settings are here, others are set later when the EigrpProcess sets this
        * interface
        */
+      boolean passive = eigrpProcess.getPassiveInterfaceDefault();
+      if (iface.getEigrpPassive() != null) {
+        passive = iface.getEigrpPassive();
+      }
       newIface.setEigrp(
           EigrpInterfaceSettings.builder()
               .setBandwidth(iface.getBandwidth())
               .setDelay(iface.getDelay())
+              .setPassive(passive)
               .build());
     }
 

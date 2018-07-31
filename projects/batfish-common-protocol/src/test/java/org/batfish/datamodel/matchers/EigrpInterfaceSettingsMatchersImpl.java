@@ -53,4 +53,15 @@ final class EigrpInterfaceSettingsMatchersImpl {
       return actual.getEnabled();
     }
   }
+
+  static final class HasPassive extends FeatureMatcher<EigrpInterfaceSettings, Boolean> {
+    public HasPassive(@Nonnull Matcher<? super Boolean> subMatcher) {
+      super(subMatcher, "An EigrpInterfaceSettings with passive:", "passive");
+    }
+
+    @Override
+    protected Boolean featureValueOf(EigrpInterfaceSettings actual) {
+      return actual.getPassive();
+    }
+  }
 }

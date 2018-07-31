@@ -17,6 +17,8 @@ re_classic_tail
    rec_address_family
    | rec_null
    | re_network
+   | re_passive_interface_default
+   | re_passive_interface
    | re_redistribute_bgp
    | re_redistribute_connected
    | re_redistribute_eigrp
@@ -42,6 +44,16 @@ re_named_tail
 re_network
 :
    NETWORK address = IP_ADDRESS mask = IP_ADDRESS? NEWLINE
+;
+
+re_passive_interface
+:
+   NO? PASSIVE_INTERFACE i = interface_name NEWLINE
+;
+
+re_passive_interface_default
+:
+   NO? PASSIVE_INTERFACE DEFAULT NEWLINE
 ;
 
 re_redistribute_bgp
@@ -134,6 +146,15 @@ reaf_interface
    )?
 ;
 
+reaf_interface_default
+:
+   AF_INTERFACE DEFAULT NEWLINE
+   reaf_interface_tail*
+   (
+      EXIT_AF_INTERFACE NEWLINE
+   )?
+;
+
 reaf_interface_null
 :
    NO?
@@ -147,7 +168,6 @@ reaf_interface_null
       | HELLO_INTERVAL
       | HOLD_TIME
       | NEXT_HOP_SELF
-      | PASSIVE_INTERFACE
       | SHUTDOWN
       | SPLIT_HORIZON
       | SUMMARY_ADDRESS
@@ -157,6 +177,7 @@ reaf_interface_null
 reaf_interface_tail
 :
    reaf_interface_null
+   | reafi_passive_interface
 ;
 
 reaf_topology_tail
@@ -199,6 +220,11 @@ reaf_topology_null
    ) null_rest_of_line
 ;
 
+reafi_passive_interface
+:
+   NO? PASSIVE_INTERFACE NEWLINE
+;
+
 rec_address_family
 :
    ADDRESS_FAMILY IPV4 UNICAST? VRF vrf = variable
@@ -226,7 +252,6 @@ rec_address_family_null
       | NEIGHBOR
       | NSF
       | OFFSET_LIST
-      | PASSIVE_INTERFACE
       | REDISTRIBUTE
    ) null_rest_of_line
 ;
@@ -234,6 +259,8 @@ rec_address_family_null
 rec_address_family_tail
 :
    re_network
+   | re_passive_interface_default
+   | re_passive_interface
    | rec_address_family_null
 ;
 
@@ -254,7 +281,6 @@ rec_null
       | NEIGHBOR
       | NSF
       | OFFSET_LIST
-      | PASSIVE_INTERFACE
       | SHUTDOWN
       | SPLIT_HORIZON
       | SUMMARY_METRIC
@@ -298,10 +324,13 @@ ren_address_family_null
 
 ren_address_family_tail
 :
-   reaf_interface
-   | ren_address_family_null
-   | re_network
+   re_network
+   | re_passive_interface_default
+   | re_passive_interface
+   | reaf_interface_default
+   | reaf_interface
    | reaf_topology
+   | ren_address_family_null
 ;
 
 ren_null
@@ -323,16 +352,35 @@ ren_service_family
    resf_footer
 ;
 
+ren_service_family_null
+:
+   NO?
+   (
+      EIGRP
+      | TIMERS
+   ) null_rest_of_line
+;
+
 ren_service_family_tail
 :
-   resf_interface
-   | ren_address_family_null
+   ren_service_family_null
+   | resf_interface_default
+   | resf_interface
    | resf_topology
 ;
 
 resf_interface
 :
    SF_INTERFACE iname = interface_name NEWLINE
+   resf_interface_tail*
+   (
+      EXIT_SF_INTERFACE NEWLINE
+   )?
+;
+
+resf_interface_default
+:
+   SF_INTERFACE DEFAULT NEWLINE
    resf_interface_tail*
    (
       EXIT_SF_INTERFACE NEWLINE

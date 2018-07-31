@@ -908,9 +908,11 @@ class CiscoConversions {
       if (match) {
         Double delay = null;
         Double bandwidth = null;
+        boolean passive = proc.getPassiveInterfaceDefault();
         if (iface.getEigrp() != null) {
           delay = iface.getEigrp().getDelay();
           bandwidth = iface.getEigrp().getBandwidth();
+          passive = iface.getEigrp().getPassive();
         }
 
         // For bandwidth/delay, defaults are separate from actuals to inform metric calculations
@@ -930,6 +932,7 @@ class CiscoConversions {
                 .setEnabled(true)
                 .setAsn(proc.getAsn())
                 .setMetric(metric)
+                .setPassive(passive)
                 .build());
       } else {
         if (iface.getEigrp() != null && iface.getEigrp().getDelay() != null) {

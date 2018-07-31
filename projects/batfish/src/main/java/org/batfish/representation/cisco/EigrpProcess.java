@@ -21,6 +21,7 @@ public class EigrpProcess implements Serializable {
   private Ip _routerId;
   private Set<IpWildcard> _wildcardNetworks;
   private Set<Prefix> _networks;
+  private boolean _passiveInterfaceDefault;
 
   public EigrpProcess(Long asn, EigrpProcessMode mode) {
     _asn = asn;
@@ -83,12 +84,20 @@ public class EigrpProcess implements Serializable {
     return _networks;
   }
 
+  public boolean getPassiveInterfaceDefault() {
+    return _passiveInterfaceDefault;
+  }
+
   public Ip getRouterId() {
     return _routerId;
   }
 
   public void setRouterId(Ip routerId) {
     _routerId = routerId;
+  }
+
+  public void setPassiveInterfaceDefault(boolean passiveInterfaceDefault) {
+    _passiveInterfaceDefault = passiveInterfaceDefault;
   }
 
   public Set<IpWildcard> getWildcardNetworks() {

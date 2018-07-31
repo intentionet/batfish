@@ -14,12 +14,14 @@ public class EigrpInterfaceSettings implements Serializable {
   private static final String PROP_DELAY = "delay";
   private static final String PROP_ENABLED = "enabled";
   private static final String PROP_METRIC = "metric";
+  private static final String PROP_PASSIVE = "passive";
   private static final long serialVersionUID = 1L;
   @Nullable private final Long _asn;
   @Nullable private final Double _bandwidth;
   @Nullable private final Double _delay;
   private final boolean _enabled;
   @Nullable private final EigrpMetric _metric;
+  private final boolean _passive;
 
   @JsonCreator
   private EigrpInterfaceSettings(
@@ -27,12 +29,14 @@ public class EigrpInterfaceSettings implements Serializable {
       @Nullable @JsonProperty(PROP_BANDWIDTH) Double bandwidth,
       @Nullable @JsonProperty(PROP_DELAY) Double delay,
       @JsonProperty(PROP_ENABLED) boolean enabled,
-      @Nullable @JsonProperty(PROP_METRIC) EigrpMetric metric) {
+      @Nullable @JsonProperty(PROP_METRIC) EigrpMetric metric,
+      @JsonProperty(PROP_PASSIVE) boolean passive) {
     _asn = asn;
     _bandwidth = bandwidth;
     _delay = delay;
     _enabled = enabled;
     _metric = metric;
+    _passive = passive;
   }
 
   public static Builder builder() {
@@ -52,7 +56,8 @@ public class EigrpInterfaceSettings implements Serializable {
         && Objects.equals(_bandwidth, rhs._bandwidth)
         && Objects.equals(_delay, rhs._delay)
         && (_enabled == rhs._enabled)
-        && Objects.equals(_metric, rhs._metric);
+        && Objects.equals(_metric, rhs._metric)
+        && _passive == rhs._passive;
   }
 
   /** @return The AS number for this interface */
@@ -95,12 +100,19 @@ public class EigrpInterfaceSettings implements Serializable {
     return _metric;
   }
 
+  /** @return Whether interface is passive */
+  @JsonProperty(PROP_PASSIVE)
+  public boolean getPassive() {
+    return _passive;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(_asn, _bandwidth, _delay, _enabled, _metric);
+    return Objects.hash(_asn, _bandwidth, _delay, _enabled, _metric, _passive);
   }
 
   public static class Builder {
+
     @Nullable private Long _asn;
 
     @Nullable private Double _bandwidth;
@@ -111,10 +123,12 @@ public class EigrpInterfaceSettings implements Serializable {
 
     @Nullable private EigrpMetric _metric;
 
+    private boolean _passive;
+
     private Builder() {}
 
     public EigrpInterfaceSettings build() {
-      return new EigrpInterfaceSettings(_asn, _bandwidth, _delay, _enabled, _metric);
+      return new EigrpInterfaceSettings(_asn, _bandwidth, _delay, _enabled, _metric, _passive);
     }
 
     public Builder setAsn(@Nullable Long asn) {
@@ -139,6 +153,11 @@ public class EigrpInterfaceSettings implements Serializable {
 
     public Builder setBandwidth(@Nullable Double bandwidth) {
       _bandwidth = bandwidth;
+      return this;
+    }
+
+    public Builder setPassive(boolean passive) {
+      _passive = passive;
       return this;
     }
   }

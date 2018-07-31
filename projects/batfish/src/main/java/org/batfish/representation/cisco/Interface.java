@@ -134,6 +134,12 @@ public class Interface implements Serializable {
 
   private boolean _dhcpRelayClient;
 
+  /**
+   * True (or false) means interface was explicitly configured as (not) passive. Null means not
+   * explicit
+   */
+  @Nullable private Boolean _eigrpPassive;
+
   private String _incomingFilter;
 
   private int _incomingFilterLine;
@@ -320,6 +326,11 @@ public class Interface implements Serializable {
 
   public boolean getDhcpRelayClient() {
     return _dhcpRelayClient;
+  }
+
+  @Nullable
+  public Boolean getEigrpPassive() {
+    return _eigrpPassive;
   }
 
   public String getIncomingFilter() {
@@ -564,6 +575,10 @@ public class Interface implements Serializable {
 
   public void setDelay(@Nullable Double delayPs) {
     _delay = delayPs;
+  }
+
+  public void setEigrpPassive(boolean eigrpPassive) {
+    _eigrpPassive = eigrpPassive;
   }
 
   public void setProxyArp(boolean proxyArp) {

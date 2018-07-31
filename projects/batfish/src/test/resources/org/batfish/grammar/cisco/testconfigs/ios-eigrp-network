@@ -33,10 +33,19 @@ router eigrp 1
  network 10.0.0.0 0.0.0.255
  network 10.0.1.0 0.0.0.255
  network 10.0.2.0 0.0.0.255
+ passive-interface default
+ no passive-interface Ethernet0
+ no passive-interface Ethernet1
 !
 router eigrp virtual-name
  address-family ipv4 vrf vrf-name autonomous-system 2
   network 10.0.3.0 0.0.0.255
   network 10.0.4.0 0.0.0.255
   network 10.0.5.0 0.0.0.255
+  no passive-interface Ethernet3
+  af-interface default
+   passive-interface
+  exit-af-interface
+  af-interface Ethernet4
+   no passive-interface
 !

@@ -122,12 +122,13 @@ public class Main {
     }
   }
 
-  private static void readQuestionTemplates(Path questionsPath, Map<String, String> templates) {
+  @VisibleForTesting
+  static void readQuestionTemplates(Path questionsPath, Map<String, String> templates) {
     try {
       Files.walkFileTree(
           questionsPath,
           EnumSet.of(FOLLOW_LINKS),
-          1,
+          Integer.MAX_VALUE,
           new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {

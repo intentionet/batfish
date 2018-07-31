@@ -127,6 +127,7 @@ router eigrp virtual
    dampening-change 75
    dampening-interval 45
    hold-time 40
+   passive-interface
   exit-af-interface
   network 1.1.1.100
   remote-neighbors source GigabitEthernet0/0/1 unicast-listen lisp-encap 2
@@ -139,14 +140,18 @@ router eigrp virtual
   topology VOICE tid 1000
    no auto-summary
   exit-af-topology
+  passive-interface default
+  no passive-interface FastEthernet0/1
  exit-address-family
  service-family ipv4 vrf service-family autonomous-system 3
-  neighbor 1.1.1.100
   sf-interface Ethernet0
    bandwidth-percent 75
    dampening-change 75
    dampening-interval 45
    hold-time 50
+  exit-sf-interface
+  sf-interface default
+   no split-horizon
   exit-sf-interface
   topology base
  exit-service-family

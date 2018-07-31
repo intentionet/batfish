@@ -16,6 +16,7 @@ import static org.batfish.datamodel.matchers.FlowMatchers.hasTcpFlagsRst;
 import static org.batfish.datamodel.matchers.FlowMatchers.hasTcpFlagsUrg;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.util.Optional;
 import net.sf.javabdd.BDD;
@@ -25,6 +26,26 @@ import org.batfish.datamodel.IpProtocol;
 import org.junit.Test;
 
 public class BDDPacketTest {
+  @Test
+  public void testAllocateBDDBit() {
+    BDDPacket.factory.reset();
+    BDDPacket pkt = new BDDPacket();
+    int varNum = BDDPacket.factory.varNum();
+    BDD bdd = pkt.allocateBDDBit("foo");
+    assertThat(bdd, notNullValue());
+    assertThat(BDDPacket.factory.varNum(), equalTo(varNum + 1));
+  }
+
+  @Test
+  public void testAllocateBDDInteger() {
+    BDDPacket.factory.reset();
+    BDDPacket pkt = new BDDPacket();
+    int varNum = BDDPacket.factory.varNum();
+    BDDInteger var = pkt.allocateBDDInteger("foo", 5, false);
+    assertThat(var, notNullValue());
+    assertThat(BDDPacket.factory.varNum(), equalTo(varNum + 5));
+  }
+
   @Test
   public void testGetFlow_empty() {
     BDDPacket pkt = new BDDPacket();

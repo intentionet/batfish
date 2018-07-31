@@ -66,7 +66,9 @@ public final class EigrpEdge implements Serializable, Comparable<EigrpEdge> {
 
     if (!eigrp1.getEnabled()
         || !eigrp2.getEnabled()
-        || !Objects.equals(eigrp1.getAsNumber(), eigrp2.getAsNumber())) {
+        || !Objects.equals(eigrp1.getAsNumber(), eigrp2.getAsNumber())
+        || eigrp1.getPassive()
+        || eigrp2.getPassive()) {
       return empty();
     }
     return Optional.of(

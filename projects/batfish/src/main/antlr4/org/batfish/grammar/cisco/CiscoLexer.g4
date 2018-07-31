@@ -456,7 +456,7 @@ AF_GROUP
 
 AF_INTERFACE
 :
-   'af-interface'
+   'af-interface' -> pushMode ( M_Interface )
 ;
 
 AF11
@@ -10643,7 +10643,7 @@ SEVERITY
 
 SF_INTERFACE
 :
-   'sf-interface'
+   'sf-interface' -> pushMode ( M_Interface )
 ;
 
 SFLOW
