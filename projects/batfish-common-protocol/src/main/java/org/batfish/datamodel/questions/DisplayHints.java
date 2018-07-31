@@ -201,7 +201,8 @@ public class DisplayHints {
   }
 
   @JsonProperty(PROP_TEXT_DESC)
-  public void setTextDesc(String textDesc) {
+  public DisplayHints setTextDesc(String textDesc) {
     _textDesc = textDesc;
+    return this;
   }
 }

@@ -1,0 +1,15 @@
+{
+  "class" : "org.batfish.question.initialization.FileParseStatusQuestion",
+  "differential" : false,
+  "includeOneTableKeys" : false,
+  "instance" : {
+    "description" : "Shows file parse status.",
+    "instanceName" : "qname",
+    "longDescription" : "For each file in a snapshot, produces information about whether it parsed and which hosts it produced.",
+    "tags" : [
+      "file",
+      "initialization",
+      "parse"
+    ]
+  }
+}
