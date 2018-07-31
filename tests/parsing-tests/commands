@@ -12,4 +12,4 @@ test tests/parsing-tests/unit-tests-unused.ref get unusedstructures
 test tests/parsing-tests/unit-tests-nodes.ref get nodes summary=false
 
 # The srx-testbed currently has a bunch of stuff not in unit-tests. Keep testing it for now.
-test -compareall tests/parsing-tests/srx-testbed.ref init-testrig test_rigs/srx-testbed
+test -compareall tests/parsing-tests/srx-testbed.ref init-testrig tests/parsing-tests/networks/srx-testbed
