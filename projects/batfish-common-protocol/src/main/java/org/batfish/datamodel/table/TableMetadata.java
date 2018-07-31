@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +33,7 @@ public class TableMetadata {
   public TableMetadata(
       @Nullable @JsonProperty(PROP_COLUMN_METADATA) List<ColumnMetadata> columnMetadata,
       @Nullable @JsonProperty(PROP_DISPLAY_HINTS) DisplayHints displayHints) {
-    _columnMetadata = ImmutableList.copyOf(firstNonNull(columnMetadata, new LinkedList<>()));
+    _columnMetadata = ImmutableList.copyOf(firstNonNull(columnMetadata, ImmutableList.of()));
     _displayHints = displayHints;
 
     // check if there is a duplicate column name
