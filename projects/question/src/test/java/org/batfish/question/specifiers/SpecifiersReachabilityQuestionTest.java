@@ -20,11 +20,11 @@ import org.batfish.specifier.AllNodesNodeSpecifier;
 import org.batfish.specifier.ConstantIpSpaceSpecifier;
 import org.batfish.specifier.ConstantUniverseIpSpaceSpecifierFactory;
 import org.batfish.specifier.ConstantWildcardSetIpSpaceSpecifierFactory;
+import org.batfish.specifier.FlexibleLocationIpSpaceSpecifierFactory;
 import org.batfish.specifier.FlexibleNodeSpecifierFactory;
 import org.batfish.specifier.InferFromLocationIpSpaceSpecifier;
 import org.batfish.specifier.NameRegexNodeSpecifier;
 import org.batfish.specifier.NameRegexNodeSpecifierFactory;
-import org.batfish.specifier.NodeNameRegexConnectedHostsIpSpaceSpecifier;
 import org.batfish.specifier.NodeSpecifierInterfaceLocationSpecifier;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,19 +40,18 @@ public class SpecifiersReachabilityQuestionTest {
   @Test
   public void getDestinationIpSpace_bothNull() {
     SpecifiersReachabilityQuestion question = new SpecifiersReachabilityQuestion();
-    exception.expect(IllegalArgumentException.class);
-    exception.expectMessage(
-        "NodeNameRegexConnectedHostsIpSpaceSpecifierFactory requires input of type String");
-    question.getDestinationIpSpaceSpecifier();
+    assertThat(
+        question.getDestinationIpSpaceSpecifier(),
+        equalTo(new ConstantIpSpaceSpecifier(UniverseIpSpace.INSTANCE)));
   }
 
   @Test
   public void getDestinationIpSpace_factoryNull() {
     SpecifiersReachabilityQuestion question = new SpecifiersReachabilityQuestion();
-    question.setDestinationIpSpaceSpecifierInput("foo");
+    question.setDestinationIpSpaceSpecifierInput("ofLocation(foo)");
     assertThat(
         question.getDestinationIpSpaceSpecifier(),
-        equalTo(new NodeNameRegexConnectedHostsIpSpaceSpecifier(Pattern.compile("foo"))));
+        equalTo(new FlexibleLocationIpSpaceSpecifierFactory().buildIpSpaceSpecifier("foo")));
   }
 
   @Test
