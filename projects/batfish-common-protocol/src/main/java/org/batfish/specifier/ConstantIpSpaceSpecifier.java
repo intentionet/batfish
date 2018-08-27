@@ -1,5 +1,6 @@
 package org.batfish.specifier;
 
+import com.google.common.base.MoreObjects;
 import java.util.Objects;
 import java.util.Set;
 import org.batfish.datamodel.IpSpace;
@@ -35,5 +36,12 @@ public final class ConstantIpSpaceSpecifier implements IpSpaceSpecifier {
   @Override
   public IpSpaceAssignment resolve(Set<Location> locations, SpecifierContext ctxt) {
     return IpSpaceAssignment.builder().assign(locations, _ipSpace).build();
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(ConstantIpSpaceSpecifier.class)
+        .add("ipSpace", _ipSpace)
+        .toString();
   }
 }
