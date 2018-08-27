@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * <ul>
  *   <li>null, which returns a default factory provided by the subclass.
  *   <li>ref.addressgroup(foo, bar), which returns {@link ReferenceAddressGroupIpSpaceSpecifier};
- *   <li>ofLocation(...), which returns {@link LocationIpSpaceSpecifier};
+ *   <li>ofLocation(...), which returns {@link FlexibleLocationIpSpaceSpecifierFactory};
  *   <li>inputs accepted by {@link ConstantWildcardSetIpSpaceSpecifierFactory}
  * </ul>
  */
@@ -43,8 +43,7 @@ public abstract class FlexibleIpSpaceSpecifierFactory implements IpSpaceSpecifie
     }
     matcher = LOCATION_PATTERN.matcher(input);
     if (matcher.find()) {
-      return new LocationIpSpaceSpecifier(
-          new FlexibleLocationSpecifierFactory().buildLocationSpecifier(matcher.group(1)));
+      return new FlexibleLocationIpSpaceSpecifierFactory().buildIpSpaceSpecifier(matcher.group(1));
     }
     return new ConstantWildcardSetIpSpaceSpecifierFactory().buildIpSpaceSpecifier(input);
   }
