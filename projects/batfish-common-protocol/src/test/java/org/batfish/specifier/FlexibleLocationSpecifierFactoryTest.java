@@ -7,7 +7,11 @@ import static org.junit.Assert.assertThat;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
+/** Tests of {@link FlexibleLocationSpecifierFactory}. */
+@RunWith(JUnit4.class)
 public class FlexibleLocationSpecifierFactoryTest {
   @Rule public ExpectedException exception = ExpectedException.none();
 
