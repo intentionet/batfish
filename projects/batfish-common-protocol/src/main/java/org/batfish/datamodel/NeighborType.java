@@ -10,6 +10,7 @@ public enum NeighborType {
   EBGP("ebgp"),
   EIGRP("eigrp"),
   IBGP("ibgp"),
+  ISIS("isis"),
   LAYER1("layer1"),
   LAYER2("layer2"),
   LAYER3("layer3"),

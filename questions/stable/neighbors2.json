@@ -1,0 +1,43 @@
+{
+  "class": "org.batfish.question.neighbors.NeighborsQuestion",
+    "differential": false,
+    "instance": {
+        "description": "Lists neighbor relationships in the snapshot",
+        "instanceName": "neighbors2",
+        "longDescription": "Lists neighbor relationships of the specified type (layer3, eBGP, iBGP, ospf, etc.)",
+        "tags": [
+            "topology"
+        ],
+        "variables": {
+            "neighborType": {
+                "allowedValues": [
+                    "ebgp",
+                    "eigrp",
+                    "ibgp",
+                    "isis",
+                    "layer1",
+                    "layer2",
+                    "layer3",
+                    "ospf",
+                    "rip"
+                ],
+                "description": "Types of neighbor relationships to include",
+                "optional": true,
+                "type": "string"
+            },
+            "nodes": {
+                "description": "Include neighbors whose first node matches this name or regex",
+                "type": "nodeSpec",
+                "value": ".*"
+            },
+            "remoteNodes": {
+                "description": "Include neighbors whose second node matches this name or regex",
+                "type": "nodeSpec",
+                "value": ".*"
+            }          
+        }
+    },
+    "neighborType": "${neighborType}",
+    "nodes": "${nodes}",
+    "remoteNodes": "${remoteNodes}"
+}
