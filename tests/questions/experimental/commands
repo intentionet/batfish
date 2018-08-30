@@ -16,7 +16,7 @@ test -raw tests/questions/experimental/filterTable.ref validate-template filterT
 test -raw tests/questions/experimental/interfaceMtu.ref validate-template interfaceMtu comparator='>', interfaces='Gig.*', mtuBytes=0, nodes='as1core2'
 
 # validate interfaceProperties
-test -raw tests/questions/experimental/interfaceProperties.ref validate-template interfaceProperties nodes=".*", interfaces=".*", properties=".*"
+test -raw tests/questions/experimental/interfaceProperties.ref validate-template interfaceProperties excludeShutInterfaces=false, nodes=".*", interfaces=".*", properties=".*"
 
 # validate neighbors
 test -raw tests/questions/experimental/neighbors.ref validate-template neighbors neighborTypes=["ebgp"], nodes=".*", remoteNodes=".*", style="summary", roleDimension="default"

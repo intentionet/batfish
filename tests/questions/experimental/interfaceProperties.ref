@@ -14,6 +14,12 @@
       "interfaces"
     ],
     "variables" : {
+      "excludeShutInterfaces" : {
+        "description" : "Exclude interfaces that are shutdown",
+        "optional" : false,
+        "type" : "boolean",
+        "value" : false
+      },
       "interfaces" : {
         "description" : "Include interfaces matching this regex",
         "optional" : true,

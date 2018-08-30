@@ -1,6 +1,7 @@
 {
     "class": "org.batfish.question.interfaceproperties.InterfacePropertiesQuestion",
     "differential": false,
+    "excludeShutInterfaces": "${excludeShutInterfaces}",
     "interfaces": "${interfaces}",
     "nodes": "${nodes}",
     "properties": "${properties}",
@@ -12,6 +13,12 @@
             "interfaces"
         ],
         "variables": {
+            "excludeShutInterfaces": {
+                "description": "Exclude interfaces that are shutdown",
+                "type": "boolean",
+                "optional": false,
+                "value": true
+            },
             "interfaces": {
                 "description": "Include interfaces matching this regex",
                 "type": "javaRegex",
