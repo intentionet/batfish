@@ -1,11 +1,8 @@
 package org.batfish.datamodel.acl;
 
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasEvents;
-import static org.batfish.datamodel.matchers.DataModelMatchers.isDefaultDeniedByAclIpSpaceNamed;
 import static org.batfish.datamodel.matchers.DataModelMatchers.isDefaultDeniedByIpAccessListNamed;
-import static org.batfish.datamodel.matchers.DataModelMatchers.isDeniedByAclIpSpaceLineThat;
 import static org.batfish.datamodel.matchers.DataModelMatchers.isDeniedByIpAccessListLineThat;
-import static org.batfish.datamodel.matchers.DataModelMatchers.isDeniedByNamedIpSpace;
 import static org.batfish.datamodel.matchers.DataModelMatchers.isPermittedByAclIpSpaceLineThat;
 import static org.batfish.datamodel.matchers.DataModelMatchers.isPermittedByIpAccessListLineThat;
 import static org.batfish.datamodel.matchers.DataModelMatchers.isPermittedByNamedIpSpace;
@@ -28,7 +25,6 @@ import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpSpaceMetadata;
 import org.batfish.datamodel.IpSpaceReference;
 import org.batfish.datamodel.UniverseIpSpace;
-import org.batfish.datamodel.matchers.DeniedByAclIpSpaceLineMatchers;
 import org.batfish.datamodel.matchers.DeniedByIpAccessListLineMatchers;
 import org.batfish.datamodel.matchers.PermittedByAclIpSpaceLineMatchers;
 import org.batfish.datamodel.matchers.PermittedByIpAccessListLineMatchers;
@@ -83,12 +79,7 @@ public class AclTracerTest {
             acl, FLOW, SRC_INTERFACE, availableAcls, namedIpSpaces, namedIpSpaceMetadata);
 
     assertThat(
-        trace,
-        hasEvents(
-            contains(
-                ImmutableList.of(
-                    isDefaultDeniedByAclIpSpaceNamed(ACL_IP_SPACE_NAME),
-                    isDefaultDeniedByIpAccessListNamed(ACL_NAME)))));
+        trace, hasEvents(contains(ImmutableList.of(isDefaultDeniedByIpAccessListNamed(ACL_NAME)))));
   }
 
   @Test
@@ -121,14 +112,14 @@ public class AclTracerTest {
         hasEvents(
             contains(
                 ImmutableList.of(
-                    isPermittedByIpAccessListLineThat(
-                        allOf(
-                            PermittedByIpAccessListLineMatchers.hasName(aclIndirectName),
-                            PermittedByIpAccessListLineMatchers.hasIndex(0))),
                     isDeniedByIpAccessListLineThat(
                         allOf(
                             DeniedByIpAccessListLineMatchers.hasName(ACL_NAME),
-                            DeniedByIpAccessListLineMatchers.hasIndex(0)))))));
+                            DeniedByIpAccessListLineMatchers.hasIndex(0))),
+                    isPermittedByIpAccessListLineThat(
+                        allOf(
+                            PermittedByIpAccessListLineMatchers.hasName(aclIndirectName),
+                            PermittedByIpAccessListLineMatchers.hasIndex(0)))))));
   }
 
   @Test
@@ -178,15 +169,7 @@ public class AclTracerTest {
             acl, FLOW, SRC_INTERFACE, availableAcls, namedIpSpaces, namedIpSpaceMetadata);
 
     assertThat(
-        trace,
-        hasEvents(
-            contains(
-                ImmutableList.of(
-                    isDeniedByAclIpSpaceLineThat(
-                        allOf(
-                            DeniedByAclIpSpaceLineMatchers.hasName(ACL_IP_SPACE_NAME),
-                            DeniedByAclIpSpaceLineMatchers.hasIndex(0))),
-                    isDefaultDeniedByIpAccessListNamed(ACL_NAME)))));
+        trace, hasEvents(contains(ImmutableList.of(isDefaultDeniedByIpAccessListNamed(ACL_NAME)))));
   }
 
   @Test
@@ -213,12 +196,7 @@ public class AclTracerTest {
             acl, FLOW, SRC_INTERFACE, availableAcls, namedIpSpaces, namedIpSpaceMetadata);
 
     assertThat(
-        trace,
-        hasEvents(
-            contains(
-                ImmutableList.of(
-                    isDeniedByNamedIpSpace(ipSpaceName),
-                    isDefaultDeniedByIpAccessListNamed(ACL_NAME)))));
+        trace, hasEvents(contains(ImmutableList.of(isDefaultDeniedByIpAccessListNamed(ACL_NAME)))));
   }
 
   @Test
@@ -313,14 +291,14 @@ public class AclTracerTest {
         hasEvents(
             contains(
                 ImmutableList.of(
-                    isPermittedByAclIpSpaceLineThat(
-                        allOf(
-                            PermittedByAclIpSpaceLineMatchers.hasName(ACL_IP_SPACE_NAME),
-                            PermittedByAclIpSpaceLineMatchers.hasIndex(0))),
                     isPermittedByIpAccessListLineThat(
                         allOf(
                             PermittedByIpAccessListLineMatchers.hasName(ACL_NAME),
-                            PermittedByIpAccessListLineMatchers.hasIndex(0)))))));
+                            PermittedByIpAccessListLineMatchers.hasIndex(0))),
+                    isPermittedByAclIpSpaceLineThat(
+                        allOf(
+                            PermittedByAclIpSpaceLineMatchers.hasName(ACL_IP_SPACE_NAME),
+                            PermittedByAclIpSpaceLineMatchers.hasIndex(0)))))));
   }
 
   @Test
@@ -349,11 +327,11 @@ public class AclTracerTest {
         hasEvents(
             contains(
                 ImmutableList.of(
-                    isPermittedByNamedIpSpace(ipSpaceName),
                     isPermittedByIpAccessListLineThat(
                         allOf(
                             PermittedByIpAccessListLineMatchers.hasName(ACL_NAME),
-                            PermittedByIpAccessListLineMatchers.hasIndex(0)))))));
+                            PermittedByIpAccessListLineMatchers.hasIndex(0))),
+                    isPermittedByNamedIpSpace(ipSpaceName)))));
   }
 
   @Test

@@ -4,8 +4,9 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.batfish.common.util.CommonUtil.rangesContain;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Iterables;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -39,6 +40,7 @@ public final class AclTracer extends Evaluator {
       @Nonnull Map<String, IpSpaceMetadata> namedIpSpaceMetadata) {
     AclTracer tracer =
         new AclTracer(flow, srcInterface, availableAcls, namedIpSpaces, namedIpSpaceMetadata);
+    tracer._rootAclName = ipAccessList.getName();
     tracer.trace(ipAccessList);
     return tracer.getTrace();
   }
@@ -47,7 +49,11 @@ public final class AclTracer extends Evaluator {
 
   private final Map<IpSpace, String> _ipSpaceNames;
 
-  private Builder<TraceEvent> _traceEvents;
+  private final List<List<TraceEvent>> _traceStack;
+
+  private int _stackPointer = -1;
+
+  private String _rootAclName;
 
   public AclTracer(
       @Nonnull Flow flow,
@@ -58,7 +64,7 @@ public final class AclTracer extends Evaluator {
     super(flow, srcInterface, availableAcls, namedIpSpaces);
     _ipSpaceNames = new IdentityHashMap<>();
     _ipSpaceMetadata = new IdentityHashMap<>();
-    _traceEvents = ImmutableList.builder();
+    _traceStack = new LinkedList<>();
     namedIpSpaces.forEach((name, ipSpace) -> _ipSpaceNames.put(ipSpace, name));
     namedIpSpaceMetadata.forEach(
         (name, ipSpaceMetadata) -> _ipSpaceMetadata.put(namedIpSpaces.get(name), ipSpaceMetadata));
@@ -89,28 +95,43 @@ public final class AclTracer extends Evaluator {
   }
 
   public @Nonnull AclTrace getTrace() {
-    return new AclTrace(_traceEvents.build());
+    if (_traceStack.isEmpty()) {
+      // Nothing matched at all
+      return new AclTrace(
+          ImmutableList.of(new DefaultDeniedByIpAccessList(_rootAclName, null, null)));
+    }
+    // Return the last action at each level
+    return new AclTrace(
+        _traceStack
+            .stream()
+            .filter(l -> !l.isEmpty())
+            .map(Iterables::getLast)
+            .collect(ImmutableList.toImmutableList()));
   }
 
   public void recordAction(
       @Nonnull IpAccessList ipAccessList, int index, @Nonnull IpAccessListLine line) {
     String lineDescription = firstNonNull(line.getName(), line.toString());
     if (line.getAction() == LineAction.PERMIT) {
-      _traceEvents.add(
-          new PermittedByIpAccessListLine(
-              index,
-              lineDescription,
-              ipAccessList.getName(),
-              ipAccessList.getSourceName(),
-              ipAccessList.getSourceType()));
+      _traceStack
+          .get(_stackPointer)
+          .add(
+              new PermittedByIpAccessListLine(
+                  index,
+                  lineDescription,
+                  ipAccessList.getName(),
+                  ipAccessList.getSourceName(),
+                  ipAccessList.getSourceType()));
     } else {
-      _traceEvents.add(
-          new DeniedByIpAccessListLine(
-              index,
-              lineDescription,
-              ipAccessList.getName(),
-              ipAccessList.getSourceName(),
-              ipAccessList.getSourceType()));
+      _traceStack
+          .get(_stackPointer)
+          .add(
+              new DeniedByIpAccessListLine(
+                  index,
+                  lineDescription,
+                  ipAccessList.getName(),
+                  ipAccessList.getSourceName(),
+                  ipAccessList.getSourceType()));
     }
   }
 
@@ -123,30 +144,38 @@ public final class AclTracer extends Evaluator {
       String ipDescription,
       IpSpaceDescriber describer) {
     if (line.getAction() == LineAction.PERMIT) {
-      _traceEvents.add(
-          new PermittedByAclIpSpaceLine(
-              aclIpSpaceName,
-              ipSpaceMetadata,
-              index,
-              computeLineDescription(line, describer),
-              ip,
-              ipDescription));
+      _traceStack
+          .get(_stackPointer)
+          .add(
+              new PermittedByAclIpSpaceLine(
+                  aclIpSpaceName,
+                  ipSpaceMetadata,
+                  index,
+                  computeLineDescription(line, describer),
+                  ip,
+                  ipDescription));
     } else {
-      _traceEvents.add(
-          new DeniedByAclIpSpaceLine(
-              aclIpSpaceName,
-              ipSpaceMetadata,
-              index,
-              computeLineDescription(line, describer),
-              ip,
-              ipDescription));
+      _traceStack
+          .get(_stackPointer)
+          .add(
+              new DeniedByAclIpSpaceLine(
+                  aclIpSpaceName,
+                  ipSpaceMetadata,
+                  index,
+                  computeLineDescription(line, describer),
+                  ip,
+                  ipDescription));
     }
   }
 
   public void recordDefaultDeny(@Nonnull IpAccessList ipAccessList) {
-    _traceEvents.add(
-        new DefaultDeniedByIpAccessList(
-            ipAccessList.getName(), ipAccessList.getSourceName(), ipAccessList.getSourceType()));
+    _traceStack
+        .get(_stackPointer)
+        .add(
+            new DefaultDeniedByIpAccessList(
+                ipAccessList.getName(),
+                ipAccessList.getSourceName(),
+                ipAccessList.getSourceType()));
   }
 
   public void recordDefaultDeny(
@@ -154,8 +183,9 @@ public final class AclTracer extends Evaluator {
       @Nullable IpSpaceMetadata ipSpaceMetadata,
       Ip ip,
       String ipDescription) {
-    _traceEvents.add(
-        new DefaultDeniedByAclIpSpace(aclIpSpaceName, ip, ipDescription, ipSpaceMetadata));
+    _traceStack
+        .get(_stackPointer)
+        .add(new DefaultDeniedByAclIpSpace(aclIpSpaceName, ip, ipDescription, ipSpaceMetadata));
   }
 
   public void recordNamedIpSpaceAction(
@@ -166,12 +196,17 @@ public final class AclTracer extends Evaluator {
       Ip ip,
       String ipDescription) {
     if (permit) {
-      _traceEvents.add(
-          new PermittedByNamedIpSpace(
-              ip, ipDescription, ipSpaceDescription, ipSpaceMetadata, name));
+      _traceStack
+          .get(_stackPointer)
+          .add(
+              new PermittedByNamedIpSpace(
+                  ip, ipDescription, ipSpaceDescription, ipSpaceMetadata, name));
     } else {
-      _traceEvents.add(
-          new DeniedByNamedIpSpace(ip, ipDescription, ipSpaceDescription, ipSpaceMetadata, name));
+      _traceStack
+          .get(_stackPointer)
+          .add(
+              new DeniedByNamedIpSpace(
+                  ip, ipDescription, ipSpaceDescription, ipSpaceMetadata, name));
     }
   }
 
@@ -361,14 +396,17 @@ public final class AclTracer extends Evaluator {
 
   private boolean trace(@Nonnull IpAccessList ipAccessList) {
     List<IpAccessListLine> lines = ipAccessList.getLines();
+    newTrace();
     for (int i = 0; i < lines.size(); i++) {
       IpAccessListLine line = lines.get(i);
       if (line.getMatchCondition().accept(this)) {
         recordAction(ipAccessList, i, line);
+        endTrace();
         return line.getAction() == LineAction.PERMIT;
       }
     }
     recordDefaultDeny(ipAccessList);
+    endTraceNoMatch();
     return false;
   }
 
@@ -392,5 +430,29 @@ public final class AclTracer extends Evaluator {
   @Override
   public Boolean visitPermittedByAcl(PermittedByAcl permittedByAcl) {
     return trace(_availableAcls.get(permittedByAcl.getAclName()));
+  }
+
+  /** Start a new trace: indicates jump in a level of indirection to a new named structure */
+  public void newTrace() {
+    // Push down a new trace
+    _traceStack.add(new LinkedList<>());
+    _stackPointer++;
+  }
+
+  /** End a trace: indicates that tracing of a named structure is finished. */
+  public void endTrace() {
+    // Pop up, keep traces
+    _stackPointer--;
+  }
+
+  /**
+   * End a trace: indicates that tracing of a named structure is finished, with no match occurring.
+   */
+  public void endTraceNoMatch() {
+    // Remove all traces from current pointer to the end
+    while (_traceStack.size() > _stackPointer && _stackPointer >= 0) {
+      _traceStack.remove(_stackPointer);
+    }
+    _stackPointer--;
   }
 }

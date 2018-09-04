@@ -99,7 +99,12 @@ public class TestFiltersTest {
     TestFiltersAnswerer answerer = new TestFiltersAnswerer(question, batfish);
     TableAnswerElement answer = answerer.answer();
 
-    /* Trace should be present for referencing acl with two events: being denied by referenced acl, and permited by referencing acl in later line */
+    /*
+     * Trace should be present for referencing acl with one event:
+     * Permitted by referencing acl
+     *
+     * NO event for referenced ACL since it's action was not match (default deny)
+     */
     assertThat(
         answer,
         hasRows(
@@ -110,7 +115,6 @@ public class TestFiltersTest {
                     hasEvents(
                         contains(
                             ImmutableList.of(
-                                isDefaultDeniedByIpAccessListNamed(referencedAcl.getName()),
                                 isPermittedByIpAccessListLineThat(
                                     PermittedByIpAccessListLineMatchers.hasName(acl.getName()))))),
                     Schema.ACL_TRACE))));

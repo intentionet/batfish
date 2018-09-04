@@ -46,6 +46,7 @@ public class IpSpaceTracer implements GenericIpSpaceVisitor<Boolean> {
   @Override
   public Boolean visitAclIpSpace(AclIpSpace aclIpSpace) {
     String name = _aclTracer.getIpSpaceNames().get(aclIpSpace);
+    _aclTracer.newTrace();
     List<AclIpSpaceLine> lines = aclIpSpace.getLines();
     for (int i = 0; i < lines.size(); i++) {
       AclIpSpaceLine line = lines.get(i);
@@ -60,6 +61,7 @@ public class IpSpaceTracer implements GenericIpSpaceVisitor<Boolean> {
               _ipDescription,
               _ipSpaceDescriber);
         }
+        _aclTracer.endTrace();
         return line.getAction() == LineAction.PERMIT;
       }
     }
@@ -67,6 +69,7 @@ public class IpSpaceTracer implements GenericIpSpaceVisitor<Boolean> {
       _aclTracer.recordDefaultDeny(
           name, _aclTracer.getIpSpaceMetadata().get(aclIpSpace), _ip, _ipDescription);
     }
+    _aclTracer.endTraceNoMatch();
     return false;
   }
 
@@ -85,7 +88,14 @@ public class IpSpaceTracer implements GenericIpSpaceVisitor<Boolean> {
     String name = ipSpaceReference.getName();
     IpSpace ipSpace = _aclTracer.getNamedIpSpaces().get(name);
     if (ipSpace != null) {
-      return ipSpace.accept(this);
+      _aclTracer.newTrace();
+      Boolean accepted = ipSpace.accept(this);
+      if (!accepted) {
+        _aclTracer.endTraceNoMatch();
+      } else {
+        _aclTracer.endTrace();
+      }
+      return accepted;
     } else {
       return false;
     }
@@ -94,7 +104,7 @@ public class IpSpaceTracer implements GenericIpSpaceVisitor<Boolean> {
   private boolean reportIfNamed(IpSpace ipSpace) {
     boolean result = ipSpace.containsIp(_ip, _aclTracer.getNamedIpSpaces());
     String name = _aclTracer.getIpSpaceNames().get(ipSpace);
-    if (name != null) {
+    if (name != null && result) {
       _aclTracer.recordNamedIpSpaceAction(
           name,
           ipSpace.accept(_ipSpaceDescriber),
