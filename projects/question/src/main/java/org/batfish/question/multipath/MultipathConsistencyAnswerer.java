@@ -1,6 +1,8 @@
 package org.batfish.question.multipath;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.batfish.question.traceroute.TracerouteAnswerer.COL_FLOW;
+import static org.batfish.question.traceroute.TracerouteAnswerer.COL_TRACES;
 import static org.batfish.question.traceroute.TracerouteAnswerer.createMetadata;
 
 import com.google.common.collect.ImmutableSet;
@@ -19,10 +21,6 @@ import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableAnswerElement;
 
 public class MultipathConsistencyAnswerer extends Answerer {
-
-  static final String COL_FLOW = "flow";
-  static final String COL_TRACES = "traces";
-
   public MultipathConsistencyAnswerer(Question question, IBatfish batfish) {
     super(question, batfish);
   }

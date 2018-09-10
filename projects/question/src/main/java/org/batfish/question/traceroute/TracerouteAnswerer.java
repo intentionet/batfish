@@ -41,8 +41,8 @@ import org.batfish.specifier.LocationVisitor;
 import org.batfish.specifier.SpecifierContext;
 
 public final class TracerouteAnswerer extends Answerer {
-  static final String COL_FLOW = "Flow";
-  static final String COL_TRACES = "Traces";
+  public static final String COL_FLOW = "Flow";
+  public static final String COL_TRACES = "Traces";
 
   private final Map<String, Configuration> _configurations;
   private final IpSpaceRepresentative _ipSpaceRepresentative;
