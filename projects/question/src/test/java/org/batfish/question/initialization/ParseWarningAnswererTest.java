@@ -9,7 +9,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSortedMap;
-import org.batfish.common.BatfishLogger;
 import org.batfish.common.Warnings;
 import org.batfish.common.Warnings.ParseWarning;
 import org.batfish.common.plugin.IBatfishTestAdapter;
@@ -86,11 +85,6 @@ public class ParseWarningAnswererTest {
   }
 
   private static class TestBatfish extends IBatfishTestAdapter {
-    @Override
-    public BatfishLogger getLogger() {
-      return null;
-    }
-
     @Override
     public ParseVendorConfigurationAnswerElement loadParseVendorConfigurationAnswerElement() {
       ParseVendorConfigurationAnswerElement pvcae = new ParseVendorConfigurationAnswerElement();

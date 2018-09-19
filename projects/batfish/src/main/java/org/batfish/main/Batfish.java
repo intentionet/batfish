@@ -56,7 +56,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.sf.javabdd.BDD;
-import net.sf.javabdd.BDDFactory;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.configuration2.ImmutableConfiguration;
@@ -80,7 +79,6 @@ import org.batfish.common.Warnings;
 import org.batfish.common.bdd.BDDPacket;
 import org.batfish.common.bdd.BDDSourceManager;
 import org.batfish.common.bdd.HeaderSpaceToBDD;
-import org.batfish.common.bdd.IpAccessListToBDD;
 import org.batfish.common.plugin.BgpTablePlugin;
 import org.batfish.common.plugin.DataPlanePlugin;
 import org.batfish.common.plugin.DataPlanePlugin.ComputeDataPlaneResult;
@@ -117,7 +115,6 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
-import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpsecVpn;
 import org.batfish.datamodel.RipNeighbor;
@@ -126,9 +123,6 @@ import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
-import org.batfish.datamodel.acl.AclLineMatchExpr;
-import org.batfish.datamodel.answers.AclReachabilityRows;
-import org.batfish.datamodel.answers.AclSpecs;
 import org.batfish.datamodel.answers.Answer;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.answers.AnswerMetadataUtil;
@@ -723,62 +717,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
     AclLineIndependentSatisfiabilityQuerySynthesizer query =
         new AclLineIndependentSatisfiabilityQuerySynthesizer(hostname, aclName, lineToCheck);
     return new NodSatJob<>(_settings, aclSynthesizer, query, true);
-  }
-
-  // new implementation using BDD
-  @Override
-  public void answerAclReachability(List<AclSpecs> aclSpecs, AclReachabilityRows answerRows) {
-    BDDPacket bddPacket = new BDDPacket();
-    BDDFactory bddFactory = bddPacket.getFactory();
-
-    for (AclSpecs aclSpec : aclSpecs) {
-      BDDSourceManager sourceMgr =
-          BDDSourceManager.forInterfaces(bddPacket, aclSpec.acl.getInterfaces());
-      IpAccessListToBDD ipAccessListToBDD =
-          IpAccessListToBDD.create(
-              bddPacket, sourceMgr, aclSpec.acl.getDependencies(), ImmutableMap.of());
-
-      IpAccessList ipAcl = aclSpec.acl.getSanitizedAcl();
-      List<IpAccessListLine> lines = ipAcl.getLines();
-
-      List<BDD> ipLineToBDDMap = new ArrayList<>();
-      Set<Integer> unreachableButMatchableLineNums = new HashSet<>();
-
-      // compute if each acl line is unmatchable and/or unreachable
-      BDD rest = bddFactory.one();
-      for (int lineNum = 0; lineNum < lines.size(); lineNum++) {
-        IpAccessListLine line = lines.get(lineNum);
-        AclLineMatchExpr matchExpr = line.getMatchCondition();
-        BDD lineBDD = matchExpr.accept(ipAccessListToBDD);
-        ipLineToBDDMap.add(lineBDD);
-        if (lineBDD.isZero()) {
-          // this line is unmatchable
-          answerRows.addUnreachableLine(aclSpec, lineNum, true, new TreeSet<>());
-        } else if (rest.isZero() || lineBDD.and(rest).isZero()) {
-          unreachableButMatchableLineNums.add(lineNum);
-        }
-        rest = rest.and(lineBDD.not());
-      }
-
-      // compute blocking lines
-      for (int lineNum : unreachableButMatchableLineNums) {
-        SortedSet<Integer> blockingLineNums = new TreeSet<>();
-        BDD restOfLine = ipLineToBDDMap.get(lineNum);
-
-        for (int prevLineNum = 0; prevLineNum < lineNum; prevLineNum++) {
-          if (restOfLine.isZero()) {
-            break;
-          }
-          BDD prevBDD = ipLineToBDDMap.get(prevLineNum);
-
-          if (!(prevBDD.and(restOfLine).isZero())) {
-            blockingLineNums.add(prevLineNum);
-            restOfLine = restOfLine.and(prevBDD.not());
-          }
-        }
-        answerRows.addUnreachableLine(aclSpec, lineNum, false, blockingLineNums);
-      }
-    }
   }
 
   public static Warnings buildWarnings(Settings settings) {
@@ -4227,19 +4165,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
   }
 
   private Set<String> resolveSources(ReachFilterParameters parameters, String node) {
-    LocationVisitor<Boolean> onNode =
-        new LocationVisitor<Boolean>() {
-          @Override
-          public Boolean visitInterfaceLinkLocation(InterfaceLinkLocation interfaceLinkLocation) {
-            return interfaceLinkLocation.getNodeName().equals(node);
-          }
-
-          @Override
-          public Boolean visitInterfaceLocation(InterfaceLocation interfaceLocation) {
-            return interfaceLocation.getNodeName().equals(node);
-          }
-        };
-
     LocationVisitor<String> locationToSource =
         new LocationVisitor<String>() {
           @Override
@@ -4257,7 +4182,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
         .getStartLocationSpecifier()
         .resolve(specifierContext())
         .stream()
-        .filter(onNode::visit)
+        .filter(LocationVisitor.onNode(node)::visit)
         .map(locationToSource::visit)
         .collect(ImmutableSet.toImmutableSet());
   }

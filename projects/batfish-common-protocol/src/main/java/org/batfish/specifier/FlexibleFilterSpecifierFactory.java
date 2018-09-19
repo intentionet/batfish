@@ -12,6 +12,9 @@ import javax.annotation.Nullable;
  *
  * <ul>
  *   <li>null, which returns {@link ShorthandFilterSpecifier} that matches everything
+ *   <li>inFilterOf(foo), which returns {@link InterfaceSpecifierFilterSpecifier} with foo being fed
+ *       to {@link FlexibleInterfaceSpecifierFactory}
+ *   <li>outFilterOf(foo), as above but for output filters
  *   <li>ref.filtergroup(foo, bar), which returns {@link ReferenceFilterGroupFilterSpecifier};
  *   <li>inputs accepted by {@link ShorthandFilterSpecifier}
  * </ul>
@@ -19,6 +22,12 @@ import javax.annotation.Nullable;
 @AutoService(FilterSpecifierFactory.class)
 public class FlexibleFilterSpecifierFactory implements FilterSpecifierFactory {
   public static final String NAME = FlexibleFilterSpecifierFactory.class.getSimpleName();
+
+  private static final Pattern IN_FILTER_OF_PATTERN =
+      Pattern.compile("inFilterOf\\((.*)\\)", Pattern.CASE_INSENSITIVE);
+
+  private static final Pattern OUT_FILTER_OF_PATTERN =
+      Pattern.compile("outFilterOf\\((.*)\\)", Pattern.CASE_INSENSITIVE);
 
   private static final Pattern REF_PATTERN =
       Pattern.compile("ref\\.filtergroup\\((.*)\\)", Pattern.CASE_INSENSITIVE);
@@ -35,7 +44,24 @@ public class FlexibleFilterSpecifierFactory implements FilterSpecifierFactory {
     }
     checkArgument(input instanceof String, NAME + " requires String input");
     String str = ((String) input).trim();
-    Matcher matcher = REF_PATTERN.matcher(str);
+
+    Matcher matcher = IN_FILTER_OF_PATTERN.matcher(str);
+    if (matcher.find()) {
+      InterfaceSpecifier specifier =
+          new FlexibleInterfaceSpecifierFactory().buildInterfaceSpecifier(matcher.group(1));
+      return new InterfaceSpecifierFilterSpecifier(
+          InterfaceSpecifierFilterSpecifier.Type.IN_FILTER, specifier);
+    }
+
+    matcher = OUT_FILTER_OF_PATTERN.matcher(str);
+    if (matcher.find()) {
+      InterfaceSpecifier specifier =
+          new FlexibleInterfaceSpecifierFactory().buildInterfaceSpecifier(matcher.group(1));
+      return new InterfaceSpecifierFilterSpecifier(
+          InterfaceSpecifierFilterSpecifier.Type.OUT_FILTER, specifier);
+    }
+
+    matcher = REF_PATTERN.matcher(str);
     if (matcher.find()) {
       return new ReferenceFilterGroupFilterSpecifierFactory()
           .buildFilterSpecifier(matcher.group(1));

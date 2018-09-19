@@ -4,16 +4,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpSpace;
-import org.batfish.main.Batfish;
 import org.batfish.referencelibrary.ReferenceBook;
 import org.batfish.role.NodeRoleDimension;
 
+/** Implementation of {@link SpecifierContext}. */
 public class SpecifierContextImpl implements SpecifierContext {
-  private final @Nonnull Batfish _batfish;
+  private final @Nonnull IBatfish _batfish;
 
   private final @Nonnull Map<String, Configuration> _configs;
 
@@ -22,7 +23,7 @@ public class SpecifierContextImpl implements SpecifierContext {
   private final @Nonnull Map<String, Map<String, IpSpace>> _vrfOwnedIps;
 
   public SpecifierContextImpl(
-      @Nonnull Batfish batfish, @Nonnull Map<String, Configuration> configs) {
+      @Nonnull IBatfish batfish, @Nonnull Map<String, Configuration> configs) {
     _batfish = batfish;
     _configs = configs;
     Map<Ip, Map<String, Set<String>>> ipInterfaceOwners =

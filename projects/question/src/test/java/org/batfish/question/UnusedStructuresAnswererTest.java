@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import org.batfish.common.BatfishLogger;
 import org.batfish.common.plugin.IBatfishTestAdapter;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
@@ -102,11 +101,6 @@ public class UnusedStructuresAnswererTest {
   }
 
   private static class TestBatfish extends IBatfishTestAdapter {
-    @Override
-    public BatfishLogger getLogger() {
-      return null;
-    }
-
     @Override
     public ConvertConfigurationAnswerElement loadConvertConfigurationAnswerElementOrReparse() {
       ConvertConfigurationAnswerElement ccae = new ConvertConfigurationAnswerElement();

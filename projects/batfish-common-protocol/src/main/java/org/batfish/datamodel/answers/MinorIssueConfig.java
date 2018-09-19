@@ -1,6 +1,6 @@
 package org.batfish.datamodel.answers;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,8 +8,10 @@ import com.google.common.base.MoreObjects;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /** Represents the configuration of a minor issue type */
+@ParametersAreNonnullByDefault
 public class MinorIssueConfig {
   private static final String PROP_MINOR_ISSUE = "minorIssue";
   private static final String PROP_SEVERITY = "severity";
@@ -20,11 +22,15 @@ public class MinorIssueConfig {
   @Nullable private final String _url;
 
   @JsonCreator
-  public MinorIssueConfig(
-      @JsonProperty(PROP_MINOR_ISSUE) String minorIssue,
-      @JsonProperty(PROP_SEVERITY) Integer severity,
-      @JsonProperty(PROP_URL) String url) {
-    checkArgument(minorIssue != null, "'minorIssue' cannot be null");
+  private static @Nonnull MinorIssueConfig create(
+      @JsonProperty(PROP_MINOR_ISSUE) @Nullable String minorIssue,
+      @JsonProperty(PROP_SEVERITY) @Nullable Integer severity,
+      @JsonProperty(PROP_URL) @Nullable String url) {
+    return new MinorIssueConfig(
+        requireNonNull(minorIssue, "'minorIssue' cannot be null"), severity, url);
+  }
+
+  public MinorIssueConfig(String minorIssue, Integer severity, String url) {
     _minorIssue = minorIssue;
     _severity = severity;
     _url = url;
@@ -32,12 +38,16 @@ public class MinorIssueConfig {
 
   @Override
   public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
     if (!(o instanceof MinorIssueConfig)) {
       return false;
     }
-    return Objects.equals(_minorIssue, ((MinorIssueConfig) o)._minorIssue)
-        && Objects.equals(_severity, ((MinorIssueConfig) o)._severity)
-        && Objects.equals(_url, ((MinorIssueConfig) o)._url);
+    MinorIssueConfig rhs = (MinorIssueConfig) o;
+    return _minorIssue.equals(rhs._minorIssue)
+        && Objects.equals(_severity, rhs._severity)
+        && Objects.equals(_url, rhs._url);
   }
 
   @JsonProperty(PROP_MINOR_ISSUE)

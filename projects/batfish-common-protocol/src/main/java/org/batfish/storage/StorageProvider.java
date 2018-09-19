@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -299,4 +300,15 @@ public interface StorageProvider {
    */
   void storeQuestionSettings(String settings, String network, String questionClass)
       throws IOException;
+
+  /**
+   * Returns the {@link MajorIssueConfig}s for the given network and majorIssueTypes, keyed by major
+   * issue type. If no config exists for a given major issue type, will return a mapping whose value
+   * is a {@link MajorIssueConfig} with an empty list of {@link MinorIssueConfig}s
+   *
+   * @param network The name of the network
+   * @param majorIssueTypes The types of the major issues whose configurations are to be loaded
+   */
+  @Nonnull
+  Map<String, MajorIssueConfig> loadMajorIssueConfigs(String network, Set<String> majorIssueTypes);
 }

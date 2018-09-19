@@ -68,7 +68,7 @@ public final class TracerouteQuestion extends Question {
 
   @Override
   public String getName() {
-    return "traceroute2";
+    return "traceroute";
   }
 
   @Override

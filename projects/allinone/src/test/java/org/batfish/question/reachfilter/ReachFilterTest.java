@@ -59,6 +59,7 @@ import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.question.ReachFilterParameters;
+import org.batfish.question.testfilters.TestFiltersAnswerer;
 import org.batfish.specifier.ConstantIpSpaceSpecifier;
 import org.batfish.specifier.NameRegexInterfaceLinkLocationSpecifier;
 import org.junit.BeforeClass;
@@ -334,12 +335,10 @@ public final class ReachFilterTest {
 
   @Test
   public void testTestFilter() {
-    ReachFilterQuestion question = new ReachFilterQuestion();
     String hostname = _config.getHostname();
     Flow flow = Flow.builder().setIngressNode(hostname).setDstIp(IP2).setTag("tag").build();
-    ReachFilterAnswerer answerer = new ReachFilterAnswerer(question, _batfish);
     assertThat(
-        answerer.testFiltersRow(hostname, ACL, flow),
+        TestFiltersAnswerer.getRow(ACL, flow, _config),
         allOf(
             hasColumn(COL_ACTION, equalTo("DENY"), Schema.STRING),
             hasColumn(COL_FILTER_NAME, equalTo(ACL.getName()), Schema.STRING)));

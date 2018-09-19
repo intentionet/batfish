@@ -30,12 +30,12 @@ test tests/basic/isisLoopbacks.ref get isisLoopbacks
 test tests/basic/ospfSessionCheck.ref get ospfsessioncheck
 test tests/basic/ospfStatus.ref get ospfstatus interfacesSpecifier="Loopback.*", status=".*passive"
 test tests/basic/selfAdjacencies.ref get selfAdjacencies
-test tests/basic/testfilters.ref get testFilters dst="1.1.1.1", nodes="host.*", filters="filter.*"
-test tests/basic/traceroute-1-2.ref get traceroute ingressNode="as1core1", dst="host1"
-test tests/basic/traceroute-1-2-ignoreAcls.ref get traceroute ingressNode="as1core1", dst="host1", ignoreAcls=true
-test tests/basic/traceroute-2-1.ref get traceroute ingressNode="host2", dst="1.0.1.1"
-test tests/basic/traceroute2-1-2.ref get traceroute2 startLocation="enter(as1core1)", headers={"dstIps": "ofLocation(host1)"}
-test tests/basic/traceroute2-2-1.ref get traceroute2 startLocation="host2", headers={"dstIps": "1.0.1.1"}
+test tests/basic/testfilters.ref get testFilters headers={"dstIps": "1.1.1.1"}, nodes="host.*", filters="filter.*"
+test tests/basic/oldtraceroute-1-2.ref get oldtraceroute ingressNode="as1core1", dst="host1"
+test tests/basic/oldtraceroute-1-2-ignoreAcls.ref get oldtraceroute ingressNode="as1core1", dst="host1", ignoreAcls=true
+test tests/basic/oldtraceroute-2-1.ref get oldtraceroute ingressNode="host2", dst="1.0.1.1"
+test tests/basic/traceroute-1-2.ref get traceroute startLocation="enter(as1core1)", headers={"dstIps": "ofLocation(host1)"}
+test tests/basic/traceroute-2-1.ref get traceroute startLocation="host2", headers={"dstIps": "1.0.1.1"}
 test tests/basic/multipath-host1.ref get reachability type="multipath", ingressNodeRegex="host1", srcIps=["2.128.0.0"], dstIps=["3.0.1.2"], ipProtocols=["TCP"], srcPorts=[0], dstPorts=[0]
 test tests/basic/multipath-host2.ref get reachability type="multipath", ingressNodeRegex="host2", srcIps=["2.128.0.0"], dstIps=["1.0.1.1"], ipProtocols=["UDP"], srcPorts=[0], dstPorts=[0]
 test tests/basic/bgpAsnUse.ref get bgpasnuse minCount=2

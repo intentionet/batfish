@@ -4,12 +4,15 @@ import static org.batfish.coordinator.WorkMgr.generateFileDateString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -30,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.batfish.common.AnswerRowsOptions;
@@ -46,10 +50,14 @@ import org.batfish.coordinator.AnalysisMetadataMgr.AnalysisType;
 import org.batfish.datamodel.TestrigMetadata;
 import org.batfish.datamodel.answers.Answer;
 import org.batfish.datamodel.answers.AnswerMetadata;
+import org.batfish.datamodel.answers.AnswerMetadataUtil;
 import org.batfish.datamodel.answers.AnswerStatus;
 import org.batfish.datamodel.answers.Issue;
+import org.batfish.datamodel.answers.MajorIssueConfig;
 import org.batfish.datamodel.answers.Metrics;
+import org.batfish.datamodel.answers.MinorIssueConfig;
 import org.batfish.datamodel.answers.Schema;
+import org.batfish.datamodel.answers.StringAnswerElement;
 import org.batfish.datamodel.pojo.Node;
 import org.batfish.datamodel.pojo.Topology;
 import org.batfish.datamodel.table.ColumnMetadata;
@@ -568,8 +576,10 @@ public class WorkMgrTest {
     String questionName = "question1";
     String questionContent = "{}";
     AnswerMetadata answerMetadata =
-        new AnswerMetadata(
-            new Metrics(ImmutableMap.of(), ImmutableSet.of(), 1), AnswerStatus.SUCCESS);
+        AnswerMetadata.builder()
+            .setMetrics(Metrics.builder().setNumRows(1).build())
+            .setStatus(AnswerStatus.SUCCESS)
+            .build();
     _manager.initContainer(networkName, null);
     _manager.configureAnalysis(
         networkName,
@@ -594,8 +604,10 @@ public class WorkMgrTest {
     String analysisName = "analysis1";
     String questionName = "question1";
     AnswerMetadata answerMetadata =
-        new AnswerMetadata(
-            new Metrics(ImmutableMap.of(), ImmutableSet.of(), 1), AnswerStatus.SUCCESS);
+        AnswerMetadata.builder()
+            .setMetrics(Metrics.builder().setNumRows(1).build())
+            .setStatus(AnswerStatus.SUCCESS)
+            .build();
     _manager.initContainer(networkName, null);
     _manager.configureAnalysis(
         networkName, true, analysisName, ImmutableMap.of(), ImmutableList.of(), null);
@@ -626,7 +638,7 @@ public class WorkMgrTest {
     AnswerMetadata answerResult =
         _manager.getAnswerMetadata(networkName, snapshotName, questionName, null, analysisName);
 
-    assertThat(answerResult, equalTo(new AnswerMetadata(null, AnswerStatus.NOTFOUND)));
+    assertThat(answerResult, equalTo(AnswerMetadata.forStatus(AnswerStatus.NOTFOUND)));
   }
 
   @Test
@@ -637,8 +649,10 @@ public class WorkMgrTest {
     String analysisName = "analysis1";
     String questionName = "question1";
     AnswerMetadata answerMetadata =
-        new AnswerMetadata(
-            new Metrics(ImmutableMap.of(), ImmutableSet.of(), 1), AnswerStatus.SUCCESS);
+        AnswerMetadata.builder()
+            .setMetrics(Metrics.builder().setNumRows(1).build())
+            .setStatus(AnswerStatus.SUCCESS)
+            .build();
     _manager.initContainer(networkName, null);
     _storage.storeAnswerMetadata(
         answerMetadata, networkName, snapshotName, questionName, null, analysisName);
@@ -655,8 +669,10 @@ public class WorkMgrTest {
     String questionContent = "{}";
     String questionName = "question2Name";
     AnswerMetadata answerMetadata =
-        new AnswerMetadata(
-            new Metrics(ImmutableMap.of(), ImmutableSet.of(), 2), AnswerStatus.SUCCESS);
+        AnswerMetadata.builder()
+            .setMetrics(Metrics.builder().setNumRows(2).build())
+            .setStatus(AnswerStatus.SUCCESS)
+            .build();
     _manager.initContainer(networkName, null);
     _manager.uploadQuestion(networkName, questionName, questionContent, false);
     _storage.storeAnswerMetadata(
@@ -680,7 +696,7 @@ public class WorkMgrTest {
     AnswerMetadata answer2Result =
         _manager.getAnswerMetadata(networkName, snapshotName, questionName, null, null);
 
-    assertThat(answer2Result, equalTo(new AnswerMetadata(null, AnswerStatus.NOTFOUND)));
+    assertThat(answer2Result, equalTo(AnswerMetadata.forStatus(AnswerStatus.NOTFOUND)));
   }
 
   @Test
@@ -690,8 +706,10 @@ public class WorkMgrTest {
     String snapshotName = "snapshot1";
     String questionName = "question2Name";
     AnswerMetadata answerMetadata =
-        new AnswerMetadata(
-            new Metrics(ImmutableMap.of(), ImmutableSet.of(), 2), AnswerStatus.SUCCESS);
+        AnswerMetadata.builder()
+            .setMetrics(Metrics.builder().setNumRows(2).build())
+            .setStatus(AnswerStatus.SUCCESS)
+            .build();
     _manager.initContainer(networkName, null);
     _storage.storeAnswerMetadata(
         answerMetadata, networkName, snapshotName, questionName, null, null);
@@ -1228,5 +1246,284 @@ public class WorkMgrTest {
 
     assertThat(_manager.getQuestionPath(adhocWorkItem), equalTo(adhocDir));
     assertThat(_manager.getQuestionPath(analysisWorkItem), equalTo(analysisQDir));
+  }
+
+  @Test
+  public void testApplyPendingIssuesSettingsChangesNoMetrics() throws IOException {
+    String network = "network1";
+    String snapshot = "snapshot1";
+    String question = "question2Name";
+    String referenceSnapshot = null;
+    String analysis = null;
+    Answer oldAnswer = new Answer();
+    oldAnswer.setStatus(AnswerStatus.SUCCESS);
+    oldAnswer.setAnswerElements(ImmutableList.of(new StringAnswerElement("blah")));
+    AnswerMetadata answerMetadata =
+        AnswerMetadata.builder().setStatus(AnswerStatus.SUCCESS).build();
+    _manager.initContainer(network, null);
+    _storage.storeAnswer(
+        BatfishObjectMapper.writeString(oldAnswer),
+        network,
+        snapshot,
+        question,
+        referenceSnapshot,
+        analysis);
+    _storage.storeAnswerMetadata(
+        answerMetadata, network, snapshot, question, referenceSnapshot, analysis);
+
+    assertThat(
+        _manager.applyPendingIssuesSettingsChanges(
+            answerMetadata, network, snapshot, question, referenceSnapshot, analysis),
+        sameInstance(answerMetadata));
+  }
+
+  @Test
+  public void testApplyPendingIssuesSettingsChangesNoMatchingIssueConfigs() throws IOException {
+    String network = "network1";
+    String snapshot = "snapshot1";
+    String question = "question2Name";
+    String referenceSnapshot = null;
+    String analysis = null;
+    Answer oldAnswer = new Answer();
+    String col = "Issue";
+    String major = "maj";
+    String otherMajor = "otherMajor";
+    String minor = "min";
+    oldAnswer.setStatus(AnswerStatus.SUCCESS);
+    TableAnswerElement table =
+        new TableAnswerElement(
+            new TableMetadata(ImmutableList.of(new ColumnMetadata(col, Schema.ISSUE, "desc"))));
+    table.addRow(Row.of(col, new Issue("blah", 1, new Issue.Type(major, minor))));
+    oldAnswer.setAnswerElements(ImmutableList.of(table));
+    AnswerMetadata answerMetadata =
+        AnswerMetadataUtil.computeAnswerMetadata(oldAnswer, _manager.getLogger());
+    _manager.initContainer(network, null);
+    _storage.storeAnswer(
+        BatfishObjectMapper.writeString(oldAnswer),
+        network,
+        snapshot,
+        question,
+        referenceSnapshot,
+        analysis);
+    _storage.storeAnswerMetadata(
+        answerMetadata, network, snapshot, question, referenceSnapshot, analysis);
+    _storage.storeMajorIssueConfig(
+        network,
+        otherMajor,
+        new MajorIssueConfig(
+            otherMajor, ImmutableList.of(new MinorIssueConfig(minor, 6, "http://example.com"))));
+
+    assertThat(
+        _manager.applyPendingIssuesSettingsChanges(
+            answerMetadata, network, snapshot, question, referenceSnapshot, analysis),
+        sameInstance(answerMetadata));
+  }
+
+  @Test
+  public void testApplyPendingIssuesSettingsChangesDifferentIssueConfig()
+      throws IOException, InterruptedException {
+    String network = "network1";
+    String snapshot = "snapshot1";
+    String question = "question2Name";
+    String referenceSnapshot = null;
+    String analysis = null;
+    Answer oldAnswer = new Answer();
+    String col = "Issue";
+    String major = "maj";
+    String minor = "min";
+    oldAnswer.setStatus(AnswerStatus.SUCCESS);
+    TableAnswerElement oldTable =
+        new TableAnswerElement(
+            new TableMetadata(ImmutableList.of(new ColumnMetadata(col, Schema.ISSUE, "desc"))));
+    oldTable.addRow(Row.of(col, new Issue("blah", 1, new Issue.Type(major, minor))));
+    oldAnswer.setAnswerElements(ImmutableList.of(oldTable));
+    AnswerMetadata oldAnswerMetadata =
+        AnswerMetadataUtil.computeAnswerMetadata(oldAnswer, _manager.getLogger());
+    _manager.initContainer(network, null);
+    _storage.storeAnswer(
+        BatfishObjectMapper.writeString(oldAnswer),
+        network,
+        snapshot,
+        question,
+        referenceSnapshot,
+        analysis);
+    _storage.storeAnswerMetadata(
+        oldAnswerMetadata, network, snapshot, question, referenceSnapshot, analysis);
+    _storage.storeMajorIssueConfig(
+        network,
+        major,
+        new MajorIssueConfig(
+            major, ImmutableList.of(new MinorIssueConfig(minor, 6, "http://example.com"))));
+
+    assertThat(
+        _manager.applyPendingIssuesSettingsChanges(
+            oldAnswerMetadata, network, snapshot, question, referenceSnapshot, analysis),
+        not(sameInstance(oldAnswerMetadata)));
+  }
+
+  @Test
+  public void testApplyIssuesConfiguration() throws IOException {
+    String network = "network1";
+    String snapshot = "snapshot1";
+    String question = "question2Name";
+    String referenceSnapshot = null;
+    String analysis = null;
+    Answer oldAnswer = new Answer();
+    String col = "Issue";
+    String major = "maj";
+    String minor = "min";
+    int newSeverity = 6;
+    oldAnswer.setStatus(AnswerStatus.SUCCESS);
+    TableAnswerElement oldTable =
+        new TableAnswerElement(
+            new TableMetadata(ImmutableList.of(new ColumnMetadata(col, Schema.ISSUE, "desc"))));
+    oldTable.addRow(Row.of(col, new Issue("blah", 1, new Issue.Type(major, minor))));
+    oldTable.addExcludedRow(
+        Row.of(col, new Issue("blorp", 1, new Issue.Type(major, minor))), "exc");
+    oldAnswer.setAnswerElements(ImmutableList.of(oldTable));
+    AnswerMetadata oldAnswerMetadata =
+        AnswerMetadataUtil.computeAnswerMetadata(oldAnswer, _manager.getLogger());
+    _manager.initContainer(network, null);
+    _storage.storeAnswer(
+        BatfishObjectMapper.writeString(oldAnswer),
+        network,
+        snapshot,
+        question,
+        referenceSnapshot,
+        analysis);
+    _storage.storeAnswerMetadata(
+        oldAnswerMetadata, network, snapshot, question, referenceSnapshot, analysis);
+    Map<String, MajorIssueConfig> majorIssueConfigs =
+        ImmutableMap.of(
+            major,
+            new MajorIssueConfig(
+                major,
+                ImmutableList.of(new MinorIssueConfig(minor, newSeverity, "http://example.com"))));
+
+    AnswerMetadata returnVal =
+        _manager.applyIssuesConfiguration(
+            majorIssueConfigs, network, snapshot, question, referenceSnapshot, analysis);
+
+    // The answer metadata now on disk should have changed
+    assertThat(returnVal, not(equalTo(oldAnswerMetadata)));
+
+    // The answer metadata now on disk should be the same as that returned by the call
+    assertThat(
+        _storage.loadAnswerMetadata(network, snapshot, question, referenceSnapshot, analysis),
+        equalTo(returnVal));
+
+    Answer newAnswer =
+        BatfishObjectMapper.mapper()
+            .readValue(
+                _storage.loadAnswer(network, snapshot, question, referenceSnapshot, analysis),
+                new TypeReference<Answer>() {});
+    TableAnswerElement newTable = (TableAnswerElement) newAnswer.getAnswerElements().get(0);
+
+    // The answer's rows should have changed.
+    assertThat(newTable.getRowsList(), not(equalTo(oldTable.getRowsList())));
+
+    // The answer's excluded rows should have changed.
+    assertThat(
+        newTable.getExcludedRows().get(0).getRowsList(),
+        not(equalTo(oldTable.getExcludedRows().get(0).getRowsList())));
+  }
+
+  @Test
+  public void testApplyRowIssuesConfigurationNonIssue() {
+    String col = "col";
+    Row oldRow = Row.of(col, "foo");
+    Set<String> issueColumns = ImmutableSet.of();
+    Map<String, MajorIssueConfig> issueConfigs = ImmutableMap.of();
+
+    assertThat(
+        _manager.applyRowIssuesConfiguration(oldRow, issueColumns, issueConfigs), equalTo(oldRow));
+  }
+
+  @Test
+  public void testApplyRowIssuesConfigurationNoMatchMajorIssue() {
+    String col = "col";
+    String major = "major";
+    String otherMajor = "otherMajor";
+    String minor = "minor";
+    Row oldRow = Row.of(col, new Issue("explanation", 5, new Issue.Type(major, minor)));
+    Set<String> issueColumns = ImmutableSet.of(col);
+    Map<String, MajorIssueConfig> issueConfigs =
+        ImmutableMap.of(
+            otherMajor,
+            new MajorIssueConfig(
+                otherMajor, ImmutableList.of(new MinorIssueConfig(minor, 6, "example.com"))));
+
+    assertThat(
+        _manager.applyRowIssuesConfiguration(oldRow, issueColumns, issueConfigs), equalTo(oldRow));
+  }
+
+  @Test
+  public void testApplyRowIssuesConfigurationNoMatchMinorIssue() {
+    String col = "col";
+    String major = "major";
+    String otherMinor = "otherMinor";
+    String minor = "minor";
+    Row oldRow = Row.of(col, new Issue("explanation", 5, new Issue.Type(major, minor)));
+    Set<String> issueColumns = ImmutableSet.of(col);
+    Map<String, MajorIssueConfig> issueConfigs =
+        ImmutableMap.of(
+            major,
+            new MajorIssueConfig(
+                major, ImmutableList.of(new MinorIssueConfig(otherMinor, 6, "example.com"))));
+
+    assertThat(
+        _manager.applyRowIssuesConfiguration(oldRow, issueColumns, issueConfigs), equalTo(oldRow));
+  }
+
+  @Test
+  public void testApplyRowIssuesConfigurationMatch() {
+    String col = "col";
+    String major = "major";
+    String minor = "minor";
+    Issue oldIssue = new Issue("explanation", 5, new Issue.Type(major, minor));
+    Row oldRow = Row.of(col, oldIssue);
+    int newSeverity = 6;
+    String newUrl = "example.com";
+    Issue newIssue = new Issue(oldIssue.getExplanation(), newSeverity, oldIssue.getType(), newUrl);
+    Set<String> issueColumns = ImmutableSet.of(col);
+    Map<String, MajorIssueConfig> issueConfigs =
+        ImmutableMap.of(
+            major,
+            new MajorIssueConfig(major, ImmutableList.of(new MinorIssueConfig(minor, 6, newUrl))));
+
+    assertThat(
+        _manager.applyRowIssuesConfiguration(oldRow, issueColumns, issueConfigs),
+        equalTo(Row.of(col, newIssue)));
+  }
+
+  @Test
+  public void testAnswerIssueConfigMatchesConfiguredIssuesMissingMinorMatches() {
+    String major = "major";
+    String minor = "minor";
+    MajorIssueConfig answerIssueConfig =
+        new MajorIssueConfig(major, ImmutableMap.of(minor, new MinorIssueConfig(minor, 1, null)));
+    Map<String, MajorIssueConfig> configuredMajorIssues =
+        ImmutableMap.of(major, new MajorIssueConfig(major, ImmutableMap.of()));
+
+    assertThat(
+        _manager.answerIssueConfigMatchesConfiguredIssues(answerIssueConfig, configuredMajorIssues),
+        equalTo(true));
+  }
+
+  @Test
+  public void testAnswerIssueConfigMatchesConfiguredIssuesDifferntMinorNoMatch() {
+    String major = "major";
+    String minor = "minor";
+    MajorIssueConfig answerIssueConfig =
+        new MajorIssueConfig(major, ImmutableMap.of(minor, new MinorIssueConfig(minor, 1, null)));
+    Map<String, MajorIssueConfig> configuredMajorIssues =
+        ImmutableMap.of(
+            major,
+            new MajorIssueConfig(
+                major, ImmutableMap.of(minor, new MinorIssueConfig(minor, 2, null))));
+
+    assertThat(
+        _manager.answerIssueConfigMatchesConfiguredIssues(answerIssueConfig, configuredMajorIssues),
+        equalTo(false));
   }
 }

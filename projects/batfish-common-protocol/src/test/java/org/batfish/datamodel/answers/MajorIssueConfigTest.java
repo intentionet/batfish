@@ -16,19 +16,19 @@ public class MajorIssueConfigTest {
 
     // add a minor config
     MinorIssueConfig minor1Config = new MinorIssueConfig("minor1", 100, "www.cnn.com");
-    majorConfig.put(minor1Config);
+    majorConfig = majorConfig.put(minor1Config);
     assertThat(majorConfig, equalTo(new MajorIssueConfig("major", ImmutableList.of(minor1Config))));
 
     // add another minor config
     MinorIssueConfig minor2Config = new MinorIssueConfig("minor2", 9, "www");
-    majorConfig.put(minor2Config);
+    majorConfig = majorConfig.put(minor2Config);
     assertThat(
         majorConfig,
         equalTo(new MajorIssueConfig("major", ImmutableList.of(minor1Config, minor2Config))));
 
     // add a minor config that overwrite the first one
     MinorIssueConfig minor1ConfigAgain = new MinorIssueConfig("minor1", 90, "www");
-    majorConfig.put(minor1ConfigAgain);
+    majorConfig = majorConfig.put(minor1ConfigAgain);
     assertThat(
         majorConfig,
         equalTo(new MajorIssueConfig("major", ImmutableList.of(minor2Config, minor1ConfigAgain))));

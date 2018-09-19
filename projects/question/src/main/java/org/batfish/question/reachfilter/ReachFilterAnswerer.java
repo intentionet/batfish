@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
 import org.batfish.common.Pair;
@@ -30,11 +29,10 @@ import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.answers.AnswerElement;
-import org.batfish.datamodel.questions.NodesSpecifier;
 import org.batfish.datamodel.questions.Question;
 import org.batfish.datamodel.table.Row;
-import org.batfish.datamodel.table.Rows;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableDiff;
 import org.batfish.question.ReachFilterParameters;
@@ -81,8 +79,10 @@ public final class ReachFilterAnswerer extends Answerer {
 
     ReachFilterParameters parameters = question.toReachFilterParameters();
 
-    TableAnswerElement baseTable = TestFiltersAnswerer.create(new TestFiltersQuestion(null, null));
-    TableAnswerElement deltaTable = TestFiltersAnswerer.create(new TestFiltersQuestion(null, null));
+    TableAnswerElement baseTable =
+        TestFiltersAnswerer.create(new TestFiltersQuestion(null, null, null, null));
+    TableAnswerElement deltaTable =
+        TestFiltersAnswerer.create(new TestFiltersQuestion(null, null, null, null));
 
     Set<String> commonNodes = Sets.intersection(baseAcls.keySet(), deltaAcls.keySet());
     for (String node : commonNodes) {
@@ -125,16 +125,16 @@ public final class ReachFilterAnswerer extends Answerer {
             .getDecreasedFlow()
             .ifPresent(
                 flow -> {
-                  baseTable.addRow(testFiltersRow(true, node, baseAcl.get(), flow));
-                  deltaTable.addRow(testFiltersRow(false, node, deltaAcl.get(), flow));
+                  baseTable.addRow(testFiltersRow(true, node, baseAcl.get().getName(), flow));
+                  deltaTable.addRow(testFiltersRow(false, node, deltaAcl.get().getName(), flow));
                 });
 
         result
             .getIncreasedFlow()
             .ifPresent(
                 flow -> {
-                  baseTable.addRow(testFiltersRow(true, node, baseAcl.get(), flow));
-                  deltaTable.addRow(testFiltersRow(false, node, deltaAcl.get(), flow));
+                  baseTable.addRow(testFiltersRow(true, node, baseAcl.get().getName(), flow));
+                  deltaTable.addRow(testFiltersRow(false, node, deltaAcl.get().getName(), flow));
                 });
       }
     }
@@ -175,10 +175,11 @@ public final class ReachFilterAnswerer extends Answerer {
         _batfish.getLogger().warn(t.getMessage());
         continue;
       }
-      result.ifPresent(flow -> rows.add(testFiltersRow(hostname, acl, flow)));
+      result.ifPresent(flow -> rows.add(testFiltersRow(true, hostname, acl.getName(), flow)));
     }
 
-    _tableAnswerElement = TestFiltersAnswerer.create(new TestFiltersQuestion(null, null));
+    _tableAnswerElement =
+        TestFiltersAnswerer.create(new TestFiltersQuestion(null, null, null, null));
     _tableAnswerElement.postProcessAnswer(question, rows);
   }
 
@@ -278,51 +279,16 @@ public final class ReachFilterAnswerer extends Answerer {
     return IpAccessList.builder().setName(acl.getName()).setLines(lines).build();
   }
 
-  private Row testFiltersRow(boolean base, String hostname, IpAccessList acl, Flow flow) {
-    // TODO was traceFilterRow
+  private Row testFiltersRow(boolean base, String hostname, String aclName, Flow flow) {
     if (base) {
       _batfish.pushBaseEnvironment();
     } else {
       _batfish.pushDeltaEnvironment();
     }
-    Row row = testFiltersRow(hostname, acl, flow);
+    Configuration c = _batfish.loadConfigurations().get(hostname);
+    Row row = TestFiltersAnswerer.getRow(c.getIpAccessLists().get(aclName), flow, c);
     _batfish.popEnvironment();
     return row;
-  }
-
-  @VisibleForTesting
-  @Nonnull
-  Row testFiltersRow(String hostname, IpAccessList acl, Flow flow) {
-    TestFiltersQuestion testFiltersQuestion =
-        new TestFiltersQuestion(new NodesSpecifier(hostname), acl.getName());
-    testFiltersQuestion.setDscp(flow.getDscp());
-    testFiltersQuestion.setDst(flow.getDstIp().toString());
-    testFiltersQuestion.setDstPort(flow.getDstPort());
-    testFiltersQuestion.setEcn(flow.getEcn());
-    testFiltersQuestion.setFragmentOffset(flow.getFragmentOffset());
-    testFiltersQuestion.setIcmpCode(flow.getFragmentOffset());
-    testFiltersQuestion.setIcmpType(flow.getFragmentOffset());
-    testFiltersQuestion.setIngressInterface(flow.getIngressInterface());
-    testFiltersQuestion.setIpProtocol(flow.getIpProtocol());
-    testFiltersQuestion.setPacketLength(flow.getPacketLength());
-    testFiltersQuestion.setSrcIp(flow.getSrcIp());
-    testFiltersQuestion.setSrcPort(flow.getSrcPort());
-    testFiltersQuestion.setState(flow.getState());
-    testFiltersQuestion.setTcpFlagsAck(flow.getTcpFlagsAck() == 1);
-    testFiltersQuestion.setTcpFlagsCwr(flow.getTcpFlagsCwr() == 1);
-    testFiltersQuestion.setTcpFlagsEce(flow.getTcpFlagsEce() == 1);
-    testFiltersQuestion.setTcpFlagsFin(flow.getTcpFlagsFin() == 1);
-    testFiltersQuestion.setTcpFlagsPsh(flow.getTcpFlagsPsh() == 1);
-    testFiltersQuestion.setTcpFlagsRst(flow.getTcpFlagsRst() == 1);
-    testFiltersQuestion.setTcpFlagsSyn(flow.getTcpFlagsSyn() == 1);
-    testFiltersQuestion.setTcpFlagsUrg(flow.getTcpFlagsUrg() == 1);
-    Rows rows = new TestFiltersAnswerer(testFiltersQuestion, _batfish).answer().getRows();
-    if (rows.size() != 1) {
-      throw new BatfishException(
-          String.format(
-              "TraceFiltersAnswerer produced an unexpected number of Rows: %d", rows.size()));
-    }
-    return rows.iterator().next();
   }
 
   /** Adds {@code nodes} (which are present in only one snapshot) to the {@code table} */
@@ -330,5 +296,9 @@ public final class ReachFilterAnswerer extends Answerer {
     for (String node : nodes) {
       table.addRow(Row.builder(table.getMetadata().toColumnMap()).put(COL_NODE, node).build());
     }
+  }
+
+  private Set<SubRange> makeSetSubrangeFromInt(int number) {
+    return ImmutableSet.of(new SubRange(number));
   }
 }

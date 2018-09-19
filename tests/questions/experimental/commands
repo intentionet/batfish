@@ -52,7 +52,7 @@ test -raw tests/questions/experimental/reducedReachability.ref validate-template
 test -raw tests/questions/experimental/specifiers.ref validate-template specifiers queryType="filter", filterSpecifierFactory="FlexibleFilterSpecifierFactory", filterSpecifierInput="filterSpecifierInput", interfaceSpecifierFactory="FlexibleInterfaceSpecifierFactory", interfaceSpecifierInput="filterSpecifierInput", ipSpaceSpecifierFactory="InferFromLocationIpSpaceSpecifierFactory", ipSpaceSpecifierInput="ipSpaceSpecifierInput", locationSpecifierFactory="FlexibleLocationSpecifierFactory", locationSpecifierInput="locationSpecifierInput", nodeSpecifierFactory="FlexibleNodeSpecifierFactory", nodeSpecifierInput="nodeSpecifierInput"
 
 # test traceroute
-test  -raw tests/questions/experimental/traceroute.ref validate-template traceroute startLocation="location", ignoreAcls=false, headers=null
+test -raw tests/questions/experimental/traceroute.ref validate-template traceroute startLocation="location", ignoreAcls=false, headers=null
 
 # test viModel
 test -raw tests/questions/experimental/viModel.ref validate-template viModel

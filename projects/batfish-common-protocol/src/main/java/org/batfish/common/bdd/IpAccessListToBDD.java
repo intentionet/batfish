@@ -31,6 +31,10 @@ import org.batfish.datamodel.acl.OriginatingFromDevice;
 import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.acl.TrueExpr;
 
+/**
+ * Converts {@link IpAccessList IpAccessLists} or {@link org.batfish.datamodel.acl.AclLineMatchExpr
+ * AclLineMatchExprs} to {@link BDD}.
+ */
 @ParametersAreNonnullByDefault
 public class IpAccessListToBDD implements GenericAclLineMatchExprVisitor<BDD> {
 
@@ -59,7 +63,12 @@ public class IpAccessListToBDD implements GenericAclLineMatchExprVisitor<BDD> {
       @Nonnull BDDSourceManager bddSrcManager,
       @Nonnull HeaderSpaceToBDD headerSpaceToBDD,
       @Nonnull Map<String, IpAccessList> aclEnv) {
-    // use laziness to tie the recursive knot.
+    /*
+     * Use suppliers to convert each ACL in the environment on demand. Memoize to avoid converting
+     * an ACL more than once. ACLs can refer to other ACLs in the environment, but if there is a
+     * cyclic reference (direct or indirect), NonRecursiveSupplier will throw an exception (to avoid
+     * going into an infinite loop).
+     */
     _aclEnv = new HashMap<>();
     aclEnv.forEach(
         (name, acl) ->

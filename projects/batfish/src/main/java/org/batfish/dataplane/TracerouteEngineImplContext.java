@@ -395,14 +395,13 @@ class TracerouteEngineImplContext {
       @Nullable NodeInterfacePair outInterface,
       TransmissionContext transmissionContext) {
     boolean out = disposition == FlowDisposition.DENIED_OUT;
-    FilterResult outResult =
+    FilterResult filterResult =
         filter.filter(
             transmissionContext._transformedFlow,
             srcInterface,
             transmissionContext._aclDefinitions,
             transmissionContext._namedIpSpaces);
-    String outFilterName = filter.getName();
-    Integer matchLine = outResult.getMatchLine();
+    Integer matchLine = filterResult.getMatchLine();
     String lineDesc;
     if (matchLine != null) {
       lineDesc = filter.getLines().get(matchLine).getName();
@@ -412,9 +411,18 @@ class TracerouteEngineImplContext {
     } else {
       lineDesc = "no-match";
     }
-    boolean denied = outResult.getAction() == LineAction.DENY;
+    String filterNotes = "{" + filter.getName() + "}{" + lineDesc + "}";
+
+    if (out) {
+      transmissionContext._filterOutNotes = filterNotes;
+    } else {
+      FlowTraceHop hop =
+          transmissionContext._hopsSoFar.get(transmissionContext._hopsSoFar.size() - 1);
+      hop.setFilterIn(filterNotes);
+    }
+
+    boolean denied = filterResult.getAction() == LineAction.DENY;
     if (denied) {
-      String notes = disposition + "{" + outFilterName + "}{" + lineDesc + "}";
       if (out) {
         Edge deniedOutEdge =
             new Edge(
@@ -429,17 +437,9 @@ class TracerouteEngineImplContext {
                 hopFlow(transmissionContext._originalFlow, transmissionContext._transformedFlow));
         transmissionContext._hopsSoFar.add(deniedOutHop);
       }
+      String notes = disposition + filterNotes;
       FlowTrace trace = new FlowTrace(disposition, transmissionContext._hopsSoFar, notes);
       transmissionContext._flowTraces.add(trace);
-    } else {
-      String filterNotes = "{" + outFilterName + "}{" + lineDesc + "}";
-      if (out) {
-        transmissionContext._filterOutNotes = filterNotes;
-      } else {
-        FlowTraceHop hop =
-            transmissionContext._hopsSoFar.get(transmissionContext._hopsSoFar.size() - 1);
-        hop.setFilterIn(filterNotes);
-      }
     }
     return denied;
   }

@@ -123,6 +123,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]
@@ -205,6 +206,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]
@@ -287,6 +289,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]
@@ -369,6 +372,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]
@@ -480,6 +484,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]
@@ -562,6 +567,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]
@@ -644,6 +650,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]
@@ -726,6 +733,7 @@
                   "node2" : "host1",
                   "node2interface" : "eth0"
                 },
+                "filterIn" : "{filter::INPUT}{default}",
                 "routes" : [
                   "ConnectedRoute<2.128.0.0/24,nhip:AUTO/NONE(-1l),nhint:GigabitEthernet2/0>_fnhip:null"
                 ]

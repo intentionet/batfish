@@ -1,22 +1,17 @@
 {
   "class" : "org.batfish.question.testfilters.TestFiltersQuestion",
   "filters" : ".*",
+  "headers" : {
+    "srcIps" : "1.1.1.1/32"
+  },
   "nodes" : ".*",
+  "startLocation" : "node1",
   "differential" : false,
-  "dscp" : 12,
-  "dst" : "1.2.3.4",
-  "dstPort" : 23,
-  "dstProtocol" : "http",
-  "ecn" : 1,
-  "fragmentOffset" : 12,
-  "icmpCode" : 12,
-  "icmpType" : 23,
   "includeOneTableKeys" : true,
-  "ingressInterface" : "randomInterface",
   "instance" : {
     "description" : "Evaluate the processing of a flow by a given filter/ACL",
     "instanceName" : "qname",
-    "longDescription" : "Find the disposition of the specified flow when processed through the specified filter/ACL.",
+    "longDescription" : "Find how the specified flow is processed through the specified filters/ACLs.",
     "tags" : [
       "dataPlane",
       "filter",
@@ -24,185 +19,33 @@
       "trace"
     ],
     "variables" : {
-      "dscp" : {
-        "description" : "Applied Differentiated Services Code Point (DSCP) value in IP header",
-        "optional" : true,
-        "type" : "integer",
-        "value" : 12
-      },
-      "dst" : {
-        "description" : "Destination hostname or IP address",
-        "optional" : false,
-        "type" : "string",
-        "value" : "1.2.3.4"
-      },
-      "dstPort" : {
-        "description" : "Destination port in TCP/UDP header",
-        "optional" : true,
-        "type" : "integer",
-        "value" : 23
-      },
-      "dstProtocol" : {
-        "description" : "Destination named protocol (can affect IP protocol number; ICMP type/code; TCP/UDP destination port)",
-        "optional" : true,
-        "type" : "string",
-        "value" : "http"
-      },
-      "ecn" : {
-        "description" : "Applied Explicit Congestion Notification (ECN) value in TCP header",
-        "optional" : true,
-        "type" : "integer",
-        "value" : 1
-      },
       "filters" : {
         "description" : "Only consider filters that match this regular expression",
         "optional" : false,
         "type" : "javaRegex",
         "value" : ".*"
       },
-      "fragmentOffset" : {
-        "description" : "Fragment offset value in IP header",
+      "headers" : {
+        "description" : "Packet header constraints",
         "optional" : true,
-        "type" : "integer",
-        "value" : 12
-      },
-      "icmpCode" : {
-        "description" : "ICMP code in ICMP header",
-        "optional" : true,
-        "type" : "integer",
-        "value" : 12
-      },
-      "icmpType" : {
-        "description" : "ICMP type in ICMP header",
-        "optional" : true,
-        "type" : "integer",
-        "value" : 23
-      },
-      "ingressInterface" : {
-        "description" : "Ingress interface(s) to consider for this flow. Important to specify for firewalls, since that picks the zone and zone rules",
-        "minLength" : 1,
-        "optional" : true,
-        "type" : "string",
-        "value" : "randomInterface"
-      },
-      "ipProtocol" : {
-        "description" : "IP Protocol number in IP header",
-        "optional" : true,
-        "type" : "string",
-        "value" : "tcp"
+        "type" : "headerConstraint",
+        "value" : {
+          "srcIps" : "1.1.1.1/32"
+        }
       },
       "nodes" : {
-        "description" : "Examine filters on nodes matching this name or regex",
+        "description" : "Only examine filters on nodes matching this name or regex",
         "optional" : false,
         "type" : "nodeSpec",
         "value" : ".*"
       },
-      "packetLength" : {
-        "description" : "Packet length in IP header",
-        "optional" : true,
-        "type" : "integer",
-        "value" : 12
-      },
-      "srcIp" : {
-        "description" : "Source IP address in IP header",
-        "optional" : false,
-        "type" : "ip",
-        "value" : "1.1.1.1"
-      },
-      "srcPort" : {
-        "description" : "Source port in TCP/UDP header",
-        "optional" : true,
-        "type" : "integer",
-        "value" : 123
-      },
-      "srcProtocol" : {
-        "description" : "Source named protocol (can affect IP protocol number; ICMP type/code; TCP/UDP source port)",
+      "startLocation" : {
+        "description" : "Location to start tracing from",
+        "minLength" : 1,
         "optional" : true,
         "type" : "string",
-        "value" : "dns"
-      },
-      "state" : {
-        "allowedValues" : [
-          "established",
-          "new"
-        ],
-        "description" : "Non-transitive stateful-firewall state (applies to all protocols, and is independent of TCP flags)",
-        "optional" : true,
-        "type" : "string",
-        "value" : "new",
-        "values" : [
-          {
-            "description" : "Firewalls consider this a new flow",
-            "name" : "new"
-          },
-          {
-            "description" : "Firewalls consider this flow as having already been established",
-            "name" : "established"
-          }
-        ]
-      },
-      "tcpAck" : {
-        "description" : "ACK bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : true
-      },
-      "tcpCwr" : {
-        "description" : "CWR bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : false
-      },
-      "tcpEce" : {
-        "description" : "ECE bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : true
-      },
-      "tcpFin" : {
-        "description" : "FIN bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : false
-      },
-      "tcpPsh" : {
-        "description" : "PSH bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : true
-      },
-      "tcpRst" : {
-        "description" : "RST bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : false
-      },
-      "tcpSyn" : {
-        "description" : "SYN bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : true
-      },
-      "tcpUrg" : {
-        "description" : "URG bit in TCP flags in TCP header",
-        "optional" : true,
-        "type" : "boolean",
-        "value" : false
+        "value" : "node1"
       }
     }
-  },
-  "ipProtocol" : "TCP",
-  "packetLength" : 12,
-  "srcIp" : "1.1.1.1",
-  "srcPort" : 123,
-  "srcProtocol" : "dns",
-  "state" : "NEW",
-  "tcpAck" : true,
-  "tcpCwr" : false,
-  "tcpEce" : true,
-  "tcpFin" : false,
-  "tcpPsh" : true,
-  "tcpRst" : false,
-  "tcpSyn" : true,
-  "tcpUrg" : false
+  }
 }

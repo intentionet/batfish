@@ -23,9 +23,11 @@ import org.batfish.datamodel.pojo.Environment;
 import org.batfish.datamodel.questions.IPacketTraceQuestion;
 import org.batfish.datamodel.questions.Question;
 
+@Deprecated
 @AutoService(Plugin.class)
 public class TracerouteQuestionPlugin extends QuestionPlugin {
 
+  @Deprecated
   public static class TracerouteAnswerer extends Answerer {
 
     public TracerouteAnswerer(Question question, IBatfish batfish) {
@@ -153,6 +155,7 @@ public class TracerouteQuestionPlugin extends QuestionPlugin {
    *
    * @type Traceroute dataplane
    */
+  @Deprecated
   public static class TracerouteQuestion extends IPacketTraceQuestion {
 
     private static final String PROP_IGNORE_ACLS = "ignoreAcls";
@@ -209,7 +212,7 @@ public class TracerouteQuestionPlugin extends QuestionPlugin {
 
     @Override
     public String getName() {
-      return "traceroute";
+      return "oldtraceroute";
     }
 
     @Override

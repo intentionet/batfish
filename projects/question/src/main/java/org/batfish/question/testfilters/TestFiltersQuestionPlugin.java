@@ -17,6 +17,6 @@ public class TestFiltersQuestionPlugin extends QuestionPlugin {
 
   @Override
   protected Question createQuestion() {
-    return new TestFiltersQuestion(null, null);
+    return new TestFiltersQuestion(null, null, null, null);
   }
 }

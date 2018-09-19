@@ -5,17 +5,25 @@ import static org.batfish.datamodel.answers.AclReachabilityRows.createMetadata;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.ParametersAreNonnullByDefault;
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDFactory;
 import org.batfish.common.Answerer;
+import org.batfish.common.bdd.BDDPacket;
+import org.batfish.common.bdd.BDDSourceManager;
+import org.batfish.common.bdd.IpAccessListToBDD;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.Configuration;
@@ -59,7 +67,7 @@ public class AclReachabilityAnswerer extends Answerer {
 
     SortedMap<String, Configuration> configurations = _batfish.loadConfigurations();
     List<AclSpecs> aclSpecs = getAclSpecs(configurations, specifiedAcls, answerRows);
-    _batfish.answerAclReachability(aclSpecs, answerRows);
+    answerAclReachability(aclSpecs, answerRows);
     TableAnswerElement answer = new TableAnswerElement(createMetadata(question));
     answer.postProcessAnswer(question, answerRows.getRows());
     return answer;
@@ -431,5 +439,60 @@ public class AclReachabilityAnswerer extends Answerer {
       }
     }
     return aclSpecs.stream().map(AclSpecs.Builder::build).collect(Collectors.toList());
+  }
+
+  private static void answerAclReachability(
+      List<AclSpecs> aclSpecs, AclReachabilityRows answerRows) {
+    BDDPacket bddPacket = new BDDPacket();
+    BDDFactory bddFactory = bddPacket.getFactory();
+
+    for (AclSpecs aclSpec : aclSpecs) {
+      BDDSourceManager sourceMgr =
+          BDDSourceManager.forInterfaces(bddPacket, aclSpec.acl.getInterfaces());
+      IpAccessListToBDD ipAccessListToBDD =
+          IpAccessListToBDD.create(
+              bddPacket, sourceMgr, aclSpec.acl.getDependencies(), ImmutableMap.of());
+
+      IpAccessList ipAcl = aclSpec.acl.getSanitizedAcl();
+      List<IpAccessListLine> lines = ipAcl.getLines();
+
+      List<BDD> ipLineToBDDMap = new ArrayList<>();
+      Set<Integer> unreachableButMatchableLineNums = new HashSet<>();
+
+      // compute if each acl line is unmatchable and/or unreachable
+      BDD rest = bddFactory.one();
+      for (int lineNum = 0; lineNum < lines.size(); lineNum++) {
+        IpAccessListLine line = lines.get(lineNum);
+        AclLineMatchExpr matchExpr = line.getMatchCondition();
+        BDD lineBDD = matchExpr.accept(ipAccessListToBDD);
+        ipLineToBDDMap.add(lineBDD);
+        if (lineBDD.isZero()) {
+          // this line is unmatchable
+          answerRows.addUnreachableLine(aclSpec, lineNum, true, new TreeSet<>());
+        } else if (rest.isZero() || lineBDD.and(rest).isZero()) {
+          unreachableButMatchableLineNums.add(lineNum);
+        }
+        rest = rest.and(lineBDD.not());
+      }
+
+      // compute blocking lines
+      for (int lineNum : unreachableButMatchableLineNums) {
+        SortedSet<Integer> blockingLineNums = new TreeSet<Integer>();
+        BDD restOfLine = ipLineToBDDMap.get(lineNum);
+
+        for (int prevLineNum = 0; prevLineNum < lineNum; prevLineNum++) {
+          if (restOfLine.isZero()) {
+            break;
+          }
+          BDD prevBDD = ipLineToBDDMap.get(prevLineNum);
+
+          if (!(prevBDD.and(restOfLine).isZero())) {
+            blockingLineNums.add(prevLineNum);
+            restOfLine = restOfLine.and(prevBDD.not());
+          }
+        }
+        answerRows.addUnreachableLine(aclSpec, lineNum, false, blockingLineNums);
+      }
+    }
   }
 }

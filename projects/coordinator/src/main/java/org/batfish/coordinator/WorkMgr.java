@@ -4,8 +4,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toCollection;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -16,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
 import io.opentracing.ActiveSpan;
 import io.opentracing.References;
 import io.opentracing.SpanContext;
@@ -26,6 +29,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -82,11 +86,14 @@ import org.batfish.datamodel.AnalysisMetadata;
 import org.batfish.datamodel.TestrigMetadata;
 import org.batfish.datamodel.answers.Answer;
 import org.batfish.datamodel.answers.AnswerMetadata;
+import org.batfish.datamodel.answers.AnswerMetadataUtil;
 import org.batfish.datamodel.answers.AnswerStatus;
 import org.batfish.datamodel.answers.AnswerSummary;
 import org.batfish.datamodel.answers.AutocompleteSuggestion;
 import org.batfish.datamodel.answers.AutocompleteSuggestion.CompletionType;
+import org.batfish.datamodel.answers.Issue;
 import org.batfish.datamodel.answers.MajorIssueConfig;
+import org.batfish.datamodel.answers.MinorIssueConfig;
 import org.batfish.datamodel.answers.ParseVendorConfigurationAnswerElement;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.pojo.Node;
@@ -99,6 +106,7 @@ import org.batfish.datamodel.questions.NodesSpecifier;
 import org.batfish.datamodel.questions.OspfPropertySpecifier;
 import org.batfish.datamodel.questions.Question;
 import org.batfish.datamodel.table.ColumnMetadata;
+import org.batfish.datamodel.table.ExcludedRows;
 import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
@@ -685,9 +693,9 @@ public class WorkMgr extends AbstractCoordinator {
       @Nullable String referenceSnapshot,
       @Nullable String analysis)
       throws JsonProcessingException, FileNotFoundException {
-    if (!_storage.checkQuestionExists(network, question, analysis)) {
-      throw new FileNotFoundException("Question file not found for " + question);
-    }
+    // Side effect: ensures metadata and answer are up to date
+    getAnswerMetadata(network, snapshot, question, referenceSnapshot, analysis);
+
     String answer = "unknown";
     try {
       answer = _storage.loadAnswer(network, snapshot, question, referenceSnapshot, analysis);
@@ -777,22 +785,198 @@ public class WorkMgr extends AbstractCoordinator {
     try {
       AnswerMetadata answerMetadata =
           _storage.loadAnswerMetadata(network, snapshot, question, referenceSnapshot, analysis);
+      FileTime answerMetadataLastModifiedTime =
+          _storage.getAnswerMetadataLastModifiedTime(
+              network, snapshot, question, referenceSnapshot, analysis);
       if (_storage
               .getQuestionLastModifiedTime(network, question, analysis)
-              .compareTo(
-                  _storage.getAnswerMetadataLastModifiedTime(
-                      network, snapshot, question, referenceSnapshot, analysis))
+              .compareTo(answerMetadataLastModifiedTime)
           > 0) {
-        return new AnswerMetadata(null, AnswerStatus.STALE);
+        return AnswerMetadata.forStatus(AnswerStatus.STALE);
       }
-      return answerMetadata;
+      return applyPendingIssuesSettingsChanges(
+          answerMetadata, network, snapshot, question, referenceSnapshot, analysis);
     } catch (FileNotFoundException e) {
-      return new AnswerMetadata(null, AnswerStatus.NOTFOUND);
+      return AnswerMetadata.forStatus(AnswerStatus.NOTFOUND);
     } catch (IOException e) {
       _logger.errorf(
           "Failed to read answer metadata file:\n%s", Throwables.getStackTraceAsString(e));
-      return new AnswerMetadata(null, AnswerStatus.FAILURE);
+      return AnswerMetadata.forStatus(AnswerStatus.FAILURE);
     }
+  }
+
+  @VisibleForTesting
+  @Nonnull
+  AnswerMetadata applyPendingIssuesSettingsChanges(
+      @Nonnull AnswerMetadata currentAnswerMetadata,
+      @Nonnull String network,
+      @Nonnull String snapshot,
+      @Nonnull String question,
+      @Nullable String referenceSnapshot,
+      @Nullable String analysis)
+      throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
+    if (currentAnswerMetadata.getMetrics() == null) {
+      // issues configuration not applicable to this answer, so nothing to do.
+      return currentAnswerMetadata;
+    }
+    Map<String, MajorIssueConfig> answerMajorIssueConfigs =
+        currentAnswerMetadata.getMetrics().getMajorIssueConfigs();
+    Map<String, MajorIssueConfig> latestMajorIssueConfigs =
+        _storage.loadMajorIssueConfigs(network, answerMajorIssueConfigs.keySet());
+    if (answerIssueConfigsMatchConfiguredIssues(currentAnswerMetadata, latestMajorIssueConfigs)) {
+      return currentAnswerMetadata;
+    }
+    return applyIssuesConfiguration(
+        latestMajorIssueConfigs, network, snapshot, question, referenceSnapshot, analysis);
+  }
+
+  private boolean answerIssueConfigsMatchConfiguredIssues(
+      AnswerMetadata answerMetadata, Map<String, MajorIssueConfig> configuredMajorIssues) {
+    return answerMetadata
+        .getMetrics()
+        .getMajorIssueConfigs()
+        .values()
+        .stream()
+        .allMatch(
+            answerMajor ->
+                answerIssueConfigMatchesConfiguredIssues(answerMajor, configuredMajorIssues));
+  }
+
+  @VisibleForTesting
+  boolean answerIssueConfigMatchesConfiguredIssues(
+      MajorIssueConfig answerIssueConfig, Map<String, MajorIssueConfig> configuredMajorIssues) {
+    MajorIssueConfig configuredMajorIssue =
+        configuredMajorIssues.get(answerIssueConfig.getMajorIssue());
+    Map<String, MinorIssueConfig> answerMinorIssues = answerIssueConfig.getMinorIssueConfigsMap();
+    Map<String, MinorIssueConfig> configuredMinorIssues =
+        configuredMajorIssue.getMinorIssueConfigsMap();
+    return Sets.intersection(answerMinorIssues.keySet(), configuredMinorIssues.keySet())
+        .stream()
+        .allMatch(minor -> answerMinorIssues.get(minor).equals(configuredMinorIssues.get(minor)));
+  }
+
+  @VisibleForTesting
+  @Nonnull
+  AnswerMetadata applyIssuesConfiguration(
+      @Nonnull Map<String, MajorIssueConfig> majorIssueConfigs,
+      @Nonnull String network,
+      @Nonnull String snapshot,
+      @Nonnull String question,
+      @Nullable String referenceSnapshot,
+      @Nullable String analysis)
+      throws JsonParseException, JsonMappingException, FileNotFoundException, IOException {
+    Answer oldAnswer =
+        BatfishObjectMapper.mapper()
+            .readValue(
+                _storage.loadAnswer(network, snapshot, question, referenceSnapshot, analysis),
+                new TypeReference<Answer>() {});
+    TableAnswerElement oldTable = (TableAnswerElement) oldAnswer.getAnswerElements().get(0);
+    TableMetadata tableMetadata = oldTable.getMetadata();
+    Set<String> issueColumns =
+        tableMetadata
+            .getColumnMetadata()
+            .stream()
+            .filter(cm -> cm.getSchema().equals(Schema.ISSUE))
+            .map(ColumnMetadata::getName)
+            .collect(ImmutableSet.toImmutableSet());
+    TableAnswerElement newTable = new TableAnswerElement(tableMetadata);
+    applyIssuesConfigurationToRows(oldTable.getRowsList(), issueColumns, majorIssueConfigs)
+        .forEach(newTable::addRow);
+    applyIssuesConfigurationToAllExcludedRows(
+            oldTable.getExcludedRows(), issueColumns, majorIssueConfigs)
+        .forEach(
+            excludedRows -> {
+              String exclusionName = excludedRows.getExclusionName();
+              excludedRows
+                  .getRowsList()
+                  .forEach(excludedRow -> newTable.addExcludedRow(excludedRow, exclusionName));
+            });
+    Answer newAnswer = new Answer();
+
+    // Copy relevant portions from old answer and table
+    newAnswer.setQuestion(oldAnswer.getQuestion());
+    newAnswer.setStatus(AnswerStatus.SUCCESS);
+    newAnswer.setSummary(oldAnswer.getSummary());
+    newTable.setSummary(oldTable.getSummary());
+
+    // Use new rows
+    newAnswer.setAnswerElements(ImmutableList.of(newTable));
+
+    // Compute and store new answer and answer metdata
+    AnswerMetadata newAnswerMetadata = AnswerMetadataUtil.computeAnswerMetadata(newAnswer, _logger);
+    String answerStr = BatfishObjectMapper.writePrettyString(newAnswer);
+    _storage.storeAnswer(answerStr, network, snapshot, question, referenceSnapshot, analysis);
+    _storage.storeAnswerMetadata(
+        newAnswerMetadata, network, snapshot, question, referenceSnapshot, analysis);
+
+    return newAnswerMetadata;
+  }
+
+  private Stream<ExcludedRows> applyIssuesConfigurationToAllExcludedRows(
+      List<ExcludedRows> allExcludedRows,
+      Set<String> issueColumns,
+      Map<String, MajorIssueConfig> issueConfigs) {
+    return allExcludedRows
+        .stream()
+        .map(
+            excludedRows ->
+                applyIssuesConfigurationToExcludedRows(excludedRows, issueColumns, issueConfigs));
+  }
+
+  private ExcludedRows applyIssuesConfigurationToExcludedRows(
+      ExcludedRows oldExcludedRows,
+      Set<String> issueColumns,
+      Map<String, MajorIssueConfig> issueConfigs) {
+    ExcludedRows newExcludedRows = new ExcludedRows(oldExcludedRows.getExclusionName());
+    applyIssuesConfigurationToRows(oldExcludedRows.getRowsList(), issueColumns, issueConfigs)
+        .forEach(newExcludedRows::addRow);
+    return newExcludedRows;
+  }
+
+  private Stream<Row> applyIssuesConfigurationToRows(
+      List<Row> rowsList, Set<String> issueColumns, Map<String, MajorIssueConfig> issueConfigs) {
+    return rowsList
+        .stream()
+        .map(row -> applyRowIssuesConfiguration(row, issueColumns, issueConfigs));
+  }
+
+  @VisibleForTesting
+  @Nonnull
+  Row applyRowIssuesConfiguration(
+      Row oldRow, Set<String> issueColumns, Map<String, MajorIssueConfig> issueConfigs) {
+    Row.RowBuilder builder = Row.builder();
+    oldRow
+        .getColumnNames()
+        .forEach(
+            column -> {
+              if (!issueColumns.contains(column)) {
+                builder.put(column, oldRow.get(column));
+                return;
+              }
+              Issue oldIssue = oldRow.getIssue(column);
+              MajorIssueConfig config = issueConfigs.get(oldIssue.getType().getMajor());
+              Issue newIssue;
+              if (config == null) {
+                newIssue = oldIssue;
+              } else {
+                String minorIssue = oldIssue.getType().getMinor();
+                Optional<MinorIssueConfig> optionalMinorConfig =
+                    config.getMinorIssueConfig(minorIssue);
+                if (optionalMinorConfig.isPresent()) {
+                  MinorIssueConfig minorConfig = optionalMinorConfig.get();
+                  newIssue =
+                      new Issue(
+                          oldIssue.getExplanation(),
+                          minorConfig.getSeverity(),
+                          oldIssue.getType(),
+                          minorConfig.getUrl());
+                } else {
+                  newIssue = oldIssue;
+                }
+              }
+              builder.put(column, newIssue);
+            });
+    return builder.build();
   }
 
   /**

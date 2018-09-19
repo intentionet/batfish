@@ -12,7 +12,6 @@ import org.batfish.common.BatfishException;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.questions.DisplayHints;
@@ -79,7 +78,7 @@ public class InterfacePropertiesAnswerer extends Answerer {
   }
 
   @Override
-  public AnswerElement answer() {
+  public TableAnswerElement answer() {
     InterfacePropertiesQuestion question = (InterfacePropertiesQuestion) _question;
     Map<String, Configuration> configurations = _batfish.loadConfigurations();
     Set<String> nodes = question.getNodes().getMatchingNodes(_batfish);

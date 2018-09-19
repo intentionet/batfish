@@ -1,35 +1,14 @@
 {
   "class": "org.batfish.question.testfilters.TestFiltersQuestion",
   "differential": false,
-  "dscp": "${dscp}",
-  "dst": "${dst}",
-  "dstPort": "${dstPort}",
-  "dstProtocol": "${dstProtocol}",
-  "ecn": "${ecn}",
   "filters": "${filters}",
-  "fragmentOffset": "${fragmentOffset}",
-  "icmpCode": "${icmpCode}",
-  "icmpType": "${icmpType}",
-  "ingressInterface": "${ingressInterface}",
-  "ipProtocol": "${ipProtocol}",
+  "headers": "${headers}",
   "nodes": "${nodes}",
-  "packetLength": "${packetLength}",
-  "srcIp": "${srcIp}",
-  "srcPort": "${srcPort}",
-  "srcProtocol": "${srcProtocol}",
-  "state": "${state}",
-  "tcpAck": "${tcpAck}",
-  "tcpCwr": "${tcpCwr}",
-  "tcpEce": "${tcpEce}",
-  "tcpFin": "${tcpFin}",
-  "tcpPsh": "${tcpPsh}",
-  "tcpRst": "${tcpRst}",
-  "tcpSyn": "${tcpSyn}",
-  "tcpUrg": "${tcpUrg}",
+  "startLocation": "${startLocation}",
   "instance": {
     "description": "Evaluate the processing of a flow by a given filter/ACL",
     "instanceName": "testfilters",
-    "longDescription": "Find the disposition of the specified flow when processed through the specified filter/ACL.",
+    "longDescription": "Find how the specified flow is processed through the specified filters/ACLs.",
     "tags": [
       "dataPlane",
       "filter",
@@ -37,139 +16,27 @@
       "trace"
     ],
     "variables": {
-      "dscp": {
-        "description": "Applied Differentiated Services Code Point (DSCP) value in IP header",
-        "optional": true,
-        "type": "integer"
-      },
-      "dst": {
-        "description": "Destination hostname or IP address",
-        "type": "string"
-      },
-      "dstPort": {
-        "description": "Destination port in TCP/UDP header",
-        "optional": true,
-        "type": "integer"
-      },
-      "dstProtocol": {
-        "description": "Destination named protocol (can affect IP protocol number; ICMP type/code; TCP/UDP destination port)",
-        "optional": true,
-        "type": "string"
-      },
-      "ecn": {
-        "description": "Applied Explicit Congestion Notification (ECN) value in TCP header",
-        "optional": true,
-        "type": "integer"
-      },
       "filters": {
         "description": "Only consider filters that match this regular expression",
         "type": "javaRegex",
         "value": ".*"
       },
-      "fragmentOffset": {
-        "description": "Fragment offset value in IP header",
-        "optional": true,
-        "type": "integer"
-      },
-      "icmpCode": {
-        "description": "ICMP code in ICMP header",
-        "optional": true,
-        "type": "integer"
-      },
-      "icmpType": {
-        "description": "ICMP type in ICMP header",
-        "optional": true,
-        "type": "integer"
-      },
-      "ingressInterface": {
-        "description": "Ingress interface(s) to consider for this flow. Important to specify for firewalls, since that picks the zone and zone rules",
-        "minLength": 1,
-        "optional": true,
-        "type": "string"
-      },
-      "ipProtocol": {
-        "description": "IP Protocol number in IP header",
-        "optional": true,
-        "type": "string"
-      },
       "nodes": {
-        "description": "Examine filters on nodes matching this name or regex",
+        "description": "Only examine filters on nodes matching this name or regex",
         "type": "nodeSpec",
         "value": ".*"
       },
-      "packetLength": {
-        "description": "Packet length in IP header",
+      "headers": {
+        "description": "Packet header constraints",
         "optional": true,
-        "type": "integer"
+        "type": "headerConstraint"
       },
-      "srcIp": {
-        "description": "Source IP address in IP header",
-        "type": "ip"
-      },
-      "srcPort": {
-        "description": "Source port in TCP/UDP header",
-        "optional": true,
-        "type": "integer"
-      },
-      "srcProtocol": {
-        "description": "Source named protocol (can affect IP protocol number; ICMP type/code; TCP/UDP source port)",
-        "optional": true,
-        "type": "string"
-      },
-      "state": {
-        "values": [{
-            "name": "new",
-            "description": "Firewalls consider this a new flow"
-          },
-          {
-            "name": "established",
-            "description": "Firewalls consider this flow as having already been established"
-          }
-        ],
-        "description": "Non-transitive stateful-firewall state (applies to all protocols, and is independent of TCP flags)",
-        "optional": true,
-        "type": "string"
-      },
-      "tcpAck": {
-        "description": "ACK bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      },
-      "tcpCwr": {
-        "description": "CWR bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      },
-      "tcpEce": {
-        "description": "ECE bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      },
-      "tcpFin": {
-        "description": "FIN bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      },
-      "tcpPsh": {
-        "description": "PSH bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      },
-      "tcpRst": {
-        "description": "RST bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      },
-      "tcpSyn": {
-        "description": "SYN bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      },
-      "tcpUrg": {
-        "description": "URG bit in TCP flags in TCP header",
-        "optional": true,
-        "type": "boolean"
-      }
+      "startLocation": {
+        "description": "Location to start tracing from",
+        "minLength": 1,
+        "type": "string",
+        "optional": true
+      }      
     }
   }
 }

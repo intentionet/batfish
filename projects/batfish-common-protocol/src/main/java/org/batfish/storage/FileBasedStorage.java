@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Closer;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,10 +26,12 @@ import java.nio.file.attribute.FileTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -209,7 +212,7 @@ public final class FileBasedStorage implements StorageProvider {
     Path path = getMajorIssueConfigDir(network, majorIssueType);
 
     if (!Files.exists(path)) {
-      return new MajorIssueConfig(majorIssueType, null);
+      return new MajorIssueConfig(majorIssueType, ImmutableMap.of());
     }
 
     String majorIssueFileText = CommonUtil.readFile(path);
@@ -220,7 +223,7 @@ public final class FileBasedStorage implements StorageProvider {
       _logger.errorf(
           "ERROR: Could not cast file for major issue %s in network %s to MajorIssueConfig: %s",
           majorIssueType, network, Throwables.getStackTraceAsString(e));
-      return new MajorIssueConfig(majorIssueType, null);
+      return new MajorIssueConfig(majorIssueType, ImmutableMap.of());
     }
   }
 
@@ -238,7 +241,6 @@ public final class FileBasedStorage implements StorageProvider {
 
   private @Nonnull Path getMajorIssueConfigDir(String network, String majorIssueType) {
     return getNetworkSettingsDir(network)
-        .resolve(BfConsts.RELPATH_CONTAINER_SETTINGS)
         .resolve(BfConsts.RELPATH_CONTAINER_SETTINGS_ISSUES)
         .resolve(majorIssueType + ".json");
   }
@@ -716,5 +718,16 @@ public final class FileBasedStorage implements StorageProvider {
   public void storeQuestionSettings(String settings, String network, String questionClass)
       throws IOException {
     FileUtils.writeStringToFile(getQuestionSettingsPath(network, questionClass).toFile(), settings);
+  }
+
+  @Override
+  public @Nonnull Map<String, MajorIssueConfig> loadMajorIssueConfigs(
+      String network, Set<String> majorIssueTypes) {
+    return majorIssueTypes
+        .stream()
+        .collect(
+            ImmutableMap.toImmutableMap(
+                Function.identity(),
+                majorIssueType -> loadMajorIssueConfig(network, majorIssueType)));
   }
 }

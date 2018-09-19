@@ -28,7 +28,7 @@ test -raw tests/questions/stable/referencedStructures.ref validate-template refe
 test -raw tests/questions/stable/routes.ref validate-template routes network="1.1.1.1/24", nodes=".*", vrfs=".*", rib="main", protocols=".*"
 
 # test testfilters
-test  -raw tests/questions/stable/testfilters.ref validate-template testfilters dscp=12, dst="1.2.3.4", dstPort=23, dstProtocol="http", ecn=1, filters=".*", fragmentOffset=12, icmpCode=12, icmpType=23, ingressInterface="randomInterface", ipProtocol="tcp", nodes=".*", packetLength=12, srcIp="1.1.1.1", srcPort=123, srcProtocol="dns", state="new", tcpAck=true, tcpCwr=false, tcpEce=true, tcpFin=false, tcpPsh=true, tcpRst=false, tcpSyn=true, tcpUrg=false
+test  -raw tests/questions/stable/testfilters.ref validate-template testfilters headers={"srcIps": "1.1.1.1/32"}, filters=".*",  nodes=".*", startLocation="node1"
 
 # test undefinedReferences
 test -raw tests/questions/stable/undefinedReferences.ref validate-template undefinedreferences nodes=".*"

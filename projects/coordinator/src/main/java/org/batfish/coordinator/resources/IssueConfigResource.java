@@ -38,9 +38,9 @@ public class IssueConfigResource {
     if (!minorConfig.isPresent()) {
       return Response.status(Status.NOT_FOUND).build();
     }
-    majorConfig.delMinorIssueConfig(_minor);
+    MajorIssueConfig result = majorConfig.delMinorIssueConfig(_minor);
     try {
-      Main.getWorkMgr().putMajorIssueConfig(_network, _major, majorConfig);
+      Main.getWorkMgr().putMajorIssueConfig(_network, _major, result);
       return Response.ok().build();
     } catch (IOException e) {
       throw new InternalServerErrorException("Could not delete the issue config");

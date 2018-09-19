@@ -22,7 +22,7 @@ public class TestFiltersQuestionTest {
    */
   @Test
   public void testDefaultSpecifierInput() {
-    TestFiltersQuestion question = new TestFiltersQuestion(null, "acl");
+    TestFiltersQuestion question = new TestFiltersQuestion(null, "acl", null, null);
 
     assertThat(
         question.getFilterSpecifier(),

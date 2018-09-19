@@ -8,7 +8,6 @@ import com.google.common.collect.Multiset;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.batfish.common.BatfishException;
 import org.batfish.common.util.BatfishObjectMapper;
@@ -67,7 +66,7 @@ public final class TableAnswerElement extends AnswerElement {
       }
     }
     // no matching exclusionName found; create a new one
-    ExcludedRows rows = new ExcludedRows(exclusionName, new Rows());
+    ExcludedRows rows = new ExcludedRows(exclusionName);
     rows.addRow(row);
     _excludedRows.add(rows);
   }
@@ -167,17 +166,6 @@ public final class TableAnswerElement extends AnswerElement {
   @JsonProperty(PROP_EXCLUDED_ROWS)
   private void setExcludedRows(List<ExcludedRows> excludedRows) {
     _excludedRows = excludedRows == null ? new LinkedList<>() : excludedRows;
-  }
-
-  @JsonIgnore
-  private void setRows(Rows rows) {
-    if (rows == null) {
-      _rows = new Rows();
-      _rowsList = new LinkedList<>();
-    } else {
-      _rows = rows;
-      _rowsList = rows.getData().stream().collect(Collectors.toList());
-    }
   }
 
   @JsonProperty(PROP_ROWS)

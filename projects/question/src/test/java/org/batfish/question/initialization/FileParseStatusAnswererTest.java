@@ -8,7 +8,6 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
-import org.batfish.common.BatfishLogger;
 import org.batfish.common.plugin.IBatfishTestAdapter;
 import org.batfish.datamodel.answers.ParseStatus;
 import org.batfish.datamodel.answers.ParseVendorConfigurationAnswerElement;
@@ -65,11 +64,6 @@ public class FileParseStatusAnswererTest {
   }
 
   private static class TestBatfish extends IBatfishTestAdapter {
-    @Override
-    public BatfishLogger getLogger() {
-      return null;
-    }
-
     @Override
     public ParseVendorConfigurationAnswerElement loadParseVendorConfigurationAnswerElement() {
       ParseVendorConfigurationAnswerElement pvcae = new ParseVendorConfigurationAnswerElement();

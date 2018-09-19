@@ -42,7 +42,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
-import org.batfish.common.BatfishLogger;
 import org.batfish.common.plugin.IBatfishTestAdapter;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.BgpRoute.Builder;
@@ -397,11 +396,6 @@ public class RoutesAnswererTest {
     @Override
     public DataPlane loadDataPlane() {
       return _dp;
-    }
-
-    @Override
-    public BatfishLogger getLogger() {
-      return null;
     }
 
     @Override

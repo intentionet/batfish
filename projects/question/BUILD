@@ -15,6 +15,7 @@ java_library(
     ],
     deps = [
         "//projects/batfish-common-protocol:common",
+        "//projects/lib/bdd",
         "//projects/lib/jsonpath",
         "@auto_service//:compile",
         "@commons_lang3//:compile",

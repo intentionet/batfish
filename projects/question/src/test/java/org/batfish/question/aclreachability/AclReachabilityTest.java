@@ -24,9 +24,11 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Multiset;
-import java.io.IOException;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.stream.Collectors;
+import org.batfish.common.plugin.IBatfish;
+import org.batfish.common.plugin.IBatfishTestAdapter;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.HeaderSpace;
@@ -47,8 +49,6 @@ import org.batfish.datamodel.acl.MatchSrcInterface;
 import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableAnswerElement;
-import org.batfish.main.Batfish;
-import org.batfish.main.BatfishTestUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,7 +83,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testWithIcmpType() throws IOException {
+  public void testWithIcmpType() {
     // First line accepts IP 1.2.3.4
     // Second line accepts same but only ICMP of type 8
     List<IpAccessListLine> lines =
@@ -97,7 +97,7 @@ public class AclReachabilityTest {
                     .setIcmpTypes(ImmutableList.of(new SubRange(8)))
                     .build()));
     _aclb.setLines(lines).setName("acl").build();
-    List<String> lineNames = lines.stream().map(l -> l.toString()).collect(Collectors.toList());
+    List<String> lineNames = lines.stream().map(Object::toString).collect(Collectors.toList());
 
     TableAnswerElement answer = answer(new AclReachabilityQuestion());
 
@@ -123,7 +123,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testIpWildcards() throws IOException {
+  public void testIpWildcards() {
     // First line accepts src IPs 1.2.3.4/30
     // Second line accepts src IPs 1.2.3.4/32
     List<IpAccessListLine> lines =
@@ -141,7 +141,7 @@ public class AclReachabilityTest {
                     .setSrcIps(new IpWildcard(new Prefix(new Ip("1.2.3.4"), 28)).toIpSpace())
                     .build()));
     _aclb.setLines(lines).setName("acl").build();
-    List<String> lineNames = lines.stream().map(l -> l.toString()).collect(Collectors.toList());
+    List<String> lineNames = lines.stream().map(Object::toString).collect(Collectors.toList());
 
     TableAnswerElement answer = answer(new AclReachabilityQuestion());
 
@@ -167,7 +167,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testCycleAppearsOnce() throws IOException {
+  public void testCycleAppearsOnce() {
     // acl1 permits anything acl2 permits... twice
     // acl2 permits anything acl1 permits... twice
     _aclb
@@ -204,7 +204,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testCircularReferences() throws IOException {
+  public void testCircularReferences() {
     // acl0 permits anything acl1 permits
     // acl1 permits anything acl2 permits, plus 1 other line to avoid acl3's line being unmatchable
     // acl2 permits anything acl0 permits
@@ -258,7 +258,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testUndefinedReference() throws IOException {
+  public void testUndefinedReference() {
 
     IpAccessListLine aclLine =
         IpAccessListLine.accepting().setMatchCondition(new PermittedByAcl("???")).build();
@@ -287,7 +287,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testIndirection() throws IOException {
+  public void testIndirection() {
     /*
      Referenced ACL contains 1 line: Permit 1.0.0.0/24
      Main ACL contains 2 lines:
@@ -308,7 +308,7 @@ public class AclReachabilityTest {
             acceptingHeaderSpace(
                 HeaderSpace.builder().setSrcIps(Prefix.parse("1.0.0.0/24").toIpSpace()).build()));
     IpAccessList acl = _aclb.setLines(aclLines).setName("acl2").build();
-    List<String> lineNames = aclLines.stream().map(l -> l.toString()).collect(Collectors.toList());
+    List<String> lineNames = aclLines.stream().map(Object::toString).collect(Collectors.toList());
 
     /*
      Runs two questions:
@@ -344,7 +344,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testMultipleCoveringLines() throws IOException {
+  public void testMultipleCoveringLines() {
     List<IpAccessListLine> aclLines =
         ImmutableList.of(
             acceptingHeaderSpace(
@@ -360,7 +360,7 @@ public class AclReachabilityTest {
                     .setSrcIps(new IpWildcard("1.0.0.0:0.0.0.1").toIpSpace())
                     .build()));
     IpAccessList acl = _aclb.setLines(aclLines).setName("acl").build();
-    List<String> lineNames = aclLines.stream().map(l -> l.toString()).collect(Collectors.toList());
+    List<String> lineNames = aclLines.stream().map(Object::toString).collect(Collectors.toList());
 
     TableAnswerElement answer = answer(new AclReachabilityQuestion());
 
@@ -391,7 +391,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testIndependentlyUnmatchableLines() throws IOException {
+  public void testIndependentlyUnmatchableLines() {
     /*
     Construct ACL with lines:
     0. Reject 1.0.0.0/24 (unblocked)
@@ -412,7 +412,7 @@ public class AclReachabilityTest {
             acceptingHeaderSpace(
                 HeaderSpace.builder().setSrcIps(Prefix.parse("1.2.3.4/32").toIpSpace()).build()));
     IpAccessList acl = _aclb.setLines(aclLines).setName("acl").build();
-    List<String> lineNames = aclLines.stream().map(l -> l.toString()).collect(Collectors.toList());
+    List<String> lineNames = aclLines.stream().map(Object::toString).collect(Collectors.toList());
 
     TableAnswerElement answer = answer(new AclReachabilityQuestion());
 
@@ -468,7 +468,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testOriginalAclNotMutated() throws IOException {
+  public void testOriginalAclNotMutated() {
     // ACL that references an undefined ACL and an IpSpace; check line unchanged in original version
     IpAccessList acl =
         _aclb
@@ -508,7 +508,7 @@ public class AclReachabilityTest {
   }
 
   @Test
-  public void testWithSrcInterfaceReference() throws IOException {
+  public void testWithSrcInterfaceReference() {
     List<IpAccessListLine> aclLines =
         ImmutableList.of(
             IpAccessListLine.accepting()
@@ -518,7 +518,7 @@ public class AclReachabilityTest {
                 .setMatchCondition(new MatchSrcInterface(ImmutableList.of("iface")))
                 .build());
     IpAccessList acl = _aclb.setLines(aclLines).setName("acl").build();
-    List<String> lineNames = aclLines.stream().map(l -> l.toString()).collect(Collectors.toList());
+    List<String> lineNames = aclLines.stream().map(Object::toString).collect(Collectors.toList());
 
     TableAnswerElement answer = answer(new AclReachabilityQuestion());
 
@@ -544,10 +544,14 @@ public class AclReachabilityTest {
     assertThat(answer.getRows().getData(), equalTo(expected));
   }
 
-  private TableAnswerElement answer(AclReachabilityQuestion q) throws IOException {
-    Batfish batfish =
-        BatfishTestUtils.getBatfish(
-            ImmutableSortedMap.of(_c1.getHostname(), _c1, _c2.getHostname(), _c2), _folder);
+  private TableAnswerElement answer(AclReachabilityQuestion q) {
+    IBatfish batfish =
+        new IBatfishTestAdapter() {
+          @Override
+          public SortedMap<String, Configuration> loadConfigurations() {
+            return ImmutableSortedMap.of(_c1.getHostname(), _c1, _c2.getHostname(), _c2);
+          }
+        };
     AclReachabilityAnswerer answerer = new AclReachabilityAnswerer(q, batfish);
     return answerer.answer();
   }

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -99,7 +100,7 @@ public class FileBasedStorageTest {
     String network = "network";
     assertThat(
         _storage.loadMajorIssueConfig(network, majorIssue),
-        equalTo(new MajorIssueConfig(majorIssue, null)));
+        equalTo(new MajorIssueConfig(majorIssue, ImmutableMap.of())));
   }
 
   @Test

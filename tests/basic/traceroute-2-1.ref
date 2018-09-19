@@ -1,28 +1,41 @@
 [
   {
-    "class" : "org.batfish.datamodel.FlowHistory",
-    "traces" : {
-      "Flow<ingressNode:host2 ingressVrf:default srcIp:2.128.1.101 dstIp:1.0.1.1 ipProtocol:IP dscp: 0 ecn:0 fragmentOffset:0 packetLength:0 state:NEW tag:BASE>" : {
-        "environments" : {
-          "BASE" : {
-            "envName" : "env_default",
-            "testrigName" : "basic-example"
-          }
+    "class" : "org.batfish.datamodel.table.TableAnswerElement",
+    "metadata" : {
+      "columnMetadata" : [
+        {
+          "description" : "The flow",
+          "isKey" : true,
+          "isValue" : false,
+          "name" : "Flow",
+          "schema" : "Flow"
         },
-        "flow" : {
+        {
+          "description" : "The flow traces",
+          "isKey" : false,
+          "isValue" : true,
+          "name" : "Traces",
+          "schema" : "Set<FlowTrace>"
+        }
+      ],
+      "textDesc" : "Paths for flow ${Flow}"
+    },
+    "rows" : [
+      {
+        "Flow" : {
           "dscp" : 0,
           "dstIp" : "1.0.1.1",
-          "dstPort" : 0,
+          "dstPort" : 33434,
           "ecn" : 0,
           "fragmentOffset" : 0,
           "icmpCode" : 255,
           "icmpVar" : 255,
           "ingressNode" : "host2",
           "ingressVrf" : "default",
-          "ipProtocol" : "IP",
+          "ipProtocol" : "UDP",
           "packetLength" : 0,
           "srcIp" : "2.128.1.101",
-          "srcPort" : 0,
+          "srcPort" : 49152,
           "state" : "NEW",
           "tag" : "BASE",
           "tcpFlagsAck" : 0,
@@ -34,269 +47,273 @@
           "tcpFlagsSyn" : 0,
           "tcpFlagsUrg" : 0
         },
-        "paths" : {
-          "BASE" : [
-            {
-              "disposition" : "ACCEPTED",
-              "hops" : [
-                {
-                  "edge" : {
-                    "node1" : "host2",
-                    "node1interface" : "eth0",
-                    "node2" : "as2dept1",
-                    "node2interface" : "GigabitEthernet3/0"
-                  },
-                  "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
-                  "filterOut" : "{filter::OUTPUT}{default}",
-                  "routes" : [
-                    "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
-                  ]
+        "Traces" : [
+          {
+            "disposition" : "ACCEPTED",
+            "hops" : [
+              {
+                "edge" : {
+                  "node1" : "host2",
+                  "node1interface" : "eth0",
+                  "node2" : "as2dept1",
+                  "node2interface" : "GigabitEthernet3/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dept1",
-                    "node1interface" : "GigabitEthernet1/0",
-                    "node2" : "as2dist2",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:2.34.201.3,nhint:dynamic>_fnhip:2.34.201.3"
-                  ]
+                "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
+                "filterOut" : "{filter::OUTPUT}{default}",
+                "routes" : [
+                  "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dept1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as2dist1",
+                  "node2interface" : "GigabitEthernet2/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dist2",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as2core2",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.22.2"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:2.34.101.3,nhint:dynamic>_fnhip:2.34.101.3"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dist1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as2core1",
+                  "node2interface" : "GigabitEthernet2/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2core2",
-                    "node1interface" : "GigabitEthernet1/0",
-                    "node2" : "as2border1",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.12.1"
-                  ]
+                "filterIn" : "{blocktelnet}{permit ip any any}",
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.11.2"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2core1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as2border1",
+                  "node2interface" : "GigabitEthernet1/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2border1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as1border1",
-                    "node2interface" : "GigabitEthernet1/0"
-                  },
-                  "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
-                  ]
-                }
-              ],
-              "notes" : "ACCEPTED"
-            },
-            {
-              "disposition" : "ACCEPTED",
-              "hops" : [
-                {
-                  "edge" : {
-                    "node1" : "host2",
-                    "node1interface" : "eth0",
-                    "node2" : "as2dept1",
-                    "node2interface" : "GigabitEthernet3/0"
-                  },
-                  "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
-                  "filterOut" : "{filter::OUTPUT}{default}",
-                  "routes" : [
-                    "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.11.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2border1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as1border1",
+                  "node2interface" : "GigabitEthernet1/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dept1",
-                    "node1interface" : "GigabitEthernet1/0",
-                    "node2" : "as2dist2",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:2.34.201.3,nhint:dynamic>_fnhip:2.34.201.3"
-                  ]
+                "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
+                ]
+              }
+            ],
+            "notes" : "ACCEPTED"
+          },
+          {
+            "disposition" : "ACCEPTED",
+            "hops" : [
+              {
+                "edge" : {
+                  "node1" : "host2",
+                  "node1interface" : "eth0",
+                  "node2" : "as2dept1",
+                  "node2interface" : "GigabitEthernet3/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dist2",
-                    "node1interface" : "GigabitEthernet1/0",
-                    "node2" : "as2core1",
-                    "node2interface" : "GigabitEthernet3/0"
-                  },
-                  "filterIn" : "{blocktelnet}{permit ip any any}",
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.12.2"
-                  ]
+                "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
+                "filterOut" : "{filter::OUTPUT}{default}",
+                "routes" : [
+                  "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dept1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as2dist1",
+                  "node2interface" : "GigabitEthernet2/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2core1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as2border1",
-                    "node2interface" : "GigabitEthernet1/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.11.1"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:2.34.101.3,nhint:dynamic>_fnhip:2.34.101.3"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dist1",
+                  "node1interface" : "GigabitEthernet1/0",
+                  "node2" : "as2core2",
+                  "node2interface" : "GigabitEthernet3/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2border1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as1border1",
-                    "node2interface" : "GigabitEthernet1/0"
-                  },
-                  "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
-                  ]
-                }
-              ],
-              "notes" : "ACCEPTED"
-            },
-            {
-              "disposition" : "ACCEPTED",
-              "hops" : [
-                {
-                  "edge" : {
-                    "node1" : "host2",
-                    "node1interface" : "eth0",
-                    "node2" : "as2dept1",
-                    "node2interface" : "GigabitEthernet3/0"
-                  },
-                  "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
-                  "filterOut" : "{filter::OUTPUT}{default}",
-                  "routes" : [
-                    "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.21.2"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2core2",
+                  "node1interface" : "GigabitEthernet1/0",
+                  "node2" : "as2border1",
+                  "node2interface" : "GigabitEthernet2/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dept1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as2dist1",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:2.34.101.3,nhint:dynamic>_fnhip:2.34.101.3"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.12.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2border1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as1border1",
+                  "node2interface" : "GigabitEthernet1/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dist1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as2core1",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "filterIn" : "{blocktelnet}{permit ip any any}",
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.11.2"
-                  ]
+                "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
+                ]
+              }
+            ],
+            "notes" : "ACCEPTED"
+          },
+          {
+            "disposition" : "ACCEPTED",
+            "hops" : [
+              {
+                "edge" : {
+                  "node1" : "host2",
+                  "node1interface" : "eth0",
+                  "node2" : "as2dept1",
+                  "node2interface" : "GigabitEthernet3/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2core1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as2border1",
-                    "node2interface" : "GigabitEthernet1/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.11.1"
-                  ]
+                "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
+                "filterOut" : "{filter::OUTPUT}{default}",
+                "routes" : [
+                  "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dept1",
+                  "node1interface" : "GigabitEthernet1/0",
+                  "node2" : "as2dist2",
+                  "node2interface" : "GigabitEthernet2/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2border1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as1border1",
-                    "node2interface" : "GigabitEthernet1/0"
-                  },
-                  "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
-                  ]
-                }
-              ],
-              "notes" : "ACCEPTED"
-            },
-            {
-              "disposition" : "ACCEPTED",
-              "hops" : [
-                {
-                  "edge" : {
-                    "node1" : "host2",
-                    "node1interface" : "eth0",
-                    "node2" : "as2dept1",
-                    "node2interface" : "GigabitEthernet3/0"
-                  },
-                  "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
-                  "filterOut" : "{filter::OUTPUT}{default}",
-                  "routes" : [
-                    "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:2.34.201.3,nhint:dynamic>_fnhip:2.34.201.3"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dist2",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as2core2",
+                  "node2interface" : "GigabitEthernet2/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dept1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as2dist1",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:2.34.101.3,nhint:dynamic>_fnhip:2.34.101.3"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.22.2"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2core2",
+                  "node1interface" : "GigabitEthernet1/0",
+                  "node2" : "as2border1",
+                  "node2interface" : "GigabitEthernet2/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2dist1",
-                    "node1interface" : "GigabitEthernet1/0",
-                    "node2" : "as2core2",
-                    "node2interface" : "GigabitEthernet3/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.21.2"
-                  ]
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.12.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2border1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as1border1",
+                  "node2interface" : "GigabitEthernet1/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2core2",
-                    "node1interface" : "GigabitEthernet1/0",
-                    "node2" : "as2border1",
-                    "node2interface" : "GigabitEthernet2/0"
-                  },
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.12.1"
-                  ]
+                "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
+                ]
+              }
+            ],
+            "notes" : "ACCEPTED"
+          },
+          {
+            "disposition" : "ACCEPTED",
+            "hops" : [
+              {
+                "edge" : {
+                  "node1" : "host2",
+                  "node1interface" : "eth0",
+                  "node2" : "as2dept1",
+                  "node2interface" : "GigabitEthernet3/0"
                 },
-                {
-                  "edge" : {
-                    "node1" : "as2border1",
-                    "node1interface" : "GigabitEthernet0/0",
-                    "node2" : "as1border1",
-                    "node2interface" : "GigabitEthernet1/0"
-                  },
-                  "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
-                  "routes" : [
-                    "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
-                  ]
-                }
-              ],
-              "notes" : "ACCEPTED"
-            }
-          ]
-        }
+                "filterIn" : "{RESTRICT_HOST_TRAFFIC_IN}{permit ip 2.128.0.0 0.0.255.255 any}",
+                "filterOut" : "{filter::OUTPUT}{default}",
+                "routes" : [
+                  "StaticRoute<0.0.0.0/0,nhip:2.128.1.1,nhint:eth0>_fnhip:2.128.1.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dept1",
+                  "node1interface" : "GigabitEthernet1/0",
+                  "node2" : "as2dist2",
+                  "node2interface" : "GigabitEthernet2/0"
+                },
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:2.34.201.3,nhint:dynamic>_fnhip:2.34.201.3"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2dist2",
+                  "node1interface" : "GigabitEthernet1/0",
+                  "node2" : "as2core1",
+                  "node2interface" : "GigabitEthernet3/0"
+                },
+                "filterIn" : "{blocktelnet}{permit ip any any}",
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.23.12.2"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2core1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as2border1",
+                  "node2interface" : "GigabitEthernet1/0"
+                },
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:2.12.11.1"
+                ]
+              },
+              {
+                "edge" : {
+                  "node1" : "as2border1",
+                  "node1interface" : "GigabitEthernet0/0",
+                  "node2" : "as1border1",
+                  "node2interface" : "GigabitEthernet1/0"
+                },
+                "filterOut" : "{INSIDE_TO_AS1}{permit ip 2.0.0.0 0.255.255.255 1.0.0.0 0.255.255.255}",
+                "routes" : [
+                  "BgpRoute<1.0.1.0/24,nhip:10.12.11.1,nhint:dynamic>_fnhip:10.12.11.1"
+                ]
+              }
+            ],
+            "notes" : "ACCEPTED"
+          }
+        ]
       }
+    ],
+    "summary" : {
+      "notes" : "Found 1 results",
+      "numFailed" : 0,
+      "numPassed" : 0,
+      "numResults" : 1
     }
   }
 ]

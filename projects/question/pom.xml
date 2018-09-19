@@ -101,6 +101,11 @@
     </dependency>
 
     <dependency>
+      <groupId>net.sf.javabdd</groupId>
+      <artifactId>javabdd</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
