@@ -2,6 +2,7 @@ package org.batfish.datamodel.acl;
 
 import static org.batfish.datamodel.IpAccessListLine.accepting;
 import static org.batfish.datamodel.IpAccessListLine.rejecting;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.TRUE;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.and;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchDstIp;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchDstPrefix;
@@ -34,13 +35,24 @@ public class AclExplainerTest {
   }
 
   private AclLineMatchExpr explain(IpAccessList acl) {
-    return AclExplainer.explain(_pkt, _mgr, acl, ImmutableMap.of(), ImmutableMap.of());
+    return explain(TRUE, acl);
+  }
+
+  private AclLineMatchExpr explain(AclLineMatchExpr invariantExpr, IpAccessList acl) {
+    return AclExplainer.explain(
+        _pkt, _mgr, invariantExpr, acl, ImmutableMap.of(), ImmutableMap.of());
   }
 
   private AclLineMatchExpr explainDifferential(IpAccessList denyAcl, IpAccessList permitAcl) {
+    return explainDifferential(TRUE, denyAcl, permitAcl);
+  }
+
+  private AclLineMatchExpr explainDifferential(
+      AclLineMatchExpr invariantExpr, IpAccessList denyAcl, IpAccessList permitAcl) {
     return AclExplainer.explainDifferential(
         _pkt,
         _mgr,
+        invariantExpr,
         denyAcl,
         ImmutableMap.of(),
         ImmutableMap.of(),
@@ -60,6 +72,19 @@ public class AclExplainerTest {
             .build();
     AclLineMatchExpr explanation = explain(acl);
     assertThat(explanation, equalTo(or(matchDstIp1, matchDstIp2)));
+  }
+
+  @Test
+  public void testExplainInvariant() {
+    MatchHeaderSpace matchDstIp1 = matchDstIp("1.1.1.1");
+    AclLineMatchExpr matchDstIp2 = matchDstIp("2.2.2.2");
+    IpAccessList acl =
+        IpAccessList.builder()
+            .setName("acl")
+            .setLines(ImmutableList.of(accepting(matchDstIp1), accepting(matchDstIp2)))
+            .build();
+    AclLineMatchExpr explanation = explain(matchDstPrefix("2.0.0.0/8"), acl);
+    assertThat(explanation, equalTo(matchDstIp2));
   }
 
   @Test
@@ -162,6 +187,10 @@ public class AclExplainerTest {
     assertThat(
         explainDifferential(denyAcl, permitAcl),
         equalTo(or(matchDstIp, and(matchDstPrefix16, not(matchDstPrefix24)))));
+    /*
+     * Add an invariant that contradicts the second disjunct
+     */
+    assertThat(explainDifferential(matchDstPrefix24, denyAcl, permitAcl), equalTo(matchDstIp));
 
     /*
      * Switch the prefixes. Now the second explanation becomes

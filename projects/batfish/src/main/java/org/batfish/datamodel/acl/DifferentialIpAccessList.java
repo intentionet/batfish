@@ -1,6 +1,7 @@
 package org.batfish.datamodel.acl;
 
 import static org.batfish.datamodel.IpAccessListLine.rejecting;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.not;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -46,6 +47,7 @@ public final class DifferentialIpAccessList {
   }
 
   public static DifferentialIpAccessList create(
+      AclLineMatchExpr invariantExpr,
       IpAccessList denyAcl,
       Map<String, IpAccessList> denyNamedAcls,
       Map<String, IpSpace> denyNamedIpSpaces,
@@ -63,6 +65,8 @@ public final class DifferentialIpAccessList {
             .setName(DIFFERENTIAL_ACL_NAME)
             .setLines(
                 ImmutableList.<IpAccessListLine>builder()
+                    // reject if invariant not satisfied
+                    .add(rejecting(not(invariantExpr)))
                     // reject if permitted by denyAcl
                     .add(rejecting(new PermittedByAcl(denyAclName)))
                     .addAll(permitAcl.getLines())

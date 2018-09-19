@@ -1,6 +1,7 @@
 package org.batfish.datamodel.acl;
 
 import static org.batfish.datamodel.IpAccessListLine.accepting;
+import static org.batfish.datamodel.acl.AclLineMatchExprs.TRUE;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.permittedByAcl;
 import static org.batfish.datamodel.acl.DifferentialIpAccessList.RENAMER;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -72,6 +73,7 @@ public class DifferentialIpAccessListTest {
 
     DifferentialIpAccessList differential =
         DifferentialIpAccessList.create(
+            TRUE,
             denyAcl,
             denyNamedAcls,
             denyNamedIpSpaces,
