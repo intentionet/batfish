@@ -18,6 +18,7 @@ import org.batfish.specifier.SpecifierContext;
 /** A set of parameters for ACL filter analysis that uses high-level specifiers. */
 public final class ReachFilterParameters {
   private final @Nonnull IpSpaceSpecifier _destinationIpSpaceSpecifier;
+  private final boolean _generateExplanations;
   private final @Nonnull HeaderSpace _headerSpace;
   private final @Nonnull LocationSpecifier _startLocationSpecifier;
   private final @Nonnull IpSpaceSpecifier _sourceIpSpaceSpecifier;
@@ -26,8 +27,10 @@ public final class ReachFilterParameters {
       @Nonnull IpSpaceSpecifier destinationIpSpaceSpecifier,
       @Nonnull LocationSpecifier startLocationSpecifier,
       @Nonnull IpSpaceSpecifier sourceIpSpaceSpecifier,
-      @Nonnull HeaderSpace headerSpace) {
+      @Nonnull HeaderSpace headerSpace,
+      boolean generateExplanations) {
     _destinationIpSpaceSpecifier = destinationIpSpaceSpecifier;
+    _generateExplanations = generateExplanations;
     _headerSpace = headerSpace;
     _startLocationSpecifier = startLocationSpecifier;
     _sourceIpSpaceSpecifier = sourceIpSpaceSpecifier;
@@ -36,6 +39,10 @@ public final class ReachFilterParameters {
   @Nonnull
   public IpSpaceSpecifier getDestinationIpSpaceSpecifier() {
     return _destinationIpSpaceSpecifier;
+  }
+
+  public boolean getGenerateExplanations() {
+    return _generateExplanations;
   }
 
   @Nonnull
@@ -83,6 +90,7 @@ public final class ReachFilterParameters {
     private HeaderSpace _headerSpace;
     private LocationSpecifier _startLocationSpecifier;
     private IpSpaceSpecifier _sourceIpSpaceSpecifier;
+    private boolean _generateExplanations;
 
     private Builder() {}
 
@@ -92,8 +100,8 @@ public final class ReachFilterParameters {
       return this;
     }
 
-    public Builder setSourceIpSpaceSpecifier(@Nonnull IpSpaceSpecifier sourceIpSpaceSpecifier) {
-      _sourceIpSpaceSpecifier = sourceIpSpaceSpecifier;
+    public Builder setGenerateExplanations(boolean generateExplanations) {
+      _generateExplanations = generateExplanations;
       return this;
     }
 
@@ -102,12 +110,18 @@ public final class ReachFilterParameters {
       return this;
     }
 
+    public Builder setSourceIpSpaceSpecifier(@Nonnull IpSpaceSpecifier sourceIpSpaceSpecifier) {
+      _sourceIpSpaceSpecifier = sourceIpSpaceSpecifier;
+      return this;
+    }
+
     public ReachFilterParameters build() {
       return new ReachFilterParameters(
           requireNonNull(_destinationIpSpaceSpecifier),
           requireNonNull(_startLocationSpecifier),
           requireNonNull(_sourceIpSpaceSpecifier),
-          requireNonNull(_headerSpace));
+          requireNonNull(_headerSpace),
+          _generateExplanations);
     }
 
     public Builder setStartLocationSpecifier(@Nonnull LocationSpecifier startLocationSpecifier) {

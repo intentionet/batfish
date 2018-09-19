@@ -44,6 +44,7 @@ import org.batfish.grammar.GrammarSettings;
 import org.batfish.question.ReachFilterParameters;
 import org.batfish.question.ReachabilityParameters;
 import org.batfish.question.reachfilter.DifferentialReachFilterResult;
+import org.batfish.question.reachfilter.ReachFilterResult;
 import org.batfish.referencelibrary.ReferenceLibrary;
 import org.batfish.role.NodeRoleDimension;
 import org.batfish.role.NodeRolesData;
@@ -191,7 +192,7 @@ public interface IBatfish extends IPluginConsumer {
   void registerExternalBgpAdvertisementPlugin(
       ExternalBgpAdvertisementPlugin externalBgpAdvertisementPlugin);
 
-  Optional<Flow> reachFilter(
+  Optional<ReachFilterResult> reachFilter(
       Configuration node, IpAccessList acl, ReachFilterParameters parameters);
 
   AnswerElement smtBlackhole(HeaderQuestion q);
