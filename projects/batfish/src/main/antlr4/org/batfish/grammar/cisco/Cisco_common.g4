@@ -484,6 +484,11 @@ rp_subrange
    )
 ;
 
+service_group_protocol
+:
+     TCP | TCP_UDP | UDP
+;
+
 service_specifier
 :
    service_specifier_icmp
@@ -580,11 +585,6 @@ variable_secret
 variable_group_id
 :
     ~( NEWLINE | TCP | TCP_UDP | UDP )+
-;
-
-variable_service_protocol
-:
-     TCP | TCP_UDP | UDP
 ;
 
 variable_vlan

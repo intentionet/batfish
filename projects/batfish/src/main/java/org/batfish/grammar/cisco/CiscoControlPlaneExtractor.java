@@ -930,6 +930,7 @@ import org.batfish.grammar.cisco.CiscoParser.S_zone_pairContext;
 import org.batfish.grammar.cisco.CiscoParser.Sd_switchport_blankContext;
 import org.batfish.grammar.cisco.CiscoParser.Sd_switchport_shutdownContext;
 import org.batfish.grammar.cisco.CiscoParser.Send_community_bgp_tailContext;
+import org.batfish.grammar.cisco.CiscoParser.Service_group_protocolContext;
 import org.batfish.grammar.cisco.CiscoParser.Service_specifier_icmpContext;
 import org.batfish.grammar.cisco.CiscoParser.Service_specifier_protocolContext;
 import org.batfish.grammar.cisco.CiscoParser.Service_specifier_tcp_udpContext;
@@ -1010,7 +1011,6 @@ import org.batfish.grammar.cisco.CiscoParser.VariableContext;
 import org.batfish.grammar.cisco.CiscoParser.Variable_access_listContext;
 import org.batfish.grammar.cisco.CiscoParser.Variable_group_idContext;
 import org.batfish.grammar.cisco.CiscoParser.Variable_permissiveContext;
-import org.batfish.grammar.cisco.CiscoParser.Variable_service_protocolContext;
 import org.batfish.grammar.cisco.CiscoParser.Viaf_vrrpContext;
 import org.batfish.grammar.cisco.CiscoParser.Viafv_addressContext;
 import org.batfish.grammar.cisco.CiscoParser.Viafv_preemptContext;
@@ -10726,7 +10726,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Nullable
   private ServiceObjectGroup.ServiceProtocol toServiceProtocol(
-      Variable_service_protocolContext protocol) {
+      Service_group_protocolContext protocol) {
     if (protocol == null) {
       return null;
     }

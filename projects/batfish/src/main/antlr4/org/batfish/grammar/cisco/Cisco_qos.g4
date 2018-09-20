@@ -332,7 +332,7 @@ ogg_service
 :
    SERVICE name = variable_group_id
    (
-      protocol_type = variable_service_protocol
+      protocol_type = service_group_protocol
    )?
    NEWLINE
    (
@@ -407,7 +407,7 @@ og_service
 :
    SERVICE name = variable_group_id
    (
-      protocol_type = variable_service_protocol
+      protocol_type = service_group_protocol
    )?
    NEWLINE
    (

@@ -1,5 +1,6 @@
 package org.batfish.datamodel.acl;
 
+import static org.batfish.datamodel.IpAccessListLine.rejecting;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.not;
 
 import com.google.common.collect.ImmutableList;
@@ -21,6 +22,11 @@ import org.batfish.datamodel.acl.normalize.AclToAclLineMatchExpr;
 public final class AclExplainer {
   private AclExplainer() {}
 
+  /**
+   * Explain the flow space permitted by one {@link IpAccessList} ({@param permitAcl}) but denied by
+   * another ({@param denyAcl}). The {@param invariantExp} allows scoping the explanation to a space
+   * of interest (use {@link TrueExpr} to explain the entire difference).
+   */
   public static AclLineMatchExpr explainDifferential(
       BDDPacket bddPacket,
       BDDSourceManager mgr,
@@ -34,7 +40,6 @@ public final class AclExplainer {
     // Construct an ACL that permits the difference of the two ACLs.
     DifferentialIpAccessList differentialIpAccessList =
         DifferentialIpAccessList.create(
-            invariantExpr,
             denyAcl,
             denyNamedAcls,
             denyNamedIpSpaces,
@@ -51,10 +56,15 @@ public final class AclExplainer {
 
     return explain(
         ipAccessListToBDD,
-        differentialIpAccessList.getAcl(),
+        scopedAcl(invariantExpr, differentialIpAccessList.getAcl()),
         differentialIpAccessList.getNamedAcls());
   }
 
+  /**
+   * Explain the flow space permitted by an {@link IpAccessList}. The {@param invariantExp} allows
+   * scoping the explanation to a space of interest (use {@link TrueExpr} to explain the entire
+   * space).
+   */
   public static AclLineMatchExpr explain(
       BDDPacket bddPacket,
       BDDSourceManager mgr,
@@ -65,15 +75,7 @@ public final class AclExplainer {
     IpAccessListToBDD ipAccessListToBDD =
         MemoizedIpAccessListToBDD.create(bddPacket, mgr, namedAcls, namedIpSpaces);
 
-    IpAccessList aclWithInvariant =
-        IpAccessList.builder()
-            .setName(acl.getName())
-            .setLines(
-                ImmutableList.<IpAccessListLine>builder()
-                    .add(IpAccessListLine.rejecting(not(invariantExpr)))
-                    .addAll(acl.getLines())
-                    .build())
-            .build();
+    IpAccessList aclWithInvariant = scopedAcl(invariantExpr, acl);
 
     return explain(ipAccessListToBDD, aclWithInvariant, namedAcls);
   }
@@ -89,5 +91,20 @@ public final class AclExplainer {
 
     // Simplify the normal form
     return AclExplanation.explainNormalForm(aclExprNf);
+  }
+
+  /**
+   * Scope the headerspace permitted by an {@link IpAccessList} to those flows that also match
+   * {@param invariantExpr}.
+   */
+  private static IpAccessList scopedAcl(AclLineMatchExpr invariantExpr, IpAccessList acl) {
+    return IpAccessList.builder()
+        .setName(acl.getName())
+        .setLines(
+            ImmutableList.<IpAccessListLine>builder()
+                .add(rejecting(not(invariantExpr)))
+                .addAll(acl.getLines())
+                .build())
+        .build();
   }
 }

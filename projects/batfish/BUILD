@@ -36,7 +36,6 @@ java_library(
         "//projects/batfish/src/main/antlr4/org/batfish/grammar/vyos",
         "//projects/lib/bdd",
         "//projects/lib/z3",
-        "//projects/question",
         "@antlr4_runtime//:compile",
         "@auto_service//:compile",
         "@commons_collections4//:compile",
