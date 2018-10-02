@@ -4,7 +4,6 @@ import static org.batfish.common.util.CommonUtil.toImmutableMap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.sf.javabdd.BDD;
@@ -68,22 +66,16 @@ public class BDDReachabilityAnalysis {
   // postState --> preState --> predicate
   private final Map<StateExpr, Map<StateExpr, Edge>> _reverseEdges;
 
-  private final Map<StateExpr, BDD> _graphRoots;
-
-  // state --> final state --> predicate
-  private final Supplier<Map<StateExpr, Map<StateExpr, BDD>>> _reverseReachableStates;
+  private final ImmutableSet<StateExpr> _graphRoots;
 
   private Set<StateExpr> _leafStates;
 
   BDDReachabilityAnalysis(
-      BDDPacket packet,
-      Map<StateExpr, BDD> graphRoots,
-      Map<StateExpr, Map<StateExpr, Edge>> edges) {
+      BDDPacket packet, Set<StateExpr> graphRoots, Map<StateExpr, Map<StateExpr, Edge>> edges) {
     _bddPacket = packet;
     _edges = edges;
     _reverseEdges = computeReverseEdges(_edges);
-    _graphRoots = ImmutableMap.copyOf(graphRoots);
-    _reverseReachableStates = Suppliers.memoize(this::computeReverseReachableStates);
+    _graphRoots = ImmutableSet.copyOf(graphRoots);
     _leafStates = computeTerminalStates();
   }
 
@@ -100,15 +92,6 @@ public class BDDReachabilityAnalysis {
     // freeze
     return toImmutableMap(
         reverseEdges, Entry::getKey, entry -> ImmutableMap.copyOf(entry.getValue()));
-  }
-
-  /*
-   * node --> final --> set of headers that can reach final from node.
-   */
-  private Map<StateExpr, Map<StateExpr, BDD>> computeReverseReachableStates() {
-    List<StateExpr> leaves =
-        ImmutableList.of(Accept.INSTANCE, Drop.INSTANCE, NeighborUnreachable.INSTANCE);
-    return computeReverseReachableStates(leaves);
   }
 
   private Map<StateExpr, Map<StateExpr, BDD>> computeReverseReachableStates(
@@ -131,7 +114,7 @@ public class BDDReachabilityAnalysis {
           (postState, leaf) -> {
             Map<StateExpr, Edge> postStateInEdges = _reverseEdges.get(postState);
             if (postStateInEdges == null) {
-              // preState has no in-edges
+              // postState has no in-edges
               return;
             }
 
@@ -182,11 +165,11 @@ public class BDDReachabilityAnalysis {
    */
   @VisibleForTesting
   List<MultipathInconsistency> computeMultipathInconsistencies() {
-    return _reverseReachableStates
-        .get()
+    return computeReverseReachableStates(
+            ImmutableList.of(Accept.INSTANCE, Drop.INSTANCE, NeighborUnreachable.INSTANCE))
         .entrySet()
         .stream()
-        .filter(entry -> _graphRoots.containsKey(entry.getKey()))
+        .filter(entry -> _graphRoots.contains(entry.getKey()))
         .flatMap(
             entry -> {
               StateExpr root = entry.getKey();
@@ -220,18 +203,17 @@ public class BDDReachabilityAnalysis {
 
   public Map<IngressLocation, BDD> getIngressLocationAcceptBDDs() {
     BDD zero = _bddPacket.getFactory().zero();
-    return _reverseReachableStates
-        .get()
-        .entrySet()
+    Map<StateExpr, Map<StateExpr, BDD>> reverseReachableStates =
+        computeReverseReachableStates(ImmutableList.of(Accept.INSTANCE));
+    return _graphRoots
         .stream()
-        .filter(
-            entry ->
-                entry.getKey() instanceof OriginateInterfaceLink
-                    || entry.getKey() instanceof OriginateVrf)
         .collect(
             ImmutableMap.toImmutableMap(
-                entry -> toIngressLocation(entry.getKey()),
-                entry -> entry.getValue().getOrDefault(Accept.INSTANCE, zero)));
+                BDDReachabilityAnalysis::toIngressLocation,
+                root ->
+                    reverseReachableStates
+                        .getOrDefault(root, ImmutableMap.of())
+                        .getOrDefault(Accept.INSTANCE, zero)));
   }
 
   @VisibleForTesting

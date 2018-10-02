@@ -432,7 +432,7 @@ public final class BDDReachabilityAnalysisTest {
     BDDReachabilityAnalysis graph =
         new BDDReachabilityAnalysis(
             pkt,
-            ImmutableMap.of(originateVrf, one),
+            ImmutableSet.of(originateVrf),
             ImmutableMap.of(
                 originateVrf,
                 ImmutableMap.of(Drop.INSTANCE, new Edge(originateVrf, Drop.INSTANCE, one))));

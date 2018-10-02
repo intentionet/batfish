@@ -762,7 +762,7 @@ public final class BDDReachabilityAnalysisFactory {
     Map<StateExpr, Map<StateExpr, Edge>> edges =
         computeEdges(Stream.concat(generateEdges(), generateRootEdges(roots)));
 
-    return new BDDReachabilityAnalysis(_bddPacket, roots, edges);
+    return new BDDReachabilityAnalysis(_bddPacket, roots.keySet(), edges);
   }
 
   private String ifaceVrf(String node, String iface) {
