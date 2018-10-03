@@ -11,6 +11,14 @@ Batfish is a network configuration analysis tool that can find bugs and guarante
 
 The developers of Batfish include folks from [Intentionet](https://www.intentionet.com), University of California Los Angeles, University of Southern California, and Microsoft Research. See [www.batfish.org](http://www.batfish.org) for technical information on how it works. ![Analytics](https://ga-beacon.appspot.com/UA-100596389-3/open-source/batfish?pixel&useReferer)
 
+## How do I get started?
+
+For a quick start, check out instructions for using the pre-built [allinone Docker container](https://github.com/batfish/docker/blob/master/allinone.md) (Batfish plus a Python client) or the [Batfish-only Docker container](https://github.com/batfish/docker/blob/master/batfish.md), available on Docker Hub.
+
+If you are interested in developing or building Batfish yourself, go to [Batfish Wiki](https://github.com/batfish/batfish/wiki).
+
+Batfish is being maintained and released as a commercial product by [Intentionet](https://www.intentionet.com). If you'd like a hosted service, drop a line to [info@intentionet.com](mailto:info@intentionet.com).
+
 ## What kinds of correctness checks does Batfish support?
 
 Batfish supports many types of correctness checks, including
@@ -46,14 +54,6 @@ Batfish supports many types of correctness checks, including
   - Two configurations, potentially from different vendors, are semantically equivalent
 
 These checks are performed by asking questions about configurations. See [here](https://github.com/batfish/batfish/wiki/Questions) for the list of questions.
-
-## How do I get started?
-
-For a quick start, checkout the pre-built [allinone Docker container](https://hub.docker.com/r/batfish/allinone/) (Batfish plus a Python client) or the [Batfish-only Docker container](https://hub.docker.com/r/batfish/batfish/), available on Docker Hub.
-
-If you are a DIYer, go to [Batfish Wiki](https://github.com/batfish/batfish/wiki).
-
-Batfish is being maintained and released as a commercial product by [Intentionet](https://www.intentionet.com). If you'd like a hosted service, drop a line to [info@intentionet.com](mailto:info@intentionet.com).
 
 ## What configuration formats does Batfish support?
 

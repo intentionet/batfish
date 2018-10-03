@@ -280,6 +280,8 @@ vlan ifdescr detail
 vpc domain 32
   auto-recovery
   delay restore 150
+  no dual-active exclude interface-vlan
+  graceful consistency-check
   ip arp synchronize
   peer-config-check-bypass
   peer-gateway

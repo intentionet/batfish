@@ -1,11 +1,11 @@
 {
-    "class": "org.batfish.question.bgpproperties.BgpPropertiesQuestion",
+    "class": "org.batfish.question.bgpproperties.BgpProcessConfigurationQuestion",
     "differential": false,
     "nodes": "${nodes}",
     "properties": "${properties}",
     "instance": {
-        "description": "Return BGP configuration properties",
-        "instanceName": "bgpProperties",
+        "description": "Return BGP process configuration properties",
+        "instanceName": "bgpProcessConfiguration",
         "tags": [
             "bgp",
             "configuration"

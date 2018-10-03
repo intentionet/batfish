@@ -8,15 +8,15 @@ import org.batfish.datamodel.questions.Question;
 import org.batfish.question.QuestionPlugin;
 
 @AutoService(Plugin.class)
-public class BgpPropertiesPlugin extends QuestionPlugin {
+public class BgpProcessConfigurationPlugin extends QuestionPlugin {
 
   @Override
   protected Answerer createAnswerer(Question question, IBatfish batfish) {
-    return new BgpPropertiesAnswerer(question, batfish);
+    return new BgpProcessConfigurationAnswerer(question, batfish);
   }
 
   @Override
   protected Question createQuestion() {
-    return new BgpPropertiesQuestion(null, null);
+    return new BgpProcessConfigurationQuestion(null, null);
   }
 }

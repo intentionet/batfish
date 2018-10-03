@@ -26,13 +26,13 @@ import org.batfish.datamodel.table.Row.RowBuilder;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
 
-public class BgpPropertiesAnswerer extends Answerer {
+public class BgpProcessConfigurationAnswerer extends Answerer {
 
   public static final String COL_NODE = "Node";
   public static final String COL_VRF = "VRF";
   public static final String COL_ROUTER_ID = "Router_ID";
 
-  public BgpPropertiesAnswerer(Question question, IBatfish batfish) {
+  public BgpProcessConfigurationAnswerer(Question question, IBatfish batfish) {
     super(question, batfish);
   }
 
@@ -65,7 +65,7 @@ public class BgpPropertiesAnswerer extends Answerer {
   }
 
   /** Creates a {@link TableMetadata} object from the question. */
-  static TableMetadata createTableMetadata(BgpPropertiesQuestion question) {
+  static TableMetadata createTableMetadata(BgpProcessConfigurationQuestion question) {
     String textDesc =
         String.format(
             "Properties of BGP process ${%s}:${%s}:${%s}.", COL_NODE, COL_VRF, COL_ROUTER_ID);
@@ -78,7 +78,7 @@ public class BgpPropertiesAnswerer extends Answerer {
 
   @Override
   public AnswerElement answer() {
-    BgpPropertiesQuestion question = (BgpPropertiesQuestion) _question;
+    BgpProcessConfigurationQuestion question = (BgpProcessConfigurationQuestion) _question;
     Map<String, Configuration> configurations = _batfish.loadConfigurations();
     Set<String> nodes = question.getNodes().getMatchingNodes(_batfish);
 

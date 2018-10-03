@@ -53,3 +53,7 @@ arp access-list unnumberedArpAcl
 !
 arp access-list numberedArpAcl
     10 deny ip any mac any
+!
+ip access-list test-codes
+    10 permit udp any any eq bfd
+    20 permit udp any any eq bfd-echo

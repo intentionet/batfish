@@ -1685,7 +1685,7 @@
         "File_Name" : "configs/ios_interface",
         "Struct_Type" : "policy-map",
         "Ref_Name" : "FOOBAR",
-        "Context" : "interface service-policy type control subscriber",
+        "Context" : "interface service-policy",
         "Lines" : {
           "filename" : "configs/ios_interface",
           "lines" : [

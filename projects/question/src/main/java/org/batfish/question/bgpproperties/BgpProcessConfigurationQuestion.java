@@ -13,7 +13,7 @@ import org.batfish.datamodel.questions.Question;
  * #_properties} determine which nodes and properties are included. The default is to include
  * everything.
  */
-public class BgpPropertiesQuestion extends Question {
+public class BgpProcessConfigurationQuestion extends Question {
 
   private static final String PROP_NODES = "nodes";
   private static final String PROP_PROPERTIES = "properties";
@@ -21,7 +21,7 @@ public class BgpPropertiesQuestion extends Question {
   @Nonnull private NodesSpecifier _nodes;
   @Nonnull private BgpPropertySpecifier _properties;
 
-  public BgpPropertiesQuestion(
+  public BgpProcessConfigurationQuestion(
       @JsonProperty(PROP_NODES) NodesSpecifier nodeRegex,
       @JsonProperty(PROP_PROPERTIES) BgpPropertySpecifier propertySpec) {
     _nodes = firstNonNull(nodeRegex, NodesSpecifier.ALL);
@@ -35,7 +35,7 @@ public class BgpPropertiesQuestion extends Question {
 
   @Override
   public String getName() {
-    return "bgpproperties";
+    return "bgpProcessConfiguration";
   }
 
   @JsonProperty(PROP_NODES)

@@ -19,7 +19,7 @@ import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableMetadata;
 import org.junit.Test;
 
-public class BgpPropertiesAnswererTest {
+public class BgpProcessConfigurationAnswererTest {
 
   @Test
   public void getProperties() {
@@ -38,13 +38,14 @@ public class BgpPropertiesAnswererTest {
     String property1 = BgpPropertySpecifier.MULTIPATH_EBGP;
     String property2 = BgpPropertySpecifier.TIE_BREAKER;
 
-    BgpPropertiesQuestion question =
-        new BgpPropertiesQuestion(null, new BgpPropertySpecifier(property1 + "|" + property2));
+    BgpProcessConfigurationQuestion question =
+        new BgpProcessConfigurationQuestion(
+            null, new BgpPropertySpecifier(property1 + "|" + property2));
 
-    TableMetadata metadata = BgpPropertiesAnswerer.createTableMetadata(question);
+    TableMetadata metadata = BgpProcessConfigurationAnswerer.createTableMetadata(question);
 
     Multiset<Row> propertyRows =
-        BgpPropertiesAnswerer.getProperties(
+        BgpProcessConfigurationAnswerer.getProperties(
             question.getProperties(),
             ImmutableMap.of("node1", conf1),
             ImmutableSet.of("node1"),
@@ -53,9 +54,9 @@ public class BgpPropertiesAnswererTest {
     // we should have exactly one row1 with two properties
     Row expectedRow =
         Row.builder()
-            .put(BgpPropertiesAnswerer.COL_NODE, new Node("node1"))
-            .put(BgpPropertiesAnswerer.COL_VRF, "vrf1")
-            .put(BgpPropertiesAnswerer.COL_ROUTER_ID, new Ip("1.1.1.1"))
+            .put(BgpProcessConfigurationAnswerer.COL_NODE, new Node("node1"))
+            .put(BgpProcessConfigurationAnswerer.COL_VRF, "vrf1")
+            .put(BgpProcessConfigurationAnswerer.COL_ROUTER_ID, new Ip("1.1.1.1"))
             .put(property2, BgpTieBreaker.ARRIVAL_ORDER.toString())
             .put(property1, true)
             .build();

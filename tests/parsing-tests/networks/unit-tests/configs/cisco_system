@@ -18,6 +18,7 @@ no system default switchport fabricpath
 no system default switchport monitor exclude header
 system default switchport shutdown
 system fabric
+  service-policy type queuing input POLICY
 system fabric-mode full-rate
 system flowcontrol bus auto
 system jumbomtu 9100

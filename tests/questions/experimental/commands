@@ -3,8 +3,8 @@ load-questions questions/experimental
 # validate filterLineReachability
 test -raw tests/questions/experimental/filterLineReachability.ref validate-template filterLineReachability filters=".*", nodes=".*"
 
-# validate bgpProperties
-test -raw tests/questions/experimental/bgpProperties.ref validate-template bgpProperties nodes=".*", properties="multipath-.*"
+# validate bgpProcessConfiguration
+test -raw tests/questions/experimental/bgpProcessConfiguration.ref validate-template bgpProcessConfiguration nodes=".*", properties="multipath-.*"
 
 # validate bgpSessionStatus
 test -raw tests/questions/experimental/bgpSessionStatus.ref validate-template bgpSessionStatus includeEstablishedCount=true, nodes=".*", remoteNodes=".*", status=".*", type=".*"

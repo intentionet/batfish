@@ -146,7 +146,6 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_PIM
 import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_POLICY_ROUTING_MAP;
 import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_SELF_REF;
 import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_SERVICE_POLICY;
-import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_SERVICE_POLICY_CONTROL_SUBSCRIBER;
 import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_STANDBY_TRACK;
 import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_SUMMARY_ADDRESS_EIGRP_LEAK_MAP;
 import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_ZONE_MEMBER;
@@ -219,6 +218,7 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.SNMP_SERVER_F
 import static org.batfish.representation.cisco.CiscoStructureUsage.SNMP_SERVER_TFTP_SERVER_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.SSH_IPV4_ACL;
 import static org.batfish.representation.cisco.CiscoStructureUsage.SSH_IPV6_ACL;
+import static org.batfish.representation.cisco.CiscoStructureUsage.SYSTEM_SERVICE_POLICY;
 import static org.batfish.representation.cisco.CiscoStructureUsage.TRACK_INTERFACE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.TUNNEL_PROTECTION_IPSEC_PROFILE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.TUNNEL_SOURCE;
@@ -566,7 +566,6 @@ import org.batfish.grammar.cisco.CiscoParser.If_mtuContext;
 import org.batfish.grammar.cisco.CiscoParser.If_nameifContext;
 import org.batfish.grammar.cisco.CiscoParser.If_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.If_service_policyContext;
-import org.batfish.grammar.cisco.CiscoParser.If_service_policy_control_subscriberContext;
 import org.batfish.grammar.cisco.CiscoParser.If_shutdownContext;
 import org.batfish.grammar.cisco.CiscoParser.If_spanning_treeContext;
 import org.batfish.grammar.cisco.CiscoParser.If_speed_eosContext;
@@ -920,6 +919,7 @@ import org.batfish.grammar.cisco.CiscoParser.S_snmp_serverContext;
 import org.batfish.grammar.cisco.CiscoParser.S_sntpContext;
 import org.batfish.grammar.cisco.CiscoParser.S_spanning_treeContext;
 import org.batfish.grammar.cisco.CiscoParser.S_switchportContext;
+import org.batfish.grammar.cisco.CiscoParser.S_system_service_policyContext;
 import org.batfish.grammar.cisco.CiscoParser.S_tacacs_serverContext;
 import org.batfish.grammar.cisco.CiscoParser.S_trackContext;
 import org.batfish.grammar.cisco.CiscoParser.S_usernameContext;
@@ -2229,10 +2229,16 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitStandby_group_timers(Standby_group_timersContext ctx) {
-    int helloTime =
-        _no ? org.batfish.datamodel.hsrp.HsrpGroup.DEFAULT_HELLO_TIME : toInteger(ctx.hello_time);
-    int holdTime =
-        _no ? org.batfish.datamodel.hsrp.HsrpGroup.DEFAULT_HOLD_TIME : toInteger(ctx.hold_time);
+    int helloTime;
+    int holdTime;
+    if (_no) {
+      helloTime = org.batfish.datamodel.hsrp.HsrpGroup.DEFAULT_HELLO_TIME;
+      holdTime = org.batfish.datamodel.hsrp.HsrpGroup.DEFAULT_HOLD_TIME;
+    } else {
+      helloTime =
+          ctx.hello_ms != null ? toInteger(ctx.hello_ms) : (toInteger(ctx.hello_sec) * 1000);
+      holdTime = ctx.hold_ms != null ? toInteger(ctx.hold_ms) : (toInteger(ctx.hold_sec) * 1000);
+    }
     _currentInterfaces.forEach(
         i -> {
           HsrpGroup hsrpGroup = i.getHsrpGroups().get(_currentHsrpGroup);
@@ -5794,15 +5800,6 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void exitIf_service_policy_control_subscriber(
-      If_service_policy_control_subscriberContext ctx) {
-    // TODO: do something with this.
-    String mapname = ctx.policy_map.getText();
-    _configuration.referenceStructure(
-        POLICY_MAP, mapname, INTERFACE_SERVICE_POLICY_CONTROL_SUBSCRIBER, ctx.getStart().getLine());
-  }
-
-  @Override
   public void exitIf_shutdown(If_shutdownContext ctx) {
     if (ctx.NO() == null) {
       for (Interface currentInterface : _currentInterfaces) {
@@ -5887,6 +5884,13 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitIf_switchport_mode(If_switchport_modeContext ctx) {
+    if (ctx.if_switchport_mode_monitor() != null) {
+      // This does not actually change the switchport mode, rather it just
+      // configures buffer settings. See, e.g.,
+      // https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus3000/sw/system_mgmt/503_U5_1/b_3k_System_Mgmt_Config_503_u5_1/b_3k_System_Mgmt_Config_503_u5_1_chapter_010000.html
+      return;
+    }
+
     SwitchportMode mode;
     if (ctx.ACCESS() != null) {
       mode = SwitchportMode.ACCESS;
@@ -8455,6 +8459,15 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void exitS_system_service_policy(S_system_service_policyContext ctx) {
+    _configuration.referenceStructure(
+        POLICY_MAP,
+        ctx.policy_map.getText(),
+        SYSTEM_SERVICE_POLICY,
+        ctx.policy_map.getStart().getLine());
+  }
+
+  @Override
   public void exitS_switchport(S_switchportContext ctx) {
     if (ctx.ACCESS() != null) {
       _configuration.getCf().setDefaultSwitchportMode(SwitchportMode.ACCESS);
@@ -9866,6 +9879,10 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   private NamedPort toNamedPort(PortContext ctx) {
     if (ctx.AOL() != null) {
       return NamedPort.AOL;
+    } else if (ctx.BFD() != null) {
+      return NamedPort.BFD_CONTROL;
+    } else if (ctx.BFD_ECHO() != null) {
+      return NamedPort.BFD_ECHO;
     } else if (ctx.BGP() != null) {
       return NamedPort.BGP;
     } else if (ctx.BIFF() != null) {

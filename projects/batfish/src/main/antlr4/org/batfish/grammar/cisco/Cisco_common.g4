@@ -302,6 +302,8 @@ port
 :
    DEC
    | AOL
+   | BFD
+   | BFD_ECHO
    | BGP
    | BIFF
    | BOOTPC

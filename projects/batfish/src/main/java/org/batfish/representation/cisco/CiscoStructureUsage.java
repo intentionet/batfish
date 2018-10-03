@@ -176,6 +176,7 @@ public enum CiscoStructureUsage implements StructureUsage {
   SNMP_SERVER_COMMUNITY_ACL6("snmp server community ipv6 acl"),
   SNMP_SERVER_FILE_TRANSFER_ACL("snmp server file transfer acl"),
   SNMP_SERVER_TFTP_SERVER_LIST("snmp server tftp-server list"),
+  SYSTEM_SERVICE_POLICY("system service-policy"),
   SSH_ACL("ssh acl"),
   SSH_IPV4_ACL("ssh ipv4 access-list"),
   SSH_IPV6_ACL("ssh ipv6 access-list"),

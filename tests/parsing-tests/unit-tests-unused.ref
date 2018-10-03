@@ -328,6 +328,18 @@
         }
       },
       {
+        "Structure_Type" : "extended ipv4 access-list",
+        "Structure_Name" : "test-codes",
+        "Source_Lines" : {
+          "filename" : "configs/cisco_acl",
+          "lines" : [
+            57,
+            58,
+            59
+          ]
+        }
+      },
+      {
         "Structure_Type" : "ipv4 prefix-list",
         "Structure_Name" : "allowprefix",
         "Source_Lines" : {
@@ -2624,10 +2636,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 190 results",
+      "notes" : "Found 191 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 190
+      "numResults" : 191
     }
   }
 ]

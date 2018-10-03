@@ -134,7 +134,6 @@ import org.batfish.datamodel.answers.InitInfoAnswerElement;
 import org.batfish.datamodel.answers.InitStepAnswerElement;
 import org.batfish.datamodel.answers.MajorIssueConfig;
 import org.batfish.datamodel.answers.NodAnswerElement;
-import org.batfish.datamodel.answers.NodFirstUnsatAnswerElement;
 import org.batfish.datamodel.answers.NodSatAnswerElement;
 import org.batfish.datamodel.answers.ParseAnswerElement;
 import org.batfish.datamodel.answers.ParseEnvironmentBgpTablesAnswerElement;
@@ -206,7 +205,6 @@ import org.batfish.z3.CompositeNodJob;
 import org.batfish.z3.IngressLocation;
 import org.batfish.z3.LocationToIngressLocation;
 import org.batfish.z3.MultipathInconsistencyQuerySynthesizer;
-import org.batfish.z3.NodFirstUnsatJob;
 import org.batfish.z3.NodJob;
 import org.batfish.z3.NodSatJob;
 import org.batfish.z3.QuerySynthesizer;
@@ -909,21 +907,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
     topology.prune(getEdgeBlacklist(), getNodeBlacklist(), getInterfaceBlacklist());
     _logger.printElapsedTime();
     return topology;
-  }
-
-  public <KeyT, ResultT> void computeNodFirstUnsatOutput(
-      List<NodFirstUnsatJob<KeyT, ResultT>> jobs, Map<KeyT, ResultT> output) {
-    _logger.info("\n*** EXECUTING NOD UNSAT JOBS ***\n");
-    _logger.resetTimer();
-    BatfishJobExecutor.runJobsInExecutor(
-        _settings,
-        _logger,
-        jobs,
-        output,
-        new NodFirstUnsatAnswerElement(),
-        true,
-        "NOD First-UNSAT");
-    _logger.printElapsedTime();
   }
 
   public Set<Flow> computeNodOutput(List<NodJob> jobs) {

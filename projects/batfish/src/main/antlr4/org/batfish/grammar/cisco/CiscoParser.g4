@@ -2817,6 +2817,11 @@ s_no_access_list_standard
    NO ACCESS_LIST ACL_NUM_STANDARD NEWLINE
 ;
 
+s_no_bfd
+:
+   NO BFD null_rest_of_line
+;
+
 s_no_enable
 :
    NO ENABLE PASSWORD (LEVEL level = DEC)? NEWLINE
@@ -3038,6 +3043,17 @@ s_system
       | system_null
       | system_qos
    )
+   s_system_inner*
+;
+
+s_system_inner
+:
+   s_system_service_policy
+;
+
+s_system_service_policy
+:
+   SERVICE_POLICY TYPE QUEUING (INPUT | OUTPUT) policy_map = variable NEWLINE
 ;
 
 s_tacacs
@@ -3236,7 +3252,8 @@ s_vrf_context
 :
    VRF CONTEXT name = variable NEWLINE
    (
-      vrfc_ip_route
+      vrfc_address_family
+      | vrfc_ip_route
       | vrfc_null
    )*
 ;
@@ -3639,6 +3656,7 @@ stanza
    | s_netservice
    | s_no_access_list_extended
    | s_no_access_list_standard
+   | s_no_bfd
    | s_no_enable
    | s_ntp
    | s_null
@@ -4414,6 +4432,8 @@ vpc_null
    (
       AUTO_RECOVERY
       | DELAY
+      | DUAL_ACTIVE
+      | GRACEFUL
       | IP
       | PEER_CONFIG_CHECK_BYPASS
       | PEER_GATEWAY
@@ -4466,6 +4486,11 @@ vpn_null
       | PRIORITY
       | REDIRECT_FQDN
    ) null_rest_of_line
+;
+
+vrfc_address_family
+:
+   ADDRESS_FAMILY (IPV4 | IPV6) UNICAST NEWLINE
 ;
 
 vrfc_ip_route

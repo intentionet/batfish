@@ -13546,6 +13546,43 @@
             "        MAC:'mac'  <== mode:DEFAULT_MODE",
             "        sendermac = (access_list_mac_range",
             "          ANY:'any'  <== mode:DEFAULT_MODE)",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
+            "  (stanza",
+            "    (extended_access_list_stanza",
+            "      IP:'ip'  <== mode:DEFAULT_MODE",
+            "      ACCESS_LIST:'access-list'  <== mode:DEFAULT_MODE",
+            "      shortname = (variable",
+            "        VARIABLE:'test-codes'  <== mode:DEFAULT_MODE)",
+            "      NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
+            "      (extended_access_list_tail",
+            "        num = DEC:'10'  <== mode:DEFAULT_MODE",
+            "        ala = (access_list_action",
+            "          PERMIT:'permit'  <== mode:DEFAULT_MODE)",
+            "        prot = (protocol",
+            "          UDP:'udp'  <== mode:DEFAULT_MODE)",
+            "        srcipr = (access_list_ip_range",
+            "          ANY:'any'  <== mode:DEFAULT_MODE)",
+            "        dstipr = (access_list_ip_range",
+            "          ANY:'any'  <== mode:DEFAULT_MODE)",
+            "        alps_dst = (port_specifier",
+            "          EQ:'eq'  <== mode:DEFAULT_MODE",
+            "          (port",
+            "            BFD:'bfd'  <== mode:DEFAULT_MODE))",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "      (extended_access_list_tail",
+            "        num = DEC:'20'  <== mode:DEFAULT_MODE",
+            "        ala = (access_list_action",
+            "          PERMIT:'permit'  <== mode:DEFAULT_MODE)",
+            "        prot = (protocol",
+            "          UDP:'udp'  <== mode:DEFAULT_MODE)",
+            "        srcipr = (access_list_ip_range",
+            "          ANY:'any'  <== mode:DEFAULT_MODE)",
+            "        dstipr = (access_list_ip_range",
+            "          ANY:'any'  <== mode:DEFAULT_MODE)",
+            "        alps_dst = (port_specifier",
+            "          EQ:'eq'  <== mode:DEFAULT_MODE",
+            "          (port",
+            "            BFD_ECHO:'bfd-echo'  <== mode:DEFAULT_MODE))",
             "        NEWLINE:'\\n\\n'  <== mode:DEFAULT_MODE)))",
             "  EOF:<EOF>  <== mode:DEFAULT_MODE)"
           ]
@@ -20490,13 +20527,13 @@
             "        COLLECT:'collect'  <== mode:DEFAULT_MODE",
             "        (null_rest_of_line",
             "          COUNTER:'counter'  <== mode:DEFAULT_MODE",
-            "          VARIABLE:'bytes'  <== mode:DEFAULT_MODE",
+            "          BYTES:'bytes'  <== mode:DEFAULT_MODE",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (flow_null",
             "        COLLECT:'collect'  <== mode:DEFAULT_MODE",
             "        (null_rest_of_line",
             "          COUNTER:'counter'  <== mode:DEFAULT_MODE",
-            "          VARIABLE:'packets'  <== mode:DEFAULT_MODE",
+            "          PACKETS:'packets'  <== mode:DEFAULT_MODE",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (flow_null",
             "        COLLECT:'collect'  <== mode:DEFAULT_MODE",
@@ -28577,7 +28614,7 @@
             "        OUT:'out'  <== mode:DEFAULT_MODE",
             "        VARIABLE:'of'  <== mode:DEFAULT_MODE",
             "        DEC:'5678'  <== mode:DEFAULT_MODE",
-            "        VARIABLE:'bytes'  <== mode:DEFAULT_MODE",
+            "        BYTES:'bytes'  <== mode:DEFAULT_MODE",
             "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)))",
             "  (stanza",
             "    (s_null",
@@ -28614,6 +28651,18 @@
             "        (null_rest_of_line",
             "          VARIABLE:'restore'  <== mode:DEFAULT_MODE",
             "          DEC:'150'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
+            "      (vpc_null",
+            "        NO:'no'  <== mode:DEFAULT_MODE",
+            "        DUAL_ACTIVE:'dual-active'  <== mode:DEFAULT_MODE",
+            "        (null_rest_of_line",
+            "          EXCLUDE:'exclude'  <== mode:DEFAULT_MODE",
+            "          VARIABLE:'interface-vlan'  <== mode:DEFAULT_MODE",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
+            "      (vpc_null",
+            "        GRACEFUL:'graceful'  <== mode:DEFAULT_MODE",
+            "        (null_rest_of_line",
+            "          VARIABLE:'consistency-check'  <== mode:DEFAULT_MODE",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (vpc_null",
             "        IP:'ip'  <== mode:DEFAULT_MODE",
@@ -32298,7 +32347,7 @@
             "        SWITCHBACK:'switchback'  <== mode:DEFAULT_MODE",
             "        (null_rest_of_line",
             "          METHOD:'method'  <== mode:DEFAULT_MODE",
-            "          VARIABLE:'graceful'  <== mode:DEFAULT_MODE",
+            "          GRACEFUL:'graceful'  <== mode:DEFAULT_MODE",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
             "  EOF:<EOF>  <== mode:DEFAULT_MODE)"
           ]
@@ -34260,6 +34309,15 @@
             "      (system_null",
             "        FABRIC:'fabric'  <== mode:DEFAULT_MODE",
             "        (null_rest_of_line",
+            "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
+            "      (s_system_inner",
+            "        (s_system_service_policy",
+            "          SERVICE_POLICY:'service-policy'  <== mode:DEFAULT_MODE",
+            "          TYPE:'type'  <== mode:DEFAULT_MODE",
+            "          QUEUING:'queuing'  <== mode:DEFAULT_MODE",
+            "          INPUT:'input'  <== mode:DEFAULT_MODE",
+            "          policy_map = (variable",
+            "            VARIABLE:'POLICY'  <== mode:DEFAULT_MODE)",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))))",
             "  (stanza",
             "    (s_system",
@@ -36429,6 +36487,16 @@
             "      name = (variable",
             "        MANAGEMENT:'management'  <== mode:DEFAULT_MODE)",
             "      NEWLINE:'\\n'  <== mode:DEFAULT_MODE",
+            "      (vrfc_address_family",
+            "        ADDRESS_FAMILY:'address-family'  <== mode:DEFAULT_MODE",
+            "        IPV4:'ipv4'  <== mode:DEFAULT_MODE",
+            "        UNICAST:'unicast'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
+            "      (vrfc_address_family",
+            "        ADDRESS_FAMILY:'address-family'  <== mode:DEFAULT_MODE",
+            "        IPV6:'ipv6'  <== mode:DEFAULT_MODE",
+            "        UNICAST:'unicast'  <== mode:DEFAULT_MODE",
+            "        NEWLINE:'\\n'  <== mode:DEFAULT_MODE)",
             "      (vrfc_null",
             "        IP:'ip'  <== mode:DEFAULT_MODE",
             "        PIM:'pim'  <== mode:DEFAULT_MODE",
@@ -38915,7 +38983,7 @@
             "            low = DEC:'1'  <== mode:M_Interface)))",
             "      NEWLINE:'\\n'  <== mode:M_Interface",
             "      (if_inner",
-            "        (if_service_policy_control_subscriber",
+            "        (if_service_policy",
             "          SERVICE_POLICY:'service-policy'  <== mode:DEFAULT_MODE",
             "          TYPE:'type'  <== mode:DEFAULT_MODE",
             "          CONTROL:'control'  <== mode:DEFAULT_MODE",
@@ -38963,7 +39031,8 @@
             "            group = DEC:'1001'  <== mode:DEFAULT_MODE",
             "            (standby_group_authentication",
             "              AUTHENTICATION:'authentication'  <== mode:DEFAULT_MODE",
-            "              auth = DEC:'012345678901234567890123456789012345678'  <== mode:M_Authentication))",
+            "              auth = (variable",
+            "                DEC:'012345678901234567890123456789012345678'  <== mode:M_Authentication)))",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (if_inner",
             "        (if_standby",
@@ -38999,8 +39068,8 @@
             "            (standby_group_timers",
             "              TIMERS:'timers'  <== mode:DEFAULT_MODE",
             "              MSEC:'msec'  <== mode:DEFAULT_MODE",
-            "              hello_time = DEC:'500'  <== mode:DEFAULT_MODE",
-            "              hold_time = DEC:'2'  <== mode:DEFAULT_MODE))",
+            "              hello_ms = DEC:'500'  <== mode:DEFAULT_MODE",
+            "              hold_sec = DEC:'2'  <== mode:DEFAULT_MODE))",
             "          NEWLINE:'\\n'  <== mode:DEFAULT_MODE))",
             "      (if_inner",
             "        (if_standby",
@@ -56814,7 +56883,7 @@
           "Parse warnings" : [
             {
               "Comment" : "This feature is not currently supported",
-              "Line" : 7,
+              "Line" : 9,
               "Parser_Context" : "[vrfc_ip_route s_vrf_context stanza cisco_configuration]",
               "Text" : "ip route 0.0.0.0/0 1.2.3.4"
             }
@@ -57723,6 +57792,14 @@
             "standard" : {
               "definitionLines" : [
                 28
+              ],
+              "numReferrers" : 0
+            },
+            "test-codes" : {
+              "definitionLines" : [
+                57,
+                58,
+                59
               ],
               "numReferrers" : 0
             }
@@ -62511,6 +62588,15 @@
             }
           }
         },
+        "configs/cisco_system" : {
+          "policy-map" : {
+            "POLICY" : {
+              "system service-policy" : [
+                21
+              ]
+            }
+          }
+        },
         "configs/cisco_track" : {
           "interface" : {
             "GigabitEthernet0/0" : {
@@ -62732,7 +62818,7 @@
           },
           "policy-map" : {
             "FOOBAR" : {
-              "interface service-policy type control subscriber" : [
+              "interface service-policy" : [
                 5
               ]
             }
@@ -64516,7 +64602,7 @@
         "configs/ios_interface" : {
           "policy-map" : {
             "FOOBAR" : {
-              "interface service-policy type control subscriber" : [
+              "interface service-policy" : [
                 5
               ]
             }

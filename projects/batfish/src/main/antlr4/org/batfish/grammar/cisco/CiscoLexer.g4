@@ -1436,6 +1436,11 @@ BFD
    'bfd'
 ;
 
+BFD_ECHO
+:
+   'bfd-echo'
+;
+
 BFD_ENABLE
 :
    'bfd-enable'
@@ -1661,6 +1666,11 @@ BUCKETS
    'buckets'
 ;
 
+BUFFER_LIMIT
+:
+   'buffer-limit'
+;
+
 BUFFER_SIZE
 :
    'buffer-size'
@@ -1689,6 +1699,11 @@ BUFFERS
 BURST_SIZE
 :
    'burst-size'
+;
+
+BYTES
+:
+    'bytes'
 ;
 
 CA
@@ -4882,6 +4897,11 @@ GOPHER
    'gopher'
 ;
 
+GRACEFUL
+:
+   'graceful'
+;
+
 GRACEFUL_RESTART
 :
    'graceful-restart'
@@ -5947,6 +5967,11 @@ JUMBOMTU
 KBPS
 :
    'kbps'
+;
+
+KBYTES
+:
+    'kbytes'
 ;
 
 KEEPALIVE
@@ -7027,6 +7052,11 @@ MBPS
 MBSSID
 :
    'mbssid'
+;
+
+MBYTES
+:
+    'mbytes'
 ;
 
 MCAST_BOUNDARY
@@ -8402,6 +8432,11 @@ PACKET_TOO_BIG
 PACKETCABLE
 :
    'packetcable'
+;
+
+PACKETS
+:
+   'packets'
 ;
 
 PACKETSIZE
