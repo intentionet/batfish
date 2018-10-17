@@ -1,6 +1,5 @@
 package org.batfish.dataplane.traceroute;
 
-import static org.batfish.dataplane.traceroute.TracerouteUtils.createDummyHop;
 import static org.batfish.dataplane.traceroute.TracerouteUtils.createEnterSrcIfaceStep;
 import static org.batfish.dataplane.traceroute.TracerouteUtils.isArpSuccessful;
 import static org.batfish.dataplane.traceroute.TracerouteUtils.validateInputs;
@@ -340,30 +339,18 @@ public class TracerouteEngineImplContext {
               List<Hop> hops = new ArrayList<>();
               String ingressInterfaceName = flow.getIngressInterface();
               if (ingressInterfaceName != null) {
-                Hop dummyHop = createDummyHop();
-                hops.add(dummyHop);
                 TransmissionContext transmissionContext =
                     new TransmissionContext(
                         Maps.newHashMap(),
-                        dummyHop.getNode(),
+                        new Node(ingressNodeName),
                         currentFlowTraces,
                         hops,
                         Maps.newTreeMap(),
                         flow,
                         new ArrayList<>(),
                         flow);
-                if (isArpSuccessful(
-                    flow.getDstIp(),
-                    _forwardingAnalysis,
-                    _configurations.get(ingressNodeName),
-                    ingressInterfaceName)) {
-                  processHop(
-                      ingressNodeName,
-                      ingressInterfaceName,
-                      transmissionContext,
-                      flow,
-                      visitedHops);
-                }
+                processHop(
+                    ingressNodeName, ingressInterfaceName, transmissionContext, flow, visitedHops);
               } else {
                 TransmissionContext transmissionContext =
                     new TransmissionContext(
