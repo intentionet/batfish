@@ -54,9 +54,7 @@ public class Edge implements Serializable, Comparable<Edge> {
 
   /** Create an Edge from {@link Interface}s */
   public Edge(Interface tail, Interface head) {
-    this(
-        new NodeInterfacePair(tail.getOwner().getHostname(), tail.getName()),
-        new NodeInterfacePair(head.getOwner().getHostname(), head.getName()));
+    this(new NodeInterfacePair(tail), new NodeInterfacePair(head));
   }
 
   /** Create an edge from names of nodes and interfaces */

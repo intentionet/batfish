@@ -2,6 +2,7 @@ package org.batfish.common.util;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Comparators;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -57,6 +58,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -828,39 +830,67 @@ public class CommonUtil {
         new SSLEngineConfigurator(sslCon, false, verifyClient, false));
   }
 
+  /** Returns {@code true} if any {@link Ip IP address} is owned by both devices. */
+  private static boolean haveIpInCommon(Interface i1, Interface i2) {
+    for (InterfaceAddress ia : i1.getAllAddresses()) {
+      for (InterfaceAddress ia2 : i2.getAllAddresses()) {
+        if (ia.getIp().equals(ia2.getIp())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   public static Topology synthesizeTopology(Map<String, Configuration> configurations) {
-    SortedSet<Edge> edges = new TreeSet<>();
     Map<Prefix, List<Interface>> prefixInterfaces = new HashMap<>();
     configurations.forEach(
         (nodeName, node) -> {
           for (Interface iface : node.getAllInterfaces().values()) {
-            if (!iface.isLoopback(node.getConfigurationFormat()) && iface.getActive()) {
-              for (InterfaceAddress address : iface.getAllAddresses()) {
-                if (address.getNetworkBits() < Prefix.MAX_PREFIX_LENGTH) {
-                  Prefix prefix = address.getPrefix();
-                  List<Interface> interfaceBucket =
-                      prefixInterfaces.computeIfAbsent(prefix, k -> new LinkedList<>());
-                  interfaceBucket.add(iface);
-                }
+            if (iface.isLoopback(node.getConfigurationFormat()) || !iface.getActive()) {
+              continue;
+            }
+            for (InterfaceAddress address : iface.getAllAddresses()) {
+              if (address.getNetworkBits() < Prefix.MAX_PREFIX_LENGTH) {
+                Prefix prefix = address.getPrefix();
+                List<Interface> interfaceBucket =
+                    prefixInterfaces.computeIfAbsent(prefix, k -> new LinkedList<>());
+                interfaceBucket.add(iface);
               }
             }
           }
         });
-    for (List<Interface> bucket : prefixInterfaces.values()) {
-      for (Interface iface1 : bucket) {
-        for (Interface iface2 : bucket) {
-          if (iface1 != iface2
-              // don't connect interfaces that have even a single address in common
-              && Sets.intersection(iface1.getAllAddresses(), iface2.getAllAddresses()).isEmpty()) {
-            edges.add(
-                new Edge(
-                    new NodeInterfacePair(iface1.getOwner().getHostname(), iface1.getName()),
-                    new NodeInterfacePair(iface2.getOwner().getHostname(), iface2.getName())));
+
+    ImmutableSortedSet.Builder<Edge> edges = ImmutableSortedSet.naturalOrder();
+    for (Entry<Prefix, List<Interface>> bucketEntry : prefixInterfaces.entrySet()) {
+      Prefix p = bucketEntry.getKey();
+
+      // Collect all interfaces that have subnets overlapping P iff they have an IP address in P.
+      // Use an IdentityHashSet to prevent duplicates.
+      Set<Interface> candidateInterfaces = Sets.newIdentityHashSet();
+      IntStream.range(0, Prefix.MAX_PREFIX_LENGTH)
+          .mapToObj(
+              i -> prefixInterfaces.getOrDefault(new Prefix(p.getStartIp(), i), ImmutableList.of()))
+          .flatMap(Collection::stream)
+          .filter(
+              iface -> iface.getAllAddresses().stream().anyMatch(ia -> p.containsIp(ia.getIp())))
+          .forEach(candidateInterfaces::add);
+
+      for (Interface iface1 : bucketEntry.getValue()) {
+        for (Interface iface2 : candidateInterfaces) {
+          // no self-edges
+          if (iface1 == iface2) {
+            continue;
           }
+          // don't connect interfaces that have any IP address in common
+          if (haveIpInCommon(iface1, iface2)) {
+            continue;
+          }
+          edges.add(new Edge(iface1, iface2));
         }
       }
     }
-    return new Topology(edges);
+    return new Topology(edges.build());
   }
 
   public static <K1, K2, V1, V2> Map<K2, V2> toImmutableMap(

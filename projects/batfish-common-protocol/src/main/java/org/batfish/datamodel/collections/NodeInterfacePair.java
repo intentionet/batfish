@@ -10,6 +10,7 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import org.batfish.datamodel.Interface;
 
 /** Combination of node name and interface name */
 @ParametersAreNonnullByDefault
@@ -34,6 +35,10 @@ public class NodeInterfacePair implements Serializable, Comparable<NodeInterface
   public NodeInterfacePair(String hostname, String interfaceName) {
     _hostname = hostname;
     _interfaceName = interfaceName;
+  }
+
+  public NodeInterfacePair(Interface iface) {
+    this(iface.getOwner().getHostname(), iface.getName());
   }
 
   /** Return node name */

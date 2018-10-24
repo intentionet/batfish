@@ -107,11 +107,7 @@ public final class SpecifiersAnswerer extends Answerer {
 
     Set<Interface> interfaces = interfaceSpecifier.resolve(nodes, context);
     for (Interface iface : interfaces) {
-      table.addRow(
-          Row.of(
-              columnMap,
-              COL_INTERFACE,
-              new NodeInterfacePair(iface.getOwner().getHostname(), iface.getName())));
+      table.addRow(Row.of(columnMap, COL_INTERFACE, new NodeInterfacePair(iface)));
     }
 
     return table;
