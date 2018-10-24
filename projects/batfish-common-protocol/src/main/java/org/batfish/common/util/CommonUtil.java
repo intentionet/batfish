@@ -2,6 +2,7 @@ package org.batfish.common.util;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Comparators;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -57,6 +58,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -846,17 +848,34 @@ public class CommonUtil {
             }
           }
         });
-    for (List<Interface> bucket : prefixInterfaces.values()) {
-      for (Interface iface1 : bucket) {
-        for (Interface iface2 : bucket) {
-          if (iface1 != iface2
-              // don't connect interfaces that have even a single address in common
-              && Sets.intersection(iface1.getAllAddresses(), iface2.getAllAddresses()).isEmpty()) {
-            edges.add(
-                new Edge(
-                    new NodeInterfacePair(iface1.getOwner().getHostname(), iface1.getName()),
-                    new NodeInterfacePair(iface2.getOwner().getHostname(), iface2.getName())));
+    for (Entry<Prefix, List<Interface>> bucketEntry : prefixInterfaces.entrySet()) {
+      Prefix p = bucketEntry.getKey();
+
+      // Collect all interfaces that have subnets overlapping P iff they have an IP address in P.
+      // Use an IdentityHashSet to prevent duplicates.
+      Set<Interface> candidateInterfaces = Sets.newIdentityHashSet();
+      IntStream.rangeClosed(0, p.getPrefixLength())
+          .mapToObj(
+              i -> prefixInterfaces.getOrDefault(new Prefix(p.getStartIp(), i), ImmutableList.of()))
+          .flatMap(Collection::stream)
+          .filter(
+              iface -> iface.getAllAddresses().stream().anyMatch(ia -> p.containsIp(ia.getIp())))
+          .forEach(candidateInterfaces::add);
+
+      for (Interface iface1 : bucketEntry.getValue()) {
+        for (Interface iface2 : candidateInterfaces) {
+          // no self-edges
+          if (iface1 == iface2) {
+            continue;
           }
+          // don't connect interfaces that have even a single address in common
+          if (!Sets.intersection(iface1.getAllAddresses(), iface2.getAllAddresses()).isEmpty()) {
+            continue;
+          }
+          edges.add(
+              new Edge(
+                  new NodeInterfacePair(iface1.getOwner().getHostname(), iface1.getName()),
+                  new NodeInterfacePair(iface2.getOwner().getHostname(), iface2.getName())));
         }
       }
     }
