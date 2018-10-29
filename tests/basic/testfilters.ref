@@ -86,7 +86,7 @@
           "events" : [
             {
               "class" : "org.batfish.datamodel.acl.DeniedByIpAccessListLine",
-              "description" : "Flow denied by ACL named 'filter::INPUT', index 1: default",
+              "description" : "Flow denied by filter named filter::INPUT, index 1: default",
               "index" : 1,
               "lineDescription" : "default",
               "name" : "filter::INPUT"
@@ -131,7 +131,7 @@
           "events" : [
             {
               "class" : "org.batfish.datamodel.acl.DeniedByIpAccessListLine",
-              "description" : "Flow denied by ACL named 'filter::INPUT', index 2: default",
+              "description" : "Flow denied by filter named filter::INPUT, index 2: default",
               "index" : 2,
               "lineDescription" : "default",
               "name" : "filter::INPUT"
@@ -144,51 +144,6 @@
           "id" : "node-host1",
           "name" : "host1"
         },
-        "Filter_Name" : "filter::FORWARD",
-        "Flow" : {
-          "dscp" : 0,
-          "dstIp" : "1.1.1.1",
-          "dstPort" : 80,
-          "ecn" : 0,
-          "fragmentOffset" : 0,
-          "icmpCode" : 255,
-          "icmpVar" : 255,
-          "ingressNode" : "host1",
-          "ingressVrf" : "default",
-          "ipProtocol" : "TCP",
-          "packetLength" : 512,
-          "srcIp" : "2.128.0.101",
-          "srcPort" : 49152,
-          "state" : "NEW",
-          "tag" : "FlowTag",
-          "tcpFlagsAck" : 0,
-          "tcpFlagsCwr" : 0,
-          "tcpFlagsEce" : 0,
-          "tcpFlagsFin" : 0,
-          "tcpFlagsPsh" : 0,
-          "tcpFlagsRst" : 0,
-          "tcpFlagsSyn" : 0,
-          "tcpFlagsUrg" : 0
-        },
-        "Action" : "PERMIT",
-        "Line_Content" : "default",
-        "Trace" : {
-          "events" : [
-            {
-              "class" : "org.batfish.datamodel.acl.PermittedByIpAccessListLine",
-              "description" : "Flow permitted by ACL named 'filter::FORWARD', index 0: default",
-              "index" : 0,
-              "lineDescription" : "default",
-              "name" : "filter::FORWARD"
-            }
-          ]
-        }
-      },
-      {
-        "Node" : {
-          "id" : "node-host1",
-          "name" : "host1"
-        },
         "Filter_Name" : "filter::OUTPUT",
         "Flow" : {
           "dscp" : 0,
@@ -221,7 +176,7 @@
           "events" : [
             {
               "class" : "org.batfish.datamodel.acl.PermittedByIpAccessListLine",
-              "description" : "Flow permitted by ACL named 'filter::OUTPUT', index 0: default",
+              "description" : "Flow permitted by filter named filter::OUTPUT, index 0: default",
               "index" : 0,
               "lineDescription" : "default",
               "name" : "filter::OUTPUT"
@@ -231,6 +186,51 @@
       },
       {
         "Node" : {
+          "id" : "node-host1",
+          "name" : "host1"
+        },
+        "Filter_Name" : "filter::FORWARD",
+        "Flow" : {
+          "dscp" : 0,
+          "dstIp" : "1.1.1.1",
+          "dstPort" : 80,
+          "ecn" : 0,
+          "fragmentOffset" : 0,
+          "icmpCode" : 255,
+          "icmpVar" : 255,
+          "ingressNode" : "host1",
+          "ingressVrf" : "default",
+          "ipProtocol" : "TCP",
+          "packetLength" : 512,
+          "srcIp" : "2.128.0.101",
+          "srcPort" : 49152,
+          "state" : "NEW",
+          "tag" : "FlowTag",
+          "tcpFlagsAck" : 0,
+          "tcpFlagsCwr" : 0,
+          "tcpFlagsEce" : 0,
+          "tcpFlagsFin" : 0,
+          "tcpFlagsPsh" : 0,
+          "tcpFlagsRst" : 0,
+          "tcpFlagsSyn" : 0,
+          "tcpFlagsUrg" : 0
+        },
+        "Action" : "PERMIT",
+        "Line_Content" : "default",
+        "Trace" : {
+          "events" : [
+            {
+              "class" : "org.batfish.datamodel.acl.PermittedByIpAccessListLine",
+              "description" : "Flow permitted by filter named filter::FORWARD, index 0: default",
+              "index" : 0,
+              "lineDescription" : "default",
+              "name" : "filter::FORWARD"
+            }
+          ]
+        }
+      },
+      {
+        "Node" : {
           "id" : "node-host2",
           "name" : "host2"
         },
@@ -266,7 +266,7 @@
           "events" : [
             {
               "class" : "org.batfish.datamodel.acl.PermittedByIpAccessListLine",
-              "description" : "Flow permitted by ACL named 'filter::FORWARD', index 0: default",
+              "description" : "Flow permitted by filter named filter::FORWARD, index 0: default",
               "index" : 0,
               "lineDescription" : "default",
               "name" : "filter::FORWARD"
@@ -311,7 +311,7 @@
           "events" : [
             {
               "class" : "org.batfish.datamodel.acl.PermittedByIpAccessListLine",
-              "description" : "Flow permitted by ACL named 'filter::OUTPUT', index 1: default",
+              "description" : "Flow permitted by filter named filter::OUTPUT, index 1: default",
               "index" : 1,
               "lineDescription" : "default",
               "name" : "filter::OUTPUT"

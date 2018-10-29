@@ -1,5 +1,6 @@
 package org.batfish.datamodel.acl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,27 +21,16 @@ public final class PermittedByIpAccessListLine implements TerminalTraceEvent {
 
   private static final long serialVersionUID = 1L;
 
-  private static String computeDescription(
-      int index,
-      @Nonnull String lineDescription,
-      @Nonnull String name,
-      @Nullable String sourceName,
-      @Nullable String sourceType) {
-    if (sourceName != null) {
-      return String.format(
-          "Flow permitted by '%s' named '%s', index %d: %s",
-          sourceType, sourceName, index, lineDescription);
-    }
-    return String.format(
-        "Flow permitted by ACL named '%s', index %d: %s", name, index, lineDescription);
-  }
-
   @JsonCreator
   private static PermittedByIpAccessListLine create(
-      @JsonProperty(PROP_DESCRIPTION) String description,
-      @JsonProperty(PROP_INDEX) int index,
-      @JsonProperty(PROP_LINE_DESCRIPTION) @Nonnull String lineDescription,
-      @JsonProperty(PROP_NAME) @Nonnull String name) {
+      @Nullable @JsonProperty(PROP_DESCRIPTION) String description,
+      @Nullable @JsonProperty(PROP_INDEX) Integer index,
+      @Nullable @JsonProperty(PROP_LINE_DESCRIPTION) String lineDescription,
+      @Nullable @JsonProperty(PROP_NAME) String name) {
+    checkArgument(description != null, "Missing %s", PROP_DESCRIPTION);
+    checkArgument(index != null, "Missing %s", PROP_INDEX);
+    checkArgument(lineDescription != null, "Missing %s", PROP_LINE_DESCRIPTION);
+    checkArgument(name != null, "Missing %s", PROP_NAME);
     return new PermittedByIpAccessListLine(
         requireNonNull(description), index, requireNonNull(lineDescription), requireNonNull(name));
   }
@@ -53,17 +43,32 @@ public final class PermittedByIpAccessListLine implements TerminalTraceEvent {
 
   private final String _name;
 
-  public PermittedByIpAccessListLine(
+  /**
+   * Creates a new {@link PermittedByIpAccessListLine} trace, using the source information if
+   * provided to generate the description of the trace event. Note that either both or neither of
+   * {@code sourceName} and {@code sourceType} must be present.
+   */
+  public static PermittedByIpAccessListLine create(
       int index,
       @Nonnull String lineDescription,
       @Nonnull String name,
       @Nullable String sourceName,
       @Nullable String sourceType) {
-    this(
-        computeDescription(index, lineDescription, name, sourceName, sourceType),
-        index,
-        lineDescription,
-        name);
+    checkArgument(
+        (sourceName == null) == (sourceType == null),
+        "Expected either both or neither of sourceName (%s) and sourceType (%s) to be null",
+        sourceName,
+        sourceType);
+    String permitter;
+    if (sourceName != null) {
+      permitter = String.format("%s named %s", sourceType, sourceName);
+    } else {
+      permitter = String.format("filter named %s", name);
+    }
+    String description =
+        String.format("Flow permitted by %s, index %d: %s", permitter, index, lineDescription);
+
+    return new PermittedByIpAccessListLine(description, index, lineDescription, name);
   }
 
   private PermittedByIpAccessListLine(

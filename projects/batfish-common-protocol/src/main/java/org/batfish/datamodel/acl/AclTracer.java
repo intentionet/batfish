@@ -108,7 +108,7 @@ public final class AclTracer extends Evaluator {
     String lineDescription = firstNonNull(line.getName(), line.toString());
     if (line.getAction() == LineAction.PERMIT) {
       _currentTreeNode.setEvent(
-          new PermittedByIpAccessListLine(
+          PermittedByIpAccessListLine.create(
               index,
               lineDescription,
               ipAccessList.getName(),
@@ -116,7 +116,7 @@ public final class AclTracer extends Evaluator {
               ipAccessList.getSourceType()));
     } else {
       _currentTreeNode.setEvent(
-          new DeniedByIpAccessListLine(
+          DeniedByIpAccessListLine.create(
               index,
               lineDescription,
               ipAccessList.getName(),

@@ -1,5 +1,7 @@
 package org.batfish.datamodel;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -35,6 +37,11 @@ public class IpAccessList extends ComparableStructure<String> {
     @Override
     public IpAccessList build() {
       String name = _name != null ? _name : generateName();
+      checkState(
+          (_sourceName == null) == (_sourceType == null),
+          "Either both or neither of sourceName (%s) and sourceType (%s) must be provided",
+          _sourceName,
+          _sourceType);
       IpAccessList ipAccessList = new IpAccessList(name, _lines, _sourceName, _sourceType);
       if (_owner != null) {
         _owner.getIpAccessLists().put(name, ipAccessList);
