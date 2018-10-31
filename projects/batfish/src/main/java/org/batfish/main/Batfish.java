@@ -3987,9 +3987,6 @@ public class Batfish extends PluginConsumer implements IBatfish {
         !parameters.getFlowDispositions().isEmpty(), "Must specify at least one FlowDisposition");
     BDDPacket pkt = new BDDPacket();
 
-    // TODO add ignoreAcls parameter
-    boolean ignoreAcls = false;
-
     /*
      * TODO should we have separate parameters for base and delta?
      * E.g. suppose we add a host subnet in the delta network. This would be a source of
@@ -3998,7 +3995,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
      */
     pushBaseSnapshot();
     Map<IngressLocation, BDD> baseAcceptBDDs =
-        getBddReachabilityAnalysisFactory(pkt, ignoreAcls)
+        getBddReachabilityAnalysisFactory(pkt, parameters.getIgnoreAcls())
             .bddReachabilityAnalysis(
                 parameters.getIpSpaceAssignment(),
                 parameters.getHeaderSpace(),
@@ -4011,7 +4008,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
 
     pushDeltaSnapshot();
     Map<IngressLocation, BDD> deltaAcceptBDDs =
-        getBddReachabilityAnalysisFactory(pkt, ignoreAcls)
+        getBddReachabilityAnalysisFactory(pkt, parameters.getIgnoreAcls())
             .bddReachabilityAnalysis(
                 parameters.getIpSpaceAssignment(),
                 parameters.getHeaderSpace(),

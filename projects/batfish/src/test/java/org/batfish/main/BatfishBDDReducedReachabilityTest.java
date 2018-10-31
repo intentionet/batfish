@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -46,6 +47,7 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
+import org.batfish.datamodel.acl.AclLineMatchExprs;
 import org.batfish.question.differentialreachability.DifferentialReachabilityParameters;
 import org.batfish.question.differentialreachability.DifferentialReachabilityResult;
 import org.batfish.specifier.InferFromLocationIpSpaceSpecifier;
@@ -136,11 +138,20 @@ public class BatfishBDDReducedReachabilityTest {
 
   private static DifferentialReachabilityParameters parameters(
       Batfish batfish, Set<FlowDisposition> dispositions, AclLineMatchExpr headerSpace) {
+    return parameters(batfish, dispositions, headerSpace, false);
+  }
+
+  private static DifferentialReachabilityParameters parameters(
+      Batfish batfish,
+      Set<FlowDisposition> dispositions,
+      AclLineMatchExpr headerSpace,
+      boolean ignoreAcls) {
     return new DifferentialReachabilityParameters(
         dispositions,
         ImmutableSet.of(),
         batfish.loadConfigurations().keySet(),
         headerSpace,
+        ignoreAcls,
         InferFromLocationIpSpaceSpecifier.INSTANCE.resolve(
             ALL_LOCATIONS.resolve(batfish.specifierContext()), batfish.specifierContext()),
         ImmutableSet.of());
@@ -580,5 +591,50 @@ public class BatfishBDDReducedReachabilityTest {
                     hasIngressInterface(PHYSICAL),
                     hasSrcIp(NODE1_PHYSICAL_LINK_IP)))));
     checkDispositions(batfish, flows, NULL_ROUTED);
+  }
+
+  /** Delta network adds an outgoing deny-all ACL. */
+  class IgnoreAclsNetworkGenerator implements NetworkGenerator {
+    @Override
+    public SortedMap<String, Configuration> generateConfigs(boolean delta) {
+      Configuration node1 = _cb.setHostname(NODE1).build();
+      Vrf v1 = _vb.setOwner(node1).build();
+      _ib.setOwner(node1).setVrf(v1);
+      if (delta) {
+        _ib.setOutgoingFilter(
+            _nf.aclBuilder()
+                .setOwner(node1)
+                .setLines(ImmutableList.of(IpAccessListLine.REJECT_ALL))
+                .build());
+      }
+      _ib.setName(PHYSICAL).setAddresses(NODE1_PHYSICAL_NETWORK).build();
+      _ib = _nf.interfaceBuilder();
+
+      Configuration node2 = _cb.setHostname(NODE2).build();
+      Vrf v2 = _vb.setOwner(node2).build();
+      _ib.setOwner(node2).setVrf(v2);
+      _ib.setName(PHYSICAL)
+          .setAddresses(NODE2_PHYSICAL_NETWORK, new InterfaceAddress(DST_IP, 32))
+          .build();
+
+      return ImmutableSortedMap.of(NODE1, node1, NODE2, node2);
+    }
+  }
+
+  @Test
+  public void testIgnoreAcls() throws IOException {
+    Batfish batfish = initBatfish(new IgnoreAclsNetworkGenerator());
+    DifferentialReachabilityResult differentialReachabilityResult =
+        batfish.bddReducedReachability(
+            parameters(batfish, ImmutableSet.of(ACCEPTED), AclLineMatchExprs.TRUE, true));
+    assertThat(differentialReachabilityResult.getIncreasedReachabilityFlows(), empty());
+    assertThat(differentialReachabilityResult.getDecreasedReachabilityFlows(), empty());
+
+    differentialReachabilityResult =
+        batfish.bddReducedReachability(
+            parameters(batfish, ImmutableSet.of(ACCEPTED), AclLineMatchExprs.TRUE, false));
+
+    assertThat(differentialReachabilityResult.getIncreasedReachabilityFlows(), empty());
+    assertThat(differentialReachabilityResult.getDecreasedReachabilityFlows(), not(empty()));
   }
 }

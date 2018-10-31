@@ -154,6 +154,7 @@ public class ReducedReachabilityTest {
         ImmutableSet.of(),
         batfish.loadConfigurations().keySet(),
         TRUE,
+        false,
         InferFromLocationIpSpaceSpecifier.INSTANCE.resolve(
             ALL_LOCATIONS.resolve(batfish.specifierContext()), batfish.specifierContext()),
         ImmutableSet.of());

@@ -11,6 +11,7 @@
     "transitLocations" : "ccc"
   },
   "differential" : true,
+  "ignoreAcls" : false,
   "includeOneTableKeys" : true,
   "instance" : {
     "description" : "Detect differential reachability.",
@@ -36,6 +37,12 @@
           "srcIps" : "sss",
           "dstIps" : "ddd"
         }
+      },
+      "ignoreAcls" : {
+        "description" : "Do not apply ACLs during analysis",
+        "optional" : true,
+        "type" : "boolean",
+        "value" : false
       },
       "pathConstraints" : {
         "description" : "Constraint the path a flow can take (start/end/transit locations)",

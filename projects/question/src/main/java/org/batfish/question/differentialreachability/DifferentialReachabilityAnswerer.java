@@ -97,22 +97,24 @@ public class DifferentialReachabilityAnswerer extends Answerer {
         forbiddenTransitNodes,
         finalNodes,
         headerSpace,
+        question.getIgnoreAcls(),
         ipSpaceAssignment,
         requiredTransitNodes);
   }
 
   @Override
   public TableAnswerElement answerDiff() {
-    DifferentialReachabilityResult result = _batfish.bddReducedReachability(parameters());
+    DifferentialReachabilityParameters parameters = parameters();
+    DifferentialReachabilityResult result = _batfish.bddReducedReachability(parameters);
 
     Set<Flow> flows =
         Sets.union(result.getDecreasedReachabilityFlows(), result.getIncreasedReachabilityFlows());
 
     _batfish.pushBaseSnapshot();
-    _batfish.processFlows(flows, false);
+    _batfish.processFlows(flows, parameters.getIgnoreAcls());
     _batfish.popSnapshot();
     _batfish.pushDeltaSnapshot();
-    _batfish.processFlows(flows, false);
+    _batfish.processFlows(flows, parameters.getIgnoreAcls());
     _batfish.popSnapshot();
 
     FlowHistory flowHistory = _batfish.getHistory();
