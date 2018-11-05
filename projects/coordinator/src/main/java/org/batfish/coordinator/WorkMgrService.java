@@ -44,6 +44,7 @@ import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.coordinator.AnalysisMetadataMgr.AnalysisType;
 import org.batfish.coordinator.WorkDetails.WorkType;
 import org.batfish.coordinator.WorkQueueMgr.QueueType;
+import org.batfish.coordinator.id.IdManager;
 import org.batfish.datamodel.SnapshotMetadata;
 import org.batfish.datamodel.answers.Answer;
 import org.batfish.datamodel.answers.AnswerMetadata;
@@ -52,6 +53,8 @@ import org.batfish.datamodel.answers.AutocompleteSuggestion.CompletionType;
 import org.batfish.datamodel.answers.GetAnalysisAnswerMetricsAnswer;
 import org.batfish.datamodel.pojo.WorkStatus;
 import org.batfish.datamodel.questions.Question;
+import org.batfish.identifiers.NetworkId;
+import org.batfish.storage.StorageProvider;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -1443,6 +1446,50 @@ public class WorkMgrService {
     } catch (Exception e) {
       String stackTrace = Throwables.getStackTraceAsString(e);
       _logger.errorf("WMS:getStatus exception: %s", stackTrace);
+      return failureResponse(e.getMessage());
+    }
+  }
+
+  /**
+   * Obtain the log of a completed task
+   *
+   * @param apiKey The API key of the client
+   * @param clientVersion The version of the client
+   * @param workId The work ID to retrieve the log for
+   */
+  @POST
+  @Path(CoordConsts.SVC_RSC_GET_WORKLOG)
+  @Produces(MediaType.APPLICATION_JSON)
+  public JSONArray getWorkLog(
+      @FormDataParam(CoordConsts.SVC_KEY_API_KEY) String apiKey,
+      @FormDataParam(CoordConsts.SVC_KEY_VERSION) String clientVersion,
+      @FormDataParam(CoordConsts.SVC_KEY_NETWORK_NAME) String network,
+      @FormDataParam(CoordConsts.SVC_KEY_SNAPSHOT_NAME) String snapshot,
+      @FormDataParam(CoordConsts.SVC_KEY_WORKID) String workId) {
+    try {
+      _logger.infof("WMS:getWorkLog %s\n", workId);
+
+      checkStringParam(apiKey, "API key");
+      checkStringParam(clientVersion, "Client version");
+      checkStringParam(workId, "work id");
+      checkNetworkAccessibility(apiKey, network);
+      checkStringParam(snapshot, "Snapshot name");
+
+      checkApiKeyValidity(apiKey);
+      checkClientVersion(clientVersion);
+
+      IdManager idm = Main.getWorkMgr().getIdManager();
+      StorageProvider storage = Main.getWorkMgr().getStorage();
+      NetworkId networkId = idm.getNetworkId(network);
+
+      return successResponse(
+          storage.loadWorkLog(networkId, idm.getSnapshotId(snapshot, networkId), workId));
+    } catch (IllegalArgumentException | AccessControlException e) {
+      _logger.errorf("WMS:getWorkLog exception: %s\n", e.getMessage());
+      return failureResponse(e.getMessage());
+    } catch (Exception e) {
+      String stackTrace = Throwables.getStackTraceAsString(e);
+      _logger.errorf("WMS:getWorkLog exception: %s", stackTrace);
       return failureResponse(e.getMessage());
     }
   }

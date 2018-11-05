@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.common.topology.Layer1Topology;
 import org.batfish.datamodel.AnalysisMetadata;
@@ -77,6 +78,12 @@ public class TestStorageProvider implements StorageProvider {
 
   @Override
   public MajorIssueConfig loadMajorIssueConfig(NetworkId network, IssueSettingsId majorIssueType) {
+    throw new UnsupportedOperationException("no implementation for generated method");
+  }
+
+  @Nonnull
+  @Override
+  public String loadWorkLog(NetworkId network, SnapshotId snapshot, String workId) {
     throw new UnsupportedOperationException("no implementation for generated method");
   }
 

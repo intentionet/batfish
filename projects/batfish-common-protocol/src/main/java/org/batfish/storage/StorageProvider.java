@@ -9,6 +9,7 @@ import java.util.SortedSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import org.batfish.common.BatfishException;
 import org.batfish.common.topology.Layer1Topology;
 import org.batfish.datamodel.AnalysisMetadata;
 import org.batfish.datamodel.Configuration;
@@ -110,6 +111,9 @@ public interface StorageProvider {
    */
   @Nullable
   MajorIssueConfig loadMajorIssueConfig(NetworkId network, IssueSettingsId majorIssueType);
+
+  @Nonnull
+  String loadWorkLog(NetworkId network, SnapshotId snapshot, String workId) throws BatfishException;
 
   /**
    * Stores the {@link MajorIssueConfig} into the given network. Will replace any previously-stored

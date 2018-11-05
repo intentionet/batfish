@@ -297,6 +297,16 @@ public final class FileBasedStorage implements StorageProvider {
   }
 
   @Override
+  @Nonnull
+  public String loadWorkLog(NetworkId network, SnapshotId snapshot, String workId) {
+    Path logPath =
+        _d.getSnapshotDir(network, snapshot)
+            .resolve(BfConsts.RELPATH_OUTPUT)
+            .resolve(workId + BfConsts.SUFFIX_LOG_FILE);
+    return CommonUtil.readFile(logPath);
+  }
+
+  @Override
   public @Nullable MajorIssueConfig loadMajorIssueConfig(
       NetworkId network, IssueSettingsId majorIssueType) {
     Path path = _d.getMajorIssueConfigDir(network, majorIssueType);

@@ -148,6 +148,7 @@ public class CoordConsts {
   public static final String SVC_RSC_GET_OBJECT = "getobject";
   public static final String SVC_RSC_GET_PARSING_RESULTS = "getparsingresults";
   public static final String SVC_RSC_GET_QUESTION_TEMPLATES = "getquestiontemplates";
+  public static final String SVC_RSC_GET_WORKLOG = "getworklog";
   public static final String SVC_RSC_GET_WORKSTATUS = "getworkstatus";
   public static final String SVC_RSC_GETSTATUS = "getstatus";
   public static final String SVC_RSC_INIT_CONTAINER = "initcontainer";

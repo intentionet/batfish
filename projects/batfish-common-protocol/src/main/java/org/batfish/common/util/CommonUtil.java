@@ -752,8 +752,9 @@ public class CommonUtil {
     return ranges.stream().anyMatch(sr -> sr.includes(num));
   }
 
-  public static String readFile(Path file) {
-    String text = null;
+  @Nonnull
+  public static String readFile(Path file) throws BatfishException {
+    String text;
     try {
       text = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
     } catch (IOException e) {
