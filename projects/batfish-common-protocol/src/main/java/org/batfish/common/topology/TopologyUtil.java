@@ -54,6 +54,7 @@ public final class TopologyUtil {
       i1.getAllowedVlans()
           .stream()
           .flatMapToInt(SubRange::asStream)
+          .filter(vl -> vl != i1.getNativeVlan() && vl != i2.getNativeVlan())
           .filter(
               i1AllowedVlan ->
                   i2.getAllowedVlans().stream().anyMatch(sr -> sr.includes(i1AllowedVlan)))
