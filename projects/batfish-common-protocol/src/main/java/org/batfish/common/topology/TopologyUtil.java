@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -81,18 +82,15 @@ public final class TopologyUtil {
         .forEach(
             i -> {
               if (i.getSwitchportMode() == SwitchportMode.TRUNK) {
-                switchportsByVlan
-                    .computeIfAbsent(i.getNativeVlan(), n -> ImmutableList.builder())
-                    .add(i.getName());
-                i.getAllowedVlans()
-                    .stream()
-                    .flatMapToInt(SubRange::asStream)
+                IntStream.concat(
+                        IntStream.of(i.getNativeVlan()),
+                        i.getAllowedVlans().stream().flatMapToInt(SubRange::asStream))
+                    .distinct()
                     .forEach(
-                        allowedVlan -> {
-                          switchportsByVlan
-                              .computeIfAbsent(allowedVlan, n -> ImmutableList.builder())
-                              .add(i.getName());
-                        });
+                        vlan ->
+                            switchportsByVlan
+                                .computeIfAbsent(vlan, n -> ImmutableList.builder())
+                                .add(i.getName()));
               }
               if (i.getSwitchportMode() == SwitchportMode.ACCESS) {
                 switchportsByVlan
@@ -208,18 +206,15 @@ public final class TopologyUtil {
         .forEach(
             i -> {
               if (i.getSwitchportMode() == SwitchportMode.TRUNK) {
-                switchportsByVlan
-                    .computeIfAbsent(i.getNativeVlan(), n -> ImmutableList.builder())
-                    .add(i.getName());
-                i.getAllowedVlans()
-                    .stream()
-                    .flatMapToInt(SubRange::asStream)
+                IntStream.concat(
+                        IntStream.of(i.getNativeVlan()),
+                        i.getAllowedVlans().stream().flatMapToInt(SubRange::asStream))
+                    .distinct()
                     .forEach(
-                        allowedVlan -> {
-                          switchportsByVlan
-                              .computeIfAbsent(allowedVlan, n -> ImmutableList.builder())
-                              .add(i.getName());
-                        });
+                        vlan ->
+                            switchportsByVlan
+                                .computeIfAbsent(vlan, n -> ImmutableList.builder())
+                                .add(i.getName()));
               }
               if (i.getSwitchportMode() == SwitchportMode.ACCESS) {
                 switchportsByVlan
