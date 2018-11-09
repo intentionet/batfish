@@ -4,6 +4,10 @@ set system host-name juniper_system
 #
 set system allow-v4mapped-packets
 set system auto-snapshot
+set system no-ping-record-route
+set system no-ping-time-stamp
+set system no-redirects
+set system no-redirects-ipv6
 set system saved-core-files 10
 set system saved-core-context
 set system static-host-mapping host1 inet 1.2.3.4

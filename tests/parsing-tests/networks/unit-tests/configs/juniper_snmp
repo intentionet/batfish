@@ -7,8 +7,11 @@ set snmp community "dummycommunity" clients 1.2.3.0/24
 set snmp community "dummycommunity" view myviewname1
 set snmp contact "some contact"
 set snmp description abcdefg
+set snmp filter-duplicates
+set snmp filter-interfaces interfaces "^abc|^cde"
 set snmp location "some location"
 set snmp interface ge-0/0/0.0
+set snmp stats-cache-lifetime 30
 set snmp traceoptions flag pdu
 set snmp trap-group mytrapgroup categories authentication
 set snmp trap-group mytrapgroup categories chassis

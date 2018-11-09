@@ -1229,6 +1229,16 @@ FILTER
    'filter'
 ;
 
+FILTER_DUPLICATES
+:
+   'filter-duplicates'
+;
+
+FILTER_INTERFACES
+:
+   'filter-interfaces'
+;
+
 FINGER
 :
    'finger'
@@ -3711,6 +3721,16 @@ NO_PEER_LOOP_CHECK
    'no-peer-loop-check'
 ;
 
+NO_PING_RECORD_ROUTE
+:
+   'no-ping-record-route'
+;
+
+NO_PING_TIME_STAMP
+:
+   'no-ping-time-stamp'
+;
+
 NO_READVERTISE
 :
    'no-readvertise'
@@ -3719,6 +3739,11 @@ NO_READVERTISE
 NO_REDIRECTS
 :
    'no-redirects'
+;
+
+NO_REDIRECTS_IPV6
+:
+   'no-redirects-ipv6'
 ;
 
 NO_RESOLVE
@@ -4919,6 +4944,11 @@ STATION_ADDRESS
 STATION_PORT
 :
    'station-port'
+;
+
+STATS_CACHE_LIFETIME
+:
+   'stats-cache-lifetime'
 ;
 
 STORM_CONTROL
@@ -6180,6 +6210,11 @@ mode M_InterfaceQuote;
 M_InterfaceQuote_QUOTE
 :
    '"' -> channel ( HIDDEN ) , popMode
+;
+
+M_InterfaceQuote_PIPE
+:
+   '|' -> type ( PIPE)
 ;
 
 M_InterfaceQuote_VARIABLE

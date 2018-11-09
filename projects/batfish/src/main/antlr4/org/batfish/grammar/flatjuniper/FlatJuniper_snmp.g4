@@ -32,8 +32,11 @@ snmp_null
    (
       CONTACT
       | DESCRIPTION
+      | FILTER_DUPLICATES
+      | FILTER_INTERFACES
       | INTERFACE
       | LOCATION
+      | STATS_CACHE_LIFETIME
       | TRACEOPTIONS
       | TRAP_OPTIONS
       | VIEW
