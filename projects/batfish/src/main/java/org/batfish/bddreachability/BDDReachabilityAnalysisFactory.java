@@ -1051,6 +1051,7 @@ public final class BDDReachabilityAnalysisFactory {
 
     boolean loopIncluded = actionsCopy.remove(FlowDisposition.LOOP);
 
+    // detecting Loops can work with any disposition, using ACCEPTED arbitrarily here
     BDDReachabilityAnalysis analysis =
         bddReachabilityAnalysis(
             srcIpSpaceAssignment,

@@ -12,6 +12,7 @@ import static org.batfish.datamodel.FlowDisposition.NULL_ROUTED;
 import static org.batfish.z3.expr.NodeInterfaceNeighborUnreachableMatchers.hasHostname;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
@@ -26,16 +27,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import net.sf.javabdd.BDD;
 import org.batfish.common.bdd.BDDPacket;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.DataPlane;
 import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.FlowDisposition;
 import org.batfish.datamodel.HeaderSpace;
+import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.UniverseIpSpace;
+import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.flow.Trace;
 import org.batfish.datamodel.flow.TraceWrapperAsAnswerElement;
@@ -350,16 +356,35 @@ public final class BDDReachabilityAnalysisFactoryTest {
 
   @Test
   public void testGetAllBDDsLoopWithAccepted() throws IOException {
-    SortedMap<String, Configuration> configs = LoopNetwork.testLoopNetwork(true);
+    SortedMap<String, Configuration> configs = new TreeMap<>(LoopNetwork.testLoopNetwork(true));
+
+    // adding an isolated config which has no route to the looping destination prefix
+    NetworkFactory nf = new NetworkFactory();
+    Configuration loopbackConfig =
+        nf.configurationBuilder()
+            .setConfigurationFormat(ConfigurationFormat.CISCO_IOS)
+            .setHostname("loopbackConfig")
+            .build();
+    Vrf vrf = nf.vrfBuilder().setOwner(loopbackConfig).build();
+
+    InterfaceAddress loopbackAddress = new InterfaceAddress("1.2.3.4/32");
+    nf.interfaceBuilder()
+        .setActive(true)
+        .setOwner(loopbackConfig)
+        .setVrf(vrf)
+        .setAddress(loopbackAddress)
+        .build();
+    configs.put(loopbackConfig.getHostname(), loopbackConfig);
+
     Batfish batfish = BatfishTestUtils.getBatfish(configs, temp);
     batfish.computeDataPlane(false);
 
     ReachabilityParameters reachabilityParameters =
         ReachabilityParameters.builder()
             .setSourceLocationSpecifier(AllInterfacesLocationSpecifier.INSTANCE)
-            .setActions(ImmutableSortedSet.of(FlowDisposition.LOOP, FlowDisposition.ACCEPTED))
+            .setActions(ImmutableSortedSet.of(FlowDisposition.LOOP, FlowDisposition.NO_ROUTE))
             .setFinalNodesSpecifier(AllNodesNodeSpecifier.INSTANCE)
-            .setHeaderSpace(new HeaderSpace())
+            .setHeaderSpace(HeaderSpace.builder().setDstIps(new Ip("2.0.0.0").toIpSpace()).build())
             .build();
 
     AnswerElement answer = batfish.bddSingleReachability(reachabilityParameters);
@@ -367,13 +392,13 @@ public final class BDDReachabilityAnalysisFactoryTest {
     assertThat(answer, instanceOf(TraceWrapperAsAnswerElement.class));
     Map<Flow, List<Trace>> flowTraces = ((TraceWrapperAsAnswerElement) answer).getFlowTraces();
     Set<Flow> flows = flowTraces.keySet();
-    assertThat(flows, hasSize(2));
+    assertThat(flows, hasSize(3));
 
     Set<Ip> srcIps = flows.stream().map(Flow::getSrcIp).collect(Collectors.toSet());
     Set<Ip> dstIps = flows.stream().map(Flow::getDstIp).collect(Collectors.toSet());
 
-    assertThat(srcIps, contains(new Ip("1.0.0.0"), new Ip("1.0.0.1")));
-    assertThat(dstIps, contains(new Ip("1.0.0.0")));
+    assertThat(srcIps, contains(new Ip("1.0.0.0"), new Ip("1.0.0.1"), new Ip("1.2.3.4")));
+    assertThat(dstIps, contains(new Ip("2.0.0.0")));
 
     Set<FlowDisposition> flowDispositions =
         flowTraces
@@ -383,6 +408,7 @@ public final class BDDReachabilityAnalysisFactoryTest {
             .map(Trace::getDisposition)
             .collect(ImmutableSet.toImmutableSet());
 
-    assertThat(flowDispositions, contains(FlowDisposition.ACCEPTED));
+    assertThat(
+        flowDispositions, containsInAnyOrder(FlowDisposition.LOOP, FlowDisposition.NO_ROUTE));
   }
 }
