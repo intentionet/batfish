@@ -261,4 +261,29 @@ public class IpsecSessionStatusAnswererTest {
                 Schema.STRING),
             hasColumn(COL_STATUS, equalTo("IPSEC_SESSION_ESTABLISHED"), Schema.STRING)));
   }
+
+  @Test
+  public void testToRowTunnelMissingEndpoint() {
+    IpsecSessionInfo.Builder ipsecPeeringInfoBuilder = IpsecSessionInfo.builder();
+
+    IpsecSessionInfo ipsecSessionInfo =
+        ipsecPeeringInfoBuilder
+            .setInitiatorHostname(INITIATOR_HOST_NAME)
+            .setInitiatorInterface("Test_interface")
+            .setInitiatorIp(new Ip("1.2.3.4"))
+            .setInitiatorTunnelInterface("Tunnel1_interface")
+            .setResponderHostname(RESPONDER_HOST_NAME)
+            .setResponderInterface("Test_interface")
+            .setResponderIp(new Ip("2.3.4.5"))
+            .setIpsecSessionStatus(MISSING_END_POINT)
+            .build();
+
+    Row row = toRow(ipsecSessionInfo);
+
+    assertThat(
+        row,
+        allOf(
+            hasColumn(COL_TUNNEL_INTERFACES, equalTo("Tunnel1_interface->"), Schema.STRING),
+            hasColumn(COL_STATUS, equalTo("MISSING_END_POINT"), Schema.STRING)));
+  }
 }

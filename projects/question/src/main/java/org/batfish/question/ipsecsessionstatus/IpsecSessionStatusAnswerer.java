@@ -1,5 +1,6 @@
 package org.batfish.question.ipsecsessionstatus;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.batfish.question.ipsecsessionstatus.IpsecSessionInfo.IpsecSessionStatus.IKE_PHASE1_FAILED;
 import static org.batfish.question.ipsecsessionstatus.IpsecSessionInfo.IpsecSessionStatus.IKE_PHASE1_KEY_MISMATCH;
 import static org.batfish.question.ipsecsessionstatus.IpsecSessionInfo.IpsecSessionStatus.IPSEC_PHASE2_FAILED;
@@ -180,11 +181,12 @@ class IpsecSessionStatusAnswerer extends Answerer {
         .put(COL_RESPONDER_IP, info.getResponderIp())
         .put(
             COL_TUNNEL_INTERFACES,
-            info.getInitiatorTunnelInterface() != null && info.getResponderTunnelInterface() != null
-                ? String.format(
+            info.getInitiatorTunnelInterface() == null && info.getResponderTunnelInterface() == null
+                ? NOT_APPLICABLE
+                : String.format(
                     "%s->%s",
-                    info.getInitiatorTunnelInterface(), info.getResponderTunnelInterface())
-                : NOT_APPLICABLE)
+                    firstNonNull(info.getInitiatorTunnelInterface(), ""),
+                    firstNonNull(info.getResponderTunnelInterface(), "")))
         .put(COL_STATUS, info.getIpsecSessionStatus());
     return row.build();
   }
