@@ -7,7 +7,7 @@
     "dstPorts" : "0-21,23-1000",
     "ipProtocols" : "TCP",
     "srcIps" : "1.1.1.1",
-    "srcPorts" : "0-0"
+    "srcPorts" : "0"
   },
   "invertSearch" : false,
   "nodes" : ".*",

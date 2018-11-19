@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.DiscreteDomain;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
@@ -19,6 +18,7 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,21 +54,6 @@ public final class IntegerSpace implements Serializable {
   @Nonnull
   static IntegerSpace create(@Nullable String s) {
     return IntegerSpace.Builder.create(s).build();
-  }
-
-  @JsonValue
-  private String value() {
-    return String.join(
-        ",",
-        getRanges()
-            .stream()
-            .map(
-                r ->
-                    String.join(
-                        "-",
-                        ImmutableList.of(
-                            r.lowerEndpoint().toString(), String.valueOf(r.upperEndpoint() - 1))))
-            .collect(ImmutableList.toImmutableList()));
   }
 
   /** This space as a set of included {@link Range}s */
@@ -364,9 +349,19 @@ public final class IntegerSpace implements Serializable {
     return Objects.hash(_rangeset);
   }
 
+  private static String toRangeString(Range<Integer> r) {
+    int lower = r.lowerEndpoint();
+    int upper = r.upperEndpoint() - 1;
+    if (lower == upper) {
+      return Integer.toString(lower);
+    }
+    return lower + "-" + upper;
+  }
+
+  @JsonValue
   @Override
   public String toString() {
-    return _rangeset.toString();
+    return getRanges().stream().map(IntegerSpace::toRangeString).collect(Collectors.joining(","));
   }
 
   private static final long serialVersionUID = 1L;

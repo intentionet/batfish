@@ -400,4 +400,13 @@ public class IntegerSpaceTest {
     List<Integer> streamed = space.stream().boxed().collect(ImmutableList.toImmutableList());
     assertThat(streamed, equalTo(ImmutableList.of(-3, -2, -1, 1, 2, 3, 4, 5)));
   }
+
+  @Test
+  public void testToString() {
+    assertThat(
+        IntegerSpace.builder().including(new SubRange(5, 10)).excluding(9).build().toString(),
+        equalTo("5-8,10"));
+
+    assertThat(IntegerSpace.builder().build().toString(), equalTo(""));
+  }
 }

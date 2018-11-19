@@ -17899,7 +17899,7 @@
             "name" : "xe-0/0/0.0",
             "accessVlan" : 0,
             "active" : true,
-            "allowedVlans" : "30-30,40-40,50-50",
+            "allowedVlans" : "30,40,50",
             "autostate" : true,
             "bandwidth" : 1.0E10,
             "declaredNames" : [
@@ -24876,7 +24876,7 @@
             "name" : "FastEthernet0/1",
             "accessVlan" : 0,
             "active" : true,
-            "allowedVlans" : "12-12,34-34,56-78,99-99",
+            "allowedVlans" : "12,34,56-78,99",
             "autostate" : true,
             "bandwidth" : 1.0E8,
             "declaredNames" : [
