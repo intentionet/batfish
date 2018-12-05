@@ -34,6 +34,9 @@ public interface GenericRib<R extends AbstractRoute> extends Serializable {
   /**
    * Execute the longest prefix match for a given IP address.
    *
+   * <p><strong>Note</strong>: this function returns only forwarding routes, aka, routes where
+   * {@link AbstractRoute#getNonForwarding()} returns false.
+   *
    * @param address the IP address to match
    * @return a set of routes with the maximum allowable prefix length that match the {@code address}
    */
@@ -42,8 +45,11 @@ public interface GenericRib<R extends AbstractRoute> extends Serializable {
   /**
    * Execute a constrained longest prefix match for a given IP address.
    *
-   * <p>To be used when the longest prefix match is unsatisfactory and less specific route(s) is
-   * required.
+   * <p><strong>Note</strong>: this function returns only forwarding routes, aka, routes where
+   * {@link AbstractRoute#getNonForwarding()} returns false.
+   *
+   * <p>Most callers should use {@link #longestPrefixMatch(Ip)}; this function may be used when the
+   * longest prefix matches are unsatisfactory and less specific routes are required.
    *
    * @param address the IP address to match
    * @param maxPrefixLength the maximum prefix length allowed (i.e., do not match more specific
