@@ -1,5 +1,6 @@
 package org.batfish.dataplane.rib;
 
+import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasPrefix;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -13,6 +14,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.junit.Assert.assertThat;
 
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -521,5 +523,34 @@ public class AbstractRibTest {
     assertThat(_rib.longestPrefixMatch(ip, 19), contains(r18));
     assertThat(_rib.longestPrefixMatch(ip, 18), contains(r18));
     assertThat(_rib.longestPrefixMatch(ip, 17), empty());
+  }
+
+  @Test
+  public void testNonForwarding() {
+    StaticRoute.Builder b =
+        StaticRoute.builder()
+            .setNextHopIp(Ip.ZERO)
+            .setNextHopInterface(null)
+            .setAdministrativeCost(1)
+            .setMetric(0L)
+            .setTag(0);
+    // Non forwarding 1.2.3.4/32
+    _rib.mergeRouteGetDelta(
+        b.setNetwork(Prefix.parse("1.2.3.4/32")).setNonForwarding(true).build());
+    // Non forwarding 1.2.3.4/31
+    _rib.mergeRouteGetDelta(
+        b.setNetwork(Prefix.parse("1.2.3.4/31")).setNonForwarding(true).build());
+    // Two routes, one forwarding one non-forwarding for 1.2.3.4/30.
+    _rib.mergeRouteGetDelta(
+        b.setNetwork(Prefix.parse("1.2.3.4/30")).setNonForwarding(true).build());
+    _rib.mergeRouteGetDelta(
+        b.setNetwork(Prefix.parse("1.2.3.4/30")).setNonForwarding(false).build());
+    _rib.mergeRouteGetDelta(
+        b.setNetwork(Prefix.parse("1.2.3.4/8")).setNonForwarding(false).build());
+
+    // Looking for 1.2.3.4, should skip the /32 and /31, and then find the single forwarding /30
+    Set<StaticRoute> routes = _rib.longestPrefixMatch(new Ip("1.2.3.4"));
+    assertThat(routes, hasSize(1));
+    assertThat(Iterables.getOnlyElement(routes), hasPrefix(Prefix.parse("1.2.3.4/30")));
   }
 }
