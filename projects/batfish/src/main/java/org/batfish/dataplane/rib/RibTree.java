@@ -59,7 +59,25 @@ class RibTree<R extends AbstractRoute> implements Serializable {
 
   Set<R> getLongestPrefixMatch(Ip address, int maxPrefixLength) {
     long addressBits = address.asLong();
-    return _root.getLongestPrefixMatch(address, addressBits, maxPrefixLength);
+    int curMax = maxPrefixLength;
+    while (curMax >= 0) {
+      Set<R> routes = _root.getLongestPrefixMatch(address, addressBits, curMax);
+      if (routes.isEmpty()) {
+        // There aren't any routes in the RIB that match this IP. Exit early.
+        break;
+      }
+
+      Set<R> forwardingRoutes =
+          routes.stream().filter(r -> !r.getNonForwarding()).collect(ImmutableSet.toImmutableSet());
+      if (!forwardingRoutes.isEmpty()) {
+        // We found the LPM forwarding routes, return them.
+        return forwardingRoutes;
+      }
+
+      // All LPMs are non-forwarding routes, so look for less specific routes.
+      curMax = routes.iterator().next().getNetwork().getPrefixLength() - 1;
+    }
+    return ImmutableSet.of();
   }
 
   /**
