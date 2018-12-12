@@ -242,9 +242,8 @@ public class TracerouteEngineImplContext {
       Map<String, IpSpace> namedIpSpaces,
       boolean ignoreFilters) {
 
-    checkArgument(
-        node != null && inInterfaceName != null && outInterfaceName != null,
-        "Node, inputInterface and outgoingInterface cannot be null");
+    checkArgument(node != null, "Node is missing");
+    checkArgument(outInterfaceName != null, "OutgoingInterface is missing");
 
     PreSourceNatOutgoingFilterStep.Builder stepBuilder = PreSourceNatOutgoingFilterStep.builder();
     stepBuilder.setAction(PERMITTED);
@@ -672,8 +671,7 @@ public class TracerouteEngineImplContext {
 
                   IpAccessList filter = outgoingInterface.getPreSourceNatOutgoingFilter();
                   // Apply preSourceNatOutgoingFilter
-                  if (inputIfaceName != null && filter != null) {
-                    // check preSourceNat only for packets originating from other nodes
+                  if (filter != null) {
                     PreSourceNatOutgoingFilterStep step =
                         applyPreSourceNatFilter(
                             currentFlow,
