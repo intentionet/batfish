@@ -151,40 +151,107 @@ public enum NamedPort {
   POP3(110),
   PPTP(1723),
   R2CP(28762),
-  RADIUS_ACCT_CISCO(1646),
-  RADIUS_ACCT_JUNIPER(1813),
-  RADIUS_CISCO(1645),
-  RADIUS_JUNIPER(1812),
+  /** RADIUS (variant 1, port 1646) Accounting Protocol. */
+  RADIUS_1_ACCT(1646),
+  /** RADIUS (variant 1, port 1645) Auth Protocol. */
+  RADIUS_1_AUTH(1645),
+  /** RADIUS (variant 2, port 1813) Accounting Protocol. */
+  RADIUS_2_ACCT(1813),
+  /** RADIUS (variant 2, port 1812) Auth Protocol. */
+  RADIUS_2_AUTH(1812),
+  /** Remove Mail Checking Protocol. */
+  RE_MAIL_CK(50),
+  /** RFS Server. */
+  REMOTEFS(556),
+  /** SupportSoft Nexus Remote Command. */
+  REPCMD(641),
   REVERSE_SSH(2901),
   REVERSE_TELNET(2900),
+  /** Remote Job Entry. */
+  RJE(5),
   RKINIT(2108),
+  /** Resource Location Protocol. */
+  RLP(39),
+  /** RLZ DBase. */
+  RLZDBASE(635),
+  /** Remote Monitoring and Control Protocol. */
+  RMC(657),
+  /** Rpc2portmap. */
+  RPC2PORTMAP(369),
+  /** rsync File Synchronization Protocol. */
+  RSYNC(873),
+  /** Remote Telnet Service. */
+  RTELNET(107),
+  /** Real Time Streaming Protocol. */
   RTSP(554),
   SAP(9875),
   SECUREID_UDP(5510),
+  /** Simple Gateway Monitoring Protocol. */
+  SGMP(153),
+  /** Secure Internet Live Conferencing. */
+  SILC(706),
   SIP_5060(5060),
   SIP_5061(5061),
+  /** Simple Mail Transfer Protocol. */
   SMTP(25),
+  /** SNMP Unix Multiplexer. */
+  SMUX(199),
+  /** SNA Gateway Access Server. */
+  SNAGAS(108),
   SNMP(161),
   SNMPTRAP(162),
   SNPP(444),
   SOCKS(1080),
   SQLNET(1521),
+  /** SQL Services. */
+  SQLSERV(118),
+  /** SQL Service. */
+  SQLSRV(156),
   SSH(22),
+  /** Email message submission. */
+  SUBMISSION(587),
   SUNRPC(111),
+  /** Server Location Protocol. */
+  SVRLOC(427),
+  /** Active users. */
+  SYSTAT(11),
   TACACS(49),
   TACACS_DS(65),
   TALK(517),
+  /** Topology Broadcast based on Reverse-Path Forwarding Protocol. */
+  TBRPF(712),
+  /** TCP Port Service Multiplexer. */
+  TCPMUX(1),
+  /** Aladdin Knowledge Systems Hasp services, TCP/IP version. */
+  TCPNETHASPSRV(475),
   TELNET(23),
   TFTP(69),
   TIME(37),
   TIMED(525),
   TRACEROUTE(33434),
+  /** TUNNEL Profile. */
+  TUNNEL(604),
+  /** Uninterruptible Power Supply. */
+  UPS(401),
   UUCP(540),
+  /** UUCP Path Service. */
+  UUCP_PATH(117),
+  /** VMNET. */
+  VMNET(175),
   VXLAN(4789),
   WHOIS(43),
   XDMCP(177),
   XNM_CLEAR_TEXT(3221),
-  XNM_SSL(3220);
+  XNM_SSL(3220),
+  /** Xerox Nework Systems Clearinghouse. */
+  XNS_CH(54),
+  /** Xerox Nework Systems Mail. */
+  XNS_MAIL(58),
+  /** Xerox Nework Systems Time. */
+  XNS_TIME(52),
+  /** ANSI Z39.50. */
+  Z39_50(210),
+  ;
 
   private static final Map<Integer, NamedPort> NUMBER_TO_PORT_MAP = buildNumberToPortMap();
 

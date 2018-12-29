@@ -10193,21 +10193,57 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     } else if (ctx.PPTP() != null) {
       return NamedPort.PPTP;
     } else if (ctx.RADIUS() != null) {
-      return NamedPort.RADIUS_CISCO;
+      if (_format == ARISTA) {
+        return NamedPort.RADIUS_2_AUTH;
+      } else {
+        return NamedPort.RADIUS_1_AUTH;
+      }
     } else if (ctx.RADIUS_ACCT() != null) {
-      return NamedPort.RADIUS_ACCT_CISCO;
+      if (_format == ARISTA) {
+        return NamedPort.RADIUS_2_ACCT;
+      } else {
+        return NamedPort.RADIUS_1_ACCT;
+      }
+    } else if (ctx.RE_MAIL_CK() != null) {
+      return NamedPort.RE_MAIL_CK;
+    } else if (ctx.REMOTEFS() != null) {
+      return NamedPort.REMOTEFS;
+    } else if (ctx.REPCMD() != null) {
+      return NamedPort.REPCMD;
     } else if (ctx.RIP() != null) {
       return NamedPort.EFStcp_OR_RIPudp;
+    } else if (ctx.RJE() != null) {
+      return NamedPort.RJE;
+    } else if (ctx.RLP() != null) {
+      return NamedPort.RLP;
+    } else if (ctx.RLZDBASE() != null) {
+      return NamedPort.RLZDBASE;
+    } else if (ctx.RMC() != null) {
+      return NamedPort.RMC;
+    } else if (ctx.RPC2PORTMAP() != null) {
+      return NamedPort.RPC2PORTMAP;
     } else if (ctx.RSH() != null) {
       return NamedPort.CMDtcp_OR_SYSLOGudp;
+    } else if (ctx.RSYNC() != null) {
+      return NamedPort.RSYNC;
+    } else if (ctx.RTELNET() != null) {
+      return NamedPort.RTELNET;
     } else if (ctx.RTSP() != null) {
       return NamedPort.RTSP;
     } else if (ctx.SECUREID_UDP() != null) {
       return NamedPort.SECUREID_UDP;
+    } else if (ctx.SGMP() != null) {
+      return NamedPort.SGMP;
+    } else if (ctx.SILC() != null) {
+      return NamedPort.SILC;
     } else if (ctx.SIP() != null) {
       return NamedPort.SIP_5060;
     } else if (ctx.SMTP() != null) {
       return NamedPort.SMTP;
+    } else if (ctx.SMUX() != null) {
+      return NamedPort.SMUX;
+    } else if (ctx.SNAGAS() != null) {
+      return NamedPort.SNAGAS;
     } else if (ctx.SNMP() != null) {
       return NamedPort.SNMP;
     } else if (ctx.SNMP_TRAP() != null) {
@@ -10216,26 +10252,50 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       return NamedPort.SNMPTRAP;
     } else if (ctx.SQLNET() != null) {
       return NamedPort.SQLNET;
+    } else if (ctx.SQLSERV() != null) {
+      return NamedPort.SQLSERV;
+    } else if (ctx.SQLSRV() != null) {
+      return NamedPort.SQLSRV;
     } else if (ctx.SSH() != null) {
       return NamedPort.SSH;
+    } else if (ctx.SUBMISSION() != null) {
+      return NamedPort.SUBMISSION;
     } else if (ctx.SUNRPC() != null) {
       return NamedPort.SUNRPC;
+    } else if (ctx.SVRLOC() != null) {
+      return NamedPort.SVRLOC;
     } else if (ctx.SYSLOG() != null) {
       return NamedPort.CMDtcp_OR_SYSLOGudp;
+    } else if (ctx.SYSTAT() != null) {
+      return NamedPort.SYSTAT;
     } else if (ctx.TACACS() != null) {
       return NamedPort.TACACS;
     } else if (ctx.TACACS_DS() != null) {
       return NamedPort.TACACS_DS;
     } else if (ctx.TALK() != null) {
       return NamedPort.TALK;
+    } else if (ctx.TBRPF() != null) {
+      return NamedPort.TBRPF;
+    } else if (ctx.TCPMUX() != null) {
+      return NamedPort.TCPMUX;
+    } else if (ctx.TCPNETHASPSRV() != null) {
+      return NamedPort.TCPNETHASPSRV;
     } else if (ctx.TELNET() != null) {
       return NamedPort.TELNET;
     } else if (ctx.TFTP() != null) {
       return NamedPort.TFTP;
     } else if (ctx.TIME() != null) {
       return NamedPort.TIME;
+    } else if (ctx.TUNNEL() != null) {
+      return NamedPort.TUNNEL;
+    } else if (ctx.UPS() != null) {
+      return NamedPort.UPS;
     } else if (ctx.UUCP() != null) {
       return NamedPort.UUCP;
+    } else if (ctx.UUCP_PATH() != null) {
+      return NamedPort.UUCP_PATH;
+    } else if (ctx.VMNET() != null) {
+      return NamedPort.VMNET;
     } else if (ctx.VXLAN() != null) {
       return NamedPort.VXLAN;
     } else if (ctx.WHO() != null) {
@@ -10246,6 +10306,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       return NamedPort.HTTP;
     } else if (ctx.XDMCP() != null) {
       return NamedPort.XDMCP;
+    } else if (ctx.XNS_CH() != null) {
+      return NamedPort.XNS_CH;
+    } else if (ctx.XNS_MAIL() != null) {
+      return NamedPort.XNS_MAIL;
+    } else if (ctx.XNS_TIME() != null) {
+      return NamedPort.XNS_TIME;
+    } else if (ctx.Z39_50() != null) {
+      return NamedPort.Z39_50;
     } else {
       throw convError(NamedPort.class, ctx);
     }

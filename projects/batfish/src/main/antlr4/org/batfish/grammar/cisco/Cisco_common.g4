@@ -391,31 +391,61 @@ port
    | PPTP
    | RADIUS
    | RADIUS_ACCT
+   | RE_MAIL_CK
+   | REMOTEFS
+   | REPCMD
    | RIP
+   | RJE
+   | RLP
+   | RLZDBASE
+   | RMC
+   | RPC2PORTMAP
    | RSH
+   | RSYNC
+   | RTELNET
    | RTSP
    | SECUREID_UDP
+   | SGMP
+   | SILC
    | SIP
    | SMTP
+   | SMUX
+   | SNAGAS
    | SNMP
    | SNMP_TRAP
    | SNMPTRAP
    | SQLNET
+   | SQLSERV
+   | SQLSRV
    | SSH
+   | SUBMISSION
    | SUNRPC
+   | SVRLOC
    | SYSLOG
+   | SYSTAT
    | TACACS
    | TACACS_DS
    | TALK
+   | TBRPF
+   | TCPMUX
+   | TCPNETHASPSRV
    | TELNET
    | TFTP
    | TIME
+   | TUNNEL
+   | UPS
    | UUCP
+   | UUCP_PATH
+   | VMNET
    | VXLAN
    | WHO
    | WHOIS
    | WWW
    | XDMCP
+   | XNS_CH
+   | XNS_MAIL
+   | XNS_TIME
+   | Z39_50
 ;
 
 prefix_set_elem

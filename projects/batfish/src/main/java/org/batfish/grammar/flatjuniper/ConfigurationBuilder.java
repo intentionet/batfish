@@ -811,9 +811,9 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     } else if (ctx.PRINTER() != null) {
       return NamedPort.LPD;
     } else if (ctx.RADACCT() != null) {
-      return NamedPort.RADIUS_JUNIPER;
+      return NamedPort.RADIUS_2_AUTH;
     } else if (ctx.RADIUS() != null) {
-      return NamedPort.RADIUS_JUNIPER;
+      return NamedPort.RADIUS_2_AUTH;
     } else if (ctx.RIP() != null) {
       return NamedPort.EFStcp_OR_RIPudp;
     } else if (ctx.RKINIT() != null) {
