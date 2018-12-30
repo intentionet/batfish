@@ -1,5 +1,6 @@
 package org.batfish.datamodel;
 
+import java.util.Objects;
 import javax.annotation.Nonnull;
 
 /** Represents properties of a peering session between two {@link BgpPeerConfig}s. */
@@ -93,6 +94,26 @@ public final class BgpSessionProperties {
         SessionType.isEbgp(sessionType) && initiator.getAdvertiseInactive(),
         !SessionType.isEbgp(sessionType) && initiator.getAdvertiseExternal(),
         sessionType);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof BgpSessionProperties)) {
+      return false;
+    }
+    BgpSessionProperties that = (BgpSessionProperties) o;
+    return _additionalPaths == that._additionalPaths
+        && _advertiseExternal == that._advertiseExternal
+        && _advertiseInactive == that._advertiseInactive
+        && _sessionType == that._sessionType;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_additionalPaths, _advertiseExternal, _advertiseInactive, _sessionType);
   }
 
   public enum SessionType {

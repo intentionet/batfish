@@ -2073,15 +2073,14 @@ public class VirtualRouter implements Serializable {
     So to get session properties, we might need to flip the src/dst edge
      */
     Optional<BgpSessionProperties> session = bgpTopology.edgeValue(edge.src(), edge.dst());
-    if (session.isPresent()) {
-      return session.get();
-    }
-    return bgpTopology
-        .edgeValue(edge.dst(), edge.src())
-        .orElseThrow(
-            () ->
-                new IllegalArgumentException(
-                    String.format("No BGP edge %s in BGP topology", edge)));
+    return session.orElseGet(
+        () ->
+            bgpTopology
+                .edgeValue(edge.dst(), edge.src())
+                .orElseThrow(
+                    () ->
+                        new IllegalArgumentException(
+                            String.format("No BGP edge %s in BGP topology", edge))));
   }
 
   private void queueOutgoingIsisRoutes(

@@ -2556,12 +2556,11 @@ public class Batfish extends PluginConsumer implements IBatfish {
   @Override
   public Set<BgpAdvertisement> loadExternalBgpAnnouncements(
       Map<String, Configuration> configurations) {
-    Set<BgpAdvertisement> advertSet = new LinkedHashSet<>();
-    for (ExternalBgpAdvertisementPlugin plugin : _externalBgpAdvertisementPlugins) {
-      Set<BgpAdvertisement> currentAdvertisements = plugin.loadExternalBgpAdvertisements();
-      advertSet.addAll(currentAdvertisements);
-    }
-    return advertSet;
+    return _externalBgpAdvertisementPlugins
+        .stream()
+        .map(ExternalBgpAdvertisementPlugin::loadExternalBgpAdvertisements)
+        .flatMap(Set::stream)
+        .collect(ImmutableSet.toImmutableSet());
   }
 
   /**
