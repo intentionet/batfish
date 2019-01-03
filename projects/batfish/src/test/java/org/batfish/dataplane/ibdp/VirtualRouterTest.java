@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.graph.ImmutableValueGraph;
 import com.google.common.graph.Network;
@@ -809,9 +810,6 @@ public class VirtualRouterTest {
 
     Map<String, Configuration> configs =
         ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
-    Topology topology = synthesizeTopology(configs);
-    ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
-        ImmutableValueGraph.copyOf(ValueGraphBuilder.directed().allowsSelfLoops(false).build());
     Map<String, Node> nodes =
         ImmutableMap.of(c1.getHostname(), new Node(c1), c2.getHostname(), new Node(c2));
     Map<String, VirtualRouter> vrs =
@@ -822,13 +820,6 @@ public class VirtualRouterTest {
             .collect(
                 ImmutableMap.toImmutableMap(
                     vr -> vr.getConfiguration().getHostname(), Function.identity()));
-    Network<IsisNode, IsisEdge> initialIsisTopology = initIsisTopology(configs, topology);
-    Network<EigrpInterface, EigrpEdge> eigrpTopology = initEigrpTopology(configs, topology);
-    vrs.values()
-        .forEach(
-            vr ->
-                vr.initQueuesAndDeltaBuilders(
-                    nodes, topology, bgpTopology, eigrpTopology, initialIsisTopology));
 
     // Set IS-IS on interfaces. Set cost to 0 for convenience - this way route advertisements in rib
     // delta should be equal to incoming route advertisements because the metrics won't increase.
@@ -848,14 +839,6 @@ public class VirtualRouterTest {
             .setLevel1(passiveLevelSettings)
             .setLevel2(activeLevelSettings)
             .build());
-    Network<IsisNode, IsisEdge> updatedIsisTopology = initIsisTopology(configs, topology);
-
-    // Re-run
-    vrs.values()
-        .forEach(
-            vr ->
-                vr.initQueuesAndDeltaBuilders(
-                    nodes, topology, bgpTopology, eigrpTopology, updatedIsisTopology));
 
     // Build route advertisements.
     IsisRoute.Builder routeBuilder =
@@ -866,26 +849,41 @@ public class VirtualRouterTest {
             .setNetwork(Prefix.parse("1.1.1.1/24"))
             .setNextHopIp(Ip.parse("10.0.0.0"));
 
-    RouteAdvertisement<IsisRoute> level1Advert1to2 =
+    RouteAdvertisement<IsisRoute> level1AdvertToR2 =
         new RouteAdvertisement<>(
             routeBuilder.setLevel(IsisLevel.LEVEL_1).setProtocol(RoutingProtocol.ISIS_L1).build());
-    RouteAdvertisement<IsisRoute> level2Advert1to2 =
+    RouteAdvertisement<IsisRoute> level2AdvertToR2 =
         new RouteAdvertisement<>(
             routeBuilder.setLevel(IsisLevel.LEVEL_2).setProtocol(RoutingProtocol.ISIS_L2).build());
 
     routeBuilder.setNetwork(Prefix.parse("2.2.2.2/24")).setNextHopIp(Ip.parse("10.0.0.1"));
 
-    RouteAdvertisement<IsisRoute> level1Advert2to1 =
+    RouteAdvertisement<IsisRoute> level1AdvertToR1 =
         new RouteAdvertisement<>(
             routeBuilder.setLevel(IsisLevel.LEVEL_1).setProtocol(RoutingProtocol.ISIS_L1).build());
-    RouteAdvertisement<IsisRoute> level2Advert2to1 =
+    RouteAdvertisement<IsisRoute> level2AdvertToR1 =
         new RouteAdvertisement<>(
             routeBuilder.setLevel(IsisLevel.LEVEL_2).setProtocol(RoutingProtocol.ISIS_L2).build());
 
-    vrs.get(c1.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level1Advert2to1));
-    vrs.get(c1.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level2Advert2to1));
-    vrs.get(c2.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level1Advert1to2));
-    vrs.get(c2.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level2Advert1to2));
+    IsisEdge edge1To2 =
+        new IsisEdge(
+            IsisLevel.LEVEL_1_2,
+            new IsisNode(c2.getHostname(), i2.getName()),
+            new IsisNode(c1.getHostname(), i1.getName()));
+    IsisEdge edge2To1 =
+        new IsisEdge(
+            IsisLevel.LEVEL_1_2,
+            new IsisNode(c1.getHostname(), i1.getName()),
+            new IsisNode(c2.getHostname(), i2.getName()));
+
+    Queue<RouteAdvertisement<IsisRoute>> routeAdvertsToR1 = new ConcurrentLinkedQueue<>();
+    Queue<RouteAdvertisement<IsisRoute>> routeAdvertsToR2 = new ConcurrentLinkedQueue<>();
+    routeAdvertsToR1.addAll(ImmutableList.of(level1AdvertToR1, level2AdvertToR1));
+    routeAdvertsToR2.addAll(ImmutableList.of(level1AdvertToR2, level2AdvertToR2));
+    vrs.get(c1.getHostname())._isisIncomingRoutes =
+        ImmutableSortedMap.of(edge1To2, routeAdvertsToR1);
+    vrs.get(c2.getHostname())._isisIncomingRoutes =
+        ImmutableSortedMap.of(edge2To1, routeAdvertsToR2);
 
     NetworkConfigurations nc = NetworkConfigurations.of(configs);
 
@@ -894,7 +892,7 @@ public class VirtualRouterTest {
         vrs.get(c1.getHostname()).propagateIsisRoutes(nc);
     RibDelta<IsisRoute> L1Delta = ribDelta.getKey();
     RibDelta<IsisRoute> L2Delta = ribDelta.getValue();
-    assertThat(L1Delta.getActions(), contains(level1Advert2to1));
+    assertThat(L1Delta.getActions(), contains(level1AdvertToR1));
     assertThat(L2Delta, nullValue());
 
     // Tests for R2
@@ -902,6 +900,6 @@ public class VirtualRouterTest {
     L1Delta = ribDelta.getKey();
     L2Delta = ribDelta.getValue();
     assertThat(L1Delta, nullValue());
-    assertThat(L2Delta.getActions(), contains(level2Advert1to2));
+    assertThat(L2Delta.getActions(), contains(level2AdvertToR2));
   }
 }
