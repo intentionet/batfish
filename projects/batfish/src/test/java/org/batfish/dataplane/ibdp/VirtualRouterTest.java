@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.collection.IsEmptyIterable.emptyIterableOf;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -46,8 +47,10 @@ import org.batfish.datamodel.ConnectedRoute;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IsisRoute;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.LocalRoute;
+import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.OspfExternalType1Route;
 import org.batfish.datamodel.OspfExternalType2Route;
@@ -767,5 +770,138 @@ public class VirtualRouterTest {
                     IsisLevel.LEVEL_1_2,
                     new IsisNode(c1.getHostname(), i1.getName()),
                     new IsisNode(c2.getHostname(), i2.getName())))));
+  }
+
+  /*
+   * Setup:
+   * - Node R1 with ISIS interface with active L1 and passive L2
+   * - Node R2 with ISIS interface with passive L1 and active L2
+   * Manually send route advertisements to both routers at both levels. Should see:
+   * - R1 propagate advertisements at L1 but not L2
+   * - R2 propagate advertisements at L2 but not L1
+   */
+  @Test
+  public void testIsisRoutePropagationWithPassiveInterfaceLevels() {
+    NetworkFactory nf = new NetworkFactory();
+    Configuration.Builder cb =
+        nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS);
+    Configuration c1 = cb.build();
+    Configuration c2 = cb.build();
+
+    Vrf.Builder vb = nf.vrfBuilder().setName(DEFAULT_VRF_NAME);
+    Vrf v1 = vb.setOwner(c1).build();
+    Vrf v2 = vb.setOwner(c2).build();
+
+    IsisLevelSettings levelSettings = IsisLevelSettings.builder().build();
+    IsisProcess.Builder isb =
+        IsisProcess.builder().setLevel1(levelSettings).setLevel2(levelSettings);
+    Interface.Builder ib = nf.interfaceBuilder();
+
+    // Area: 0001, SystemID: 0100.0000.0000
+    isb.setVrf(v1).setNetAddress(new IsoAddress("49.0001.0100.0000.0000.00")).build();
+    Interface i1 =
+        ib.setOwner(c1).setVrf(v1).setAddress(new InterfaceAddress("10.0.0.0/31")).build();
+
+    // Area: 0001, SystemID: 0100.0000.0001
+    isb.setVrf(v2).setNetAddress(new IsoAddress("49.0001.0100.0000.0001.00")).build();
+    Interface i2 =
+        ib.setOwner(c2).setVrf(v2).setAddress(new InterfaceAddress("10.0.0.1/31")).build();
+
+    Map<String, Configuration> configs =
+        ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2);
+    Topology topology = synthesizeTopology(configs);
+    ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
+        ImmutableValueGraph.copyOf(ValueGraphBuilder.directed().allowsSelfLoops(false).build());
+    Map<String, Node> nodes =
+        ImmutableMap.of(c1.getHostname(), new Node(c1), c2.getHostname(), new Node(c2));
+    Map<String, VirtualRouter> vrs =
+        nodes
+            .values()
+            .stream()
+            .map(n -> n.getVirtualRouters().get(DEFAULT_VRF_NAME))
+            .collect(
+                ImmutableMap.toImmutableMap(
+                    vr -> vr.getConfiguration().getHostname(), Function.identity()));
+    Network<IsisNode, IsisEdge> initialIsisTopology = initIsisTopology(configs, topology);
+    Network<EigrpInterface, EigrpEdge> eigrpTopology = initEigrpTopology(configs, topology);
+    vrs.values()
+        .forEach(
+            vr ->
+                vr.initQueuesAndDeltaBuilders(
+                    nodes, topology, bgpTopology, eigrpTopology, initialIsisTopology));
+
+    // Set IS-IS on interfaces. Set cost to 0 for convenience - this way route advertisements in rib
+    // delta should be equal to incoming route advertisements because the metrics won't increase.
+    IsisInterfaceLevelSettings activeLevelSettings =
+        IsisInterfaceLevelSettings.builder().setMode(IsisInterfaceMode.ACTIVE).setCost(0L).build();
+    IsisInterfaceLevelSettings passiveLevelSettings =
+        IsisInterfaceLevelSettings.builder().setMode(IsisInterfaceMode.PASSIVE).setCost(0L).build();
+    i1.setIsis(
+        IsisInterfaceSettings.builder()
+            .setPointToPoint(true)
+            .setLevel1(activeLevelSettings)
+            .setLevel2(passiveLevelSettings)
+            .build());
+    i2.setIsis(
+        IsisInterfaceSettings.builder()
+            .setPointToPoint(true)
+            .setLevel1(passiveLevelSettings)
+            .setLevel2(activeLevelSettings)
+            .build());
+    Network<IsisNode, IsisEdge> updatedIsisTopology = initIsisTopology(configs, topology);
+
+    // Re-run
+    vrs.values()
+        .forEach(
+            vr ->
+                vr.initQueuesAndDeltaBuilders(
+                    nodes, topology, bgpTopology, eigrpTopology, updatedIsisTopology));
+
+    // Build route advertisements.
+    IsisRoute.Builder routeBuilder =
+        new IsisRoute.Builder()
+            .setAdmin(115)
+            .setArea("1")
+            .setSystemId("id")
+            .setNetwork(Prefix.parse("1.1.1.1/24"))
+            .setNextHopIp(Ip.parse("10.0.0.0"));
+
+    RouteAdvertisement<IsisRoute> level1Advert1to2 =
+        new RouteAdvertisement<>(
+            routeBuilder.setLevel(IsisLevel.LEVEL_1).setProtocol(RoutingProtocol.ISIS_L1).build());
+    RouteAdvertisement<IsisRoute> level2Advert1to2 =
+        new RouteAdvertisement<>(
+            routeBuilder.setLevel(IsisLevel.LEVEL_2).setProtocol(RoutingProtocol.ISIS_L2).build());
+
+    routeBuilder.setNetwork(Prefix.parse("2.2.2.2/24")).setNextHopIp(Ip.parse("10.0.0.1"));
+
+    RouteAdvertisement<IsisRoute> level1Advert2to1 =
+        new RouteAdvertisement<>(
+            routeBuilder.setLevel(IsisLevel.LEVEL_1).setProtocol(RoutingProtocol.ISIS_L1).build());
+    RouteAdvertisement<IsisRoute> level2Advert2to1 =
+        new RouteAdvertisement<>(
+            routeBuilder.setLevel(IsisLevel.LEVEL_2).setProtocol(RoutingProtocol.ISIS_L2).build());
+
+    vrs.get(c1.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level1Advert2to1));
+    vrs.get(c1.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level2Advert2to1));
+    vrs.get(c2.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level1Advert1to2));
+    vrs.get(c2.getHostname())._isisIncomingRoutes.values().forEach(q -> q.add(level2Advert1to2));
+
+    NetworkConfigurations nc = NetworkConfigurations.of(configs);
+
+    // Tests for R1
+    Entry<RibDelta<IsisRoute>, RibDelta<IsisRoute>> ribDelta =
+        vrs.get(c1.getHostname()).propagateIsisRoutes(nc);
+    RibDelta<IsisRoute> L1Delta = ribDelta.getKey();
+    RibDelta<IsisRoute> L2Delta = ribDelta.getValue();
+    assertThat(L1Delta.getActions(), contains(level1Advert2to1));
+    assertThat(L2Delta, nullValue());
+
+    // Tests for R2
+    ribDelta = vrs.get(c2.getHostname()).propagateIsisRoutes(nc);
+    L1Delta = ribDelta.getKey();
+    L2Delta = ribDelta.getValue();
+    assertThat(L1Delta, nullValue());
+    assertThat(L2Delta.getActions(), contains(level2Advert1to2));
   }
 }

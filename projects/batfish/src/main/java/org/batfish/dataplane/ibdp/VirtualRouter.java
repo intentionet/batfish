@@ -1412,48 +1412,45 @@ public class VirtualRouter implements Serializable {
           while (queue.peek() != null) {
             RouteAdvertisement<IsisRoute> routeAdvert = queue.remove();
             IsisRoute neighborRoute = routeAdvert.getRoute();
+            IsisLevel routeLevel = neighborRoute.getLevel();
+            IsisInterfaceLevelSettings isisLevelSettings =
+                routeLevel == IsisLevel.LEVEL_1
+                    ? iface.getIsis().getLevel1()
+                    : iface.getIsis().getLevel2();
 
+            // Do not propagate route if ISIS interface is passive at this level
+            if (isisLevelSettings.getMode() == IsisInterfaceMode.PASSIVE) {
+              continue;
+            }
             routeBuilder
                 .setNetwork(neighborRoute.getNetwork())
                 .setArea(neighborRoute.getArea())
                 .setAttach(neighborRoute.getAttach())
                 .setSystemId(neighborRoute.getSystemId());
             boolean withdraw = routeAdvert.isWithdrawn();
-            // TODO: simplify
-            if (neighborRoute.getLevel() == IsisLevel.LEVEL_1) {
-              long incrementalMetric =
-                  firstNonNull(iface.getIsis().getLevel1().getCost(), IsisRoute.DEFAULT_METRIC);
-              IsisRoute newL1Route =
-                  routeBuilder
-                      .setAdmin(l1Admin)
-                      .setLevel(IsisLevel.LEVEL_1)
-                      .setMetric(incrementalMetric + neighborRoute.getMetric())
-                      .setProtocol(RoutingProtocol.ISIS_L1)
-                      .build();
-              if (withdraw) {
-                l1DeltaBuilder.remove(newL1Route, Reason.WITHDRAW);
-                _isisL1Rib.removeBackupRoute(newL1Route);
-              } else {
-                l1DeltaBuilder.from(_isisL1StagingRib.mergeRouteGetDelta(newL1Route));
-                _isisL1Rib.removeBackupRoute(newL1Route);
-              }
-            } else { // neighborRoute is level2
-              long incrementalMetric =
-                  firstNonNull(iface.getIsis().getLevel2().getCost(), IsisRoute.DEFAULT_METRIC);
-              IsisRoute newL2Route =
-                  routeBuilder
-                      .setAdmin(l2Admin)
-                      .setLevel(IsisLevel.LEVEL_2)
-                      .setMetric(incrementalMetric + neighborRoute.getMetric())
-                      .setProtocol(RoutingProtocol.ISIS_L2)
-                      .build();
-              if (withdraw) {
-                l2DeltaBuilder.remove(newL2Route, Reason.WITHDRAW);
-                _isisL2Rib.removeBackupRoute(newL2Route);
-              } else {
-                l2DeltaBuilder.from(_isisL2StagingRib.mergeRouteGetDelta(newL2Route));
-                _isisL2Rib.addBackupRoute(newL2Route);
-              }
+            int adminCost = routeLevel == IsisLevel.LEVEL_1 ? l1Admin : l2Admin;
+            RoutingProtocol levelProtocol =
+                routeLevel == IsisLevel.LEVEL_1 ? RoutingProtocol.ISIS_L1 : RoutingProtocol.ISIS_L2;
+            RibDelta.Builder<IsisRoute> deltaBuilder =
+                routeLevel == IsisLevel.LEVEL_1 ? l1DeltaBuilder : l2DeltaBuilder;
+            IsisLevelRib levelRib = routeLevel == IsisLevel.LEVEL_1 ? _isisL1Rib : _isisL2Rib;
+            long incrementalMetric =
+                firstNonNull(isisLevelSettings.getCost(), IsisRoute.DEFAULT_METRIC);
+            IsisRoute newRoute =
+                routeBuilder
+                    .setAdmin(adminCost)
+                    .setLevel(routeLevel)
+                    .setMetric(incrementalMetric + neighborRoute.getMetric())
+                    .setProtocol(levelProtocol)
+                    .build();
+            if (withdraw) {
+              deltaBuilder.remove(newRoute, Reason.WITHDRAW);
+              levelRib.removeBackupRoute(newRoute);
+            } else {
+              IsisLevelRib levelStagingRib =
+                  routeLevel == IsisLevel.LEVEL_1 ? _isisL1StagingRib : _isisL2StagingRib;
+              deltaBuilder.from(levelStagingRib.mergeRouteGetDelta(newRoute));
+              levelRib.addBackupRoute(newRoute);
             }
           }
         });
