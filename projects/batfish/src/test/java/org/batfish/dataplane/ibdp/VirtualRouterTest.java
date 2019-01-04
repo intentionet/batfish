@@ -890,16 +890,18 @@ public class VirtualRouterTest {
     // Tests for R1
     Entry<RibDelta<IsisRoute>, RibDelta<IsisRoute>> ribDelta =
         vrs.get(c1.getHostname()).propagateIsisRoutes(nc);
-    RibDelta<IsisRoute> L1Delta = ribDelta.getKey();
-    RibDelta<IsisRoute> L2Delta = ribDelta.getValue();
-    assertThat(L1Delta.getActions(), contains(level1AdvertToR1));
-    assertThat(L2Delta, nullValue());
+    assertThat(ribDelta, notNullValue());
+    RibDelta<IsisRoute> l1Delta = ribDelta.getKey();
+    RibDelta<IsisRoute> l2Delta = ribDelta.getValue();
+    assertThat(l1Delta.getActions(), equalTo(ImmutableList.of(level1AdvertToR1)));
+    assertThat(l2Delta, nullValue());
 
     // Tests for R2
     ribDelta = vrs.get(c2.getHostname()).propagateIsisRoutes(nc);
-    L1Delta = ribDelta.getKey();
-    L2Delta = ribDelta.getValue();
-    assertThat(L1Delta, nullValue());
-    assertThat(L2Delta.getActions(), contains(level2AdvertToR2));
+    assertThat(ribDelta, notNullValue());
+    l1Delta = ribDelta.getKey();
+    l2Delta = ribDelta.getValue();
+    assertThat(l1Delta, nullValue());
+    assertThat(l2Delta.getActions(), equalTo(ImmutableList.of(level2AdvertToR2)));
   }
 }
