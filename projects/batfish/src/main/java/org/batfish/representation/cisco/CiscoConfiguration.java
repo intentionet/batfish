@@ -37,6 +37,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Multimaps;
+import com.google.common.collect.Ordering;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -98,6 +99,7 @@ import org.batfish.datamodel.IpsecPolicy;
 import org.batfish.datamodel.IpsecVpn;
 import org.batfish.datamodel.Line;
 import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.Mlag;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
@@ -399,6 +401,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private AristaEosVxlan _eosVxlan;
 
+  @Nonnull private Map<String, MlagConfiguration> _eosMlagConfigurations;
+
   private final Map<String, ExpandedCommunityList> _expandedCommunityLists;
 
   private final Map<String, ExtendedAccessList> _extendedAccessLists;
@@ -522,6 +526,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     _cryptoMapSets = new HashMap<>();
     _dhcpRelayServers = new ArrayList<>();
     _dnsServers = new TreeSet<>();
+    _eosMlagConfigurations = new HashMap<>();
     _expandedCommunityLists = new TreeMap<>();
     _extendedAccessLists = new TreeMap<>();
     _extendedIpv6AccessLists = new TreeMap<>();
@@ -744,6 +749,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   public AristaEosVxlan getEosVxlan() {
     return _eosVxlan;
+  }
+
+  @Nonnull
+  public Map<String, MlagConfiguration> getEosMlagConfigurations() {
+    return _eosMlagConfigurations;
   }
 
   public Map<String, ExpandedCommunityList> getExpandedCommunityLists() {
@@ -2573,6 +2583,15 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return newProcess;
   }
 
+  private Mlag toMlag(MlagConfiguration mlag) {
+    return Mlag.builder()
+        .setId(mlag.getDomainId())
+        .setPeerAddress(mlag.getPeerAddress())
+        .setPeerInterface(mlag.getPeerLink())
+        .setLocalInterface(mlag.getLocalInterface())
+        .build();
+  }
+
   private org.batfish.datamodel.ospf.StubSettings toStubSettings(StubSettings stubSettings) {
     return org.batfish.datamodel.ospf.StubSettings.builder()
         .setSuppressType3(stubSettings.getNoSummary())
@@ -3226,6 +3245,18 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
     // apply vrrp settings to interfaces
     applyVrrp(c);
+
+    // convert MLAG configs
+    if (_vendor.equals(ConfigurationFormat.ARISTA)) {
+      c.setMlags(
+          _eosMlagConfigurations
+              .values()
+              .stream()
+              .filter(m -> !m.isShutdown())
+              .collect(
+                  ImmutableSortedMap.toImmutableSortedMap(
+                      Ordering.natural(), MlagConfiguration::getDomainId, this::toMlag)));
+    }
 
     // ISAKMP policies to IKE proposals
     for (Entry<Integer, IsakmpPolicy> e : _isakmpPolicies.entrySet()) {

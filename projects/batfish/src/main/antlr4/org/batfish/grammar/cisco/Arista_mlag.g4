@@ -45,11 +45,13 @@ eos_mlag_shutdown
 s_eos_mlag
 :
    MLAG CONFIGURATION NEWLINE
-   eos_mlag_domain
-   | eos_mlag_local_interface
-   | eos_mlag_peer_address
-   | eos_mlag_peer_link
-   | eos_mlag_reload_delay
-   | eos_mlag_shutdown
+   (
+      eos_mlag_domain
+      | eos_mlag_local_interface
+      | eos_mlag_peer_address
+      | eos_mlag_peer_link
+      | eos_mlag_reload_delay
+      | eos_mlag_shutdown
+   )*
 ;
 

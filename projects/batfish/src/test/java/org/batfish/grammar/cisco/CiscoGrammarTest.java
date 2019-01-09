@@ -44,6 +44,7 @@ import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpsecPhase
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpsecPolicy;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpsecProposal;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasIpsecVpn;
+import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasMlagConfig;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVendorFamily;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrfs;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasAclName;
@@ -124,6 +125,9 @@ import static org.batfish.datamodel.matchers.LineMatchers.hasAuthenticationLogin
 import static org.batfish.datamodel.matchers.LineMatchers.requiresAuthentication;
 import static org.batfish.datamodel.matchers.MatchHeaderSpaceMatchers.hasHeaderSpace;
 import static org.batfish.datamodel.matchers.MatchHeaderSpaceMatchers.isMatchHeaderSpaceThat;
+import static org.batfish.datamodel.matchers.MlagMatchers.hasId;
+import static org.batfish.datamodel.matchers.MlagMatchers.hasPeerAddress;
+import static org.batfish.datamodel.matchers.MlagMatchers.hasPeerInterface;
 import static org.batfish.datamodel.matchers.NssaSettingsMatchers.hasDefaultOriginateType;
 import static org.batfish.datamodel.matchers.NssaSettingsMatchers.hasSuppressType3;
 import static org.batfish.datamodel.matchers.OrMatchExprMatchers.hasDisjuncts;
@@ -323,6 +327,7 @@ import org.batfish.datamodel.matchers.IpsecPhase2ProposalMatchers;
 import org.batfish.datamodel.matchers.IpsecPolicyMatchers;
 import org.batfish.datamodel.matchers.IpsecProposalMatchers;
 import org.batfish.datamodel.matchers.IpsecVpnMatchers;
+import org.batfish.datamodel.matchers.MlagMatchers;
 import org.batfish.datamodel.matchers.OspfAreaMatchers;
 import org.batfish.datamodel.matchers.Route6FilterListMatchers;
 import org.batfish.datamodel.matchers.RouteFilterListMatchers;
@@ -3111,6 +3116,26 @@ public class CiscoGrammarTest {
             ImmutableSet.of(
                 new Dependency("Ethernet0", DependencyType.AGGREGATE),
                 new Dependency("Ethernet1", DependencyType.AGGREGATE))));
+  }
+
+  @Test
+  public void testEosMlagConfig() throws IOException {
+    String hostname = "eos-mlag";
+
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    Configuration c = batfish.loadConfigurations().get(hostname);
+
+    final String mlagName = "MLAG_DOMAIN_ID";
+    assertThat(c, hasMlagConfig(mlagName, hasId(mlagName)));
+    assertThat(c, hasMlagConfig(mlagName, hasPeerAddress(Ip.parse("1.1.1.3"))));
+    assertThat(c, hasMlagConfig(mlagName, hasPeerInterface("Port-Channel1")));
+    assertThat(c, hasMlagConfig(mlagName, MlagMatchers.hasLocalInterface("Vlan4094")));
+
+    final String mlagShutdown = "MLAG_SHUTDOWN";
+    assertThat(c, hasMlagConfig(mlagShutdown, nullValue()));
+
+    final String mlagNoShutdown = "MLAG_NO_SHUTDOWN";
+    assertThat(c, hasMlagConfig(mlagNoShutdown, hasId(mlagNoShutdown)));
   }
 
   @Test

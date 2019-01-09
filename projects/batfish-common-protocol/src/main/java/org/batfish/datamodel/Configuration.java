@@ -154,6 +154,8 @@ public final class Configuration implements Serializable {
 
   private static final String PROP_LOGGING_SOURCE_INTERFACE = "loggingSourceInterface";
 
+  private static final String PROP_MLAGS = "mlags";
+
   private static final String PROP_NAME = "name";
 
   private static final String PROP_NTP_SERVERS = "ntpServers";
@@ -248,6 +250,8 @@ public final class Configuration implements Serializable {
 
   private String _loggingSourceInterface;
 
+  private NavigableMap<String, Mlag> _mlags;
+
   private final String _name;
 
   /** Normal =&gt; Excluding extended and reserved vlans that should not be modified or deleted. */
@@ -333,6 +337,7 @@ public final class Configuration implements Serializable {
     _ipsecProposals = new TreeMap<>();
     _ipsecVpns = new TreeMap<>();
     _loggingServers = new TreeSet<>();
+    _mlags = ImmutableSortedMap.of();
     _normalVlanRange = new SubRange(VLAN_NORMAL_MIN_DEFAULT, VLAN_NORMAL_MAX_DEFAULT);
     _ntpServers = new TreeSet<>();
     _routeFilterLists = new TreeMap<>();
@@ -596,6 +601,12 @@ public final class Configuration implements Serializable {
   @JsonProperty(PROP_LOGGING_SOURCE_INTERFACE)
   public String getLoggingSourceInterface() {
     return _loggingSourceInterface;
+  }
+
+  @JsonProperty(PROP_MLAGS)
+  @Nonnull
+  public NavigableMap<String, Mlag> getMlags() {
+    return _mlags;
   }
 
   @JsonIgnore
@@ -894,6 +905,11 @@ public final class Configuration implements Serializable {
   @JsonProperty(PROP_LOGGING_SOURCE_INTERFACE)
   public void setLoggingSourceInterface(String loggingSourceInterface) {
     _loggingSourceInterface = loggingSourceInterface;
+  }
+
+  @JsonProperty(PROP_MLAGS)
+  public void setMlags(Map<String, Mlag> mlags) {
+    _mlags = ImmutableSortedMap.copyOf(mlags);
   }
 
   @JsonIgnore

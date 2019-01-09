@@ -22,6 +22,7 @@ import org.batfish.datamodel.IpsecPhase2Proposal;
 import org.batfish.datamodel.IpsecPolicy;
 import org.batfish.datamodel.IpsecProposal;
 import org.batfish.datamodel.IpsecVpn;
+import org.batfish.datamodel.Mlag;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasConfigurationFormat;
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasDefaultVrf;
@@ -42,6 +43,7 @@ import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasIpsecPhase2Pr
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasIpsecPolicy;
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasIpsecProposal;
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasIpsecVpn;
+import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasMlag;
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasTrackingGroups;
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasVendorFamily;
 import org.batfish.datamodel.matchers.ConfigurationMatchersImpl.HasVrf;
@@ -227,6 +229,15 @@ public class ConfigurationMatchers {
   public static HasIpsecPolicy hasIpsecPolicy(
       @Nonnull String name, @Nonnull Matcher<? super IpsecPolicy> subMatcher) {
     return new HasIpsecPolicy(name, subMatcher);
+  }
+
+  /**
+   * Provides a matcher that matches if the provided {@code subMatcher} matches the configuration's
+   * MLAG configuration with the specified name.
+   */
+  public static HasMlag hasMlagConfig(
+      @Nonnull String name, @Nonnull Matcher<? super Mlag> subMatcher) {
+    return new HasMlag(name, subMatcher);
   }
 
   /**

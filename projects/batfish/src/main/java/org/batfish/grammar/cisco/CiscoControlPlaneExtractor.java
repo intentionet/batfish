@@ -7031,7 +7031,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitEos_mlag_domain(Eos_mlag_domainContext ctx) {
-    _currentEosMlagConfiguration.setDomainId(ctx.DOMAIN_ID().getText());
+    _currentEosMlagConfiguration.setDomainId(ctx.id.getText());
   }
 
   @Override
@@ -8667,6 +8667,12 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitS_eos_mlag(S_eos_mlagContext ctx) {
+    if (_currentEosMlagConfiguration != null
+        && _currentEosMlagConfiguration.getDomainId() != null) {
+      _configuration
+          .getEosMlagConfigurations()
+          .put(_currentEosMlagConfiguration.getDomainId(), _currentEosMlagConfiguration);
+    }
     _currentEosMlagConfiguration = null;
   }
 

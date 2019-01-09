@@ -18,6 +18,7 @@ import org.batfish.datamodel.IpsecPhase2Proposal;
 import org.batfish.datamodel.IpsecPolicy;
 import org.batfish.datamodel.IpsecProposal;
 import org.batfish.datamodel.IpsecVpn;
+import org.batfish.datamodel.Mlag;
 import org.batfish.datamodel.Route6FilterList;
 import org.batfish.datamodel.RouteFilterList;
 import org.batfish.datamodel.Vrf;
@@ -282,6 +283,20 @@ final class ConfigurationMatchersImpl {
     @Override
     protected IpsecPeerConfig featureValueOf(Configuration actual) {
       return actual.getIpsecPeerConfigs().get(_name);
+    }
+  }
+
+  static final class HasMlag extends FeatureMatcher<Configuration, Mlag> {
+    private final String _name;
+
+    HasMlag(@Nonnull String name, @Nonnull Matcher<? super Mlag> subMatcher) {
+      super(subMatcher, "A Configuration with Mlag" + name + ":", "ipsecPeerConfig " + name);
+      _name = name;
+    }
+
+    @Override
+    protected Mlag featureValueOf(Configuration actual) {
+      return actual.getMlags().get(_name);
     }
   }
 

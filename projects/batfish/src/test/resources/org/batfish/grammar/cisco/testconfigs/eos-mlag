@@ -1,0 +1,17 @@
+! boot system flash:/EOS-4.19.1F.swi
+!
+hostname eos-mlag
+!
+mlag configuration
+  domain-id MLAG_DOMAIN_ID
+  local-interface Vlan4094
+  peer-address 1.1.1.3
+  peer-link Port-Channel1
+!
+mlag configuration
+  domain-id MLAG_SHUTDOWN
+  shutdown
+!
+mlag configuration
+  domain-id MLAG_NO_SHUTDOWN
+  no shutdown
