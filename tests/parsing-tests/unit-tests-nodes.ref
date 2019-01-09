@@ -11939,6 +11939,54 @@
           }
         }
       },
+      "eos_trunk_group" : {
+        "configurationFormat" : "ARISTA",
+        "name" : "eos_trunk_group",
+        "defaultCrossZoneAction" : "PERMIT",
+        "defaultInboundAction" : "PERMIT",
+        "deviceType" : "SWITCH",
+        "interfaces" : {
+          "Port-Channel1" : {
+            "name" : "Port-Channel1",
+            "accessVlan" : 0,
+            "active" : false,
+            "allowedVlans" : "1-2",
+            "autostate" : true,
+            "bandwidth" : 0.0,
+            "declaredNames" : [
+              "Port-Channel1"
+            ],
+            "mtu" : 1500,
+            "nativeVlan" : 1,
+            "ospfDeadInterval" : 0,
+            "ospfEnabled" : false,
+            "ospfHelloMultiplier" : 0,
+            "ospfPassive" : false,
+            "ospfPointToPoint" : false,
+            "proxyArp" : false,
+            "ripEnabled" : false,
+            "ripPassive" : false,
+            "spanningTreePortfast" : false,
+            "switchportMode" : "TRUNK",
+            "switchportTrunkEncapsulation" : "DOT1Q",
+            "type" : "AGGREGATED",
+            "vrf" : "default"
+          }
+        },
+        "vendorFamily" : {
+          "cisco" : {
+            "hostname" : "eos_trunk_group"
+          }
+        },
+        "vrfs" : {
+          "default" : {
+            "name" : "default",
+            "interfaces" : [
+              "Port-Channel1"
+            ]
+          }
+        }
+      },
       "foundry_access_list" : {
         "configurationFormat" : "FOUNDRY",
         "name" : "foundry_access_list",
