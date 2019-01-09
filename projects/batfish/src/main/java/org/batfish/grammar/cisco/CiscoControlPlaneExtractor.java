@@ -1533,7 +1533,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Nullable private IntegerSpace _currentVlans;
 
-  private Integer _currentVlanNum;
+  private Integer _currentVxlanVlanNum;
 
   private String _currentVrf;
 
@@ -2234,9 +2234,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void exitEos_vxif_vxlan_flood(Eos_vxif_vxlan_floodContext ctx) {
     SortedSet<Ip> floodAddresses = _eosVxlan.getFloodAddresses();
-    if (_currentVlanNum != null) {
+    if (_currentVxlanVlanNum != null) {
       floodAddresses =
-          _eosVxlan.getVlanFloodAddresses().computeIfAbsent(_currentVlanNum, n -> new TreeSet<>());
+          _eosVxlan
+              .getVlanFloodAddresses()
+              .computeIfAbsent(_currentVxlanVlanNum, n -> new TreeSet<>());
     }
 
     if (ctx.REMOVE() != null) {
@@ -2275,17 +2277,17 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterEos_vxif_vxlan_vlan(Eos_vxif_vxlan_vlanContext ctx) {
-    _currentVlanNum = toInteger(ctx.num);
+    _currentVxlanVlanNum = toInteger(ctx.num);
   }
 
   @Override
   public void exitEos_vxif_vxlan_vlan(Eos_vxif_vxlan_vlanContext ctx) {
-    _currentVlanNum = null;
+    _currentVxlanVlanNum = null;
   }
 
   @Override
   public void exitEos_vxif_vxlan_vlan_vni(Eos_vxif_vxlan_vlan_vniContext ctx) {
-    _eosVxlan.getVlanVnis().computeIfAbsent(_currentVlanNum, n -> toInteger(ctx.num));
+    _eosVxlan.getVlanVnis().computeIfAbsent(_currentVxlanVlanNum, n -> toInteger(ctx.num));
   }
 
   @Override
