@@ -664,6 +664,11 @@ ALLOCATE
    'allocate'
 ;
 
+ALLOCATION
+:
+   'allocation'
+;
+
 ALLOW
 :
    'allow'
@@ -959,6 +964,11 @@ AS_SET
 ASA
 :
    'ASA'
+;
+
+ASCENDING
+:
+   'ascending'
 ;
 
 ASCII_AUTHENTICATION
@@ -3040,6 +3050,11 @@ DES
 DES_SHA1
 :
    'des-sha1'
+;
+
+DESCENDING
+:
+   'descending'
 ;
 
 DESCRIPTION
@@ -12311,6 +12326,11 @@ SUPPRESSED
 SUSPECT_ROGUE_CONF_LEVEL
 :
    'suspect-rogue-conf-level'
+;
+
+SUSPEND
+:
+   'suspend'
 ;
 
 SVC

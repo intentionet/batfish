@@ -1,0 +1,22 @@
+! boot system flash:/EOS-4.19.1F.swi
+!
+hostname eos_trunk_group
+!
+vlan 1
+   name VLAN1
+   trunk group GROUP1
+!
+vlan 2
+   trunk group GROUP2
+!
+interface Port-Channel1
+   switchport mode trunk
+   switchport trunk group GROUP1
+   switchport trunk group GROUP2
+!
+interface Port-Channel2
+   switchport mode trunk
+   switchport trunk allowed vlan 99
+   ! trunk group lines below should have no effect
+   switchport trunk group GROUP1
+   switchport trunk group GROUP2

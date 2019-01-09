@@ -1,7 +1,7 @@
 parser grammar CiscoParser;
 
 import
-Cisco_common, Arista_mlag, Cisco_aaa, Cisco_acl, Cisco_bgp, Cisco_cable, Cisco_crypto, Cisco_callhome, Cisco_eigrp, Cisco_hsrp, Cisco_ignored, Cisco_interface, Cisco_isis, Cisco_line, Cisco_logging, Cisco_mpls, Cisco_ntp, Cisco_ospf, Cisco_pim, Cisco_qos, Cisco_rip, Cisco_routemap, Cisco_snmp, Cisco_static, Cisco_zone;
+Cisco_common, Arista_mlag, Arista_vlan, Cisco_aaa, Cisco_acl, Cisco_bgp, Cisco_cable, Cisco_crypto, Cisco_callhome, Cisco_eigrp, Cisco_hsrp, Cisco_ignored, Cisco_interface, Cisco_isis, Cisco_line, Cisco_logging, Cisco_mpls, Cisco_ntp, Cisco_ospf, Cisco_pim, Cisco_qos, Cisco_rip, Cisco_routemap, Cisco_snmp, Cisco_static, Cisco_zone;
 
 
 options {
@@ -3180,17 +3180,31 @@ s_username_attributes
 
 s_vlan
 :
-   NO? VLAN
    (
-      ACCESS_MAP
-      |
-      (
-         variable_vlan? DEC
-      )
-   ) null_rest_of_line
-   (
-      vlan_null
-   )*
+     NO? VLAN
+     (
+       eos_vlan_id
+       | eos_vlan_internal
+     ) s_vlan_inner*
+   )
+   | (
+       NO? VLAN
+       (
+          ACCESS_MAP
+          |
+          (
+             variable_vlan? DEC
+          )
+       ) null_rest_of_line
+     ) s_vlan_inner*
+;
+
+s_vlan_inner
+:
+   eos_vlan_name
+   | eos_vlan_state
+   | eos_vlan_trunk
+   | vlan_null
 ;
 
 s_vlan_name
@@ -4159,7 +4173,6 @@ vlan_null
       | MEDIA
       | MTU
       | MULTICAST
-      | NAME
       | PARENT
       | PRIORITY
       | PRIVATE_VLAN
@@ -4171,7 +4184,6 @@ vlan_null
       | STATISTICS
       | STP
       | TAGGED
-      | TRUNK
       | TB_VLAN1
       | TB_VLAN2
       | UNTAGGED

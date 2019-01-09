@@ -1,0 +1,22 @@
+! boot system flash:/EOS-4.19.1F.swi
+!
+hostname eos_trunk_group
+!
+vlan 1
+   name VLAN1
+   trunk group GROUP1
+!
+vlan 2
+   trunk group GROUP2
+
+vlan internal allocation policy ascending range 4 5
+vlan internal allocation policy descending range 8 9 
+
+vlan 99
+   state active
+   state suspended 
+!
+interface Port-Channel1
+   switchport mode trunk
+   switchport trunk group GROUP1
+   switchport trunk group GROUP2
