@@ -15,3 +15,6 @@ mlag configuration
 mlag configuration
   domain-id MLAG_NO_SHUTDOWN
   no shutdown
+
+interface Port-Channel1
+  mlag 5

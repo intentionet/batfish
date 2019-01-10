@@ -2061,6 +2061,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     } else {
       newIface.setDhcpRelayAddresses(ImmutableList.copyOf(iface.getDhcpRelayAddresses()));
     }
+    newIface.setMlagId(iface.getMlagId());
     newIface.setMtu(getInterfaceMtu(iface));
     newIface.setOspfPointToPoint(iface.getOspfPointToPoint());
     newIface.setProxyArp(iface.getProxyArp());

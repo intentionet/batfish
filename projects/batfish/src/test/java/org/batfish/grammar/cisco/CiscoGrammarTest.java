@@ -92,6 +92,7 @@ import static org.batfish.datamodel.matchers.InterfaceMatchers.hasEigrp;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasHsrpGroup;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasHsrpVersion;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasIsis;
+import static org.batfish.datamodel.matchers.InterfaceMatchers.hasMlagId;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasMtu;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasOspfArea;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasVrf;
@@ -3136,6 +3137,9 @@ public class CiscoGrammarTest {
 
     final String mlagNoShutdown = "MLAG_NO_SHUTDOWN";
     assertThat(c, hasMlagConfig(mlagNoShutdown, hasId(mlagNoShutdown)));
+
+    // Test interface config
+    assertThat(c, hasInterface("Port-Channel1", hasMlagId(5)));
   }
 
   @Test

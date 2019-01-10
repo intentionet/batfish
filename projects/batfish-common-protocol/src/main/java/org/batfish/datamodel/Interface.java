@@ -461,6 +461,8 @@ public final class Interface extends ComparableStructure<String> {
 
   private static final String PROP_ISIS_L2_INTERFACE_MODE = "isisL2InterfaceMode";
 
+  private static final String PROP_MLAG_ID = "mlagId";
+
   private static final String PROP_MTU = "mtu";
 
   private static final String PROP_NATIVE_VLAN = "nativeVlan";
@@ -732,6 +734,8 @@ public final class Interface extends ComparableStructure<String> {
   private InterfaceType _interfaceType;
 
   private IsisInterfaceSettings _isis;
+
+  @Nullable private Integer _mlagId;
 
   private int _mtu;
 
@@ -1101,6 +1105,12 @@ public final class Interface extends ComparableStructure<String> {
   public IsisInterfaceMode getIsisL2InterfaceMode() {
     // TODO: deprecate properly
     return null;
+  }
+
+  @JsonProperty(PROP_MLAG_ID)
+  @Nullable
+  public Integer getMlagId() {
+    return _mlagId;
   }
 
   @JsonProperty(PROP_MTU)
@@ -1474,6 +1484,11 @@ public final class Interface extends ComparableStructure<String> {
   @Deprecated
   public void setIsisL2InterfaceMode(IsisInterfaceMode mode) {
     // TODO: deprecate properly
+  }
+
+  @JsonProperty(PROP_MLAG_ID)
+  public void setMlagId(Integer mlagId) {
+    _mlagId = mlagId;
   }
 
   @JsonProperty(PROP_MTU)

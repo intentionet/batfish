@@ -28,6 +28,7 @@ import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasEigrp;
 import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasHsrpGroup;
 import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasHsrpVersion;
 import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasIsis;
+import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasMlagId;
 import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasMtu;
 import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasName;
 import org.batfish.datamodel.matchers.InterfaceMatchersImpl.HasOspfArea;
@@ -168,6 +169,19 @@ public final class InterfaceMatchers {
   public static @Nonnull Matcher<Interface> hasIsis(
       @Nonnull Matcher<? super IsisInterfaceSettings> subMatcher) {
     return new HasIsis(subMatcher);
+  }
+
+  /** Provides a matcher that matches if the provided value matches the interface's MLAG ID. */
+  public static HasMlagId hasMlagId(int value) {
+    return hasMlagId(equalTo(value));
+  }
+
+  /**
+   * Provides a matcher that matches if the provided {@code subMatcher} matches the interface's MLAG
+   * ID.
+   */
+  public static HasMlagId hasMlagId(Matcher<? super Integer> subMatcher) {
+    return new HasMlagId(subMatcher);
   }
 
   /** Provides a matcher that matches if the provided value matches the interface's MTU. */

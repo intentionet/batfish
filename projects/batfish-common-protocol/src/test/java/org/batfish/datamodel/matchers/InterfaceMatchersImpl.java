@@ -148,6 +148,18 @@ final class InterfaceMatchersImpl {
     }
   }
 
+  static final class HasMlagId extends FeatureMatcher<Interface, Integer> {
+    HasMlagId(@Nonnull Matcher<? super Integer> subMatcher) {
+      super(subMatcher, "an Interface with MLAG ID:", "mlagId");
+    }
+
+    @Override
+    @Nullable
+    protected Integer featureValueOf(Interface actual) {
+      return actual.getMlagId();
+    }
+  }
+
   static final class HasMtu extends FeatureMatcher<Interface, Integer> {
     HasMtu(@Nonnull Matcher<? super Integer> subMatcher) {
       super(subMatcher, "an Interface with MTU:", "MTU");

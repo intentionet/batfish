@@ -11919,6 +11919,7 @@
             "declaredNames" : [
               "Port-Channel2"
             ],
+            "mlagId" : 2,
             "mtu" : 1500,
             "nativeVlan" : 1,
             "ospfDeadInterval" : 0,
