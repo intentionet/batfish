@@ -11937,6 +11937,14 @@
             "vrf" : "default"
           }
         },
+        "mlags" : {
+          "MLAG_DOMAIN" : {
+            "id" : "MLAG_DOMAIN",
+            "localInterface" : "Vlan4094",
+            "peerAddress" : "1.1.1.3",
+            "peerInterface" : "Port-Channel1"
+          }
+        },
         "vendorFamily" : {
           "cisco" : {
             "hostname" : "eos_mlag"
