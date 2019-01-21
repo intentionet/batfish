@@ -10,6 +10,7 @@ import static org.batfish.representation.juniper.JuniperStructureType.ADDRESS_BO
 import static org.batfish.representation.juniper.NatPacketLocation.interfaceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.routingInstanceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.zoneLocation;
+import static org.batfish.representation.juniper.RoutingInformationBase.RIB_IPV4_UNICAST;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -42,6 +43,7 @@ import org.apache.commons.collections4.list.TreeList;
 import org.apache.commons.lang3.SerializationUtils;
 import org.batfish.common.BatfishException;
 import org.batfish.common.VendorConversionException;
+import org.batfish.common.Warnings;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.AclIpSpace;
 import org.batfish.datamodel.AuthenticationKey;
@@ -100,6 +102,7 @@ import org.batfish.datamodel.acl.OrMatchExpr;
 import org.batfish.datamodel.acl.OriginatingFromDevice;
 import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.acl.TrueExpr;
+import org.batfish.datamodel.dataplane.rib.RibId;
 import org.batfish.datamodel.isis.IsisInterfaceMode;
 import org.batfish.datamodel.isis.IsisProcess;
 import org.batfish.datamodel.ospf.OspfAreaSummary;
@@ -171,6 +174,19 @@ public final class JuniperConfiguration extends VendorConfiguration {
   private static final String DEFAULT_BGP_EXPORT_POLICY_NAME = "~DEFAULT_BGP_EXPORT_POLICY~";
 
   private static final String DEFAULT_BGP_IMPORT_POLICY_NAME = "~DEFAULT_BGP_IMPORT_POLICY~";
+
+  private static final String DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY_NAME =
+      "~DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY~";
+
+  private static final Map<RoutingProtocol, String> DEFAULT_IMPORT_POLICIES =
+      ImmutableMap.<RoutingProtocol, String>builder()
+          .put(RoutingProtocol.CONNECTED, DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY_NAME)
+          .put(RoutingProtocol.LOCAL, DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY_NAME)
+          .put(RoutingProtocol.AGGREGATE, DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY_NAME)
+          .put(RoutingProtocol.STATIC, DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY_NAME)
+          .put(RoutingProtocol.BGP, DEFAULT_BGP_IMPORT_POLICY_NAME)
+          .put(RoutingProtocol.IBGP, DEFAULT_BGP_IMPORT_POLICY_NAME)
+          .build();
 
   @VisibleForTesting static final int DEFAULT_ISIS_COST = 10;
 
@@ -829,6 +845,28 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return _allStandardCommunities;
   }
 
+  /**
+   * Generate a {@link RoutingPolicy} for use when importing routes from pseudo-protocols (direct,
+   * static, aggregate, generated)
+   */
+  @VisibleForTesting
+  static RoutingPolicy generateDefaultPseudoProtocolImportPolicy(@Nonnull Configuration c) {
+    return RoutingPolicy.builder()
+        .setOwner(c)
+        .setName(DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY_NAME)
+        .setStatements(
+            ImmutableList.of(
+                new If(
+                    new Disjunction(
+                        new MatchProtocol(RoutingProtocol.CONNECTED),
+                        new MatchProtocol(RoutingProtocol.LOCAL),
+                        new MatchProtocol(RoutingProtocol.STATIC),
+                        new MatchProtocol(RoutingProtocol.AGGREGATE)),
+                    ImmutableList.of(Statements.ReturnTrue.toStaticStatement()),
+                    ImmutableList.of(Statements.ReturnFalse.toStaticStatement()))))
+        .build();
+  }
+
   public Map<String, NodeDevice> getNodeDevices() {
     return _nodeDevices;
   }
@@ -864,6 +902,19 @@ public final class JuniperConfiguration extends VendorConfiguration {
     RoutingPolicy defaultBgpImportPolicy = new RoutingPolicy(DEFAULT_BGP_IMPORT_POLICY_NAME, _c);
     _c.getRoutingPolicies().put(DEFAULT_BGP_IMPORT_POLICY_NAME, defaultBgpImportPolicy);
     PsThenAccept.INSTANCE.applyTo(defaultBgpImportPolicy.getStatements(), this, _c, _w);
+  }
+
+  /**
+   * Initialize default pseudo-protocol import policy (if it does not exist) in the
+   * vendor-independent {@link Configuration}.
+   *
+   * @return the name of the initialized policy
+   */
+  private void initDefaultPseudoProtocolImportPolicy() {
+    if (_c.getRoutingPolicies().containsKey(DEFAULT_PSEUDO_PROTOCOL_IMPORT_POLICY_NAME)) {
+      return;
+    }
+    generateDefaultPseudoProtocolImportPolicy(_c);
   }
 
   private void initFirstLoopbackInterface() {
@@ -1793,6 +1844,77 @@ public final class JuniperConfiguration extends VendorConfiguration {
     return ipSpaces;
   }
 
+  @Nonnull
+  private static org.batfish.datamodel.dataplane.rib.RibGroup toRibGroup(
+      RibGroup rg, RoutingProtocol protocol, Configuration c, Warnings w) {
+    ImmutableList<RibId> importRibs =
+        rg.getImportRibs().stream()
+            .map(rib -> toRibId(c.getHostname(), rib, w))
+            .filter(Objects::nonNull)
+            .collect(ImmutableList.toImmutableList());
+
+    RibId exportRib =
+        rg.getExportRib() != null ? toRibId(c.getHostname(), rg.getExportRib(), w) : null;
+    List<BooleanExpr> policyCalls =
+        rg.getImportPolicies().stream().map(CallExpr::new).collect(ImmutableList.toImmutableList());
+
+    String policyName = generateRibGroupImportPolicyName(rg, protocol);
+    RoutingPolicy.builder()
+        .setOwner(c)
+        .setName(policyName)
+        .setStatements(
+            ImmutableList.of(
+                // Add default policy
+                new SetDefaultPolicy(DEFAULT_IMPORT_POLICIES.get(protocol)),
+                // Construct a policy chain based on defined import policies
+                new If(
+                    new DisjunctionChain(policyCalls),
+                    ImmutableList.of(Statements.ExitAccept.toStaticStatement()),
+                    ImmutableList.of(Statements.ExitReject.toStaticStatement()))))
+        .build();
+    return new org.batfish.datamodel.dataplane.rib.RibGroup(
+        rg.getName(), importRibs, policyName, exportRib);
+  }
+
+  private static String generateRibGroupImportPolicyName(RibGroup rg, RoutingProtocol protocol) {
+    return String.format("~RIB_GROUP_IMPORT_POLICY_%s_%s", rg.getName(), protocol);
+  }
+
+  @VisibleForTesting
+  @Nullable
+  static RibId toRibId(String hostname, String rib, @Nullable Warnings w) {
+    String[] parts = rib.split("\\.");
+    if (parts.length < 2 || parts.length > 3) {
+      throw new VendorConversionException(String.format("Invalid RIB identifier %s", rib));
+    }
+    String vrfName;
+    String addressFamily;
+    String ribNumber;
+    if (parts.length == 3) {
+      vrfName = parts[0];
+      addressFamily = parts[1];
+      ribNumber = parts[2];
+    } else { // length == 2
+      vrfName = Configuration.DEFAULT_VRF_NAME;
+      addressFamily = parts[0];
+      ribNumber = parts[1];
+    }
+
+    String ribName = addressFamily + "." + ribNumber;
+    // Normalize the common case into vendor-independent language
+    if (ribName.equals(RIB_IPV4_UNICAST)) {
+      ribName = RibId.DEFAULT_RIB_NAME;
+    }
+
+    // We only support IPv4 unicast
+    if (!addressFamily.equals("inet") && w != null) {
+      w.unimplemented(
+          String.format("Rib name conversion: %s address family is not supported", addressFamily));
+      return null;
+    }
+    return new RibId(hostname, vrfName, ribName);
+  }
+
   private RoutingPolicy toRoutingPolicy(FirewallFilter filter) {
     String name = filter.getName();
     RoutingPolicy routingPolicy = new RoutingPolicy(name, _c);
@@ -2467,15 +2589,14 @@ public final class JuniperConfiguration extends VendorConfiguration {
       }
 
       // static routes
-      for (StaticRoute route :
-          ri.getRibs().get(RoutingInformationBase.RIB_IPV4_UNICAST).getStaticRoutes().values()) {
+      for (StaticRoute route : ri.getRibs().get(RIB_IPV4_UNICAST).getStaticRoutes().values()) {
         org.batfish.datamodel.StaticRoute newStaticRoute = toStaticRoute(route);
         vrf.getStaticRoutes().add(newStaticRoute);
       }
 
       // aggregate routes
       for (AggregateRoute route :
-          ri.getRibs().get(RoutingInformationBase.RIB_IPV4_UNICAST).getAggregateRoutes().values()) {
+          ri.getRibs().get(RIB_IPV4_UNICAST).getAggregateRoutes().values()) {
         route.inheritUnsetFields(ri.getAggregateRouteDefaults());
         org.batfish.datamodel.GeneratedRoute newAggregateRoute = toAggregateRoute(route);
         vrf.getGeneratedRoutes().add(newAggregateRoute);
@@ -2483,11 +2604,30 @@ public final class JuniperConfiguration extends VendorConfiguration {
 
       // generated routes
       for (GeneratedRoute route :
-          ri.getRibs().get(RoutingInformationBase.RIB_IPV4_UNICAST).getGeneratedRoutes().values()) {
+          ri.getRibs().get(RIB_IPV4_UNICAST).getGeneratedRoutes().values()) {
         route.inheritUnsetFields(ri.getGeneratedRouteDefaults());
         org.batfish.datamodel.GeneratedRoute newGeneratedRoute = toGeneratedRoute(route);
         vrf.getGeneratedRoutes().add(newGeneratedRoute);
       }
+
+      /*
+       * RIB groups applied to each protocol.
+       *
+       * 1. ensure default import policies exist
+       * 2. convert VS rib groups to VI rib groups on a per-protocol basis
+       */
+      initDefaultImportPolicies();
+      vrf.setAppliedRibGroups(
+          ri.getAppliedRibGroups().entrySet().stream()
+              .collect(
+                  ImmutableMap.toImmutableMap(
+                      Entry::getKey, // protocol
+                      rgEntry ->
+                          toRibGroup(
+                              _masterLogicalSystem.getRibGroups().get(rgEntry.getValue()),
+                              rgEntry.getKey(),
+                              _c,
+                              _w))));
 
       // create ospf process
       if (ri.getOspfAreas().size() > 0) {
@@ -2639,6 +2779,12 @@ public final class JuniperConfiguration extends VendorConfiguration {
     _c.computeRoutingPolicySources(_w);
 
     return _c;
+  }
+
+  /** Initialize default protocol-specific import policies */
+  private void initDefaultImportPolicies() {
+    initDefaultBgpImportPolicy();
+    initDefaultPseudoProtocolImportPolicy();
   }
 
   private void convertInterfaces() {

@@ -1,0 +1,9 @@
+set system host-name juniper_rib_groups
+#
+set routing-options interface-routes rib-group inet interface-routes-rib
+set routing-options interface-routes rib-group inet6 interface-routes-rib
+set routing-options rib-groups interface-routes-rib import-rib inet.0 
+set routing-options rib-groups interface-routes-rib import-rib VRF2.inet.0
+set routing-options rib-groups interface-routes-rib import-policy RIB_IN
+set routing-options rib-groups interface-routes-rib import-policy RIB_IN2
+set routing-options rib-groups interface-routes-rib export-rib RIB_OUT.inet.14

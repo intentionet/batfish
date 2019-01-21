@@ -1,6 +1,7 @@
 package org.batfish.representation.juniper;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
@@ -81,6 +82,8 @@ public class LogicalSystem implements Serializable {
 
   private final Map<String, PrefixList> _prefixLists;
 
+  @Nonnull private final Map<String, RibGroup> _ribGroups;
+
   private final Map<String, RouteFilter> _routeFilters;
 
   private final Map<String, RoutingInstance> _routingInstances;
@@ -121,6 +124,7 @@ public class LogicalSystem implements Serializable {
     _ntpServers = new TreeSet<>();
     _prefixLists = new TreeMap<>();
     _policyStatements = new TreeMap<>();
+    _ribGroups = new HashMap<>();
     _routeFilters = new TreeMap<>();
     _routingInstances = new TreeMap<>();
     _routingInstances.put(Configuration.DEFAULT_VRF_NAME, _defaultRoutingInstance);
@@ -308,6 +312,11 @@ public class LogicalSystem implements Serializable {
 
   public Map<String, PrefixList> getPrefixLists() {
     return _prefixLists;
+  }
+
+  @Nonnull
+  public Map<String, RibGroup> getRibGroups() {
+    return _ribGroups;
   }
 
   public Map<String, RouteFilter> getRouteFilters() {

@@ -480,11 +480,7 @@ roi_family
 
 roi_rib_group
 :
-   RIB_GROUP
-   (
-      roir_inet
-      | roir_null
-   )
+   RIB_GROUP (INET | INET6) name = variable
 ;
 
 roif_inet
@@ -517,16 +513,6 @@ roifie_lan
 roifie_point_to_point
 :
    POINT_TO_POINT
-;
-
-roir_inet
-:
-   INET name = variable
-;
-
-roir_null
-:
-   INET6 null_filler
 ;
 
 ror_export_rib

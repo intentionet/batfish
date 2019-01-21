@@ -596,6 +596,13 @@
         "Comment" : "This feature is not currently supported"
       },
       {
+        "Filename" : "juniper_rib_groups",
+        "Line" : 4,
+        "Text" : "rib-group inet6 interface-routes-rib",
+        "Parser_Context" : "[roi_rib_group ro_interface_routes s_routing_options s_common statement set_line_tail set_line flat_juniper_configuration]",
+        "Comment" : "This feature is not currently supported"
+      },
+      {
         "Filename" : "juniper_routing_options",
         "Line" : 10,
         "Text" : "confederation 11111 members 22222",
@@ -625,10 +632,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 83 results",
+      "notes" : "Found 84 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 83
+      "numResults" : 84
     }
   }
 ]

@@ -3,6 +3,7 @@ package org.batfish.representation.juniper;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.SnmpServer;
 
 public class RoutingInstance implements Serializable {
@@ -28,6 +30,8 @@ public class RoutingInstance implements Serializable {
   @Nullable private Long _as;
 
   private AggregateRoute _aggregateRouteDefaults;
+
+  @Nonnull private Map<RoutingProtocol, String> _appliedRibGroups;
 
   private final SortedMap<String, DhcpRelayGroup> _dhcpRelayGroups;
 
@@ -83,6 +87,7 @@ public class RoutingInstance implements Serializable {
 
   public RoutingInstance(String name) {
     _aggregateRouteDefaults = initAggregateRouteDefaults();
+    _appliedRibGroups = new HashMap<>();
     _confederationMembers = new TreeSet<>();
     _dhcpRelayGroups = new TreeMap<>();
     _dhcpRelayServerGroups = new TreeMap<>();
@@ -126,6 +131,15 @@ public class RoutingInstance implements Serializable {
   @Nullable
   public Long getAs() {
     return _as;
+  }
+
+  @Nonnull
+  public Map<RoutingProtocol, String> getAppliedRibGroups() {
+    return _appliedRibGroups;
+  }
+
+  public void applyRibGroup(RoutingProtocol protocol, String ribGroupName) {
+    _appliedRibGroups.put(protocol, ribGroupName);
   }
 
   public SortedMap<String, DhcpRelayGroup> getDhcpRelayGroups() {

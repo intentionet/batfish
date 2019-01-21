@@ -6,17 +6,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
 import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
+import org.batfish.datamodel.dataplane.rib.RibGroup;
 import org.batfish.datamodel.eigrp.EigrpProcess;
 import org.batfish.datamodel.isis.IsisProcess;
 import org.batfish.datamodel.ospf.OspfProcess;
@@ -73,10 +76,11 @@ public class Vrf extends ComparableStructure<String> {
 
   private static final String PROP_VNI_SETTINGS = "vniSettings";
 
-  /** */
   private static final long serialVersionUID = 1L;
 
   private static final String PROP_STATIC_ROUTES = "staticRoutes";
+
+  private SortedMap<RoutingProtocol, RibGroup> _appliedRibGroups;
 
   private transient NavigableSet<BgpAdvertisement> _bgpAdvertisements;
 
@@ -129,12 +133,18 @@ public class Vrf extends ComparableStructure<String> {
   @JsonCreator
   public Vrf(@JsonProperty(PROP_NAME) String name) {
     super(name);
+    _appliedRibGroups = ImmutableSortedMap.of();
     _eigrpProcesses = new TreeMap<>();
     _generatedRoutes = new TreeSet<>();
     _generatedIpv6Routes = new TreeSet<>();
     _interfaces = new TreeMap<>();
     _staticRoutes = new TreeSet<>();
     _vniSettings = new TreeMap<>();
+  }
+
+  /** Return any RIB groups applied to a given routing protocol */
+  public Map<RoutingProtocol, RibGroup> getAppliedRibGroups() {
+    return _appliedRibGroups;
   }
 
   @JsonIgnore
@@ -291,6 +301,10 @@ public class Vrf extends ComparableStructure<String> {
         _interfaces.put(ifaceName, owner.getAllInterfaces().get(ifaceName));
       }
     }
+  }
+
+  public void setAppliedRibGroups(Map<RoutingProtocol, RibGroup> appliedRibGroups) {
+    _appliedRibGroups = ImmutableSortedMap.copyOf(appliedRibGroups);
   }
 
   @JsonProperty(PROP_BGP_PROCESS)

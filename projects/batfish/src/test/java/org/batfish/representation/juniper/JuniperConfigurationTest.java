@@ -1,6 +1,7 @@
 package org.batfish.representation.juniper;
 
 import static org.batfish.common.Warnings.TAG_PEDANTIC;
+import static org.batfish.common.Warnings.TAG_UNIMPLEMENTED;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchSrcInterface;
 import static org.batfish.datamodel.matchers.AndMatchExprMatchers.hasConjuncts;
 import static org.batfish.datamodel.matchers.AndMatchExprMatchers.isAndMatchExprThat;
@@ -12,6 +13,7 @@ import static org.batfish.datamodel.matchers.MatchHeaderSpaceMatchers.isMatchHea
 import static org.batfish.representation.juniper.JuniperConfiguration.DEFAULT_ISIS_COST;
 import static org.batfish.representation.juniper.JuniperConfiguration.MAX_ISIS_COST_WITHOUT_WIDE_METRICS;
 import static org.batfish.representation.juniper.JuniperConfiguration.buildScreen;
+import static org.batfish.representation.juniper.JuniperConfiguration.toRibId;
 import static org.batfish.representation.juniper.NatPacketLocation.interfaceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.routingInstanceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.zoneLocation;
@@ -49,6 +51,7 @@ import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.acl.MatchSrcInterface;
 import org.batfish.datamodel.acl.OrMatchExpr;
 import org.batfish.datamodel.acl.PermittedByAcl;
+import org.batfish.datamodel.dataplane.rib.RibId;
 import org.junit.Test;
 
 public class JuniperConfigurationTest {
@@ -436,5 +439,31 @@ public class JuniperConfigurationTest {
                         IpAccessListLine.accepting(new PermittedByAcl("~SCREEN_ZONE~zone"))))
                 .build()));
     assertThat(config._c.getIpAccessLists().get("~SCREEN_ZONE~zone"), notNullValue());
+  }
+
+  @Test
+  public void testToRibId() {
+    String hostname = "host";
+    assertThat(
+        toRibId(hostname, "inet.0", null),
+        equalTo(new RibId(hostname, Configuration.DEFAULT_VRF_NAME, RibId.DEFAULT_RIB_NAME)));
+    assertThat(
+        toRibId(hostname, "inet.1", null),
+        equalTo(new RibId(hostname, Configuration.DEFAULT_VRF_NAME, "inet.1")));
+    assertThat(
+        toRibId(hostname, "VRF1.inet.0", null),
+        equalTo(new RibId(hostname, "VRF1", RibId.DEFAULT_RIB_NAME)));
+    assertThat(
+        toRibId(hostname, "VRF1.inet.1", null), equalTo(new RibId(hostname, "VRF1", "inet.1")));
+
+    Warnings w = new Warnings(true, true, true);
+    assertThat(toRibId(hostname, "inet6.0", w), nullValue());
+    assertThat(
+        w.getUnimplementedWarnings(),
+        equalTo(
+            ImmutableList.of(
+                new Warning(
+                    "Rib name conversion: inet6 address family is not supported",
+                    TAG_UNIMPLEMENTED))));
   }
 }
