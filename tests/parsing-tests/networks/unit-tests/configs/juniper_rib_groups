@@ -7,3 +7,19 @@ set routing-options rib-groups interface-routes-rib import-rib VRF2.inet.0
 set routing-options rib-groups interface-routes-rib import-policy RIB_IN
 set routing-options rib-groups interface-routes-rib import-policy RIB_IN2
 set routing-options rib-groups interface-routes-rib export-rib RIB_OUT.inet.14
+#
+set routing-options rib-groups bgp-rib-group import-rib inet.0 
+set routing-options rib-groups bgp-rib-group import-rib VRF2.inet.0
+#
+set protocols bgp family inet unicast rib-group bgp-rib-group
+set protocols bgp group BGP_GROUP family inet unicast rib-group bgp-rib-group
+set protocols bgp group BGP_GROUP neighbor 1.1.1.1 family inet unicast rib-group bgp-rib-group
+set logical-systems LOGICALSYSTEM protocols bgp family inet unicast rib-group bgp-rib-group
+set logical-systems LOGICALSYSTEM protocols bgp group BGP_GROUP family inet unicast rib-group bgp-rib-group
+set logical-systems LOGICALSYSTEM protocols bgp group BGP_GROUP neighbor 1.1.1.1 family inet unicast rib-group bgp-rib-group
+set logical-systems LOGICALSYSTEM routing-instances ROUTING_INSTANCE_NAME protocols bgp family inet unicast rib-group bgp-rib-group
+set logical-systems LOGICALSYSTEM routing-instances ROUTING_INSTANCE_NAME protocols bgp group BGP_GROUP family inet unicast rib-group bgp-rib-group
+set logical-systems LOGICALSYSTEM routing-instances ROUTING_INSTANCE_NAME protocols bgp group BGP_GROUP neighbor 1.1.1.1 family inet unicast rib-group bgp-rib-group
+set routing-instances ROUTING_INSTANCE_NAME protocols bgp family inet unicast rib-group bgp-rib-group
+set routing-instances ROUTING_INSTANCE_NAME protocols bgp group BGP_GROUP family inet unicast rib-group bgp-rib-group
+set routing-instances ROUTING_INSTANCE_NAME protocols bgp group BGP_GROUP neighbor 1.1.1.1 family inet unicast rib-group bgp-rib-group

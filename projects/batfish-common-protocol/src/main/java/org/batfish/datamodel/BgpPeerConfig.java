@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.batfish.datamodel.dataplane.rib.RibGroup;
 
 /** Represents a configured BGP peering, at the control plane level */
 @JsonSchemaDescription("A configured e/iBGP peering relationship")
@@ -34,6 +35,8 @@ public abstract class BgpPeerConfig implements Serializable {
   static final String PROP_ALLOW_LOCAL_AS_IN = "allowLocalAsIn";
 
   static final String PROP_ALLOW_REMOTE_AS_OUT = "allowRemoteAsOut";
+
+  static final String PROP_APPLIED_RIB_GROUP = "appliedRibGroup";
 
   static final String PROP_AUTHENTICATION_SETTINGS = "authenticationSettings";
 
@@ -84,6 +87,8 @@ public abstract class BgpPeerConfig implements Serializable {
   private final boolean _allowLocalAsIn;
 
   private final boolean _allowRemoteAsOut;
+
+  @Nullable private final RibGroup _appliedRibGroup;
 
   @Nullable private final BgpAuthenticationSettings _authenticationSettings;
 
@@ -144,6 +149,7 @@ public abstract class BgpPeerConfig implements Serializable {
       @JsonProperty(PROP_ADVERTISE_INACTIVE) boolean advertiseInactive,
       @JsonProperty(PROP_ALLOW_LOCAL_AS_IN) boolean allowLocalAsIn,
       @JsonProperty(PROP_ALLOW_REMOTE_AS_OUT) boolean allowRemoteAsOut,
+      @JsonProperty(PROP_APPLIED_RIB_GROUP) @Nullable RibGroup appliedRibGroup,
       @JsonProperty(PROP_AUTHENTICATION_SETTINGS) @Nullable
           BgpAuthenticationSettings authenticationSettings,
       @JsonProperty(PROP_CLUSTER_ID) @Nullable Long clusterId,
@@ -168,6 +174,7 @@ public abstract class BgpPeerConfig implements Serializable {
     _advertiseInactive = advertiseInactive;
     _allowLocalAsIn = allowLocalAsIn;
     _allowRemoteAsOut = allowRemoteAsOut;
+    _appliedRibGroup = appliedRibGroup;
     _authenticationSettings = authenticationSettings;
     _clusterId = clusterId;
     _defaultMetric = defaultMetric;
@@ -229,6 +236,12 @@ public abstract class BgpPeerConfig implements Serializable {
       "Whether to allow sending of advertisements containing the remote AS number in the AS-path")
   public boolean getAllowRemoteAsOut() {
     return _allowRemoteAsOut;
+  }
+
+  /** Return the {@link RibGroup} applied to this config */
+  @Nullable
+  public RibGroup getAppliedRibGroup() {
+    return _appliedRibGroup;
   }
 
   @Nullable
@@ -420,6 +433,7 @@ public abstract class BgpPeerConfig implements Serializable {
     protected boolean _advertiseInactive;
     protected boolean _allowLocalAsIn;
     protected boolean _allowRemoteAsOut;
+    @Nullable protected RibGroup _appliedRibGroup;
     @Nullable protected BgpAuthenticationSettings _authenticationSettings;
     @Nullable protected BgpProcess _bgpProcess;
     protected Long _clusterId;
@@ -479,6 +493,11 @@ public abstract class BgpPeerConfig implements Serializable {
 
     public S setAllowRemoteAsOut(boolean allowRemoteAsOut) {
       _allowRemoteAsOut = allowRemoteAsOut;
+      return getThis();
+    }
+
+    public S setAppliedRibGroup(@Nullable RibGroup ribGroup) {
+      _appliedRibGroup = ribGroup;
       return getThis();
     }
 

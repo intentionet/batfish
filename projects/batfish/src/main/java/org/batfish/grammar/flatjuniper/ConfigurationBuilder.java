@@ -36,6 +36,7 @@ import static org.batfish.representation.juniper.JuniperStructureUsage.AS_PATH_G
 import static org.batfish.representation.juniper.JuniperStructureUsage.AUTHENTICATION_KEY_CHAINS_POLICY;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_ALLOW;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_EXPORT_POLICY;
+import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_FAMILY_INET_UNICAST;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_IMPORT_POLICY;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_NEIGHBOR;
 import static org.batfish.representation.juniper.JuniperStructureUsage.DHCP_RELAY_GROUP_ACTIVE_SERVER_GROUP;
@@ -179,6 +180,7 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_remove_privateContext
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.B_typeContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.BandwidthContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Bfiu_loopsContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Bfiu_rib_groupContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Bgp_asnContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Bl_loopsContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Bl_numberContext;
@@ -3585,6 +3587,14 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   @Override
   public void exitBfiu_loops(Bfiu_loopsContext ctx) {
     _currentBgpGroup.setLoops(toInt(ctx.DEC()));
+  }
+
+  @Override
+  public void enterBfiu_rib_group(Bfiu_rib_groupContext ctx) {
+    String groupName = unquote(ctx.name.getText());
+    _configuration.referenceStructure(
+        RIB_GROUP, groupName, BGP_FAMILY_INET_UNICAST, ctx.name.getStart().getLine());
+    _currentBgpGroup.setRibGroup(groupName);
   }
 
   @Override

@@ -442,6 +442,17 @@ public final class JuniperConfiguration extends VendorConfiguration {
           .getFalseStatements()
           .add(Statements.ExitReject.toStaticStatement());
 
+      // Apply rib groups
+      if (ig.getRibGroup() != null) {
+        neighbor.setAppliedRibGroup(
+            toRibGroup(
+                _masterLogicalSystem.getRibGroups().get(ig.getRibGroup()),
+                ig.getType() == BgpGroupType.INTERNAL ? RoutingProtocol.IBGP : RoutingProtocol.BGP,
+                _c,
+                routingInstance.getName(),
+                _w));
+      }
+
       // export policies
       String peerExportPolicyName = computePeerExportPolicyName(ig.getRemoteAddress());
       neighbor.setExportPolicy(peerExportPolicyName);

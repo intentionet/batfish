@@ -1,0 +1,25 @@
+set system host-name juniper-bgp-rib-group
+# define rib group 1
+set routing-options rib-groups RIB_GROUP_1 import-rib inet.0
+set routing-options rib-groups RIB_GROUP_1 import-rib VRF2.inet.0
+# define rib group 2
+set routing-options rib-groups RIB_GROUP_2 import-rib inet.0
+set routing-options rib-groups RIB_GROUP_2 import-rib VRF3.inet.0
+#
+set interfaces ge-0/0/0 unit 0 family inet address 1.1.1.2/31
+set interfaces ge-0/0/1 unit 0 family inet address 1.1.1.4/31
+# bgp config
+set routing-options autonomous-system 1
+set routing-options router-id 1.1.1.1
+#
+set protocols bgp group EBGP-GROUP type external
+set protocols bgp group EBGP-GROUP peer-as 2
+set protocols bgp group EBGP-GROUP family inet unicast rib-group RIB_GROUP_1
+#
+# this neighbor should inherit the rib group from the group
+set protocols bgp group EBGP-GROUP neighbor 1.1.1.3
+# this neighbor has different rib group applied
+set protocols bgp group EBGP-GROUP neighbor 1.1.1.5
+set protocols bgp group EBGP-GROUP neighbor 1.1.1.5 family inet unicast rib-group RIB_GROUP_2
+#
+

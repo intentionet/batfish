@@ -65,6 +65,8 @@ public class BgpGroup implements Serializable {
 
   private Boolean _removePrivate;
 
+  @Nullable private String _ribGroup;
+
   private BgpGroupType _type;
 
   public BgpGroup() {
@@ -135,6 +137,9 @@ public class BgpGroup implements Serializable {
       }
       if (_peerAs == null) {
         _peerAs = _parent._peerAs;
+      }
+      if (_ribGroup == null) {
+        _ribGroup = _parent._ribGroup;
       }
       if (_type == null) {
         _type = _parent._type;
@@ -234,6 +239,11 @@ public class BgpGroup implements Serializable {
     return _removePrivate;
   }
 
+  @Nullable
+  public String getRibGroup() {
+    return _ribGroup;
+  }
+
   public final BgpGroupType getType() {
     return _type;
   }
@@ -316,6 +326,10 @@ public class BgpGroup implements Serializable {
 
   public void setRemovePrivate(boolean removePrivate) {
     _removePrivate = removePrivate;
+  }
+
+  public void setRibGroup(@Nullable String ribGroup) {
+    _ribGroup = ribGroup;
   }
 
   public final void setType(BgpGroupType type) {

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.batfish.datamodel.dataplane.rib.RibGroup;
 
 /**
  * Represents a passive BGP config, which allows peering with multiple remote peers, but cannot
@@ -40,6 +41,7 @@ public final class BgpPassivePeerConfig extends BgpPeerConfig {
       @JsonProperty(PROP_ADVERTISE_INACTIVE) boolean advertiseInactive,
       @JsonProperty(PROP_ALLOW_LOCAL_AS_IN) boolean allowLocalAsIn,
       @JsonProperty(PROP_ALLOW_REMOTE_AS_OUT) boolean allowRemoteAsOut,
+      @JsonProperty(PROP_APPLIED_RIB_GROUP) @Nullable RibGroup appliedRibGroup,
       @JsonProperty(PROP_AUTHENTICATION_SETTINGS) @Nullable
           BgpAuthenticationSettings authenticationSettings,
       @JsonProperty(PROP_CLUSTER_ID) @Nullable Long clusterId,
@@ -67,6 +69,7 @@ public final class BgpPassivePeerConfig extends BgpPeerConfig {
         advertiseInactive,
         allowLocalAsIn,
         allowRemoteAsOut,
+        appliedRibGroup,
         authenticationSettings,
         clusterId,
         defaultMetric,
@@ -149,6 +152,7 @@ public final class BgpPassivePeerConfig extends BgpPeerConfig {
               _advertiseInactive,
               _allowLocalAsIn,
               _allowRemoteAsOut,
+              _appliedRibGroup,
               _authenticationSettings,
               _clusterId,
               _defaultMetric,

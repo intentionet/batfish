@@ -4293,4 +4293,28 @@ public final class FlatJuniperGrammarTest {
             new ConnectedRoute(Prefix.parse("2.2.2.8/31"), "ge-0/0/3.0"),
             new LocalRoute(new InterfaceAddress("2.2.2.8/31"), "ge-0/0/3.0")));
   }
+
+  @Test
+  public void testBgpRibGroup() throws IOException {
+    String hostname = "juniper-bgp-rib-group";
+    Configuration c = parseConfig(hostname);
+    BatfishTestUtils.getBatfish(ImmutableSortedMap.of(hostname, c), _folder);
+
+    assertThat(
+        c.getDefaultVrf()
+            .getBgpProcess()
+            .getActiveNeighbors()
+            .get(Prefix.parse("1.1.1.3/32"))
+            .getAppliedRibGroup()
+            .getName(),
+        equalTo("RIB_GROUP_1"));
+    assertThat(
+        c.getDefaultVrf()
+            .getBgpProcess()
+            .getActiveNeighbors()
+            .get(Prefix.parse("1.1.1.5/32"))
+            .getAppliedRibGroup()
+            .getName(),
+        equalTo("RIB_GROUP_2"));
+  }
 }
