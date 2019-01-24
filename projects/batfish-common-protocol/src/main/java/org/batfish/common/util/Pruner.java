@@ -7,8 +7,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -73,12 +73,12 @@ public class Pruner<T> {
     _propertyExtractors = ImmutableList.copyOf(propertyExtractors);
   }
 
-  public Collection<T> prune(List<T> objects, int maxSize) {
+  public List<T> prune(List<T> objects, int maxSize) {
     if (objects.size() <= maxSize) {
       return objects;
     }
 
-    Set<T> selectedObjects = new HashSet<>();
+    LinkedHashSet<T> selectedObjects = new LinkedHashSet<>();
     List<Property<T, ?>> properties =
         _propertyExtractors.stream()
             .map(propertyExtractor -> new Property<>(propertyExtractor, objects))
@@ -106,7 +106,7 @@ public class Pruner<T> {
               .limit(maxSize - selectedObjects.size())
               .collect(Collectors.toList()));
     }
-    return selectedObjects;
+    return ImmutableList.copyOf(selectedObjects);
   }
 
   /** @param <T> The type of objects being pruned. */
