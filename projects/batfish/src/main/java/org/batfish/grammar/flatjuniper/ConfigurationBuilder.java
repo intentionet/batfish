@@ -36,7 +36,7 @@ import static org.batfish.representation.juniper.JuniperStructureUsage.AS_PATH_G
 import static org.batfish.representation.juniper.JuniperStructureUsage.AUTHENTICATION_KEY_CHAINS_POLICY;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_ALLOW;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_EXPORT_POLICY;
-import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_FAMILY_INET_UNICAST;
+import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_FAMILY_INET_UNICAST_RIB_GROUP;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_IMPORT_POLICY;
 import static org.batfish.representation.juniper.JuniperStructureUsage.BGP_NEIGHBOR;
 import static org.batfish.representation.juniper.JuniperStructureUsage.DHCP_RELAY_GROUP_ACTIVE_SERVER_GROUP;
@@ -3593,7 +3593,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   public void enterBfiu_rib_group(Bfiu_rib_groupContext ctx) {
     String groupName = unquote(ctx.name.getText());
     _configuration.referenceStructure(
-        RIB_GROUP, groupName, BGP_FAMILY_INET_UNICAST, ctx.name.getStart().getLine());
+        RIB_GROUP, groupName, BGP_FAMILY_INET_UNICAST_RIB_GROUP, ctx.name.getStart().getLine());
     _currentBgpGroup.setRibGroup(groupName);
   }
 

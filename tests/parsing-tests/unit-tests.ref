@@ -72283,7 +72283,7 @@
           },
           "rib-group" : {
             "bgp-rib-group" : {
-              "bgp family inet unicast" : [
+              "bgp family inet unicast rib-group" : [
                 14,
                 15,
                 16,
