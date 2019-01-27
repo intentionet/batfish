@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.batfish.common.util.CommonUtil.toImmutableSortedMap;
 import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PATH;
+import static org.batfish.datamodel.routing_policy.Environment.Direction.IN;
 import static org.batfish.dataplane.protocols.IsisProtocolHelper.convertRouteLevel1ToLevel2;
 import static org.batfish.dataplane.protocols.IsisProtocolHelper.setOverloadOnAllRoutes;
 import static org.batfish.dataplane.protocols.StaticRouteHelper.isInterfaceRoute;
@@ -18,10 +19,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import com.google.common.graph.Network;
 import com.google.common.graph.ValueGraph;
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -150,6 +153,13 @@ public class VirtualRouter implements Serializable {
   /** The RIB containing connected routes */
   private transient ConnectedRib _connectedRib;
 
+  /**
+   * Queues containing routes that are coming in from other VRFs (as a result of explicitly
+   * configured leaking or applied RIB groups.
+   */
+  private transient SortedMap<CrossVrfEdgeId, Queue<RouteAdvertisement<AbstractRoute>>>
+      _crossVrfIncomingRoutes;
+
   /** Helper RIB containing all paths obtained with external BGP */
   transient BgpRib _ebgpRib;
 
@@ -261,6 +271,18 @@ public class VirtualRouter implements Serializable {
     _virtualEigrpProcesses = ImmutableMap.of();
   }
 
+  private void initCrossVrfQueues() {
+    // TODO: also handle non-default RIBs
+    _crossVrfIncomingRoutes =
+        _node.getVirtualRouters().keySet().stream()
+            .filter(n -> !_name.equals(n))
+            .collect(
+                ImmutableSortedMap.toImmutableSortedMap(
+                    Ordering.natural(),
+                    vrfName -> new CrossVrfEdgeId(vrfName, RibId.DEFAULT_RIB_NAME),
+                    v -> new ConcurrentLinkedQueue<>()));
+  }
+
   /**
    * Convert a given RibDelta into {@link RouteAdvertisement} objects and enqueue them onto a given
    * queue.
@@ -328,7 +350,7 @@ public class VirtualRouter implements Serializable {
         .map(
             route -> {
               AbstractRouteBuilder<?, ?> builder = route.toBuilder();
-              boolean accept = policy.process(route, builder, null, _name, Direction.IN);
+              boolean accept = policy.process(route, builder, null, _name, IN);
               return accept ? builder.build() : null;
             })
         .filter(Objects::nonNull)
@@ -386,6 +408,8 @@ public class VirtualRouter implements Serializable {
     initEigrpQueues(eigrpTopology);
 
     initIsisQueues(isisTopology);
+
+    initCrossVrfQueues();
 
     // Initialize message queues for each Ospf neighbor
     if (_vrf.getOspfProcess() == null) {
@@ -827,7 +851,7 @@ public class VirtualRouter implements Serializable {
                     transformedIncomingRouteBuilder,
                     advert.getSrcIp(),
                     _name,
-                    Direction.IN);
+                    IN);
           }
         }
         if (acceptIncoming) {
@@ -1305,11 +1329,14 @@ public class VirtualRouter implements Serializable {
    * Process BGP messages from neighbors, return a list of delta changes to the RIBs
    *
    * @param bgpTopology the bgp peering relationships
+   * @param nodes
    * @return Map from a {@link BgpRib} to {@link RibDelta} objects
    */
   @Nonnull
   Map<BgpRib, RibDelta<BgpRoute>> processBgpMessages(
-      ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology, NetworkConfigurations nc) {
+      ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology,
+      NetworkConfigurations nc,
+      Map<String, Node> nodes) {
 
     // If we have no BGP process, nothing to do
     if (_vrf.getBgpProcess() == null) {
@@ -1336,6 +1363,7 @@ public class VirtualRouter implements Serializable {
       BgpPeerConfig remoteBgpConfig = requireNonNull(nc.getBgpPeerConfig(e.getKey().src()));
 
       BgpRib targetRib = sessionProperties.isEbgp() ? _ebgpStagingRib : _ibgpStagingRib;
+      Builder<AbstractRoute> perNeighborDelta = RibDelta.builder();
 
       // Process all routes from neighbor
       while (queue.peek() != null) {
@@ -1364,7 +1392,7 @@ public class VirtualRouter implements Serializable {
                     remoteBgpConfig.getLocalIp(),
                     ourConfigId.getRemotePeerPrefix(),
                     _name,
-                    Direction.IN);
+                    IN);
           }
         }
         if (!acceptIncoming) {
@@ -1375,7 +1403,7 @@ public class VirtualRouter implements Serializable {
               remoteBgpConfig.getLocalIp(),
               remoteConfigId.getVrfName(),
               importPolicyName,
-              Direction.IN);
+              IN);
           continue;
         }
         BgpRoute transformedIncomingRoute = transformedIncomingRouteBuilder.build();
@@ -1383,10 +1411,12 @@ public class VirtualRouter implements Serializable {
         if (remoteRouteAdvert.isWithdrawn()) {
           // Note this route was removed
           ribDeltas.get(targetRib).remove(transformedIncomingRoute, Reason.WITHDRAW);
+          perNeighborDelta.remove(transformedIncomingRoute, Reason.WITHDRAW);
           _bgpRib.removeBackupRoute(transformedIncomingRoute);
         } else {
           // Merge into staging rib, note delta
           ribDeltas.get(targetRib).from(targetRib.mergeRouteGetDelta(transformedIncomingRoute));
+          perNeighborDelta.add(transformedIncomingRoute);
           _bgpRib.addBackupRoute(transformedIncomingRoute);
           _prefixTracer.installed(
               transformedIncomingRoute.getNetwork(),
@@ -1395,6 +1425,21 @@ public class VirtualRouter implements Serializable {
               remoteConfigId.getVrfName(),
               importPolicyName);
         }
+      }
+      // Apply rib groups if any
+      RibGroup rg = ourBgpConfig.getAppliedRibGroup();
+      if (rg != null) {
+        rg.getImportRibs()
+            .forEach(
+                rib ->
+                    nodes
+                        .get(_c.getHostname())
+                        .getVirtualRouters()
+                        .get(rib.getVrfName())
+                        .enqueueCrossVrfRoutes(
+                            new CrossVrfEdgeId(_name, rib.getRibName()),
+                            perNeighborDelta.build().getActions(),
+                            rg.getImportPolicy()));
       }
     }
     // Return built deltas from RibDelta builders
@@ -2391,7 +2436,8 @@ public class VirtualRouter implements Serializable {
         && (_vrf.getOspfProcess() == null
             || _ospfExternalIncomingRoutes.values().stream().allMatch(Queue::isEmpty))
         && (_vrf.getIsisProcess() == null
-            || _isisIncomingRoutes.values().stream().allMatch(Queue::isEmpty));
+            || _isisIncomingRoutes.values().stream().allMatch(Queue::isEmpty))
+        && _crossVrfIncomingRoutes.values().stream().allMatch(Queue::isEmpty);
   }
 
   /**
@@ -2639,6 +2685,10 @@ public class VirtualRouter implements Serializable {
             .sum()
         + _virtualEigrpProcesses.values().stream()
             .mapToInt(VirtualEigrpProcess::computeIterationHashCode)
+            .sum()
+        + _crossVrfIncomingRoutes.values().stream()
+            .flatMap(Queue::stream)
+            .mapToInt(RouteAdvertisement::hashCode)
             .sum();
   }
 
@@ -2722,10 +2772,51 @@ public class VirtualRouter implements Serializable {
     return transformedOutgoingRoute;
   }
 
-  public Optional<Rib> getRib(RibId id) {
+  Optional<Rib> getRib(RibId id) {
     if (!_name.equals(id.getVrfName())) {
       return Optional.empty();
     }
     return Optional.ofNullable(_mainRibs.get(id.getRibName()));
+  }
+
+  private void enqueueCrossVrfRoutes(
+      @Nonnull CrossVrfEdgeId from,
+      @Nonnull Collection<RouteAdvertisement<AbstractRoute>> routes,
+      @Nullable String policyName) {
+    checkState(_crossVrfIncomingRoutes.containsKey(from), "No queue allocated for VRF %s", from);
+
+    Collection<RouteAdvertisement<AbstractRoute>> filteredRoutes = routes;
+    if (policyName != null) {
+      RoutingPolicy policy = _c.getRoutingPolicies().get(policyName);
+      filteredRoutes =
+          routes.stream()
+              .map(
+                  ra -> {
+                    AbstractRouteBuilder routeBuilder = ra.getRoute().toBuilder();
+                    if (policy.process(ra.getRoute(), routeBuilder, null, _name, IN)) {
+                      return ra.toBuilder().setRoute(routeBuilder.build()).build();
+                    } else {
+                      return null;
+                    }
+                  })
+              .filter(Objects::nonNull)
+              .collect(ImmutableList.toImmutableList());
+    }
+    _crossVrfIncomingRoutes.get(from).addAll(filteredRoutes);
+  }
+
+  void processCrossVrfRoutes() {
+    _crossVrfIncomingRoutes.forEach(
+        (edgeId, queue) -> {
+          while (queue.peek() != null) {
+            RouteAdvertisement<AbstractRoute> ra = queue.remove();
+            // TODO: handle non-default main RIBs based on RIB specified in edgeID
+            if (ra.isWithdrawn()) {
+              _mainRibRouteDeltaBuilder.from(_mainRib.removeRouteGetDelta(ra.getRoute()));
+            } else {
+              _mainRibRouteDeltaBuilder.from(_mainRib.mergeRouteGetDelta(ra.getRoute()));
+            }
+          }
+        });
   }
 }
