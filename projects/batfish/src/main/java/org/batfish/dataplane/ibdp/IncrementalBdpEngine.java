@@ -463,6 +463,8 @@ class IncrementalBdpEngine {
 
       computeIterationOfBgpRoutes(
           nodes, iterationLabel, allNodes, bgpTopology, networkConfigurations);
+
+      leakAcrossVrfs(nodes, iterationLabel);
     }
   }
 
@@ -497,11 +499,31 @@ class IncrementalBdpEngine {
               n -> {
                 for (VirtualRouter vr : n.getVirtualRouters().values()) {
                   Map<BgpRib, RibDelta<BgpRoute>> deltas =
-                      vr.processBgpMessages(bgpTopology, networkConfigurations);
+                      vr.processBgpMessages(bgpTopology, networkConfigurations, nodes);
                   vr.finalizeBgpRoutesAndQueueOutgoingMessages(
                       deltas, allNodes, bgpTopology, networkConfigurations);
                 }
                 propagateBgpCompleted.incrementAndGet();
+              });
+    }
+  }
+
+  private void leakAcrossVrfs(Map<String, Node> nodes, String iterationLabel) {
+    try (ActiveSpan span =
+        GlobalTracer.get()
+            .buildSpan(iterationLabel + ": Leaking routes across VRFs")
+            .startActive()) {
+      assert span != null; // avoid unused warning
+
+      AtomicInteger propagateCrossVRF =
+          _newBatch.apply(iterationLabel + ": Leaking roues across VRFs", nodes.size());
+      nodes
+          .values()
+          .parallelStream()
+          .forEach(
+              n -> {
+                n.getVirtualRouters().values().forEach(VirtualRouter::processCrossVrfRoutes);
+                propagateCrossVRF.incrementAndGet();
               });
     }
   }
