@@ -2792,7 +2792,7 @@ public class VirtualRouter implements Serializable {
           routes.stream()
               .map(
                   ra -> {
-                    AbstractRouteBuilder routeBuilder = ra.getRoute().toBuilder();
+                    AbstractRouteBuilder<?, ?> routeBuilder = ra.getRoute().toBuilder();
                     if (policy.process(ra.getRoute(), routeBuilder, null, _name, IN)) {
                       return ra.toBuilder().setRoute(routeBuilder.build()).build();
                     } else {
