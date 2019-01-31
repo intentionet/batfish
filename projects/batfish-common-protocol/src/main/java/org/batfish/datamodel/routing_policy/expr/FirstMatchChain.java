@@ -22,14 +22,15 @@ import org.batfish.datamodel.routing_policy.RoutingPolicy;
 
 /**
  * Juniper subroutine chain. Evaluates a route against a series of routing policies in order.
- * Returns a {@link Result} with a boolean value of true if at least one of the top-level policies
- * accepts the route.
+ * Returns a {@link Result} corresponding to the first policy that matches the route, with a boolean
+ * value of true if that policy accepts it or false if that policy rejects it. If none of the
+ * policies match the route, returns the result of evaluating the environment's default policy.
  *
  * <p>See more info on chains:
  * https://www.juniper.net/documentation/en_US/junos/topics/concept/policy-routing-policies-chain-evaluation-method.html
  */
 @ParametersAreNonnullByDefault
-public class DisjunctionChain extends BooleanExpr {
+public class FirstMatchChain extends BooleanExpr {
 
   private static final long serialVersionUID = 1L;
 
@@ -38,12 +39,12 @@ public class DisjunctionChain extends BooleanExpr {
   @Nonnull private List<BooleanExpr> _subroutines;
 
   @JsonCreator
-  private static DisjunctionChain create(
+  private static FirstMatchChain create(
       @Nullable @JsonProperty(PROP_SUBROUTINES) List<BooleanExpr> subroutines) {
-    return new DisjunctionChain(firstNonNull(subroutines, ImmutableList.of()));
+    return new FirstMatchChain(firstNonNull(subroutines, ImmutableList.of()));
   }
 
-  public DisjunctionChain(List<BooleanExpr> subroutines) {
+  public FirstMatchChain(List<BooleanExpr> subroutines) {
     _subroutines = ImmutableList.copyOf(subroutines);
   }
 
@@ -51,8 +52,8 @@ public class DisjunctionChain extends BooleanExpr {
   public Set<String> collectSources(
       Set<String> parentSources, Map<String, RoutingPolicy> routingPolicies, Warnings w) {
     ImmutableSet.Builder<String> childSources = ImmutableSet.builder();
-    for (BooleanExpr disjunct : _subroutines) {
-      childSources.addAll(disjunct.collectSources(parentSources, routingPolicies, w));
+    for (BooleanExpr policyMatcher : _subroutines) {
+      childSources.addAll(policyMatcher.collectSources(parentSources, routingPolicies, w));
     }
     return childSources.build();
   }
@@ -62,10 +63,10 @@ public class DisjunctionChain extends BooleanExpr {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof DisjunctionChain)) {
+    if (!(o instanceof FirstMatchChain)) {
       return false;
     }
-    DisjunctionChain that = (DisjunctionChain) o;
+    FirstMatchChain that = (FirstMatchChain) o;
     return Objects.equals(_subroutines, that._subroutines);
   }
 
@@ -84,9 +85,9 @@ public class DisjunctionChain extends BooleanExpr {
       if (subroutineResult.getExit()) {
         // Reached an exit/terminal action. Return regardless of boolean value
         return subroutineResult;
-      } else if (!subroutineResult.getFallThrough() && subroutineResult.getBooleanValue()) {
-        // Matched the route, first match that returns true lets us short-circuit
-        subroutineResult.setReturn(true);
+      } else if (!subroutineResult.getFallThrough()) {
+        // Found first match, short-circuit here
+        subroutineResult.setReturn(false);
         return subroutineResult;
       }
     }

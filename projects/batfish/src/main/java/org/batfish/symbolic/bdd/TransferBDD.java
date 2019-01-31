@@ -38,8 +38,8 @@ import org.batfish.datamodel.routing_policy.expr.ConjunctionChain;
 import org.batfish.datamodel.routing_policy.expr.DecrementLocalPreference;
 import org.batfish.datamodel.routing_policy.expr.DecrementMetric;
 import org.batfish.datamodel.routing_policy.expr.Disjunction;
-import org.batfish.datamodel.routing_policy.expr.DisjunctionChain;
 import org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet;
+import org.batfish.datamodel.routing_policy.expr.FirstMatchChain;
 import org.batfish.datamodel.routing_policy.expr.IncrementLocalPreference;
 import org.batfish.datamodel.routing_policy.expr.IncrementMetric;
 import org.batfish.datamodel.routing_policy.expr.IntExpr;
@@ -247,29 +247,29 @@ class TransferBDD {
       }
     }
 
-    if (expr instanceof DisjunctionChain) {
-      p.debug("DisjunctionChain");
-      DisjunctionChain d = (DisjunctionChain) expr;
-      List<BooleanExpr> disjuncts = new ArrayList<>(d.getSubroutines());
+    if (expr instanceof FirstMatchChain) {
+      p.debug("FirstMatchChain");
+      FirstMatchChain d = (FirstMatchChain) expr;
+      List<BooleanExpr> chainPolicies = new ArrayList<>(d.getSubroutines());
       if (p.getDefaultPolicy() != null) {
         BooleanExpr be = new CallExpr(p.getDefaultPolicy().getDefaultPolicy());
-        disjuncts.add(be);
+        chainPolicies.add(be);
       }
-      if (disjuncts.isEmpty()) {
+      if (chainPolicies.isEmpty()) {
         TransferReturn ret = new TransferReturn(p.getData(), factory.zero());
         return fromExpr(ret);
       } else {
         TransferResult<TransferReturn, BDD> result = new TransferResult<>();
         TransferParam<BDDRoute> record = p;
         BDD acc = factory.zero();
-        for (int i = disjuncts.size() - 1; i >= 0; i--) {
-          BooleanExpr disjunct = disjuncts.get(i);
+        for (int i = chainPolicies.size() - 1; i >= 0; i--) {
+          BooleanExpr policyMatcher = chainPolicies.get(i);
           TransferParam<BDDRoute> param =
               record
                   .setDefaultPolicy(null)
                   .setChainContext(TransferParam.ChainContext.CONJUNCTION)
                   .indent();
-          TransferResult<TransferReturn, BDD> r = compute(disjunct, param);
+          TransferResult<TransferReturn, BDD> r = compute(policyMatcher, param);
           record = record.setData(r.getReturnValue().getFirst());
           acc = ite(r.getFallthroughValue(), acc, r.getReturnValue().getSecond());
         }

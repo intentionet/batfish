@@ -15,17 +15,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** Tests of {@link DisjunctionChain} */
+/** Tests of {@link FirstMatchChain} */
 @RunWith(JUnit4.class)
-public class DisjunctionChainTest {
+public class FirstMatchChainTest {
 
   @Test
   public void testEquals() {
     new EqualsTester()
         .addEqualityGroup(new Object())
         .addEqualityGroup(
-            new DisjunctionChain(ImmutableList.of(BooleanExprs.TRUE)),
-            new DisjunctionChain(ImmutableList.of(BooleanExprs.TRUE)))
+            new FirstMatchChain(ImmutableList.of(BooleanExprs.TRUE)),
+            new FirstMatchChain(ImmutableList.of(BooleanExprs.TRUE)))
         .addEqualityGroup(ImmutableList.of())
         .addEqualityGroup(ImmutableList.of(BooleanExprs.FALSE))
         .testEquals();
@@ -33,23 +33,32 @@ public class DisjunctionChainTest {
 
   @Test
   public void testJavaSerialization() {
-    DisjunctionChain dc = new DisjunctionChain(ImmutableList.of(BooleanExprs.TRUE));
-    assertThat(SerializationUtils.clone(dc), equalTo(dc));
+    FirstMatchChain fmc = new FirstMatchChain(ImmutableList.of(BooleanExprs.TRUE));
+    assertThat(SerializationUtils.clone(fmc), equalTo(fmc));
   }
 
   @Test
   public void testJsonSerialization() throws IOException {
-    DisjunctionChain dc = new DisjunctionChain(ImmutableList.of(BooleanExprs.TRUE));
-    assertThat(BatfishObjectMapper.clone(dc, DisjunctionChain.class), equalTo(dc));
+    FirstMatchChain fmc = new FirstMatchChain(ImmutableList.of(BooleanExprs.TRUE));
+    assertThat(BatfishObjectMapper.clone(fmc, FirstMatchChain.class), equalTo(fmc));
   }
 
   @Test
   public void testEvaluate() {
-    DisjunctionChain dc =
-        new DisjunctionChain(ImmutableList.of(BooleanExprs.FALSE, BooleanExprs.TRUE));
-    // Test that OR is evaluated correctly
+    FirstMatchChain fmc =
+        new FirstMatchChain(ImmutableList.of(BooleanExprs.FALSE, BooleanExprs.TRUE));
+    // Test that first match is used
     assertThat(
-        dc.evaluate(
+        fmc.evaluate(
+                Environment.builder(new Configuration("host", ConfigurationFormat.JUNIPER))
+                    .setVrf(Configuration.DEFAULT_VRF_NAME)
+                    .build())
+            .getBooleanValue(),
+        equalTo(false));
+    fmc = new FirstMatchChain(ImmutableList.of(BooleanExprs.TRUE, BooleanExprs.FALSE));
+    // Test that first match is used
+    assertThat(
+        fmc.evaluate(
                 Environment.builder(new Configuration("host", ConfigurationFormat.JUNIPER))
                     .setVrf(Configuration.DEFAULT_VRF_NAME)
                     .build())
@@ -59,7 +68,7 @@ public class DisjunctionChainTest {
 
   @Test
   public void testToString() {
-    DisjunctionChain dc = new DisjunctionChain(ImmutableList.of(BooleanExprs.TRUE));
-    assertThat(dc.toString(), equalTo("DisjunctionChain{subroutines=[StaticBooleanExpr{}]}"));
+    FirstMatchChain fmc = new FirstMatchChain(ImmutableList.of(BooleanExprs.TRUE));
+    assertThat(fmc.toString(), equalTo("FirstMatchChain{subroutines=[StaticBooleanExpr{}]}"));
   }
 }

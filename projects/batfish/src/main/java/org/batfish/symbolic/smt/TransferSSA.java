@@ -40,8 +40,8 @@ import org.batfish.datamodel.routing_policy.expr.ConjunctionChain;
 import org.batfish.datamodel.routing_policy.expr.DecrementLocalPreference;
 import org.batfish.datamodel.routing_policy.expr.DecrementMetric;
 import org.batfish.datamodel.routing_policy.expr.Disjunction;
-import org.batfish.datamodel.routing_policy.expr.DisjunctionChain;
 import org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet;
+import org.batfish.datamodel.routing_policy.expr.FirstMatchChain;
 import org.batfish.datamodel.routing_policy.expr.IncrementLocalPreference;
 import org.batfish.datamodel.routing_policy.expr.IncrementMetric;
 import org.batfish.datamodel.routing_policy.expr.IntExpr;
@@ -434,28 +434,28 @@ class TransferSSA {
       }
     }
 
-    if (expr instanceof DisjunctionChain) {
-      pCur.debug("DisjunctionChain");
-      DisjunctionChain d = (DisjunctionChain) expr;
-      List<BooleanExpr> disjuncts = new ArrayList<>(d.getSubroutines());
+    if (expr instanceof FirstMatchChain) {
+      pCur.debug("FirstMatchChain");
+      FirstMatchChain chain = (FirstMatchChain) expr;
+      List<BooleanExpr> chainPolicies = new ArrayList<>(chain.getSubroutines());
       if (pCur.getDefaultPolicy() != null) {
         BooleanExpr be = new CallExpr(pCur.getDefaultPolicy().getDefaultPolicy());
-        disjuncts.add(be);
+        chainPolicies.add(be);
       }
-      if (disjuncts.isEmpty()) {
+      if (chainPolicies.isEmpty()) {
         return fromExpr(_enc.mkTrue());
       } else {
         TransferResult<BoolExpr, BoolExpr> result = new TransferResult<>();
         BoolExpr acc = _enc.mkFalse();
-        for (int i = disjuncts.size() - 1; i >= 0; i--) {
-          BooleanExpr disjunct = disjuncts.get(i);
+        for (int i = chainPolicies.size() - 1; i >= 0; i--) {
+          BooleanExpr policyMatcher = chainPolicies.get(i);
           TransferParam<SymbolicRoute> param =
               pCur.setDefaultPolicy(null).setChainContext(TransferParam.ChainContext.CONJUNCTION);
-          TransferResult<BoolExpr, BoolExpr> r = compute(disjunct, param);
-          result.addChangedVariables(r);
+          TransferResult<BoolExpr, BoolExpr> r = compute(policyMatcher, param);
+          result = result.addChangedVariables(r);
           acc = _enc.mkIf(r.getFallthroughValue(), acc, r.getReturnValue());
         }
-        pCur.debug("DisjunctionChain Result: " + acc);
+        pCur.debug("FirstMatchChain Result: " + acc);
         return result.setReturnValue(acc);
       }
     }

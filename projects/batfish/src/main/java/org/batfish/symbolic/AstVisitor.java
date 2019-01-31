@@ -10,7 +10,7 @@ import org.batfish.datamodel.routing_policy.expr.CallExpr;
 import org.batfish.datamodel.routing_policy.expr.Conjunction;
 import org.batfish.datamodel.routing_policy.expr.ConjunctionChain;
 import org.batfish.datamodel.routing_policy.expr.Disjunction;
-import org.batfish.datamodel.routing_policy.expr.DisjunctionChain;
+import org.batfish.datamodel.routing_policy.expr.FirstMatchChain;
 import org.batfish.datamodel.routing_policy.expr.Not;
 import org.batfish.datamodel.routing_policy.statement.If;
 import org.batfish.datamodel.routing_policy.statement.SetDefaultPolicy;
@@ -50,9 +50,9 @@ public class AstVisitor {
         visit(conf, be, fs, fe);
       }
 
-    } else if (e instanceof DisjunctionChain) {
-      DisjunctionChain d = (DisjunctionChain) e;
-      for (BooleanExpr be : d.getSubroutines()) {
+    } else if (e instanceof FirstMatchChain) {
+      FirstMatchChain p = (FirstMatchChain) e;
+      for (BooleanExpr be : p.getSubroutines()) {
         visit(conf, be, fs, fe);
       }
 

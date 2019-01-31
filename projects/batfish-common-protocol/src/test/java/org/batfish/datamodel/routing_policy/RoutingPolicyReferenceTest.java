@@ -14,7 +14,7 @@ import org.batfish.datamodel.routing_policy.expr.CallExpr;
 import org.batfish.datamodel.routing_policy.expr.Conjunction;
 import org.batfish.datamodel.routing_policy.expr.ConjunctionChain;
 import org.batfish.datamodel.routing_policy.expr.Disjunction;
-import org.batfish.datamodel.routing_policy.expr.DisjunctionChain;
+import org.batfish.datamodel.routing_policy.expr.FirstMatchChain;
 import org.batfish.datamodel.routing_policy.expr.Not;
 import org.batfish.datamodel.routing_policy.expr.WithEnvironmentExpr;
 import org.batfish.datamodel.routing_policy.statement.BufferedStatement;
@@ -124,9 +124,9 @@ public class RoutingPolicyReferenceTest {
     Disjunction disjunction = new Disjunction();
     disjunction.setDisjuncts(ImmutableList.of(conjunctionChain));
 
-    DisjunctionChain disjunctionChain = new DisjunctionChain(ImmutableList.of(disjunction));
+    FirstMatchChain firstMatchChain = new FirstMatchChain(ImmutableList.of(disjunction));
 
-    Not not = new Not(disjunctionChain);
+    Not not = new Not(firstMatchChain);
 
     If if5 = new If();
     if5.setGuard(not);
