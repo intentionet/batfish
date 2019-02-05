@@ -8,8 +8,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.io.FileMatchers.anExistingDirectory;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -286,12 +286,15 @@ public final class FileBasedStorageTest {
     NetworkId network = new NetworkId("network");
     String id = "heresanid";
 
+    Boolean found = null;
     try {
       _storage.loadNetworkBlob(network, id);
-      fail("blob should not exist");
+      found = true;
     } catch (FileNotFoundException e) {
-      /* Expected. */
+      found = false;
     }
+    assertNonNull("Should have been set", found);
+    assertFalse("Should not have been found", found);
 
     byte[] content = "here's some content".getBytes(StandardCharsets.UTF_8);
     _storage.storeNetworkBlob(new ByteArrayInputStream(content), network, id);
@@ -299,6 +302,8 @@ public final class FileBasedStorageTest {
     byte[] loaded = ByteStreams.toByteArray(_storage.loadNetworkBlob(network, id));
     assertThat(content, equalTo(loaded));
   }
+
+  private void assertNonNull(String should_have_been_set, Boolean found) {}
 
   @Test
   public void testLoadSnapshotInputObjectFile() throws IOException {
