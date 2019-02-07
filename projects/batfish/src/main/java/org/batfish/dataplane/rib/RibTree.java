@@ -41,7 +41,7 @@ class RibTree<R extends AbstractRoute> implements Serializable {
     Prefix prefix = route.getNetwork();
     int prefixLength = prefix.getPrefixLength();
     long bits = prefix.getStartIp().asLong();
-    return _root.removeRoute(route, bits, prefixLength, 0, reason);
+    return _root.removeRoute(route, reason);
   }
 
   /**
@@ -54,7 +54,7 @@ class RibTree<R extends AbstractRoute> implements Serializable {
     Prefix prefix = route.getNetwork();
     int prefixLength = prefix.getPrefixLength();
     long bits = prefix.getStartIp().asLong();
-    return _root.containsRoute(route, bits, prefixLength);
+    return _root.containsRoute(route);
   }
 
   /**
@@ -93,10 +93,7 @@ class RibTree<R extends AbstractRoute> implements Serializable {
    */
   @Nonnull
   RibDelta<R> mergeRoute(R route) {
-    Prefix prefix = route.getNetwork();
-    int prefixLength = prefix.getPrefixLength();
-    long bits = prefix.getStartIp().asLong();
-    return _root.mergeRoute(route, bits, prefixLength, 0);
+    return _root.mergeRoute(route);
   }
 
   @Override
