@@ -11,6 +11,7 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
@@ -126,12 +127,12 @@ public class IpAccessList implements Serializable {
       return false;
     }
     IpAccessList other = (IpAccessList) o;
-    return other._lines.equals(_lines);
+    return _name.equals(other._name) && other._lines.equals(_lines);
   }
 
   @Override
   public int hashCode() {
-    return _lines.hashCode();
+    return Objects.hash(_name, _lines);
   }
 
   public FilterResult filter(

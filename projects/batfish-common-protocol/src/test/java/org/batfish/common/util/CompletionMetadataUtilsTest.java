@@ -237,7 +237,7 @@ public final class CompletionMetadataUtilsTest {
         ImmutableSortedMap.of(ikePhase1ProposalName, new IkePhase1Proposal(ikePhase1ProposalName)));
     config.setIpAccessLists(
         ImmutableSortedMap.of(
-            ipAccessListName, new IpAccessList(ipAccessListName, ImmutableList.of(), null, null)));
+            ipAccessListName, IpAccessList.builder().setName(ipAccessListName).build()));
     config.setIp6AccessLists(
         ImmutableSortedMap.of(ip6AccessListName, new Ip6AccessList(ip6AccessListName)));
     config.setIpsecPhase2Policies(
