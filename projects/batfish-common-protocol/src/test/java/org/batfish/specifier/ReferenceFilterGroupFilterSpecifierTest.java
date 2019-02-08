@@ -28,9 +28,9 @@ public class ReferenceFilterGroupFilterSpecifierTest {
   private static final String _nodeName = "node0";
   private static final MockSpecifierContext _ctxt;
 
-  private static final IpAccessList _filter1 = new IpAccessList("filter1");
-  private static final IpAccessList _filter2 = new IpAccessList("filter2");
-  private static final IpAccessList _filter3 = new IpAccessList("filter3");
+  private static final IpAccessList _filter1 = IpAccessList.builder().setName("filter1").build();
+  private static final IpAccessList _filter2 = IpAccessList.builder().setName("filter2").build();
+  private static final IpAccessList _filter3 = IpAccessList.builder().setName("filter3").build();
 
   static {
     NetworkFactory nf = new NetworkFactory();

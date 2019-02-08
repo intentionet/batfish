@@ -42,8 +42,8 @@ public class FiltersSpecifierTest {
   public void matchesName() {
     FiltersSpecifier specifier = new FiltersSpecifier("name:acl.*");
 
-    IpAccessList matchingList = new IpAccessList("acl-99");
-    IpAccessList nonMatchingList = new IpAccessList("nana");
+    IpAccessList matchingList = IpAccessList.builder().setName("acl-99").build();
+    IpAccessList nonMatchingList = IpAccessList.builder().setName("nana").build();
 
     assertThat(specifier.matches(matchingList, null), equalTo(true));
     assertThat(specifier.matches(nonMatchingList, null), equalTo(false));
@@ -53,7 +53,7 @@ public class FiltersSpecifierTest {
   public void matchesIpv4() {
     FiltersSpecifier specifier = new FiltersSpecifier("ipv4:acl.*");
 
-    IpAccessList matchingList = new IpAccessList("acl-99");
+    IpAccessList matchingList = IpAccessList.builder().setName("acl-99").build();
     Ip6AccessList nonMatchingList = new Ip6AccessList("acl-99");
 
     assertThat(specifier.matches(matchingList, null), equalTo(true));

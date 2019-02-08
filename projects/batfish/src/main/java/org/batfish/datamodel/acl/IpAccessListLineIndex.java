@@ -21,7 +21,7 @@ public class IpAccessListLineIndex implements Comparable<IpAccessListLineIndex> 
     if (this == lineIndex) {
       return 0;
     }
-    return Comparator.comparing(IpAccessListLineIndex::getAcl)
+    return Comparator.comparing((IpAccessListLineIndex index) -> index.getAcl().getName())
         .thenComparingInt(IpAccessListLineIndex::getIndex)
         .compare(this, lineIndex);
   }

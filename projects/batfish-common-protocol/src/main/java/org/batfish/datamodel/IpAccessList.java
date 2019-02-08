@@ -1,20 +1,23 @@
 package org.batfish.datamodel;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.collect.ImmutableList;
 import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.batfish.common.util.ComparableStructure;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
 import org.batfish.datamodel.acl.Evaluator;
 
 @JsonSchemaDescription("An access-list used to filter IPV4 packets")
-public class IpAccessList extends ComparableStructure<String> {
+public class IpAccessList implements Serializable {
 
   public static class Builder extends NetworkFactoryBuilder<IpAccessList> {
 
@@ -70,9 +73,8 @@ public class IpAccessList extends ComparableStructure<String> {
   }
 
   private static final String PROP_LINES = "lines";
-
+  private static final String PROP_NAME = "name";
   private static final String PROP_SOURCE_NAME = "sourceName";
-
   private static final String PROP_SOURCE_TYPE = "sourceType";
 
   private static final long serialVersionUID = 1L;
@@ -87,37 +89,30 @@ public class IpAccessList extends ComparableStructure<String> {
     }
   }
 
-  static boolean bothNullOrUnorderedEqual(IpAccessList a, IpAccessList b) {
-    if (a == null && b == null) {
-      return true;
-    } else if (a != null && b != null) {
-      return a.unorderedEqual(b);
-    } else {
-      return false;
-    }
-  }
-
   public static Builder builder() {
     return new Builder(null);
   }
 
   private List<IpAccessListLine> _lines;
 
+  @Nonnull private final String _name;
+
   private String _sourceName;
 
   private String _sourceType;
 
   @JsonCreator
-  public IpAccessList(@JsonProperty(PROP_NAME) String name) {
-    super(name);
+  private IpAccessList(@Nullable @JsonProperty(PROP_NAME) String name) {
+    checkArgument(name != null, "IpAccessList missing %s", PROP_NAME);
+    _name = name;
   }
 
   public IpAccessList(
-      String name,
+      @Nonnull String name,
       List<IpAccessListLine> lines,
       @Nullable String sourceName,
       @Nullable String sourceType) {
-    super(name);
+    _name = name;
     _lines = ImmutableList.copyOf(lines);
     _sourceName = sourceName;
     _sourceType = sourceType;
@@ -132,6 +127,11 @@ public class IpAccessList extends ComparableStructure<String> {
     }
     IpAccessList other = (IpAccessList) o;
     return other._lines.equals(_lines);
+  }
+
+  @Override
+  public int hashCode() {
+    return _lines.hashCode();
   }
 
   public FilterResult filter(
@@ -156,6 +156,12 @@ public class IpAccessList extends ComparableStructure<String> {
       }
     }
     return new FilterResult(null, defaultAction);
+  }
+
+  @JsonProperty(PROP_NAME)
+  @Nonnull
+  public String getName() {
+    return _name;
   }
 
   @JsonProperty(PROP_LINES)
@@ -208,7 +214,7 @@ public class IpAccessList extends ComparableStructure<String> {
   @Override
   public String toString() {
     StringBuilder output =
-        new StringBuilder().append(getClass().getSimpleName()).append(":").append(_key);
+        new StringBuilder().append(getClass().getSimpleName()).append(":").append(_name);
     for (IpAccessListLine line : _lines) {
       output.append("\n");
       output.append(line);
