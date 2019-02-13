@@ -1,13 +1,13 @@
 package org.batfish.dataplane;
 
 import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasPrefix;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -88,7 +88,7 @@ public class FibImplTest {
     // longer prefix match). Should see only iface1 in interfaces to ip1.
     Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> nextHopIfacesByRouteToIp1 =
         fib.getNextHopInterfacesByRoute(ip1);
-    assertThat(nextHopIfacesByRouteToIp1.entrySet(), hasSize(1));
+    assertThat(nextHopIfacesByRouteToIp1, aMapWithSize(1));
     Set<String> nextHopIfacesToIp1 =
         nextHopIfacesByRouteToIp1.values().stream()
             .flatMap(ifaceMap -> ifaceMap.keySet().stream())
@@ -98,7 +98,7 @@ public class FibImplTest {
     // Should see interfaces iface2 and iface3 in interfaces to ip2.
     Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> nextHopIfacesByRouteToIp2 =
         fib.getNextHopInterfacesByRoute(ip2);
-    assertThat(nextHopIfacesByRouteToIp2.entrySet(), hasSize(2));
+    assertThat(nextHopIfacesByRouteToIp2, aMapWithSize(2));
     Set<String> nextHopIfacesToIp2 =
         nextHopIfacesByRouteToIp2.values().stream()
             .flatMap(ifaceMap -> ifaceMap.keySet().stream())
