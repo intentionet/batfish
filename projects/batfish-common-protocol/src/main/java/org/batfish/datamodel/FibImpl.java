@@ -7,8 +7,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
@@ -43,7 +43,7 @@ public class FibImpl implements Fib {
    * @throws BatfishException if resolution depth is exceeded (high likelihood of a routing loop) OR
    *     an invalid route in the RIB has been encountered.
    */
-  private static Map<String, Map<Ip, Set<AbstractRoute>>> collectNextHopInterfaces(
+  public static Map<String, Map<Ip, Set<AbstractRoute>>> collectNextHopInterfaces(
       GenericRib<AbstractRoute> rib, AbstractRoute route) {
     Map<String, Map<Ip, Set<AbstractRoute>>> nextHopInterfaces = new HashMap<>();
     collectNextHopInterfaces(
@@ -176,16 +176,34 @@ public class FibImpl implements Fib {
 
   @Override
   public @Nonnull Set<String> getNextHopInterfaces(Ip ip) {
-    return _rib.longestPrefixMatch(ip).stream()
-        .flatMap(nextHopRoute -> _nextHopInterfaces.get(nextHopRoute).keySet().stream())
-        .collect(ImmutableSet.toImmutableSet());
+    Map<String, Map<Ip, Set<AbstractRoute>>> outputNextHopInterfaces = new TreeMap<>();
+    Set<AbstractRoute> nextHopRoutes = _rib.longestPrefixMatch(ip);
+    for (AbstractRoute nextHopRoute : nextHopRoutes) {
+      Map<String, Map<Ip, Set<AbstractRoute>>> currentNextHopInterfaces =
+          _nextHopInterfaces.get(nextHopRoute);
+      currentNextHopInterfaces.forEach(
+          (nextHopInterface, nextHopInterfaceRoutesByFinalNextHopIp) -> {
+            Map<Ip, Set<AbstractRoute>> outputNextHopInterfaceRoutesByFinalNextHopIp =
+                outputNextHopInterfaces.computeIfAbsent(nextHopInterface, k -> new TreeMap<>());
+            outputNextHopInterfaceRoutesByFinalNextHopIp.putAll(
+                nextHopInterfaceRoutesByFinalNextHopIp);
+          });
+    }
+    return outputNextHopInterfaces.keySet();
   }
 
   @Override
   public @Nonnull Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>>
       getNextHopInterfacesByRoute(Ip dstIp) {
-    return _rib.longestPrefixMatch(dstIp).stream()
-        .collect(ImmutableMap.toImmutableMap(Function.identity(), _nextHopInterfaces::get));
+    Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> nextHopInterfacesByRoute =
+        new HashMap<>();
+    Set<AbstractRoute> nextHopRoutes = _rib.longestPrefixMatch(dstIp);
+    for (AbstractRoute nextHopRoute : nextHopRoutes) {
+      Map<String, Map<Ip, Set<AbstractRoute>>> nextHopInterfaces =
+          _nextHopInterfaces.get(nextHopRoute);
+      nextHopInterfacesByRoute.put(nextHopRoute, nextHopInterfaces);
+    }
+    return nextHopInterfacesByRoute;
   }
 
   @Override

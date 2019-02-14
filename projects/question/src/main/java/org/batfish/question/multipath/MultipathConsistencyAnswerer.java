@@ -10,13 +10,11 @@ import static org.batfish.question.traceroute.TracerouteAnswerer.createMetadata;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.Multiset;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import org.batfish.common.Answerer;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.datamodel.AclIpSpace;
@@ -78,8 +76,8 @@ public class MultipathConsistencyAnswerer extends Answerer {
         String.format(
             "Expect only one environment in flow history info. Found %d",
             historyInfo.getPaths().size()));
-    SortedSet<FlowTrace> paths =
-        historyInfo.getPaths().values().stream().findAny().orElseGet(ImmutableSortedSet::of);
+    Set<FlowTrace> paths =
+        historyInfo.getPaths().values().stream().findAny().orElseGet(ImmutableSet::of);
     return Row.of(COL_FLOW, historyInfo.getFlow(), COL_TRACES, paths);
   }
 

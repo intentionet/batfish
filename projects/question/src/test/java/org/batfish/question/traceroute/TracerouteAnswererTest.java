@@ -21,13 +21,13 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multiset;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.FlowDisposition;
 import org.batfish.datamodel.FlowHistory;
@@ -275,8 +275,8 @@ public class TracerouteAnswererTest {
 
   @Test
   public void flowHistoryToRow() {
-    SortedSet<FlowTrace> traces =
-        ImmutableSortedSet.of(
+    Set<FlowTrace> traces =
+        ImmutableSet.of(
             new FlowTrace(FlowDisposition.ACCEPTED, ImmutableList.of(), "notes1"),
             new FlowTrace(FlowDisposition.DENIED_OUT, ImmutableList.of(), "notes2"));
     Flow flow =

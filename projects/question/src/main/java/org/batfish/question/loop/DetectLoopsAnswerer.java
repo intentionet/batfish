@@ -7,7 +7,7 @@ import static org.batfish.question.traceroute.TracerouteAnswerer.createMetadata;
 
 import com.google.common.base.Functions;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -15,7 +15,6 @@ import com.google.common.collect.Multiset;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.stream.Collectors;
 import org.batfish.common.Answerer;
 import org.batfish.common.plugin.IBatfish;
@@ -81,8 +80,8 @@ public final class DetectLoopsAnswerer extends Answerer {
         String.format(
             "Expect only one environment in flow history info. Found %d",
             historyInfo.getPaths().size()));
-    SortedSet<FlowTrace> paths =
-        historyInfo.getPaths().values().stream().findAny().orElseGet(ImmutableSortedSet::of);
+    Set<FlowTrace> paths =
+        historyInfo.getPaths().values().stream().findAny().orElseGet(ImmutableSet::of);
     return Row.of(COL_FLOW, historyInfo.getFlow(), COL_TRACES, paths);
   }
 

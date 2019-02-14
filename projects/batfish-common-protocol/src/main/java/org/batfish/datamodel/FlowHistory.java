@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.batfish.common.BatfishException;
@@ -29,13 +28,13 @@ public class FlowHistory extends AnswerElement {
 
     private Flow _flow;
 
-    private Map<String, SortedSet<FlowTrace>> _paths;
+    private Map<String, Set<FlowTrace>> _paths;
 
     @JsonCreator
     public FlowHistoryInfo(
         @JsonProperty(PROP_FLOW) Flow flow,
         @JsonProperty(PROP_ENVIRONMENTS) Map<String, Environment> environments,
-        @JsonProperty(PROP_PATHS) Map<String, SortedSet<FlowTrace>> paths) {
+        @JsonProperty(PROP_PATHS) Map<String, Set<FlowTrace>> paths) {
       _flow = flow;
       _environments = environments;
       _paths = paths;
@@ -52,7 +51,7 @@ public class FlowHistory extends AnswerElement {
     }
 
     @JsonProperty(PROP_PATHS)
-    public Map<String, SortedSet<FlowTrace>> getPaths() {
+    public Map<String, Set<FlowTrace>> getPaths() {
       return _paths;
     }
   }
@@ -140,7 +139,7 @@ public class FlowHistory extends AnswerElement {
     StringBuilder sb = new StringBuilder();
     for (String flowString : _traces.keySet()) {
       sb.append("Flow: " + flowString + "\n");
-      Map<String, SortedSet<FlowTrace>> envTraceSetMap = _traces.get(flowString).getPaths();
+      Map<String, Set<FlowTrace>> envTraceSetMap = _traces.get(flowString).getPaths();
       for (String environmentName : envTraceSetMap.keySet()) {
         sb.append(" Environment: " + environmentName + "\n");
         Set<FlowTrace> traces = envTraceSetMap.get(environmentName);

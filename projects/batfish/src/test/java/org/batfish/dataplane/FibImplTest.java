@@ -1,22 +1,19 @@
 package org.batfish.dataplane;
 
 import static org.batfish.datamodel.matchers.AbstractRouteMatchers.hasPrefix;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.Configuration.Builder;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Fib;
 import org.batfish.datamodel.FibImpl;
@@ -48,62 +45,23 @@ public class FibImplTest {
   private static final InterfaceAddress NODE1_PHYSICAL_NETWORK = new InterfaceAddress("2.0.0.1/8");
   private static final Ip EXTERNAL_IP = Ip.parse("7.7.7.7");
 
+  private NetworkFactory _nf;
+  private Builder _cb;
   private Interface.Builder _ib;
+  private Vrf.Builder _vb;
+
   private Configuration _config;
   private Vrf _vrf;
 
   @Before
   public void setup() {
-    NetworkFactory nf = new NetworkFactory();
-    Configuration.Builder cb =
-        nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS);
-    _ib = nf.interfaceBuilder();
-    _config = cb.setHostname(NODE1).build();
-    _vrf = nf.vrfBuilder().setOwner(_config).setName(Configuration.DEFAULT_VRF_NAME).build();
+    _nf = new NetworkFactory();
+    _cb = _nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS);
+    _ib = _nf.interfaceBuilder();
+    _vb = _nf.vrfBuilder();
+    _config = _cb.setHostname(NODE1).build();
+    _vrf = _vb.setOwner(_config).setName(Configuration.DEFAULT_VRF_NAME).build();
     _ib.setOwner(_config).setVrf(_vrf);
-  }
-
-  @Test
-  public void testGetNextHopInterfacesByRoute() throws IOException {
-    String iface1 = "iface1";
-    String iface2 = "iface2";
-    String iface3 = "iface3";
-    Ip ip1 = Ip.parse("1.1.1.0");
-    Ip ip2 = Ip.parse("2.2.2.0");
-    _ib.setName(iface1).setAddress(new InterfaceAddress(ip1, 24)).build();
-    _ib.setName(iface2).setAddress(new InterfaceAddress(ip2, 24)).build();
-    _ib.setName(iface3).setAddress(new InterfaceAddress(ip2, 24)).build();
-
-    Batfish batfish =
-        BatfishTestUtils.getBatfish(ImmutableSortedMap.of(_config.getHostname(), _config), folder);
-    batfish.computeDataPlane();
-    Fib fib =
-        batfish
-            .loadDataPlane()
-            .getFibs()
-            .get(_config.getHostname())
-            .get(Configuration.DEFAULT_VRF_NAME);
-
-    // Should have one LocalRoute per interface (also one ConnectedRoute, but LocalRoute will have
-    // longer prefix match). Should see only iface1 in interfaces to ip1.
-    Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> nextHopIfacesByRouteToIp1 =
-        fib.getNextHopInterfacesByRoute(ip1);
-    assertThat(nextHopIfacesByRouteToIp1, aMapWithSize(1));
-    Set<String> nextHopIfacesToIp1 =
-        nextHopIfacesByRouteToIp1.values().stream()
-            .flatMap(ifaceMap -> ifaceMap.keySet().stream())
-            .collect(Collectors.toSet());
-    assertThat(nextHopIfacesToIp1, contains(iface1));
-
-    // Should see interfaces iface2 and iface3 in interfaces to ip2.
-    Map<AbstractRoute, Map<String, Map<Ip, Set<AbstractRoute>>>> nextHopIfacesByRouteToIp2 =
-        fib.getNextHopInterfacesByRoute(ip2);
-    assertThat(nextHopIfacesByRouteToIp2, aMapWithSize(2));
-    Set<String> nextHopIfacesToIp2 =
-        nextHopIfacesByRouteToIp2.values().stream()
-            .flatMap(ifaceMap -> ifaceMap.keySet().stream())
-            .collect(Collectors.toSet());
-    assertThat(nextHopIfacesToIp2, containsInAnyOrder(iface2, iface3));
   }
 
   @Test
