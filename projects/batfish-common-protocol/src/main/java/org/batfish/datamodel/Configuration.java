@@ -14,6 +14,7 @@ import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -29,6 +30,7 @@ import org.batfish.common.BatfishException;
 import org.batfish.common.Warnings;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
 import org.batfish.datamodel.ospf.OspfProcess;
+import org.batfish.datamodel.packet_policy.PacketPolicy;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.tracking.TrackMethod;
 import org.batfish.datamodel.vendor_family.VendorFamily;
@@ -237,6 +239,8 @@ public final class Configuration implements Serializable {
 
   private String _ntpSourceInterface;
 
+  private Map<String, PacketPolicy> _packetPolicies;
+
   private NavigableMap<String, Route6FilterList> _route6FilterLists;
 
   private NavigableMap<String, RouteFilterList> _routeFilterLists;
@@ -292,6 +296,7 @@ public final class Configuration implements Serializable {
     _mlags = ImmutableSortedMap.of();
     _normalVlanRange = new SubRange(VLAN_NORMAL_MIN_DEFAULT, VLAN_NORMAL_MAX_DEFAULT);
     _ntpServers = new TreeSet<>();
+    _packetPolicies = new HashMap<>();
     _routeFilterLists = new TreeMap<>();
     _route6FilterLists = new TreeMap<>();
     _routingPolicies = new TreeMap<>();
@@ -534,6 +539,11 @@ public final class Configuration implements Serializable {
   @JsonProperty(PROP_NTP_SOURCE_INTERFACE)
   public String getNtpSourceInterface() {
     return _ntpSourceInterface;
+  }
+
+  /** Return the defined policies that can be used for policy-based routing */
+  public Map<String, PacketPolicy> getPacketPolicies() {
+    return _packetPolicies;
   }
 
   @JsonPropertyDescription("Dictionary of all IPV6 route filter lists for this node.")

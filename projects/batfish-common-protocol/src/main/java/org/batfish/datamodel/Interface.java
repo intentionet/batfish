@@ -32,7 +32,6 @@ import org.batfish.datamodel.isis.IsisInterfaceMode;
 import org.batfish.datamodel.isis.IsisInterfaceSettings;
 import org.batfish.datamodel.ospf.OspfArea;
 import org.batfish.datamodel.ospf.OspfProcess;
-import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.transformation.Transformation;
 
 public final class Interface extends ComparableStructure<String> {
@@ -835,9 +834,7 @@ public final class Interface extends ComparableStructure<String> {
 
   private boolean _ripPassive;
 
-  private RoutingPolicy _routingPolicy;
-
-  private transient String _routingPolicyName;
+  private String _routingPolicyName;
 
   private boolean _spanningTreePortfast;
 
@@ -974,9 +971,6 @@ public final class Interface extends ComparableStructure<String> {
       return false;
     }
     if (!_proxyArp == other._proxyArp) {
-      return false;
-    }
-    if (!Objects.equals(this._routingPolicy, other._routingPolicy)) {
       return false;
     }
     if (!Objects.equals(_speed, other._speed)) {
@@ -1348,21 +1342,13 @@ public final class Interface extends ComparableStructure<String> {
     return _ripPassive;
   }
 
-  @JsonIgnore
-  public RoutingPolicy getRoutingPolicy() {
-    return _routingPolicy;
-  }
-
+  /**
+   * The name of the policy used on this interface for policy routing (as opposed to
+   * destination-based routing).
+   */
   @JsonProperty(PROP_ROUTING_POLICY)
-  @JsonPropertyDescription(
-      "The routing policy used on this interface for policy-routing (as opposed to destination-"
-          + "routing). Stored as @id")
   public String getRoutingPolicyName() {
-    if (_routingPolicy != null) {
-      return _routingPolicy.getName();
-    } else {
-      return _routingPolicyName;
-    }
+    return _routingPolicyName;
   }
 
   @JsonProperty(PROP_SPANNING_TREE_PORTFAST)
@@ -1717,11 +1703,6 @@ public final class Interface extends ComparableStructure<String> {
   @JsonProperty(PROP_RIP_PASSIVE)
   public void setRipPassive(boolean ripPassive) {
     _ripPassive = ripPassive;
-  }
-
-  @JsonIgnore
-  public void setRoutingPolicy(RoutingPolicy routingPolicy) {
-    _routingPolicy = routingPolicy;
   }
 
   @JsonProperty(PROP_ROUTING_POLICY)
