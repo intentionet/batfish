@@ -66,6 +66,7 @@ import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.Interface.Dependency;
 import org.batfish.datamodel.Interface.DependencyType;
 import org.batfish.datamodel.InterfaceAddress;
+import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
@@ -2991,7 +2992,13 @@ public final class JuniperConfiguration extends VendorConfiguration {
                         // set IRB VLAN ID if assigned
                         newUnitInterface.setVlan(irbVlanIds.get(name));
 
-                        // Don't create bind dependency for 'irb.XXX' interfcaes, since there isn't
+                        // TODO: discuss with Ari. Also, should this happen in VI land or VS land?
+                        if (newUnitInterface.getInterfaceType() == InterfaceType.VLAN
+                            && newUnitInterface.getVlan() == null) {
+                          newUnitInterface.setActive(false);
+                        }
+
+                        // Don't create bind dependency for 'irb.XXX' interfaces, since there isn't
                         // really an 'irb' interface
                         if (!name.startsWith("irb")) {
                           newUnitInterface.addDependency(

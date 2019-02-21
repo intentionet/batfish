@@ -215,7 +215,7 @@ public final class TopologyUtil {
               });
         });
     vrf.getInterfaces().values().stream()
-        .filter(i -> i.getInterfaceType() == InterfaceType.VLAN)
+        .filter(i -> i.getInterfaceType() == InterfaceType.VLAN && i.getVlan() != null)
         .forEach(
             irbInterface -> {
               String irbName = irbInterface.getName();
