@@ -60,6 +60,7 @@ java_library(
         "@opentracing_api//:compile",
         "@opentracing_contrib_jaxrs//:compile",
         "@opentracing_util//:compile",
+        "@parboiled//:compile",
     ],
 )
 
