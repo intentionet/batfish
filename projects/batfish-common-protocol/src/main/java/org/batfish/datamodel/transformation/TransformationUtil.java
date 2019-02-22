@@ -46,9 +46,12 @@ public final class TransformationUtil {
             AssignIpAddressFromPool assignIpAddressFromPool) {
           return assignIpAddressFromPool.getType() != SOURCE_NAT
               ? Stream.of()
-              : LongStream.range(
-                      assignIpAddressFromPool.getPoolStart().asLong(),
-                      assignIpAddressFromPool.getPoolEnd().asLong() + 1)
+              : assignIpAddressFromPool.getIpRanges().asRanges().stream()
+                  .flatMapToLong(
+                      ipRange ->
+                          LongStream.range(
+                              ipRange.lowerEndpoint().asLong(),
+                              ipRange.upperEndpoint().asLong() + 1))
                   .mapToObj(Ip::create);
         }
 

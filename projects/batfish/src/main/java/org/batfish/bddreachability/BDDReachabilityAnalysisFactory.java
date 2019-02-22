@@ -1227,8 +1227,12 @@ public final class BDDReachabilityAnalysisFactory {
             IpField ipField = assignIpAddressFromPool.getIpField();
             BDDInteger var = getIpSpaceToBDD(ipField).getBDDInteger();
             BDD bdd =
-                var.geq(assignIpAddressFromPool.getPoolStart().asLong())
-                    .and(var.leq(assignIpAddressFromPool.getPoolEnd().asLong()));
+                assignIpAddressFromPool.getIpRanges().asRanges().stream()
+                    .map(
+                        range ->
+                            var.geq(range.lowerEndpoint().asLong())
+                                .and(var.leq(range.upperEndpoint().asLong())))
+                    .reduce(var.getFactory().zero(), BDD::or);
             ranges.merge(ipField, bdd, BDD::or);
             return null;
           }

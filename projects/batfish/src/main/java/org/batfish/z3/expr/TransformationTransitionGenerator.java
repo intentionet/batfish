@@ -89,13 +89,15 @@ public final class TransformationTransitionGenerator {
     @Override
     public BasicRuleStatement visitAssignIpAddressFromPool(
         AssignIpAddressFromPool assignIpAddressFromPool) {
-      return new BasicRuleStatement(
-          assignFromPoolExpr(
-              getField(assignIpAddressFromPool.getIpField()),
-              assignIpAddressFromPool.getPoolStart(),
-              assignIpAddressFromPool.getPoolEnd()),
-          _preState,
-          _postState);
+      Field field = getField(assignIpAddressFromPool.getIpField());
+
+      ImmutableList<BooleanExpr> disjuncts =
+          assignIpAddressFromPool.getIpRanges().asRanges().stream()
+              .map(range -> assignFromPoolExpr(field, range.lowerEndpoint(), range.upperEndpoint()))
+              .collect(ImmutableList.toImmutableList());
+      BooleanExpr expr = disjuncts.size() == 1 ? disjuncts.get(0) : new OrExpr(disjuncts);
+
+      return new BasicRuleStatement(expr, _preState, _postState);
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
+import org.batfish.common.util.serialization.BatfishThirdPartySerializationModule;
 
 public final class BatfishObjectMapper {
   private static final ObjectMapper MAPPER = baseMapper();
@@ -154,6 +155,9 @@ public final class BatfishObjectMapper {
         JsonInclude.Value.construct(Include.NON_EMPTY, Include.ALWAYS));
     // This line makes Guava collections work with jackson
     mapper.registerModule(new GuavaModule());
+
+    // Custom (de)serialization for 3rd-party classes
+    mapper.registerModule(new BatfishThirdPartySerializationModule());
 
     return mapper;
   }

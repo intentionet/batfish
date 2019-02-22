@@ -39,7 +39,7 @@ public final class ReturnFlowTransformation {
     @Override
     public TransformationStep visitAssignIpAddressFromPool(AssignIpAddressFromPool step) {
       return new AssignIpAddressFromPool(
-          step.getType(), step.getIpField().opposite(), step.getPoolStart(), step.getPoolEnd());
+          step.getType(), step.getIpField().opposite(), step.getIpRanges());
     }
 
     @Override

@@ -138,7 +138,8 @@ public class TransformationEvaluator {
 
     @Override
     public Boolean visitAssignIpAddressFromPool(AssignIpAddressFromPool step) {
-      return set(step.getType(), step.getIpField(), get(step.getIpField()), step.getPoolStart());
+      Ip ip = step.getIpRanges().asRanges().iterator().next().lowerEndpoint();
+      return set(step.getType(), step.getIpField(), get(step.getIpField()), ip);
     }
 
     @Override

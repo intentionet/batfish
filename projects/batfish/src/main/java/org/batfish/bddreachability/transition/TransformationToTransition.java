@@ -4,6 +4,7 @@ import static org.batfish.bddreachability.transition.Transitions.IDENTITY;
 import static org.batfish.bddreachability.transition.Transitions.reverse;
 import static org.batfish.datamodel.transformation.ReturnFlowTransformation.returnFlowTransformation;
 
+import com.google.common.collect.RangeSet;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -42,12 +43,17 @@ public class TransformationToTransition {
     _stepToTransition = new TransformationStepToTransition();
   }
 
-  private static EraseAndSet assignIpFromPool(BDDInteger var, Ip poolStart, Ip poolEnd) {
+  private static EraseAndSet assignIpFromPool(BDDInteger var, RangeSet<Ip> ranges) {
     BDD erase = Arrays.stream(var.getBitvec()).reduce(var.getFactory().one(), BDD::and);
     BDD setValue =
-        poolStart.equals(poolEnd)
-            ? var.value(poolStart.asLong())
-            : var.geq(poolStart.asLong()).and(var.leq(poolEnd.asLong()));
+        ranges.asRanges().stream()
+            .map(
+                range ->
+                    range.lowerEndpoint().equals(range.upperEndpoint())
+                        ? var.value(range.lowerEndpoint().asLong())
+                        : var.geq(range.lowerEndpoint().asLong())
+                            .and(var.leq(range.upperEndpoint().asLong())))
+            .reduce(var.getFactory().zero(), BDD::or);
     return new EraseAndSet(erase, setValue);
   }
 
@@ -90,7 +96,7 @@ public class TransformationToTransition {
 
     @Override
     public Transition visitAssignIpAddressFromPool(AssignIpAddressFromPool step) {
-      return assignIpFromPool(ipField(step.getIpField()), step.getPoolStart(), step.getPoolEnd());
+      return assignIpFromPool(ipField(step.getIpField()), step.getIpRanges());
     }
 
     @Override
