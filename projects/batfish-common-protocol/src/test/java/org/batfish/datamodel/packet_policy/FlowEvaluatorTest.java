@@ -143,4 +143,25 @@ public class FlowEvaluatorTest {
         .addEqualityGroup(new Object())
         .testEquals();
   }
+
+  @Test
+  public void testEvaluateFindsFirstReachableTerminalAction() {
+    // Setup policy
+    PacketPolicy policy =
+        new PacketPolicy(
+            "policyName",
+            ImmutableList.of(
+                new If(
+                    new PacketMatchExpr(FalseExpr.INSTANCE),
+                    ImmutableList.of(new FibLookup("Unreachable"))),
+                new If(new PacketMatchExpr(TrueExpr.INSTANCE), ImmutableList.of(Drop.instance())),
+                new FibLookup("lastVRF")));
+
+    // Test:
+    FlowResult result = FlowEvaluator.evaluate(_flow, "Eth0", policy, ImmutableSet.of());
+
+    assertThat(result.getAction(), equalTo(Drop.instance()));
+    // No transformations occurred
+    assertThat(result.getFinalFlow(), equalTo(_flow));
+  }
 }

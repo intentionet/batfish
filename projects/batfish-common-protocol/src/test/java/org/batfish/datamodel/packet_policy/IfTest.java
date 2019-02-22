@@ -9,6 +9,7 @@ import com.google.common.testing.EqualsTester;
 import java.io.IOException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.batfish.common.util.BatfishObjectMapper;
+import org.batfish.datamodel.acl.TrueExpr;
 import org.junit.Test;
 
 /** Tests of {@link If} */
@@ -16,9 +17,11 @@ public class IfTest {
 
   @Test
   public void testEquals() {
+    If ifExpr = new If(Noop.instance(), ImmutableList.of());
     new EqualsTester()
-        .addEqualityGroup()
-        .addEqualityGroup()
+        .addEqualityGroup(ifExpr, ifExpr, new If(Noop.instance(), ImmutableList.of()))
+        .addEqualityGroup(new If(new PacketMatchExpr(TrueExpr.INSTANCE), ImmutableList.of()))
+        .addEqualityGroup(new If(Noop.instance(), ImmutableList.of(Drop.instance())))
         .addEqualityGroup(new Object())
         .testEquals();
   }
