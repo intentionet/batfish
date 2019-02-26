@@ -29,6 +29,10 @@ public final class BDDFirewallSessionTraceInfoMatchers {
     return new HasNextHop(equalTo(nodeInterfacePair));
   }
 
+  public static HasNextHop hasNextHop(Matcher<? super NodeInterfacePair> matcher) {
+    return new HasNextHop(matcher);
+  }
+
   public static HasOutgoingInterface hasOutgoingInterface(String outIface) {
     return new HasOutgoingInterface(equalTo(outIface));
   }

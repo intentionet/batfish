@@ -7,6 +7,7 @@ import static org.batfish.common.bdd.BDDFiniteDomain.domainsWithSharedVariable;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -17,7 +18,6 @@ import org.batfish.common.bdd.BDDPacket;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Edge;
 import org.batfish.datamodel.Interface;
-import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 
 /**
@@ -33,20 +33,39 @@ import org.batfish.datamodel.collections.NodeInterfacePair;
  */
 public final class LastHopOutgoingInterfaceManager {
   private static final String VAR_NAME = "LAST_HOP_OUTGOING_IFACE";
+  private static final String NO_LAST_HOP_INTERFACE =
+      "LastHopOutgoingInterfaceManager.NO_LAST_HOP_INTERFACE";
+  private static final String NO_LAST_HOP_NODE = "LastHopOutgoingInterfaceManager.NO_LAST_HOP_NODE";
+
+  // used for originating at an interface
+  public static final NodeInterfacePair NO_LAST_HOP =
+      new NodeInterfacePair(NO_LAST_HOP_NODE, NO_LAST_HOP_INTERFACE);
 
   // (Receiving node, ingress interface) --> [(Sending node, egress interface)]
   private final Map<NodeInterfacePair, BDDFiniteDomain<NodeInterfacePair>> _finiteDomains;
 
+  private final Set<String> _receivingNodes;
+
   private final BDD _trueBdd;
 
   public LastHopOutgoingInterfaceManager(
-      BDDPacket pkt, Map<String, Configuration> configs, Topology topology) {
-    _finiteDomains = computeFiniteDomains(pkt, configs, topology);
+      BDDPacket pkt, Map<String, Configuration> configs, Set<Edge> topologyEdges) {
+    this(pkt, computeFiniteDomains(pkt, configs, topologyEdges));
+  }
+
+  @VisibleForTesting
+  LastHopOutgoingInterfaceManager(
+      BDDPacket pkt, Map<NodeInterfacePair, BDDFiniteDomain<NodeInterfacePair>> finiteDomains) {
+    _finiteDomains = ImmutableMap.copyOf(finiteDomains);
+    _receivingNodes =
+        _finiteDomains.keySet().stream()
+            .map(NodeInterfacePair::getHostname)
+            .collect(ImmutableSet.toImmutableSet());
     _trueBdd = pkt.getFactory().one();
   }
 
   private static Map<NodeInterfacePair, BDDFiniteDomain<NodeInterfacePair>> computeFiniteDomains(
-      BDDPacket pkt, Map<String, Configuration> configs, Topology topology) {
+      BDDPacket pkt, Map<String, Configuration> configs, Set<Edge> topologyEdges) {
     // Nodes that can have sessions (and thus need to track last hop outgoing interface).
     Set<String> sessionNodes =
         configs.values().stream()
@@ -59,9 +78,12 @@ public final class LastHopOutgoingInterfaceManager {
             .collect(ImmutableSet.toImmutableSet());
 
     Map<NodeInterfacePair, Set<NodeInterfacePair>> lastHops =
-        topology.getEdges().stream()
+        topologyEdges.stream()
             .filter(edge -> sessionNodes.contains(edge.getNode2()))
             .collect(groupingBy(Edge::getHead, mapping(Edge::getTail, Collectors.toSet())));
+
+    // add a dummy NodeInterfacePair for originating from that interface
+    lastHops.values().forEach(set -> set.add(NO_LAST_HOP));
 
     return lastHops.isEmpty()
         ? ImmutableMap.of()
@@ -70,7 +92,23 @@ public final class LastHopOutgoingInterfaceManager {
 
   public BDD existsLastHop(BDD bdd) {
     // all domains have the same variable, so just pick one.
-    return _finiteDomains.values().iterator().next().existsValue(bdd);
+    Iterator<BDDFiniteDomain<NodeInterfacePair>> iterator = _finiteDomains.values().iterator();
+    if (iterator.hasNext()) {
+      return iterator.next().existsValue(bdd);
+    }
+
+    // No domains! Nothing to do.
+    return bdd;
+  }
+
+  /** Return whether the input {@link BDD} has a constraint on the last hop variable. */
+  public boolean hasLastHopConstraint(BDD bdd) {
+    // all domains have the same variable, so just pick one.
+    return !existsLastHop(bdd).equals(bdd);
+  }
+
+  public BDD getNoLastHopOutgoingInterfaceBdd(String node, String iface) {
+    return getLastHopOutgoingInterfaceBdd(NO_LAST_HOP_NODE, NO_LAST_HOP_INTERFACE, node, iface);
   }
 
   public BDD getLastHopOutgoingInterfaceBdd(
@@ -95,5 +133,9 @@ public final class LastHopOutgoingInterfaceManager {
   @VisibleForTesting
   Map<NodeInterfacePair, BDDFiniteDomain<NodeInterfacePair>> getFiniteDomains() {
     return _finiteDomains;
+  }
+
+  public boolean isTrackedReceivingNode(String node) {
+    return _receivingNodes.contains(node);
   }
 }

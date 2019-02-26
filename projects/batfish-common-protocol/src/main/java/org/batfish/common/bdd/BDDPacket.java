@@ -3,6 +3,7 @@ package org.batfish.common.bdd;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.batfish.common.bdd.BDDInteger.makeFromIndex;
 import static org.batfish.common.bdd.BDDUtils.isAssignment;
+import static org.batfish.common.bdd.BDDUtils.swapPairing;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -115,6 +116,8 @@ public class BDDPacket {
 
   private BDD _tcpUrg;
 
+  private final BDDPairing _swapSourceAndDestinationPairing;
+
   /*
    * Creates a collection of BDD variables representing the
    * various attributes of a control plane advertisement.
@@ -177,6 +180,10 @@ public class BDDPacket {
     _ecn = allocateBDDInteger("ecn", ECN_LENGTH, false);
     _fragmentOffset = allocateBDDInteger("fragmentOffset", FRAGMENT_OFFSET_LENGTH, false);
     _state = allocateBDDInteger("state", STATE_LENGTH, false);
+    _swapSourceAndDestinationPairing =
+        swapPairing(
+            getDstIp(), getSrcIp(), //
+            getDstPort(), getSrcPort());
   }
 
   /*
@@ -557,5 +564,9 @@ public class BDDPacket {
       r = r.or(x);
     }
     return r;
+  }
+
+  public BDD swapSourceAndDestinationFields(BDD bdd) {
+    return bdd.replace(_swapSourceAndDestinationPairing);
   }
 }
