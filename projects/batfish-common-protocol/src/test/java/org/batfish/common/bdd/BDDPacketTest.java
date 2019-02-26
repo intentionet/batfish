@@ -21,6 +21,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import net.sf.javabdd.BDD;
 import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.Ip;
@@ -171,5 +173,33 @@ public class BDDPacketTest {
     assertThat(flow, hasSrcIp(srcIp));
     assertThat(flow, hasIpProtocol(IpProtocol.TCP));
     assertThat(flow, not(hasDstPort(0)));
+  }
+
+  @Test
+  public void testSwapSourceAndDestinationFields() {
+    BDDPacket pkt = new BDDPacket();
+    BDDInteger dstIp = pkt.getDstIp();
+    BDDInteger srcIp = pkt.getSrcIp();
+    BDDInteger dstPort = pkt.getDstPort();
+    BDDInteger srcPort = pkt.getSrcPort();
+
+    Ip ip1 = Ip.parse("1.1.1.1");
+    Ip ip2 = Ip.parse("2.2.2.2");
+    Ip ip3 = Ip.parse("3.3.3.3");
+    Ip ip4 = Ip.parse("4.4.4.4");
+
+    BiFunction<BDDInteger, BDDInteger, Function<BDDInteger, BDD>> mkBdd =
+        (ipVar1, ipVar2) ->
+            portVar ->
+                (ipVar1.value(ip1.asLong()).and(ipVar2.value(ip2.asLong())).and(portVar.value(0)))
+                    .or(
+                        ipVar1
+                            .value(ip3.asLong())
+                            .and(ipVar2.value(ip4.asLong()))
+                            .and(ipVar1.value(1)));
+
+    BDD orig = mkBdd.apply(dstIp, srcIp).apply(dstPort);
+    BDD swapped = mkBdd.apply(srcIp, dstIp).apply(srcPort);
+    assertThat(pkt.swapSourceAndDestinationFields(orig), equalTo(swapped));
   }
 }

@@ -16,6 +16,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.sf.javabdd.BDD;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.FirewallSessionInterfaceInfo;
+import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.acl.MatchSrcInterface;
 import org.batfish.datamodel.acl.OriginatingFromDevice;
@@ -83,6 +85,19 @@ public final class BDDSourceManager {
     return forSourcesInternal(pkt, sources, ImmutableSet.of());
   }
 
+  /**
+   * Create a {@link BDDSourceManager} that tracks the specified interfaces as sources, plus the
+   * device itself.
+   */
+  public static BDDSourceManager forInterfaces(BDDInteger var, Set<String> interfaces) {
+    Set<String> sources =
+        ImmutableSet.<String>builder()
+            .addAll(interfaces)
+            .add(SOURCE_ORIGINATING_FROM_DEVICE)
+            .build();
+    return new BDDSourceManager(new BDDFiniteDomain<>(var, sources), ImmutableSet.of());
+  }
+
   public static BDDSourceManager forIpAccessList(
       BDDPacket pkt, Configuration config, IpAccessList acl) {
     return forIpAccessList(
@@ -103,9 +118,13 @@ public final class BDDSourceManager {
   /**
    * Initialize a {@link BDDSourceManager} for each {@link Configuration} in a network. A single
    * variable is shared by all of them.
+   *
+   * @param initializeSessions When true, nodes that might initialize sessions (i.e. one of their
+   *     active interfaces has a {@link FirewallSessionInterfaceInfo} object) will track all
+   *     interfaces, regardless of whether they are referenced by an ACL.
    */
   public static Map<String, BDDSourceManager> forNetwork(
-      BDDPacket pkt, Map<String, Configuration> configs) {
+      BDDPacket pkt, Map<String, Configuration> configs, boolean initializeSessions) {
     Map<String, Set<String>> activeSources =
         toImmutableMap(
             configs.entrySet(),
@@ -123,6 +142,15 @@ public final class BDDSourceManager {
             entry -> {
               Configuration config = entry.getValue();
               Set<String> active = activeSources.get(config.getHostname());
+
+              if (initializeSessions
+                  && config.getAllInterfaces().values().stream()
+                      .filter(Interface::getActive)
+                      .anyMatch(iface -> iface.getFirewallSessionInterfaceInfo() != null)) {
+                // This node may initialize sessions -- have to track all active sources
+                return active;
+              }
+
               Set<String> sources = new HashSet<>();
               for (IpAccessList acl : config.getIpAccessLists().values()) {
                 referencedSources(config.getIpAccessLists(), acl).stream()

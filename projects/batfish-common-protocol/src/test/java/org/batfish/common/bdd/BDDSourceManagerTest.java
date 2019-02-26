@@ -5,6 +5,7 @@ import static org.batfish.datamodel.IpAccessListLine.ACCEPT_ALL;
 import static org.batfish.datamodel.IpAccessListLine.accepting;
 import static org.batfish.datamodel.IpAccessListLine.rejecting;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchSrcInterface;
+import static org.batfish.datamodel.acl.SourcesReferencedByIpAccessLists.SOURCE_ORIGINATING_FROM_DEVICE;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -22,6 +23,7 @@ import java.util.Set;
 import net.sf.javabdd.BDD;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
+import org.batfish.datamodel.FirewallSessionInterfaceInfo;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.NetworkFactory;
@@ -123,7 +125,8 @@ public class BDDSourceManagerTest {
     Map<String, Configuration> network =
         ImmutableMap.of(config1.getHostname(), config1, config2.getHostname(), config2);
 
-    Map<String, BDDSourceManager> bddSourceManagers = BDDSourceManager.forNetwork(_pkt, network);
+    Map<String, BDDSourceManager> bddSourceManagers =
+        BDDSourceManager.forNetwork(_pkt, network, false);
     BDDSourceManager mgr1 = bddSourceManagers.get(config1.getHostname());
     BDDSourceManager mgr2 = bddSourceManagers.get(config2.getHostname());
 
@@ -159,5 +162,48 @@ public class BDDSourceManagerTest {
             IFACE2, others,
             IFACE3, others,
             IFACE4, others));
+  }
+
+  @Test
+  public void testInitializeSessions() {
+    NetworkFactory nf = new NetworkFactory();
+    Configuration config =
+        nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS).build();
+    Interface.Builder ib = nf.interfaceBuilder().setOwner(config).setActive(true);
+    ib.setName(IFACE1).build();
+    ib.setName(IFACE2).build();
+    ib.setName(IFACE3)
+        .setFirewallSessionInterfaceInfo(
+            new FirewallSessionInterfaceInfo(ImmutableList.of(IFACE3), null, null))
+        .build();
+
+    String hostname = config.getHostname();
+    Map<String, Configuration> configs = ImmutableMap.of(hostname, config);
+    BDDSourceManager mgr = BDDSourceManager.forNetwork(_pkt, configs, true).get(hostname);
+    assertTrue(mgr.allSourcesTracked());
+    assertEquals(
+        mgr.getSourceBDDs().keySet(),
+        ImmutableSet.of(IFACE1, IFACE2, IFACE3, SOURCE_ORIGINATING_FROM_DEVICE));
+    assertEquals(mgr.getSourceBDDs().values().stream().distinct().count(), 4);
+  }
+
+  @Test
+  public void testInitializeSessions_noSessionInfo() {
+    NetworkFactory nf = new NetworkFactory();
+    Configuration config =
+        nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS).build();
+    Interface.Builder ib = nf.interfaceBuilder().setOwner(config).setActive(true);
+    ib.setName(IFACE1).build();
+    ib.setName(IFACE2).build();
+    ib.setName(IFACE3).build();
+
+    String hostname = config.getHostname();
+    Map<String, Configuration> configs = ImmutableMap.of(hostname, config);
+    BDDSourceManager mgr = BDDSourceManager.forNetwork(_pkt, configs, true).get(hostname);
+    assertTrue(!mgr.allSourcesTracked());
+    assertEquals(
+        mgr.getSourceBDDs().keySet(),
+        ImmutableSet.of(IFACE1, IFACE2, IFACE3, SOURCE_ORIGINATING_FROM_DEVICE));
+    assertEquals(mgr.getSourceBDDs().values().stream().distinct().count(), 1);
   }
 }

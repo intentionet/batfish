@@ -17,12 +17,13 @@ import static org.hamcrest.Matchers.hasSize;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import net.sf.javabdd.BDD;
 import org.batfish.bddreachability.transition.Transition;
+import org.batfish.common.BatfishException;
 import org.batfish.common.bdd.BDDPacket;
 import org.batfish.common.bdd.BDDSourceManager;
 import org.batfish.common.bdd.HeaderSpaceToBDD;
@@ -34,7 +35,6 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.Prefix;
-import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.z3.expr.StateExpr;
@@ -143,20 +143,18 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
     // temporarily add a FirewallSessionInterfaceInfo to FW to force its last hops to be tracked
     fwi1.setFirewallSessionInterfaceInfo(
         new FirewallSessionInterfaceInfo(ImmutableList.of(FWI2), null, null));
-    Topology topology =
-        new Topology(
-            ImmutableSortedSet.copyOf(
-                ImmutableList.of(
-                    // R1:I1 -- FW:I1
-                    new org.batfish.datamodel.Edge(r1i1, fwi1),
-                    new org.batfish.datamodel.Edge(fwi1, r1i1),
-                    // R2:I1 -- FW:I1
-                    new org.batfish.datamodel.Edge(r2i1, fwi1),
-                    new org.batfish.datamodel.Edge(fwi1, r2i1),
-                    // R3:I1 -- FW:I2
-                    new org.batfish.datamodel.Edge(r3i1, fwi2),
-                    new org.batfish.datamodel.Edge(fwi2, r3i1))));
-    _lastHopMgr = new LastHopOutgoingInterfaceManager(PKT, _configs, topology);
+    Set<org.batfish.datamodel.Edge> edges =
+        ImmutableSet.of(
+            // R1:I1 -- FW:I1
+            new org.batfish.datamodel.Edge(r1i1, fwi1),
+            new org.batfish.datamodel.Edge(fwi1, r1i1),
+            // R2:I1 -- FW:I1
+            new org.batfish.datamodel.Edge(r2i1, fwi1),
+            new org.batfish.datamodel.Edge(fwi1, r2i1),
+            // R3:I1 -- FW:I2
+            new org.batfish.datamodel.Edge(r3i1, fwi2),
+            new org.batfish.datamodel.Edge(fwi2, r3i1));
+    _lastHopMgr = new LastHopOutgoingInterfaceManager(PKT, _configs, edges);
 
     // transformations
     Transition fwI1Transition = new MockTransition(FWI1);
@@ -180,7 +178,7 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
     return computeInitializedSesssions(
         PKT,
         _configs,
-        ImmutableMap.of(FW, _fwSrcMgr),
+        ImmutableMap.of(FW, _fwSrcMgr, R1, _fwSrcMgr, R2, _fwSrcMgr),
         _lastHopMgr,
         forwardReachableSets,
         _reverseFlowTransformationFactory);
@@ -394,5 +392,15 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
                 hasOutgoingInterface(FWI2),
                 hasSessionFlows(r3I1SessionFlows),
                 hasTransformation(_fwI3ToI2Transition))));
+  }
+
+  @Test
+  public void testOriginatingFromDevice() {
+    throw new BatfishException("TODO");
+  }
+
+  @Test
+  public void testNoLastHopOutgoingInterface() {
+    throw new BatfishException("TODO");
   }
 }

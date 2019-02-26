@@ -4,9 +4,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.immutableEntry;
 import static java.util.stream.Collectors.toMap;
+import static org.batfish.bddreachability.transition.Transitions.IDENTITY;
 import static org.batfish.bddreachability.transition.Transitions.compose;
-import static org.batfish.common.bdd.BDDUtils.swapPairing;
 import static org.batfish.common.util.CommonUtil.toImmutableMap;
+import static org.batfish.datamodel.acl.SourcesReferencedByIpAccessLists.SOURCE_ORIGINATING_FROM_DEVICE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -15,11 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.sf.javabdd.BDD;
-import net.sf.javabdd.BDDPairing;
 import org.batfish.bddreachability.transition.Transition;
 import org.batfish.common.bdd.BDDFiniteDomain;
 import org.batfish.common.bdd.BDDPacket;
@@ -46,14 +47,12 @@ import org.batfish.z3.expr.StateExpr;
  */
 @ParametersAreNonnullByDefault
 final class BDDReachabilityAnalysisSessionFactory {
+  private final BDDPacket _bddPacket;
   private final Map<String, Configuration> _configs;
   private final Map<String, BDDSourceManager> _srcManagers;
   private final LastHopOutgoingInterfaceManager _lastHopManager;
   private final Map<NodeInterfacePair, BDD> _sessionBdds;
   private final BDDReverseFlowTransformationFactory _reverseFlowTransformationFactory;
-
-  // used to swap src/dst header fields
-  private BDDPairing _reverseFlowPairing;
 
   private BDDReachabilityAnalysisSessionFactory(
       BDDPacket bddPacket,
@@ -62,15 +61,12 @@ final class BDDReachabilityAnalysisSessionFactory {
       LastHopOutgoingInterfaceManager lastHopManager,
       Map<StateExpr, BDD> forwardReachableBdds,
       BDDReverseFlowTransformationFactory transformationFactory) {
+    _bddPacket = bddPacket;
     _configs = configs;
     _srcManagers = srcManagers;
     _lastHopManager = lastHopManager;
-    _sessionBdds = reachableSessionCreationBdds(forwardReachableBdds);
+    _sessionBdds = reachableSessionCreationBdds(configs, forwardReachableBdds);
     _reverseFlowTransformationFactory = transformationFactory;
-    _reverseFlowPairing =
-        swapPairing(
-            bddPacket.getDstIp(), bddPacket.getSrcIp(), //
-            bddPacket.getDstPort(), bddPacket.getSrcPort());
   }
 
   /**
@@ -124,6 +120,8 @@ final class BDDReachabilityAnalysisSessionFactory {
       return ImmutableList.of();
     }
 
+    BDDSourceManager srcManager = _srcManagers.get(hostname);
+    Map<String, BDD> sourceBdds = srcManager.getSourceBDDs();
     Map<String, Map<NodeInterfacePair, BDD>> lastHopOutgoingInterfaceBdds =
         toImmutableMap(
             config.activeInterfaces(),
@@ -163,6 +161,8 @@ final class BDDReachabilityAnalysisSessionFactory {
       BDD outIfaceBdd) {
     String hostname = outIface.getOwner().getHostname();
     checkNotNull(outIface.getFirewallSessionInterfaceInfo());
+    Set<String> sessionInterfaces =
+        outIface.getFirewallSessionInterfaceInfo().getSessionInterfaces();
 
     BDDSourceManager srcMgr = _srcManagers.get(hostname);
 
@@ -185,52 +185,80 @@ final class BDDReachabilityAnalysisSessionFactory {
     srcMgr
         .getSourceBDDs()
         .forEach(
-            (srcIface, srcIfaceBdd) -> {
-              // Flows that entered srcIface and exited outIface
-              BDD srcIfaceToOutIfaceBdd = outIfaceBdd.and(srcIfaceBdd);
+            (src, srcBdd) -> {
+              // Flows entered src (either an interface or this device) and exited outIface
+              BDD srcToOutIfaceBdd = outIfaceBdd.and(srcBdd);
 
-              if (srcIfaceToOutIfaceBdd.isZero()) {
+              if (srcToOutIfaceBdd.isZero()) {
                 return;
               }
 
-              /* srcIface's incoming transformation, applied in the reverse direction to the return
+              /* src's incoming transformation, applied in the reverse direction to the return
                * flow.
                */
               Transition incomingTransformation =
-                  _reverseFlowTransformationFactory.reverseFlowIncomingTransformation(
-                      hostname, srcIface);
+                  src.equals(SOURCE_ORIGINATING_FROM_DEVICE)
+                      ? IDENTITY
+                      : _reverseFlowTransformationFactory.reverseFlowIncomingTransformation(
+                          hostname, src);
 
               // reverse direction, so out comes before in.
               Transition transformation = compose(outgoingTransformation, incomingTransformation);
 
-              lastHopOutIfaceBdds
-                  .get(srcIface)
-                  .forEach(
-                      (lastHopOutIface, lastHopOutIfaceBdd) -> {
-                        // Flows that came from lastHopOutIface, entered srcIface and exited
-                        // outIface
-                        BDD lastHopToSrcIfaceToOutIfaceBdd =
-                            srcIfaceToOutIfaceBdd.and(lastHopOutIfaceBdd);
-                        if (lastHopToSrcIfaceToOutIfaceBdd.isZero()) {
-                          return;
-                        }
+              if (src.equals(SOURCE_ORIGINATING_FROM_DEVICE)) {
+                assert !_lastHopManager.hasLastHopConstraint(srcToOutIfaceBdd);
 
-                        // Return flows for this session.
-                        BDD sessionBdd =
-                            srcMgr
-                                .existsSource(
-                                    _lastHopManager.existsLastHop(lastHopToSrcIfaceToOutIfaceBdd))
-                                .replace(_reverseFlowPairing);
+                // Return flows for this session.
+                BDD sessionBdd =
+                    _bddPacket.swapSourceAndDestinationFields(
+                        srcMgr.existsSource(srcToOutIfaceBdd));
+                builder.add(
+                    new BDDFirewallSessionTraceInfo(
+                        hostname, sessionInterfaces, null, null, sessionBdd, transformation));
+              } else {
+                Map<NodeInterfacePair, BDD> nextHops = lastHopOutIfaceBdds.get(src);
+                if (nextHops.isEmpty()) {
+                  // The src interface has no neighbors
+                  assert !_lastHopManager.hasLastHopConstraint(srcToOutIfaceBdd);
+                  BDD sessionBdd =
+                      _bddPacket.swapSourceAndDestinationFields(
+                          srcMgr.existsSource(srcToOutIfaceBdd));
+                  builder.add(
+                      new BDDFirewallSessionTraceInfo(
+                          hostname, sessionInterfaces, null, src, sessionBdd, transformation));
+                  return;
+                }
 
-                        builder.add(
-                            new BDDFirewallSessionTraceInfo(
-                                outIface.getOwner().getHostname(),
-                                outIface.getFirewallSessionInterfaceInfo().getSessionInterfaces(),
-                                lastHopOutIface,
-                                srcIface,
-                                sessionBdd,
-                                transformation));
-                      });
+                nextHops.forEach(
+                    (lastHopOutIface, lastHopOutIfaceBdd) -> {
+                      // Flows that came from lastHopOutIface, entered src and exited outIface
+                      BDD lastHopToSrcIfaceToOutIfaceBdd = srcToOutIfaceBdd.and(lastHopOutIfaceBdd);
+                      if (lastHopToSrcIfaceToOutIfaceBdd.isZero()) {
+                        return;
+                      }
+
+                      // Return flows for this session.
+                      BDD sessionBdd =
+                          _bddPacket.swapSourceAndDestinationFields(
+                              srcMgr.existsSource(
+                                  _lastHopManager.existsLastHop(lastHopToSrcIfaceToOutIfaceBdd)));
+
+                      // Next hop for session flows
+                      NodeInterfacePair sessionNextHop =
+                          lastHopOutIface == LastHopOutgoingInterfaceManager.NO_LAST_HOP
+                              ? null
+                              : lastHopOutIface;
+
+                      builder.add(
+                          new BDDFirewallSessionTraceInfo(
+                              hostname,
+                              sessionInterfaces,
+                              sessionNextHop,
+                              src,
+                              sessionBdd,
+                              transformation));
+                    });
+              }
             });
     return builder.build();
   }
@@ -240,13 +268,23 @@ final class BDDReachabilityAnalysisSessionFactory {
    * session exiting that interface.
    */
   private static Map<NodeInterfacePair, BDD> reachableSessionCreationBdds(
-      Map<StateExpr, BDD> reachable) {
+      Map<String, Configuration> configs, Map<StateExpr, BDD> reachable) {
     return reachable.entrySet().stream()
         .map(
             entry ->
                 immutableEntry(
                     entry.getKey().accept(SessionCreationNodeVisitor.INSTANCE), entry.getValue()))
         .filter(entry -> entry.getKey() != null)
+        .filter(
+            entry -> {
+              NodeInterfacePair key = entry.getKey();
+              return configs
+                      .get(key.getHostname())
+                      .getAllInterfaces()
+                      .get(key.getInterface())
+                      .getFirewallSessionInterfaceInfo()
+                  != null;
+            })
         .collect(toMap(Entry::getKey, Entry::getValue, BDD::or));
   }
 }
