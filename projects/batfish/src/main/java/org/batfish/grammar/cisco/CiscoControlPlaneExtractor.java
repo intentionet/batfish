@@ -4057,6 +4057,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     // TODO: do something with this.
     String name = ctx.name.getText();
     defineStructure(CLASS_MAP, name, ctx);
+    todo(ctx);
   }
 
   @Override
@@ -4292,6 +4293,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       String name = ctx.variable_policy_map_header().getText();
       defineStructure(POLICY_MAP, name, ctx);
     }
+    todo(ctx);
   }
 
   @Override
@@ -4310,6 +4312,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     // TODO: do something with this.
     String name = ctx.name.getText();
     defineStructure(SERVICE_TEMPLATE, name, ctx);
+    todo(ctx);
   }
 
   @Override
@@ -5242,6 +5245,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitDistribute_list_bgp_tail(Distribute_list_bgp_tailContext ctx) {
+    // Note: Mutually exclusive with Prefix_list_bgp_tail
+    // https://www.cisco.com/c/en/us/support/docs/ip/border-gateway-protocol-bgp/5816-bgpfaq-5816.html
     todo(ctx);
   }
 
@@ -5820,7 +5825,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
         filterList,
         BGP_NEIGHBOR_FILTER_AS_PATH_ACCESS_LIST,
         ctx.getStart().getLine());
-    // TODO: Handle filter-list in batfish
+    todo(ctx);
   }
 
   @Override
@@ -6318,6 +6323,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     String mapname = ctx.policy_map.getText();
     _configuration.referenceStructure(
         POLICY_MAP, mapname, INTERFACE_SERVICE_POLICY, ctx.getStart().getLine());
+    todo(ctx);
   }
 
   @Override
@@ -8127,6 +8133,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       // a false positive undefined reference.
       _configuration.defineStructure(CLASS_MAP, "class-default", ctx.getStart().getLine());
     }
+    todo(ctx);
   }
 
   @Override

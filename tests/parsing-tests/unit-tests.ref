@@ -67670,6 +67670,22 @@
       },
       "version" : "0.36.0",
       "warnings" : {
+        "configs/arista_interface" : {
+          "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 8,
+              "Parser_Context" : "[if_service_policy if_inner s_interface stanza cisco_configuration]",
+              "Text" : "service-policy type pbr input pbr-pmap"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 9,
+              "Parser_Context" : "[if_service_policy if_inner s_interface stanza cisco_configuration]",
+              "Text" : "service-policy type qos input qos-pmap"
+            }
+          ]
+        },
         "configs/arista_nat" : {
           "Parse warnings" : [
             {
@@ -67920,6 +67936,24 @@
           "Parse warnings" : [
             {
               "Comment" : "This feature is not currently supported",
+              "Line" : 10,
+              "Parser_Context" : "[filter_list_bgp_tail neighbor_flat_rb_stanza router_bgp_stanza_tail router_bgp_stanza stanza cisco_configuration]",
+              "Text" : "filter-list 10 out"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 14,
+              "Parser_Context" : "[filter_list_bgp_tail neighbor_flat_rb_stanza router_bgp_stanza_tail router_bgp_stanza stanza cisco_configuration]",
+              "Text" : "filter-list 20 in"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 18,
+              "Parser_Context" : "[filter_list_bgp_tail neighbor_flat_rb_stanza router_bgp_stanza_tail router_bgp_stanza stanza cisco_configuration]",
+              "Text" : "filter-list 40 in"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
               "Line" : 29,
               "Parser_Context" : "[redistribute_ospf_bgp_tail bgp_tail router_bgp_stanza_tail router_bgp_stanza stanza cisco_configuration]",
               "Text" : "redistribute ospf abc"
@@ -68126,6 +68160,62 @@
             }
           ]
         },
+        "configs/cisco_misc" : {
+          "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 187,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type inspect dns preset_dns_map\n parameters\n  id-mismatch action log\n  id-randomization\n  message-length maximum 512\n  message-length maximum client auto\n  no tcp-inspection"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 194,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map global_policy\n class inspection_default\n  inspect dns preset_dns_map\n  inspect esmtp\n  inspect ftp\n  inspect ip-options\n  inspect h323 h225\n  inspect h323 ras\n  inspect http ucla_http_inspect\n  inspect netbios\n  inspect snmp\n  inspect tftp\n class ICMP-cmap\n  inspect icmp\n class TCP-cmap\n  set connection advanced-options tcp-state-bypass\n class class-default\n  user-statistics accounting"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 195,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class inspection_default\n  inspect dns preset_dns_map\n  inspect esmtp\n  inspect ftp\n  inspect ip-options\n  inspect h323 h225\n  inspect h323 ras\n  inspect http ucla_http_inspect\n  inspect netbios\n  inspect snmp\n  inspect tftp"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 206,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class ICMP-cmap\n  inspect icmp"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 208,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class TCP-cmap\n  set connection advanced-options tcp-state-bypass"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 210,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class class-default\n  user-statistics accounting"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 212,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type inspect http ucla_http_inspect\n parameters\n  protocol-violation action drop-connection log"
+            }
+          ]
+        },
+        "configs/cisco_nxos" : {
+          "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 8,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map type control-plane match-any copp-icmp\n  match access-group name copp-system-acl-icmp"
+            }
+          ]
+        },
         "configs/cisco_ospf" : {
           "Parse warnings" : [
             {
@@ -68217,6 +68307,178 @@
               "Line" : 83,
               "Parser_Context" : "[ro_area_filterlist s_router_ospf stanza cisco_configuration]",
               "Text" : "area 0 filter-list prefix OUTFILTER out"
+            }
+          ]
+        },
+        "configs/cisco_qos" : {
+          "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 5,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map type control subscriber match-none ABC\n match result-type aaa-timeout\n match authorization-status authorized\n match method dot1x\n match activated-service-template DEF\n match service-template GHI"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 11,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map type network-qos match-any bippety\n  description dum dee dum\n  match cos 0,5-7"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 14,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map type network-qos match-any boppety\n  match cos 1-2,4\n  match protocol fcoe mpls\n  match protocol fcoe"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 19,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map type pbr match-any boop\n 10 match ip access-group boop\n 20 match access-list boop2"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 23,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map match-any cos_all\n  match class-map blip\n  match cos  0  1  2  3  4  5  6  7"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 48,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type network-qos default-ploosh-policy\n description gawff\n  class type network-qos bippetyboo-drop\n    bandwidth remaining percent 10\n    queue-limit dscp cs2 percent 80\n    queue-limit dscp cs3 percent 90\n    queue-limit dscp cs6 percent 100\n    queue-limit dscp cs7 percent 100\n    queue-buffers ratio 10\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    shape kbps 5000000\n    mtu 1500\n  class type network-qos bippetyboo-ndrop-fcoe\n    pause\n    no congestion-control random-detect\n    mtu 2112\n  class type network-qos bippetyboo-ndrop\n    pause\n    no congestion-control random-detect\n    mtu 2112\n  end-policy-map"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 50,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos bippetyboo-drop\n    bandwidth remaining percent 10\n    queue-limit dscp cs2 percent 80\n    queue-limit dscp cs3 percent 90\n    queue-limit dscp cs6 percent 100\n    queue-limit dscp cs7 percent 100\n    queue-buffers ratio 10\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    shape kbps 5000000\n    mtu 1500"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 62,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos bippetyboo-ndrop-fcoe\n    pause\n    no congestion-control random-detect\n    mtu 2112"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 66,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos bippetyboo-ndrop\n    pause\n    no congestion-control random-detect\n    mtu 2112"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 71,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type control-plane feefoo\n class fffoooddd\n  set cos 7\n  service-policy prioritize_backbone\n  trust dscp\n  police cir 36000 kbps bc 250 ms conform transmit violate drop\n   conform-action transmit\n   exceed-action set-dscp-transmit dscp table policed-dscp\n   violate-action drop"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 72,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class fffoooddd\n  set cos 7\n  service-policy prioritize_backbone\n  trust dscp\n  police cir 36000 kbps bc 250 ms conform transmit violate drop\n   conform-action transmit\n   exceed-action set-dscp-transmit dscp table policed-dscp\n   violate-action drop"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 80,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type network-qos default-foob-policy\n  class type network-qos c-foob-drop\n    random-detect aggregate minimum-thresh 1024 maximum-thresh 2048 mark-prob 10\n    fair-queue\n     random-detect\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    mtu 1500\n  class type network-qos c-foob-ndrop-fcoe\n    pause\n    no congestion-control random-detect\n    mtu 2112\n  class type network-qos c-foob-ndrop\n    pause\n    no congestion-control random-detect\n    mtu 2112"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 81,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos c-foob-drop\n    random-detect aggregate minimum-thresh 1024 maximum-thresh 2048 mark-prob 10\n    fair-queue\n     random-detect\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    mtu 1500"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 89,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos c-foob-ndrop-fcoe\n    pause\n    no congestion-control random-detect\n    mtu 2112"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 93,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos c-foob-ndrop\n    pause\n    no congestion-control random-detect\n    mtu 2112"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 97,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type pbr blorf\n 10 class blerf\n  set nexthop 1.2.3.4"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 98,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "10 class blerf\n  set nexthop 1.2.3.4"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 101,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type queueing qqqqq\n  class type queuing bleefee\n    priority level 1\n    bandwidth remaining percent 14\n      dbl"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 102,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type queuing bleefee\n    priority level 1\n    bandwidth remaining percent 14\n      dbl"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 106,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type queuing qqqqq2\n  class type queuing bleefee2"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 107,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type queuing bleefee2"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 108,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type network-qos default-bleeb-policy\n  class type network-qos c-bleeb-drop\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    mtu 1500\n  class type network-qos c-bleeb-ndrop-fcoe\n    pause\n    no congestion-control random-detect\n    mtu 2112"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 109,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos c-bleeb-drop\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    mtu 1500"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 114,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos c-bleeb-ndrop-fcoe\n    pause\n    no congestion-control random-detect\n    mtu 2112"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 118,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type network-qos default-fleep-policy\n  class type network-qos floop\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    mtu 1500"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 119,
+              "Parser_Context" : "[pm_class s_policy_map stanza cisco_configuration]",
+              "Text" : "class type network-qos floop\n    no pause\n    congestion-control tail-drop\n    no congestion-control random-detect\n    mtu 1500"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 124,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map type control subscriber my-bogus-policy\n event session-started match-all\n  10 class always do-until-failure\n   20 authenticate using dot1x priority 10\n event authentication-failure match-first\n  5 class MY_CLASS_1 do-until-failure\n   10 activate service-template my_TEMPLATE_NAME\n  10 class MY_CLASS_2 do-until-failure\n   10 pause reauthentication\n   20 authorize\n   30 terminate dot1x\n   40 authenticate using mab priority 10\n   50 authentication-restart 60\n   60 terminate mab\n   70 authentication-restart 60\n   80 clear-session\n   90 resume reauthentication"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 142,
+              "Parser_Context" : "[s_service_template stanza cisco_configuration]",
+              "Text" : "service-template template_name\n access-group ACL_NAME\n description Service template for Fail open mode\n inactivity-timer 3600 \n linksec policy must-secure\n linksec policy should-secure\n vlan 313\n voice vlan\n tag USER_DEFINED_TAG"
             }
           ]
         },
@@ -69460,6 +69722,26 @@
             }
           ]
         },
+        "configs/foundry_misc" : {
+          "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 41,
+              "Parser_Context" : "[s_policy_map stanza cisco_configuration]",
+              "Text" : "policy-map limitarp\n cir 195456 cbs 1250"
+            }
+          ]
+        },
+        "configs/ios_interface" : {
+          "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 5,
+              "Parser_Context" : "[if_service_policy if_inner s_interface stanza cisco_configuration]",
+              "Text" : "service-policy type control subscriber FOOBAR"
+            }
+          ]
+        },
         "configs/ios_xr_bgp_neighbor_group" : {
           "Parse warnings" : [
             {
@@ -69478,6 +69760,18 @@
         },
         "configs/ios_xr_class_map" : {
           "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 5,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map match-any ABC\n match dscp ipv4 cs4\n end-class-map"
+            },
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 9,
+              "Parser_Context" : "[s_class_map stanza cisco_configuration]",
+              "Text" : "class-map match-any ABCD\n match not dscp ipv4 cs2 cs3 cs4\n end-class-map"
+            },
             {
               "Comment" : "This feature is not currently supported",
               "Line" : 10,
