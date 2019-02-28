@@ -6,7 +6,7 @@
         "description": "Return configuration parameters for OSPF area for every router or node",
         "instanceName": "ospfAreaConfiguration",
          "orderedVariableNames": [
-            "nodes",
+            "nodes"
         ],
         "tags": [
             "ospf"
