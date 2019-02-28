@@ -6,10 +6,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.common.Answerer;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.ospf.OspfArea;
@@ -25,15 +27,13 @@ import org.batfish.datamodel.table.TableMetadata;
 /** Implements {@link OspfAreaConfigurationQuestion}. */
 public class OspfAreaConfigurationAnswerer extends Answerer {
 
-  private static final String COL_NODE = "Node";
-  private static final String COL_VRF = "VRF";
-  private static final String COL_PROCESS_ID = "Process_ID";
-  private static final String COL_AREA = "Area";
-  private static final String COL_AREA_TYPE = "Area_Type";
-  private static final String COL_DEFAULT_ORIGINATE = "Default_Originate";
-  private static final String COL_ACTIVE_INTERFACES = "Active_Interfaces";
-  private static final String COL_PASSIVE_INTERFACES = "Passive_Interfaces";
-  private static final String COL_NO_SUMMARY = "No_Summary";
+  static final String COL_NODE = "Node";
+  static final String COL_VRF = "VRF";
+  static final String COL_PROCESS_ID = "Process_ID";
+  static final String COL_AREA = "Area";
+  static final String COL_AREA_TYPE = "Area_Type";
+  static final String COL_ACTIVE_INTERFACES = "Active_Interfaces";
+  static final String COL_PASSIVE_INTERFACES = "Passive_Interfaces";
 
   public OspfAreaConfigurationAnswerer(Question question, IBatfish batfish) {
     super(question, batfish);
@@ -65,16 +65,10 @@ public class OspfAreaConfigurationAnswerer extends Answerer {
     columnBuilder.add(new ColumnMetadata(COL_AREA_TYPE, Schema.STRING, "Area Type", false, true));
     columnBuilder.add(
         new ColumnMetadata(
-            COL_DEFAULT_ORIGINATE, Schema.BOOLEAN, "Default Originate", false, true));
-    columnBuilder.add(new ColumnMetadata(COL_PROCESS_ID, Schema.STRING, "Process ID", false, true));
-    columnBuilder.add(
-        new ColumnMetadata(
             COL_ACTIVE_INTERFACES, Schema.set(Schema.STRING), "Active Interfaces", false, true));
     columnBuilder.add(
         new ColumnMetadata(
             COL_PASSIVE_INTERFACES, Schema.set(Schema.STRING), "Passive Interfaces", false, true));
-    columnBuilder.add(
-        new ColumnMetadata(COL_NO_SUMMARY, Schema.BOOLEAN, "No Summary", false, true));
 
     return new TableMetadata(columnBuilder.build(), "Display OSPF information areas");
   }
@@ -101,7 +95,7 @@ public class OspfAreaConfigurationAnswerer extends Answerer {
                     for (OspfArea area : ospfProcess.getAreas().values()) {
                       rows.add(
                           getRow(
-                              configurations,
+                              configurations.get(nodeName),
                               nodeName,
                               vrf.getName(),
                               ospfProcess.getProcessId(),
@@ -114,7 +108,7 @@ public class OspfAreaConfigurationAnswerer extends Answerer {
   }
 
   private static Row getRow(
-      Map<String, Configuration> configurations,
+      @Nonnull Configuration configuration,
       String nodeName,
       String vrfName,
       @Nullable String processId,
@@ -127,14 +121,20 @@ public class OspfAreaConfigurationAnswerer extends Answerer {
             .put(COL_VRF, vrfName)
             .put(COL_PROCESS_ID, processId)
             .put(COL_AREA, ospfArea.getAreaNumber())
-            .put(COL_AREA_TYPE, ospfArea.getStubType())
-            .put(COL_DEFAULT_ORIGINATE, ospfArea.getInjectDefaultRoute());
-    Configuration configuration = configurations.get(nodeName);
-    if (configuration == null
-        || !configuration.getVrfs().containsKey(vrfName)
-        || configuration.getVrfs().get(vrfName).getOspfProcess() == null) {
-      return rowBuilder.build();
+            .put(COL_AREA_TYPE, ospfArea.getStubType());
+
+    ImmutableList.Builder<String> activeInterfaces = ImmutableList.builder();
+    ImmutableList.Builder<String> passiveInterfaces = ImmutableList.builder();
+    for (String ifaceName : ospfArea.getInterfaces()) {
+      Interface iface = configuration.getAllInterfaces().get(ifaceName);
+      if (iface.getOspfPassive()) {
+        passiveInterfaces.add(ifaceName);
+      } else {
+        activeInterfaces.add(ifaceName);
+      }
     }
-    configuration.getVrfs().get(vrfName).getOspfProcess().getAr
+    rowBuilder.put(COL_ACTIVE_INTERFACES, activeInterfaces.build());
+    rowBuilder.put(COL_PASSIVE_INTERFACES, passiveInterfaces.build());
+    return rowBuilder.build();
   }
 }

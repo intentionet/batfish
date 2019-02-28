@@ -1,0 +1,23 @@
+{
+    "class": "org.batfish.question.ospfarea.OspfAreaConfigurationQuestion",
+    "differential": false,
+    "nodes": "${nodes}",
+    "instance": {
+        "description": "Return configuration parameters for OSPF area for every router or node",
+        "instanceName": "ospfAreaConfiguration",
+         "orderedVariableNames": [
+            "nodes",
+        ],
+        "tags": [
+            "ospf"
+        ],
+        "variables": {
+            "nodes": {
+                "description": "Include nodes matching this name or regex",
+                "type": "nodeSpec",
+                "optional": true,
+                "displayName": "Nodes"
+            }
+        }
+    }
+}
