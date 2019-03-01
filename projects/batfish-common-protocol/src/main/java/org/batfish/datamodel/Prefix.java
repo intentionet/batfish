@@ -191,10 +191,12 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
 
   @Override
   public int hashCode() {
-    if (_hashcode == 0) {
-      _hashcode = Objects.hash(_ip, _prefixLength);
+    int hashcode = _hashcode;
+    if (hashcode == 0) {
+      hashcode = Objects.hash(_ip, _prefixLength);
+      _hashcode = hashcode;
     }
-    return _hashcode;
+    return hashcode;
   }
 
   public PrefixIpSpace toIpSpace() {
