@@ -127,8 +127,8 @@ public class Ip6 implements Comparable<Ip6>, Serializable {
       b.put(ip6Bytes);
       BitSet bitsWithHighestMostSignificant = BitSet.valueOf(b.array());
       bits = new BitSet(Prefix6.MAX_PREFIX_LENGTH);
-      for (int i = Prefix6.MAX_PREFIX_LENGTH - 1, j = 0; i >= 0; i--, j++) {
-        bits.set(j, bitsWithHighestMostSignificant.get(i));
+      for (int i = 0; i < Prefix6.MAX_PREFIX_LENGTH; ++i) {
+        bits.set(Prefix6.MAX_PREFIX_LENGTH - i - 1, bitsWithHighestMostSignificant.get(i));
       }
       _addressBitsCache.put(this, bits);
     }

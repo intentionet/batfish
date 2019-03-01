@@ -63,29 +63,6 @@ load("@auto_service//:rules.bzl", "auto_service_compile")
 
 auto_service_compile()
 
-# azure-storage
-maven_repository(
-    name = "azure_storage",
-    force = [
-        "com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "org.apache.commons:commons-lang3:3.8.1",
-        "org.slf4j:slf4j-api:1.7.25",
-    ],
-    transitive_deps = [
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "b970c65a38da0569013e0c76de7c404f842496c2:com.microsoft.azure:azure-storage:2.0.0",
-        "6505a72a097d9270f7a9e7bf42c4238283247755:org.apache.commons:commons-lang3:3.8.1",
-        "da76ca59f6a57ee3102f8f9bd9cee742973efa8a:org.slf4j:slf4j-api:1.7.25",
-    ],
-    deps = [
-        "com.microsoft.azure:azure-storage:2.0.0",
-    ],
-)
-
-load("@azure_storage//:rules.bzl", "azure_storage_compile")
-
-azure_storage_compile()
-
 # Commons
 maven_repository(
     name = "commons_beanutils",
@@ -336,10 +313,10 @@ icu4j_compile()
 maven_repository(
     name = "jackson_annotations",
     transitive_deps = [
-        "4b838e5c4fc17ac02f3293e9a558bb781a51c46d:com.fasterxml.jackson.core:jackson-annotations:2.9.7",
+        "ba7f0e6f8f1b28d251eeff2a5604bed34c53ff35:com.fasterxml.jackson.core:jackson-annotations:2.9.8",
     ],
     deps = [
-        "com.fasterxml.jackson.core:jackson-annotations:2.9.7",
+        "com.fasterxml.jackson.core:jackson-annotations:2.9.8",
     ],
 )
 
@@ -351,10 +328,10 @@ jackson_annotations_compile()
 maven_repository(
     name = "jackson_core",
     transitive_deps = [
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
+        "0f5a654e4675769c716e5b387830d19b501ca191:com.fasterxml.jackson.core:jackson-core:2.9.8",
     ],
     deps = [
-        "com.fasterxml.jackson.core:jackson-core:2.9.7",
+        "com.fasterxml.jackson.core:jackson-core:2.9.8",
     ],
 )
 
@@ -366,15 +343,15 @@ jackson_core_compile()
 maven_repository(
     name = "jackson_databind",
     force = [
-        "com.fasterxml.jackson.core:jackson-annotations:2.9.7",
+        "com.fasterxml.jackson.core:jackson-annotations:2.9.8",
     ],
     transitive_deps = [
-        "4b838e5c4fc17ac02f3293e9a558bb781a51c46d:com.fasterxml.jackson.core:jackson-annotations:2.9.7",
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "e6faad47abd3179666e89068485a1b88a195ceb7:com.fasterxml.jackson.core:jackson-databind:2.9.7",
+        "ba7f0e6f8f1b28d251eeff2a5604bed34c53ff35:com.fasterxml.jackson.core:jackson-annotations:2.9.8",
+        "0f5a654e4675769c716e5b387830d19b501ca191:com.fasterxml.jackson.core:jackson-core:2.9.8",
+        "11283f21cc480aa86c4df7a0a3243ec508372ed2:com.fasterxml.jackson.core:jackson-databind:2.9.8",
     ],
     deps = [
-        "com.fasterxml.jackson.core:jackson-databind:2.9.7",
+        "com.fasterxml.jackson.core:jackson-databind:2.9.8",
     ],
 )
 
@@ -386,15 +363,15 @@ jackson_databind_compile()
 maven_repository(
     name = "jackson_guava",
     force = [
-        "com.fasterxml.jackson.core:jackson-annotations:2.9.7",
+        "com.fasterxml.jackson.core:jackson-annotations:2.9.8",
         "com.google.guava:guava:26.0-jre",
         "com.google.errorprone:error_prone_annotations:2.3.1",
     ],
     transitive_deps = [
-        "4b838e5c4fc17ac02f3293e9a558bb781a51c46d:com.fasterxml.jackson.core:jackson-annotations:2.9.7",
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "e6faad47abd3179666e89068485a1b88a195ceb7:com.fasterxml.jackson.core:jackson-databind:2.9.7",
-        "3fc843def28bb7b7f7fae414cc61b347ba89e5ce:com.fasterxml.jackson.datatype:jackson-datatype-guava:2.9.7",
+        "ba7f0e6f8f1b28d251eeff2a5604bed34c53ff35:com.fasterxml.jackson.core:jackson-annotations:2.9.8",
+        "0f5a654e4675769c716e5b387830d19b501ca191:com.fasterxml.jackson.core:jackson-core:2.9.8",
+        "11283f21cc480aa86c4df7a0a3243ec508372ed2:com.fasterxml.jackson.core:jackson-databind:2.9.8",
+        "b7f7819800f8ebe51a03dd951636f6dbc6245ce6:com.fasterxml.jackson.datatype:jackson-datatype-guava:2.9.8",
         "25ea2e8b0c338a877313bd4672d3fe056ea78f0d:com.google.code.findbugs:jsr305:3.0.2",
         "a6a2b2df72fd13ec466216049b303f206bd66c5d:com.google.errorprone:error_prone_annotations:2.3.1",
         "6a806eff209f36f635f943e16d97491f00f6bfab:com.google.guava:guava:26.0-jre",
@@ -403,7 +380,7 @@ maven_repository(
         "775b7e22fb10026eed3f86e8dc556dfafe35f2d5:org.codehaus.mojo:animal-sniffer-annotations:1.14",
     ],
     deps = [
-        "com.fasterxml.jackson.datatype:jackson-datatype-guava:2.9.7",
+        "com.fasterxml.jackson.datatype:jackson-datatype-guava:2.9.8",
     ],
 )
 
@@ -415,16 +392,16 @@ jackson_guava_compile()
 maven_repository(
     name = "jackson_jdk8",
     force = [
-        "com.fasterxml.jackson.core:jackson-annotations:2.9.7",
+        "com.fasterxml.jackson.core:jackson-annotations:2.9.8",
     ],
     transitive_deps = [
-        "4b838e5c4fc17ac02f3293e9a558bb781a51c46d:com.fasterxml.jackson.core:jackson-annotations:2.9.7",
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "e6faad47abd3179666e89068485a1b88a195ceb7:com.fasterxml.jackson.core:jackson-databind:2.9.7",
-        "98d8f190db07f97c64c0ea3af5792f718a6c2cc1:com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.7",
+        "ba7f0e6f8f1b28d251eeff2a5604bed34c53ff35:com.fasterxml.jackson.core:jackson-annotations:2.9.8",
+        "0f5a654e4675769c716e5b387830d19b501ca191:com.fasterxml.jackson.core:jackson-core:2.9.8",
+        "11283f21cc480aa86c4df7a0a3243ec508372ed2:com.fasterxml.jackson.core:jackson-databind:2.9.8",
+        "bcd02aa9195390e23747ed40bf76be869ad3a2fb:com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.8",
     ],
     deps = [
-        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.7",
+        "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.8",
     ],
 )
 
@@ -436,16 +413,16 @@ jackson_jdk8_compile()
 maven_repository(
     name = "jackson_jsr310",
     force = [
-        "com.fasterxml.jackson.core:jackson-annotations:2.9.7",
+        "com.fasterxml.jackson.core:jackson-annotations:2.9.8",
     ],
     transitive_deps = [
-        "4b838e5c4fc17ac02f3293e9a558bb781a51c46d:com.fasterxml.jackson.core:jackson-annotations:2.9.7",
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "e6faad47abd3179666e89068485a1b88a195ceb7:com.fasterxml.jackson.core:jackson-databind:2.9.7",
-        "cbd919f1ce67533e07b98dd493247e8dbabc26b2:com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7",
+        "ba7f0e6f8f1b28d251eeff2a5604bed34c53ff35:com.fasterxml.jackson.core:jackson-annotations:2.9.8",
+        "0f5a654e4675769c716e5b387830d19b501ca191:com.fasterxml.jackson.core:jackson-core:2.9.8",
+        "11283f21cc480aa86c4df7a0a3243ec508372ed2:com.fasterxml.jackson.core:jackson-databind:2.9.8",
+        "28ad1bced632ba338e51c825a652f6e11a8e6eac:com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.8",
     ],
     deps = [
-        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.7",
+        "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.8",
     ],
 )
 
@@ -457,16 +434,16 @@ jackson_jsr310_compile()
 maven_repository(
     name = "jackson_jaxrs_base",
     force = [
-        "com.fasterxml.jackson.core:jackson-annotations:2.9.7",
+        "com.fasterxml.jackson.core:jackson-annotations:2.9.8",
     ],
     transitive_deps = [
-        "4b838e5c4fc17ac02f3293e9a558bb781a51c46d:com.fasterxml.jackson.core:jackson-annotations:2.9.7",
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "e6faad47abd3179666e89068485a1b88a195ceb7:com.fasterxml.jackson.core:jackson-databind:2.9.7",
-        "0d7f607b3a12e6e92b2f29c721e03c11b638cc32:com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.7",
+        "ba7f0e6f8f1b28d251eeff2a5604bed34c53ff35:com.fasterxml.jackson.core:jackson-annotations:2.9.8",
+        "0f5a654e4675769c716e5b387830d19b501ca191:com.fasterxml.jackson.core:jackson-core:2.9.8",
+        "11283f21cc480aa86c4df7a0a3243ec508372ed2:com.fasterxml.jackson.core:jackson-databind:2.9.8",
+        "0113dc616852ea990255d3a820d1006ac2531ae7:com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.8",
     ],
     deps = [
-        "com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.7",
+        "com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.8",
     ],
 )
 
@@ -621,20 +598,20 @@ jersey_container_grizzly2_compile()
 maven_repository(
     name = "jersey_media_jackson",
     force = [
-        "com.fasterxml.jackson.core:jackson-annotations:2.9.7",
-        "com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "com.fasterxml.jackson.core:jackson-databind:2.9.7",
-        "com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.7",
-        "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.7",
-        "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.7",
+        "com.fasterxml.jackson.core:jackson-annotations:2.9.8",
+        "com.fasterxml.jackson.core:jackson-core:2.9.8",
+        "com.fasterxml.jackson.core:jackson-databind:2.9.8",
+        "com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.8",
+        "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.8",
+        "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.8",
         "javax.annotation:javax.annotation-api:1.3.2",
         "javax.ws.rs:javax.ws.rs-api:2.1.1",
     ],
     transitive_deps = [
-        "4b838e5c4fc17ac02f3293e9a558bb781a51c46d:com.fasterxml.jackson.core:jackson-annotations:2.9.7",
-        "4b7f0e0dc527fab032e9800ed231080fdc3ac015:com.fasterxml.jackson.core:jackson-core:2.9.7",
-        "e6faad47abd3179666e89068485a1b88a195ceb7:com.fasterxml.jackson.core:jackson-databind:2.9.7",
-        "2774b8e960697678ca87cf54abd59c736fcd1e83:com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.7",
+        "ba7f0e6f8f1b28d251eeff2a5604bed34c53ff35:com.fasterxml.jackson.core:jackson-annotations:2.9.8",
+        "0f5a654e4675769c716e5b387830d19b501ca191:com.fasterxml.jackson.core:jackson-core:2.9.8",
+        "11283f21cc480aa86c4df7a0a3243ec508372ed2:com.fasterxml.jackson.core:jackson-databind:2.9.8",
+        "da08815ba1c7f7b435e7df02b7bf98327bad2fd4:com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.8",
         "934c04d3cfef185a8008e7bf34331b79730a9d43:javax.annotation:javax.annotation-api:1.3.2",
         "d3466bc9321fe84f268a1adb3b90373fc14b0eb5:javax.ws.rs:javax.ws.rs-api:2.1.1",
         "98e0b7dcef77dc04809f0603868140a1c60bea71:org.glassfish.hk2.external:javax.inject:2.5.0-b42",
@@ -1186,7 +1163,7 @@ xstream_compile()
 
 # ANTLR4 tool
 http_jar(
-    name="antlr4_tool",
-    sha256="6852386d7975eff29171dae002cc223251510d35f291ae277948f381a7b380b4",
-    url="https://search.maven.org/remotecontent?filepath=org/antlr/antlr4/4.7.2/antlr4-4.7.2-complete.jar"
+    name = "antlr4_tool",
+    sha256 = "6852386d7975eff29171dae002cc223251510d35f291ae277948f381a7b380b4",
+    url = "https://search.maven.org/remotecontent?filepath=org/antlr/antlr4/4.7.2/antlr4-4.7.2-complete.jar",
 )

@@ -56,7 +56,7 @@ public final class OspfProcessConfigurationAnswerer extends Answerer {
   public AnswerElement answer() {
     OspfProcessConfigurationQuestion question = (OspfProcessConfigurationQuestion) _question;
     Map<String, Configuration> configurations = _batfish.loadConfigurations();
-    Set<String> nodes = question.getNodes().getMatchingNodes(_batfish);
+    Set<String> nodes = question.getNodesSpecifier().resolve(_batfish.specifierContext());
 
     Set<String> matchingProperties =
         ImmutableSet.copyOf(question.getProperties().getMatchingProperties());

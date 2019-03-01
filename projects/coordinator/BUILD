@@ -23,7 +23,6 @@ java_library(
     deps = [
         "//projects/batfish-common-protocol:common",
         "//projects/question",
-        "@azure_storage//:compile",
         "@commons_io//:compile",
         "@grizzly_server//:compile",
         "@guava//:compile",

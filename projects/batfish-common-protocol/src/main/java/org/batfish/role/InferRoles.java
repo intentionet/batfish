@@ -224,7 +224,8 @@ public final class InferRoles {
       List<Pair<String, PreToken>> pretokens) {
     List<Pair<String, Token>> tokens = new ArrayList<>();
     int size = pretokens.size();
-    for (int i = 0; i < size; i++) {
+    int i = 0;
+    while (i < size) {
       StringBuilder chars = new StringBuilder(pretokens.get(i).getFirst());
       PreToken pt = pretokens.get(i).getSecond();
       switch (pt) {
@@ -247,6 +248,7 @@ public final class InferRoles {
         default:
           throw new BatfishException("Unknown pretoken " + pt);
       }
+      i++;
     }
     return tokens;
   }
@@ -257,7 +259,8 @@ public final class InferRoles {
       List<Pair<String, PreToken>> pretokens) {
     List<Pair<String, Token>> tokens = new ArrayList<>();
     int size = pretokens.size();
-    for (int i = 0; i < size; i++) {
+    int i = 0;
+    while (i < size) {
       String chars = pretokens.get(i).getFirst();
       PreToken pt = pretokens.get(i).getSecond();
       switch (pt) {
@@ -278,6 +281,7 @@ public final class InferRoles {
         default:
           throw new BatfishException("Unexpected pretoken " + pt);
       }
+      i++;
     }
     return tokens;
   }

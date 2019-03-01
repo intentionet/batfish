@@ -57,6 +57,9 @@ test -raw tests/questions/experimental/nodes.ref validate-template nodes nodes="
 # validate nodeProperties
 test -raw tests/questions/experimental/nodeProperties.ref validate-template nodeProperties nodes=".*", properties="ntp.*"
 
+# validate ospfAreaConfiguration
+test -raw tests/questions/experimental/ospfAreaConfiguration.ref validate-template ospfAreaConfiguration nodes=".*"
+
 # validate ospfProcessConfiguration
 test -raw tests/questions/experimental/ospfProcessConfiguration.ref validate-template ospfProcessConfiguration nodes=".*", properties="props-.*"
 

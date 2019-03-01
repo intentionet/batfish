@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -11,6 +13,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nullable;
@@ -281,9 +284,15 @@ public class PrefixSpace implements Serializable {
    *
    * @return A {@code Set} of all {@link PrefixRange}s in this {@link PrefixSpace}
    */
-  @JsonValue
   public Set<PrefixRange> getPrefixRanges() {
     return _trie.getPrefixRanges();
+  }
+
+  @JsonValue
+  private SortedSet<PrefixRange> jsonValue() {
+    // Sorted for deterministic output
+    return getPrefixRanges().stream()
+        .collect(ImmutableSortedSet.toImmutableSortedSet(Ordering.natural()));
   }
 
   @Override

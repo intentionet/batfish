@@ -20,7 +20,6 @@ import org.batfish.common.Task;
 import org.batfish.common.WorkItem;
 import org.batfish.common.util.WorkItemBuilder;
 import org.batfish.coordinator.WorkDetails.WorkType;
-import org.batfish.coordinator.queues.AzureQueue;
 import org.batfish.coordinator.queues.MemoryQueue;
 import org.batfish.coordinator.queues.WorkQueue;
 import org.batfish.datamodel.InitializationMetadata;
@@ -59,18 +58,6 @@ public class WorkQueueMgr {
     _blockingWork = new HashSet<>();
     _logger = logger;
     switch (wqType) {
-      case azure:
-        String storageConnectionString =
-            String.format(
-                "DefaultEndpointsProtocol=%s;AccountName=%s;AccountKey=%s",
-                Main.getSettings().getStorageProtocol(),
-                Main.getSettings().getStorageAccountName(),
-                Main.getSettings().getStorageAccountKey());
-        _queueCompletedWork =
-            new AzureQueue(Main.getSettings().getQueueCompletedWork(), storageConnectionString);
-        _queueIncompleteWork =
-            new AzureQueue(Main.getSettings().getQueueIncompleteWork(), storageConnectionString);
-        break;
       case memory:
         _queueCompletedWork = new MemoryQueue();
         _queueIncompleteWork = new MemoryQueue();

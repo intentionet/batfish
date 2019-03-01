@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -28,7 +25,7 @@ public class Prefix6Space implements Serializable {
     public void addPrefix6Range(Prefix6Range prefix6Range) {
       Prefix6 prefix6 = prefix6Range.getPrefix6();
       int prefixLength = prefix6.getPrefixLength();
-      BitSet bits = getAddressBits(prefix6.getAddress());
+      BitSet bits = prefix6.getAddress().getAddressBits();
       _root.addPrefix6Range(prefix6Range, bits, prefixLength, 0);
     }
 
@@ -47,7 +44,7 @@ public class Prefix6Space implements Serializable {
     public boolean containsPrefix6Range(Prefix6Range prefix6Range) {
       Prefix6 prefix6 = prefix6Range.getPrefix6();
       int prefixLength = prefix6.getPrefixLength();
-      BitSet bits = getAddressBits(prefix6.getAddress());
+      BitSet bits = prefix6.getAddress().getAddressBits();
       return _root.containsPrefix6Range(prefix6Range, bits, prefixLength, 0);
     }
 
@@ -164,27 +161,8 @@ public class Prefix6Space implements Serializable {
     }
   }
 
-  private static final int NUM_BITS = 128;
-
   /** */
   private static final long serialVersionUID = 1L;
-
-  // TODO: verify that this has been correctly modified for Ip6 / BigInteger
-  private static BitSet getAddressBits(Ip6 address) {
-    int numBytes = NUM_BITS / 8;
-    BigInteger addressAsBigInteger = address.asBigInteger();
-    byte[] addressAsByteArray = addressAsBigInteger.toByteArray();
-    byte[] addressAs128BitByteArray = Arrays.copyOfRange(addressAsByteArray, 0, numBytes);
-    ByteBuffer b = ByteBuffer.allocate(numBytes);
-    b.order(ByteOrder.LITTLE_ENDIAN);
-    b.put(addressAs128BitByteArray);
-    BitSet bitsWithHighestMostSignificant = BitSet.valueOf(b.array());
-    BitSet bits = new BitSet(NUM_BITS);
-    for (int i = NUM_BITS - 1, j = 0; i >= 0; i--, j++) {
-      bits.set(j, bitsWithHighestMostSignificant.get(i));
-    }
-    return bits;
-  }
 
   private BitTrie _trie;
 

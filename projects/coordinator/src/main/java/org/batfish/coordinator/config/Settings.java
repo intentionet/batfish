@@ -56,11 +56,6 @@ public class Settings extends BaseSettings {
   private static final String ARG_SSL_WORK_TRUST_ALL_CERTS = "sslworktrustallcerts";
   private static final String ARG_SSL_WORK_TRUSTSTORE_FILE = "sslworktruststorefile";
   private static final String ARG_SSL_WORK_TRUSTSTORE_PASSWORD = "sslworktruststorepassword";
-  /** Need when using Azure queues for storing work items */
-  private static final String ARG_STORAGE_ACCOUNT_KEY = "storageaccountkey";
-
-  private static final String ARG_STORAGE_ACCOUNT_NAME = "storageaccountname";
-  private static final String ARG_STORAGE_PROTOCOL = "storageprotocol";
 
   private static final String ARG_TRACING_AGENT_HOST = "tracingagenthost";
   private static final String ARG_TRACING_AGENT_PORT = "tracingagentport";
@@ -334,13 +329,6 @@ public class Settings extends BaseSettings {
     setDefaultProperty(ARG_TRACING_AGENT_HOST, "localhost");
     setDefaultProperty(ARG_TRACING_AGENT_PORT, 5775);
     setDefaultProperty(ARG_TRACING_ENABLE, false);
-    // setDefaultProperty(ARG_SSL_KEYSTORE_FILE, "selfsigned.jks");
-    // setDefaultProperty(ARG_SSL_KEYSTORE_PASSWORD, "batfish");
-    setDefaultProperty(
-        ARG_STORAGE_ACCOUNT_KEY,
-        "zRTT++dVryOWXJyAM7NM0TuQcu0Y23BgCQfkt7xh2f/Mm+r6c8/XtPTY0xxaF6tPSACJiuACsjotDeNIVyXM8Q==");
-    setDefaultProperty(ARG_STORAGE_ACCOUNT_NAME, "testdrive");
-    setDefaultProperty(ARG_STORAGE_PROTOCOL, "http");
   }
 
   private void initOptions() {
@@ -380,7 +368,7 @@ public class Settings extends BaseSettings {
     addListOption(
         ARG_QUESTION_TEMPLATE_DIRS, "paths to question template directories", ARGNAME_PATHS);
 
-    addOption(ARG_QUEUE_TYPE, "queue type to use {azure, memory}", "qtype");
+    addOption(ARG_QUEUE_TYPE, "queue type to use {memory}", "qtype");
 
     addOption(
         ARG_POOL_BIND_HOST,
@@ -461,9 +449,6 @@ public class Settings extends BaseSettings {
     _sslWorkTrustAllCerts = getBooleanOptionValue(ARG_SSL_WORK_TRUST_ALL_CERTS);
     _sslWorkTruststoreFile = getPathOptionValue(ARG_SSL_WORK_TRUSTSTORE_FILE);
     _sslWorkTruststorePassword = getStringOptionValue(ARG_SSL_WORK_TRUSTSTORE_PASSWORD);
-    _storageAccountKey = getStringOptionValue(ARG_STORAGE_ACCOUNT_KEY);
-    _storageAccountName = getStringOptionValue(ARG_STORAGE_ACCOUNT_NAME);
-    _storageProtocol = getStringOptionValue(ARG_STORAGE_PROTOCOL);
     _tracingAgentHost = getStringOptionValue(ARG_TRACING_AGENT_HOST);
     _tracingAgentPort = getIntegerOptionValue(ARG_TRACING_AGENT_PORT);
     _tracingEnable = getBooleanOptionValue(ARG_TRACING_ENABLE);

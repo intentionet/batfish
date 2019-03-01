@@ -4,14 +4,23 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import java.util.Map;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.visitors.GenericIpSpaceVisitor;
 
+@ParametersAreNonnullByDefault
 public class PrefixIpSpace extends IpSpace {
 
   private static final String PROP_PREFIX = "prefix";
 
-  /** */
   private static final long serialVersionUID = 1L;
+
+  public static IpSpace of(Prefix prefix) {
+    return prefix.equals(Prefix.ZERO)
+        ? UniverseIpSpace.INSTANCE
+        : prefix.getPrefixLength() == Prefix.MAX_PREFIX_LENGTH
+            ? prefix.getStartIp().toIpSpace()
+            : prefix.toIpSpace();
+  }
 
   private final Prefix _prefix;
 
