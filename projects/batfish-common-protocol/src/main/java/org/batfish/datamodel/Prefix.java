@@ -92,6 +92,8 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
 
   private final int _prefixLength;
 
+  private transient volatile int _hashcode = 0;
+
   private Prefix(Ip ip, int prefixLength) {
     checkArgument(
         prefixLength >= 0 && prefixLength <= MAX_PREFIX_LENGTH,
@@ -189,7 +191,10 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(_ip, _prefixLength);
+    if (_hashcode == 0) {
+      _hashcode = Objects.hash(_ip, _prefixLength);
+    }
+    return _hashcode;
   }
 
   public PrefixIpSpace toIpSpace() {
