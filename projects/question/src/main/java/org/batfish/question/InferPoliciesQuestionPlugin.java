@@ -411,13 +411,10 @@ public class InferPoliciesQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
+  /**
    * Infer likely role-based consistency policies for the network. Each such policy in general has
    * the form: all nodes that have the same role, according to a given role specifier S, must be
    * consistent with one another in some particular way.
-   *
-   * @type InferPolicies multifile
    */
   public static final class InferPoliciesQuestion extends Question {
 

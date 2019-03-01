@@ -277,21 +277,7 @@ public class OspfSessionCheckQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
-   * Checks if OSPF sessions are correctly configured.
-   *
-   * <p>Details coming
-   *
-   * @type OspfSessionCheck multifile
-   * @param foreignOspfNetworks Details coming.
-   * @param node1Regex Regular expression to match the nodes names for one end of the sessions.
-   *     Default is '.*' (all nodes).
-   * @param node2Regex Regular expression to match the nodes names for the other end of the
-   *     sessions. Default is '.*' (all nodes).
-   * @example bf_answer("OspfSessionCheck", node1Regex="as1.*", node2Regex="as2.*") Checks all OSPF
-   *     sessions between nodes that start with as1 and those that start with as2.
-   */
+  /** Checks if OSPF sessions are correctly configured. */
   public static class OspfSessionCheckQuestion extends Question {
 
     private static final String PROP_FOREIGN_OSPF_NETWORKS = "foreignOspfNetworks";

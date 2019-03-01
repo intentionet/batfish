@@ -63,13 +63,7 @@ public class ParseTreesQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
-   * Outputs parse trees from test-rig initialization.
-   *
-   * @type InitInfo onefile
-   * @example bf_answer("parsetrees") Get parse trees
-   */
+  /** Outputs parse trees from snapshot initialization. */
   public static class ParseTreesQuestion extends Question {
 
     public ParseTreesQuestion() {}

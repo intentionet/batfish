@@ -380,35 +380,13 @@ public class OutliersQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
+  /**
    * Detects and ranks outliers based on a comparison of nodes' configurations.
    *
    * <p>If many nodes have a structure of a given name and a few do not, this may indicate an error.
    * If many nodes have a structure named N whose definition is identical, and a few nodes have a
    * structure named N that is defined differently, this may indicate an error. This question
    * leverages this and similar intuition to find outliers.
-   *
-   * @type Outliers multifile
-   * @param serverSets Set of server-set names to analyze drawn from ( DnsServers, LoggingServers,
-   *     NtpServers, SnmpTrapServers, TacacsServers) Default value is '[]' (which denotes all
-   *     server-set names). This option is applicable to the "sameServers" hypothesis.
-   * @param namedStructTypes Set of structure types to analyze drawn from ( AsPathAccessList,
-   *     AuthenticationKeyChain, CommunityList,IkePhase1Policy, IkePhase1Proposal, IkePhase1Key, IpAccessList,
-   *      IpsecPhase2Policy, IpsecPhase2Proposal, IpsecPeerConfig,, RouteFilterList, RoutingPolicy)
-   *      Default value is '[]' (which denotes all structure types). This option is applicable to
-   *      the "sameName" and sameDefinition" hypotheses.
-   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @param hypothesis A string that indicates the hypothesis being used to identify outliers.
-   *     "sameDefinition" indicates a hypothesis that same-named structures should have identical
-   *     definitions. "sameName" indicates a hypothesis that all nodes should have structures of the
-   *     same names. "sameServers" indicates a hypothesis that all nodes should have the same set of
-   *     protocol-specific servers (e.g., DNS servers). Default is "sameDefinition".
-   * @param verbose A boolean that indicates whether all results should be returned, including
-   *     situations when a hypothesis yields no outliers and situations when a hypothesis yields a
-   *     number of outliers that exceeds our threshold for considering it a likely error. Default
-   *     value is false.
    */
   public static final class OutliersQuestion extends Question implements INodeRegexQuestion {
 

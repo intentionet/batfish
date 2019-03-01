@@ -79,16 +79,7 @@ public class RolesQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
-   * List the roles of each node.
-   *
-   * @type Roles multifile
-   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @param roleDimension Which dimension to report on. The default is the primary auto-inferred
-   *     one.
-   */
+  /** List the roles of each node. */
   public static final class RolesQuestion extends Question {
 
     private static final String PROP_NODE_REGEX = "nodeRegex";

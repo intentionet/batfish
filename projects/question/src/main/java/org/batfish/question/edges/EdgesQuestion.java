@@ -7,16 +7,7 @@ import org.batfish.datamodel.EdgeType;
 import org.batfish.datamodel.questions.NodesSpecifier;
 import org.batfish.datamodel.questions.Question;
 
-// <question_page_comment>
-/*
- * Lists neighbor relationships in the network as edges.
- *
- * @param edgeType The type(s) of edges to focus. Default is Layer 3.
- * @param nodes Regular expression to match the nodes names for one end of pair. Default is '.*'
- *     (all nodes).
- * @param remoteNodes Regular expression to match the nodes names for the other end of the pair.
- *     Default is '.*' (all nodes).
- */
+/** Lists neighbor relationships in the network as edges. */
 public class EdgesQuestion extends Question {
 
   private static final String PROP_EDGE_TYPE = "edgeType";

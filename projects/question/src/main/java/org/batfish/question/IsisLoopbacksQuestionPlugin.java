@@ -207,18 +207,11 @@ public class IsisLoopbacksQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
+  /**
    * Lists which loopbacks interfaces are being announced into ISIS.
    *
    * <p>When running ISIS, it is a good practice to announce loopbacks interface IPs into ISIS. This
    * question produces the list of nodes for which such announcements are happening.
-   *
-   * @type IsisLoopbacks onefile
-   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @example bf_answer("IsisLoopbacks", nodeRegex='as2.*') Answers the question only for nodes
-   *     whose names start with 'as2'.
    */
   public static class IsisLoopbacksQuestion extends Question {
 

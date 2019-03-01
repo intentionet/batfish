@@ -168,19 +168,11 @@ public class BgpLoopbacksQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-
-  /*
+  /**
    * Lists which loopback interfaces are being announced into BGP.
    *
    * <p>When running BGP without an IGP, one may wish to announce loopback interface IPs into BGP.
    * This question produces the list of nodes for which such announcements are not happening.
-   *
-   * @type BgpLoopbacks onefile
-   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @example bf_answer("BgpLoopbacks", nodeRegex='as2.*') Answers the question only for nodes whose
-   *     names start with 'as2'.
    */
   public static class BgpLoopbacksQuestion extends Question {
 

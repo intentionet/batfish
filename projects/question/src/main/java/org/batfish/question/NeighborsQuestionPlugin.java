@@ -987,30 +987,10 @@ public class NeighborsQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
-   * Lists neighbor relationships in the testrig.
+  /**
+   * Produces the raw JSON datamodel for neighbor relationships in the snapshot.
    *
-   * <p>Details coming
-   *
-   * @type Neighbors multifile
-   * @param neighborType The type(s) of neighbor relationships to focus on among (eBGP, iBGP, IP).
-   *     Default is IP.
-   * @param nodes Regular expression to match the nodes names for one end of pair. Default is '.*'
-   *     (all nodes).
-   * @param remoteNodes Regular expression to match the nodes names for the other end of the pair.
-   *     Default is '.*' (all nodes).
-   * @param style String indicating the style of information requested about each edge: "summary" is
-   *     the default and returns only the names of nodes/interfaces in the edge; "verbose" provides
-   *     full configuration information about those nodes/interfaces; "role" abstracts edges to the
-   *     role level.
-   * @param roleSpecifier NodeRoleSpecifier that assigns roles to nodes. This is an optional
-   *     variable that is only used if the style is set to "role". If no roleSpecifier is provided
-   *     then by default the roles originally assigned to nodes when the configurations were loaded
-   *     are used.
-   * @example bf_answer("Neighbors", neighborType=["ebgp", "ibgp"] node1Regex="as1.*",
-   *     node2Regex="as2.*") Shows all eBGP and iBGP neighbor relationships between nodes that start
-   *     with as1 and those that start with as2.
+   * <p>Generally prefer {@link org.batfish.question.edges.EdgesQuestion}.
    */
   public static class NeighborsQuestion extends Question {
 

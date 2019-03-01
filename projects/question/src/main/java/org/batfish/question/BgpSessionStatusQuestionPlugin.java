@@ -319,20 +319,10 @@ public class BgpSessionStatusQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
+  /**
    * Returns the status of BGP sessions.
    *
    * <p>Based on config data, determines the status of IBGP and EBGP sessions
-   *
-   * @type BgpSessionCheck multifile
-   * @param foreignBgpGroups Details coming.
-   * @param node1Regex Regular expression to match the nodes names for one end of the sessions.
-   *     Default is '.*' (all nodes).
-   * @param node2Regex Regular expression to match the nodes names for the other end of the
-   *     sessions. Default is '.*' (all nodes).
-   * @example bf_answer("BgpSessionCheck", node1Regex="as1.*", node2Regex="as2.*") Checks all BGP
-   *     sessions between nodes that start with as1 and those that start with as2.
    */
   public static class BgpSessionStatusQuestion extends Question {
 

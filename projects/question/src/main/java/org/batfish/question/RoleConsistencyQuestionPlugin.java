@@ -109,16 +109,9 @@ public class RoleConsistencyQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
+  /**
    * Checks a role-based consistency policy requiring that all nodes of the same role have the same
    * value for some particular configuration property (e.g., DnsServers).
-   *
-   * @type RoleConsistency multifile
-   * @param roleDimension The name of the role dimension to use. If not specified then the primary
-   *     auto-inferred role dimension.
-   * @param propertyName A string representing the name of the configuration property to check.
-   *     Allowed values are DnsServers, LoggingServers, NtpServers, SnmpTrapServers, TacacsServers.
    */
   public static final class RoleConsistencyQuestion extends AbstractRoleConsistencyQuestion {
 

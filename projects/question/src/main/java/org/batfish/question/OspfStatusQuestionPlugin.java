@@ -217,21 +217,7 @@ public class OspfStatusQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
-   * Lists the OSPF status of interfaces.
-   *
-   * <p>When running OSPF, it is a good practice to announce loopbacks interface IPs into OSPF. This
-   * question produces the list of nodes for which such announcements are happening.
-   *
-   * @type OspfStatus onefile
-   * @param interfacesSpecifier Expression for interfaces to include. Default value is '.*' (all
-   *     interfaces).
-   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @example bf_answer("OspfStatus", nodeRegex='as2.*') Answers the question only for nodes whose
-   *     names start with 'as2'.
-   */
+  /** Lists the OSPF status of interfaces. */
   public static class OspfStatusQuestion extends Question {
 
     private static final String PROP_INTERFACES_SPECIFIER = "interfacesSpecifier";
