@@ -188,7 +188,8 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
 
   @Override
   public int hashCode() {
-    return 31 * _prefixLength + Long.hashCode(_ip.asLong());
+    // We want a custom quick implementation, so don't call Objects.hash()
+    return 31 * Long.hashCode(_ip.asLong()) + _prefixLength;
   }
 
   public PrefixIpSpace toIpSpace() {
