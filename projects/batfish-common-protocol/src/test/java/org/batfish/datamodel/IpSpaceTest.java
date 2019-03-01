@@ -64,7 +64,7 @@ public class IpSpaceTest {
     Ip ip = Ip.parse("1.0.0.0");
     IpIpSpace ipIpSpace = ip.toIpSpace();
     Prefix p = Prefix.create(ip, 24);
-    PrefixIpSpace prefixIpSpace = p.toIpSpace();
+    IpSpace prefixIpSpace = p.toIpSpace();
     IpWildcard ipWildcard1 = new IpWildcard(p);
     IpWildcardIpSpace ipWildcard1IpSpace = ipWildcard1.toIpSpace();
     IpWildcard ipWildcard2 = new IpWildcard(ip);

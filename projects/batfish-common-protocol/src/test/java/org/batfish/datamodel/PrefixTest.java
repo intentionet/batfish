@@ -32,7 +32,7 @@ public class PrefixTest {
 
   @Test
   public void testContains() {
-    PrefixIpSpace p = Prefix.parse("1.2.3.4/31").toIpSpace();
+    IpSpace p = Prefix.parse("1.2.3.4/31").toIpSpace();
     assertThat(p, containsIp(Ip.parse("1.2.3.4")));
     assertThat(p, containsIp(Ip.parse("1.2.3.5")));
     assertThat(p, not(containsIp(Ip.parse("1.2.3.6"))));

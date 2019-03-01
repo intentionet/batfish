@@ -112,7 +112,7 @@ public class IpSpaceToBDD implements GenericIpSpaceVisitor<BDD> {
   }
 
   public BDD toBDD(Ip ip) {
-    return visit(Prefix.create(ip, Prefix.MAX_PREFIX_LENGTH).toIpSpace());
+    return firstBitsEqual(ip, Prefix.MAX_PREFIX_LENGTH);
   }
 
   public BDD toBDD(IpWildcard ipWildcard) {
