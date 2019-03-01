@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.io.Serializable;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nonnull;
@@ -91,8 +90,6 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
   private final Ip _ip;
 
   private final int _prefixLength;
-
-  private transient volatile int _hashcode = 0;
 
   private Prefix(Ip ip, int prefixLength) {
     checkArgument(
@@ -191,12 +188,7 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
 
   @Override
   public int hashCode() {
-    int hashcode = _hashcode;
-    if (hashcode == 0) {
-      hashcode = Objects.hash(_ip, _prefixLength);
-      _hashcode = hashcode;
-    }
-    return hashcode;
+    return 31 * _prefixLength + Long.hashCode(_ip.asLong());
   }
 
   public PrefixIpSpace toIpSpace() {
