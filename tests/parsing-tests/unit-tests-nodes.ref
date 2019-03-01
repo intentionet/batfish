@@ -25923,6 +25923,76 @@
                           "prefixSet" : {
                             "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
                             "prefixSpace" : [
+                              "100.93.104.127/32"
+                            ]
+                          }
+                        },
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.Not",
+                          "expr" : {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                            "protocol" : "bgp"
+                          }
+                        },
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.Not",
+                          "expr" : {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                            "protocol" : "ibgp"
+                          }
+                        },
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.Not",
+                          "expr" : {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
+                            "protocol" : "aggregate"
+                          }
+                        },
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.WithEnvironmentExpr",
+                          "expr" : {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.BooleanExprs$StaticBooleanExpr",
+                            "type" : "True"
+                          },
+                          "postStatements" : [
+                            {
+                              "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                              "type" : "UnsetWriteIntermediateBgpAttributes"
+                            }
+                          ],
+                          "postTrueStatements" : [
+                            {
+                              "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                              "type" : "SetReadIntermediateBgpAttributes"
+                            },
+                            {
+                              "class" : "org.batfish.datamodel.routing_policy.statement.SetOrigin",
+                              "originType" : {
+                                "class" : "org.batfish.datamodel.routing_policy.expr.LiteralOrigin",
+                                "originType" : "igp"
+                              }
+                            }
+                          ],
+                          "preStatements" : [
+                            {
+                              "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                              "type" : "SetWriteIntermediateBgpAttributes"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.Conjunction",
+                      "conjuncts" : [
+                        {
+                          "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
+                          "prefix" : {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
+                          },
+                          "prefixSet" : {
+                            "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
+                            "prefixSpace" : [
                               "100.78.0.0/29"
                             ]
                           }
@@ -25994,76 +26064,6 @@
                             "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
                             "prefixSpace" : [
                               "100.78.3.0/29"
-                            ]
-                          }
-                        },
-                        {
-                          "class" : "org.batfish.datamodel.routing_policy.expr.Not",
-                          "expr" : {
-                            "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
-                            "protocol" : "bgp"
-                          }
-                        },
-                        {
-                          "class" : "org.batfish.datamodel.routing_policy.expr.Not",
-                          "expr" : {
-                            "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
-                            "protocol" : "ibgp"
-                          }
-                        },
-                        {
-                          "class" : "org.batfish.datamodel.routing_policy.expr.Not",
-                          "expr" : {
-                            "class" : "org.batfish.datamodel.routing_policy.expr.MatchProtocol",
-                            "protocol" : "aggregate"
-                          }
-                        },
-                        {
-                          "class" : "org.batfish.datamodel.routing_policy.expr.WithEnvironmentExpr",
-                          "expr" : {
-                            "class" : "org.batfish.datamodel.routing_policy.expr.BooleanExprs$StaticBooleanExpr",
-                            "type" : "True"
-                          },
-                          "postStatements" : [
-                            {
-                              "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
-                              "type" : "UnsetWriteIntermediateBgpAttributes"
-                            }
-                          ],
-                          "postTrueStatements" : [
-                            {
-                              "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
-                              "type" : "SetReadIntermediateBgpAttributes"
-                            },
-                            {
-                              "class" : "org.batfish.datamodel.routing_policy.statement.SetOrigin",
-                              "originType" : {
-                                "class" : "org.batfish.datamodel.routing_policy.expr.LiteralOrigin",
-                                "originType" : "igp"
-                              }
-                            }
-                          ],
-                          "preStatements" : [
-                            {
-                              "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
-                              "type" : "SetWriteIntermediateBgpAttributes"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      "class" : "org.batfish.datamodel.routing_policy.expr.Conjunction",
-                      "conjuncts" : [
-                        {
-                          "class" : "org.batfish.datamodel.routing_policy.expr.MatchPrefixSet",
-                          "prefix" : {
-                            "class" : "org.batfish.datamodel.routing_policy.expr.DestinationNetwork"
-                          },
-                          "prefixSet" : {
-                            "class" : "org.batfish.datamodel.routing_policy.expr.ExplicitPrefixSet",
-                            "prefixSpace" : [
-                              "100.93.104.127/32"
                             ]
                           }
                         },
