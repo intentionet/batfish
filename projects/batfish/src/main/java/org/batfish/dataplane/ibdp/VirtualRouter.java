@@ -116,6 +116,7 @@ import org.batfish.dataplane.rib.BgpRib;
 import org.batfish.dataplane.rib.ConnectedRib;
 import org.batfish.dataplane.rib.IsisLevelRib;
 import org.batfish.dataplane.rib.IsisRib;
+import org.batfish.dataplane.rib.KernelRib;
 import org.batfish.dataplane.rib.LocalRib;
 import org.batfish.dataplane.rib.OspfExternalType1Rib;
 import org.batfish.dataplane.rib.OspfExternalType2Rib;
@@ -197,6 +198,8 @@ public class VirtualRouter implements Serializable {
   private transient IsisLevelRib _isisL2StagingRib;
 
   private transient IsisRib _isisRib;
+
+  transient KernelRib _kernelRib;
 
   transient LocalRib _localRib;
 
@@ -323,10 +326,12 @@ public class VirtualRouter implements Serializable {
   @VisibleForTesting
   void initForIgpComputation() {
     initConnectedRib();
+    initKernelRib();
     initLocalRib();
     initStaticRibs();
     // Always import local and connected routes into your own rib
     importRib(_independentRib, _connectedRib);
+    importRib(_independentRib, _kernelRib);
     importRib(_independentRib, _localRib);
     importRib(_independentRib, _staticInterfaceRib, _name);
     importRib(_mainRib, _independentRib);
@@ -1031,6 +1036,15 @@ public class VirtualRouter implements Serializable {
   }
 
   /**
+   * Initialize the kernel RIB -- a RIB containing non-forwarding routes installed unconditionally
+   * for the purpose of redistribution
+   */
+  @VisibleForTesting
+  void initKernelRib() {
+    _vrf.getKernelRoutes().stream().map(this::annotateRoute).forEach(_kernelRib::mergeRoute);
+  }
+
+  /**
    * Initialize the local RIB -- a RIB containing non-forwarding /32 routes for exact addresses of
    * interfaces
    */
@@ -1238,6 +1252,7 @@ public class VirtualRouter implements Serializable {
   final void initRibs() {
     // Non-learned-protocol RIBs
     _connectedRib = new ConnectedRib();
+    _kernelRib = new KernelRib();
     _localRib = new LocalRib();
     _generatedRib = new Rib();
     _independentRib = new Rib();

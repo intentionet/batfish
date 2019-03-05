@@ -105,14 +105,17 @@ public class NamedStructuresAnswerer extends Answerer {
           if (namedStructuresMap instanceof Map<?, ?>) {
             if (question.getIndicatePresence()) {
               row.put(COL_STRUCTURE_NAME, structName)
-                  .put(COL_PRESENT_ON_NODE, ((Map) namedStructuresMap).containsKey(structName));
+                  .put(
+                      COL_PRESENT_ON_NODE,
+                      ((Map<?, ?>) namedStructuresMap).containsKey(structName));
               rows.add(row.build());
             } else {
-              if (((Map) namedStructuresMap).containsKey(structName)) {
+              if (((Map<?, ?>) namedStructuresMap).containsKey(structName)) {
                 row.put(COL_STRUCTURE_NAME, structName)
                     .put(
                         COL_STRUCTURE_DEFINITION,
-                        insertedObject(((Map) namedStructuresMap).get(structName), structureType));
+                        insertedObject(
+                            ((Map<?, ?>) namedStructuresMap).get(structName), structureType));
                 rows.add(row.build());
               }
             }

@@ -1,6 +1,7 @@
 package org.batfish.bddreachability;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.batfish.datamodel.acl.SourcesReferencedByIpAccessLists.SOURCE_ORIGINATING_FROM_DEVICE;
 
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -27,6 +28,9 @@ final class BDDFirewallSessionTraceInfo {
       @Nullable String outgoingInterface,
       BDD sessionFlows,
       Transition transformation) {
+    checkArgument(
+        !SOURCE_ORIGINATING_FROM_DEVICE.equals(outgoingInterface),
+        "Use null instead of SOURCE_ORIGINATING_FROM_DEVICE for outgoingInterface");
     checkArgument(
         (outgoingInterface != null) || (nextHop == null),
         "If outgoingInterface is null, nextHop must be null");

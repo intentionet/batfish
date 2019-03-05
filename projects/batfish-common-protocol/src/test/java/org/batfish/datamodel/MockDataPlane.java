@@ -94,8 +94,6 @@ public class MockDataPlane implements DataPlane {
 
   private final ForwardingAnalysis _forwardingAnalysis;
 
-  private final Map<Ip, Set<String>> _ipOwners;
-
   private final Map<Ip, Map<String, Set<String>>> _ipVrfOwners;
 
   private final SortedMap<String, SortedMap<String, GenericRib<AnnotatedRoute<AbstractRoute>>>>
@@ -110,7 +108,6 @@ public class MockDataPlane implements DataPlane {
     _configurations = builder._configurations;
     _fibs = builder._fibs;
     _forwardingAnalysis = builder._forwardingAnalysis;
-    _ipOwners = builder._ipOwners;
     _ipVrfOwners = builder._ipVrfOwners;
     _ribs = ImmutableSortedMap.copyOf(builder._ribs);
     _topology = builder._topology;

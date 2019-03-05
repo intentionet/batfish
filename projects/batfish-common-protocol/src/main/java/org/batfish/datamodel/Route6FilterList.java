@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.batfish.common.util.ComparableStructure;
 
-@JsonSchemaDescription("An access-list used to filter IPV6 routes")
+/** An access-list used to filter IPV6 routes */
 public class Route6FilterList extends ComparableStructure<String> {
 
   private static final String PROP_LINES = "lines";

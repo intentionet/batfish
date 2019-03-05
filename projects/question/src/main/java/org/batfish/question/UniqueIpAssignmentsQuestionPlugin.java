@@ -120,20 +120,11 @@ public class UniqueIpAssignmentsQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
+  /**
    * Lists IP addresses that are assigned to multiple interfaces.
    *
    * <p>Except in cases of anycast, an IP address should be assigned to only one interface. This
    * question produces the list of IP addresses for which this condition does not hold.
-   *
-   * @type UniqueIpAssignments multifile
-   * @param interfacesSpecifier Specification for interfaces to consider. Default value is '.*' (all
-   *     interfaces).
-   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @example bf_answer("UniqueIpAssignments", nodeRegex='as2.*') Answers the question only for
-   *     nodes whose names start with 'as2'.
    */
   public static class UniqueIpAssignmentsQuestion extends Question {
 

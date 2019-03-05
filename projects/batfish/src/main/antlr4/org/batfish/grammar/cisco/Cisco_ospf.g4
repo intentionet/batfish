@@ -464,11 +464,15 @@ ro6_distance
 
 ro6_distribute_list
 :
-   DISTRIBUTE_LIST PREFIX_LIST variable
+   DISTRIBUTE_LIST PREFIX_LIST name = variable_distribute_list
    (
       IN
       | OUT
-   ) NEWLINE
+   )
+   (
+      iname = interface_name
+   )?
+   NEWLINE
 ;
 
 ro6_log_adjacency_changes

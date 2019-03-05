@@ -40,6 +40,6 @@ public class BgpSessionStatusQuestion extends BgpSessionQuestion {
 
   @Override
   public String getName() {
-    return "bgpSessionStatusNew";
+    return "bgpSessionStatus";
   }
 }

@@ -2,9 +2,8 @@ package org.batfish.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 
-@JsonSchemaDescription("A line in an Ip6AccessList")
+/** A line in an Ip6AccessList */
 public final class Ip6AccessListLine extends Header6Space {
   private static final String PROP_ACTION = "action";
   private static final String PROP_NAME = "name";
@@ -33,7 +32,7 @@ public final class Ip6AccessListLine extends Header6Space {
     return _action;
   }
 
-  @JsonSchemaDescription("The name of this line in the list")
+  /** The name of this line in the list */
   @JsonProperty(PROP_NAME)
   public String getName() {
     return _name;

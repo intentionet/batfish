@@ -40,14 +40,7 @@ public class InitInfoQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
-   * Outputs results of test-rig initialization.
-   *
-   * @type InitInfo onefile
-   * @example bf_answer("initinfo", summary=True") Get summary information about test-rig
-   *     initialization
-   */
+  /** Outputs results of test-rig initialization. */
   public static class InitInfoQuestion extends Question {
 
     public static final String PROP_ENVIRONMENT_BGP_TABLES = "environmentBgpTables";

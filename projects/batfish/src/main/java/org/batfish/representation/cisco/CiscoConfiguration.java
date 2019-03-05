@@ -3634,6 +3634,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
         CiscoStructureUsage.OSPF_DISTRIBUTE_LIST_PREFIX_LIST_OUT,
         CiscoStructureUsage.OSPF_DISTRIBUTE_LIST_ROUTE_MAP_IN,
         CiscoStructureUsage.OSPF_DISTRIBUTE_LIST_ROUTE_MAP_OUT,
+        CiscoStructureUsage.OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_IN,
+        CiscoStructureUsage.OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_OUT,
         CiscoStructureUsage.ROUTER_STATIC_ROUTE,
         CiscoStructureUsage.ROUTER_VRRP_INTERFACE,
         CiscoStructureUsage.SERVICE_POLICY_INTERFACE,
@@ -3719,6 +3721,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
         CiscoStructureType.PREFIX6_LIST,
         CiscoStructureUsage.BGP_INBOUND_PREFIX6_LIST,
         CiscoStructureUsage.BGP_OUTBOUND_PREFIX6_LIST,
+        CiscoStructureUsage.OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_IN,
+        CiscoStructureUsage.OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_OUT,
         CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_PREFIX_LIST);
 
     markConcreteStructure(

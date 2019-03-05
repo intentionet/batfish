@@ -1,7 +1,6 @@
 package org.batfish.bddreachability;
 
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchDst;
-import static org.batfish.datamodel.transformation.Noop.NOOP_SOURCE_NAT;
 import static org.batfish.datamodel.transformation.Transformation.always;
 import static org.batfish.datamodel.transformation.Transformation.when;
 import static org.batfish.datamodel.transformation.TransformationStep.assignDestinationIp;
@@ -9,7 +8,6 @@ import static org.batfish.datamodel.transformation.TransformationStep.assignSour
 import static org.batfish.datamodel.transformation.TransformationStep.shiftDestinationIp;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableMap;
@@ -18,7 +16,6 @@ import java.util.Map;
 import net.sf.javabdd.BDD;
 import org.batfish.bddreachability.transition.TransformationToTransition;
 import org.batfish.bddreachability.transition.Transition;
-import org.batfish.bddreachability.transition.Zero;
 import org.batfish.common.bdd.BDDInteger;
 import org.batfish.common.bdd.BDDPacket;
 import org.batfish.common.bdd.BDDSourceManager;
@@ -32,7 +29,6 @@ import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Vrf;
-import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.transformation.Transformation;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,11 +41,6 @@ public class BDDReverseFlowTransformationFactoryImplTest {
 
   private static final String HOSTNAME = "HOSTNAME";
   private static final String IFACENAME = "INTERFACE";
-  private static final NodeInterfacePair IFACE = new NodeInterfacePair(HOSTNAME, IFACENAME);
-
-  private static final BDDReverseTransformationRanges FULL_REVERSE_TRANSFORMATION_RANGES =
-      new MockBDDReverseTransformationRanges(
-          ZERO, ImmutableMap.of(IFACE, ONE), ImmutableMap.of(IFACE, ONE));
 
   private Map<String, TransformationToTransition> _transformationToTransitions;
   private Map<String, Configuration> _configs;
@@ -105,57 +96,6 @@ public class BDDReverseFlowTransformationFactoryImplTest {
   public void testNoTransformation() {}
 
   @Test
-  public void testNoRange() {
-    /* there is an active interface with transformations, but the relevant states were not reached
-     * in the forward pass. The reverse-pass transformations are constant-ZERO transitions.
-     */
-    Transformation transformation = always().build();
-    Interface i =
-        _ib.setIncomingTransformation(transformation)
-            .setOutgoingTransformation(transformation)
-            .build();
-
-    BDDReverseTransformationRanges reverseTransformationRanges =
-        new MockBDDReverseTransformationRanges(ZERO, ImmutableMap.of(), ImmutableMap.of());
-
-    BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, reverseTransformationRanges);
-    assertThat(factory.reverseFlowIncomingTransformation(HOSTNAME, i.getName()), is(Zero.INSTANCE));
-    assertThat(factory.reverseFlowOutgoingTransformation(HOSTNAME, i.getName()), is(Zero.INSTANCE));
-  }
-
-  @Test
-  public void testNontrivialRange() {
-    Transformation transformation = always().apply(NOOP_SOURCE_NAT).build();
-    Interface i =
-        _ib.setIncomingTransformation(transformation)
-            .setOutgoingTransformation(transformation)
-            .build();
-    Prefix incomingRangePrefix = Prefix.parse("2.0.0.0/8");
-    Prefix outgoingRangePrefix = Prefix.parse("3.0.0.0/8");
-    BDD incomingRangeBdd = _headerSpaceToBDD.getDstIpSpaceToBdd().toBDD(incomingRangePrefix);
-    BDD outgoingRangeBdd = _headerSpaceToBDD.getDstIpSpaceToBdd().toBDD(outgoingRangePrefix);
-    NodeInterfacePair nodeIface = new NodeInterfacePair(HOSTNAME, i.getName());
-    BDDReverseTransformationRanges reverseTransformationRanges =
-        new MockBDDReverseTransformationRanges(
-            ZERO,
-            ImmutableMap.of(nodeIface, incomingRangeBdd),
-            ImmutableMap.of(nodeIface, outgoingRangeBdd));
-    BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, reverseTransformationRanges);
-
-    Transition incomingTransformation =
-        factory.reverseFlowIncomingTransformation(HOSTNAME, i.getName());
-    assertThat(incomingTransformation.transitForward(ONE), equalTo(incomingRangeBdd));
-
-    Transition outgoingTransformation =
-        factory.reverseFlowOutgoingTransformation(HOSTNAME, i.getName());
-    assertThat(outgoingTransformation.transitForward(ONE), equalTo(outgoingRangeBdd));
-  }
-
-  @Test
   public void testSrcAssignToPool() {
     Ip poolStart = Ip.parse("1.1.1.1");
     Ip poolEnd = Ip.parse("1.1.1.5");
@@ -165,8 +105,7 @@ public class BDDReverseFlowTransformationFactoryImplTest {
             .setOutgoingTransformation(transformation)
             .build();
     BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, FULL_REVERSE_TRANSFORMATION_RANGES);
+        new BDDReverseFlowTransformationFactoryImpl(_configs, _transformationToTransitions);
     Transition incomingTransformation =
         factory.reverseFlowIncomingTransformation(HOSTNAME, i.getName());
 
@@ -201,8 +140,7 @@ public class BDDReverseFlowTransformationFactoryImplTest {
             .setOutgoingTransformation(transformation)
             .build();
     BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, FULL_REVERSE_TRANSFORMATION_RANGES);
+        new BDDReverseFlowTransformationFactoryImpl(_configs, _transformationToTransitions);
 
     BDD matchBdd = srcBdd(matchIp);
     BDD poolBdd = srcBdd(poolIp);
@@ -229,8 +167,7 @@ public class BDDReverseFlowTransformationFactoryImplTest {
             .build();
 
     BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, FULL_REVERSE_TRANSFORMATION_RANGES);
+        new BDDReverseFlowTransformationFactoryImpl(_configs, _transformationToTransitions);
 
     BDD shiftPrefixBdd = srcBdd(shiftPrefix);
 
@@ -274,8 +211,7 @@ public class BDDReverseFlowTransformationFactoryImplTest {
             .build();
 
     BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, FULL_REVERSE_TRANSFORMATION_RANGES);
+        new BDDReverseFlowTransformationFactoryImpl(_configs, _transformationToTransitions);
 
     BDD poolBdd = srcBdd(poolIp);
     BDD shiftPrefixBdd = srcBdd(shiftPrefix);
@@ -331,8 +267,7 @@ public class BDDReverseFlowTransformationFactoryImplTest {
             .build();
 
     BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, FULL_REVERSE_TRANSFORMATION_RANGES);
+        new BDDReverseFlowTransformationFactoryImpl(_configs, _transformationToTransitions);
 
     BDD pool1Bdd = dstBdd(pool1);
     BDD pool2Bdd = dstBdd(pool2);
@@ -387,8 +322,7 @@ public class BDDReverseFlowTransformationFactoryImplTest {
             .build();
 
     BDDReverseFlowTransformationFactoryImpl factory =
-        new BDDReverseFlowTransformationFactoryImpl(
-            _configs, _transformationToTransitions, FULL_REVERSE_TRANSFORMATION_RANGES);
+        new BDDReverseFlowTransformationFactoryImpl(_configs, _transformationToTransitions);
     Transition incomingTransformation =
         factory.reverseFlowIncomingTransformation(HOSTNAME, i.getName());
 

@@ -41,7 +41,7 @@ public class AclLineMatchExprWithProvenance<T>
     if (!(getClass() == o.getClass())) {
       return false;
     }
-    return Objects.equals(_matchExpr, ((AclLineMatchExprWithProvenance) o)._matchExpr);
+    return Objects.equals(_matchExpr, ((AclLineMatchExprWithProvenance<?>) o)._matchExpr);
   }
 
   @Nonnull

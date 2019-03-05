@@ -1,0 +1,62 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+  hostname f5_bigip_structured_ltm_snat_cases
+}
+
+net vlan /Common/vlan1 {
+}
+
+net vlan /Common/vlan2 {
+}
+
+
+ltm snat /Common/empty {
+}
+
+ltm snat /Common/no_vlans {
+    snatpool /Common/snatpool1
+}
+
+ltm snat /Common/vlans_missing_names {
+    snatpool /Common/snatpool2
+    vlans-enabled
+}
+
+ltm snat /Common/vlans {
+    snatpool /Common/snatpool3
+    vlans-enabled
+    vlans {
+        /Common/vlan1
+    }
+}
+
+ltm snatpool /Common/snatpool1 {
+    members {
+        /Common/192.0.2.1
+    }
+}
+
+ltm snat-translation /Common/192.0.2.1 {
+    address 192.0.2.1
+}
+
+ltm snatpool /Common/snatpool2 {
+    members {
+        /Common/192.0.2.2
+    }
+}
+
+ltm snat-translation /Common/192.0.2.2 {
+    address 192.0.2.2
+}
+
+ltm snatpool /Common/snatpool3 {
+    members {
+        /Common/192.0.2.3
+    }
+}
+
+ltm snat-translation /Common/192.0.2.3 {
+    address 192.0.2.3
+}

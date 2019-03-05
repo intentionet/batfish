@@ -4669,4 +4669,14 @@ public final class FlatJuniperGrammarTest {
     assertNotNull(pool5);
     assertNull(pool5.getPortAddressTranslation());
   }
+
+  @Test
+  public void testVrfSpecificPoolPortAddressTranslation() {
+    JuniperConfiguration juniperConfiguration = parseJuniperConfig("juniper-nat-vrf");
+    Nat sourceNat = juniperConfiguration.getMasterLogicalSystem().getNatSource();
+    NatPool pool0 = sourceNat.getPools().get("POOL0");
+    NatPool pool1 = sourceNat.getPools().get("POOL1");
+    assertThat(pool0.getOwner(), equalTo("R1"));
+    assertNull(pool1.getOwner());
+  }
 }

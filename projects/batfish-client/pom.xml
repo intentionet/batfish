@@ -88,11 +88,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.kjetland</groupId>
-      <artifactId>mbknor-jackson-jsonschema_2.12</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.uber.jaeger</groupId>
       <artifactId>jaeger-core</artifactId>
     </dependency>
@@ -170,7 +165,7 @@
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>java-hamcrest</artifactId>
+      <artifactId>hamcrest</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

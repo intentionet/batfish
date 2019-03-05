@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.MoreObjects;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 
-@JsonSchemaDescription("A line in an Route6FilterList")
+/** A line in an Route6FilterList */
 public class Route6FilterLine implements Serializable {
 
   private static final String PROP_ACTION = "action";

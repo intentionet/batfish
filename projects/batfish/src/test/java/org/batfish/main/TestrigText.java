@@ -111,6 +111,10 @@ public class TestrigText {
       return this;
     }
 
+    public Builder setHostsText(String testrigResourcePrefix, String... filenames) {
+      return setHostsText(testrigResourcePrefix, Arrays.asList(filenames));
+    }
+
     public Builder setHostsText(String testrigResourcePrefix, Iterable<String> filenames) {
       _hostsText =
           readTestrigResources(testrigResourcePrefix, BfConsts.RELPATH_HOST_CONFIGS_DIR, filenames);

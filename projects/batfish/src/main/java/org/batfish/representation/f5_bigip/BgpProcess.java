@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import org.batfish.datamodel.Ip;
 
 /** BGP process configuration */
 @ParametersAreNonnullByDefault
@@ -18,6 +19,7 @@ public final class BgpProcess implements Serializable {
   private @Nullable Long _localAs;
   private final @Nonnull String _name;
   private final @Nonnull Map<String, BgpNeighbor> _neighbors;
+  private @Nullable Ip _routerId;
 
   public BgpProcess(String name) {
     _name = name;
@@ -44,6 +46,14 @@ public final class BgpProcess implements Serializable {
 
   public @Nonnull Map<String, BgpNeighbor> getNeighbors() {
     return _neighbors;
+  }
+
+  public @Nullable Ip getRouterId() {
+    return _routerId;
+  }
+
+  public void setRouterId(Ip routerId) {
+    _routerId = routerId;
   }
 
   public void setLocalAs(@Nullable Long localAs) {

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
@@ -15,6 +14,8 @@ import org.batfish.datamodel.pojo.Node;
 import org.batfish.datamodel.questions.OspfPropertySpecifier;
 import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.specifier.MockSpecifierContext;
+import org.batfish.specifier.NameNodeSpecifier;
 import org.junit.Test;
 
 public class OspfPropertiesAnswererTest {
@@ -40,12 +41,11 @@ public class OspfPropertiesAnswererTest {
 
     TableMetadata metadata = OspfPropertiesAnswerer.createTableMetadata(question);
 
+    MockSpecifierContext ctxt =
+        MockSpecifierContext.builder().setConfigs(ImmutableMap.of("node1", conf1)).build();
     Multiset<Row> propertyRows =
         OspfPropertiesAnswerer.getProperties(
-            question.getProperties(),
-            ImmutableMap.of("node1", conf1),
-            ImmutableSet.of("node1"),
-            metadata.toColumnMap());
+            question.getProperties(), ctxt, new NameNodeSpecifier("node1"), metadata.toColumnMap());
 
     // we should have exactly one row1 with two properties
     Row expectedRow =

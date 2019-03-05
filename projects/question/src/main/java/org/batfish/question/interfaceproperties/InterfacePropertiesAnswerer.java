@@ -2,21 +2,19 @@ package org.batfish.question.interfaceproperties;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
 import org.batfish.common.plugin.IBatfish;
-import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.questions.DisplayHints;
 import org.batfish.datamodel.questions.InterfacePropertySpecifier;
-import org.batfish.datamodel.questions.InterfacesSpecifier;
 import org.batfish.datamodel.questions.PropertySpecifier;
 import org.batfish.datamodel.questions.PropertySpecifier.PropertyDescriptor;
 import org.batfish.datamodel.questions.Question;
@@ -25,6 +23,9 @@ import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.Row.RowBuilder;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.specifier.InterfaceSpecifier;
+import org.batfish.specifier.NodeSpecifier;
+import org.batfish.specifier.SpecifierContext;
 
 public class InterfacePropertiesAnswerer extends Answerer {
 
@@ -78,8 +79,6 @@ public class InterfacePropertiesAnswerer extends Answerer {
   @Override
   public TableAnswerElement answer() {
     InterfacePropertiesQuestion question = (InterfacePropertiesQuestion) _question;
-    Map<String, Configuration> configurations = _batfish.loadConfigurations();
-    Set<String> nodes = question.getNodes().getMatchingNodes(_batfish);
 
     TableMetadata tableMetadata = createTableMetadata(question);
     TableAnswerElement answer = new TableAnswerElement(tableMetadata);
@@ -87,9 +86,9 @@ public class InterfacePropertiesAnswerer extends Answerer {
     Multiset<Row> propertyRows =
         getProperties(
             question.getProperties(),
-            configurations,
-            nodes,
-            question.getInterfaces(),
+            _batfish.specifierContext(),
+            question.getNodeSpecifier(),
+            question.getInterfaceSpecifier(),
             question.getOnlyActive(),
             tableMetadata.toColumnMap());
 
@@ -104,15 +103,15 @@ public class InterfacePropertiesAnswerer extends Answerer {
 
   public static Multiset<Row> getProperties(
       InterfacePropertySpecifier propertySpecifier,
-      Map<String, Configuration> configurations,
-      Set<String> nodes,
-      InterfacesSpecifier interfacesSpecifier,
+      SpecifierContext ctxt,
+      NodeSpecifier nodeSpecifier,
+      InterfaceSpecifier interfaceSpecifier,
       Map<String, ColumnMetadata> columns) {
     return getProperties(
         propertySpecifier,
-        configurations,
-        nodes,
-        interfacesSpecifier,
+        ctxt,
+        nodeSpecifier,
+        interfaceSpecifier,
         InterfacePropertiesQuestion.DEFAULT_EXCLUDE_SHUT_INTERFACES,
         columns);
   }
@@ -121,25 +120,25 @@ public class InterfacePropertiesAnswerer extends Answerer {
    * Gets properties of interfaces.
    *
    * @param propertySpecifier Specifies which properties to get
-   * @param configurations configuration to use in extractions
-   * @param nodes the set of nodes to consider
-   * @param interfacesSpecifier Specifies which interfaces to consider
+   * @param ctxt Specifier context
+   * @param nodeSpecifier Specifiers which nodes to consider
+   * @param interfaceSpecifier Specifies which interfaces to consider
    * @param columns a map from column name to {@link ColumnMetadata}
    * @return A multiset of {@link Row}s where each row corresponds to a node and columns correspond
    *     to property values.
    */
   public static Multiset<Row> getProperties(
       InterfacePropertySpecifier propertySpecifier,
-      Map<String, Configuration> configurations,
-      Set<String> nodes,
-      InterfacesSpecifier interfacesSpecifier,
+      SpecifierContext ctxt,
+      NodeSpecifier nodeSpecifier,
+      InterfaceSpecifier interfaceSpecifier,
       boolean excludeShutInterfaces,
       Map<String, ColumnMetadata> columns) {
     Multiset<Row> rows = HashMultiset.create();
 
-    for (String nodeName : nodes) {
-      for (Interface iface : configurations.get(nodeName).getAllInterfaces().values()) {
-        if (!interfacesSpecifier.matches(iface) || (excludeShutInterfaces && !iface.getActive())) {
+    for (String nodeName : nodeSpecifier.resolve(ctxt)) {
+      for (Interface iface : interfaceSpecifier.resolve(ImmutableSet.of(nodeName), ctxt)) {
+        if (excludeShutInterfaces && !iface.getActive()) {
           continue;
         }
         RowBuilder row =

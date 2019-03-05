@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.collect.ImmutableList;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,7 @@ import javax.annotation.Nullable;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
 import org.batfish.datamodel.acl.Evaluator;
 
-@JsonSchemaDescription("An access-list used to filter IPV4 packets")
+/** An access-list used to filter IPV4 packets */
 public class IpAccessList implements Serializable {
 
   public static class Builder extends NetworkFactoryBuilder<IpAccessList> {

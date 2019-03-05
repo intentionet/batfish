@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableSet;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.Set;
 import java.util.SortedMap;
@@ -19,7 +18,6 @@ import javax.annotation.Nullable;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
 
 /** Represents a bgp process on a router */
-@JsonSchemaDescription("A BGP routing process")
 public class BgpProcess implements Serializable {
 
   public static class Builder extends NetworkFactoryBuilder<BgpProcess> {

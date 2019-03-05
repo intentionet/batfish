@@ -7,7 +7,6 @@ import static org.batfish.datamodel.acl.AclLineMatchExprs.TRUE;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,6 @@ import org.batfish.datamodel.acl.AclLineMatchExpr;
  * {@link Transformation}. When the guard does not match the flow, apply the {@code orElse} {@link
  * Transformation}. Stop upon reaching a {@code null} transformation.
  */
-@JsonSchemaDescription("A packet transformation")
 @ParametersAreNonnullByDefault
 public final class Transformation implements Serializable {
   /** */

@@ -1,0 +1,23 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+    hostname f5_bigip_structured_bgp_router_id_auto
+}
+
+net self /Common/self1 {
+    address 192.0.2.1/24
+    vlan /Common/vlan1
+}
+
+net vlan /Common/vlan1 {
+    interfaces {
+        1.0 { }
+    }
+}
+
+net interface 1.0 {
+}
+
+net routing bgp /Common/bgp1 {
+}
+

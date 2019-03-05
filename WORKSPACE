@@ -267,11 +267,11 @@ maven_repository(
         "2973d150c0dc1fefe998f834810d68f278ea58ec:junit:junit:4.12",
         "cea74543d5904a30861a61b4643a5f2bb372efc4:org.checkerframework:checker-qual:2.5.2",
         "775b7e22fb10026eed3f86e8dc556dfafe35f2d5:org.codehaus.mojo:animal-sniffer-annotations:1.14",
-        "0f1c8853ade0ecf707f5a261c830e98893983813:org.hamcrest:java-hamcrest:2.0.0.0",
+        "9420ba32c29217b54eebd26ff7f9234d31c3fbb2:org.hamcrest:hamcrest:2.1",
     ],
     deps = [
         "com.google.guava:guava-testlib:26.0-jre",
-        "org.hamcrest:java-hamcrest:2.0.0.0",
+        "org.hamcrest:hamcrest:2.1",
     ],
 )
 
@@ -283,10 +283,10 @@ guava_testlib_compile()
 maven_repository(
     name = "hamcrest",
     transitive_deps = [
-        "0f1c8853ade0ecf707f5a261c830e98893983813:org.hamcrest:java-hamcrest:2.0.0.0",
+        "9420ba32c29217b54eebd26ff7f9234d31c3fbb2:org.hamcrest:hamcrest:2.1",
     ],
-    deps = [
-        "org.hamcrest:java-hamcrest:2.0.0.0",
+     deps = [
+        "org.hamcrest:hamcrest:2.1",
     ],
 )
 
@@ -750,12 +750,12 @@ maven_repository(
         "92c158af89e6749b20134c3182935046a49a1662:org.glassfish.jersey.core:jersey-server:2.27",
         "106f2237ee03493185d9d915c9a1c011df716a2a:org.glassfish.jersey.media:jersey-media-jaxb:2.27",
         "5e5cc32c73cda92af420be5302b963c8bd26f26f:org.glassfish.jersey.test-framework:jersey-test-framework-core:2.27",
-        "0f1c8853ade0ecf707f5a261c830e98893983813:org.hamcrest:java-hamcrest:2.0.0.0",
+        "9420ba32c29217b54eebd26ff7f9234d31c3fbb2:org.hamcrest:hamcrest:2.1",
     ],
     deps = [
         "javax.xml.bind:jaxb-api:2.3.0",
         "org.glassfish.jersey.test-framework:jersey-test-framework-core:2.27",
-        "org.hamcrest:java-hamcrest:2.0.0.0",
+        "org.hamcrest:hamcrest:2.1",
     ],
 )
 
@@ -803,12 +803,12 @@ maven_repository(
         "106f2237ee03493185d9d915c9a1c011df716a2a:org.glassfish.jersey.media:jersey-media-jaxb:2.27",
         "5e5cc32c73cda92af420be5302b963c8bd26f26f:org.glassfish.jersey.test-framework:jersey-test-framework-core:2.27",
         "e0f254a263831248d009a9538d0a43412d1ae09a:org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.27",
-        "0f1c8853ade0ecf707f5a261c830e98893983813:org.hamcrest:java-hamcrest:2.0.0.0",
+        "9420ba32c29217b54eebd26ff7f9234d31c3fbb2:org.hamcrest:hamcrest:2.1",
     ],
     deps = [
         "javax.xml.bind:jaxb-api:2.3.0",
         "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.27",
-        "org.hamcrest:java-hamcrest:2.0.0.0",
+        "org.hamcrest:hamcrest:2.1",
     ],
 )
 
@@ -944,11 +944,11 @@ maven_repository(
     },
     transitive_deps = [
         "2973d150c0dc1fefe998f834810d68f278ea58ec:junit:junit:4.12",
-        "0f1c8853ade0ecf707f5a261c830e98893983813:org.hamcrest:java-hamcrest:2.0.0.0",
+        "9420ba32c29217b54eebd26ff7f9234d31c3fbb2:org.hamcrest:hamcrest:2.1",
     ],
     deps = [
         "junit:junit:4.12",
-        "org.hamcrest:java-hamcrest:2.0.0.0",
+        "org.hamcrest:hamcrest:2.1",
     ],
 )
 

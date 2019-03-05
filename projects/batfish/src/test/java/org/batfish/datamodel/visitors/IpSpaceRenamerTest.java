@@ -8,12 +8,12 @@ import org.batfish.datamodel.AclIpSpace;
 import org.batfish.datamodel.EmptyIpSpace;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpIpSpace;
+import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpSpaceReference;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.IpWildcardIpSpace;
 import org.batfish.datamodel.IpWildcardSetIpSpace;
 import org.batfish.datamodel.Prefix;
-import org.batfish.datamodel.PrefixIpSpace;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class IpSpaceRenamerTest {
   private static final IpIpSpace IP_IP_SPACE = Ip.parse("1.1.1.1").toIpSpace();
 
   private static final IpSpaceRenamer RENAMER = new IpSpaceRenamer(ImmutableMap.of(FOO, BAR)::get);
-  private static final PrefixIpSpace PREFIX_IP_SPACE = Prefix.parse("1.0.0.0/8").toIpSpace();
+  private static final IpSpace PREFIX_IP_SPACE = Prefix.parse("1.0.0.0/8").toIpSpace();
   private static final IpWildcardIpSpace IP_WILDCARD_IP_SPACE =
       new IpWildcard("1.2.0.0/16").toIpSpace();
   private static final IpWildcardSetIpSpace IP_WILDCARD_SET_IP_SPACE =

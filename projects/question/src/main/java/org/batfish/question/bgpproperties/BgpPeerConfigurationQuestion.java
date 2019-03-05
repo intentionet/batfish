@@ -57,7 +57,7 @@ public class BgpPeerConfigurationQuestion extends Question {
 
   @JsonIgnore
   @Nonnull
-  NodeSpecifier getNodesSpecifier() {
+  NodeSpecifier getNodeSpecifier() {
     return SpecifierFactories.getNodeSpecifierOrDefault(_nodes, AllNodesNodeSpecifier.INSTANCE);
   }
 }

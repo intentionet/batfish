@@ -138,6 +138,7 @@ nat_pool
       natp_address
       | natp_description
       | natp_port
+      | natp_routing_instance
    )
 ;
 
@@ -207,6 +208,11 @@ natp_port
 natp_description
 :
    DESCRIPTION null_filler
+;
+
+natp_routing_instance
+:
+   ROUTING_INSTANCE name = variable
 ;
 
 proposal_set_type
@@ -1237,35 +1243,35 @@ seso_icmp
    ICMP
    (
       sesoi_flood
-      | FRAGMENT
-      | ICMPV6_MALFORMED
+      | sesoi_fragment
+      | sesoi_icmpv6_malformed
       | sesoi_ip_sweep
-      | LARGE
-      | PING_DEATH
-   )+
+      | sesoi_large
+      | sesoi_ping_death
+   )
 ;
 
 seso_ip
 :
    IP
    (
-      BAD_OPTION
-      | BLOCK_FRAG
+      sesop_bad_option
+      | sesop_block_frag
       | sesop_ipv6_extension_header
       | sesop_ipv6_extension_header_limit
-      | IPV6_MALFORMED_HEADER
-      | LOOSE_SOURCE_ROUTE_OPTION
-      | RECORD_ROUTE_OPTION
-      | SECURITY_OPTION
-      | SOURCE_ROUTE_OPTION
-      | SPOOFING
-      | STREAM_OPTION
-      | STRICT_SOURCE_ROUTE_OPTION
-      | TEAR_DROP
-      | TIMESTAMP_OPTION
-      | UNKNOWN_PROTOCOL
+      | sesop_ipv6_malformed_header
+      | sesop_loose_source_route_option
+      | sesop_record_route_option
+      | sesop_security_option
+      | sesop_source_route_option
+      | sesop_spoofing
+      | sesop_stream_option
+      | sesop_strict_source_route_option
+      | sesop_tear_drop
+      | sesop_timestamp_option
+      | sesop_unknown_protocol
       | sesop_tunnel
-   )+
+   )
 ;
 
 seso_limit_session
@@ -1274,24 +1280,24 @@ seso_limit_session
    (
       DESTINATION_IP_BASED DEC
       | SOURCE_IP_BASED DEC
-   )+
+   )
 ;
 
 seso_tcp
 :
    TCP
    (
-      FIN_NO_ACK
-      | LAND
+      sesot_fin_no_ack
+      | sesot_land
       | sesot_port_scan
       | sesot_syn_ack_ack_proxy
-      | SYN_FIN
+      | sesot_syn_fin
       | sesot_syn_flood
-      | SYN_FRAG
-      | TCP_NO_FLAG
+      | sesot_syn_frag
+      | sesot_tcp_no_flag
       | sesot_tcp_sweep
-      | WINNUKE
-   )+
+      | sesot_winnuke
+   )
 ;
 
 seso_udp
@@ -1309,9 +1315,39 @@ sesoi_flood
    FLOOD threshold
 ;
 
+sesoi_fragment
+:
+   FRAGMENT
+;
+
+sesoi_icmpv6_malformed
+:
+   ICMPV6_MALFORMED
+;
+
 sesoi_ip_sweep
 :
    IP_SWEEP threshold
+;
+
+sesoi_large
+:
+   LARGE
+;
+
+sesoi_ping_death
+:
+   PING_DEATH
+;
+
+sesop_bad_option
+:
+   BAD_OPTION
+;
+
+sesop_block_frag
+:
+   BLOCK_FRAG
 ;
 
 sesop_ipv6_extension_header
@@ -1329,12 +1365,62 @@ sesop_ipv6_extension_header
        | ROUTING_HEADER
        | SHIM6_HEADER
        | sesop6_user_option
-   )+
+   )
 ;
 
 sesop_ipv6_extension_header_limit
 :
    IPV6_EXTENSION_HEADER_LIMIT limit=DEC
+;
+
+sesop_ipv6_malformed_header
+:
+   IPV6_MALFORMED_HEADER
+;
+
+sesop_loose_source_route_option
+:
+   LOOSE_SOURCE_ROUTE_OPTION
+;
+
+sesop_record_route_option
+:
+   RECORD_ROUTE_OPTION
+;
+
+sesop_security_option
+:
+   SECURITY_OPTION
+;
+
+sesop_source_route_option
+:
+   SOURCE_ROUTE_OPTION
+;
+
+sesop_spoofing
+:
+   SPOOFING
+;
+
+sesop_stream_option
+:
+   STREAM_OPTION
+;
+
+sesop_strict_source_route_option
+:
+   STRICT_SOURCE_ROUTE_OPTION
+;
+
+sesop_tear_drop
+:
+   TEAR_DROP
+;
+
+sesop_timestamp_option
+:
+   TIMESTAMP_OPTION
 ;
 
 sesop_tunnel
@@ -1345,7 +1431,12 @@ sesop_tunnel
       | sesopt_ip_in_udp
       | sesopt_ipip
       | BAD_INNER_HEADER
-   )+
+   )
+;
+
+sesop_unknown_protocol
+:
+   UNKNOWN_PROTOCOL
 ;
 
 sesop6_dst_header
@@ -1357,7 +1448,7 @@ sesop6_dst_header
       | LINE_IDENTIFICATION_OPTION
       | TUNNEL_ENCAPSULATION_LIMIT_OPTION
       | sesop6_user_option
-   )+
+   )
 ;
 
 sesop6_hop_header
@@ -1371,12 +1462,22 @@ sesop6_hop_header
       | QUICK_START_OPTION
       | ROUTER_ALERT_OPTION
       | sesop6_user_option
-   )+
+   )
 ;
 
 sesop6_user_option
 :
    USER_DEFINED_OPTION_TYPE type_low=DEC (TO type_high=DEC)?
+;
+
+sesot_fin_no_ack
+:
+   FIN_NO_ACK
+;
+
+sesot_land
+:
+   LAND
 ;
 
 sesot_port_scan
@@ -1387,6 +1488,11 @@ sesot_port_scan
 sesot_syn_ack_ack_proxy
 :
    SYN_ACK_ACK_PROXY threshold
+;
+
+sesot_syn_fin
+:
+   SYN_FIN
 ;
 
 sesot_syn_flood
@@ -1402,9 +1508,24 @@ sesot_syn_flood
   )
 ;
 
+sesot_syn_frag
+:
+   SYN_FRAG
+;
+
+sesot_tcp_no_flag
+:
+   TCP_NO_FLAG
+;
+
 sesot_tcp_sweep
 :
    TCP_SWEEP threshold
+;
+
+sesot_winnuke
+:
+   WINNUKE
 ;
 
 sesots_alarm_thred
@@ -1475,7 +1596,7 @@ sesopt_gre
       | GRE_4IN6
       | GRE_6IN4
       | GRE_6IN6
-   )+
+   )
 ;
 
 sesopt_ip_in_udp
@@ -1495,7 +1616,7 @@ sesopt_ipip
       | IPIP_6TO4RELAY
       | ISATAP
       | DSLITE
-   )+
+   )
 ;
 
 sez_security_zone

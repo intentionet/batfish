@@ -160,6 +160,8 @@ public enum CiscoStructureUsage implements StructureUsage {
   OSPF_REDISTRIBUTE_CONNECTED_MAP("ospf redistribute connected route-map"),
   OSPF_REDISTRIBUTE_EIGRP_MAP("ospf redistribute eigrp route-map"),
   OSPF_REDISTRIBUTE_STATIC_MAP("ospf redistribute static route-map"),
+  OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_IN("ipv6 router ospf distribute-list prefix-list in"),
+  OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_OUT("ipv6 router ospf distribute-list prefix-list out"),
   PIM_ACCEPT_REGISTER_ACL("pim accept-register acl"),
   PIM_ACCEPT_REGISTER_ROUTE_MAP("pim accept-register route-map"),
   PIM_ACCEPT_RP_ACL("pim accept-rp acl"),

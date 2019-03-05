@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -27,7 +26,7 @@ import org.batfish.datamodel.eigrp.EigrpProcess;
 import org.batfish.datamodel.isis.IsisProcess;
 import org.batfish.datamodel.ospf.OspfProcess;
 
-@JsonSchemaDescription("A virtual routing and forwarding (VRF) instance on a node.")
+/** A virtual routing and forwarding (VRF) instance on a node. */
 public class Vrf extends ComparableStructure<String> {
 
   public static class Builder extends NetworkFactoryBuilder<Vrf> {

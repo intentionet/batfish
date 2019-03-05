@@ -310,6 +310,7 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.Nat_pool_default_port_r
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Nat_rule_setContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Natp_addressContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Natp_portContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Natp_routing_instanceContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.O_areaContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.O_exportContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.O_reference_bandwidthContext;
@@ -508,6 +509,18 @@ import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sepctxpm_source_address
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sepctxpm_source_identityContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sepctxpt_denyContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sepctxpt_permitContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesoi_fragmentContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesoi_largeContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesoi_ping_deathContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesop_block_fragContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesop_spoofingContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesop_unknown_protocolContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesot_fin_no_ackContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesot_landContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesot_syn_finContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesot_syn_fragContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesot_tcp_no_flagContext;
+import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sesot_winnukeContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sez_security_zoneContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sezs_address_bookContext;
 import org.batfish.grammar.flatjuniper.FlatJuniperParser.Sezs_host_inbound_trafficContext;
@@ -2968,39 +2981,70 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   }
 
   @Override
-  public void exitSeso_icmp(FlatJuniperParser.Seso_icmpContext ctx) {
-    if (!ctx.LARGE().isEmpty()) {
-      _currentScreen.getScreenOptions().add(IcmpLarge.INSTANCE);
-    } else {
-      todo(ctx);
-    }
+  public void exitSesoi_fragment(Sesoi_fragmentContext ctx) {
+    // Batfish does not currently model the IP fragmentation bits.
+    todo(ctx, "Unsupported netscreen ICMP option");
   }
 
   @Override
-  public void exitSeso_ip(FlatJuniperParser.Seso_ipContext ctx) {
-    if (!ctx.UNKNOWN_PROTOCOL().isEmpty()) {
-      _currentScreen.getScreenOptions().add(IpUnknownProtocol.INSTANCE);
-    } else {
-      todo(ctx);
-    }
+  public void exitSesoi_large(Sesoi_largeContext ctx) {
+    _currentScreen.getScreenOptions().add(IcmpLarge.INSTANCE);
   }
 
   @Override
-  public void exitSeso_tcp(FlatJuniperParser.Seso_tcpContext ctx) {
-    if (!ctx.TCP_NO_FLAG().isEmpty()) {
-      _currentScreen.getScreenOptions().add(TcpNoFlag.INSTANCE);
-    } else if (!ctx.SYN_FIN().isEmpty()) {
-      _currentScreen.getScreenOptions().add(TcpSynFin.INSTANCE);
-    } else if (!ctx.FIN_NO_ACK().isEmpty()) {
-      _currentScreen.getScreenOptions().add(TcpFinNoAck.INSTANCE);
-    } else {
-      todo(ctx);
-    }
+  public void exitSesoi_ping_death(Sesoi_ping_deathContext ctx) {
+    // Batfish does not currently model the IP fragmentation bits needed for this.
+    todo(ctx, "Unsupported netscreen ICMP option");
   }
 
   @Override
-  public void exitSeso_udp(FlatJuniperParser.Seso_udpContext ctx) {
-    todo(ctx);
+  public void exitSesop_block_frag(Sesop_block_fragContext ctx) {
+    // Batfish does not currently model the IP fragmentation bits.
+    todo(ctx, "Unsupported netscreen IP option");
+  }
+
+  @Override
+  public void exitSesop_spoofing(Sesop_spoofingContext ctx) {
+    // Need to plumb into reachability and dataplane to support.
+    todo(ctx, "Unsupported netscreen IP option");
+  }
+
+  @Override
+  public void exitSesop_unknown_protocol(Sesop_unknown_protocolContext ctx) {
+    _currentScreen.getScreenOptions().add(IpUnknownProtocol.INSTANCE);
+  }
+
+  @Override
+  public void exitSesot_fin_no_ack(Sesot_fin_no_ackContext ctx) {
+    _currentScreen.getScreenOptions().add(TcpFinNoAck.INSTANCE);
+  }
+
+  @Override
+  public void exitSesot_land(Sesot_landContext ctx) {
+    // Batfish has no way to express SourceIp == DestIp.
+    todo(ctx, "Unsupported netscreen TCP option");
+  }
+
+  @Override
+  public void exitSesot_syn_fin(Sesot_syn_finContext ctx) {
+    _currentScreen.getScreenOptions().add(TcpSynFin.INSTANCE);
+  }
+
+  @Override
+  public void exitSesot_syn_frag(Sesot_syn_fragContext ctx) {
+    // Batfish does not currently model the IP fragmentation bits.
+    todo(ctx, "Unsupported netscreen TCP option");
+  }
+
+  @Override
+  public void exitSesot_tcp_no_flag(Sesot_tcp_no_flagContext ctx) {
+    _currentScreen.getScreenOptions().add(TcpNoFlag.INSTANCE);
+  }
+
+  @Override
+  public void exitSesot_winnuke(Sesot_winnukeContext ctx) {
+    // Batfish does not currently support transformation in filters.
+    todo(ctx, "Unsupported netscreen TCP option");
   }
 
   @Override
@@ -4409,6 +4453,12 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     } else {
       _w.redFlag(ctx.getText() + " cannot be recognized");
     }
+  }
+
+  @Override
+  public void exitNatp_routing_instance(Natp_routing_instanceContext ctx) {
+    String ri = ctx.name.getText();
+    _currentNatPool.setOwner(ri);
   }
 
   @Override
@@ -6112,6 +6162,10 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   private void todo(ParserRuleContext ctx) {
     _w.todo(ctx, getFullText(ctx), _parser);
+  }
+
+  private void todo(ParserRuleContext ctx, String message) {
+    _w.addWarning(ctx, getFullText(ctx), _parser, message);
   }
 
   private Family toFamily(F_familyContext ctx) {

@@ -28,6 +28,15 @@ public abstract class Answerer {
 
   protected final BatfishLogger _logger;
 
+  /**
+   * The question of this answer object, which helps the answerer figure out the context in which it
+   * is called (embedded within question parameters).
+   *
+   * <p>In hindsight, this pattern has proved problematic. When other bits of code (e.g., other
+   * answerer's) need access to this answerer's logic, they must first create a question that looks
+   * similar to what a user-created question will look like (which is not good by itself, and also
+   * impossible in some other cases).
+   */
   protected final Question _question;
 
   public Answerer(Question question, IBatfish batfish) {

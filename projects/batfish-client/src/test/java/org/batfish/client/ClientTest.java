@@ -152,7 +152,7 @@ public final class ClientTest {
 
   private void checkProcessCommandErrorMessage(
       Command command, String[] parameters, String expected) throws Exception {
-    Client client = new Client(new String[] {"-runmode", "gendatamodel"});
+    Client client = new Client(new String[] {"-runmode", "interactive"});
     File tempFile = _folder.newFile("writer");
     FileWriter writer = new FileWriter(tempFile);
     client._logger = new BatfishLogger("output", false);
@@ -239,7 +239,7 @@ public final class ClientTest {
 
   @Test
   public void testDefaultCase() throws Exception {
-    Client client = new Client(new String[] {"-runmode", "gendatamodel"});
+    Client client = new Client(new String[] {"-runmode", "interactive"});
     File tempFile = _folder.newFile("writer");
     FileWriter writer = new FileWriter(tempFile);
     client._logger = new BatfishLogger("output", false);
@@ -1037,8 +1037,7 @@ public final class ClientTest {
 
   @Test
   public void testLoadQuestionsNames() throws Exception {
-    Client client =
-        new Client(new String[] {"-runmode", "gendatamodel", "-prettyanswers", "false"});
+    Client client = new Client(new String[] {"-runmode", "interactive", "-prettyanswers", "false"});
     JSONObject testQuestion = new JSONObject();
     testQuestion.put(
         "instance",
@@ -1291,7 +1290,7 @@ public final class ClientTest {
 
   private void testProcessCommandWithValidInput(
       Command command, String[] parameters, String expected) throws Exception {
-    Client client = new Client(new String[] {"-runmode", "gendatamodel"});
+    Client client = new Client(new String[] {"-runmode", "interactive"});
     File tempFile = _folder.newFile("writer");
     FileWriter writer = new FileWriter(tempFile);
     String[] args = ArrayUtils.addAll(new String[] {command.commandName()}, parameters);
@@ -1305,11 +1304,6 @@ public final class ClientTest {
   public void testPromptInvalidParas() throws Exception {
     String[] parameters = new String[] {"parameter1"};
     testInvalidInput(PROMPT, new String[] {}, parameters);
-  }
-
-  @Test
-  public void testPromptValidParas() throws Exception {
-    testProcessCommandWithValidInput(PROMPT, new String[] {}, "");
   }
 
   @Test

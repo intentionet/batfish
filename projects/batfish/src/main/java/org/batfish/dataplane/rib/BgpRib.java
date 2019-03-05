@@ -3,11 +3,10 @@ package org.batfish.dataplane.rib;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -49,7 +48,7 @@ public class BgpRib extends AbstractRib<BgpRoute> {
 
   // Best BGP paths. Invariant: must be re-evaluated (per prefix) each time a route is added or
   // evicted
-  @Nonnull private Map<Prefix, BgpRoute> _bestPaths;
+  @Nonnull private final Map<Prefix, BgpRoute> _bestPaths;
 
   public BgpRib(
       @Nullable Map<Prefix, SortedSet<BgpRoute>> backupRoutes,
@@ -74,7 +73,7 @@ public class BgpRib extends AbstractRib<BgpRoute> {
         Integer.valueOf(1).equals(maxPaths) || multipathEquivalentAsPathMatchMode != null,
         "Multipath AS-Path-Match-mode must be specified for a multipath BGP RIB");
     _multipathEquivalentAsPathMatchMode = multipathEquivalentAsPathMatchMode;
-    _bestPaths = ImmutableMap.of();
+    _bestPaths = new HashMap<>(0);
   }
 
   /*
@@ -130,7 +129,7 @@ public class BgpRib extends AbstractRib<BgpRoute> {
   public RibDelta<BgpRoute> mergeRouteGetDelta(BgpRoute route) {
     RibDelta<BgpRoute> delta = super.mergeRouteGetDelta(route);
     if (!delta.isEmpty()) {
-      delta.getPrefixes().forEach(this::updateBestPath);
+      delta.getPrefixes().forEach(this::selectBestPath);
     }
     return delta;
   }
@@ -140,7 +139,7 @@ public class BgpRib extends AbstractRib<BgpRoute> {
   public RibDelta<BgpRoute> removeRouteGetDelta(BgpRoute route, Reason reason) {
     RibDelta<BgpRoute> delta = super.removeRouteGetDelta(route, reason);
     if (!delta.isEmpty()) {
-      delta.getPrefixes().forEach(this::updateBestPath);
+      delta.getPrefixes().forEach(this::selectBestPath);
     }
     return delta;
   }
@@ -183,24 +182,14 @@ public class BgpRib extends AbstractRib<BgpRoute> {
     }
   }
 
-  private void updateBestPath(Prefix prefix) {
+  private void selectBestPath(Prefix prefix) {
     Optional<BgpRoute> s = extractRoutes(prefix).stream().max(this::bestPathComparator);
     if (!s.isPresent()) {
       // Remove best path and return
-      _bestPaths =
-          _bestPaths.entrySet().stream()
-              .filter(e -> !e.getKey().equals(prefix))
-              .collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue));
+      _bestPaths.remove(prefix);
       return;
     }
-    _bestPaths =
-        ImmutableMap.<Prefix, BgpRoute>builder()
-            .putAll(
-                _bestPaths.entrySet().stream()
-                    .filter(e -> !e.getKey().equals(prefix))
-                    .collect(ImmutableSet.toImmutableSet()))
-            .put(prefix, s.get())
-            .build();
+    _bestPaths.put(prefix, s.get());
   }
 
   /**

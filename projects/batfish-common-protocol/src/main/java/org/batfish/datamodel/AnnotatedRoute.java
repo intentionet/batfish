@@ -33,7 +33,7 @@ public final class AnnotatedRoute<R extends AbstractRoute>
       // Routes are equal; AbstractRoutes arbitrarily come before AnnotatedRoutes
       return 1;
     }
-    AnnotatedRoute<?> other = (AnnotatedRoute) o;
+    AnnotatedRoute<?> other = (AnnotatedRoute<?>) o;
     return _sourceVrf.compareTo(other._sourceVrf);
   }
 
@@ -66,7 +66,7 @@ public final class AnnotatedRoute<R extends AbstractRoute>
     if (!(obj instanceof AnnotatedRoute)) {
       return false;
     }
-    AnnotatedRoute<?> o = (AnnotatedRoute) obj;
+    AnnotatedRoute<?> o = (AnnotatedRoute<?>) obj;
     return Objects.equals(_route, o._route) && Objects.equals(_sourceVrf, o._sourceVrf);
   }
 

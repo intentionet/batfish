@@ -184,6 +184,7 @@ import static org.batfish.representation.cisco.CiscoStructureType.KEYRING;
 import static org.batfish.representation.cisco.CiscoStructureType.MAC_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureType.NETWORK_OBJECT;
 import static org.batfish.representation.cisco.CiscoStructureType.NETWORK_OBJECT_GROUP;
+import static org.batfish.representation.cisco.CiscoStructureType.PREFIX6_LIST;
 import static org.batfish.representation.cisco.CiscoStructureType.PREFIX_LIST;
 import static org.batfish.representation.cisco.CiscoStructureType.PREFIX_SET;
 import static org.batfish.representation.cisco.CiscoStructureType.PROTOCOL_OBJECT_GROUP;
@@ -1263,6 +1264,20 @@ public class CiscoGrammarTest {
         ccae,
         hasUndefinedReference(
             filename, BFD_TEMPLATE, "bfd-template-undefined", INTERFACE_BFD_TEMPLATE));
+  }
+
+  @Test
+  public void testIosBgpPrefixListReferences() throws IOException {
+    String hostname = "ios_bgp_prefix_list_references";
+    String filename = String.format("configs/%s", hostname);
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse();
+
+    assertThat(ccae, hasNumReferrers(filename, PREFIX_LIST, "pl4in", 1));
+    assertThat(ccae, hasNumReferrers(filename, PREFIX_LIST, "pl4out", 1));
+    assertThat(ccae, hasNumReferrers(filename, PREFIX6_LIST, "pl6in", 1));
+    assertThat(ccae, hasNumReferrers(filename, PREFIX6_LIST, "pl6out", 1));
   }
 
   /**

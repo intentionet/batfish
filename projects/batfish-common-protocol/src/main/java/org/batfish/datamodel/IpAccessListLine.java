@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -13,7 +12,7 @@ import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.acl.TrueExpr;
 
-@JsonSchemaDescription("A line in an IpAccessList")
+/** A line in an IpAccessList */
 public final class IpAccessListLine implements Serializable {
 
   public static class Builder {
@@ -163,7 +162,7 @@ public final class IpAccessListLine implements Serializable {
     return _matchCondition;
   }
 
-  @JsonSchemaDescription("The name of this line in the list")
+  /** The name of this line in the list */
   @JsonProperty(PROP_NAME)
   public String getName() {
     return _name;

@@ -10,6 +10,11 @@ ltm snat /Common/SOME_SNAT {
         /Common/vlan_used
     }
 }
+ltm virtual /Common/SOME_VIRTUAL {
+    vlans {
+        /Common/vlan_used
+    }
+}
 net self /Common/my_self {
     vlan /Common/vlan_used
 }

@@ -474,7 +474,7 @@
         "File_Name" : "configs/cadant_bgp",
         "Struct_Type" : "route-map",
         "Ref_Name" : "blerp",
-        "Context" : "bgp outbound route-map",
+        "Context" : "bgp outbound ipv6 route-map",
         "Lines" : {
           "filename" : "configs/cadant_bgp",
           "lines" : [
@@ -1586,6 +1586,30 @@
       },
       {
         "File_Name" : "configs/cisco_ospf",
+        "Struct_Type" : "ipv6 prefix-list",
+        "Ref_Name" : "SWITCHLAN",
+        "Context" : "ipv6 router ospf distribute-list prefix-list in",
+        "Lines" : {
+          "filename" : "configs/cisco_ospf",
+          "lines" : [
+            120
+          ]
+        }
+      },
+      {
+        "File_Name" : "configs/cisco_ospf",
+        "Struct_Type" : "ipv6 prefix-list",
+        "Ref_Name" : "SWITCHLAN-OUT",
+        "Context" : "ipv6 router ospf distribute-list prefix-list out",
+        "Lines" : {
+          "filename" : "configs/cisco_ospf",
+          "lines" : [
+            121
+          ]
+        }
+      },
+      {
+        "File_Name" : "configs/cisco_ospf",
         "Struct_Type" : "route-map",
         "Ref_Name" : "DIRECT_OSPF",
         "Context" : "ospf redistribute connected route-map",
@@ -2306,7 +2330,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            89
+            90
           ]
         }
       },
@@ -2318,7 +2342,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            93
+            94
           ]
         }
       },
@@ -2330,7 +2354,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            95
+            96
           ]
         }
       },
@@ -2342,7 +2366,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            96
+            97
           ]
         }
       },
@@ -2354,7 +2378,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            97
+            98
           ]
         }
       },
@@ -2366,7 +2390,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            153
+            155
           ]
         }
       },
@@ -2378,7 +2402,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            80
+            81
           ]
         }
       },
@@ -2390,7 +2414,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            81
+            82
           ]
         }
       },
@@ -2402,7 +2426,19 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            85
+            86
+          ]
+        }
+      },
+      {
+        "File_Name" : "configs/f5_bigip_structured_ltm",
+        "Struct_Type" : "vlan",
+        "Ref_Name" : "/Common/MY_VLAN",
+        "Context" : "virtual vlans vlan",
+        "Lines" : {
+          "filename" : "configs/f5_bigip_structured_ltm",
+          "lines" : [
+            112
           ]
         }
       },
@@ -2414,7 +2450,7 @@
         "Lines" : {
           "filename" : "configs/f5_bigip_structured_ltm",
           "lines" : [
-            69
+            70
           ]
         }
       },
@@ -3997,10 +4033,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 324 results",
+      "notes" : "Found 327 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 324
+      "numResults" : 327
     }
   }
 ]

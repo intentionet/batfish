@@ -17,7 +17,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closer;
-import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import com.uber.jaeger.Configuration.ReporterConfiguration;
 import com.uber.jaeger.Configuration.SamplerConfiguration;
 import com.uber.jaeger.samplers.ConstSampler;
@@ -85,7 +84,6 @@ import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.common.util.WorkItemBuilder;
 import org.batfish.common.util.ZipUtility;
-import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.FlowState;
 import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.InterfaceType;
@@ -717,10 +715,6 @@ public class Client extends AbstractClient implements IClient {
         _logger =
             new BatfishLogger(_settings.getLogLevel(), false, _settings.getLogFile(), false, false);
         break;
-      case gendatamodel:
-        _logger =
-            new BatfishLogger(_settings.getLogLevel(), false, _settings.getLogFile(), false, false);
-        break;
       case genquestions:
         if (_settings.getQuestionsDir() == null) {
           System.err.println(
@@ -754,7 +748,6 @@ public class Client extends AbstractClient implements IClient {
         } catch (Exception e) {
           System.err.printf("Could not initialize client: %s\n", e.getMessage());
           e.printStackTrace();
-          System.exit(1);
         }
         break;
       default:
@@ -1233,59 +1226,6 @@ public class Client extends AbstractClient implements IClient {
     return true;
   }
 
-  private void generateDatamodel() {
-    try {
-      JsonSchemaGenerator schemaGenNew = new JsonSchemaGenerator(BatfishObjectMapper.mapper());
-      JsonNode schemaNew = schemaGenNew.generateJsonSchema(Configuration.class);
-      _logger.output(BatfishObjectMapper.writePrettyString(schemaNew));
-
-      // Reflections reflections = new Reflections("org.batfish.datamodel");
-      // Set<Class<? extends AnswerElement>> classes =
-      // reflections.getSubTypesOf(AnswerElement.class);
-      // _logger.outputf("Found %d classes that inherit %s\n",
-      // classes.toArray().length, "AnswerElement");
-      //
-      // File dmDir = Paths.get(_settings.getDatamodelDir()).toFile();
-      // if (!dmDir.exists()) {
-      // if (!dmDir.mkdirs()) {
-      // throw new BatfishException("Could not create directory: " +
-      // dmDir.getAbsolutePath());
-      // }
-      // }
-      //
-      // for (Class c : classes) {
-      // String className = c.getCanonicalName()
-      // .replaceAll("org\\.batfish\\.datamodel\\.", "")
-      // .replaceAll("\\.", "-")
-      // + ".json";
-      // _logger.outputf("%s --> %s\n", c, className);
-      // Path file = Paths.get(dmDir.getAbsolutePath(), className);
-      // try (PrintWriter out = new
-      // PrintWriter(file.toAbsolutePath().toString())) {
-      // ObjectMapper mapper = new BatfishObjectMapper();
-      // JsonSchemaGenerator schemaGen = new JsonSchemaGenerator(mapper);
-      // JsonNode schema = schemaGen.generateJsonSchema(c);
-      // String schemaString = mapper.writeValueAsString(schema);
-      // out.println(schemaString);
-      // }
-      // }
-
-      // JsonSchemaGenerator schemaGenNew = new JsonSchemaGenerator(mapper,
-      // true, JsonSchemaConfig.vanillaJsonSchemaDraft4());
-      // JsonNode schemaNew =
-      // schemaGenNew.generateJsonSchema(Configuration.class);
-      // _logger.output(mapper.writeValueAsString(schemaNew));
-
-      // _logger.output("\n");
-      // JsonNode schemaNew2 =
-      // schemaGenNew.generateJsonSchema(SchemaTest.Parent.class);
-      // _logger.output(mapper.writeValueAsString(schemaNew2));
-    } catch (Exception e) {
-      _logger.errorf("Could not generate data model: %s", e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
   private boolean generateDataplane(
       @Nullable FileWriter outWriter, List<String> options, List<String> parameters) {
     if (!isValidArgument(options, parameters, 0, 0, 0, Command.GEN_DP)) {
@@ -1689,7 +1629,6 @@ public class Client extends AbstractClient implements IClient {
       case interactive:
         break;
 
-      case gendatamodel:
       case genquestions:
       default:
         return;
@@ -2861,10 +2800,6 @@ public class Client extends AbstractClient implements IClient {
           runBatchFile();
           break;
         }
-
-      case gendatamodel:
-        generateDatamodel();
-        break;
 
       case genquestions:
         generateQuestions();

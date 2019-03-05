@@ -64,7 +64,6 @@ import org.batfish.common.BatfishException;
 import org.batfish.common.BfConsts;
 import org.batfish.common.ColumnFilter;
 import org.batfish.common.ColumnSortOption;
-import org.batfish.common.CompletionMetadata;
 import org.batfish.common.Container;
 import org.batfish.common.WorkItem;
 import org.batfish.common.util.BatfishObjectMapper;
@@ -2913,14 +2912,5 @@ public final class WorkMgrTest {
     assertThat(
         _manager.getSnapshotExtendedObjectsMetadata(network, snapshot),
         contains(new StoredObjectMetadata(fileName, content.getBytes().length)));
-  }
-
-  private void storeCompletionMetadata(
-      CompletionMetadata completionMetadata, String network, String snapshot) throws IOException {
-    NetworkId networkId = _idManager.generateNetworkId();
-    _idManager.assignNetwork(network, networkId);
-    SnapshotId snapshotId = _idManager.generateSnapshotId();
-    _idManager.assignSnapshot(snapshot, networkId, snapshotId);
-    _storage.storeCompletionMetadata(completionMetadata, networkId, snapshotId);
   }
 }

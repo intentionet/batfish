@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.collect.ImmutableSet;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -17,7 +16,7 @@ import org.batfish.datamodel.GeneratedRoute;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.Vrf;
 
-@JsonSchemaDescription("An IS-IS routing process")
+/** An IS-IS routing process */
 public class IsisProcess implements Serializable {
 
   public static class Builder {

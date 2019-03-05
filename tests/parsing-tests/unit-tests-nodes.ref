@@ -10435,8 +10435,7 @@
             ]
           },
           "obj_any" : {
-            "class" : "org.batfish.datamodel.PrefixIpSpace",
-            "prefix" : "0.0.0.0/0"
+            "class" : "org.batfish.datamodel.UniverseIpSpace"
           }
         },
         "vendorFamily" : {
@@ -12312,6 +12311,9 @@
             "virtuals" : {
               "/Common/SOME_VIRTUAL" : {
                 "name" : "/Common/SOME_VIRTUAL",
+                "vlans" : [
+                  "/Common/MY_VLAN"
+                ],
                 "destination" : "/Common/192.0.2.7",
                 "destinationPort" : 80,
                 "ipProtocol" : "TCP",
@@ -12567,6 +12569,7 @@
                   "sendCommunity" : false
                 }
               },
+              "routerId" : "192.0.2.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             }
           }

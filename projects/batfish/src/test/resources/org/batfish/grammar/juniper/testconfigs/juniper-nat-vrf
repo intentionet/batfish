@@ -1,0 +1,8 @@
+#
+set system host-name juniper-nat-vrf
+#
+set routing-instances R1 interface ge-0/0/1.0
+# vrf-specific pool
+set security nat source pool POOL0 routing-instance R1
+# default-vrf pool 
+set security nat source pool POOL1 description TEXT

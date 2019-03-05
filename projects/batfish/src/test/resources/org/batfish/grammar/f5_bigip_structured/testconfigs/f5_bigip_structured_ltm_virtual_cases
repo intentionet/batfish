@@ -1,0 +1,73 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+  hostname f5_bigip_structured_ltm_virtual_cases
+}
+
+net vlan /Common/vlan1 {
+}
+
+net vlan /Common/vlan2 {
+}
+
+ltm node /Common/node1 {
+    address 10.0.0.1
+}
+
+ltm pool /Common/pool1 {
+    members {
+        /Common/node1:80 {
+            address 10.0.0.1
+        }
+    }
+}
+
+ltm virtual /Common/ipv6_dest {
+    destination dead:beef::1.80
+    pool /Common/pool1
+}
+
+ltm virtual /Common/implicit_mask {
+    destination /Common/192.0.2.1:80
+    pool /Common/pool1
+}
+
+ltm virtual /Common/missing_dest {
+    pool /Common/pool1
+}
+
+ltm virtual /Common/undefined_dest {
+    destination /Common/192.0.2.2
+    pool /Common/pool1
+}
+
+ltm virtual /Common/vlans_missing_names {
+    destination /Common/192.0.2.3:80
+    pool /Common/pool1
+    vlans-enabled
+}
+
+ltm virtual /Common/vlans {
+    destination /Common/192.0.2.4:80
+    pool /Common/pool1
+    vlans-enabled
+    vlans {
+        /Common/vlan1
+    }
+}
+
+ltm virtual-address /Common/192.0.2.1 {
+    address 192.0.2.1
+}
+
+ltm virtual-address /Common/192.0.2.3 {
+    address 192.0.2.3
+}
+
+ltm virtual-address /Common/192.0.2.4 {
+    address 192.0.2.4
+}
+
+ltm virtual-address /Common/dead:beef::1 {
+    address dead:beef::1
+}

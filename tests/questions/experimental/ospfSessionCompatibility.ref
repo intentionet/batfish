@@ -1,0 +1,34 @@
+{
+  "class" : "org.batfish.question.ospfsession.OspfSessionCompatibilityQuestion",
+  "nodes" : ".*",
+  "remoteNodes" : ".*",
+  "differential" : false,
+  "includeOneTableKeys" : true,
+  "instance" : {
+    "description" : "Returns compatible OSPF sessions",
+    "instanceName" : "qname",
+    "orderedVariableNames" : [
+      "nodes",
+      "remoteNodes"
+    ],
+    "tags" : [
+      "ospf"
+    ],
+    "variables" : {
+      "nodes" : {
+        "description" : "Include nodes matching this name or regex",
+        "displayName" : "Nodes",
+        "optional" : true,
+        "type" : "nodeSpec",
+        "value" : ".*"
+      },
+      "remoteNodes" : {
+        "description" : "Include remote nodes matching this name or regex",
+        "displayName" : "Remote Nodes",
+        "optional" : true,
+        "type" : "nodeSpec",
+        "value" : ".*"
+      }
+    }
+  }
+}

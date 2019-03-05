@@ -22,8 +22,7 @@ test tests/basic/nodes-diff.ref get nodes summary=false, differential=true
 
 # Everything below here is to be converted into regular unit tests in some form.
 test tests/basic/filterLineReachability.ref get filterLineReachability
-test tests/basic/bgpSessionStatus.ref get bgpsessionstatus type="ebgp.*", status="missing.*"
-test tests/basic/bgpSessionStatusNew.ref get bgpsessionstatusnew nodes="as2.*", remoteNodes="as3.*"
+test tests/basic/bgpSessionStatus.ref get bgpsessionstatus nodes="as2.*", remoteNodes="as3.*"
 test tests/basic/compareSameName.ref get compareSameName
 test tests/basic/error.ref -error get error
 test tests/basic/isisLoopbacks.ref get isisLoopbacks

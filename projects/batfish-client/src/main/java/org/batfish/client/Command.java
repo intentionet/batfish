@@ -110,16 +110,6 @@ public enum Command {
     return map.build();
   }
 
-  private static Map<Command, String> buildDeprecatedMap() {
-    ImmutableMap.Builder<Command, String> map = ImmutableMap.builder();
-
-    return map.build();
-  }
-
-  private static String getDeprecatedMsg(String reason, Command replacement) {
-    return String.format("%s Use %s instead.", reason, replacement.commandName());
-  }
-
   private static Map<Command, Pair<String, String>> buildUsageMap() {
     Map<Command, Pair<String, String>> descs = new TreeMap<>();
     descs.put(

@@ -1,0 +1,31 @@
+{
+    "class": "org.batfish.question.ospfinterface.OspfInterfaceConfigurationQuestion",
+    "differential": false,
+    "nodes": "${nodes}",
+    "properties": "${properties}",
+    "instance": {
+        "description": "Returns OSPF configuration of interfaces",
+        "instanceName": "ospfInterfaceConfiguration",
+         "orderedVariableNames": [
+            "nodes",
+            "properties"
+        ],
+        "tags": [
+            "ospf"
+        ],
+        "variables": {
+            "nodes": {
+                "description": "Include nodes matching this name or regex",
+                "type": "nodeSpec",
+                "optional": true,
+                "displayName": "Nodes"
+            },
+            "properties": {
+                "description": "Include properties matching this regex",
+                "type": "ospfPropertySpec",
+                "optional": true,
+                "displayName": "Properties"
+            }
+        }
+    }
+}

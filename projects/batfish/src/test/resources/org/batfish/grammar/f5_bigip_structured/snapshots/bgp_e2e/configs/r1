@@ -1,0 +1,105 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+    hostname r1
+}
+
+ltm node /Common/node1 {
+    address 172.16.0.1
+}
+
+ltm pool /Common/pool1 {
+    members {
+        /Common/node1:80 {
+            address 172.16.0.1
+        }
+    }
+}
+
+ltm snatpool /Common/snatpool1 {
+    members {
+        /Common/192.168.0.1
+    }
+}
+
+ltm snat-translation /Common/192.168.0.1 {
+    address 192.168.0.1
+}
+
+ltm virtual /Common/virtual1 {
+    destination /Common/10.0.0.1:80
+    ip-protocol tcp
+    mask 255.255.255.255
+    pool /Common/pool1
+    source 0.0.0.0/0
+    source-address-translation {
+        pool /Common/snatpool1
+        type snat
+    }
+    translate-address enabled
+    translate-port enabled
+}
+
+ltm virtual-address /Common/10.0.0.1:80 {
+    address 10.0.0.1
+    arp enabled
+    mask 255.255.255.255
+    route-advertisement selective
+}
+
+net interface 1.0 {
+    bundle enabled
+    bundle-speed 40G
+}
+
+net vlan /Common/vlan1 {
+    interfaces {
+        1.0 { }
+    }
+    tag 100
+}
+
+net self /Common/self1 {
+    address 192.0.2.1/30
+    allow-service all
+    traffic-group /Common/traffic-group-local-only
+    vlan /Common/vlan1
+}
+
+net routing route-map /Common/rm1 {
+    entries {
+        10 {
+            action permit
+        }
+    }
+}
+
+net routing bgp /Common/bgp1 {
+    address-family {
+        ipv4 {
+            redistribute {
+                kernel {
+                    route-map rm1
+                }
+            }
+        }
+        ipv6 { }
+    }
+    local-as 1
+    neighbor {
+        192.0.2.2 {
+            address-family {
+                ipv4 {
+                    route-map {
+                        out /Common/rm1
+                    }
+                }
+                ipv6 {
+                    activate disabled
+                }
+            }
+            remote-as 2
+            update-source /Common/vlan1
+        }
+    }
+}

@@ -11,8 +11,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public final class NameNodeSpecifier implements NodeSpecifier {
   private @Nonnull final String _name;
 
-  public NameNodeSpecifier(String namePattern) {
-    _name = namePattern;
+  public NameNodeSpecifier(String name) {
+    _name = name;
   }
 
   @Override

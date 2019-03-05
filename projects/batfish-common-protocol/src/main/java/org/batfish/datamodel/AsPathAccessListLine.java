@@ -5,13 +5,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@JsonSchemaDescription("A line in an AsPathAccessList")
+/** A line in an AsPathAccessList */
 @ParametersAreNonnullByDefault
 public final class AsPathAccessListLine implements Serializable, Comparable<AsPathAccessListLine> {
   private static final String PROP_ACTION = "action";

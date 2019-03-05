@@ -192,7 +192,12 @@ public final class Prefix implements Comparable<Prefix>, Serializable {
     return 31 * Long.hashCode(_ip.asLong()) + _prefixLength;
   }
 
-  public PrefixIpSpace toIpSpace() {
+  public IpSpace toIpSpace() {
+    if (_prefixLength == 0) {
+      return UniverseIpSpace.INSTANCE;
+    } else if (_prefixLength == MAX_PREFIX_LENGTH) {
+      return _ip.toIpSpace();
+    }
     return new PrefixIpSpace(this);
   }
 

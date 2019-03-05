@@ -42,6 +42,7 @@ public enum F5BigipStructureUsage implements StructureUsage {
   VIRTUAL_RULES_RULE("virtual rules rule"),
   VIRTUAL_SELF_REFERENCE("virtual self-reference"),
   VIRTUAL_SOURCE_ADDRESS_TRANSLATION_POOL("virtual source-address-translation pool"),
+  VIRTUAL_VLANS_VLAN("virtual vlans vlan"),
   VLAN_INTERFACE("vlan interface");
 
   private final @Nonnull String _description;

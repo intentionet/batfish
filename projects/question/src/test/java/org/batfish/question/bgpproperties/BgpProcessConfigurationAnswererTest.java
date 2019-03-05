@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
 import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.BgpTieBreaker;
@@ -17,6 +16,9 @@ import org.batfish.datamodel.pojo.Node;
 import org.batfish.datamodel.questions.BgpProcessPropertySpecifier;
 import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.specifier.AllNodesNodeSpecifier;
+import org.batfish.specifier.MockSpecifierContext;
+import org.batfish.specifier.NameNodeSpecifier;
 import org.junit.Test;
 
 public class BgpProcessConfigurationAnswererTest {
@@ -40,15 +42,16 @@ public class BgpProcessConfigurationAnswererTest {
 
     BgpProcessConfigurationQuestion question =
         new BgpProcessConfigurationQuestion(
-            null, new BgpProcessPropertySpecifier(property1 + "|" + property2));
+            AllNodesNodeSpecifier.INSTANCE,
+            new BgpProcessPropertySpecifier(property1 + "|" + property2));
 
     TableMetadata metadata = BgpProcessConfigurationAnswerer.createTableMetadata(question);
 
     Multiset<Row> propertyRows =
         BgpProcessConfigurationAnswerer.getProperties(
             question.getProperties(),
-            ImmutableMap.of("node1", conf1),
-            ImmutableSet.of("node1"),
+            MockSpecifierContext.builder().setConfigs(ImmutableMap.of("node1", conf1)).build(),
+            new NameNodeSpecifier("node1"),
             metadata.toColumnMap());
 
     // we should have exactly one row1 with two properties

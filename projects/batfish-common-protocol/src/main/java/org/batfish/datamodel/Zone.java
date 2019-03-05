@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -18,7 +17,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.util.ComparableStructure;
 
 @ParametersAreNonnullByDefault
-@JsonSchemaDescription("An IPV4 firewall zone")
+/** An IPV4 firewall zone */
 public final class Zone extends ComparableStructure<String> {
 
   private static final String PROP_FROM_HOST_FILTER = "fromHostFilter";

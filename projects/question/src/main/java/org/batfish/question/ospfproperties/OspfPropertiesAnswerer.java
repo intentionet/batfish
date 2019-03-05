@@ -5,12 +5,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
 import org.batfish.common.plugin.IBatfish;
-import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.ospf.OspfProcess;
@@ -25,6 +23,8 @@ import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.Row.RowBuilder;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.specifier.NodeSpecifier;
+import org.batfish.specifier.SpecifierContext;
 
 public class OspfPropertiesAnswerer extends Answerer {
 
@@ -77,14 +77,15 @@ public class OspfPropertiesAnswerer extends Answerer {
   @Override
   public AnswerElement answer() {
     OspfPropertiesQuestion question = (OspfPropertiesQuestion) _question;
-    Map<String, Configuration> configurations = _batfish.loadConfigurations();
-    Set<String> nodes = question.getNodes().getMatchingNodes(_batfish);
-
     TableMetadata tableMetadata = createTableMetadata(question);
     TableAnswerElement answer = new TableAnswerElement(tableMetadata);
 
     Multiset<Row> propertyRows =
-        getProperties(question.getProperties(), configurations, nodes, tableMetadata.toColumnMap());
+        getProperties(
+            question.getProperties(),
+            _batfish.specifierContext(),
+            question.getNodeSpecifier(),
+            tableMetadata.toColumnMap());
 
     answer.postProcessAnswer(question, propertyRows);
     return answer;
@@ -101,54 +102,56 @@ public class OspfPropertiesAnswerer extends Answerer {
    */
   public static Multiset<Row> getProperties(
       OspfPropertySpecifier propertySpecifier,
-      Map<String, Configuration> configurations,
-      Set<String> nodes,
+      SpecifierContext ctxt,
+      NodeSpecifier nodeSpecifier,
       Map<String, ColumnMetadata> columnMetadata) {
 
     Multiset<Row> rows = HashMultiset.create();
 
-    nodes.forEach(
-        nodeName -> {
-          configurations
-              .get(nodeName)
-              .getVrfs()
-              .values()
-              .forEach(
-                  vrf -> {
-                    OspfProcess ospfProcess = vrf.getOspfProcess();
-                    if (ospfProcess == null) {
-                      return;
-                    }
-                    RowBuilder rowBuilder =
-                        Row.builder(columnMetadata)
-                            .put(COL_NODE, new Node(nodeName))
-                            .put(COL_VRF, vrf.getName())
-                            .put(COL_PROCESS_ID, ospfProcess.getProcessId());
+    nodeSpecifier
+        .resolve(ctxt)
+        .forEach(
+            nodeName -> {
+              ctxt.getConfigs()
+                  .get(nodeName)
+                  .getVrfs()
+                  .values()
+                  .forEach(
+                      vrf -> {
+                        OspfProcess ospfProcess = vrf.getOspfProcess();
+                        if (ospfProcess == null) {
+                          return;
+                        }
+                        RowBuilder rowBuilder =
+                            Row.builder(columnMetadata)
+                                .put(COL_NODE, new Node(nodeName))
+                                .put(COL_VRF, vrf.getName())
+                                .put(COL_PROCESS_ID, ospfProcess.getProcessId());
 
-                    for (String property : propertySpecifier.getMatchingProperties()) {
-                      PropertyDescriptor<OspfProcess> propertyDescriptor =
-                          OspfPropertySpecifier.JAVA_MAP.get(property);
-                      try {
-                        PropertySpecifier.fillProperty(
-                            propertyDescriptor, ospfProcess, property, rowBuilder);
-                      } catch (ClassCastException e) {
-                        throw new BatfishException(
-                            String.format(
-                                "Type mismatch between property value ('%s') and Schema ('%s') for property '%s' for OSPF process '%s->%s-%s': %s",
-                                propertyDescriptor.getGetter().apply(ospfProcess),
-                                propertyDescriptor.getSchema(),
-                                property,
-                                nodeName,
-                                vrf.getName(),
-                                ospfProcess,
-                                e.getMessage()),
-                            e);
-                      }
-                    }
+                        for (String property : propertySpecifier.getMatchingProperties()) {
+                          PropertyDescriptor<OspfProcess> propertyDescriptor =
+                              OspfPropertySpecifier.JAVA_MAP.get(property);
+                          try {
+                            PropertySpecifier.fillProperty(
+                                propertyDescriptor, ospfProcess, property, rowBuilder);
+                          } catch (ClassCastException e) {
+                            throw new BatfishException(
+                                String.format(
+                                    "Type mismatch between property value ('%s') and Schema ('%s') for property '%s' for OSPF process '%s->%s-%s': %s",
+                                    propertyDescriptor.getGetter().apply(ospfProcess),
+                                    propertyDescriptor.getSchema(),
+                                    property,
+                                    nodeName,
+                                    vrf.getName(),
+                                    ospfProcess,
+                                    e.getMessage()),
+                                e);
+                          }
+                        }
 
-                    rows.add(rowBuilder.build());
-                  });
-        });
+                        rows.add(rowBuilder.build());
+                      });
+            });
 
     return rows;
   }

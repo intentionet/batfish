@@ -110,6 +110,17 @@ public class TestUtils {
     return routes.stream().filter(r -> r.getNetwork().equals(prefix)).collect(Collectors.toList());
   }
 
+  public static Node makeF5Router(String hostname) {
+    NetworkFactory nf = new NetworkFactory();
+    Configuration c =
+        nf.configurationBuilder()
+            .setHostname(hostname)
+            .setConfigurationFormat(ConfigurationFormat.F5_BIGIP_STRUCTURED)
+            .build();
+    nf.vrfBuilder().setName(Configuration.DEFAULT_VRF_NAME).setOwner(c).build();
+    return new Node(c);
+  }
+
   public static Node makeIosRouter(String hostname) {
     NetworkFactory nf = new NetworkFactory();
     Configuration c =

@@ -1,15 +1,9 @@
 package org.batfish.bddreachability;
 
-import static org.batfish.bddreachability.transition.Transitions.IDENTITY;
-import static org.batfish.bddreachability.transition.Transitions.ZERO;
-import static org.batfish.bddreachability.transition.Transitions.compose;
-import static org.batfish.bddreachability.transition.Transitions.constraint;
-
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import net.sf.javabdd.BDD;
 import org.batfish.bddreachability.transition.TransformationToTransition;
 import org.batfish.bddreachability.transition.Transition;
 import org.batfish.datamodel.Configuration;
@@ -25,15 +19,13 @@ import org.batfish.datamodel.transformation.Transformation;
  * first select packets for which the single target Ip is the destination Ip, then unset the
  * destination Ip (effectively allowing the packet to have any destination Ip). This is problematic
  * because it could (and almost always would) include Ips that could never be transformed in the
- * forward direction pass. To remedy this, we constrain the output to be within the input of the
- * forward transformation, taken from a forward reachability analysis (and swapping source and dest
- * fields, of course).
+ * forward direction pass. To remedy this, clients must constrain the output to be within the input
+ * of the forward transformation, using {@link BDDReverseTransformationRanges}.
  */
 @ParametersAreNonnullByDefault
 class BDDReverseFlowTransformationFactoryImpl implements BDDReverseFlowTransformationFactory {
   private final Map<String, Configuration> _configs;
   private final Map<String, TransformationToTransition> _transformationToTransitions;
-  private final BDDReverseTransformationRanges _reverseTransformationRanges;
 
   // caches
   private final Map<NodeInterfacePair, Transition> _reverseFlowIncomingTransformations;
@@ -41,11 +33,9 @@ class BDDReverseFlowTransformationFactoryImpl implements BDDReverseFlowTransform
 
   public BDDReverseFlowTransformationFactoryImpl(
       Map<String, Configuration> configs,
-      Map<String, TransformationToTransition> transformationToTransitions,
-      BDDReverseTransformationRanges reverseTransformationRanges) {
+      Map<String, TransformationToTransition> transformationToTransitions) {
     _configs = configs;
     _transformationToTransitions = transformationToTransitions;
-    _reverseTransformationRanges = reverseTransformationRanges;
     _reverseFlowIncomingTransformations = new HashMap<>();
     _reverseFlowOutgoingTransformations = new HashMap<>();
   }
@@ -57,8 +47,7 @@ class BDDReverseFlowTransformationFactoryImpl implements BDDReverseFlowTransform
         k ->
             computeReverseFlowTransformation(
                 hostname,
-                _configs.get(hostname).getAllInterfaces().get(iface).getIncomingTransformation(),
-                _reverseTransformationRanges.reverseIncomingTransformationRange(hostname, iface)));
+                _configs.get(hostname).getAllInterfaces().get(iface).getIncomingTransformation()));
   }
 
   @Override
@@ -68,24 +57,11 @@ class BDDReverseFlowTransformationFactoryImpl implements BDDReverseFlowTransform
         k ->
             computeReverseFlowTransformation(
                 hostname,
-                _configs.get(hostname).getAllInterfaces().get(iface).getOutgoingTransformation(),
-                _reverseTransformationRanges.reverseOutgoingTransformationRange(hostname, iface)));
+                _configs.get(hostname).getAllInterfaces().get(iface).getOutgoingTransformation()));
   }
 
   private Transition computeReverseFlowTransformation(
-      String hostname, Transformation transformation, BDD validRange) {
-    if (validRange.isZero()) {
-      // nothing reached here in the forward path
-      return ZERO;
-    }
-    TransformationToTransition toTransition = _transformationToTransitions.get(hostname);
-    Transition transformationTransition = toTransition.toReturnFlowTransition(transformation);
-    return transformationTransition == IDENTITY
-        ? IDENTITY
-        : compose(
-            // first apply the transformation
-            transformationTransition,
-            // then make sure it's in the valid range
-            constraint(validRange));
+      String hostname, Transformation transformation) {
+    return _transformationToTransitions.get(hostname).toReturnFlowTransition(transformation);
   }
 }

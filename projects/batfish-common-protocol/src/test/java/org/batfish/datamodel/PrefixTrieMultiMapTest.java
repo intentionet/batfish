@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /** Tests of {@link PrefixTrieMultiMap} */
-@SuppressWarnings("unchecked")
 public class PrefixTrieMultiMapTest {
 
   @Rule public ExpectedException thrown = ExpectedException.none();

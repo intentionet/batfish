@@ -22,7 +22,6 @@ java_library(
     ],
     deps = [
         "//projects/batfish-common-protocol:common",
-        "//projects/lib/jackson-jsonschema:jackson_jsonschema",
         "@commons_io//:compile",
         "@commons_lang3//:compile",
         "@diffutils//:compile",

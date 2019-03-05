@@ -1,8 +1,6 @@
 package org.batfish.datamodel;
 
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
-
-@JsonSchemaDescription("Vendor configuration file format.")
+/** Vendor configuration file format. */
 public enum ConfigurationFormat {
   ALCATEL_AOS("alcatel_aos"),
   ARISTA("arista"),

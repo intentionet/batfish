@@ -97,19 +97,10 @@ public class BgpAsnUseQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-
-  /*
+  /**
    * Lists ASNs that are being used by multiple nodes
    *
    * <p>In eBGP-based data centers, it is often desired that each router have its own ASN.
-   *
-   * @type BgpAsnUse multifile
-   * @param minCount Only report ASNs that are used at least this number of nodes
-   * @param nodeRegex Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @example bf_answer("BgpAsnUse", nodeRegex='as2.*') Answers the question only for nodes whose
-   *     names start with 'as2'.
    */
   public static class BgpAsnUseQuestion extends Question {
 

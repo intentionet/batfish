@@ -15,6 +15,7 @@ nr_bgp
       nrb_address_family
       | nrb_local_as
       | nrb_neighbor
+      | nrb_router_id
       | unrecognized
     )*
   )? BRACE_RIGHT NEWLINE
@@ -196,4 +197,9 @@ nrbnn_remote_as
 nrbnn_update_source
 :
   UPDATE_SOURCE name = word NEWLINE
+;
+
+nrb_router_id
+:
+  ROUTER_ID id = word NEWLINE
 ;

@@ -52,6 +52,7 @@ import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IsisRoute;
 import org.batfish.datamodel.IsoAddress;
+import org.batfish.datamodel.KernelRoute;
 import org.batfish.datamodel.LocalRoute;
 import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.NetworkFactory;
@@ -114,6 +115,11 @@ public class VirtualRouterTest {
   private static Map<String, Node> makeIosRouters(String... hostnames) {
     return Arrays.stream(hostnames)
         .collect(ImmutableMap.toImmutableMap(hostname -> hostname, TestUtils::makeIosRouter));
+  }
+
+  private static VirtualRouter makeF5VirtualRouter(String hostname) {
+    Node n = TestUtils.makeF5Router(hostname);
+    return n.getVirtualRouters().get(DEFAULT_VRF_NAME);
   }
 
   private static VirtualRouter makeIosVirtualRouter(String hostname) {
@@ -253,6 +259,26 @@ public class VirtualRouterTest {
                             new ConnectedRoute(e.getValue().getPrefix(), e.getKey()),
                             DEFAULT_VRF_NAME))
                 .collect(ImmutableSet.toImmutableSet())));
+  }
+
+  /** Check that initialization of Kernel RIB is as expected */
+  @Test
+  public void testInitKernelRib() {
+    // Setup
+    VirtualRouter vr = makeF5VirtualRouter(null);
+    vr.getConfiguration()
+        .getDefaultVrf()
+        .setKernelRoutes(ImmutableSortedSet.of(new KernelRoute(Prefix.ZERO)));
+    vr.initRibs();
+
+    // Test
+    vr.initKernelRib();
+
+    // Assert that all kernel routes have been processed
+    assertThat(
+        vr._kernelRib.getTypedRoutes(),
+        equalTo(
+            ImmutableSet.of(new AnnotatedRoute<>(new KernelRoute(Prefix.ZERO), DEFAULT_VRF_NAME))));
   }
 
   /** Check that initialization of Local RIB is as expected */

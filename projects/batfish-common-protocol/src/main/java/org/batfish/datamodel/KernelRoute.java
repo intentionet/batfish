@@ -43,7 +43,7 @@ public final class KernelRoute extends AbstractRoute {
   }
 
   public KernelRoute(Prefix network) {
-    super(network, 0, true, true);
+    super(network, 0, false, true);
   }
 
   @Override

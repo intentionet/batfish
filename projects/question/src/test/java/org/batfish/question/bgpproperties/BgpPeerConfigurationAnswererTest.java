@@ -39,6 +39,8 @@ import org.batfish.datamodel.answers.SelfDescribingObject;
 import org.batfish.datamodel.pojo.Node;
 import org.batfish.datamodel.questions.BgpPeerPropertySpecifier;
 import org.batfish.datamodel.table.Row;
+import org.batfish.specifier.MockSpecifierContext;
+import org.batfish.specifier.NameNodeSpecifier;
 import org.junit.Test;
 
 public class BgpPeerConfigurationAnswererTest {
@@ -88,10 +90,12 @@ public class BgpPeerConfigurationAnswererTest {
 
   @Test
   public void testAnswer() {
+    MockSpecifierContext ctxt =
+        MockSpecifierContext.builder().setConfigs(ImmutableMap.of("c", _c)).build();
     Multiset<Row> rows =
         BgpPeerConfigurationAnswerer.getAnswerRows(
-            ImmutableMap.of("c", _c),
-            ImmutableSet.of("c"),
+            ctxt,
+            new NameNodeSpecifier("c"),
             BgpPeerConfigurationAnswerer.createTableMetadata(
                     new BgpPeerConfigurationQuestion(null, null))
                 .toColumnMap(),
@@ -141,10 +145,12 @@ public class BgpPeerConfigurationAnswererTest {
 
   @Test
   public void testFilteredAnswer() {
+    MockSpecifierContext ctxt =
+        MockSpecifierContext.builder().setConfigs(ImmutableMap.of("c", _c)).build();
     Multiset<Row> rows =
         BgpPeerConfigurationAnswerer.getAnswerRows(
-            ImmutableMap.of("c", _c),
-            ImmutableSet.of("c"),
+            ctxt,
+            new NameNodeSpecifier("c"),
             BgpPeerConfigurationAnswerer.createTableMetadata(
                     new BgpPeerConfigurationQuestion(
                         null, new BgpPeerPropertySpecifier("Local_IP")))

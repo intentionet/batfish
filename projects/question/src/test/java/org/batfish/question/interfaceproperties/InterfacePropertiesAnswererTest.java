@@ -20,9 +20,12 @@ import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.hsrp.HsrpGroup;
 import org.batfish.datamodel.questions.InterfacePropertySpecifier;
-import org.batfish.datamodel.questions.InterfacesSpecifier;
 import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.specifier.AllInterfacesInterfaceSpecifier;
+import org.batfish.specifier.MockSpecifierContext;
+import org.batfish.specifier.NameInterfaceSpecifier;
+import org.batfish.specifier.NameNodeSpecifier;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,12 +63,15 @@ public class InterfacePropertiesAnswererTest {
     InterfacePropertySpecifier propertySpecifier =
         new InterfacePropertySpecifier(property1 + "|" + property2);
 
+    MockSpecifierContext ctxt =
+        MockSpecifierContext.builder().setConfigs(ImmutableMap.of("node1", conf1)).build();
+
     Multiset<Row> propertyRows =
         InterfacePropertiesAnswerer.getProperties(
             propertySpecifier,
-            ImmutableMap.of("node1", conf1),
-            ImmutableSet.of("node1"),
-            new InterfacesSpecifier("iface1"),
+            ctxt,
+            new NameNodeSpecifier("node1"),
+            new NameInterfaceSpecifier("iface1"),
             new TableMetadata(
                     InterfacePropertiesAnswerer.createColumnMetadata(propertySpecifier),
                     (String) null)
@@ -93,12 +99,15 @@ public class InterfacePropertiesAnswererTest {
     String property = InterfacePropertySpecifier.DESCRIPTION;
     InterfacePropertySpecifier propertySpecifier = new InterfacePropertySpecifier(property);
 
+    MockSpecifierContext ctxt =
+        MockSpecifierContext.builder().setConfigs(ImmutableMap.of("node", conf)).build();
+
     Multiset<Row> propertyRows =
         InterfacePropertiesAnswerer.getProperties(
             propertySpecifier,
-            ImmutableMap.of("node", conf),
-            ImmutableSet.of("node"),
-            InterfacesSpecifier.ALL,
+            ctxt,
+            new NameNodeSpecifier("node"),
+            AllInterfacesInterfaceSpecifier.INSTANCE,
             true,
             new TableMetadata(
                     InterfacePropertiesAnswerer.createColumnMetadata(propertySpecifier),
@@ -116,12 +125,15 @@ public class InterfacePropertiesAnswererTest {
   }
 
   private @Nonnull Multiset<Row> getRows(String property) {
+    MockSpecifierContext ctxt =
+        MockSpecifierContext.builder().setConfigs(ImmutableMap.of(HOSTNAME, _c)).build();
+
     InterfacePropertySpecifier propertySpecifier = new InterfacePropertySpecifier(property);
     return InterfacePropertiesAnswerer.getProperties(
         propertySpecifier,
-        ImmutableMap.of(HOSTNAME, _c),
-        ImmutableSet.of(HOSTNAME),
-        new InterfacesSpecifier(INTERFACE_NAME),
+        ctxt,
+        new NameNodeSpecifier(HOSTNAME),
+        new NameInterfaceSpecifier(INTERFACE_NAME),
         new TableMetadata(
                 InterfacePropertiesAnswerer.createColumnMetadata(propertySpecifier), (String) null)
             .toColumnMap());

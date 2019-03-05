@@ -104,7 +104,7 @@ public class Environment {
     _readFromIntermediateBgpAttributes = readFromIntermediateBgpAttributes;
     _routeSourceVrf =
         originalRoute instanceof AnnotatedRoute
-            ? ((AnnotatedRoute) originalRoute).getSourceVrf()
+            ? ((AnnotatedRoute<?>) originalRoute).getSourceVrf()
             : null;
     ConfigurationFormat format = configuration.getConfigurationFormat();
     _useOutputAttributes =

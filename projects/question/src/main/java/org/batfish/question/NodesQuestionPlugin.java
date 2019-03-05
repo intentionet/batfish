@@ -467,22 +467,14 @@ public class NodesQuestionPlugin extends QuestionPlugin {
     }
   }
 
-  // <question_page_comment>
-  /*
+  /**
    * Outputs the configuration of nodes in the network.
    *
    * <p>This question may be used to extract the configuration of the node in the Batfish datamodel
    * or a summary of it.
    *
-   * @type Nodes onefile
-   * @param nodes Regular expression for names of nodes to include. Default value is '.*' (all
-   *     nodes).
-   * @param nodeType Set of nodes to focus on among (BGP, EIGRP, ISIS, OSPF). Default is empty set
-   *     ('[]') which indicates all types.
-   * @param summary (True|False) which indicates if the full configuration or a summarized view
-   *     should be output. Default is True.
-   * @example bf_answer("Nodes", nodeType=["bgp"], nodeRegex="as1.*", summary=False) Outputs the
-   *     full configuration of all nodes whose names begin with "as1" and run BGP.
+   * <p>Generally prefer properties questions like {@link
+   * org.batfish.question.nodeproperties.NodePropertiesQuestion}.
    */
   public static class NodesQuestion extends Question {
 

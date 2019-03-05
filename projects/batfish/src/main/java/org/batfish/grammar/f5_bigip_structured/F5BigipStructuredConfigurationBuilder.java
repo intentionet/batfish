@@ -63,6 +63,7 @@ import static org.batfish.representation.f5_bigip.F5BigipStructureUsage.VIRTUAL_
 import static org.batfish.representation.f5_bigip.F5BigipStructureUsage.VIRTUAL_RULES_RULE;
 import static org.batfish.representation.f5_bigip.F5BigipStructureUsage.VIRTUAL_SELF_REFERENCE;
 import static org.batfish.representation.f5_bigip.F5BigipStructureUsage.VIRTUAL_SOURCE_ADDRESS_TRANSLATION_POOL;
+import static org.batfish.representation.f5_bigip.F5BigipStructureUsage.VIRTUAL_VLANS_VLAN;
 import static org.batfish.representation.f5_bigip.F5BigipStructureUsage.VLAN_INTERFACE;
 
 import com.google.common.collect.ImmutableSet;
@@ -151,6 +152,7 @@ import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Lva_route
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Lvp_persistenceContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Lvr_ruleContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Lvsat_poolContext;
+import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Lvv_vlanContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Net_interfaceContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Net_selfContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Net_vlanContext;
@@ -159,6 +161,7 @@ import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nr_bgpCon
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nr_prefix_listContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nr_route_mapContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nrb_local_asContext;
+import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nrb_router_idContext;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nrbaf_ipv4Context;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nrbaf_ipv6Context;
 import org.batfish.grammar.f5_bigip_structured.F5BigipStructuredParser.Nrbafcr_kernelContext;
@@ -271,9 +274,7 @@ public class F5BigipStructuredConfigurationBuilder extends F5BigipStructuredPars
   private @Nullable VirtualAddress _currentVirtualAddress;
   private @Nullable Vlan _currentVlan;
   private final @Nonnull F5BigipStructuredCombinedParser _parser;
-
   private final @Nonnull String _text;
-
   private final @Nonnull Warnings _w;
 
   public F5BigipStructuredConfigurationBuilder(
@@ -469,6 +470,13 @@ public class F5BigipStructuredConfigurationBuilder extends F5BigipStructuredPars
   @Override
   public void enterLva_route_advertisement(Lva_route_advertisementContext ctx) {
     _currentVirtualAddress.setRouteAdvertisementMode(toRouteAdvertisementMode(ctx.ramode));
+  }
+
+  @Override
+  public void enterLvv_vlan(Lvv_vlanContext ctx) {
+    String name = ctx.name.getText();
+    _c.referenceStructure(VLAN, name, VIRTUAL_VLANS_VLAN, ctx.name.getStart().getLine());
+    _currentVirtual.getVlans().add(name);
   }
 
   @Override
@@ -1000,6 +1008,23 @@ public class F5BigipStructuredConfigurationBuilder extends F5BigipStructuredPars
   @Override
   public void exitNrb_local_as(Nrb_local_asContext ctx) {
     _currentBgpProcess.setLocalAs(toLong(ctx.as));
+  }
+
+  @Override
+  public void exitNrb_router_id(Nrb_router_idContext ctx) {
+    String text = ctx.id.getText();
+    Optional<Ip> ip = Ip.tryParse(text);
+    if (ip.isPresent()) {
+      _currentBgpProcess.setRouterId(ip.get());
+      return;
+    }
+    Optional<Ip6> ip6 = Ip6.tryParse(text);
+    if (ip6.isPresent()) {
+      todo(ctx);
+      return;
+    }
+    _w.redFlag(
+        String.format("'%s' is neither IPv4 nor IPv6 address in: %s", text, getFullText(ctx)));
   }
 
   @Override

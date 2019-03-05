@@ -583,57 +583,36 @@
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 109,
-        "Text" : "vlans",
-        "Parser_Context" : "[unrecognized l_virtual s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 123,
+        "Line" : 125,
         "Text" : "adaptive",
         "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 124,
+        "Line" : 126,
         "Text" : "defaults-from /Common/http",
         "Parser_Context" : "[lmh_defaults_from lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 125,
+        "Line" : 127,
         "Text" : "destination",
         "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 126,
+        "Line" : 128,
         "Text" : "interval",
         "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 127,
-        "Text" : "ip-dscp",
-        "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 128,
-        "Text" : "recv",
-        "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 129,
-        "Text" : "recv-disable",
+        "Text" : "ip-dscp",
         "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
@@ -647,329 +626,329 @@
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 130,
+        "Text" : "recv",
+        "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 131,
+        "Text" : "recv-disable",
+        "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 132,
         "Text" : "send",
         "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 135,
+        "Line" : 137,
         "Text" : "time-until-up",
         "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 136,
+        "Line" : 138,
         "Text" : "timeout",
         "Parser_Context" : "[unrecognized lm_http l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 139,
+        "Line" : 141,
         "Text" : "adaptive",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 140,
+        "Line" : 142,
         "Text" : "cipherlist",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 141,
+        "Line" : 143,
         "Text" : "compatibility",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 142,
+        "Line" : 144,
         "Text" : "defaults-from /Common/https",
         "Parser_Context" : "[lmhs_defaults_from lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 143,
+        "Line" : 145,
         "Text" : "destination",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 144,
+        "Line" : 146,
         "Text" : "interval",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 145,
+        "Line" : 147,
         "Text" : "ip-dscp",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 146,
+        "Line" : 148,
         "Text" : "recv",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 147,
+        "Line" : 149,
         "Text" : "recv-disable",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 148,
+        "Line" : 150,
         "Text" : "send",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 153,
+        "Line" : 155,
         "Text" : "ssl-profile /Common/SOME_SSL_PROFILE",
         "Parser_Context" : "[lmhs_ssl_profile lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 154,
+        "Line" : 156,
         "Text" : "time-until-up",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 155,
+        "Line" : 157,
         "Text" : "timeout",
         "Parser_Context" : "[unrecognized lm_https l_monitor s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 158,
+        "Line" : 160,
         "Text" : "app-service",
         "Parser_Context" : "[unrecognized lper_source_addr l_persistence s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 159,
+        "Line" : 161,
         "Text" : "defaults-from /Common/source_addr",
         "Parser_Context" : "[lpersa_defaults_from lper_source_addr l_persistence s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 160,
+        "Line" : 162,
         "Text" : "timeout",
         "Parser_Context" : "[unrecognized lper_source_addr l_persistence s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 163,
-        "Text" : "app-service",
-        "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 164,
-        "Text" : "defaults-from /Common/ssl",
-        "Parser_Context" : "[lperss_defaults_from lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This feature is not currently supported"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 165,
-        "Text" : "match-across-pools",
+        "Text" : "app-service",
         "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 166,
-        "Text" : "match-across-services",
-        "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
+        "Text" : "defaults-from /Common/ssl",
+        "Parser_Context" : "[lperss_defaults_from lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 167,
-        "Text" : "match-across-virtuals",
+        "Text" : "match-across-pools",
         "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 168,
-        "Text" : "override-connection-limit",
+        "Text" : "match-across-services",
         "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 169,
+        "Text" : "match-across-virtuals",
+        "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 170,
+        "Text" : "override-connection-limit",
+        "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 171,
         "Text" : "timeout",
         "Parser_Context" : "[unrecognized lper_ssl l_persistence s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 172,
+        "Line" : 174,
         "Text" : "alert-timeout",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 173,
+        "Line" : 175,
         "Text" : "allow-dynamic-record-sizing",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 174,
+        "Line" : 176,
         "Text" : "allow-non-ssl",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 175,
+        "Line" : 177,
         "Text" : "app-service",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 176,
+        "Line" : 178,
         "Text" : "cache-size",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 177,
+        "Line" : 179,
         "Text" : "cache-timeout",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 178,
+        "Line" : 180,
         "Text" : "cert",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 179,
+        "Line" : 181,
         "Text" : "cert-extension-includes",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 180,
+        "Line" : 182,
         "Text" : "cert-key-chain",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 188,
+        "Line" : 190,
         "Text" : "cert-lifespan",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 189,
+        "Line" : 191,
         "Text" : "cert-lookup-by-ipaddr-port",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 190,
+        "Line" : 192,
         "Text" : "chain",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 191,
+        "Line" : 193,
         "Text" : "cipher-group",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 192,
+        "Line" : 194,
         "Text" : "ciphers",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 193,
+        "Line" : 195,
         "Text" : "defaults-from /Common/clientssl",
         "Parser_Context" : "[lprofcs_defaults_from lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 194,
+        "Line" : 196,
         "Text" : "generic-alert",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 195,
+        "Line" : 197,
         "Text" : "handshake-timeout",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 196,
+        "Line" : 198,
         "Text" : "inherit-certkeychain",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 197,
-        "Text" : "key",
-        "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 198,
-        "Text" : "max-active-handshakes",
-        "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 199,
-        "Text" : "max-aggregate-renegotiation-per-minute",
+        "Text" : "key",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
@@ -983,503 +962,517 @@
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 200,
-        "Text" : "max-renegotiations-per-minute",
+        "Text" : "max-active-handshakes",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 201,
-        "Text" : "maximum-record-size",
+        "Text" : "max-aggregate-renegotiation-per-minute",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 202,
-        "Text" : "mod-ssl-methods",
+        "Text" : "max-renegotiations-per-minute",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 203,
-        "Text" : "mode",
+        "Text" : "maximum-record-size",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 204,
-        "Text" : "ocsp-stapling",
+        "Text" : "mod-ssl-methods",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 205,
-        "Text" : "options",
+        "Text" : "mode",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 206,
-        "Text" : "passphrase",
+        "Text" : "ocsp-stapling",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 207,
-        "Text" : "peer-no-renegotiate-timeout",
+        "Text" : "options",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 208,
-        "Text" : "proxy-ca-cert",
+        "Text" : "passphrase",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 209,
-        "Text" : "proxy-ca-key",
+        "Text" : "peer-no-renegotiate-timeout",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 210,
-        "Text" : "proxy-ssl",
+        "Text" : "proxy-ca-cert",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 211,
-        "Text" : "proxy-ssl-passthrough",
+        "Text" : "proxy-ca-key",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 212,
-        "Text" : "renegotiate-max-record-delay",
+        "Text" : "proxy-ssl",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 213,
-        "Text" : "renegotiate-period",
+        "Text" : "proxy-ssl-passthrough",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 214,
-        "Text" : "renegotiate-size",
+        "Text" : "renegotiate-max-record-delay",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 215,
-        "Text" : "renegotiation",
+        "Text" : "renegotiate-period",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 216,
-        "Text" : "secure-renegotiation",
+        "Text" : "renegotiate-size",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 217,
-        "Text" : "server-name",
+        "Text" : "renegotiation",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 218,
-        "Text" : "session-mirroring",
+        "Text" : "secure-renegotiation",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 219,
-        "Text" : "session-ticket",
+        "Text" : "server-name",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 220,
-        "Text" : "session-ticket-timeout",
+        "Text" : "session-mirroring",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 221,
-        "Text" : "sni-default",
+        "Text" : "session-ticket",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 222,
-        "Text" : "sni-require",
+        "Text" : "session-ticket-timeout",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 223,
-        "Text" : "ssl-forward-proxy",
+        "Text" : "sni-default",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 224,
-        "Text" : "ssl-forward-proxy-bypass",
+        "Text" : "sni-require",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 225,
-        "Text" : "ssl-sign-hash",
+        "Text" : "ssl-forward-proxy",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 226,
-        "Text" : "strict-resume",
+        "Text" : "ssl-forward-proxy-bypass",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 227,
+        "Text" : "ssl-sign-hash",
+        "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 228,
+        "Text" : "strict-resume",
+        "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 229,
         "Text" : "unclean-shutdown",
         "Parser_Context" : "[unrecognized lprof_client_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 230,
+        "Line" : 232,
         "Text" : "dns-resolver",
         "Parser_Context" : "[unrecognized lprof_ocsp_stapling_params l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 231,
+        "Line" : 233,
         "Text" : "responder-url",
         "Parser_Context" : "[unrecognized lprof_ocsp_stapling_params l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 232,
+        "Line" : 234,
         "Text" : "sign-hash",
         "Parser_Context" : "[unrecognized lprof_ocsp_stapling_params l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 233,
+        "Line" : 235,
         "Text" : "status-age",
         "Parser_Context" : "[unrecognized lprof_ocsp_stapling_params l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 234,
+        "Line" : 236,
         "Text" : "trusted-responders",
         "Parser_Context" : "[unrecognized lprof_ocsp_stapling_params l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 237,
-        "Text" : "app-service",
-        "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 238,
-        "Text" : "idle-timeout-override",
-        "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This syntax is unrecognized"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 239,
-        "Text" : "limit-type",
+        "Text" : "app-service",
         "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 240,
-        "Text" : "max-age",
+        "Text" : "idle-timeout-override",
         "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 241,
-        "Text" : "max-reuse",
+        "Text" : "limit-type",
         "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 242,
-        "Text" : "max-size",
+        "Text" : "max-age",
         "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 243,
+        "Text" : "max-reuse",
+        "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 244,
+        "Text" : "max-size",
+        "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 245,
         "Text" : "source-mask",
         "Parser_Context" : "[unrecognized lprof_one_connect l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 246,
+        "Line" : 248,
         "Text" : "alert-timeout",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 247,
+        "Line" : 249,
         "Text" : "app-service",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 248,
+        "Line" : 250,
         "Text" : "cache-size",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 249,
+        "Line" : 251,
         "Text" : "cache-timeout",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 250,
+        "Line" : 252,
         "Text" : "cert",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 251,
+        "Line" : 253,
         "Text" : "chain",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 252,
+        "Line" : 254,
         "Text" : "cipher-group",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 253,
+        "Line" : 255,
         "Text" : "ciphers",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 254,
+        "Line" : 256,
         "Text" : "defaults-from /Common/serverssl",
         "Parser_Context" : "[lprofss_defaults_from lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 255,
+        "Line" : 257,
         "Text" : "generic-alert",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 256,
+        "Line" : 258,
         "Text" : "handshake-timeout",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 257,
+        "Line" : 259,
         "Text" : "key",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 258,
+        "Line" : 260,
         "Text" : "max-active-handshakes",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 259,
+        "Line" : 261,
         "Text" : "mod-ssl-methods",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 260,
+        "Line" : 262,
         "Text" : "mode",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 261,
+        "Line" : 263,
         "Text" : "options",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 262,
+        "Line" : 264,
         "Text" : "proxy-ssl",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 263,
+        "Line" : 265,
         "Text" : "proxy-ssl-passthrough",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 264,
+        "Line" : 266,
         "Text" : "renegotiate-period",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 265,
+        "Line" : 267,
         "Text" : "renegotiate-size",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 266,
+        "Line" : 268,
         "Text" : "renegotiation",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 267,
+        "Line" : 269,
         "Text" : "secure-renegotiation",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 268,
+        "Line" : 270,
         "Text" : "server-name",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 269,
+        "Line" : 271,
         "Text" : "session-mirroring",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 270,
+        "Line" : 272,
         "Text" : "session-ticket",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 271,
+        "Line" : 273,
         "Text" : "sni-default",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 272,
+        "Line" : 274,
         "Text" : "sni-require",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 273,
+        "Line" : 275,
         "Text" : "ssl-forward-proxy",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 274,
+        "Line" : 276,
         "Text" : "ssl-forward-proxy-bypass",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 275,
+        "Line" : 277,
         "Text" : "ssl-sign-hash",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 276,
+        "Line" : 278,
         "Text" : "strict-resume",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 277,
+        "Line" : 279,
         "Text" : "unclean-shutdown",
         "Parser_Context" : "[unrecognized lprof_server_ssl l_profile s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
@@ -1542,13 +1535,6 @@
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 89,
-        "Text" : "/Common/SOME_PROFILE {\n            default yes\n        }",
-        "Parser_Context" : "[lvp_persistence lv_persist l_virtual s_ltm statement f5_bigip_structured_configuration]",
-        "Comment" : "This feature is not currently supported"
-      },
-      {
-        "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 9,
         "Text" : "ltm",
         "Parser_Context" : "[unrecognized statement f5_bigip_structured_configuration]",
@@ -1557,27 +1543,34 @@
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
         "Line" : 90,
+        "Text" : "/Common/SOME_PROFILE {\n            default yes\n        }",
+        "Parser_Context" : "[lvp_persistence lv_persist l_virtual s_ltm statement f5_bigip_structured_configuration]",
+        "Comment" : "This feature is not currently supported"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_ltm",
+        "Line" : 91,
         "Text" : "default",
         "Parser_Context" : "[unrecognized lvp_persistence lv_persist l_virtual s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 95,
+        "Line" : 96,
         "Text" : "/Common/P1 { }",
         "Parser_Context" : "[lv_profiles_profile lv_profiles l_virtual s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 96,
+        "Line" : 97,
         "Text" : "/Common/P2 { }",
         "Parser_Context" : "[lv_profiles_profile lv_profiles l_virtual s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_ltm",
-        "Line" : 97,
+        "Line" : 98,
         "Text" : "/Common/P3 { }",
         "Parser_Context" : "[lv_profiles_profile lv_profiles l_virtual s_ltm statement f5_bigip_structured_configuration]",
         "Comment" : "This feature is not currently supported"
@@ -1742,6 +1735,13 @@
         "Text" : "route-domain",
         "Parser_Context" : "[unrecognized nr_bgp net_routing s_net statement f5_bigip_structured_configuration]",
         "Comment" : "This syntax is unrecognized"
+      },
+      {
+        "Filename" : "configs/f5_bigip_structured_net_routing_bgp",
+        "Line" : 68,
+        "Text" : "router-id dead:beef::1234",
+        "Parser_Context" : "[nrb_router_id nr_bgp net_routing s_net statement f5_bigip_structured_configuration]",
+        "Comment" : "This feature is not currently supported"
       },
       {
         "Filename" : "configs/f5_bigip_structured_net_routing_prefix_list",

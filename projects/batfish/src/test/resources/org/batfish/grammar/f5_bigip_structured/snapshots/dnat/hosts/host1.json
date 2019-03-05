@@ -1,0 +1,9 @@
+{
+  "hostname" : "host1",
+  "hostInterfaces" : {
+    "eth0" : {
+      "name" :  "eth0",
+      "prefix" : "192.0.2.2/24"
+    }
+  }
+}

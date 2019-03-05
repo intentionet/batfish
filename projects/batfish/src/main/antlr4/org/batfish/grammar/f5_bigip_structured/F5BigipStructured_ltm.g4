@@ -317,7 +317,7 @@ ls_vlans
   VLANS BRACE_LEFT
   (
     NEWLINE lsv_vlan*
-  ) BRACE_RIGHT NEWLINE
+  )? BRACE_RIGHT NEWLINE
 ;
 
 lsv_vlan
@@ -400,6 +400,7 @@ l_virtual
       | lv_source_address_translation
       | lv_translate_address
       | lv_translate_port
+      | lv_vlans
       | lv_vlans_disabled
       | lv_vlans_enabled
       | unrecognized
@@ -508,6 +509,19 @@ lv_translate_address
 lv_translate_port
 :
   TRANSLATE_PORT ENABLED NEWLINE
+;
+
+lv_vlans
+:
+  VLANS BRACE_LEFT
+  (
+    NEWLINE lvv_vlan*
+  )? BRACE_RIGHT NEWLINE
+;
+
+lvv_vlan
+:
+  name = word NEWLINE
 ;
 
 lv_vlans_disabled

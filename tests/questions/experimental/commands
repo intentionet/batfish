@@ -57,6 +57,9 @@ test -raw tests/questions/experimental/nodes.ref validate-template nodes nodes="
 # validate nodeProperties
 test -raw tests/questions/experimental/nodeProperties.ref validate-template nodeProperties nodes=".*", properties="ntp.*"
 
+# validate ospfInterfaceConfiguration
+test -raw tests/questions/experimental/ospfInterfaceConfiguration.ref validate-template ospfInterfaceConfiguration nodes=".*", properties="props-.*"
+
 # validate ospfAreaConfiguration
 test -raw tests/questions/experimental/ospfAreaConfiguration.ref validate-template ospfAreaConfiguration nodes=".*"
 
@@ -65,6 +68,9 @@ test -raw tests/questions/experimental/ospfProcessConfiguration.ref validate-tem
 
 # validate ospfProperties
 test -raw tests/questions/experimental/ospfProperties.ref validate-template ospfProperties nodes=".*", properties="maximum-.*"
+
+# validate ospfSessionCompatibility
+test -raw tests/questions/experimental/ospfSessionCompatibility.ref validate-template ospfSessionCompatibility nodes=".*", remoteNodes=".*"
 
 # validate prefixTracer
 test -raw tests/questions/experimental/prefixTracer.ref validate-template prefixTracer nodes=".*", prefix="0.0.0.0/0"

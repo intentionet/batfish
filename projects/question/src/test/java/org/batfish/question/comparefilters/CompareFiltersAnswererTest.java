@@ -9,16 +9,12 @@ import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import net.sf.javabdd.BDD;
 import org.batfish.common.bdd.BDDPacket;
-import org.batfish.datamodel.IpAccessList;
-import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.LineAction;
-import org.batfish.datamodel.NetworkFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,18 +22,11 @@ public final class CompareFiltersAnswererTest {
   private static final String HOSTNAME = "hostname";
   private static final String FILTER = "filter";
 
-  private NetworkFactory _nf;
-
   private BDDPacket _pkt;
 
   @Before
   public void setup() {
-    _nf = new NetworkFactory();
     _pkt = new BDDPacket();
-  }
-
-  private IpAccessList aclWithLines(IpAccessListLine... lines) {
-    return _nf.aclBuilder().setLines(Arrays.asList(lines)).build();
   }
 
   private static List<FilterDifference> compare(

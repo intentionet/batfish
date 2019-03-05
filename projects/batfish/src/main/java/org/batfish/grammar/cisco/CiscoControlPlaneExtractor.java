@@ -210,6 +210,8 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.OBJECT_NAT_MA
 import static org.batfish.representation.cisco.CiscoStructureUsage.OBJECT_NAT_MAPPED_SOURCE_NETWORK_OBJECT_GROUP;
 import static org.batfish.representation.cisco.CiscoStructureUsage.OBJECT_NAT_REAL_INTERFACE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.OBJECT_NAT_REAL_SOURCE_NETWORK_OBJECT;
+import static org.batfish.representation.cisco.CiscoStructureUsage.OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_IN;
+import static org.batfish.representation.cisco.CiscoStructureUsage.OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_OUT;
 import static org.batfish.representation.cisco.CiscoStructureUsage.OSPF_AREA_FILTER_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.OSPF_AREA_INTERFACE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.OSPF_DEFAULT_ORIGINATE_ROUTE_MAP;
@@ -935,6 +937,7 @@ import org.batfish.grammar.cisco.CiscoParser.Redistribute_static_is_stanzaContex
 import org.batfish.grammar.cisco.CiscoParser.Remote_as_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Remove_private_as_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Ren_address_familyContext;
+import org.batfish.grammar.cisco.CiscoParser.Ro6_distribute_listContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_areaContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_area_filterlistContext;
 import org.batfish.grammar.cisco.CiscoParser.Ro_area_nssaContext;
@@ -1859,7 +1862,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     } else {
       pushPeer(_currentPeerGroup);
     }
-    if (af.IPV6() != null) {
+    if (af.IPV6() != null || af.VPNV6() != null) {
       _inIpv6BgpPeer = true;
     }
   }
@@ -2699,6 +2702,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
         pushPeer(_currentIpPeerGroup);
       }
     } else if (ctx.ip6 != null) {
+      _inIpv6BgpPeer = true;
       Ip6 ip6 = toIp6(ctx.ip6);
       Ipv6BgpPeerGroup pg6 = proc.getIpv6PeerGroups().get(ip6);
       if (pg6 == null) {
@@ -8808,6 +8812,21 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   public void exitRo_vrf(Ro_vrfContext ctx) {
     _currentVrf = Configuration.DEFAULT_VRF_NAME;
     _currentOspfProcess = currentVrf().getOspfProcess();
+  }
+
+  @Override
+  public void exitRo6_distribute_list(Ro6_distribute_listContext ctx) {
+    String name = ctx.name.getText();
+    int line = ctx.name.getStart().getLine();
+    boolean in = ctx.IN() != null;
+    CiscoStructureUsage usage =
+        in ? OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_IN : OSPF6_DISTRIBUTE_LIST_PREFIX_LIST_OUT;
+    _configuration.referenceStructure(PREFIX6_LIST, name, usage, line);
+
+    if (ctx.iname != null) {
+      String ifaceName = getCanonicalInterfaceName(ctx.iname.getText());
+      _configuration.referenceStructure(INTERFACE, ifaceName, usage, line);
+    }
   }
 
   @Override

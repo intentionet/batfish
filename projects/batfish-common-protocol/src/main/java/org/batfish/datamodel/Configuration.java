@@ -10,7 +10,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,9 +33,10 @@ import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.tracking.TrackMethod;
 import org.batfish.datamodel.vendor_family.VendorFamily;
 
-@JsonSchemaDescription(
-    "A Configuration represents an autonomous network device, such as a router, host, switch, or "
-        + "firewall.")
+/**
+ * A Configuration represents an autonomous network device, such as a router, host, switch, or
+ * firewall.
+ */
 public final class Configuration implements Serializable {
 
   public static class Builder extends NetworkFactoryBuilder<Configuration> {

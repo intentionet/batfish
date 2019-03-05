@@ -4,8 +4,10 @@ import com.google.auto.service.AutoService;
 import org.batfish.common.Answerer;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.plugin.Plugin;
+import org.batfish.datamodel.questions.BgpProcessPropertySpecifier;
 import org.batfish.datamodel.questions.Question;
 import org.batfish.question.QuestionPlugin;
+import org.batfish.specifier.AllNodesNodeSpecifier;
 
 @AutoService(Plugin.class)
 public class BgpProcessConfigurationPlugin extends QuestionPlugin {
@@ -17,6 +19,7 @@ public class BgpProcessConfigurationPlugin extends QuestionPlugin {
 
   @Override
   protected Question createQuestion() {
-    return new BgpProcessConfigurationQuestion(null, null);
+    return new BgpProcessConfigurationQuestion(
+        AllNodesNodeSpecifier.INSTANCE, BgpProcessPropertySpecifier.ALL);
   }
 }

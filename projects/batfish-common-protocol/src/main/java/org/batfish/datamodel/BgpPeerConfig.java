@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -18,7 +17,6 @@ import javax.annotation.Nullable;
 import org.batfish.datamodel.dataplane.rib.RibGroup;
 
 /** Represents a configured BGP peering, at the control plane level */
-@JsonSchemaDescription("A configured e/iBGP peering relationship")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "class")
 public abstract class BgpPeerConfig implements Serializable {
 

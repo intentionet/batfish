@@ -118,6 +118,7 @@ ipv6 router ospf 1
  log-adjacency-changes
  log-adjacency-changes detail
  distribute-list prefix-list SWITCHLAN in
+ distribute-list prefix-list SWITCHLAN-OUT out Ethernet0/0
  passive-interface default
  timers throttle lsa 0 50 5000
  timers throttle spf 50 50 5000

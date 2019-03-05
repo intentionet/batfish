@@ -1,0 +1,10 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+    hostname f5_bigip_structured_bgp_router_id_manual
+}
+
+net routing bgp /Common/bgp1 {
+    router-id 192.0.2.1
+}
+

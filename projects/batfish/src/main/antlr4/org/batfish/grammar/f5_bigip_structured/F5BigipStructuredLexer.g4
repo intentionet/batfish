@@ -326,6 +326,11 @@ ROUTE_MAP
   'route-map'
 ;
 
+ROUTER_ID
+:
+  'router-id'
+;
+
 ROUTING
 :
   'routing'

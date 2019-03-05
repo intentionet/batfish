@@ -8,8 +8,6 @@
   "innerQuestion" : {
     "class" : "org.batfish.question.interfaceproperties.InterfacePropertiesQuestion",
     "excludeShutInterfaces" : false,
-    "interfaces" : ".*",
-    "nodes" : ".*",
     "properties" : ".*",
     "differential" : false,
     "includeOneTableKeys" : true

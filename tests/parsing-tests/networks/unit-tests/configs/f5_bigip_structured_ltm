@@ -65,6 +65,7 @@ ltm snat /Common/SOME_SNAT {
         0.0.0.0/0 { }
     }
     snatpool /Common/SOME_SNATPOOL
+    vlans { }
     vlans {
         /Common/SOME_VLAN
     }
@@ -106,6 +107,7 @@ ltm virtual /Common/SOME_VIRTUAL {
     }
     translate-address enabled
     translate-port enabled
+    vlans { }
     vlans {
         /Common/MY_VLAN
     }

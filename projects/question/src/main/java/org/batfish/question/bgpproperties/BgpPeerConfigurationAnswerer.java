@@ -18,7 +18,6 @@ import com.google.common.collect.Multiset;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,7 +29,6 @@ import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPassivePeerConfig;
 import org.batfish.datamodel.BgpPeerConfig;
 import org.batfish.datamodel.BgpProcess;
-import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.answers.Schema;
@@ -46,6 +44,8 @@ import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.Row.RowBuilder;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.specifier.NodeSpecifier;
+import org.batfish.specifier.SpecifierContext;
 
 public class BgpPeerConfigurationAnswerer extends Answerer {
 
@@ -129,14 +129,16 @@ public class BgpPeerConfigurationAnswerer extends Answerer {
   @Override
   public AnswerElement answer() {
     BgpPeerConfigurationQuestion question = (BgpPeerConfigurationQuestion) _question;
-    Map<String, Configuration> configurations = _batfish.loadConfigurations();
-    Set<String> nodes = question.getNodesSpecifier().resolve(_batfish.specifierContext());
 
     TableMetadata tableMetadata = createTableMetadata(question);
     TableAnswerElement answer = new TableAnswerElement(tableMetadata);
 
     Multiset<Row> propertyRows =
-        getAnswerRows(configurations, nodes, tableMetadata.toColumnMap(), question.getProperties());
+        getAnswerRows(
+            _batfish.specifierContext(),
+            question.getNodeSpecifier(),
+            tableMetadata.toColumnMap(),
+            question.getProperties());
 
     answer.postProcessAnswer(question, propertyRows);
     return answer;
@@ -144,15 +146,15 @@ public class BgpPeerConfigurationAnswerer extends Answerer {
 
   @VisibleForTesting
   public static Multiset<Row> getAnswerRows(
-      Map<String, Configuration> configurations,
-      Set<String> nodes,
+      SpecifierContext ctxt,
+      NodeSpecifier nodeSpecifier,
       Map<String, ColumnMetadata> columnMetadata,
       BgpPeerPropertySpecifier propertySpecifier) {
 
     Multiset<Row> rows = HashMultiset.create();
 
-    for (String nodeName : nodes) {
-      for (Vrf vrf : configurations.get(nodeName).getVrfs().values()) {
+    for (String nodeName : nodeSpecifier.resolve(ctxt)) {
+      for (Vrf vrf : ctxt.getConfigs().get(nodeName).getVrfs().values()) {
         BgpProcess bgpProcess = vrf.getBgpProcess();
         if (bgpProcess == null) {
           continue;

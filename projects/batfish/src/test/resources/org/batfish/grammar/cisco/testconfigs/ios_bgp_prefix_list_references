@@ -1,0 +1,28 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+hostname ios_bgp_prefix_list_references
+!
+ip prefix-list pl4in seq 10 permit 10.0.0.0/32
+ip prefix-list pl4out seq 10 permit 10.0.0.1/32
+!
+ipv6 prefix-list pl6in seq 10 permit BEEF:0001::/64
+ipv6 prefix-list pl6out seq 10 permit BEEF:0002::/64
+!
+router bgp 65535
+ neighbor 192.0.2.1 remote-as 65534
+ neighbor DEAD:BEEF::2 remote-as 65533
+ !
+ address-family ipv4
+  neighbor 192.0.2.1 activate
+  neighbor 192.0.2.1 prefix-list pl4in in
+  neighbor 192.0.2.1 prefix-list pl4out out
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor DEAD:BEEF::2 activate
+  neighbor DEAD:BEEF::2 prefix-list pl6in in
+  neighbor DEAD:BEEF::2 prefix-list pl6out out
+ exit-address-family
+!
+!
+

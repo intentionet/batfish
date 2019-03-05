@@ -3,15 +3,12 @@ package org.batfish.datamodel.flow;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.kjetland.jackson.jsonSchema.annotations.JsonSchemaDescription;
 import javax.annotation.Nonnull;
-import org.batfish.datamodel.Flow;
 
 /**
- * Represents a step in a {@link Hop}, steps are operations through which a packet ({@link Flow})
- * goes through while traversing {@link Hop}s to reach the destination
+ * Represents a step in a {@link Hop}, steps are operations through which a packet ({@link
+ * org.batfish.datamodel.Flow}) goes through while traversing {@link Hop}s to reach the destination.
  */
-@JsonSchemaDescription("Represents an operation within a hop")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = EnterInputIfaceStep.class, name = "EnterInputInterface"),
