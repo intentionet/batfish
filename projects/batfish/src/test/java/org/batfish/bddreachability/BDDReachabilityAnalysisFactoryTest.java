@@ -68,9 +68,16 @@ import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.flow.Trace;
 import org.batfish.datamodel.flow.TraceWrapperAsAnswerElement;
+import org.batfish.datamodel.packet_policy.Drop;
+import org.batfish.datamodel.packet_policy.FibLookup;
+import org.batfish.datamodel.packet_policy.If;
+import org.batfish.datamodel.packet_policy.PacketMatchExpr;
+import org.batfish.datamodel.packet_policy.PacketPolicy;
+import org.batfish.datamodel.packet_policy.Return;
 import org.batfish.datamodel.transformation.TransformationStep;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
@@ -1283,5 +1290,81 @@ public final class BDDReachabilityAnalysisFactoryTest {
         bdds,
         ImmutableMap.of(
             IngressLocation.vrf(hostname, vrf.getName()), PKT.getDstIp().value(dstIp.asLong())));
+  }
+
+  /**
+   * Test with a simple network where a lookup is done using policy-based routing in a different VRF
+   */
+  @Test
+  public void testPBRCrossVrfLookup() throws IOException {
+    NetworkFactory nf = new NetworkFactory();
+    Configuration.Builder cb =
+        nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS);
+    Configuration config = cb.build();
+    String hostname = config.getHostname();
+
+    Vrf vrf = nf.vrfBuilder().setOwner(config).build();
+    Vrf vrf2 = nf.vrfBuilder().setOwner(config).build();
+
+    final String packetPolicyName = "packetPolicyName";
+    config.setPacketPolicies(
+        ImmutableSortedMap.of(
+            packetPolicyName,
+            new PacketPolicy(
+                packetPolicyName,
+                ImmutableList.of(
+                    new If(
+                        new PacketMatchExpr(
+                            new MatchHeaderSpace(
+                                HeaderSpace.builder()
+                                    .setDstIps(Prefix.parse("8.8.8.0/24").toIpSpace())
+                                    .build())),
+                        ImmutableList.of(new Return(new FibLookup(vrf2.getName()))))),
+                new Return(Drop.instance()))));
+
+    Interface.Builder ib = nf.interfaceBuilder().setOwner(config).setVrf(vrf).setActive(true);
+    Interface ingressIface = ib.setAddress(new InterfaceAddress("1.1.1.0/24")).build();
+    ingressIface.setRoutingPolicy(packetPolicyName);
+    Interface i1 = ib.setAddress(new InterfaceAddress("2.2.2.0/24")).build();
+
+    StaticRoute sb =
+        StaticRoute.builder()
+            .setAdministrativeCost(1)
+            .setNetwork(Prefix.parse("8.8.8.0/24"))
+            .setNextHopInterface(i1.getName())
+            .build();
+
+    vrf2.setStaticRoutes(ImmutableSortedSet.of(sb));
+
+    SortedMap<String, Configuration> configurations =
+        ImmutableSortedMap.of(config.getHostname(), config);
+    Batfish batfish = BatfishTestUtils.getBatfish(configurations, temp);
+    batfish.computeDataPlane();
+
+    BDDReachabilityAnalysisFactory factory =
+        new BDDReachabilityAnalysisFactory(
+            PKT, configurations, batfish.loadDataPlane().getForwardingAnalysis(), false, false);
+
+    Ip dstIp = Ip.parse("8.8.8.8");
+    BDDReachabilityAnalysis analysis =
+        factory.bddReachabilityAnalysis(
+            IpSpaceAssignment.builder()
+                .assign(
+                    new InterfaceLinkLocation(hostname, ingressIface.getName()),
+                    UniverseIpSpace.INSTANCE)
+                .build(),
+            matchDst(dstIp),
+            ImmutableSet.of(),
+            ImmutableSet.of(),
+            ImmutableSet.of(hostname),
+            ImmutableSet.of(EXITS_NETWORK));
+
+    Map<IngressLocation, BDD> bdds = analysis.getIngressLocationReachableBDDs();
+
+    assertEquals(
+        bdds,
+        ImmutableMap.of(
+            IngressLocation.interfaceLink(hostname, ingressIface.getName()),
+            PKT.getDstIp().value(dstIp.asLong())));
   }
 }

@@ -58,9 +58,11 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.EmptyIpSpace;
 import org.batfish.datamodel.FlowDisposition;
 import org.batfish.datamodel.ForwardingAnalysis;
+import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
+import org.batfish.datamodel.packet_policy.FibLookup;
 import org.batfish.datamodel.transformation.ApplyAll;
 import org.batfish.datamodel.transformation.ApplyAny;
 import org.batfish.datamodel.transformation.AssignIpAddressFromPool;
@@ -196,6 +198,9 @@ public final class BDDReachabilityAnalysisFactory {
   private final BDD _dstPortVars;
   private final BDD _sourcePortVars;
 
+  // Pre-computed conversions from packet policies to BDDs
+  private final Map<String, Map<String, PacketPolicyToBdd>> _convertedPacketPolicies;
+
   private final Set<org.batfish.datamodel.Edge> _topologyEdges;
 
   // ranges of IPs in all transformations in the network, per IP address field.
@@ -256,6 +261,8 @@ public final class BDDReachabilityAnalysisFactory {
     _routableBDDs = computeRoutableBDDs(forwardingAnalysis, _dstIpSpaceToBDD);
     _vrfAcceptBDDs = computeVrfAcceptBDDs(configs, _dstIpSpaceToBDD);
     _vrfNotAcceptBDDs = computeVrfNotAcceptBDDs(_vrfAcceptBDDs);
+
+    _convertedPacketPolicies = convertPacketPolicies(configs);
 
     _dstIpVars = Arrays.stream(_bddPacket.getDstIp().getBitvec()).reduce(_one, BDD::and);
     _sourceIpVars = Arrays.stream(_bddPacket.getSrcIp().getBitvec()).reduce(_one, BDD::and);
@@ -380,6 +387,28 @@ public final class BDDReachabilityAnalysisFactory {
         nodeEntry ->
             toImmutableMap(
                 nodeEntry.getValue(), Entry::getKey, vrfEntry -> vrfEntry.getValue().not()));
+  }
+
+  /** For all configs/interfaces that have PBR policy defined, convert the packet policy to BDDs */
+  private Map<String, Map<String, PacketPolicyToBdd>> convertPacketPolicies(
+      Map<String, Configuration> configs) {
+    return toImmutableMap(
+        configs,
+        Entry::getKey,
+        configEntry ->
+            configEntry.getValue().getAllInterfaces().values().stream()
+                .filter(iface -> iface.getRoutingPolicyName() != null)
+                .collect(
+                    ImmutableMap.toImmutableMap(
+                        Interface::getName,
+                        iface ->
+                            PacketPolicyToBdd.evaluate(
+                                configEntry
+                                    .getValue()
+                                    .getPacketPolicies()
+                                    .get(iface.getRoutingPolicyName()),
+                                _bddPacket,
+                                ipAccessListToBdd(configEntry.getValue())))));
   }
 
   IpSpaceToBDD getIpSpaceToBDD() {
@@ -525,7 +554,9 @@ public final class BDDReachabilityAnalysisFactory {
         generateRules_NodeInterfaceInsufficientInfo_InsufficientInfo(finalNodes),
         generateRules_NodeInterfaceNeighborUnreachable_NeighborUnreachable(finalNodes),
         generateRules_PreInInterface_NodeDropAclIn(),
+        generateRules_PreInInterface_NodeDropAclIn_PBR(),
         generateRules_PreInInterface_PostInInterface(),
+        generateRules_PreInInterface_PostInVrf_PBR(),
         generateRules_PostInInterface_NodeDropAclIn(),
         generateRules_PostInInterface_PostInVrf(),
         generateRules_PostInVrf_NodeAccept(),
@@ -615,7 +646,8 @@ public final class BDDReachabilityAnalysisFactory {
         .map(Configuration::getAllInterfaces)
         .map(Map::values)
         .flatMap(Collection::stream)
-        .filter(iface -> iface.getPostTransformationIncomingFilter() != null)
+        // Policy-based routing rules are generated elsewhere
+        .filter(iface -> iface.getPostTransformationIncomingFilter() == null)
         .map(
             i -> {
               String acl = i.getPostTransformationIncomingFilterName();
@@ -718,7 +750,8 @@ public final class BDDReachabilityAnalysisFactory {
         .map(Map::values)
         .flatMap(Collection::stream)
         .flatMap(vrf -> vrf.getInterfaces().values().stream())
-        .filter(iface -> iface.getIncomingFilter() != null)
+        // Policy-based routing rules are generated elsewhere
+        .filter(iface -> iface.getRoutingPolicyName() == null && iface.getIncomingFilter() != null)
         .map(
             i -> {
               String acl = i.getIncomingFilterName();
@@ -733,6 +766,54 @@ public final class BDDReachabilityAnalysisFactory {
                       constraint(aclDenyBDD),
                       removeSourceConstraint(_bddSourceManagers.get(node)),
                       removeLastHopConstraint(_lastHopMgr, node)));
+            });
+  }
+
+  private Stream<Edge> generateRules_PreInInterface_NodeDropAclIn_PBR() {
+    return _configs.values().stream()
+        .map(Configuration::getVrfs)
+        .map(Map::values)
+        .flatMap(Collection::stream)
+        .flatMap(vrf -> vrf.getInterfaces().values().stream())
+        .filter(iface -> iface.getRoutingPolicyName() != null)
+        .map(
+            i -> {
+              String node = i.getOwner().getHostname();
+              String iface = i.getName();
+              BDD denyBDD = _convertedPacketPolicies.get(node).get(iface).getToDrop();
+
+              return new Edge(
+                  new PreInInterface(node, iface),
+                  new NodeDropAclIn(node),
+                  compose(
+                      constraint(denyBDD),
+                      removeSourceConstraint(_bddSourceManagers.get(node)),
+                      removeLastHopConstraint(_lastHopMgr, node)));
+            });
+  }
+
+  private Stream<Edge> generateRules_PreInInterface_PostInVrf_PBR() {
+    return _configs.values().stream()
+        .map(Configuration::getVrfs)
+        .map(Map::values)
+        .flatMap(Collection::stream)
+        .flatMap(vrf -> vrf.getInterfaces().values().stream())
+        .filter(iface -> iface.getRoutingPolicyName() != null)
+        .flatMap(
+            iface -> {
+              String nodeName = iface.getOwner().getHostname();
+              String ifaceName = iface.getName();
+              Map<FibLookup, BDD> constraints =
+                  _convertedPacketPolicies.get(nodeName).get(ifaceName).getFibLookups();
+
+              PreInInterface preState = new PreInInterface(nodeName, ifaceName);
+              return constraints.entrySet().stream()
+                  .map(
+                      e ->
+                          new Edge(
+                              preState,
+                              new PostInVrf(nodeName, e.getKey().getVrfName()),
+                              constraint(e.getValue())));
             });
   }
 
@@ -758,6 +839,8 @@ public final class BDDReachabilityAnalysisFactory {
         .map(Map::values)
         .flatMap(Collection::stream)
         .flatMap(vrf -> vrf.getInterfaces().values().stream())
+        // Policy-based routing edges handled elsewhere
+        .filter(iface -> iface.getRoutingPolicyName() == null)
         .map(
             iface -> {
               String aclName = iface.getIncomingFilterName();
@@ -979,50 +1062,55 @@ public final class BDDReachabilityAnalysisFactory {
             iface -> {
               String hostname = iface.getOwner().getHostname();
               String ifaceName = iface.getName();
-              String vrf = iface.getVrfName();
 
-              StateExpr preState = new PreOutVrf(hostname, vrf);
+              return iface.getOwner().getVrfs().keySet().stream()
+                  .flatMap(
+                      vrf -> {
+                        StateExpr preState = new PreOutVrf(hostname, vrf);
 
-              Stream.Builder<Edge> builder = Stream.builder();
+                        Stream.Builder<Edge> builder = Stream.builder();
 
-              // delivered to subnet
-              BDD deliveredToSubnet = _deliveredToSubnetBDDs.get(hostname).get(vrf).get(ifaceName);
-              if (!deliveredToSubnet.isZero()) {
-                builder.add(
-                    new Edge(
-                        preState,
-                        new PreOutInterfaceDeliveredToSubnet(hostname, ifaceName),
-                        deliveredToSubnet));
-              }
+                        // delivered to subnet
+                        BDD deliveredToSubnet =
+                            getBDD(_deliveredToSubnetBDDs, hostname, vrf, ifaceName);
+                        if (!deliveredToSubnet.isZero()) {
+                          builder.add(
+                              new Edge(
+                                  preState,
+                                  new PreOutInterfaceDeliveredToSubnet(hostname, ifaceName),
+                                  deliveredToSubnet));
+                        }
 
-              BDD exitsNetwork = _exitsNetworkBDDs.get(hostname).get(vrf).get(ifaceName);
-              if (!exitsNetwork.isZero()) {
-                builder.add(
-                    new Edge(
-                        preState,
-                        new PreOutInterfaceExitsNetwork(hostname, ifaceName),
-                        exitsNetwork));
-              }
+                        BDD exitsNetwork = getBDD(_exitsNetworkBDDs, hostname, vrf, ifaceName);
+                        if (!exitsNetwork.isZero()) {
+                          builder.add(
+                              new Edge(
+                                  preState,
+                                  new PreOutInterfaceExitsNetwork(hostname, ifaceName),
+                                  exitsNetwork));
+                        }
 
-              BDD insufficientInfo = _insufficientInfoBDDs.get(hostname).get(vrf).get(ifaceName);
-              if (!insufficientInfo.isZero()) {
-                builder.add(
-                    new Edge(
-                        preState,
-                        new PreOutInterfaceInsufficientInfo(hostname, ifaceName),
-                        insufficientInfo));
-              }
+                        BDD insufficientInfo =
+                            getBDD(_insufficientInfoBDDs, hostname, vrf, ifaceName);
+                        if (!insufficientInfo.isZero()) {
+                          builder.add(
+                              new Edge(
+                                  preState,
+                                  new PreOutInterfaceInsufficientInfo(hostname, ifaceName),
+                                  insufficientInfo));
+                        }
 
-              BDD neighborUnreachable =
-                  _neighborUnreachableBDDs.get(hostname).get(vrf).get(ifaceName);
-              if (!neighborUnreachable.isZero()) {
-                builder.add(
-                    new Edge(
-                        preState,
-                        new PreOutInterfaceNeighborUnreachable(hostname, ifaceName),
-                        neighborUnreachable));
-              }
-              return builder.build();
+                        BDD neighborUnreachable =
+                            getBDD(_neighborUnreachableBDDs, hostname, vrf, ifaceName);
+                        if (!neighborUnreachable.isZero()) {
+                          builder.add(
+                              new Edge(
+                                  preState,
+                                  new PreOutInterfaceNeighborUnreachable(hostname, ifaceName),
+                                  neighborUnreachable));
+                        }
+                        return builder.build();
+                      });
             });
   }
 
@@ -1450,6 +1538,21 @@ public final class BDDReachabilityAnalysisFactory {
 
   private String ifaceVrf(String node, String iface) {
     return _configs.get(node).getAllInterfaces().get(iface).getVrfName();
+  }
+
+  /**
+   * @return A BDD for given node/vrf/interface extracted from the disposition map, or zero BDD if
+   *     it does not exist
+   */
+  private BDD getBDD(
+      Map<String, Map<String, Map<String, BDD>>> dispositionMap,
+      String hostname,
+      String vrfName,
+      String interfaceName) {
+    return dispositionMap
+        .getOrDefault(hostname, ImmutableMap.of())
+        .getOrDefault(vrfName, ImmutableMap.of())
+        .getOrDefault(interfaceName, _zero);
   }
 
   private static Map<String, Map<String, BDD>> computeVrfAcceptBDDs(
