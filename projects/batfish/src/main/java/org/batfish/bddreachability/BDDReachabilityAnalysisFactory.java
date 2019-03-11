@@ -58,11 +58,11 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.EmptyIpSpace;
 import org.batfish.datamodel.FlowDisposition;
 import org.batfish.datamodel.ForwardingAnalysis;
+import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.packet_policy.FibLookup;
-import org.batfish.datamodel.packet_policy.PacketPolicy;
 import org.batfish.datamodel.transformation.ApplyAll;
 import org.batfish.datamodel.transformation.ApplyAny;
 import org.batfish.datamodel.transformation.AssignIpAddressFromPool;
@@ -198,6 +198,9 @@ public final class BDDReachabilityAnalysisFactory {
   private final BDD _dstPortVars;
   private final BDD _sourcePortVars;
 
+  // Pre-computed conversions from packet policies to BDDs
+  private final Map<String, Map<String, PacketPolicyToBdd>> _convertedPacketPolicies;
+
   // ranges of IPs in all transformations in the network, per IP address field.
   private final Map<IpField, BDD> _transformationIpRanges;
 
@@ -252,6 +255,8 @@ public final class BDDReachabilityAnalysisFactory {
     _routableBDDs = computeRoutableBDDs(forwardingAnalysis, _dstIpSpaceToBDD);
     _vrfAcceptBDDs = computeVrfAcceptBDDs(configs, _dstIpSpaceToBDD);
     _vrfNotAcceptBDDs = computeVrfNotAcceptBDDs(_vrfAcceptBDDs);
+
+    _convertedPacketPolicies = convertPacketPolicies(configs);
 
     _dstIpVars = Arrays.stream(_bddPacket.getDstIp().getBitvec()).reduce(_one, BDD::and);
     _sourceIpVars = Arrays.stream(_bddPacket.getSrcIp().getBitvec()).reduce(_one, BDD::and);
@@ -376,6 +381,28 @@ public final class BDDReachabilityAnalysisFactory {
         nodeEntry ->
             toImmutableMap(
                 nodeEntry.getValue(), Entry::getKey, vrfEntry -> vrfEntry.getValue().not()));
+  }
+
+  /** For all configs/interfaces that have PBR policy defined, convert the packet policy to BDDs */
+  private Map<String, Map<String, PacketPolicyToBdd>> convertPacketPolicies(
+      Map<String, Configuration> configs) {
+    return toImmutableMap(
+        configs,
+        Entry::getKey,
+        configEntry ->
+            configEntry.getValue().getAllInterfaces().values().stream()
+                .filter(iface -> iface.getRoutingPolicyName() != null)
+                .collect(
+                    ImmutableMap.toImmutableMap(
+                        Interface::getName,
+                        iface ->
+                            PacketPolicyToBdd.evaluate(
+                                configEntry
+                                    .getValue()
+                                    .getPacketPolicies()
+                                    .get(iface.getRoutingPolicyName()),
+                                _bddPacket,
+                                ipAccessListToBdd(configEntry.getValue())))));
   }
 
   IpSpaceToBDD getIpSpaceToBDD() {
@@ -736,12 +763,9 @@ public final class BDDReachabilityAnalysisFactory {
         .filter(iface -> iface.getRoutingPolicyName() != null)
         .map(
             i -> {
-              PacketPolicy policy = i.getOwner().getPacketPolicies().get(i.getRoutingPolicyName());
               String node = i.getOwner().getHostname();
               String iface = i.getName();
-              BDD denyBDD =
-                  PacketPolicyToBdd.evaluate(policy, _bddPacket, ipAccessListToBdd(i.getOwner()))
-                      .getToDrop();
+              BDD denyBDD = _convertedPacketPolicies.get(node).get(iface).getToDrop();
 
               return new Edge(
                   new PreInInterface(node, iface),
@@ -759,19 +783,13 @@ public final class BDDReachabilityAnalysisFactory {
         .map(Map::values)
         .flatMap(Collection::stream)
         .flatMap(vrf -> vrf.getInterfaces().values().stream())
+        .filter(iface -> iface.getRoutingPolicyName() != null)
         .flatMap(
             iface -> {
-              if (iface.getRoutingPolicyName() == null) {
-                return Stream.empty();
-              }
-              PacketPolicy policy =
-                  iface.getOwner().getPacketPolicies().get(iface.getRoutingPolicyName());
-              Map<FibLookup, BDD> constraints =
-                  PacketPolicyToBdd.evaluate(
-                          policy, _bddPacket, ipAccessListToBdd(iface.getOwner()))
-                      .getFibLookups();
               String nodeName = iface.getOwner().getHostname();
               String ifaceName = iface.getName();
+              Map<FibLookup, BDD> constraints =
+                  _convertedPacketPolicies.get(nodeName).get(ifaceName).getFibLookups();
 
               PreInInterface preState = new PreInInterface(nodeName, ifaceName);
               return constraints.entrySet().stream()
@@ -806,12 +824,10 @@ public final class BDDReachabilityAnalysisFactory {
         .map(Map::values)
         .flatMap(Collection::stream)
         .flatMap(vrf -> vrf.getInterfaces().values().stream())
+        // Policy-based routing edges handled elsewhere
+        .filter(iface -> iface.getRoutingPolicyName() != null)
         .map(
             iface -> {
-              if (iface.getRoutingPolicyName() != null) {
-                // Policy-based routing edges handled elsewhere
-                return null;
-              }
               String aclName = iface.getIncomingFilterName();
               String nodeName = iface.getOwner().getHostname();
               String ifaceName = iface.getName();
@@ -826,8 +842,7 @@ public final class BDDReachabilityAnalysisFactory {
                       constraint(inAclBDD),
                       _bddIncomingTransformations.get(nodeName).get(ifaceName));
               return new Edge(preState, postState, transition);
-            })
-        .filter(Objects::nonNull);
+            });
   }
 
   private Stream<Edge> generateRules_PreOutEdge_NodeDropAclOut() {
