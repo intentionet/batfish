@@ -632,7 +632,8 @@ public final class BDDReachabilityAnalysisFactory {
         .map(Configuration::getAllInterfaces)
         .map(Map::values)
         .flatMap(Collection::stream)
-        .filter(iface -> iface.getPostTransformationIncomingFilter() != null)
+        // Policy-based routing rules are generated elsewhere
+        .filter(iface -> iface.getPostTransformationIncomingFilter() == null)
         .map(
             i -> {
               String acl = i.getPostTransformationIncomingFilterName();
@@ -825,7 +826,7 @@ public final class BDDReachabilityAnalysisFactory {
         .flatMap(Collection::stream)
         .flatMap(vrf -> vrf.getInterfaces().values().stream())
         // Policy-based routing edges handled elsewhere
-        .filter(iface -> iface.getRoutingPolicyName() != null)
+        .filter(iface -> iface.getRoutingPolicyName() == null)
         .map(
             iface -> {
               String aclName = iface.getIncomingFilterName();
