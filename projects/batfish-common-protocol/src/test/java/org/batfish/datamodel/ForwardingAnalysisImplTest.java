@@ -8,6 +8,7 @@ import static org.batfish.datamodel.ForwardingAnalysisImpl.computeArpTrueEdgeDes
 import static org.batfish.datamodel.ForwardingAnalysisImpl.computeArpTrueEdgeNextHopIp;
 import static org.batfish.datamodel.ForwardingAnalysisImpl.computeDeliveredToSubnet;
 import static org.batfish.datamodel.ForwardingAnalysisImpl.computeExitsNetwork;
+import static org.batfish.datamodel.ForwardingAnalysisImpl.computeFibInterfaces;
 import static org.batfish.datamodel.ForwardingAnalysisImpl.computeInsufficientInfo;
 import static org.batfish.datamodel.ForwardingAnalysisImpl.computeInterfaceArpReplies;
 import static org.batfish.datamodel.ForwardingAnalysisImpl.computeInterfaceHostSubnetIps;
@@ -1243,10 +1244,12 @@ public class ForwardingAnalysisImplTest {
         ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableMap.of(i1, EmptyIpSpace.INSTANCE)));
     Map<String, Map<String, Map<String, IpSpace>>> interfaceHostSubnetIps =
         ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableMap.of(i1, ip.toIpSpace())));
+    Map<String, Map<String, Set<String>>> fibInterfaces =
+        ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableSet.of(i1)));
     IpSpace ownedIps = EmptyIpSpace.INSTANCE;
 
     Map<String, Map<String, Map<String, IpSpace>>> result =
-        computeDeliveredToSubnet(arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
+        computeDeliveredToSubnet(fibInterfaces, arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
 
     assertThat(
         result,
@@ -1264,10 +1267,12 @@ public class ForwardingAnalysisImplTest {
         ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableMap.of(i1, ip.toIpSpace())));
     Map<String, Map<String, Map<String, IpSpace>>> interfaceHostSubnetIps =
         ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableMap.of(i1, EmptyIpSpace.INSTANCE)));
+    Map<String, Map<String, Set<String>>> fibInterfaces =
+        ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableSet.of(i1)));
     IpSpace ownedIps = EmptyIpSpace.INSTANCE;
 
     Map<String, Map<String, Map<String, IpSpace>>> result =
-        computeDeliveredToSubnet(arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
+        computeDeliveredToSubnet(fibInterfaces, arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
 
     assertThat(
         result,
@@ -1285,10 +1290,12 @@ public class ForwardingAnalysisImplTest {
         ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableMap.of(i1, ip.toIpSpace())));
     Map<String, Map<String, Map<String, IpSpace>>> interfaceHostSubnetIps =
         ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableMap.of(i1, ip.toIpSpace())));
+    Map<String, Map<String, Set<String>>> fibInterfaces =
+        ImmutableMap.of(c1, ImmutableMap.of(vrf1, ImmutableSet.of(i1)));
     IpSpace ownedIps = EmptyIpSpace.INSTANCE;
 
     Map<String, Map<String, Map<String, IpSpace>>> result =
-        computeDeliveredToSubnet(arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
+        computeDeliveredToSubnet(fibInterfaces, arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
 
     assertThat(
         result,
@@ -1380,13 +1387,16 @@ public class ForwardingAnalysisImplTest {
 
     IpSpace ownedIps = EmptyIpSpace.INSTANCE;
 
+    Map<String, Map<String, Set<String>>> fibInterfaces =
+        ImmutableMap.of(CONFIG1, ImmutableMap.of(VRF1, ImmutableSet.of(INTERFACE1)));
     IpSpace deliveredToSubnetIpSpace =
-        computeDeliveredToSubnet(arpFalseDestIp, interfaceHostSubnetIps, ownedIps)
+        computeDeliveredToSubnet(fibInterfaces, arpFalseDestIp, interfaceHostSubnetIps, ownedIps)
             .get(CONFIG1)
             .get(VRF1)
             .get(INTERFACE1);
     IpSpace exitsNetworkIpSpace =
         computeExitsNetwork(
+                fibInterfaces,
                 interfacesWithMissingDevices,
                 dstIpsWithUnownedNextHopIpArpFalse,
                 arpFalseDestIp,
@@ -1397,6 +1407,7 @@ public class ForwardingAnalysisImplTest {
 
     IpSpace insufficientInfoIpSpace =
         computeInsufficientInfo(
+                fibInterfaces,
                 interfaceHostSubnetIps,
                 interfacesWithMissingDevices,
                 arpFalseDestIp,
@@ -1408,6 +1419,7 @@ public class ForwardingAnalysisImplTest {
             .get(INTERFACE1);
     IpSpace neighborUnreachableIpSpace =
         computeNeighborUnreachable(
+                fibInterfaces,
                 arpFalse,
                 interfacesWithMissingDevices,
                 arpFalseDestIp,
@@ -1575,6 +1587,14 @@ public class ForwardingAnalysisImplTest {
                         i1.getName(),
                         ImmutableMap.of(Route.UNSET_ROUTE_NEXT_HOP_IP, ImmutableSet.of(route1)))))
             .setRoutesByNextHopInterface(ImmutableMap.of(i1.getName(), ImmutableSet.of(route1)))
+            .setFibEntries(
+                ImmutableMap.of(
+                    Route.UNSET_ROUTE_NEXT_HOP_IP,
+                    ImmutableSet.of(
+                        new FibEntry(
+                            Route.UNSET_ROUTE_NEXT_HOP_IP,
+                            route1.getNextHopInterface(),
+                            ImmutableList.of(route1)))))
             .build();
 
     MockFib fib2 =
@@ -1587,6 +1607,14 @@ public class ForwardingAnalysisImplTest {
                         i2.getName(),
                         ImmutableMap.of(Route.UNSET_ROUTE_NEXT_HOP_IP, ImmutableSet.of(route2)))))
             .setRoutesByNextHopInterface(ImmutableMap.of(i2.getName(), ImmutableSet.of(route2)))
+            .setFibEntries(
+                ImmutableMap.of(
+                    Route.UNSET_ROUTE_NEXT_HOP_IP,
+                    ImmutableSet.of(
+                        new FibEntry(
+                            Route.UNSET_ROUTE_NEXT_HOP_IP,
+                            route2.getNextHopInterface(),
+                            ImmutableList.of(route2)))))
             .build();
 
     Map<String, Map<String, Fib>> fibs =
@@ -1623,5 +1651,48 @@ public class ForwardingAnalysisImplTest {
             .get(v1.getName())
             .get(i1.getName())
             .containsIp(ip2, c1.getIpSpaces()));
+  }
+
+  /**
+   * Test that interfaces reachable from FIB in VRF X are not limited to interfaces that belong to
+   * VRF X. This is due to route leaking across VRFs and ability to do lookup in a different VRF.
+   */
+  @Test
+  public void testComputeFibInterfaces() {
+    // Setup
+    final String hostname = "c1";
+    Configuration c1 =
+        _cb.setHostname(hostname).setConfigurationFormat(ConfigurationFormat.CISCO_IOS).build();
+    Vrf v1 = _vb.setOwner(c1).setName("v1").build();
+    Vrf v2 = _vb.setOwner(c1).setName("v2").build();
+    Interface i1 =
+        _ib.setAddress(new InterfaceAddress("1.1.1.0/24")).setVrf(v1).setOwner(c1).build();
+
+    Ip ip = Ip.parse("1.1.1.222");
+    Map<Ip, Set<FibEntry>> fibEntryMap =
+        ImmutableMap.of(
+            ip,
+            ImmutableSet.of(
+                new FibEntry(
+                    ip,
+                    i1.getName(),
+                    ImmutableList.of(new ConnectedRoute(i1.getPrimaryNetwork(), i1.getName())))));
+
+    // Test:
+    Map<String, Map<String, Set<String>>> fibInterfaces =
+        computeFibInterfaces(
+            ImmutableMap.of(
+                hostname,
+                ImmutableMap.of(
+                    "v1",
+                    MockFib.builder().setFibEntries(fibEntryMap).build(),
+                    "v2",
+                    MockFib.builder().setFibEntries(fibEntryMap).build())));
+
+    // Both vrf1 and vrf2 can go out to i1
+    assertThat(
+        fibInterfaces.get(hostname).get(v1.getName()), equalTo(ImmutableSet.of(i1.getName())));
+    assertThat(
+        fibInterfaces.get(hostname).get(v2.getName()), equalTo(ImmutableSet.of(i1.getName())));
   }
 }

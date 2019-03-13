@@ -196,12 +196,15 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
             computeDstIpsWithOwnedNextHopIpArpFalse(matchingIps, routesWithOwnedNextHopIpArpFalse);
       }
 
+      /* Compute dispositions top-down, based on what routes are available in each VRF's FIB */
+      Map<String, Map<String, Set<String>>> fibInterfaces = computeFibInterfaces(fibs);
+
       // mapping: hostname -> vrf name -> interface -> ips belonging to a subnet of interface
       Map<String, Map<String, Map<String, IpSpace>>> interfaceHostSubnetIps =
           computeInterfaceHostSubnetIps(configurations);
 
       _deliveredToSubnet =
-          computeDeliveredToSubnet(arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
+          computeDeliveredToSubnet(fibInterfaces, arpFalseDestIp, interfaceHostSubnetIps, ownedIps);
 
       // ips belonging to any subnet in the network
       IpSpace internalIps = computeInternalIps(interfaceHostSubnetIps);
@@ -216,12 +219,14 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
 
       _exitsNetwork =
           computeExitsNetwork(
+              fibInterfaces,
               interfacesWithMissingDevices,
               dstIpsWithUnownedNextHopIpArpFalse,
               arpFalseDestIp,
               externalIps);
       _insufficientInfo =
           computeInsufficientInfo(
+              fibInterfaces,
               interfaceHostSubnetIps,
               interfacesWithMissingDevices,
               arpFalseDestIp,
@@ -230,12 +235,36 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
               internalIps);
       _neighborUnreachable =
           computeNeighborUnreachable(
+              fibInterfaces,
               _arpFalse,
               interfacesWithMissingDevices,
               arpFalseDestIp,
               interfaceHostSubnetIps,
               ownedIps);
     }
+  }
+
+  /**
+   * Compute the set of interfaces each FIB can forward out of.<br>
+   * This set by design excludes the special NULL interface. Mapping: node -&gt; vrf -&gt; set of
+   * interface names.
+   */
+  @VisibleForTesting
+  static Map<String, Map<String, Set<String>>> computeFibInterfaces(
+      Map<String, Map<String, Fib>> fibs) {
+    return toImmutableMap(
+        fibs,
+        Entry::getKey,
+        nodeEntry ->
+            toImmutableMap(
+                nodeEntry.getValue(),
+                Entry::getKey,
+                vrfEntry ->
+                    vrfEntry.getValue().allEntries().stream()
+                        .map(FibEntry::getInterfaceName)
+                        // Null-routing is a special case handled in compute nullRoutedIps
+                        .filter(name -> !Interface.NULL_INTERFACE_NAME.equals(name))
+                        .collect(ImmutableSet.toImmutableSet())));
   }
 
   /**
@@ -1088,6 +1117,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
    */
   @VisibleForTesting
   static Map<String, Map<String, Map<String, IpSpace>>> computeDeliveredToSubnet(
+      Map<String, Map<String, Set<String>>> fibInterfaces,
       Map<String, Map<String, Map<String, IpSpace>>> arpFalseDestIp,
       Map<String, Map<String, Map<String, IpSpace>>> interfaceHostSubnetIps,
       IpSpace ownedIps) {
@@ -1097,17 +1127,29 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
             .startActive()) {
       assert span != null; // avoid unused warning
       return toImmutableMap(
-          intersection(arpFalseDestIp, interfaceHostSubnetIps),
+          fibInterfaces,
           Entry::getKey,
           nodeEntry ->
               toImmutableMap(
                   nodeEntry.getValue(),
                   Entry::getKey,
                   vrfEntry ->
-                      toImmutableMap(
-                          vrfEntry.getValue(),
-                          Entry::getKey,
-                          ifaceEntry -> AclIpSpace.difference(ifaceEntry.getValue(), ownedIps))));
+                      vrfEntry.getValue().stream()
+                          .collect(
+                              ImmutableMap.toImmutableMap(
+                                  Function.identity(),
+                                  iface ->
+                                      AclIpSpace.difference(
+                                          AclIpSpace.intersection(
+                                              arpFalseDestIp
+                                                  .get(nodeEntry.getKey())
+                                                  .get(vrfEntry.getKey())
+                                                  .get(iface),
+                                              interfaceHostSubnetIps
+                                                  .get(nodeEntry.getKey())
+                                                  .get(vrfEntry.getKey())
+                                                  .get(iface)),
+                                          ownedIps)))));
     }
   }
 
@@ -1121,6 +1163,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
    * is not expected to come back into network (i.e. the ARP IP is also external).
    */
   static Map<String, Map<String, Map<String, IpSpace>>> computeExitsNetwork(
+      Map<String, Map<String, Set<String>>> fibInterfaces,
       Map<String, Set<String>> interfacesWithMissingDevices,
       Map<String, Map<String, Map<String, IpSpace>>> dstIpsWithUnownedNextHopIpArpFalse,
       Map<String, Map<String, Map<String, IpSpace>>> arpFalseDstIp,
@@ -1129,7 +1172,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
         GlobalTracer.get().buildSpan("ForwardingAnalysisImpl.computeExitsNetwork").startActive()) {
       assert span != null; // avoid unused warning
       return toImmutableMap(
-          dstIpsWithUnownedNextHopIpArpFalse,
+          fibInterfaces,
           Entry::getKey,
           nodeEntry -> {
             String hostname = nodeEntry.getKey();
@@ -1143,9 +1186,8 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
                   Map<String, IpSpace> arpFalseDstIpVrf = arpFalseDstIp.get(hostname).get(vrfName);
                   return toImmutableMap(
                       vrfEntry.getValue(),
-                      Entry::getKey,
-                      ifaceEntry -> {
-                        String ifaceName = ifaceEntry.getKey();
+                      Function.identity(),
+                      ifaceName -> {
                         // the connected subnet is full
                         if (!interfacesWithMissingDevicesNode.contains(ifaceName)) {
                           return EmptyIpSpace.INSTANCE;
@@ -1153,14 +1195,19 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
 
                         // Returns the union of the following 2 cases:
                         // 1. Arp for dst ip and dst ip is external
-                        // 2. Arp for next hop ip, next hop ip is not owned by any interfaces,
+                        // 2. Arp for next hop ip, next hop ip is not owned by any
+                        // interfaces,
                         // and dst ip is external
                         return AclIpSpace.intersection(
                             // dest ip is external
                             externalIps,
                             // arp for dst Ip OR arp for external next-hop IP
                             AclIpSpace.union(
-                                arpFalseDstIpVrf.get(ifaceName), ifaceEntry.getValue()));
+                                arpFalseDstIpVrf.get(ifaceName),
+                                dstIpsWithUnownedNextHopIpArpFalse
+                                    .get(hostname)
+                                    .get(vrfName)
+                                    .get(ifaceName)));
                       });
                 });
           });
@@ -1168,10 +1215,11 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
   }
 
   /**
-   * Necessary and sufficient: The connected subnet is not full, and when arping for dst ip, dst ip
    * is internal but not in the interface subnet, when arping for next hop ip, either next hop ip is
+   * Necessary and sufficient: The connected subnet is not full, and when arping for dst ip, dst ip
    * owned by interfaces or dst ip is internal.
    *
+   * @param fibInterfaces the set of interfaces each FIB can forward out to
    * @param interfaceHostSubnetIps Set of IPs belonging to the subnet of each interface.
    * @param interfacesWithMissingDevices Interfaces whose attached subnets are not full -- there may
    *     be other devices connected to the subnet for which we don't have a config.
@@ -1185,6 +1233,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
    */
   @VisibleForTesting
   static Map<String, Map<String, Map<String, IpSpace>>> computeInsufficientInfo(
+      Map<String, Map<String, Set<String>>> fibInterfaces,
       Map<String, Map<String, Map<String, IpSpace>>> interfaceHostSubnetIps,
       Map<String, Set<String>> interfacesWithMissingDevices,
       Map<String, Map<String, Map<String, IpSpace>>> arpFalseDestIp,
@@ -1198,65 +1247,62 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
       assert span != null; // avoid unused warning
 
       return toImmutableMap(
-          interfaceHostSubnetIps,
+          fibInterfaces,
           Entry::getKey,
           nodeEntry ->
               toImmutableMap(
                   nodeEntry.getValue(),
                   Entry::getKey,
-                  vrfEntry ->
-                      toImmutableMap(
-                          vrfEntry.getValue(),
-                          Entry::getKey,
-                          ifaceEntry -> {
-                            String hostname = nodeEntry.getKey();
-                            String vrfName = vrfEntry.getKey();
-                            String ifaceName = ifaceEntry.getKey();
-                            // If interface is full (no missing devices), it cannot be insufficient
-                            // info
-                            if (!interfacesWithMissingDevices.get(hostname).contains(ifaceName)) {
-                              return EmptyIpSpace.INSTANCE;
-                            }
+                  vrfEntry -> {
+                    String hostname = nodeEntry.getKey();
+                    String vrfName = vrfEntry.getKey();
+                    return toImmutableMap(
+                        vrfEntry.getValue(),
+                        Function.identity(),
+                        ifaceName -> {
+                          // If interface is full (no missing devices), it cannot be
+                          // insufficient info
+                          if (!interfacesWithMissingDevices.get(hostname).contains(ifaceName)) {
+                            return EmptyIpSpace.INSTANCE;
+                          }
 
-                            IpSpace ipSpaceElsewhere =
-                                AclIpSpace.difference(
-                                    internalIps,
-                                    interfaceHostSubnetIps
-                                        .get(hostname)
-                                        .get(vrfName)
-                                        .get(ifaceName));
+                          IpSpace ipSpaceElsewhere =
+                              AclIpSpace.difference(
+                                  internalIps,
+                                  interfaceHostSubnetIps.get(hostname).get(vrfName).get(ifaceName));
 
-                            // case 1: arp for dst ip, dst ip is internal but not in any subnet of
-                            // the interface
-                            IpSpace ipSpaceInternalDstIp =
-                                AclIpSpace.intersection(
-                                    arpFalseDestIp.get(hostname).get(vrfName).get(ifaceName),
-                                    ipSpaceElsewhere);
+                          // case 1: arp for dst ip, dst ip is internal but not in any
+                          // subnet of the interface
+                          IpSpace ipSpaceInternalDstIp =
+                              AclIpSpace.intersection(
+                                  arpFalseDestIp.get(hostname).get(vrfName).get(ifaceName),
+                                  ipSpaceElsewhere);
 
-                            // case 2: arp for nhip, nhip is not owned by interfaces, dst ip is
-                            // internal
-                            IpSpace dstIpsWithUnownedNextHopIpArpFalsePerInterafce =
-                                dstIpsWithUnownedNextHopIpArpFalse
-                                    .get(hostname)
-                                    .get(vrfName)
-                                    .get(ifaceName);
+                          // case 2: arp for nhip, nhip is not owned by interfaces, dst ip
+                          // is internal
+                          IpSpace dstIpsWithUnownedNextHopIpArpFalsePerInterafce =
+                              dstIpsWithUnownedNextHopIpArpFalse
+                                  .get(hostname)
+                                  .get(vrfName)
+                                  .get(ifaceName);
 
-                            IpSpace ipSpaceInternalDstIpUnownedNexthopIp =
-                                AclIpSpace.intersection(
-                                    dstIpsWithUnownedNextHopIpArpFalsePerInterafce, internalIps);
+                          IpSpace ipSpaceInternalDstIpUnownedNexthopIp =
+                              AclIpSpace.intersection(
+                                  dstIpsWithUnownedNextHopIpArpFalsePerInterafce, internalIps);
 
-                            // case 3: arp for nhip, nhip is owned by some interfaces
-                            IpSpace ipSpaceOwnedNextHopIp =
-                                dstIpsWithOwnedNextHopIpArpFalse
-                                    .get(hostname)
-                                    .get(vrfName)
-                                    .get(ifaceName);
+                          // case 3: arp for nhip, nhip is owned by some interfaces
+                          IpSpace ipSpaceOwnedNextHopIp =
+                              dstIpsWithOwnedNextHopIpArpFalse
+                                  .get(hostname)
+                                  .get(vrfName)
+                                  .get(ifaceName);
 
-                            return AclIpSpace.union(
-                                ipSpaceInternalDstIp,
-                                ipSpaceInternalDstIpUnownedNexthopIp,
-                                ipSpaceOwnedNextHopIp);
-                          })));
+                          return AclIpSpace.union(
+                              ipSpaceInternalDstIp,
+                              ipSpaceInternalDstIpUnownedNexthopIp,
+                              ipSpaceOwnedNextHopIp);
+                        });
+                  }));
     }
   }
 
@@ -1267,6 +1313,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
    * <p>An interface is full if all subnets connected to it are full.
    */
   static Map<String, Map<String, Map<String, IpSpace>>> computeNeighborUnreachable(
+      Map<String, Map<String, Set<String>>> fibInterfaces,
       Map<String, Map<String, Map<String, IpSpace>>> arpFalse,
       Map<String, Set<String>> interfacesWithMissingDevices,
       Map<String, Map<String, Map<String, IpSpace>>> arpFalseDestIp,
@@ -1278,7 +1325,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
             .startActive()) {
       assert span != null; // avoid unused warning
       return toImmutableMap(
-          arpFalse,
+          fibInterfaces,
           Entry::getKey,
           nodeEntry ->
               toImmutableMap(
@@ -1287,13 +1334,12 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
                   vrfEntry ->
                       toImmutableMap(
                           vrfEntry.getValue(),
-                          Entry::getKey,
-                          ifaceEntry -> {
+                          Function.identity(),
+                          iface -> {
                             String node = nodeEntry.getKey();
                             String vrf = vrfEntry.getKey();
-                            String iface = ifaceEntry.getKey();
 
-                            IpSpace ifaceArpFalse = ifaceEntry.getValue();
+                            IpSpace ifaceArpFalse = arpFalse.get(node).get(vrf).get(iface);
 
                             return interfacesWithMissingDevices.get(node).contains(iface)
                                 ? AclIpSpace.intersection(
