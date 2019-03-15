@@ -71,7 +71,9 @@ public class NQueensTest extends BDDTestCase {
 
     private static double runTest() {
 
-      if (B.varNum() < N * N) B.setVarNum(N * N);
+      if (B.varNum() < N * N) {
+        B.setVarNum(N * N);
+      }
 
       queen = B.one();
 
@@ -79,7 +81,11 @@ public class NQueensTest extends BDDTestCase {
 
       /* Build variable array */
       X = new BDD[N][N];
-      for (i = 0; i < N; i++) for (j = 0; j < N; j++) X[i][j] = B.ithVar(i * N + j);
+      for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+          X[i][j] = B.ithVar(i * N + j);
+        }
+      }
 
       /* Place a queen in each row */
       for (i = 0; i < N; i++) {
@@ -91,10 +97,11 @@ public class NQueensTest extends BDDTestCase {
       }
 
       /* Build requirements for each variable(field) */
-      for (i = 0; i < N; i++)
+      for (i = 0; i < N; i++) {
         for (j = 0; j < N; j++) {
           build(i, j);
         }
+      }
 
       solution = queen.satOne();
 
@@ -103,7 +110,11 @@ public class NQueensTest extends BDDTestCase {
     }
 
     private static void freeAll() {
-      for (int i = 0; i < N; i++) for (int j = 0; j < N; j++) X[i][j].free();
+      for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+          X[i][j].free();
+        }
+      }
       queen.free();
       solution.free();
     }

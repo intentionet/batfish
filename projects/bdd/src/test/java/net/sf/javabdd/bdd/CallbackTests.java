@@ -50,13 +50,17 @@ public class CallbackTests extends BDDTestCase {
       gc_called = 0;
       final int numBits = 20;
       final int max = (1 << numBits) - 1;
-      if (bdd.varNum() < numBits) bdd.setVarNum(numBits);
+      if (bdd.varNum() < numBits) {
+        bdd.setVarNum(numBits);
+      }
       int[] vars = new int[numBits];
       for (int i = 0; i < numBits; ++i) {
         vars[i] = i;
       }
       for (int i = 0; i < max; ++i) {
-        if (gc_called > 1) break;
+        if (gc_called > 1) {
+          break;
+        }
         BDD v = bdd.buildCube(i, vars);
         v.free();
       }
@@ -93,7 +97,9 @@ public class CallbackTests extends BDDTestCase {
       BDDFactory bdd = nextFactory();
       bdd.registerReorderCallback(this, m);
       reorder_called = false;
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       // bdd.varBlockAll();
       BDD x = bdd.ithVar(0);
       x.andWith(bdd.ithVar(1));

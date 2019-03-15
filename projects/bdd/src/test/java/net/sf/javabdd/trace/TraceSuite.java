@@ -42,15 +42,21 @@ public class TraceSuite {
 
   public void runDirectory(File dir, int initial_size) {
     File[] files = dir.listFiles();
-    if (files == null) return;
+    if (files == null) {
+      return;
+    }
     for (int i = 0; i < files.length; ++i) {
-      if (files[i].isDirectory()) runDirectory(files[i], initial_size);
-      else {
+      if (files[i].isDirectory()) {
+        runDirectory(files[i], initial_size);
+      } else {
         try {
           String name = files[i].getName();
           InputStream is = new BufferedInputStream(new FileInputStream(files[i]));
-          if (name.endsWith(".net.sf.javabdd.trace")) runTrace(name, is, initial_size);
-          else if (name.endsWith("README")) showFile(name, is);
+          if (name.endsWith(".net.sf.javabdd.trace")) {
+            runTrace(name, is, initial_size);
+          } else if (name.endsWith("README")) {
+            showFile(name, is);
+          }
         } catch (IOException exx) {
           System.out.println("FAILED: " + exx.getMessage() + "\n");
           exx.printStackTrace();
@@ -73,8 +79,11 @@ public class TraceSuite {
 
         String name = ze.getName();
 
-        if (name.endsWith(".net.sf.javabdd.trace")) runTrace(name, zis, initial_size);
-        else if (name.endsWith("README")) showFile(name, zis);
+        if (name.endsWith(".net.sf.javabdd.trace")) {
+          runTrace(name, zis, initial_size);
+        } else if (name.endsWith("README")) {
+          showFile(name, zis);
+        }
 
         zis.closeEntry();
         ze = zis.getNextEntry();
@@ -95,8 +104,11 @@ public class TraceSuite {
 
     System.err.println("Tracing " + name + "...");
     try {
-      if (size == -1) new TraceDriver(name, is);
-      else new TraceDriver(name, is, size);
+      if (size == -1) {
+        new TraceDriver(name, is);
+      } else {
+        new TraceDriver(name, is, size);
+      }
     } catch (Exception exx) {
       System.out.println("FAILED: " + exx.getMessage() + "\n\n");
       exx.printStackTrace();
@@ -105,7 +117,9 @@ public class TraceSuite {
     TraceDriver.verbose = save; // set back verbose to its old value
 
     // let's cleanup, so we dont affect the next run so much:
-    for (int i = 0; i < 6; i++) System.gc();
+    for (int i = 0; i < 6; i++) {
+      System.gc();
+    }
 
     try {
       Thread.sleep(5000);
@@ -119,7 +133,9 @@ public class TraceSuite {
 
     for (; ; ) {
       int i = is.read(buffer, 0, buffer.length);
-      if (i <= 0) return;
+      if (i <= 0) {
+        return;
+      }
       System.out.println(new String(buffer, 0, i));
     }
   }
@@ -127,12 +143,15 @@ public class TraceSuite {
   // -------------------------------------------------------------
 
   public static void main(String[] args) {
-    if (args.length == 1) new TraceSuite(args[0], -1);
-    else if (args.length == 2) new TraceSuite(args[0], Integer.parseInt(args[1]));
-    else
+    if (args.length == 1) {
+      new TraceSuite(args[0], -1);
+    } else if (args.length == 2) {
+      new TraceSuite(args[0], Integer.parseInt(args[1]));
+    } else {
       System.err.println(
           "Usage: java "
               + TraceSuite.class.getName()
               + " <net.sf.javabdd.trace-suite.zip> [initial size _base_]");
+    }
   }
 }

@@ -67,7 +67,9 @@ public class TraceDriver {
 
     @Override
     public void execute() {
-      if (verbose /*|| true*/) out.println(text);
+      if (verbose /*|| true*/) {
+        out.println(text);
+      }
     }
 
     @Override
@@ -101,8 +103,9 @@ public class TraceDriver {
 
     @Override
     public void execute() {
-      if (graph) v.bdd.printDot(); // bdd.printDot(v.name, v.bdd);
-      else {
+      if (graph) {
+        v.bdd.printDot(); // bdd.printDot(v.name, v.bdd);
+      } else {
         out.println(v.name + ":");
         v.bdd.printSet();
       }
@@ -110,8 +113,11 @@ public class TraceDriver {
 
     @Override
     public void show_code() {
-      if (graph) out.println(v.name + ".printDot();");
-      else out.println(v.name + ".printSet();");
+      if (graph) {
+        out.println(v.name + ".printDot();");
+      } else {
+        out.println(v.name + ".printSet();");
+      }
     }
   }
 
@@ -123,7 +129,7 @@ public class TraceDriver {
       boolean equal = (t1.bdd.equals(t2.bdd));
       if (size != -1) {
         boolean expected = (size == 0 ? false : true);
-        if (equal != expected)
+        if (equal != expected) {
           throw new IOException(
               "are_equal("
                   + t1.name
@@ -133,6 +139,7 @@ public class TraceDriver {
                   + expected
                   + ", got "
                   + equal);
+        }
       }
     }
 
@@ -140,7 +147,9 @@ public class TraceDriver {
     public void show() {
       out.print(index + "\t");
       out.print("are_equal(" + t1.name + ", " + t2.name + ");");
-      if (size != -1) out.print("\t% " + size);
+      if (size != -1) {
+        out.print("\t% " + size);
+      }
       out.println();
     }
   }
@@ -181,14 +190,19 @@ public class TraceDriver {
         boolean first = true;
         for (Enumeration e = operands.elements(); e.hasMoreElements(); ) {
           TracedVariable v = (TracedVariable) e.nextElement();
-          if (first) first = false;
-          else out.print(", ");
+          if (first) {
+            first = false;
+          } else {
+            out.print(", ");
+          }
           v.showName();
         }
         out.print(");");
       }
 
-      if (size != -1) out.print("\t% " + size);
+      if (size != -1) {
+        out.print("\t% " + size);
+      }
       out.println();
     }
 
@@ -198,23 +212,39 @@ public class TraceDriver {
 
       ret.bdd.free();
 
-      if (op.equals("not")) do_not();
-      else if (op.equals("=")) do_assign();
-      else if (op.equals("and")) do_and();
-      else if (op.equals("or")) do_or();
-      else if (op.equals("xor")) do_xor();
-      else if (op.equals("xnor")) do_xnor();
-      else if (op.equals("nor")) do_nor();
-      else if (op.equals("nand")) do_nand();
-      else if (op.equals("ite")) do_ite();
-      else if (op.equals("vars_curr_to_next")) do_s2sp();
-      else if (op.equals("vars_next_to_curr")) do_sp2s();
-      else if (op.equals("support_vars")) do_support();
-      else if (op.equals("exists")) do_exists();
-      else if (op.equals("forall")) do_forall();
-      else if (op.equals("restrict")) do_restrict();
-      else if (op.equals("rel_prod")) do_relprod();
-      else {
+      if (op.equals("not")) {
+        do_not();
+      } else if (op.equals("=")) {
+        do_assign();
+      } else if (op.equals("and")) {
+        do_and();
+      } else if (op.equals("or")) {
+        do_or();
+      } else if (op.equals("xor")) {
+        do_xor();
+      } else if (op.equals("xnor")) {
+        do_xnor();
+      } else if (op.equals("nor")) {
+        do_nor();
+      } else if (op.equals("nand")) {
+        do_nand();
+      } else if (op.equals("ite")) {
+        do_ite();
+      } else if (op.equals("vars_curr_to_next")) {
+        do_s2sp();
+      } else if (op.equals("vars_next_to_curr")) {
+        do_sp2s();
+      } else if (op.equals("support_vars")) {
+        do_support();
+      } else if (op.equals("exists")) {
+        do_exists();
+      } else if (op.equals("forall")) {
+        do_forall();
+      } else if (op.equals("restrict")) {
+        do_restrict();
+      } else if (op.equals("rel_prod")) {
+        do_relprod();
+      } else {
         throw new IOException("Unknown operation '" + op + "', #" + op_count);
       }
 
@@ -248,13 +278,15 @@ public class TraceDriver {
     }
 
     private void do_or() {
-      if (ops == 2) ret.bdd = op1.bdd.or(op2.bdd);
-      else {
-        for (Enumeration e = operands.elements(); e.hasMoreElements(); )
+      if (ops == 2) {
+        ret.bdd = op1.bdd.or(op2.bdd);
+      } else {
+        for (Enumeration e = operands.elements(); e.hasMoreElements(); ) {
           if (((TracedVariable) e.nextElement()).bdd.isOne()) {
             ret.bdd = bdd.one();
             return;
           }
+        }
 
         BDD tmp = bdd.zero();
         for (Enumeration e = operands.elements(); e.hasMoreElements(); ) {
@@ -268,13 +300,15 @@ public class TraceDriver {
     }
 
     private void do_and() {
-      if (ops == 2) ret.bdd = op1.bdd.and(op2.bdd);
-      else {
-        for (Enumeration e = operands.elements(); e.hasMoreElements(); )
+      if (ops == 2) {
+        ret.bdd = op1.bdd.and(op2.bdd);
+      } else {
+        for (Enumeration e = operands.elements(); e.hasMoreElements(); ) {
           if (((TracedVariable) e.nextElement()).bdd.isZero()) {
             ret.bdd = bdd.zero();
             return;
           }
+        }
 
         BDD tmp = bdd.one();
         for (Enumeration e = operands.elements(); e.hasMoreElements(); ) {
@@ -288,8 +322,9 @@ public class TraceDriver {
     }
 
     private void do_nand() {
-      if (ops == 2) ret.bdd = op1.bdd.apply(op2.bdd, BDDFactory.nand);
-      else {
+      if (ops == 2) {
+        ret.bdd = op1.bdd.apply(op2.bdd, BDDFactory.nand);
+      } else {
         do_and();
         BDD tmp = ret.bdd;
         ret.bdd = tmp.not();
@@ -298,8 +333,9 @@ public class TraceDriver {
     }
 
     private void do_nor() {
-      if (ops == 2) ret.bdd = op1.bdd.apply(op2.bdd, BDDFactory.nor);
-      else {
+      if (ops == 2) {
+        ret.bdd = op1.bdd.apply(op2.bdd, BDDFactory.nor);
+      } else {
         do_or();
         BDD tmp = ret.bdd;
         ret.bdd = tmp.not();
@@ -364,26 +400,36 @@ public class TraceDriver {
       String code;
       Enumeration e = operands.elements();
       TracedVariable v = (TracedVariable) e.nextElement();
-      if (op.equals("=")) out.println("BDD " + ret.name + " = " + v.name + ";");
-      else {
+      if (op.equals("=")) {
+        out.println("BDD " + ret.name + " = " + v.name + ";");
+      } else {
         out.print("BDD " + ret.name + " = " + v.name + "." + op);
         out.print("(");
         boolean mode2 = op.equals("ite");
         int i = 0;
         for (i = 0; e.hasMoreElements(); i++) {
           v = (TracedVariable) e.nextElement();
-          if (mode2 && i != 0) out.print(", ");
+          if (mode2 && i != 0) {
+            out.print(", ");
+          }
           out.print(v.name);
 
-          if (e.hasMoreElements() && !mode2) out.print("." + op + "(");
+          if (e.hasMoreElements() && !mode2) {
+            out.print("." + op + "(");
+          }
         }
-        if (!mode2) for (int j = 1; j < i; j++) out.print(")");
+        if (!mode2) {
+          for (int j = 1; j < i; j++) {
+            out.print(")");
+          }
+        }
 
         out.println(");");
       }
 
-      if (op.equals("ite"))
+      if (op.equals("ite")) {
         out.println("System.out.println(\"" + ret.name + " ==> \"+" + ret.name + ".nodeCount());");
+      }
     }
   }
 
@@ -489,7 +535,9 @@ public class TraceDriver {
     for (Enumeration e = variables.elements(); e.hasMoreElements(); ) {
       TracedVariable v = (TracedVariable) e.nextElement();
       if (v.is_var) {
-        if (i != 0) out.print(",");
+        if (i != 0) {
+          out.print(",");
+        }
         out.print(v.name + "=B.ithVar(" + i + ") ");
         i++;
       }
@@ -531,7 +579,9 @@ public class TraceDriver {
   public static void reorder_callback(boolean prestate, BDDFactory.ReorderStats s) {
     System.out.print(prestate ? "Start" : "Finish");
     System.out.println("ing reorder.");
-    if (!prestate) System.out.println(s);
+    if (!prestate) {
+      System.out.println(s);
+    }
   }
 
   // -----------------------------------------------------
@@ -658,18 +708,25 @@ public class TraceDriver {
       TracedOperation tp = (TracedOperation) e.nextElement();
       op_count = tp.index;
 
-      if (TraceDriver.verbose) tp.show(); // DEBUG !!
+      if (TraceDriver.verbose) {
+        tp.show(); // DEBUG !!
+      }
       tp.execute();
     }
   }
 
   /** BDD net.sf.javabdd.trace driver doesn't count nodes the same way as we do ... */
   private int node_count(TracedVariable v) {
-    if (v.bdd.hashCode() == -1) throw new InternalError();
+    if (v.bdd.hashCode() == -1) {
+      throw new InternalError();
+    }
     int size = v.bdd.nodeCount();
     // adjust BDD size to include terminals
-    if (v.bdd.isOne() || v.bdd.isZero()) size += 1;
-    else size += 2;
+    if (v.bdd.isOne() || v.bdd.isZero()) {
+      size += 1;
+    } else {
+      size += 2;
+    }
     return size;
   }
 
@@ -687,14 +744,17 @@ public class TraceDriver {
 
   private void skip_output() throws IOException {
     need("OUTPUT");
-    for (String tmp = need(); !tmp.equals(";"); tmp = need()) ;
+    for (String tmp = need(); !tmp.equals(";"); tmp = need()) {
+    }
   }
 
   private void read_structure() throws IOException {
     need("STRUCTURE");
     while (true) {
       String ret = need();
-      if (ret.equals("ENDMODULE")) return;
+      if (ret.equals("ENDMODULE")) {
+        return;
+      }
 
       op_count++;
 
@@ -740,7 +800,9 @@ public class TraceDriver {
 
         TracedVariable vret = (TracedVariable) map.get(ret);
         if (vret == null) // just used a new variable
-        vret = addTemporaryVariable(ret);
+        {
+          vret = addTemporaryVariable(ret);
+        }
 
         need("=");
         String op = need();
@@ -765,7 +827,9 @@ public class TraceDriver {
             need(")");
             need(";");
             Object operand = map.get(c); // assuming 0 or 1
-            if (operand == null) throw new InternalError();
+            if (operand == null) {
+              throw new InternalError();
+            }
             tp.operands.add(operand);
             tp.ret = vret;
             tp.op = "=";
@@ -783,9 +847,15 @@ public class TraceDriver {
         }
 
         tp.ops = tp.operands.size();
-        if (tp.ops > 0) tp.op1 = (TracedVariable) tp.operands.elementAt(0);
-        if (tp.ops > 1) tp.op2 = (TracedVariable) tp.operands.elementAt(1);
-        if (tp.ops > 2) tp.op3 = (TracedVariable) tp.operands.elementAt(2);
+        if (tp.ops > 0) {
+          tp.op1 = (TracedVariable) tp.operands.elementAt(0);
+        }
+        if (tp.ops > 1) {
+          tp.op2 = (TracedVariable) tp.operands.elementAt(1);
+        }
+        if (tp.ops > 2) {
+          tp.op3 = (TracedVariable) tp.operands.elementAt(2);
+        }
       }
     }
   }
@@ -837,14 +907,17 @@ public class TraceDriver {
       if (i == 0
           && (name.equals("CURR_NEXT_ASSOCIATE_EVEN_ODD_INPUT_VARS")
               || name.equals("STATE_VAR_ASSOCIATE_CURR_NEXT_INTERLEAVE"))) {
-        if (name.equals("STATE_VAR_ASSOCIATE_CURR_NEXT_INTERLEAVE")) interleave = true;
+        if (name.equals("STATE_VAR_ASSOCIATE_CURR_NEXT_INTERLEAVE")) {
+          interleave = true;
+        }
       } else {
         // alloc_var(name);
         list.add(name);
 
         name = need();
-        if (name.equals(";")) break;
-        else if (!name.equals(",")) {
+        if (name.equals(";")) {
+          break;
+        } else if (!name.equals(",")) {
           throw new IOException(
               "expected ',' when reading inputs, but got: " + name + " at line " + line_count);
         }
@@ -867,13 +940,21 @@ public class TraceDriver {
     Enumeration e = variables.elements();
     for (int i = 0; i < (size & ~1); i++) {
       TracedVariable v = (TracedVariable) e.nextElement();
-      if (v.bdd.nodeCount() > 1) throw new InternalError();
+      if (v.bdd.nodeCount() > 1) {
+        throw new InternalError();
+      }
       if (interleave) {
-        if ((i % 2) == 0) v1[i / 2] = v.bdd.var();
-        else v2[i / 2] = v.bdd.var();
+        if ((i % 2) == 0) {
+          v1[i / 2] = v.bdd.var();
+        } else {
+          v2[i / 2] = v.bdd.var();
+        }
       } else {
-        if (i < v1.length) v1[i] = v.bdd.var();
-        else v2[i - v1.length] = v.bdd.var();
+        if (i < v1.length) {
+          v1[i] = v.bdd.var();
+        } else {
+          v2[i - v1.length] = v.bdd.var();
+        }
       }
     }
 
@@ -931,20 +1012,25 @@ public class TraceDriver {
   // -----------------------------------------------------
   private int read() {
     int c = -1;
-    if (stack_tos > 0) c = stack[--stack_tos];
-    else {
+    if (stack_tos > 0) {
+      c = stack[--stack_tos];
+    } else {
       try {
         c = is.read();
       } catch (IOException exx) {
       }
     }
-    if (c == '\n') line_count++;
+    if (c == '\n') {
+      line_count++;
+    }
     return c;
   }
 
   private void push(int c) {
     stack[stack_tos++] = c;
-    if (c == '\n') line_count--;
+    if (c == '\n') {
+      line_count--;
+    }
   }
 
   private boolean isSpace(int c) {
@@ -964,10 +1050,15 @@ public class TraceDriver {
   private String getString() throws IOException {
     StringBuffer buffer = new StringBuffer();
     int c = 0;
-    while (isSpace(c = read())) ;
-    if (c != '"') throw new IOException("Not an string at line " + line_count);
+    while (isSpace(c = read())) {
+    }
+    if (c != '"') {
+      throw new IOException("Not an string at line " + line_count);
+    }
 
-    while ((c = read()) != '"') buffer.append((char) c);
+    while ((c = read()) != '"') {
+      buffer.append((char) c);
+    }
 
     return buffer.toString();
   }
@@ -975,7 +1066,9 @@ public class TraceDriver {
   private void skip_eol() {
     for (; ; ) {
       int c = read();
-      if (c == -1 || c == '\n') return;
+      if (c == -1 || c == '\n') {
+        return;
+      }
     }
   }
 
@@ -984,7 +1077,9 @@ public class TraceDriver {
     int c;
     do {
       c = read();
-      if (c == -1) return null; // EOF
+      if (c == -1) {
+        return null; // EOF
+      }
     } while (isSpace(c));
 
     if (isAlnum(c)) {
@@ -992,20 +1087,28 @@ public class TraceDriver {
         sb.append((char) c);
         c = read();
         // XXX: error fixed ??? "return" was missing
-        if (c == -1) return sb.toString();
+        if (c == -1) {
+          return sb.toString();
+        }
       } while (isAlnum(c));
 
-      if (!isSpace(c)) push(c);
+      if (!isSpace(c)) {
+        push(c);
+      }
     } else {
       if (c == '%' || c == '#') {
         int old_line = line_count;
         if (c == '%') {
           String count = next();
           TracedOperation tp = (TracedOperation) operations.lastElement();
-          if (tp.size == -1) tp.size = Integer.parseInt(count);
+          if (tp.size == -1) {
+            tp.size = Integer.parseInt(count);
+          }
         }
 
-        if (old_line == line_count) skip_eol(); // haven't had a \n yet
+        if (old_line == line_count) {
+          skip_eol(); // haven't had a \n yet
+        }
         return next();
       }
       return "" + ((char) c);
@@ -1015,15 +1118,21 @@ public class TraceDriver {
   }
 
   /* package */ void checkEquality(int a, int b, String txt) throws IOException {
-    if (a != b) throw new IOException(txt + ", " + a + " != " + b);
+    if (a != b) {
+      throw new IOException(txt + ", " + a + " != " + b);
+    }
   }
 
   /* package */ void check(boolean b, String txt) throws IOException {
-    if (!b) throw new IOException(txt);
+    if (!b) {
+      throw new IOException(txt);
+    }
   }
 
   /* package */ void check(boolean b) throws IOException {
-    if (!b) throw new IOException("Check failed");
+    if (!b) {
+      throw new IOException("Check failed");
+    }
   }
 
   // ----------------------------------------------------

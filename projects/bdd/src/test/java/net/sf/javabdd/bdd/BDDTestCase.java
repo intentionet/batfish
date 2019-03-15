@@ -29,7 +29,9 @@ public abstract class BDDTestCase extends TestCase implements Iterator {
   protected int nodenum, cachesize;
 
   protected void initFactories() {
-    if (factories != null) return;
+    if (factories != null) {
+      return;
+    }
     Collection f = new LinkedList();
     for (int k = 0; k < factoryNames.length; ++k) {
       String bddpackage = factoryNames[k];
@@ -41,8 +43,9 @@ public abstract class BDDTestCase extends TestCase implements Iterator {
                 m.invoke(null, new Object[] {new Integer(nodenum), new Integer(cachesize)});
         f.add(b);
       } catch (Throwable e) {
-        if (e instanceof InvocationTargetException)
+        if (e instanceof InvocationTargetException) {
           e = ((InvocationTargetException) e).getTargetException();
+        }
         System.out.println("Failed initializing " + bddpackage + ": " + e);
       }
     }
@@ -50,7 +53,9 @@ public abstract class BDDTestCase extends TestCase implements Iterator {
   }
 
   protected void destroyFactories() {
-    if (factories == null) return;
+    if (factories == null) {
+      return;
+    }
     for (Iterator i = factories.iterator(); i.hasNext(); ) {
       BDDFactory f = (BDDFactory) i.next();
       f.done();

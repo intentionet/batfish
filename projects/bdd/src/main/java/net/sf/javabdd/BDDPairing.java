@@ -25,9 +25,13 @@ public abstract class BDDPairing {
    * <p>Compare to bdd_setpairs.
    */
   public void set(int[] oldvar, int[] newvar) {
-    if (oldvar.length != newvar.length) throw new BDDException();
+    if (oldvar.length != newvar.length) {
+      throw new BDDException();
+    }
 
-    for (int n = 0; n < oldvar.length; n++) this.set(oldvar[n], newvar[n]);
+    for (int n = 0; n < oldvar.length; n++) {
+      this.set(oldvar[n], newvar[n]);
+    }
   }
 
   /**
@@ -46,9 +50,13 @@ public abstract class BDDPairing {
    * <p>Compare to bdd_setbddpairs.
    */
   public void set(int[] oldvar, BDD[] newvar) {
-    if (oldvar.length != newvar.length) throw new BDDException();
+    if (oldvar.length != newvar.length) {
+      throw new BDDException();
+    }
 
-    for (int n = 0; n < newvar.length; n++) this.set(oldvar[n], newvar[n]);
+    for (int n = 0; n < newvar.length; n++) {
+      this.set(oldvar[n], newvar[n]);
+    }
   }
 
   /**
@@ -69,10 +77,15 @@ public abstract class BDDPairing {
    * <p>Compare to fdd_setpairs.
    */
   public void set(BDDDomain[] p1, BDDDomain[] p2) {
-    if (p1.length != p2.length) throw new BDDException();
+    if (p1.length != p2.length) {
+      throw new BDDException();
+    }
 
-    for (int n = 0; n < p1.length; n++)
-      if (p1[n].varNum() != p2[n].varNum()) throw new BDDException();
+    for (int n = 0; n < p1.length; n++) {
+      if (p1[n].varNum() != p2[n].varNum()) {
+        throw new BDDException();
+      }
+    }
 
     for (int n = 0; n < p1.length; n++) {
       this.set(p1[n], p2[n]);

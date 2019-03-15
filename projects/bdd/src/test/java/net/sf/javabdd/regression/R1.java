@@ -28,7 +28,9 @@ public class R1 extends BDDTestCase {
       BDD x = d.ithVar(6).orWith(d.ithVar(13));
       BDD set = d.set();
       double s1 = x.satCount(set);
-      if (bdd.varNum() < 20) bdd.setVarNum(20);
+      if (bdd.varNum() < 20) {
+        bdd.setVarNum(20);
+      }
       double s2 = x.satCount(set);
       Assert.assertEquals(bdd.toString(), s1, s2, 0.00001);
       x.free();

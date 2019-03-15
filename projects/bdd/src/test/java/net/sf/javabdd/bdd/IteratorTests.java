@@ -110,11 +110,15 @@ public class IteratorTests extends BDDTestCase {
         for (int j = 0; j < count; ++j) {
           int varNum = r.nextInt(domainSize);
           BDD c = d.ithVar(varNum);
-          if (dual) c.andWith(d2.ithVar(r.nextInt(domainSize)));
+          if (dual) {
+            c.andWith(d2.ithVar(r.nextInt(domainSize)));
+          }
           b.orWith(c);
         }
         BDD var = d.set();
-        if (dual) var.andWith(d2.set());
+        if (dual) {
+          var.andWith(d2.set());
+        }
         Iterator i1 = b.iterator(var);
         Iterator i2 = new MyBDDIterator(b, var);
         b.free();
@@ -202,7 +206,9 @@ public class IteratorTests extends BDDTestCase {
      */
     @Override
     public Object next() {
-      if (b == null) throw new NoSuchElementException();
+      if (b == null) {
+        throw new NoSuchElementException();
+      }
       BDD c = b.satOne(myVar, false);
       b.applyWith(c.id(), BDDFactory.diff);
       if (b.isZero()) {

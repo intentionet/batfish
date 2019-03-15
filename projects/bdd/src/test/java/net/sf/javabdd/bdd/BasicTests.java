@@ -37,7 +37,9 @@ public class BasicTests extends BDDTestCase {
       BDDFactory bdd = nextFactory();
       BDD x = bdd.zero();
       BDD y = bdd.one();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       BDD z = bdd.ithVar(1);
       Assert.assertEquals(true, x.isZero());
       Assert.assertEquals(false, x.isOne());
@@ -56,7 +58,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       bdd.setVarOrder(new int[] {0, 1, 2, 3, 4});
       BDD a = bdd.ithVar(1);
       BDD b = bdd.ithVar(2);
@@ -92,7 +96,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       bdd.setVarOrder(new int[] {0, 1, 2, 3, 4});
       BDD a = bdd.ithVar(0);
       BDD b = bdd.ithVar(1);
@@ -128,7 +134,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       bdd.setVarOrder(new int[] {0, 1, 2, 3, 4});
       BDD a, b, c;
       a = bdd.ithVar(0);
@@ -156,7 +164,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       BDD a, b, c;
       a = bdd.ithVar(0);
       b = a.not();
@@ -179,7 +189,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       BDD a, b;
       a = bdd.ithVar(1);
       b = a.id();
@@ -269,7 +281,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       BDD a, b, c;
       a = bdd.ithVar(1);
       b = bdd.ithVar(2);
@@ -293,7 +307,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       BDD a, b, c;
       a = bdd.ithVar(1);
       b = bdd.ithVar(2);
@@ -406,7 +422,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       BDD a, b, c, d, e;
       a = bdd.ithVar(1);
       b = bdd.one();
@@ -436,7 +454,9 @@ public class BasicTests extends BDDTestCase {
     Assert.assertTrue(hasNext());
     while (hasNext()) {
       BDDFactory bdd = nextFactory();
-      if (bdd.varNum() < 5) bdd.setVarNum(5);
+      if (bdd.varNum() < 5) {
+        bdd.setVarNum(5);
+      }
       BDDPairing p1 = bdd.makePair(0, 1);
       BDDPairing p2 = bdd.makePair();
       p2.set(1, 2);
@@ -452,7 +472,9 @@ public class BasicTests extends BDDTestCase {
       Assert.assertEquals(a, b);
       a.replaceWith(p2);
       Assert.assertEquals(a, c);
-      if (bdd.varNum() < 25) bdd.setVarNum(25);
+      if (bdd.varNum() < 25) {
+        bdd.setVarNum(25);
+      }
       b.andWith(bdd.nithVar(0));
       f = b.replace(p3);
       f.andWith(bdd.ithVar(0));
@@ -588,7 +610,9 @@ public class BasicTests extends BDDTestCase {
       int y = random.nextInt(d.size().intValue());
       result.andWith(d.ithVar(y));
     }
-    if (k == 0 && random.nextBoolean()) result.andWith(f.zero());
+    if (k == 0 && random.nextBoolean()) {
+      result.andWith(f.zero());
+    }
     return result;
   }
 
@@ -598,8 +622,11 @@ public class BasicTests extends BDDTestCase {
     for (int i = 0; i < domains.length; ++i) {
       if (i > 0) {
         boolean x = random.nextBoolean();
-        if (x) sb.append('x');
-        else sb.append('_');
+        if (x) {
+          sb.append('x');
+        } else {
+          sb.append('_');
+        }
       }
       sb.append(domains[i].toString());
     }

@@ -87,9 +87,15 @@ public class FindBestOrder {
     f1.delete();
     f2.delete();
     f3.delete();
-    if (b1 != null) b1.free();
-    if (b2 != null) b2.free();
-    if (b3 != null) b3.free();
+    if (b1 != null) {
+      b1.free();
+    }
+    if (b2 != null) {
+      b2.free();
+    }
+    if (b3 != null) {
+      b3.free();
+    }
   }
 
   public void writeBDDConfig(BDDFactory bdd, String fileName) throws IOException {
@@ -101,7 +107,9 @@ public class FindBestOrder {
         dos.write(d.getName() + " " + d.size() + "\n");
       }
     } finally {
-      if (dos != null) dos.close();
+      if (dos != null) {
+        dos.close();
+      }
     }
   }
 
@@ -113,7 +121,9 @@ public class FindBestOrder {
     t.start();
     try {
       long waitTime = (long) (bestTotalTime * FACTOR) + DELAY_TIME;
-      if (waitTime < 0L) waitTime = Long.MAX_VALUE;
+      if (waitTime < 0L) {
+        waitTime = Long.MAX_VALUE;
+      }
       t.join(waitTime);
     } catch (InterruptedException x) {
     }
@@ -133,7 +143,9 @@ public class FindBestOrder {
     if (t.time < bestCalcTime) {
       bestOrder = varOrder;
       bestCalcTime = t.time;
-      if (t.totalTime < bestTotalTime) bestTotalTime = t.totalTime;
+      if (t.totalTime < bestTotalTime) {
+        bestTotalTime = t.totalTime;
+      }
     }
     return t.time;
   }
@@ -188,7 +200,9 @@ public class FindBestOrder {
         in = new BufferedReader(new FileReader(filename0));
         for (; ; ) {
           String s = in.readLine();
-          if (s == null || s.equals("")) break;
+          if (s == null || s.equals("")) {
+            break;
+          }
           StringTokenizer st = new StringTokenizer(s);
           String name = st.nextToken();
           long size = Long.parseLong(st.nextToken()) - 1;
@@ -196,11 +210,12 @@ public class FindBestOrder {
         }
       } catch (IOException x) {
       } finally {
-        if (in != null)
+        if (in != null) {
           try {
             in.close();
           } catch (IOException e) {
           }
+        }
       }
     }
 

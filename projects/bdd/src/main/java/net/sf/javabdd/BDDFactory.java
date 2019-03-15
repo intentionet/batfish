@@ -65,12 +65,18 @@ public abstract class BDDFactory {
    */
   public static BDDFactory init(String bddpackage, int nodenum, int cachesize) {
     try {
-      if (bddpackage.equals("j") || bddpackage.equals("java"))
+      if (bddpackage.equals("j") || bddpackage.equals("java")) {
         return JFactory.init(nodenum, cachesize);
-      if (bddpackage.equals("u") || bddpackage.equals("micro"))
+      }
+      if (bddpackage.equals("u") || bddpackage.equals("micro")) {
         return MicroFactory.init(nodenum, cachesize);
-      if (bddpackage.equals("test")) return TestBDDFactory.init(nodenum, cachesize);
-      if (bddpackage.equals("typed")) return TypedBDDFactory.init(nodenum, cachesize);
+      }
+      if (bddpackage.equals("test")) {
+        return TestBDDFactory.init(nodenum, cachesize);
+      }
+      if (bddpackage.equals("typed")) {
+        return TypedBDDFactory.init(nodenum, cachesize);
+      }
     } catch (LinkageError e) {
       System.out.println(
           "Could not load BDD package " + bddpackage + ": " + e.getLocalizedMessage());
@@ -172,8 +178,11 @@ public abstract class BDDFactory {
     int z = 0;
     while (i.hasNext()) {
       BDD var = (BDD) i.next();
-      if ((value & 0x1) != 0) var = var.id();
-      else var = var.not();
+      if ((value & 0x1) != 0) {
+        var = var.id();
+      } else {
+        var = var.not();
+      }
       result.andWith(var);
       ++z;
       value >>= 1;
@@ -190,8 +199,11 @@ public abstract class BDDFactory {
     BDD result = one();
     for (int z = 0; z < variables.length; z++, value >>= 1) {
       BDD v;
-      if ((value & 0x1) != 0) v = ithVar(variables[variables.length - z - 1]);
-      else v = nithVar(variables[variables.length - z - 1]);
+      if ((value & 0x1) != 0) {
+        v = ithVar(variables[variables.length - z - 1]);
+      } else {
+        v = nithVar(variables[variables.length - z - 1]);
+      }
       result.andWith(v);
     }
     return result;
@@ -363,7 +375,9 @@ public abstract class BDDFactory {
    */
   public int extVarNum(int num) {
     int start = varNum();
-    if (num < 0 || num > 0x3FFFFFFF) throw new BDDException();
+    if (num < 0 || num > 0x3FFFFFFF) {
+      throw new BDDException();
+    }
     setVarNum(start + num);
     return start;
   }
@@ -419,11 +433,12 @@ public abstract class BDDFactory {
       BDD result = load(r);
       return result;
     } finally {
-      if (r != null)
+      if (r != null) {
         try {
           r.close();
         } catch (IOException ignored) {
         }
+      }
     }
   }
   // TODO: error code from bdd_load (?)
@@ -468,7 +483,9 @@ public abstract class BDDFactory {
       loadvar2level[n] = Integer.parseInt(readNext(ifile));
     }
 
-    if (vnum > varNum()) setVarNum(vnum);
+    if (vnum > varNum()) {
+      setVarNum(vnum);
+    }
 
     LoadHash[] lh_table = new LoadHash[lh_nodenum];
     for (int n = 0; n < lh_nodenum; n++) {
@@ -483,7 +500,9 @@ public abstract class BDDFactory {
     for (int n = 0; n < lh_nodenum; n++) {
       int key = Integer.parseInt(readNext(ifile));
       int var = Integer.parseInt(readNext(ifile));
-      if (translate != null) var = translate[var];
+      if (translate != null) {
+        var = translate[var];
+      }
       int lowi = Integer.parseInt(readNext(ifile));
       int highi = Integer.parseInt(readNext(ifile));
 
@@ -492,13 +511,19 @@ public abstract class BDDFactory {
       low = loadhash_get(lh_table, lh_nodenum, lowi);
       high = loadhash_get(lh_table, lh_nodenum, highi);
 
-      if (low == null || high == null || var < 0) throw new BDDException("Incorrect file format");
+      if (low == null || high == null || var < 0) {
+        throw new BDDException("Incorrect file format");
+      }
 
       BDD b = ithVar(var);
       root = b.ite(high, low);
       b.free();
-      if (low.isZero() || low.isOne()) low.free();
-      if (high.isZero() || high.isOne()) high.free();
+      if (low.isZero() || low.isOne()) {
+        low.free();
+      }
+      if (high.isZero() || high.isOne()) {
+        high.free();
+      }
 
       int hash = key % lh_nodenum;
       int pos = lh_freepos;
@@ -512,7 +537,9 @@ public abstract class BDDFactory {
     }
     BDD tmproot = root.id();
 
-    for (int n = 0; n < lh_nodenum; n++) lh_table[n].data.free();
+    for (int n = 0; n < lh_nodenum; n++) {
+      lh_table[n].data.free();
+    }
 
     lh_table = null;
     loadvar2level = null;
@@ -532,7 +559,9 @@ public abstract class BDDFactory {
   protected String readNext(BufferedReader ifile) throws IOException {
     while (tokenizer == null || !tokenizer.hasMoreTokens()) {
       String s = ifile.readLine();
-      if (s == null) throw new BDDException("Incorrect file format");
+      if (s == null) {
+        throw new BDDException("Incorrect file format");
+      }
       tokenizer = new StringTokenizer(s);
     }
     return tokenizer.nextToken();
@@ -548,15 +577,25 @@ public abstract class BDDFactory {
 
   /** Gets a BDD from the load hash table. */
   protected BDD loadhash_get(LoadHash[] lh_table, int lh_nodenum, int key) {
-    if (key < 0) return null;
-    if (key == 0) return zero();
-    if (key == 1) return one();
+    if (key < 0) {
+      return null;
+    }
+    if (key == 0) {
+      return zero();
+    }
+    if (key == 1) {
+      return one();
+    }
 
     int hash = lh_table[key % lh_nodenum].first;
 
-    while (hash != -1 && lh_table[hash].key != key) hash = lh_table[hash].next;
+    while (hash != -1 && lh_table[hash].key != key) {
+      hash = lh_table[hash].next;
+    }
 
-    if (hash == -1) return null;
+    if (hash == -1) {
+      return null;
+    }
     return lh_table[hash].data;
   }
 
@@ -571,11 +610,12 @@ public abstract class BDDFactory {
       is = new BufferedWriter(new FileWriter(filename));
       save(is, var);
     } finally {
-      if (is != null)
+      if (is != null) {
         try {
           is.close();
         } catch (IOException ignored) {
         }
+      }
     }
   }
   // TODO: error code from bdd_save (?)
@@ -593,7 +633,9 @@ public abstract class BDDFactory {
 
     out.write(r.nodeCount() + " " + varNum() + "\n");
 
-    for (int x = 0; x < varNum(); x++) out.write(var2Level(x) + " ");
+    for (int x = 0; x < varNum(); x++) {
+      out.write(var2Level(x) + " ");
+    }
     out.write("\n");
 
     // Map visited = new HashMap();
@@ -1075,7 +1117,9 @@ public abstract class BDDFactory {
     protected ReorderStats() {}
 
     public int gain() {
-      if (usednum_before == 0) return 0;
+      if (usednum_before == 0) {
+        return 0;
+      }
 
       return (100 * (usednum_before - usednum_after)) / usednum_before;
     }
@@ -1161,9 +1205,11 @@ public abstract class BDDFactory {
       sb.append(uniqueMiss);
       sb.append(newLine);
       sb.append("=> Hit rate =   ");
-      if (uniqueHit + uniqueMiss > 0)
+      if (uniqueHit + uniqueMiss > 0) {
         sb.append(((float) uniqueHit) / ((float) uniqueHit + uniqueMiss));
-      else sb.append((float) 0);
+      } else {
+        sb.append((float) 0);
+      }
       sb.append(newLine);
       sb.append("Operator Hits:  ");
       sb.append(opHit);
@@ -1172,8 +1218,11 @@ public abstract class BDDFactory {
       sb.append(opMiss);
       sb.append(newLine);
       sb.append("=> Hit rate =   ");
-      if (opHit + opMiss > 0) sb.append(((float) opHit) / ((float) opHit + opMiss));
-      else sb.append((float) 0);
+      if (opHit + opMiss > 0) {
+        sb.append(((float) opHit) / ((float) opHit + opMiss));
+      } else {
+        sb.append((float) 0);
+      }
       sb.append(newLine);
       sb.append("Swap count =    ");
       sb.append(swapCount);
@@ -1328,8 +1377,12 @@ public abstract class BDDFactory {
     d.realsize = d1.realsize.multiply(d2.realsize);
     d.ivar = new int[d1.varNum() + d2.varNum()];
 
-    for (n = 0; n < d1.varNum(); n++) d.ivar[n] = d1.ivar[n];
-    for (n = 0; n < d2.varNum(); n++) d.ivar[d1.varNum() + n] = d2.ivar[n];
+    for (n = 0; n < d1.varNum(); n++) {
+      d.ivar[n] = d1.ivar[n];
+    }
+    for (n = 0; n < d2.varNum(); n++) {
+      d.ivar[d1.varNum() + n] = d2.ivar[n];
+    }
 
     d.var = makeSet(d.ivar);
     // bdd_addref(d.var);
@@ -1377,7 +1430,9 @@ public abstract class BDDFactory {
 
   /** Returns the ith finite domain block, as defined by calls to extDomain(). */
   public BDDDomain getDomain(int i) {
-    if (i < 0 || i >= fdvarnum) throw new IndexOutOfBoundsException();
+    if (i < 0 || i >= fdvarnum) {
+      throw new IndexOutOfBoundsException();
+    }
     return domain[i];
   }
 
@@ -1429,11 +1484,17 @@ public abstract class BDDFactory {
       String s = st.nextToken();
       BDDDomain d;
       for (int j = 0; ; ++j) {
-        if (j == numberOfDomains()) throw new BDDException("bad domain: " + s);
+        if (j == numberOfDomains()) {
+          throw new BDDException("bad domain: " + s);
+        }
         d = getDomain(j);
-        if (s.equals(d.getName())) break;
+        if (s.equals(d.getName())) {
+          break;
+        }
       }
-      if (done[d.getIndex()]) throw new BDDException("duplicate domain: " + s);
+      if (done[d.getIndex()]) {
+        throw new BDDException("duplicate domain: " + s);
+      }
       done[d.getIndex()] = true;
       doms[i] = d;
       if (st.hasMoreTokens()) {
@@ -1449,8 +1510,11 @@ public abstract class BDDFactory {
       if (!st.hasMoreTokens()) {
         break;
       }
-      if (s.equals("_")) numberOfDomains = 0;
-      else throw new BDDException("bad token: " + s);
+      if (s.equals("_")) {
+        numberOfDomains = 0;
+      } else {
+        throw new BDDException("bad token: " + s);
+      }
     }
 
     for (int i = 0; i < doms.length; ++i) {
@@ -1468,7 +1532,9 @@ public abstract class BDDFactory {
     System.arraycopy(varorder, 0, test, 0, varorder.length);
     Arrays.sort(test);
     for (int i = 0; i < test.length; ++i) {
-      if (test[i] != i) throw new BDDException(test[i] + " != " + i);
+      if (test[i] != i) {
+        throw new BDDException(test[i] + " != " + i);
+      }
     }
 
     return varorder;
@@ -1588,7 +1654,9 @@ public abstract class BDDFactory {
    * @param m method
    */
   public void registerGCCallback(Object o, Method m) {
-    if (gc_callbacks == null) gc_callbacks = new LinkedList();
+    if (gc_callbacks == null) {
+      gc_callbacks = new LinkedList();
+    }
     registerCallback(gc_callbacks, o, m);
   }
 
@@ -1599,8 +1667,12 @@ public abstract class BDDFactory {
    * @param m method
    */
   public void unregisterGCCallback(Object o, Method m) {
-    if (gc_callbacks == null) throw new BDDException();
-    if (!unregisterCallback(gc_callbacks, o, m)) throw new BDDException();
+    if (gc_callbacks == null) {
+      throw new BDDException();
+    }
+    if (!unregisterCallback(gc_callbacks, o, m)) {
+      throw new BDDException();
+    }
   }
 
   /**
@@ -1610,7 +1682,9 @@ public abstract class BDDFactory {
    * @param m method
    */
   public void registerReorderCallback(Object o, Method m) {
-    if (reorder_callbacks == null) reorder_callbacks = new LinkedList();
+    if (reorder_callbacks == null) {
+      reorder_callbacks = new LinkedList();
+    }
     registerCallback(reorder_callbacks, o, m);
   }
 
@@ -1621,8 +1695,12 @@ public abstract class BDDFactory {
    * @param m method
    */
   public void unregisterReorderCallback(Object o, Method m) {
-    if (reorder_callbacks == null) throw new BDDException();
-    if (!unregisterCallback(reorder_callbacks, o, m)) throw new BDDException();
+    if (reorder_callbacks == null) {
+      throw new BDDException();
+    }
+    if (!unregisterCallback(reorder_callbacks, o, m)) {
+      throw new BDDException();
+    }
   }
 
   /**
@@ -1632,7 +1710,9 @@ public abstract class BDDFactory {
    * @param m method
    */
   public void registerResizeCallback(Object o, Method m) {
-    if (resize_callbacks == null) resize_callbacks = new LinkedList();
+    if (resize_callbacks == null) {
+      resize_callbacks = new LinkedList();
+    }
     registerCallback(resize_callbacks, o, m);
   }
 
@@ -1643,8 +1723,12 @@ public abstract class BDDFactory {
    * @param m method
    */
   public void unregisterResizeCallback(Object o, Method m) {
-    if (resize_callbacks == null) throw new BDDException();
-    if (!unregisterCallback(resize_callbacks, o, m)) throw new BDDException();
+    if (resize_callbacks == null) {
+      throw new BDDException();
+    }
+    if (!unregisterCallback(resize_callbacks, o, m)) {
+      throw new BDDException();
+    }
   }
 
   protected void gbc_handler(boolean pre, GCStats s) {
@@ -1761,9 +1845,12 @@ public abstract class BDDFactory {
         } catch (IllegalAccessException e) {
           e.printStackTrace();
         } catch (InvocationTargetException e) {
-          if (e.getTargetException() instanceof RuntimeException)
+          if (e.getTargetException() instanceof RuntimeException) {
             throw (RuntimeException) e.getTargetException();
-          if (e.getTargetException() instanceof Error) throw (Error) e.getTargetException();
+          }
+          if (e.getTargetException() instanceof Error) {
+            throw (Error) e.getTargetException();
+          }
           e.printStackTrace();
         }
       }

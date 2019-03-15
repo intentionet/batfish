@@ -21,16 +21,23 @@ public abstract class BDDBitVector {
 
   protected void initialize(boolean isTrue) {
     BDDFactory bdd = getFactory();
-    for (int n = 0; n < bitvec.length; n++)
-      if (isTrue) bitvec[n] = bdd.one();
-      else bitvec[n] = bdd.zero();
+    for (int n = 0; n < bitvec.length; n++) {
+      if (isTrue) {
+        bitvec[n] = bdd.one();
+      } else {
+        bitvec[n] = bdd.zero();
+      }
+    }
   }
 
   protected void initialize(int val) {
     BDDFactory bdd = getFactory();
     for (int n = 0; n < bitvec.length; n++) {
-      if ((val & 0x1) != 0) bitvec[n] = bdd.one();
-      else bitvec[n] = bdd.zero();
+      if ((val & 0x1) != 0) {
+        bitvec[n] = bdd.one();
+      } else {
+        bitvec[n] = bdd.zero();
+      }
       val >>= 1;
     }
   }
@@ -38,8 +45,11 @@ public abstract class BDDBitVector {
   protected void initialize(long val) {
     BDDFactory bdd = getFactory();
     for (int n = 0; n < bitvec.length; n++) {
-      if ((val & 0x1) != 0) bitvec[n] = bdd.one();
-      else bitvec[n] = bdd.zero();
+      if ((val & 0x1) != 0) {
+        bitvec[n] = bdd.one();
+      } else {
+        bitvec[n] = bdd.zero();
+      }
       val >>= 1;
     }
   }
@@ -47,15 +57,20 @@ public abstract class BDDBitVector {
   protected void initialize(BigInteger val) {
     BDDFactory bdd = getFactory();
     for (int n = 0; n < bitvec.length; n++) {
-      if (val.testBit(0)) bitvec[n] = bdd.one();
-      else bitvec[n] = bdd.zero();
+      if (val.testBit(0)) {
+        bitvec[n] = bdd.one();
+      } else {
+        bitvec[n] = bdd.zero();
+      }
       val = val.shiftRight(1);
     }
   }
 
   protected void initialize(int offset, int step) {
     BDDFactory bdd = getFactory();
-    for (int n = 0; n < bitvec.length; n++) bitvec[n] = bdd.ithVar(offset + n * step);
+    for (int n = 0; n < bitvec.length; n++) {
+      bitvec[n] = bdd.ithVar(offset + n * step);
+    }
   }
 
   protected void initialize(BDDDomain d) {
@@ -64,7 +79,9 @@ public abstract class BDDBitVector {
 
   protected void initialize(int[] var) {
     BDDFactory bdd = getFactory();
-    for (int n = 0; n < bitvec.length; n++) bitvec[n] = bdd.ithVar(var[n]);
+    for (int n = 0; n < bitvec.length; n++) {
+      bitvec[n] = bdd.ithVar(var[n]);
+    }
   }
 
   public abstract BDDFactory getFactory();
@@ -73,7 +90,9 @@ public abstract class BDDBitVector {
     BDDFactory bdd = getFactory();
     BDDBitVector dst = bdd.createBitVector(bitvec.length);
 
-    for (int n = 0; n < bitvec.length; n++) dst.bitvec[n] = bitvec[n].id();
+    for (int n = 0; n < bitvec.length; n++) {
+      dst.bitvec[n] = bitvec[n].id();
+    }
 
     return dst;
   }
@@ -83,15 +102,21 @@ public abstract class BDDBitVector {
     BDDBitVector dst = bdd.createBitVector(bitnum);
     int minnum = Math.min(bitnum, bitvec.length);
     int n;
-    for (n = 0; n < minnum; n++) dst.bitvec[n] = bitvec[n].id();
-    for (; n < minnum; n++) dst.bitvec[n] = bdd.zero();
+    for (n = 0; n < minnum; n++) {
+      dst.bitvec[n] = bitvec[n].id();
+    }
+    for (; n < minnum; n++) {
+      dst.bitvec[n] = bdd.zero();
+    }
     return dst;
   }
 
   public boolean isConst() {
     for (int n = 0; n < bitvec.length; n++) {
       BDD b = bitvec[n];
-      if (!b.isOne() && !b.isZero()) return false;
+      if (!b.isOne() && !b.isZero()) {
+        return false;
+      }
     }
     return true;
   }
@@ -99,10 +124,15 @@ public abstract class BDDBitVector {
   public int val() {
     int n, val = 0;
 
-    for (n = bitvec.length - 1; n >= 0; n--)
-      if (bitvec[n].isOne()) val = (val << 1) | 1;
-      else if (bitvec[n].isZero()) val = val << 1;
-      else return 0;
+    for (n = bitvec.length - 1; n >= 0; n--) {
+      if (bitvec[n].isOne()) {
+        val = (val << 1) | 1;
+      } else if (bitvec[n].isZero()) {
+        val = val << 1;
+      } else {
+        return 0;
+      }
+    }
 
     return val;
   }
@@ -115,18 +145,24 @@ public abstract class BDDBitVector {
   }
 
   public BDDBitVector map2(BDDBitVector that, BDDFactory.BDDOp op) {
-    if (bitvec.length != that.bitvec.length) throw new BDDException();
+    if (bitvec.length != that.bitvec.length) {
+      throw new BDDException();
+    }
 
     BDDFactory bdd = getFactory();
     BDDBitVector res = bdd.createBitVector(bitvec.length);
-    for (int n = 0; n < bitvec.length; n++) res.bitvec[n] = bitvec[n].apply(that.bitvec[n], op);
+    for (int n = 0; n < bitvec.length; n++) {
+      res.bitvec[n] = bitvec[n].apply(that.bitvec[n], op);
+    }
 
     return res;
   }
 
   public BDDBitVector add(BDDBitVector that) {
 
-    if (bitvec.length != that.bitvec.length) throw new BDDException();
+    if (bitvec.length != that.bitvec.length) {
+      throw new BDDException();
+    }
 
     BDDFactory bdd = getFactory();
 
@@ -152,7 +188,9 @@ public abstract class BDDBitVector {
 
   public BDDBitVector sub(BDDBitVector that) {
 
-    if (bitvec.length != that.bitvec.length) throw new BDDException();
+    if (bitvec.length != that.bitvec.length) {
+      throw new BDDException();
+    }
 
     BDDFactory bdd = getFactory();
 
@@ -180,7 +218,9 @@ public abstract class BDDBitVector {
   }
 
   BDD lte(BDDBitVector r) {
-    if (this.bitvec.length != r.bitvec.length) throw new BDDException();
+    if (this.bitvec.length != r.bitvec.length) {
+      throw new BDDException();
+    }
 
     BDDFactory bdd = getFactory();
     BDD p = bdd.one();
@@ -204,13 +244,16 @@ public abstract class BDDBitVector {
     BDDBitVector zero = bdd.buildVector(divisor.bitvec.length, false);
     BDDBitVector sub = bdd.buildVector(divisor.bitvec.length, false);
 
-    for (int n = 0; n < divisor.bitvec.length; n++)
+    for (int n = 0; n < divisor.bitvec.length; n++) {
       sub.bitvec[n] = isSmaller.ite(divisor.bitvec[n], zero.bitvec[n]);
+    }
 
     BDDBitVector tmp = remainder.sub(sub);
     BDDBitVector newRemainder = tmp.shl(1, result.bitvec[divisor.bitvec.length - 1]);
 
-    if (step > 1) div_rec(divisor, newRemainder, newResult, step - 1);
+    if (step > 1) {
+      div_rec(divisor, newRemainder, newResult, step - 1);
+    }
 
     tmp.free();
     sub.free();
@@ -222,7 +265,9 @@ public abstract class BDDBitVector {
   }
 
   public void replaceWith(BDDBitVector that) {
-    if (bitvec.length != that.bitvec.length) throw new BDDException();
+    if (bitvec.length != that.bitvec.length) {
+      throw new BDDException();
+    }
     free();
     this.bitvec = that.bitvec;
     that.bitvec = null;
@@ -230,36 +275,50 @@ public abstract class BDDBitVector {
 
   public BDDBitVector shl(int pos, BDD c) {
     int minnum = Math.min(bitvec.length, pos);
-    if (minnum < 0) throw new BDDException();
+    if (minnum < 0) {
+      throw new BDDException();
+    }
 
     BDDFactory bdd = getFactory();
     BDDBitVector res = bdd.createBitVector(bitvec.length);
 
     int n;
-    for (n = 0; n < minnum; n++) res.bitvec[n] = c.id();
+    for (n = 0; n < minnum; n++) {
+      res.bitvec[n] = c.id();
+    }
 
-    for (n = minnum; n < bitvec.length; n++) res.bitvec[n] = bitvec[n - pos].id();
+    for (n = minnum; n < bitvec.length; n++) {
+      res.bitvec[n] = bitvec[n - pos].id();
+    }
 
     return res;
   }
 
   BDDBitVector shr(int pos, BDD c) {
     int maxnum = Math.max(0, bitvec.length - pos);
-    if (maxnum < 0) throw new BDDException();
+    if (maxnum < 0) {
+      throw new BDDException();
+    }
 
     BDDFactory bdd = getFactory();
     BDDBitVector res = bdd.createBitVector(bitvec.length);
 
     int n;
-    for (n = maxnum; n < bitvec.length; n++) res.bitvec[n] = c.id();
+    for (n = maxnum; n < bitvec.length; n++) {
+      res.bitvec[n] = c.id();
+    }
 
-    for (n = 0; n < maxnum; n++) res.bitvec[n] = bitvec[n + pos].id();
+    for (n = 0; n < maxnum; n++) {
+      res.bitvec[n] = bitvec[n + pos].id();
+    }
 
     return res;
   }
 
   public BDDBitVector divmod(long c, boolean which) {
-    if (c <= 0L) throw new BDDException();
+    if (c <= 0L) {
+      throw new BDDException();
+    }
     BDDFactory bdd = getFactory();
     BDDBitVector divisor = bdd.constantVector(bitvec.length, c);
     BDDBitVector tmp = bdd.buildVector(bitvec.length, false);
