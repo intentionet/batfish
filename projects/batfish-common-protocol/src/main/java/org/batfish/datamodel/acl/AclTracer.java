@@ -218,7 +218,7 @@ public final class AclTracer extends Evaluator {
         if (dstProtocol.getIpProtocol().equals(_flow.getIpProtocol())) {
           match = true;
           Integer dstPort = dstProtocol.getPort();
-          if (dstPort != null && !dstPort.equals(_flow.getDstPort())) {
+          if (!dstPort.equals(_flow.getDstPort())) {
             match = false;
           }
           if (match) {
@@ -236,7 +236,7 @@ public final class AclTracer extends Evaluator {
         if (notDstProtocol.getIpProtocol().equals(_flow.getIpProtocol())) {
           match = true;
           Integer dstPort = notDstProtocol.getPort();
-          if (dstPort != null && !dstPort.equals(_flow.getDstPort())) {
+          if (!dstPort.equals(_flow.getDstPort())) {
             match = false;
           }
           if (match) {
@@ -301,9 +301,7 @@ public final class AclTracer extends Evaluator {
         if (protocol.getIpProtocol().equals(_flow.getIpProtocol())) {
           match = true;
           Integer port = protocol.getPort();
-          if (port != null
-              && !port.equals(_flow.getDstPort())
-              && !port.equals(_flow.getSrcPort())) {
+          if (!port.equals(_flow.getDstPort()) && !port.equals(_flow.getSrcPort())) {
             match = false;
           }
           if (match) {
@@ -336,7 +334,7 @@ public final class AclTracer extends Evaluator {
         if (srcProtocol.getIpProtocol().equals(_flow.getIpProtocol())) {
           match = true;
           Integer srcPort = srcProtocol.getPort();
-          if (srcPort != null && !srcPort.equals(_flow.getSrcPort())) {
+          if (!srcPort.equals(_flow.getSrcPort())) {
             match = false;
           }
           if (match) {
@@ -354,7 +352,7 @@ public final class AclTracer extends Evaluator {
         if (notSrcProtocol.getIpProtocol().equals(_flow.getIpProtocol())) {
           match = true;
           Integer srcPort = notSrcProtocol.getPort();
-          if (srcPort != null && !srcPort.equals(_flow.getSrcPort())) {
+          if (!srcPort.equals(_flow.getSrcPort())) {
             match = false;
           }
           if (match) {

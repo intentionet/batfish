@@ -1,5 +1,6 @@
 package org.batfish.datamodel.transformation;
 
+import static com.google.common.base.Verify.verifyNotNull;
 import static org.batfish.datamodel.FlowDiff.flowDiff;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -83,9 +84,9 @@ public class TransformationEvaluator {
     private int get(PortField field) {
       switch (field) {
         case DESTINATION:
-          return _flowBuilder.getDstPort();
+          return verifyNotNull(_flowBuilder.getDstPort(), "Missing destination port");
         case SOURCE:
-          return _flowBuilder.getSrcPort();
+          return verifyNotNull(_flowBuilder.getSrcPort(), "Missing source port");
         default:
           throw new IllegalArgumentException("unknown PortField " + field);
       }

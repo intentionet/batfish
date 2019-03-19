@@ -156,10 +156,10 @@ public final class TracerouteAnswererHelper {
     if (builder.getIpProtocol() == null || builder.getIpProtocol() == IpProtocol.IP) {
       builder.setIpProtocol(IpProtocol.UDP);
     }
-    if (builder.getDstPort() == 0) {
+    if (builder.getDstPort() == null) {
       builder.setDstPort(TRACEROUTE_PORT);
     }
-    if (builder.getSrcPort() == 0) {
+    if (builder.getSrcPort() == null) {
       builder.setSrcPort(NamedPort.EPHEMERAL_LOWEST.number());
     }
     return builder;

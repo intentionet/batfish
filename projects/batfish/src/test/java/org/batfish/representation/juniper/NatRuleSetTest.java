@@ -220,7 +220,13 @@ public class NatRuleSetTest {
                 null)
             .get();
 
-    Flow.Builder fb = Flow.builder().setIngressNode("ingressNode").setSrcIp(Ip.ZERO).setTag("tag");
+    Flow.Builder fb =
+        Flow.builder()
+            .setIngressNode("ingressNode")
+            .setSrcIp(Ip.ZERO)
+            .setSrcPort(0)
+            .setDstPort(0)
+            .setTag("tag");
 
     // doesn't match rule set
     TransformationResult result =

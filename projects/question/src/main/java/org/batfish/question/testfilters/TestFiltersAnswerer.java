@@ -259,10 +259,10 @@ public class TestFiltersAnswerer extends Answerer {
     if (builder.getIpProtocol() == null || builder.getIpProtocol() == IpProtocol.IP) {
       builder.setIpProtocol(IpProtocol.TCP);
     }
-    if (builder.getDstPort() == 0) {
+    if (builder.getDstPort() == null) {
       builder.setDstPort(NamedPort.HTTP.number());
     }
-    if (builder.getSrcPort() == 0) {
+    if (builder.getSrcPort() == null) {
       builder.setSrcPort(NamedPort.EPHEMERAL_LOWEST.number());
     }
     return builder;

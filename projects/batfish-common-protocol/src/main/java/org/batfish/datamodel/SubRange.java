@@ -104,6 +104,11 @@ public final class SubRange implements Serializable, Comparable<SubRange> {
     return Objects.hash(_end, _start);
   }
 
+  /** Check whether a given integer belongs to this range. */
+  public boolean includes(@Nullable Integer integer) {
+    return integer != null && includes(integer.intValue());
+  }
+
   /** Check whether a given integer belongs to this range */
   public boolean includes(int integer) {
     return _start <= integer && integer <= _end;

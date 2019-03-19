@@ -1561,6 +1561,7 @@ public class CiscoGrammarTest {
             .setSrcIp(Ip.parse("1.1.1.1"))
             .setDstIp(Ip.parse("2.2.2.2"))
             .setIpProtocol(IpProtocol.TCP)
+            .setSrcPort(NamedPort.EPHEMERAL_LOWEST.number())
             .setDstPort(80)
             .setIngressNode("internet")
             .setTag("none")
@@ -1575,6 +1576,7 @@ public class CiscoGrammarTest {
             .setSrcIp(Ip.parse("1.1.1.2"))
             .setDstIp(Ip.parse("2.2.2.2"))
             .setIpProtocol(IpProtocol.TCP)
+            .setSrcPort(NamedPort.EPHEMERAL_LOWEST.number())
             .setDstPort(80)
             .setIngressNode("internet")
             .setTag("none")
@@ -1597,6 +1599,7 @@ public class CiscoGrammarTest {
             .setSrcIp(Ip.parse("1.1.1.1"))
             .setDstIp(Ip.parse("2.2.2.2"))
             .setIpProtocol(IpProtocol.TCP)
+            .setSrcPort(NamedPort.EPHEMERAL_LOWEST.number())
             .setDstPort(81)
             .setIngressNode("internet")
             .setTag("none")
@@ -1847,7 +1850,13 @@ public class CiscoGrammarTest {
             .setIcmpType(0)
             .build();
     Flow tcpFlow =
-        Flow.builder().setTag("").setIngressNode("").setIpProtocol(IpProtocol.TCP).build();
+        Flow.builder()
+            .setTag("")
+            .setIngressNode("")
+            .setIpProtocol(IpProtocol.TCP)
+            .setSrcPort(0)
+            .setDstPort(0)
+            .build();
 
     /* Confirm the used object groups have referrers */
     assertThat(ccae, hasNumReferrers(filename, PROTOCOL_OBJECT_GROUP, ogpIcmpName, 1));
@@ -2642,12 +2651,16 @@ public class CiscoGrammarTest {
             .setIngressNode(c.getHostname())
             .setTag("")
             .setIpProtocol(IpProtocol.TCP)
+            .setSrcPort(0)
+            .setDstPort(0)
             .build();
     Flow flowInspect =
         Flow.builder()
             .setIngressNode(c.getHostname())
             .setTag("")
             .setIpProtocol(IpProtocol.UDP)
+            .setSrcPort(0)
+            .setDstPort(0)
             .build();
     Flow flowDrop =
         Flow.builder()

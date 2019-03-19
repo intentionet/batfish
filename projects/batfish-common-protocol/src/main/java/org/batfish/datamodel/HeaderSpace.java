@@ -895,14 +895,14 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
         && _dstProtocols.stream()
             .noneMatch(
                 dstProtocol ->
-                    dstProtocol.getPort() == flow.getDstPort()
+                    dstProtocol.getPort().equals(flow.getDstPort())
                         && dstProtocol.getIpProtocol() == flow.getIpProtocol())) {
       return false;
     }
     if (_notDstProtocols.stream()
         .anyMatch(
             notDstProtocol ->
-                notDstProtocol.getPort() == flow.getDstPort()
+                notDstProtocol.getPort().equals(flow.getDstPort())
                     && notDstProtocol.getIpProtocol() == flow.getIpProtocol())) {
       return false;
     }
@@ -960,12 +960,11 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
     }
     if (!_srcOrDstProtocols.isEmpty()) {
       IpProtocol flowProtocol = flow.getIpProtocol();
-      int flowDstPort = flow.getDstPort();
-      int flowSrcPort = flow.getSrcPort();
       if (_srcOrDstProtocols.stream()
           .noneMatch(
               protocol ->
-                  (protocol.getPort() == flowDstPort || protocol.getPort() == flowSrcPort)
+                  (protocol.getPort().equals(flow.getDstPort())
+                          || protocol.getPort().equals(flow.getSrcPort()))
                       && protocol.getIpProtocol() == flowProtocol)) {
         return false;
       }
@@ -987,14 +986,14 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
         && _srcProtocols.stream()
             .noneMatch(
                 srcProtocol ->
-                    srcProtocol.getPort() == flow.getSrcPort()
+                    srcProtocol.getPort().equals(flow.getSrcPort())
                         && srcProtocol.getIpProtocol() == flow.getIpProtocol())) {
       return false;
     }
     if (_notSrcProtocols.stream()
         .anyMatch(
             notSrcProtocol ->
-                notSrcProtocol.getPort() == flow.getSrcPort()
+                notSrcProtocol.getPort().equals(flow.getSrcPort())
                     && notSrcProtocol.getIpProtocol() == flow.getIpProtocol())) {
       return false;
     }

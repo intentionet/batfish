@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.Flow;
-import org.batfish.datamodel.Flow.Builder;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
@@ -20,6 +19,7 @@ import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.NamedPort;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.TcpFlagsMatchConditions;
 import org.codehaus.jettison.json.JSONArray;
@@ -51,10 +51,8 @@ public class SecurityGroupsTest {
                 .setTcpFlags(ImmutableSet.of(TcpFlagsMatchConditions.ACK_TCP_FLAG))
                 .build());
     _region = new Region("test");
-    _flowBuilder = new Builder();
-    _flowBuilder.setIngressNode("foo");
-    _flowBuilder.setTag("TEST");
-    _flowBuilder.setIpProtocol(IpProtocol.TCP);
+    _flowBuilder =
+        Flow.builder().setIngressNode("foo").setTag("TEST").setIpProtocol(IpProtocol.TCP);
   }
 
   @Test
@@ -291,10 +289,12 @@ public class SecurityGroupsTest {
         IpAccessList.builder().setName(TEST_ACL).setLines(outboundRules).build();
 
     // flow containing SYN and ~ACK should be rejected
-    _flowBuilder.setDstIp(Ip.parse("1.2.3.4"));
-    _flowBuilder.setSrcPort(22);
-    _flowBuilder.setTcpFlagsAck(0);
-    _flowBuilder.setTcpFlagsSyn(1);
+    _flowBuilder
+        .setDstIp(Ip.parse("1.2.3.4"))
+        .setSrcPort(22)
+        .setDstPort(NamedPort.EPHEMERAL_LOWEST.number())
+        .setTcpFlagsAck(0)
+        .setTcpFlagsSyn(1);
 
     assertThat(
         outFilter
@@ -316,10 +316,12 @@ public class SecurityGroupsTest {
         IpAccessList.builder().setName(TEST_ACL).setLines(outboundRules).build();
 
     // flow containing SYN and ACK should be accepted
-    _flowBuilder.setDstIp(Ip.parse("1.2.3.4"));
-    _flowBuilder.setSrcPort(22);
-    _flowBuilder.setTcpFlagsAck(1);
-    _flowBuilder.setTcpFlagsSyn(1);
+    _flowBuilder
+        .setDstIp(Ip.parse("1.2.3.4"))
+        .setSrcPort(22)
+        .setDstPort(NamedPort.EPHEMERAL_LOWEST.number())
+        .setTcpFlagsAck(1)
+        .setTcpFlagsSyn(1);
 
     assertThat(
         outFilter
@@ -341,10 +343,12 @@ public class SecurityGroupsTest {
         IpAccessList.builder().setName(TEST_ACL).setLines(outboundRules).build();
 
     // flow containing wrong destination IP should be rejected
-    _flowBuilder.setDstIp(Ip.parse("1.2.3.5"));
-    _flowBuilder.setSrcPort(22);
-    _flowBuilder.setTcpFlagsAck(1);
-    _flowBuilder.setTcpFlagsSyn(1);
+    _flowBuilder
+        .setDstIp(Ip.parse("1.2.3.5"))
+        .setSrcPort(22)
+        .setDstPort(NamedPort.EPHEMERAL_LOWEST.number())
+        .setTcpFlagsAck(1)
+        .setTcpFlagsSyn(1);
 
     assertThat(
         outFilter
