@@ -266,14 +266,26 @@ public abstract class BDD {
   }
 
   /**
-   * Returns the logical 'difference' of two BDDs. This is a shortcut for calling "apply" with the
-   * "diff" operator.
+   * Returns the logical 'difference' of two BDDs, equivalent to {@code this.and(that.not())}. This
+   * is a shortcut for calling "apply" with the "diff" operator.
    *
    * @param that the BDD to 'subtract' from this BDD
    * @return the logical 'difference' of two BDDs
    */
   public BDD diff(BDD that) {
     return this.apply(that, BDDFactory.diff);
+  }
+
+  /**
+   * Makes this BDD be the logical 'difference' of two BDDs, equivalent to {@code
+   * this.and(that.not())}. The "that" BDD is consumed, and can no longer be used. This is a
+   * shortcut for calling "applyWith" with the "less" operator.
+   *
+   * @param that the BDD to 'subtract' from this BDD
+   * @return the logical 'difference' of two BDDs
+   */
+  public BDD diffWith(BDD that) {
+    return this.applyWith(that, BDDFactory.diff);
   }
 
   /**
@@ -286,6 +298,29 @@ public abstract class BDD {
    * @return the result of the if-then-else operator on the three BDDs
    */
   public abstract BDD ite(BDD thenBDD, BDD elseBDD);
+
+  /**
+   * Returns the logical 'less-than' of two BDDs, equivalent to {@code this.not().and(that)}. This
+   * is a shortcut for calling "apply" with the "less" operator.
+   *
+   * @param that the BDD from which this BDD will be subtracted
+   * @return the logical 'less-than' of two BDDs
+   */
+  public BDD less(BDD that) {
+    return this.apply(that, BDDFactory.less);
+  }
+
+  /**
+   * Makes this BDD be the logical 'less-than' of two BDDs, equivalent to {@code
+   * this.not().and(that)}. The "that" BDD is consumed, and can no longer be used. This is a
+   * shortcut for calling "applyWith" with the "less" operator.
+   *
+   * @param that the BDD from which this BDD will be subtracted
+   * @return the logical 'less-than' of two BDDs
+   */
+  public BDD lessWith(BDD that) {
+    return this.applyWith(that, BDDFactory.less);
+  }
 
   /**
    * Relational product. Calculates the relational product of the two BDDs as this AND that with the
