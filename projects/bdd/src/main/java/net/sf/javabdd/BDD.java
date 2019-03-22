@@ -266,6 +266,17 @@ public abstract class BDD {
   }
 
   /**
+   * Returns the logical 'difference' of two BDDs. This is a shortcut for calling "apply" with the
+   * "diff" operator.
+   *
+   * @param that the BDD to 'subtract' from this BDD
+   * @return the logical 'difference' of two BDDs
+   */
+  public BDD diff(BDD that) {
+    return this.apply(that, BDDFactory.diff);
+  }
+
+  /**
    * if-then-else operator.
    *
    * <p>Compare to bdd_ite.
