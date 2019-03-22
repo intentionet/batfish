@@ -142,7 +142,7 @@ public class IpSpaceToBDD implements GenericIpSpaceVisitor<BDD> {
       if (aclIpSpaceLine.getAction() == LineAction.PERMIT) {
         bdd = line.or(bdd);
       } else {
-        bdd = line.not().and(bdd);
+        bdd = bdd.diff(line);
       }
     }
     return bdd;
