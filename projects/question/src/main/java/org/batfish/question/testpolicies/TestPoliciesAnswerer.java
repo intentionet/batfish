@@ -20,7 +20,6 @@ import org.batfish.datamodel.routing_policy.Environment.Direction;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.table.ColumnMetadata;
 import org.batfish.datamodel.table.Row;
-import org.batfish.datamodel.table.Row.RowBuilder;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
 
@@ -31,6 +30,7 @@ public final class TestPoliciesAnswerer extends Answerer {
   public static final String COL_INPUT_ROUTE = "Input_Route";
   public static final String COL_ACTION = "Action";
   public static final String COL_OUTPUT_ROUTE = "Output_Route";
+  public static final String COL_DIFF = "Difference";
 
   private final Direction _direction;
   private final BgpRoute _inputRoute;
@@ -80,20 +80,27 @@ public final class TestPoliciesAnswerer extends Answerer {
                 false,
                 true),
             new ColumnMetadata(
-                COL_OUTPUT_ROUTE, Schema.OBJECT, "The output route, if any", false, true));
+                COL_OUTPUT_ROUTE, Schema.OBJECT, "The output route, if any", false, true),
+            new ColumnMetadata(
+                COL_DIFF,
+                Schema.list(Schema.OBJECT),
+                "The difference between the input and output routes, if any",
+                false,
+                true));
     return new TableMetadata(
         columnMetadata, String.format("Results for route ${%s}", COL_INPUT_ROUTE));
   }
 
   private static Row row(
       String node, String policy, BgpRoute inputRoute, LineAction action, BgpRoute outputRoute) {
-    RowBuilder builder =
-        Row.builder()
-            .put(COL_NODE, new Node(node))
-            .put(COL_POLICY_NAME, policy)
-            .put(COL_INPUT_ROUTE, inputRoute)
-            .put(COL_ACTION, action)
-            .put(COL_OUTPUT_ROUTE, action == PERMIT ? outputRoute : null);
-    return builder.build();
+    boolean permit = action == PERMIT;
+    return Row.builder()
+        .put(COL_NODE, new Node(node))
+        .put(COL_POLICY_NAME, policy)
+        .put(COL_INPUT_ROUTE, inputRoute)
+        .put(COL_ACTION, action)
+        .put(COL_OUTPUT_ROUTE, permit ? outputRoute : null)
+        .put(COL_DIFF, permit ? BgpRouteDiff.routeDiffs(inputRoute, outputRoute) : null)
+        .build();
   }
 }

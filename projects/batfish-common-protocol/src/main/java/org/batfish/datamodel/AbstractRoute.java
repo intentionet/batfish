@@ -31,7 +31,7 @@ public abstract class AbstractRoute implements AbstractRouteDecorator, Serializa
   public static final int NO_TAG = -1;
 
   static final String PROP_ADMINISTRATIVE_COST = "administrativeCost";
-  static final String PROP_METRIC = "metric";
+  public static final String PROP_METRIC = "metric";
   static final String PROP_NETWORK = "network";
   static final String PROP_NEXT_HOP_INTERFACE = "nextHopInterface";
   static final String PROP_NEXT_HOP_IP = "nextHopIp";

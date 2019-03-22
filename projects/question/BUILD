@@ -70,6 +70,7 @@ junit_tests(
         "@auto_service//:compile",
         "@commons_lang3//:compile",
         "@guava//:compile",
+        "@guava_testlib//:compile",
         "@hamcrest//:compile",
         "@jackson_databind//:compile",
         "@junit//:compile",

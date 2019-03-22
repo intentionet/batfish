@@ -218,15 +218,15 @@ public final class BgpRoute extends AbstractRoute {
   /** Default local preference for a BGP route if one is not set explicitly */
   public static final long DEFAULT_LOCAL_PREFERENCE = 100L;
 
-  private static final String PROP_AS_PATH = "asPath";
+  public static final String PROP_AS_PATH = "asPath";
 
   private static final String PROP_CLUSTER_LIST = "clusterList";
 
-  private static final String PROP_COMMUNITIES = "communities";
+  public static final String PROP_COMMUNITIES = "communities";
 
   private static final String PROP_DISCARD = "discard";
 
-  private static final String PROP_LOCAL_PREFERENCE = "localPreference";
+  public static final String PROP_LOCAL_PREFERENCE = "localPreference";
 
   private static final String PROP_ORIGIN_TYPE = "originType";
 

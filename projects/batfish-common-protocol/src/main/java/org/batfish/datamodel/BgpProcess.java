@@ -10,9 +10,7 @@ import com.google.common.collect.ImmutableSet;
 import java.io.Serializable;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.NetworkFactory.NetworkFactoryBuilder;
@@ -64,36 +62,19 @@ public class BgpProcess implements Serializable {
   }
 
   private static final String PROP_PASSIVE_NEIGHBORS = "dynamicNeighbors";
-
-  private static final String PROP_GENERATED_ROUTES = "generatedRoutes";
-
   private static final String PROP_MULTIPATH_EBGP = "multipathEbgp";
-
   private static final String PROP_MULTIPATH_EQUIVALENT_AS_PATH_MATCH_MODE =
       "multipathEquivalentAsPathMatchMode";
-
   private static final String PROP_MULTIPATH_IBGP = "multipathIbgp";
-
   private static final String PROP_ACTIVE_NEIGHBORS = "neighbors";
-
   private static final String PROP_ROUTER_ID = "routerId";
-
   private static final String PROP_TIE_BREAKER = "tieBreaker";
 
   private static final long serialVersionUID = 1L;
 
   private Supplier<Set<Long>> _clusterIds;
-
-  /**
-   * The set of <i>neighbor-independent</i> generated routes that may be advertised by this process
-   * if permitted by their respective generation policies
-   */
-  private SortedSet<GeneratedRoute> _generatedRoutes;
-
   private boolean _multipathEbgp;
-
   private MultipathEquivalentAsPathMatchMode _multipathEquivalentAsPathMatchMode;
-
   private boolean _multipathIbgp;
 
   /**
@@ -118,7 +99,6 @@ public class BgpProcess implements Serializable {
   /** Constructs a BgpProcess */
   public BgpProcess() {
     _activeNeighbors = new TreeMap<>();
-    _generatedRoutes = new TreeSet<>();
     _tieBreaker = BgpTieBreaker.ARRIVAL_ORDER;
     _clusterIds = new ClusterIdsSupplier();
     _originationSpace = new PrefixSpace();
@@ -150,14 +130,6 @@ public class BgpProcess implements Serializable {
   @Nonnull
   public SortedMap<Prefix, BgpActivePeerConfig> getActiveNeighbors() {
     return _activeNeighbors;
-  }
-
-  /** @return {@link #_generatedRoutes} */
-  @JsonProperty(PROP_GENERATED_ROUTES)
-  @JsonPropertyDescription(
-      "IPV4 routes generated in the BGP RIB that are not imported into the main RIB for this VRF")
-  public SortedSet<GeneratedRoute> getGeneratedRoutes() {
-    return _generatedRoutes;
   }
 
   @JsonProperty(PROP_MULTIPATH_EBGP)
@@ -199,11 +171,6 @@ public class BgpProcess implements Serializable {
   @JsonProperty(PROP_TIE_BREAKER)
   public BgpTieBreaker getTieBreaker() {
     return _tieBreaker;
-  }
-
-  @JsonProperty(PROP_GENERATED_ROUTES)
-  public void setGeneratedRoutes(SortedSet<GeneratedRoute> generatedRoutes) {
-    _generatedRoutes = generatedRoutes;
   }
 
   @JsonProperty(PROP_MULTIPATH_EBGP)
