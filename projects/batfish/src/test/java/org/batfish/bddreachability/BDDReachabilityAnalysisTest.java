@@ -2,8 +2,7 @@ package org.batfish.bddreachability;
 
 import static org.batfish.bddreachability.BDDReachabilityAnalysis.fixpoint;
 import static org.batfish.bddreachability.BDDReachabilityAnalysis.toIngressLocation;
-import static org.batfish.bddreachability.BDDReachabilityUtils.computeForwardEdgeMap;
-import static org.batfish.bddreachability.BDDReachabilityUtils.computeReverseEdgeMap;
+import static org.batfish.bddreachability.BDDReachabilityUtils.computeForwardEdgeTable;
 import static org.batfish.bddreachability.TestNetwork.DST_PREFIX_1;
 import static org.batfish.bddreachability.TestNetwork.DST_PREFIX_2;
 import static org.batfish.bddreachability.TestNetwork.LINK_1_NETWORK;
@@ -23,6 +22,8 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -473,8 +474,9 @@ public final class BDDReachabilityAnalysisTest {
     Edge edgeAB = new Edge(a, b, bddAB);
     Edge edgeBC = new Edge(b, c, bddBC);
 
-    Map<StateExpr, Map<StateExpr, Edge>> forwardEdges =
-        computeForwardEdgeMap(ImmutableList.of(edgeAB, edgeBC));
+    Table<StateExpr, StateExpr, Edge> forwardEdges =
+        computeForwardEdgeTable(ImmutableList.of(edgeAB, edgeBC));
+    Table<StateExpr, StateExpr, Edge> reverseEdges = Tables.transpose(forwardEdges);
 
     // forward from a
     {
@@ -497,9 +499,6 @@ public final class BDDReachabilityAnalysisTest {
       fixpoint(forwardReachability, forwardEdges, Edge::traverseForward);
       assertThat(forwardReachability, equalTo(ImmutableMap.of(c, start)));
     }
-
-    Map<StateExpr, Map<StateExpr, Edge>> reverseEdges =
-        computeReverseEdgeMap(ImmutableList.of(edgeAB, edgeBC));
 
     // reverse from a
     {

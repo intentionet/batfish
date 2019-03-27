@@ -17,4 +17,14 @@ public final class Zero implements Transition {
   public BDD transitBackward(BDD bdd) {
     return bdd.getFactory().zero();
   }
+
+  @Override
+  public int hashCode() {
+    return 0;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return o instanceof Zero;
+  }
 }

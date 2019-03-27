@@ -1,13 +1,14 @@
 package org.batfish.bddreachability;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.batfish.bddreachability.BDDReachabilityUtils.computeForwardEdgeMap;
-import static org.batfish.bddreachability.BDDReachabilityUtils.computeReverseEdgeMap;
+import static org.batfish.bddreachability.BDDReachabilityUtils.computeForwardEdgeTable;
 import static org.batfish.common.util.CommonUtil.toImmutableMap;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Table;
+import com.google.common.collect.Tables;
 import io.opentracing.ActiveSpan;
 import io.opentracing.util.GlobalTracer;
 import java.util.HashMap;
@@ -56,10 +57,7 @@ public class BDDReachabilityAnalysis {
   private final BDDPacket _bddPacket;
 
   // preState --> postState --> predicate
-  private final Map<StateExpr, Map<StateExpr, Edge>> _forwardEdgeMap;
-
-  // postState --> preState --> predicate
-  private final Map<StateExpr, Map<StateExpr, Edge>> _reverseEdges;
+  private final Table<StateExpr, StateExpr, Edge> _forwardEdgeTable;
 
   // stateExprs that correspond to the IngressLocations of interest
   private final ImmutableSet<StateExpr> _ingressLocationStates;
@@ -75,8 +73,7 @@ public class BDDReachabilityAnalysis {
         GlobalTracer.get().buildSpan("constructs BDDReachabilityAnalysis").startActive()) {
       assert span != null; // avoid unused warning
       _bddPacket = packet;
-      _forwardEdgeMap = computeForwardEdgeMap(edges);
-      _reverseEdges = computeReverseEdgeMap(edges);
+      _forwardEdgeTable = computeForwardEdgeTable(edges);
       _ingressLocationStates = ImmutableSet.copyOf(ingressLocationStates);
       _queryHeaderSpaceBdd = queryHeaderSpaceBdd;
     }
@@ -116,18 +113,18 @@ public class BDDReachabilityAnalysis {
   }
 
   private void backwardFixpoint(Map<StateExpr, BDD> reverseReachable) {
-    fixpoint(reverseReachable, _reverseEdges, Edge::traverseBackward);
+    fixpoint(reverseReachable, Tables.transpose(_forwardEdgeTable), Edge::traverseBackward);
   }
 
   private void forwardFixpoint(Map<StateExpr, BDD> reachable) {
-    fixpoint(reachable, _forwardEdgeMap, Edge::traverseForward);
+    fixpoint(reachable, _forwardEdgeTable, Edge::traverseForward);
   }
 
   /** Apply edges to the reachableSets until a fixed point is reached. */
   @VisibleForTesting
   static void fixpoint(
       Map<StateExpr, BDD> reachableSets,
-      Map<StateExpr, Map<StateExpr, Edge>> edges,
+      Table<StateExpr, StateExpr, Edge> edges,
       BiFunction<Edge, BDD, BDD> traverse) {
     try (ActiveSpan span =
         GlobalTracer.get().buildSpan("BDDReachabilityAnalysis.fixpoint").startActive()) {
@@ -139,7 +136,7 @@ public class BDDReachabilityAnalysis {
 
         dirtyStates.forEach(
             dirtyState -> {
-              Map<StateExpr, Edge> dirtyStateEdges = edges.get(dirtyState);
+              Map<StateExpr, Edge> dirtyStateEdges = edges.row(dirtyState);
               if (dirtyStateEdges == null) {
                 // dirtyState has no edges
                 return;
@@ -233,8 +230,8 @@ public class BDDReachabilityAnalysis {
       Map<StateExpr, BDD> newReachableInNRounds = new HashMap<>();
       bdds.forEach(
           (source, sourceBdd) ->
-              _forwardEdgeMap
-                  .getOrDefault(source, ImmutableMap.of())
+              _forwardEdgeTable
+                  .row(source)
                   .forEach(
                       (target, edge) -> {
                         BDD targetBdd = newReachableInNRounds.getOrDefault(target, zero);
@@ -264,7 +261,7 @@ public class BDDReachabilityAnalysis {
 
         dirty.forEach(
             preState -> {
-              Map<StateExpr, Edge> preStateOutEdges = _forwardEdgeMap.get(preState);
+              Map<StateExpr, Edge> preStateOutEdges = _forwardEdgeTable.row(preState);
               if (preStateOutEdges == null) {
                 // preState has no out-edges
                 return;
@@ -334,6 +331,6 @@ public class BDDReachabilityAnalysis {
 
   @VisibleForTesting
   Map<StateExpr, Map<StateExpr, Edge>> getForwardEdgeMap() {
-    return _forwardEdgeMap;
+    return _forwardEdgeTable.rowMap();
   }
 }
