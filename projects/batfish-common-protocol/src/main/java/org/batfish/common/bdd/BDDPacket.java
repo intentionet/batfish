@@ -41,7 +41,7 @@ public class BDDPacket {
    * The ratio of node table size to node cache size to preserve when resizing. The default
    * value is 0, which means never resize the cache.
    */
-  private static final int JFACTORY_CACHE_RATIO = 64;
+  private static final int JFACTORY_CACHE_RATIO = 32;
 
   /*
    * Initial size of the BDD factory node cache. Automatically resized when the node table is,
