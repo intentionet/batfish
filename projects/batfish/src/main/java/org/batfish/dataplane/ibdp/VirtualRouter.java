@@ -2523,34 +2523,6 @@ public class VirtualRouter implements Serializable {
   }
 
   /**
-   * Check if RIBs that contribute to the dataplane "dependent routes" computation have any routes
-   * that still need to be merged. I.e., if this method returns true, we cannot converge yet.
-   *
-   * @return true if there are any routes remaining, in need of merging in to the RIBs
-   */
-  boolean hasOutstandingRoutes() {
-    return !_ospfExternalDeltaBuilder.build().isEmpty()
-        || !_mainRibRouteDeltaBuilder.build().isEmpty()
-        || !_bgpDeltaBuilder.build().isEmpty();
-  }
-
-  /**
-   * Check if this router has processed all its incoming BGP messages (i.e., all router queues are
-   * empty)
-   *
-   * @return true if all queues are empty.
-   */
-  boolean hasProcessedAllMessages() {
-    return (_vrf.getBgpProcess() == null
-            || _bgpIncomingRoutes.values().stream().allMatch(Queue::isEmpty))
-        && (_vrf.getOspfProcess() == null
-            || _ospfExternalIncomingRoutes.values().stream().allMatch(Queue::isEmpty))
-        && (_vrf.getIsisProcess() == null
-            || _isisIncomingRoutes.values().stream().allMatch(Queue::isEmpty))
-        && _crossVrfIncomingRoutes.values().stream().allMatch(Queue::isEmpty);
-  }
-
-  /**
    * Queues initial round of outgoing BGP messages based on the state of the RIBs prior to any data
    * plane iterations.
    */
@@ -2912,5 +2884,21 @@ public class VirtualRouter implements Serializable {
 
   public Map<String, OspfRoutingProcess> getOspfProcesses() {
     return _ospfProcesses;
+  }
+
+  /** Check whether this virtual router has any remaining computation to do */
+  boolean isDirty() {
+    return
+    // Route Deltas
+    !_ospfExternalDeltaBuilder.build().isEmpty()
+        || !_mainRibRouteDeltaBuilder.build().isEmpty()
+        || !_bgpDeltaBuilder.build().isEmpty()
+        // Message queues
+        || !_bgpIncomingRoutes.values().stream().allMatch(Queue::isEmpty)
+        || !_ospfExternalIncomingRoutes.values().stream().allMatch(Queue::isEmpty)
+        || !_isisIncomingRoutes.values().stream().allMatch(Queue::isEmpty)
+        || !_crossVrfIncomingRoutes.values().stream().allMatch(Queue::isEmpty)
+        // Processes
+        || _ospfProcesses.values().stream().anyMatch(OspfRoutingProcess::isDirty);
   }
 }

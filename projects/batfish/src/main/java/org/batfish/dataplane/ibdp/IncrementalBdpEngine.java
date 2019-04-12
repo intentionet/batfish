@@ -172,14 +172,12 @@ class IncrementalBdpEngine {
       int topologyIterations = 0;
       IntermediateComputationResult newResult = null;
       boolean converged = false;
-      while (!converged && topologyIterations < MAX_TOPOLOGY_ITERATIONS) {
+      while (!converged && topologyIterations++ < MAX_TOPOLOGY_ITERATIONS) {
         try (ActiveSpan iterSpan =
             GlobalTracer.get()
                 .buildSpan("Topology iteration " + topologyIterations)
                 .startActive()) {
           assert iterSpan != null; // avoid unused warning
-
-          topologyIterations++;
 
           // Force re-init of partial dataplane. Re-inits forwarding analysis, etc.
           computeFibs(nodes);
@@ -738,7 +736,6 @@ class IncrementalBdpEngine {
       Schedule currentSchedule = _settings.getScheduleName();
 
       // Go into iteration mode, until the routes converge (or oscillation is detected)
-      boolean hadChanges;
       do {
         _numIterations++;
         try (ActiveSpan iterSpan =
@@ -784,7 +781,7 @@ class IncrementalBdpEngine {
 
           if (iterationsWithThisHashCode.isEmpty()) {
             iterationsWithThisHashCode.add(_numIterations);
-          } else {
+          } else if (hasNotReachedRoutingFixedPoint(nodes)) {
             // If oscillation detected, switch to a more restrictive schedule
             if (currentSchedule != Schedule.NODE_SERIALIZED) {
               _bfLogger.debugf(
@@ -795,68 +792,27 @@ class IncrementalBdpEngine {
               return true; // Found an oscillation
             }
           }
-
-          hadChanges = compareToPreviousIteration(nodes);
         }
-      } while (hadChanges || !areQueuesEmpty(nodes));
+      } while (hasNotReachedRoutingFixedPoint(nodes));
 
       ae.setDependentRoutesIterations(_numIterations);
       return false; // No oscillations
     }
   }
 
-  private boolean compareToPreviousIteration(Map<String, Node> nodes) {
+  /** Check if we have reached a routing fixed point */
+  private boolean hasNotReachedRoutingFixedPoint(Map<String, Node> nodes) {
     try (ActiveSpan span =
         GlobalTracer.get()
             .buildSpan("Iteration " + _numIterations + ": Check if fixed-point reached")
             .startActive()) {
       assert span != null; // avoid unused warning
-      // Check to see if hash has changed
-      AtomicInteger checkFixedPointCompleted =
-          _newBatch.apply(
-              "Iteration " + _numIterations + ": Check if fixed-point reached", nodes.size());
-      AtomicBoolean dependentRoutesChanged = new AtomicBoolean(false);
-      nodes
+      return nodes
           .values()
           .parallelStream()
-          .forEach(
-              n -> {
-                for (VirtualRouter vr : n.getVirtualRouters().values()) {
-                  if (vr.hasOutstandingRoutes()) {
-                    dependentRoutesChanged.set(true);
-                  }
-                }
-                checkFixedPointCompleted.incrementAndGet();
-              });
-      return dependentRoutesChanged.get();
+          .flatMap(n -> n.getVirtualRouters().values().stream())
+          .anyMatch(VirtualRouter::isDirty);
     }
-  }
-
-  /**
-   * Check that the routers have processed all messages, queues are empty and there is nothing else
-   * to do (i.e., we've converged to a stable network solution)
-   *
-   * @param nodes nodes to check
-   * @return true iff all queues are empty
-   */
-  private boolean areQueuesEmpty(Map<String, Node> nodes) {
-    AtomicInteger computeQueuesAreEmpty =
-        _newBatch.apply("Check for convergence (are queues empty?)", nodes.size());
-    AtomicBoolean areEmpty = new AtomicBoolean(true);
-    nodes
-        .values()
-        .parallelStream()
-        .forEach(
-            n -> {
-              for (VirtualRouter vr : n.getVirtualRouters().values()) {
-                if (!vr.hasProcessedAllMessages()) {
-                  areEmpty.set(false);
-                }
-              }
-              computeQueuesAreEmpty.incrementAndGet();
-            });
-
-    return areEmpty.get();
   }
 
   /**
