@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.expr.CommunitySetExpr;
 import org.batfish.datamodel.visitors.CommunitySetExprVisitor;
@@ -37,17 +38,17 @@ import org.batfish.datamodel.visitors.VoidCommunitySetExprVisitor;
 public class CommunityList extends CommunitySetExpr {
 
   private final class CommunityCacheSupplier
-      implements Supplier<LoadingCache<Long, Boolean>>, Serializable {
+      implements Supplier<LoadingCache<Community, Boolean>>, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public LoadingCache<Long, Boolean> get() {
+    public LoadingCache<Community, Boolean> get() {
       return CacheBuilder.newBuilder()
           .softValues()
           .build(
-              new CacheLoader<Long, Boolean>() {
+              new CacheLoader<Community, Boolean>() {
                 @Override
-                public Boolean load(@Nonnull Long community) {
+                public Boolean load(@Nonnull Community community) {
                   return computeIfMatches(community, null);
                 }
               });
@@ -71,7 +72,7 @@ public class CommunityList extends CommunitySetExpr {
         firstNonNull(name, ""), firstNonNull(lines, ImmutableList.of()), invertMatch);
   }
 
-  private final Supplier<LoadingCache<Long, Boolean>> _communityCache;
+  private final Supplier<LoadingCache<Community, Boolean>> _communityCache;
 
   private volatile Boolean _dynamic;
 
@@ -79,7 +80,7 @@ public class CommunityList extends CommunitySetExpr {
 
   @Nonnull private final List<CommunityListLine> _lines;
 
-  private volatile SortedSet<Long> _literalCommunities;
+  private volatile SortedSet<Community> _literalCommunities;
 
   @Nonnull private final String _name;
 
@@ -112,7 +113,7 @@ public class CommunityList extends CommunitySetExpr {
 
   @Override
   @Nonnull
-  public SortedSet<Long> asLiteralCommunities(Environment environment)
+  public SortedSet<Community> asLiteralCommunities(@Nonnull Environment environment)
       throws UnsupportedOperationException {
     if (_literalCommunities != null) {
       return _literalCommunities;
@@ -127,7 +128,7 @@ public class CommunityList extends CommunitySetExpr {
   }
 
   /** Check if any line matches given community */
-  private boolean computeIfMatches(long community, @Nullable Environment environment) {
+  private boolean computeIfMatches(Community community, @Nullable Environment environment) {
     Optional<CommunityListLine> matchingLine =
         _lines.stream()
             .filter(line -> line.getMatchCondition().matchCommunity(environment, community))
@@ -193,7 +194,7 @@ public class CommunityList extends CommunitySetExpr {
   }
 
   @Override
-  public boolean matchCommunities(Environment environment, Set<Long> communitySetCandidate) {
+  public boolean matchCommunities(Environment environment, Set<Community> communitySetCandidate) {
     if (reducible()) {
       return communitySetCandidate.stream()
           .anyMatch(community -> matchCommunity(environment, community));
@@ -218,7 +219,7 @@ public class CommunityList extends CommunitySetExpr {
    *     dynamic {@link CommunityList}.
    */
   @Override
-  public boolean matchCommunity(@Nullable Environment environment, long community) {
+  public boolean matchCommunity(@Nullable Environment environment, Community community) {
     if (dynamicMatchCommunity()) {
       if (environment == null) {
         throw new UnsupportedOperationException(

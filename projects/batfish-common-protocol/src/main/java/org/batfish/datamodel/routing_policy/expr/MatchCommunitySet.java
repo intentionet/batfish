@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import java.util.SortedSet;
 import org.batfish.datamodel.BgpRoute;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.Result;
 
@@ -34,7 +35,7 @@ public final class MatchCommunitySet extends BooleanExpr {
 
   @Override
   public Result evaluate(Environment environment) {
-    SortedSet<Long> inputCommunities = null;
+    SortedSet<Community> inputCommunities = null;
     if (environment.getUseOutputAttributes()
         && environment.getOutputRoute() instanceof BgpRoute.Builder) {
       BgpRoute.Builder bgpRouteBuilder = (BgpRoute.Builder) environment.getOutputRoute();

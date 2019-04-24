@@ -12684,7 +12684,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 80936723
+                  "community" : [
+                    "standard",
+                    "1234:65299"
+                  ]
                 }
               }
             ],
@@ -12719,7 +12722,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 141099002
+                  "community" : [
+                    "standard",
+                    "2152:65530"
+                  ]
                 }
               }
             ],
@@ -12747,7 +12753,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 141034138
+                  "community" : [
+                    "standard",
+                    "2152:666"
+                  ]
                 }
               }
             ],
@@ -12775,7 +12784,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 141099674
+                  "community" : [
+                    "standard",
+                    "2153:666"
+                  ]
                 }
               }
             ],
@@ -12803,7 +12815,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 3408538
+                  "community" : [
+                    "standard",
+                    "52:666"
+                  ]
                 }
               }
             ],
@@ -12817,7 +12832,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 3473370
+                  "community" : [
+                    "standard",
+                    "52:65498"
+                  ]
                 }
               }
             ],
@@ -12831,7 +12849,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 141098890
+                  "community" : [
+                    "standard",
+                    "2152:65418"
+                  ]
                 }
               }
             ],
@@ -12845,7 +12866,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 3410025
+                  "community" : [
+                    "standard",
+                    "52:2153"
+                  ]
                 }
               }
             ],
@@ -12859,7 +12883,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 141164426
+                  "community" : [
+                    "standard",
+                    "2153:65418"
+                  ]
                 }
               }
             ],
@@ -12895,7 +12922,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 655303352
+                  "community" : [
+                    "standard",
+                    "9999:8888"
+                  ]
                 }
               }
             ],
@@ -12931,7 +12961,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        4294967042
+                        [
+                          "standard",
+                          "65535:65282"
+                        ]
                       ]
                     }
                   },
@@ -12970,7 +13003,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 655303352
+                  "community" : [
+                    "standard",
+                    "9999:8888"
+                  ]
                 }
               }
             ],
@@ -13006,7 +13042,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        4294967042
+                        [
+                          "standard",
+                          "65535:65282"
+                        ]
                       ]
                     }
                   },
@@ -13045,7 +13084,10 @@
                 "action" : "PERMIT",
                 "matchCondition" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                  "community" : 4915242
+                  "community" : [
+                    "standard",
+                    "75:42"
+                  ]
                 }
               }
             ],
@@ -15424,8 +15466,14 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        65538,
-                        2162732
+                        [
+                          "standard",
+                          "1:2"
+                        ],
+                        [
+                          "standard",
+                          "33:44"
+                        ]
                       ]
                     }
                   },
@@ -15452,7 +15500,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        3604546
+                        [
+                          "standard",
+                          "55:66"
+                        ]
                       ]
                     }
                   },
@@ -15623,8 +15674,14 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        65538,
-                        196612
+                        [
+                          "standard",
+                          "1:2"
+                        ],
+                        [
+                          "standard",
+                          "3:4"
+                        ]
                       ]
                     }
                   },
@@ -24317,7 +24374,10 @@
                 "administrativeCost" : 130,
                 "asPath" : [ ],
                 "communities" : [
-                  131078
+                  [
+                    "standard",
+                    "2:6"
+                  ]
                 ],
                 "discard" : true,
                 "generationPolicy" : "~GENERATED_ROUTE_POLICY:10.0.1.0/24~",
@@ -28199,7 +28259,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        1310741
+                        [
+                          "standard",
+                          "20:21"
+                        ]
                       ]
                     }
                   },
@@ -28241,7 +28304,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        1441815
+                        [
+                          "standard",
+                          "22:23"
+                        ]
                       ]
                     }
                   },
@@ -28283,7 +28349,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        1572889
+                        [
+                          "standard",
+                          "24:25"
+                        ]
                       ]
                     }
                   },
@@ -28325,7 +28394,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        1703963
+                        [
+                          "standard",
+                          "26:27"
+                        ]
                       ]
                     }
                   },
@@ -28367,7 +28439,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        1835037
+                        [
+                          "standard",
+                          "28:29"
+                        ]
                       ]
                     }
                   },
@@ -28409,7 +28484,10 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        1966111
+                        [
+                          "standard",
+                          "30:31"
+                        ]
                       ]
                     }
                   },
@@ -28533,8 +28611,14 @@
                 "expr" : {
                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                   "communities" : [
-                    65538,
-                    196612
+                    [
+                      "standard",
+                      "1:2"
+                    ],
+                    [
+                      "standard",
+                      "3:4"
+                    ]
                   ]
                 }
               },
@@ -28581,8 +28665,14 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        327686,
-                        458760
+                        [
+                          "standard",
+                          "5:6"
+                        ],
+                        [
+                          "standard",
+                          "7:8"
+                        ]
                       ]
                     }
                   },
@@ -28631,8 +28721,14 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        589834,
-                        720908
+                        [
+                          "standard",
+                          "9:10"
+                        ],
+                        [
+                          "standard",
+                          "11:12"
+                        ]
                       ]
                     }
                   },
@@ -28681,8 +28777,14 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        720908,
-                        851982
+                        [
+                          "standard",
+                          "11:12"
+                        ],
+                        [
+                          "standard",
+                          "13:14"
+                        ]
                       ]
                     }
                   },
@@ -28731,8 +28833,14 @@
                     "expr" : {
                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet",
                       "communities" : [
-                        983056,
-                        1114130
+                        [
+                          "standard",
+                          "15:16"
+                        ],
+                        [
+                          "standard",
+                          "17:18"
+                        ]
                       ]
                     }
                   },
@@ -29941,42 +30049,60 @@
                                                 "action" : "PERMIT",
                                                 "matchCondition" : {
                                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                  "community" : 364058035
+                                                  "community" : [
+                                                    "standard",
+                                                    "5555:5555"
+                                                  ]
                                                 }
                                               },
                                               {
                                                 "action" : "PERMIT",
                                                 "matchCondition" : {
                                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                  "community" : 364117919
+                                                  "community" : [
+                                                    "standard",
+                                                    "5555:65439"
+                                                  ]
                                                 }
                                               },
                                               {
                                                 "action" : "PERMIT",
                                                 "matchCondition" : {
                                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                  "community" : 364117917
+                                                  "community" : [
+                                                    "standard",
+                                                    "5555:65437"
+                                                  ]
                                                 }
                                               },
                                               {
                                                 "action" : "PERMIT",
                                                 "matchCondition" : {
                                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                  "community" : 364183434
+                                                  "community" : [
+                                                    "standard",
+                                                    "5556:65418"
+                                                  ]
                                                 }
                                               },
                                               {
                                                 "action" : "PERMIT",
                                                 "matchCondition" : {
                                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                  "community" : 364183454
+                                                  "community" : [
+                                                    "standard",
+                                                    "5556:65438"
+                                                  ]
                                                 }
                                               },
                                               {
                                                 "action" : "PERMIT",
                                                 "matchCondition" : {
                                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                  "community" : 364183452
+                                                  "community" : [
+                                                    "standard",
+                                                    "5556:65436"
+                                                  ]
                                                 }
                                               },
                                               {
@@ -30071,7 +30197,10 @@
                                                 "action" : "PERMIT",
                                                 "matchCondition" : {
                                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                  "community" : 364058035
+                                                  "community" : [
+                                                    "standard",
+                                                    "5555:5555"
+                                                  ]
                                                 }
                                               }
                                             ]
@@ -30148,7 +30277,10 @@
                                             "action" : "PERMIT",
                                             "matchCondition" : {
                                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                              "community" : 920255987
+                                              "community" : [
+                                                "standard",
+                                                "14041:65011"
+                                              ]
                                             }
                                           }
                                         ]
@@ -30215,21 +30347,30 @@
                                     "action" : "PERMIT",
                                     "matchCondition" : {
                                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                      "community" : 364118010
+                                      "community" : [
+                                        "standard",
+                                        "5555:65530"
+                                      ]
                                     }
                                   },
                                   {
                                     "action" : "PERMIT",
                                     "matchCondition" : {
                                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                      "community" : 364053147
+                                      "community" : [
+                                        "standard",
+                                        "5555:667"
+                                      ]
                                     }
                                   },
                                   {
                                     "action" : "PERMIT",
                                     "matchCondition" : {
                                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                      "community" : 364116480
+                                      "community" : [
+                                        "standard",
+                                        "5555:64000"
+                                      ]
                                     }
                                   }
                                 ]
@@ -30490,7 +30631,10 @@
                                 "action" : "PERMIT",
                                 "matchCondition" : {
                                   "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                  "community" : 141035624
+                                  "community" : [
+                                    "standard",
+                                    "2152:2152"
+                                  ]
                                 }
                               }
                             ]
@@ -30621,7 +30765,10 @@
                             "action" : "PERMIT",
                             "matchCondition" : {
                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                              "community" : 141099007
+                              "community" : [
+                                "standard",
+                                "2152:65535"
+                              ]
                             }
                           },
                           {
@@ -30686,14 +30833,20 @@
                             "action" : "PERMIT",
                             "matchCondition" : {
                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                              "community" : 141034138
+                              "community" : [
+                                "standard",
+                                "2152:666"
+                              ]
                             }
                           },
                           {
                             "action" : "PERMIT",
                             "matchCondition" : {
                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                              "community" : 141098970
+                              "community" : [
+                                "standard",
+                                "2152:65498"
+                              ]
                             }
                           },
                           {
@@ -31272,14 +31425,20 @@
                             "action" : "PERMIT",
                             "matchCondition" : {
                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                              "community" : 80872090
+                              "community" : [
+                                "standard",
+                                "1234:666"
+                              ]
                             }
                           },
                           {
                             "action" : "PERMIT",
                             "matchCondition" : {
                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                              "community" : 80936922
+                              "community" : [
+                                "standard",
+                                "1234:65498"
+                              ]
                             }
                           },
                           {
@@ -32203,7 +32362,10 @@
                                                                                             "action" : "PERMIT",
                                                                                             "matchCondition" : {
                                                                                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                                                              "community" : 809107338
+                                                                                              "community" : [
+                                                                                                "standard",
+                                                                                                "12345:65418"
+                                                                                              ]
                                                                                             }
                                                                                           }
                                                                                         ]
@@ -32219,7 +32381,10 @@
                                                                                             "action" : "PERMIT",
                                                                                             "matchCondition" : {
                                                                                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                                                              "community" : 809107357
+                                                                                              "community" : [
+                                                                                                "standard",
+                                                                                                "12345:65437"
+                                                                                              ]
                                                                                             }
                                                                                           }
                                                                                         ]
@@ -32395,7 +32560,10 @@
                                                                     "action" : "PERMIT",
                                                                     "matchCondition" : {
                                                                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                                      "community" : 141035624
+                                                                      "community" : [
+                                                                        "standard",
+                                                                        "2152:2152"
+                                                                      ]
                                                                     }
                                                                   }
                                                                 ]
@@ -32411,7 +32579,10 @@
                                                                     "action" : "PERMIT",
                                                                     "matchCondition" : {
                                                                       "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                                      "community" : 141098770
+                                                                      "community" : [
+                                                                        "standard",
+                                                                        "2152:65298"
+                                                                      ]
                                                                     }
                                                                   }
                                                                 ]
@@ -32501,14 +32672,20 @@
                                                             "action" : "PERMIT",
                                                             "matchCondition" : {
                                                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                              "community" : 141098770
+                                                              "community" : [
+                                                                "standard",
+                                                                "2152:65298"
+                                                              ]
                                                             }
                                                           },
                                                           {
                                                             "action" : "PERMIT",
                                                             "matchCondition" : {
                                                               "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                                              "community" : 141098970
+                                                              "community" : [
+                                                                "standard",
+                                                                "2152:65498"
+                                                              ]
                                                             }
                                                           }
                                                         ]
@@ -32637,7 +32814,10 @@
                                         "action" : "PERMIT",
                                         "matchCondition" : {
                                           "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                                          "community" : 2623275007
+                                          "community" : [
+                                            "standard",
+                                            "40027:65535"
+                                          ]
                                         }
                                       },
                                       {
@@ -32785,7 +32965,10 @@
                         "action" : "PERMIT",
                         "matchCondition" : {
                           "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                          "community" : 65538
+                          "community" : [
+                            "standard",
+                            "1:2"
+                          ]
                         }
                       }
                     ]
@@ -33528,7 +33711,10 @@
                         "action" : "PERMIT",
                         "matchCondition" : {
                           "class" : "org.batfish.datamodel.routing_policy.expr.LiteralCommunity",
-                          "community" : 529254200
+                          "community" : [
+                            "standard",
+                            "8075:51000"
+                          ]
                         }
                       }
                     ]

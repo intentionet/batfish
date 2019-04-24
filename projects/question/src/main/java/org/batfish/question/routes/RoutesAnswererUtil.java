@@ -44,7 +44,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AbstractRouteDecorator;
 import org.batfish.datamodel.BgpRoute;
@@ -52,6 +51,7 @@ import org.batfish.datamodel.GenericRib;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Route;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.pojo.Node;
 import org.batfish.datamodel.table.ColumnMetadata;
 import org.batfish.datamodel.table.Row;
@@ -260,9 +260,7 @@ public class RoutesAnswererUtil {
         .put(COL_LOCAL_PREF, bgpRoute.getLocalPreference())
         .put(
             COL_COMMUNITIES,
-            bgpRoute.getCommunities().stream()
-                .map(CommonUtil::longToCommunity)
-                .collect(toImmutableList()))
+            bgpRoute.getCommunities().stream().map(Community::toString).collect(toImmutableList()))
         .put(COL_ORIGIN_PROTOCOL, bgpRoute.getSrcProtocol())
         .put(COL_TAG, bgpRoute.getTag() == Route.UNSET_ROUTE_TAG ? null : bgpRoute.getTag())
         .build();
@@ -590,7 +588,7 @@ public class RoutesAnswererUtil {
                                                 .setLocalPreference(route.getLocalPreference())
                                                 .setCommunities(
                                                     route.getCommunities().stream()
-                                                        .map(CommonUtil::longToCommunity)
+                                                        .map(Community::toString)
                                                         .collect(toImmutableList()))
                                                 .setTag(
                                                     route.getTag() == Route.UNSET_ROUTE_TAG

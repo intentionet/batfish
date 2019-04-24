@@ -865,7 +865,7 @@ class TransferSSA {
       default:
         for (Map.Entry<CommunityVar, BoolExpr> entry : p.getData().getCommunities().entrySet()) {
           CommunityVar cvar = entry.getKey();
-          if (variableName.equals(cvar.getValue())) {
+          if (variableName.equals(cvar.getRegex())) {
             p.getData().getCommunities().put(cvar, (BoolExpr) expr);
             return;
           }
@@ -956,13 +956,13 @@ class TransferSSA {
 
     for (Map.Entry<CommunityVar, BoolExpr> entry : p.getData().getCommunities().entrySet()) {
       CommunityVar cvar = entry.getKey();
-      if (variableName.equals(cvar.getValue())) {
+      if (variableName.equals(cvar.getRegex())) {
         Expr t = (trueBranch == null ? p.getData().getCommunities().get(cvar) : trueBranch);
         Expr f = (falseBranch == null ? p.getData().getCommunities().get(cvar) : falseBranch);
         BoolExpr newValue = _enc.mkIf(guard, (BoolExpr) t, (BoolExpr) f);
         newValue =
             _enc.mkIf(r.getReturnAssignedValue(), p.getData().getCommunities().get(cvar), newValue);
-        BoolExpr ret = createBoolVariableWith(p, cvar.getValue(), newValue);
+        BoolExpr ret = createBoolVariableWith(p, cvar.getRegex(), newValue);
         p.getData().getCommunities().put(cvar, ret);
         return new Pair<>(ret, null);
       }
@@ -1195,9 +1195,9 @@ class TransferSSA {
                   curResult.getReturnAssignedValue(),
                   curP.getData().getCommunities().get(cvar),
                   _enc.mkTrue());
-          BoolExpr x = createBoolVariableWith(curP, cvar.getValue(), newValue);
+          BoolExpr x = createBoolVariableWith(curP, cvar.getRegex(), newValue);
           curP.getData().getCommunities().put(cvar, x);
-          curResult = curResult.addChangedVariable(cvar.getValue(), x);
+          curResult = curResult.addChangedVariable(cvar.getRegex(), x);
         }
 
       } else if (stmt instanceof SetCommunity) {
@@ -1210,9 +1210,9 @@ class TransferSSA {
                   curResult.getReturnAssignedValue(),
                   curP.getData().getCommunities().get(cvar),
                   _enc.mkTrue());
-          BoolExpr x = createBoolVariableWith(curP, cvar.getValue(), newValue);
+          BoolExpr x = createBoolVariableWith(curP, cvar.getRegex(), newValue);
           curP.getData().getCommunities().put(cvar, x);
-          curResult = curResult.addChangedVariable(cvar.getValue(), x);
+          curResult = curResult.addChangedVariable(cvar.getRegex(), x);
         }
 
       } else if (stmt instanceof DeleteCommunity) {
@@ -1235,9 +1235,9 @@ class TransferSSA {
                   curResult.getReturnAssignedValue(),
                   curP.getData().getCommunities().get(cvar),
                   _enc.mkFalse());
-          BoolExpr x = createBoolVariableWith(curP, cvar.getValue(), newValue);
+          BoolExpr x = createBoolVariableWith(curP, cvar.getRegex(), newValue);
           curP.getData().getCommunities().put(cvar, x);
-          curResult = curResult.addChangedVariable(cvar.getValue(), x);
+          curResult = curResult.addChangedVariable(cvar.getRegex(), x);
         }
 
       } else if (stmt instanceof RetainCommunity) {

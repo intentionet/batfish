@@ -8,6 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.OriginType;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.matchers.BgpRouteMatchersImpl.HasCommunities;
 import org.batfish.datamodel.matchers.BgpRouteMatchersImpl.HasOriginType;
 import org.batfish.datamodel.matchers.BgpRouteMatchersImpl.HasWeight;
@@ -21,7 +22,8 @@ public final class BgpRouteMatchers {
    * Provides a matcher that matches when the supplied {@code subMatcher} matches the {@link
    * BgpRoute}'s communities.
    */
-  public static @Nonnull Matcher<BgpRoute> hasCommunities(Matcher<? super Set<Long>> subMatcher) {
+  public static @Nonnull Matcher<BgpRoute> hasCommunities(
+      Matcher<? super Set<Community>> subMatcher) {
     return new HasCommunities(subMatcher);
   }
 

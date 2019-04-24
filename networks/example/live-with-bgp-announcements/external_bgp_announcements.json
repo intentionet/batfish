@@ -14,7 +14,7 @@
       "med" : 20,
       "originatorIp" : "0.0.0.0",
       "asPath" : [ [ 1239 ], [7018, 7019]],
-      "communities" : [ 262145 ],
+      "communities" : [["standard", "4:0"]],
       "srcVrf":"default",
       "dstVrf":"default",
       "clusterList":[]

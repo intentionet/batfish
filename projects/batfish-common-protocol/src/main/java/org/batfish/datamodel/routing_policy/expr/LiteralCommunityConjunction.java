@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.visitors.CommunitySetExprVisitor;
 import org.batfish.datamodel.visitors.VoidCommunitySetExprVisitor;
@@ -27,14 +28,14 @@ public final class LiteralCommunityConjunction extends CommunitySetExpr {
 
   @JsonCreator
   private static @Nonnull LiteralCommunityConjunction create(
-      @JsonProperty(PROP_REQUIRED_COMMUNITIES) SortedSet<Long> requiredCommunities) {
+      @JsonProperty(PROP_REQUIRED_COMMUNITIES) SortedSet<Community> requiredCommunities) {
     return new LiteralCommunityConjunction(
         firstNonNull(requiredCommunities, ImmutableSortedSet.of()));
   }
 
-  private SortedSet<Long> _requiredCommunities;
+  private SortedSet<Community> _requiredCommunities;
 
-  public LiteralCommunityConjunction(@Nonnull Collection<Long> requiredCommunities) {
+  public LiteralCommunityConjunction(@Nonnull Collection<Community> requiredCommunities) {
     _requiredCommunities = ImmutableSortedSet.copyOf(requiredCommunities);
   }
 
@@ -48,8 +49,9 @@ public final class LiteralCommunityConjunction extends CommunitySetExpr {
     visitor.visitLiteralCommunityConjunction(this);
   }
 
+  @Nonnull
   @Override
-  public SortedSet<Long> asLiteralCommunities(Environment environment) {
+  public SortedSet<Community> asLiteralCommunities(@Nonnull Environment environment) {
     throw new UnsupportedOperationException(
         "Cannot be represented as a set of literal communities");
   }
@@ -71,7 +73,7 @@ public final class LiteralCommunityConjunction extends CommunitySetExpr {
   }
 
   @JsonProperty(PROP_REQUIRED_COMMUNITIES)
-  public SortedSet<Long> getRequiredCommunities() {
+  public SortedSet<Community> getRequiredCommunities() {
     return _requiredCommunities;
   }
 
@@ -81,13 +83,13 @@ public final class LiteralCommunityConjunction extends CommunitySetExpr {
   }
 
   @Override
-  public boolean matchCommunities(Environment environment, Set<Long> communitySetCandidate) {
+  public boolean matchCommunities(Environment environment, Set<Community> communitySetCandidate) {
     return Sets.intersection(_requiredCommunities, communitySetCandidate).size()
         == _requiredCommunities.size();
   }
 
   @Override
-  public boolean matchCommunity(Environment environment, long community) {
+  public boolean matchCommunity(Environment environment, Community community) {
     throw new UnsupportedOperationException("Can only be used to match a set of communities");
   }
 

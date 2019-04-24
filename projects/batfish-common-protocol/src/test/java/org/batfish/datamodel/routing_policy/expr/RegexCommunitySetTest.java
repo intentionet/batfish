@@ -1,6 +1,5 @@
 package org.batfish.datamodel.routing_policy.expr;
 
-import static org.batfish.common.util.CommonUtil.communityStringToLong;
 import static org.batfish.datamodel.matchers.CommunitySetExprMatchers.matchAnyCommunity;
 import static org.batfish.datamodel.matchers.CommunitySetExprMatchers.matchCommunities;
 import static org.batfish.datamodel.matchers.CommunitySetExprMatchers.matchCommunity;
@@ -12,6 +11,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.testing.EqualsTester;
 import java.util.Set;
 import org.batfish.datamodel.RegexCommunitySet;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,16 +41,19 @@ public class RegexCommunitySetTest {
   @Test
   public void testMatchAnyCommunity() {
     RegexCommunitySet l = new RegexCommunitySet("1:1");
-    Set<Long> communityCandidates = ImmutableSet.of(communityStringToLong("1:1"), 2L);
+    Set<Community> communityCandidates =
+        ImmutableSet.of(StandardCommunity.parse("1:1"), StandardCommunity.of(2L));
 
     assertThat(l, matchAnyCommunity(null, communityCandidates));
   }
 
   @Test
   public void testMatchCommunities() {
-    Set<Long> matchingCommunitySetCandidate1 = ImmutableSet.of(communityStringToLong("1:1"), 2L);
-    Set<Long> matchingCommunitySetCandidate2 = ImmutableSet.of(communityStringToLong("11:11"));
-    Set<Long> nonMatchingCommunitySetCandidate = ImmutableSet.of(2L);
+    Set<Community> matchingCommunitySetCandidate1 =
+        ImmutableSet.of(StandardCommunity.parse("1:1"), StandardCommunity.of(2L));
+    Set<Community> matchingCommunitySetCandidate2 =
+        ImmutableSet.of(StandardCommunity.parse("11:11"));
+    Set<Community> nonMatchingCommunitySetCandidate = ImmutableSet.of(StandardCommunity.of(2L));
     RegexCommunitySet r = new RegexCommunitySet("1:1");
 
     assertThat(r, matchCommunities(null, matchingCommunitySetCandidate1));
@@ -61,18 +65,19 @@ public class RegexCommunitySetTest {
   public void testMatchCommunity() {
     RegexCommunitySet l = new RegexCommunitySet("1:1");
 
-    assertThat(l, matchCommunity(null, communityStringToLong("1:1")));
-    assertThat(l, not(matchCommunity(null, 2L)));
+    assertThat(l, matchCommunity(null, StandardCommunity.parse("1:1")));
+    assertThat(l, not(matchCommunity(null, StandardCommunity.of(2L))));
   }
 
   @Test
   public void testMatchedCommunities() {
     RegexCommunitySet l = new RegexCommunitySet("1:1");
-    Set<Long> communityCandidates = ImmutableSet.of(communityStringToLong("1:1"), 2L);
+    Set<Community> communityCandidates =
+        ImmutableSet.of(StandardCommunity.parse("1:1"), StandardCommunity.of(2L));
 
     assertThat(
         l,
         matchedCommunities(
-            null, communityCandidates, ImmutableSet.of(communityStringToLong("1:1"))));
+            null, communityCandidates, ImmutableSet.of(StandardCommunity.parse("1:1"))));
   }
 }

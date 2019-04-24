@@ -1,6 +1,5 @@
 package org.batfish.grammar.flatjuniper;
 
-import static org.batfish.common.util.CommonUtil.communityStringToLong;
 import static org.batfish.datamodel.AuthenticationMethod.GROUP_RADIUS;
 import static org.batfish.datamodel.AuthenticationMethod.GROUP_TACACS;
 import static org.batfish.datamodel.AuthenticationMethod.PASSWORD;
@@ -240,6 +239,7 @@ import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
 import org.batfish.datamodel.answers.InitInfoAnswerElement;
 import org.batfish.datamodel.answers.ParseVendorConfigurationAnswerElement;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.isis.IsisHelloAuthenticationType;
 import org.batfish.datamodel.isis.IsisInterfaceMode;
 import org.batfish.datamodel.matchers.IkePhase1KeyMatchers;
@@ -651,7 +651,7 @@ public final class FlatJuniperGrammarTest {
     String testrigName = "static-route-communities";
     String c1Name = "r1";
     String c2Name = "r2";
-    Long acceptedCommunity = communityStringToLong("100:1002");
+    StandardCommunity acceptedCommunity = StandardCommunity.parse("100:1002");
 
     List<String> configurationNames = ImmutableList.of(c1Name, c2Name);
     Batfish batfish =
@@ -855,7 +855,7 @@ public final class FlatJuniperGrammarTest {
     BgpRoute.Builder b1 =
         BgpRoute.builder()
             .setNetwork(cr.getNetwork())
-            .setCommunities(ImmutableSet.of(5L))
+            .setCommunities(ImmutableSet.of(StandardCommunity.of(5L)))
             .setOriginatorIp(Ip.parse("2.2.2.2"))
             .setOriginType(OriginType.INCOMPLETE)
             .setProtocol(RoutingProtocol.BGP);
@@ -866,37 +866,39 @@ public final class FlatJuniperGrammarTest {
         br1.getCommunities(),
         equalTo(
             ImmutableSet.of(
-                WellKnownCommunity.NO_ADVERTISE,
-                WellKnownCommunity.NO_EXPORT,
-                WellKnownCommunity.NO_EXPORT_SUBCONFED)));
+                StandardCommunity.of(WellKnownCommunity.NO_ADVERTISE),
+                StandardCommunity.of(WellKnownCommunity.NO_EXPORT),
+                StandardCommunity.of(WellKnownCommunity.NO_EXPORT_SUBCONFED))));
 
     // p2
     RoutingPolicy p2 = c.getRoutingPolicies().get("p2");
     BgpRoute.Builder b2 =
         BgpRoute.builder()
             .setNetwork(cr.getNetwork())
-            .setCommunities(ImmutableSet.of(5L))
+            .setCommunities(ImmutableSet.of(StandardCommunity.of(5L)))
             .setOriginatorIp(Ip.parse("2.2.2.2"))
             .setOriginType(OriginType.INCOMPLETE)
             .setProtocol(RoutingProtocol.BGP);
     p2.process(cr, b2, Ip.ZERO, DEFAULT_VRF_NAME, Direction.OUT);
     BgpRoute br2 = b2.build();
 
-    assertThat(br2.getCommunities(), equalTo(ImmutableSet.of(2L, 3L)));
+    assertThat(
+        br2.getCommunities(),
+        equalTo(ImmutableSet.of(StandardCommunity.of(2L), StandardCommunity.of(3L))));
 
     // p3
     RoutingPolicy p3 = c.getRoutingPolicies().get("p3");
     BgpRoute.Builder b3 =
         BgpRoute.builder()
             .setNetwork(cr.getNetwork())
-            .setCommunities(ImmutableSet.of(5L))
+            .setCommunities(ImmutableSet.of(StandardCommunity.of(5L)))
             .setOriginatorIp(Ip.parse("2.2.2.2"))
             .setOriginType(OriginType.INCOMPLETE)
             .setProtocol(RoutingProtocol.BGP);
     p3.process(cr, b3, Ip.ZERO, DEFAULT_VRF_NAME, Direction.OUT);
     BgpRoute br3 = b3.build();
 
-    assertThat(br3.getCommunities(), equalTo(ImmutableSet.of(5L)));
+    assertThat(br3.getCommunities(), equalTo(ImmutableSet.of(StandardCommunity.of(5L))));
   }
 
   @Test
@@ -910,7 +912,7 @@ public final class FlatJuniperGrammarTest {
     BgpRoute.Builder b4 =
         BgpRoute.builder()
             .setNetwork(cr.getNetwork())
-            .setCommunities(ImmutableSet.of(5L))
+            .setCommunities(ImmutableSet.of(StandardCommunity.of(5L)))
             .setOriginatorIp(Ip.parse("2.2.2.2"))
             .setOriginType(OriginType.INCOMPLETE)
             .setProtocol(RoutingProtocol.BGP);
@@ -921,38 +923,42 @@ public final class FlatJuniperGrammarTest {
         br4.getCommunities(),
         equalTo(
             ImmutableSet.of(
-                WellKnownCommunity.NO_ADVERTISE,
-                WellKnownCommunity.NO_EXPORT,
-                WellKnownCommunity.NO_EXPORT_SUBCONFED,
-                5L)));
+                StandardCommunity.of(WellKnownCommunity.NO_ADVERTISE),
+                StandardCommunity.of(WellKnownCommunity.NO_EXPORT),
+                StandardCommunity.of(WellKnownCommunity.NO_EXPORT_SUBCONFED),
+                StandardCommunity.of(5L))));
 
     // p5
     RoutingPolicy p5 = c.getRoutingPolicies().get("p5");
     BgpRoute.Builder b5 =
         BgpRoute.builder()
             .setNetwork(cr.getNetwork())
-            .setCommunities(ImmutableSet.of(5L))
+            .setCommunities(ImmutableSet.of(StandardCommunity.of(5L)))
             .setOriginatorIp(Ip.parse("2.2.2.2"))
             .setOriginType(OriginType.INCOMPLETE)
             .setProtocol(RoutingProtocol.BGP);
     p5.process(cr, b5, Ip.ZERO, DEFAULT_VRF_NAME, Direction.OUT);
     BgpRoute br5 = b5.build();
 
-    assertThat(br5.getCommunities(), equalTo(ImmutableSet.of(2L, 3L, 5L)));
+    assertThat(
+        br5.getCommunities(),
+        equalTo(
+            ImmutableSet.of(
+                StandardCommunity.of(2L), StandardCommunity.of(3L), StandardCommunity.of(5L))));
 
     // p6
     RoutingPolicy p6 = c.getRoutingPolicies().get("p6");
     BgpRoute.Builder b6 =
         BgpRoute.builder()
             .setNetwork(cr.getNetwork())
-            .setCommunities(ImmutableSet.of(5L))
+            .setCommunities(ImmutableSet.of(StandardCommunity.of(5L)))
             .setOriginatorIp(Ip.parse("2.2.2.2"))
             .setOriginType(OriginType.INCOMPLETE)
             .setProtocol(RoutingProtocol.BGP);
     p6.process(cr, b6, Ip.ZERO, DEFAULT_VRF_NAME, Direction.OUT);
     BgpRoute br6 = b6.build();
 
-    assertThat(br6.getCommunities(), equalTo(ImmutableSet.of(5L)));
+    assertThat(br6.getCommunities(), equalTo(ImmutableSet.of(StandardCommunity.of(5L))));
   }
 
   @Test
@@ -1937,7 +1943,7 @@ public final class FlatJuniperGrammarTest {
         config.getDefaultVrf().getGeneratedRoutes().stream()
             .map(GeneratedRoute::getCommunities)
             .collect(ImmutableSet.toImmutableSet()),
-        equalTo(ImmutableSet.of(ImmutableSortedSet.of(65537L))));
+        equalTo(ImmutableSet.of(ImmutableSortedSet.of(StandardCommunity.of(65537L)))));
   }
 
   @Test
@@ -2969,11 +2975,17 @@ public final class FlatJuniperGrammarTest {
             .setOriginatorIp(Ip.parse("2.2.2.2"))
             .setOriginType(OriginType.INCOMPLETE)
             .setProtocol(RoutingProtocol.BGP);
-    result = communityPolicy.call(envWithRoute(c, brb.setCommunities(ImmutableSet.of(1L)).build()));
+    result =
+        communityPolicy.call(
+            envWithRoute(c, brb.setCommunities(ImmutableSet.of(StandardCommunity.of(1L))).build()));
     assertThat(result.getBooleanValue(), equalTo(true));
-    result = communityPolicy.call(envWithRoute(c, brb.setCommunities(ImmutableSet.of(2L)).build()));
+    result =
+        communityPolicy.call(
+            envWithRoute(c, brb.setCommunities(ImmutableSet.of(StandardCommunity.of(2L))).build()));
     assertThat(result.getBooleanValue(), equalTo(true));
-    result = communityPolicy.call(envWithRoute(c, brb.setCommunities(ImmutableSet.of(3L)).build()));
+    result =
+        communityPolicy.call(
+            envWithRoute(c, brb.setCommunities(ImmutableSet.of(StandardCommunity.of(3L))).build()));
     assertThat(result.getBooleanValue(), equalTo(false));
 
     /*

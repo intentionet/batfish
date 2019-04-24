@@ -15,7 +15,6 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import org.batfish.common.BatfishException;
 import org.batfish.common.bdd.BDDInteger;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.CommunityList;
 import org.batfish.datamodel.CommunityListLine;
 import org.batfish.datamodel.Configuration;
@@ -616,7 +615,7 @@ class TransferBDD {
         // Delete the comms
         for (CommunityVar cvar : toDelete) {
           if (!_policyQuotient.getCommsAssignedButNotMatched().contains(cvar)) {
-            curP.indent().debug("Value: " + cvar.getValue() + ", " + cvar.getType());
+            curP.indent().debug("Value: " + cvar.getRegex() + ", " + cvar.getType());
             BDD comm = curP.getData().getCommunities().get(cvar);
             BDD newValue = ite(result.getReturnAssignedValue(), comm, factory.zero());
             curP.indent().debug("New Value: " + newValue);
@@ -991,8 +990,8 @@ class TransferBDD {
       case REGEX:
         return cvar;
       case EXACT:
-        return new CommunityVar(
-            Type.REGEX, String.format("^%s$", CommonUtil.longToCommunity(cvar.asLong())), null);
+        assert cvar.getLiteralValue() != null; // invariant of the EXACT type
+        return CommunityVar.from(String.format("^%s$", cvar.getLiteralValue().matchString()));
       default:
         throw new BatfishException("Unexpected CommunityVar type: " + cvar.getType());
     }

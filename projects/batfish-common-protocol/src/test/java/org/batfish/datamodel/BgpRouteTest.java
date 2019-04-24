@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.datamodel.BgpRoute.Builder;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -72,7 +73,7 @@ public class BgpRouteTest {
         .addEqualityGroup(brb.setNonForwarding(true).build())
         .addEqualityGroup(brb.setAsPath(AsPath.ofSingletonAsSets(1L, 1L)).build())
         .addEqualityGroup(brb.setClusterList(ImmutableSet.of(1L)).build())
-        .addEqualityGroup(brb.setCommunities(ImmutableSet.of(1L)).build())
+        .addEqualityGroup(brb.setCommunities(ImmutableSet.of(StandardCommunity.of(1L))).build())
         .addEqualityGroup(brb.setDiscard(true).build())
         .addEqualityGroup(brb.setLocalPreference(10).build())
         .addEqualityGroup(brb.setMetric(10).build())

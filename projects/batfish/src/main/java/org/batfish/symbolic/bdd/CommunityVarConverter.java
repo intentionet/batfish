@@ -1,9 +1,9 @@
 package org.batfish.symbolic.bdd;
 
 import javax.annotation.Nonnull;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.CommunityList;
 import org.batfish.datamodel.RegexCommunitySet;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.expr.CommunityHalvesExpr;
 import org.batfish.datamodel.routing_policy.expr.CommunitySetExpr;
 import org.batfish.datamodel.routing_policy.expr.EmptyCommunitySetExpr;
@@ -13,7 +13,6 @@ import org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet;
 import org.batfish.datamodel.routing_policy.expr.NamedCommunitySet;
 import org.batfish.datamodel.visitors.CommunitySetExprVisitor;
 import org.batfish.symbolic.CommunityVar;
-import org.batfish.symbolic.CommunityVar.Type;
 
 /**
  * Visitor for converting a non-recursive {@link CommunitySetExpr} to a {@link CommunityVar} for
@@ -27,8 +26,8 @@ public final class CommunityVarConverter implements CommunitySetExprVisitor<Comm
     return matchCondition.accept(INSTANCE);
   }
 
-  public static @Nonnull CommunityVar toCommunityVar(long community) {
-    return new CommunityVar(Type.EXACT, CommonUtil.longToCommunity(community), community);
+  public static @Nonnull CommunityVar toCommunityVar(Community community) {
+    return CommunityVar.from(community);
   }
 
   @Override
@@ -69,6 +68,6 @@ public final class CommunityVarConverter implements CommunitySetExprVisitor<Comm
 
   @Override
   public CommunityVar visitRegexCommunitySet(RegexCommunitySet regexCommunitySet) {
-    return new CommunityVar(Type.REGEX, regexCommunitySet.getRegex(), null);
+    return CommunityVar.from(regexCommunitySet.getRegex());
   }
 }

@@ -1,13 +1,12 @@
 package org.batfish.datamodel.matchers;
 
-import static org.batfish.common.util.CommonUtil.longToCommunity;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.batfish.common.util.CommonUtil;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.expr.CommunitySetExpr;
 import org.hamcrest.Description;
@@ -39,7 +38,7 @@ public final class CommunitySetExprMatchers {
 
     @Override
     protected boolean matchesSafely(CommunitySetExpr item, Description mismatchDescription) {
-      Set<Long> asLiteralCommunities = item.asLiteralCommunities(_environment);
+      Set<Community> asLiteralCommunities = item.asLiteralCommunities(_environment);
       if (!_subMatcher.matches(asLiteralCommunities)) {
         mismatchDescription.appendText(
             String.format(
@@ -53,12 +52,12 @@ public final class CommunitySetExprMatchers {
 
   private static final class MatchAnyCommunity extends TypeSafeDiagnosingMatcher<CommunitySetExpr> {
 
-    private final Set<Long> _communityCandidates;
+    private final Set<Community> _communityCandidates;
 
     private final Environment _environment;
 
     private MatchAnyCommunity(
-        @Nullable Environment environment, @Nonnull Set<Long> communityCandidates) {
+        @Nullable Environment environment, @Nonnull Set<Community> communityCandidates) {
       _environment = environment;
       _communityCandidates = communityCandidates;
     }
@@ -86,12 +85,12 @@ public final class CommunitySetExprMatchers {
 
   private static final class MatchCommunities extends TypeSafeDiagnosingMatcher<CommunitySetExpr> {
 
-    private final Set<Long> _communitySetCandidate;
+    private final Set<Community> _communitySetCandidate;
 
     private final Environment _environment;
 
     private MatchCommunities(
-        @Nullable Environment environment, @Nonnull Set<Long> communitySetCandidate) {
+        @Nullable Environment environment, @Nonnull Set<Community> communitySetCandidate) {
       _environment = environment;
       _communitySetCandidate = communitySetCandidate;
     }
@@ -120,11 +119,11 @@ public final class CommunitySetExprMatchers {
 
   private static final class MatchCommunity extends TypeSafeDiagnosingMatcher<CommunitySetExpr> {
 
-    private final long _community;
+    private final Community _community;
 
     private final Environment _environment;
 
-    private MatchCommunity(@Nullable Environment environment, long community) {
+    private MatchCommunity(@Nullable Environment environment, Community community) {
       _environment = environment;
       _community = community;
     }
@@ -133,8 +132,7 @@ public final class CommunitySetExprMatchers {
     public void describeTo(Description description) {
       description.appendText(
           String.format(
-              "A CommunitySetExpr matching the individual comunity: %s",
-              longToCommunity(_community)));
+              "A CommunitySetExpr matching the individual community: %s", _community.toString()));
     }
 
     @Override
@@ -144,7 +142,7 @@ public final class CommunitySetExprMatchers {
         mismatchDescription.appendText(
             String.format(
                 "CommunitySetExpr: '%s' did not match the community: '%s'",
-                item, longToCommunity(_community)));
+                item, _community.toString()));
         return false;
       }
       return true;
@@ -154,16 +152,16 @@ public final class CommunitySetExprMatchers {
   private static final class MatchedCommunities
       extends TypeSafeDiagnosingMatcher<CommunitySetExpr> {
 
-    private final Set<Long> _communityCandidates;
+    private final Set<Community> _communityCandidates;
 
     private final Environment _environment;
 
-    private final Matcher<? super Set<Long>> _subMatcher;
+    private final Matcher<? super Set<Community>> _subMatcher;
 
     private MatchedCommunities(
         @Nullable Environment environment,
-        @Nonnull Set<Long> communityCandidates,
-        @Nonnull Matcher<? super Set<Long>> subMatcher) {
+        @Nonnull Set<Community> communityCandidates,
+        @Nonnull Matcher<? super Set<Community>> subMatcher) {
       _environment = environment;
       _communityCandidates = communityCandidates;
       _subMatcher = subMatcher;
@@ -181,7 +179,8 @@ public final class CommunitySetExprMatchers {
 
     @Override
     protected boolean matchesSafely(CommunitySetExpr item, Description mismatchDescription) {
-      Set<Long> matchedCommunities = item.matchedCommunities(_environment, _communityCandidates);
+      Set<Community> matchedCommunities =
+          item.matchedCommunities(_environment, _communityCandidates);
       if (!_subMatcher.matches(matchedCommunities)) {
         mismatchDescription.appendText(
             String.format(
@@ -208,7 +207,7 @@ public final class CommunitySetExprMatchers {
    * by the {link CommunitySetExpr} under the provided {@code environment}.
    */
   public static @Nonnull Matcher<CommunitySetExpr> matchAnyCommunity(
-      @Nullable Environment environment, @Nonnull Set<Long> communityCandidates) {
+      @Nullable Environment environment, @Nonnull Set<Community> communityCandidates) {
     return new MatchAnyCommunity(environment, communityCandidates);
   }
 
@@ -217,7 +216,7 @@ public final class CommunitySetExprMatchers {
    * matched by the {link CommunitySetExpr} under the provided {@code environment}.
    */
   public static @Nonnull Matcher<CommunitySetExpr> matchCommunities(
-      @Nullable Environment environment, @Nonnull Set<Long> communitySetCandidate) {
+      @Nullable Environment environment, @Nonnull Set<Community> communitySetCandidate) {
     return new MatchCommunities(environment, communitySetCandidate);
   }
 
@@ -226,7 +225,7 @@ public final class CommunitySetExprMatchers {
    * CommunitySetExpr} under the provided {@code environment}.
    */
   public static @Nonnull Matcher<CommunitySetExpr> matchCommunity(
-      @Nullable Environment environment, long community) {
+      @Nullable Environment environment, Community community) {
     return new MatchCommunity(environment, community);
   }
 
@@ -237,15 +236,15 @@ public final class CommunitySetExprMatchers {
    */
   public static @Nonnull Matcher<CommunitySetExpr> matchedCommunities(
       @Nullable Environment environment,
-      @Nonnull Set<Long> communityCandidates,
-      @Nonnull Set<Long> expectedMatchedCommunities) {
+      @Nonnull Set<Community> communityCandidates,
+      @Nonnull Set<Community> expectedMatchedCommunities) {
     return new MatchedCommunities(
         environment, communityCandidates, equalTo(expectedMatchedCommunities));
   }
 
-  private static @Nonnull String toString(Set<Long> communitySet) {
+  private static @Nonnull String toString(Set<Community> communitySet) {
     return communitySet.stream()
-        .map(CommonUtil::longToCommunity)
+        .map(Community::toString)
         .collect(ImmutableSet.toImmutableSet())
         .toString();
   }

@@ -1,8 +1,12 @@
 package org.batfish.symbolic;
 
+import com.google.common.base.MoreObjects;
+import java.util.Comparator;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import org.batfish.datamodel.bgp.community.Community;
 
 /**
  * Representation of a community variable for the symbolic encoding. Configuration languages allow
@@ -19,7 +23,8 @@ import javax.annotation.Nullable;
  *
  * @author Ryan Beckett
  */
-public class CommunityVar implements Comparable<CommunityVar> {
+@ParametersAreNonnullByDefault
+public final class CommunityVar implements Comparable<CommunityVar> {
 
   public enum Type {
     EXACT,
@@ -27,79 +32,82 @@ public class CommunityVar implements Comparable<CommunityVar> {
     OTHER
   }
 
-  private Type _type;
+  @Nonnull private final Type _type;
+  @Nonnull private final String _regex;
+  @Nullable private final Community _literalValue;
 
-  private String _value;
-
-  private Long _long;
-
-  public CommunityVar(Type type, String value, @Nullable Long l) {
+  private CommunityVar(Type type, String regex, @Nullable Community literalValue) {
     _type = type;
-    _value = value;
-    _long = l;
+    _regex = regex;
+    _literalValue = literalValue;
   }
 
+  /** Create a community var of type {@link Type#REGEX} */
+  public static CommunityVar from(String regex) {
+    return new CommunityVar(Type.REGEX, regex, null);
+  }
+
+  /**
+   * Create a community var of type {@link Type#EXACT} based on a literal {@link Community} value
+   */
+  public static CommunityVar from(Community literalCommunity) {
+    return new CommunityVar(Type.EXACT, literalCommunity.matchString(), literalCommunity);
+  }
+
+  /** Create a community var of type {@link Type#OTHER} based on a REGEX community var. */
+  public static CommunityVar other(String regex) {
+    return new CommunityVar(Type.OTHER, regex, null);
+  }
+
+  @Nonnull
   public Type getType() {
     return _type;
   }
 
-  public String getValue() {
-    return _value;
+  @Nonnull
+  public String getRegex() {
+    return _regex;
   }
 
-  public Long asLong() {
-    return _long;
+  @Nullable
+  public Community getLiteralValue() {
+    return _literalValue;
   }
 
   @Override
   public String toString() {
-    String val = '<' + _value + ',' + _type + '>';
-    String typ;
-    switch (_type) {
-      case EXACT:
-        typ = "Exact";
-        break;
-      case REGEX:
-        typ = "Regex";
-        break;
-      case OTHER:
-        typ = "Other";
-        break;
-      default:
-        typ = "Exact";
-    }
-    return typ + val;
+    return MoreObjects.toStringHelper(this)
+        .add("type", _type)
+        .add("regex", _regex)
+        .add("literalValue", _literalValue)
+        .toString();
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
+    if (this == o) {
+      return true;
+    }
     if (!(o instanceof CommunityVar)) {
       return false;
     }
-    CommunityVar other = (CommunityVar) o;
-    return Objects.equals(_value, other._value) && _type == other._type;
+    CommunityVar that = (CommunityVar) o;
+    return _type == that._type
+        && _regex.equals(that._regex)
+        && Objects.equals(_literalValue, that._literalValue);
   }
 
   @Override
   public int hashCode() {
-    int result = _type != null ? _type.ordinal() : 0;
-    result = 31 * result + (_value != null ? _value.hashCode() : 0);
-    return result;
+    return Objects.hash(_type, _regex, _literalValue);
   }
 
   @Override
-  public int compareTo(@Nonnull CommunityVar that) {
-    if (this._type.compareTo(that._type) < 0) {
-      return -1;
-    } else if (this._type.compareTo(that._type) > 0) {
-      return 1;
-    }
-
-    if (this._value.compareTo(that._value) < 0) {
-      return -1;
-    } else if (this._value.compareTo(that._value) > 0) {
-      return 1;
-    }
-    return 0;
+  public int compareTo(CommunityVar that) {
+    return Comparator.comparing(CommunityVar::getType)
+        .thenComparing(CommunityVar::getRegex)
+        .thenComparing(
+            CommunityVar::getLiteralValue, Comparator.nullsLast(Comparator.naturalOrder()))
+        .compare(this, that);
   }
 }

@@ -12,13 +12,15 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.testing.EqualsTester;
 import java.util.Set;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.junit.Test;
 
 public final class LiteralCommunityTest {
 
   @Test
   public void testAsLiteralCommunities() {
-    long val = 1L;
+    StandardCommunity val = StandardCommunity.of(1L);
     LiteralCommunity l = new LiteralCommunity(val);
 
     assertThat(l, asLiteralCommunities(null, equalTo(ImmutableSet.of(val))));
@@ -27,25 +29,29 @@ public final class LiteralCommunityTest {
   @Test
   public void testEquals() {
     new EqualsTester()
-        .addEqualityGroup(new LiteralCommunity(1L), new LiteralCommunity(1L))
-        .addEqualityGroup(new LiteralCommunity(2L))
+        .addEqualityGroup(
+            new LiteralCommunity(StandardCommunity.of(1L)),
+            new LiteralCommunity(StandardCommunity.of(1L)))
+        .addEqualityGroup(new LiteralCommunity(StandardCommunity.of(2L)))
         .testEquals();
   }
 
   @Test
   public void testMatchAnyCommunity() {
-    LiteralCommunity l = new LiteralCommunity(1L);
-    Set<Long> communityCandidates = ImmutableSet.of(1L, 2L);
+    LiteralCommunity l = new LiteralCommunity(StandardCommunity.of(1L));
+    Set<Community> communityCandidates =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
 
     assertThat(l, matchAnyCommunity(null, communityCandidates));
   }
 
   @Test
   public void testMatchCommunities() {
-    Set<Long> matchingCommunitySetCandidate1 = ImmutableSet.of(1L, 2L);
-    Set<Long> matchingCommunitySetCandidate2 = ImmutableSet.of(1L);
-    Set<Long> nonMatchingCommunitySetCandidate = ImmutableSet.of(2L);
-    LiteralCommunity l = new LiteralCommunity(1L);
+    Set<Community> matchingCommunitySetCandidate1 =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
+    Set<Community> matchingCommunitySetCandidate2 = ImmutableSet.of(StandardCommunity.of(1L));
+    Set<Community> nonMatchingCommunitySetCandidate = ImmutableSet.of(StandardCommunity.of(2L));
+    LiteralCommunity l = new LiteralCommunity(StandardCommunity.of(1L));
 
     assertThat(l, matchCommunities(null, matchingCommunitySetCandidate1));
     assertThat(l, matchCommunities(null, matchingCommunitySetCandidate2));
@@ -54,17 +60,20 @@ public final class LiteralCommunityTest {
 
   @Test
   public void testMatchCommunity() {
-    LiteralCommunity l = new LiteralCommunity(1L);
+    LiteralCommunity l = new LiteralCommunity(StandardCommunity.of(1L));
 
-    assertThat(l, matchCommunity(null, 1L));
-    assertThat(l, not(matchCommunity(null, 2L)));
+    assertThat(l, matchCommunity(null, StandardCommunity.of(1L)));
+    assertThat(l, not(matchCommunity(null, StandardCommunity.of(2L))));
   }
 
   @Test
   public void testMatchedCommunities() {
-    LiteralCommunity l = new LiteralCommunity(1L);
-    Set<Long> communityCandidates = ImmutableSet.of(1L, 2L);
+    LiteralCommunity l = new LiteralCommunity(StandardCommunity.of(1L));
+    Set<Community> communityCandidates =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
 
-    assertThat(l, matchedCommunities(null, communityCandidates, ImmutableSet.of(1L)));
+    assertThat(
+        l,
+        matchedCommunities(null, communityCandidates, ImmutableSet.of(StandardCommunity.of(1L))));
   }
 }

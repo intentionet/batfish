@@ -12,13 +12,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.batfish.common.Warnings;
 import org.batfish.common.Warnings.ParseWarning;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SubRange;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.grammar.UnrecognizedLineToken;
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.F5_bigip_imish_configurationContext;
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Ip_prefixContext;
@@ -549,7 +549,7 @@ public class F5BigipImishConfigurationBuilder extends F5BigipImishParserBaseList
 
   private @Nullable Long toLong(Standard_communityContext ctx) {
     if (ctx.STANDARD_COMMUNITY() != null) {
-      return CommonUtil.communityStringToLong(ctx.getText());
+      return StandardCommunity.parse(ctx.getText()).asLong();
     } else {
       return convProblem(Long.class, ctx, null);
     }

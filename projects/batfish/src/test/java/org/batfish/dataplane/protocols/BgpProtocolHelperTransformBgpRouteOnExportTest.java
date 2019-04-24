@@ -27,6 +27,8 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.dataplane.exceptions.BgpRoutePropagationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -161,7 +163,7 @@ public final class BgpProtocolHelperTransformBgpRouteOnExportTest {
   public void testCommunitiesInTransformedRoute() throws BgpRoutePropagationException {
     for (boolean isIbgp : ImmutableList.of(false, true)) {
       setUpPeers(isIbgp);
-      Set<Long> communities = ImmutableSortedSet.of(10L);
+      Set<Community> communities = ImmutableSortedSet.of(StandardCommunity.of(10L));
       GeneratedRoute aggRoute = _baseAggRouteBuilder.setCommunities(communities).build();
       BgpRoute bgpRoute = _baseBgpRouteBuilder.setCommunities(communities).build();
 
@@ -193,7 +195,8 @@ public final class BgpProtocolHelperTransformBgpRouteOnExportTest {
   public void testRoutesWithNoAdvertiseSetNotExported() throws BgpRoutePropagationException {
     for (boolean isIbgp : ImmutableList.of(false, true)) {
       setUpPeers(isIbgp);
-      Set<Long> noAdvertiseCommunitySet = ImmutableSortedSet.of(WellKnownCommunity.NO_ADVERTISE);
+      Set<Community> noAdvertiseCommunitySet =
+          ImmutableSortedSet.of(StandardCommunity.of(WellKnownCommunity.NO_ADVERTISE));
 
       BgpRoute.Builder transformedAggregateRoute =
           runTransformBgpRoutePreExport(

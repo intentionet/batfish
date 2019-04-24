@@ -85,7 +85,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.batfish.common.Warnings;
 import org.batfish.common.Warnings.ParseWarning;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
@@ -94,6 +93,7 @@ import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
 import org.batfish.datamodel.SubRange;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.vendor_family.f5_bigip.Pool;
 import org.batfish.datamodel.vendor_family.f5_bigip.PoolMember;
 import org.batfish.datamodel.vendor_family.f5_bigip.RouteAdvertisementMode;
@@ -1548,7 +1548,7 @@ public class F5BigipStructuredConfigurationBuilder extends F5BigipStructuredPars
 
   private @Nullable Long toCommunity(Standard_communityContext ctx) {
     if (ctx.STANDARD_COMMUNITY() != null) {
-      return CommonUtil.communityStringToLong(ctx.getText());
+      return StandardCommunity.parse(ctx.getText()).asLong();
     } else {
       return convProblem(Long.class, ctx, null);
     }

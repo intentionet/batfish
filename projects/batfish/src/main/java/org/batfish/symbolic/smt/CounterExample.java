@@ -2,6 +2,7 @@ package org.batfish.symbolic.smt;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedSet;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
@@ -34,6 +35,7 @@ import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.pojo.Environment;
 import org.batfish.symbolic.CommunityVar;
 import org.batfish.symbolic.CommunityVar.Type;
@@ -186,12 +188,12 @@ class CounterExample {
           AsPath path = AsPath.of(b.build());
 
           // Recover communities
-          SortedSet<Long> communities = new TreeSet<>();
+          ImmutableSortedSet.Builder<Community> communities = ImmutableSortedSet.naturalOrder();
           for (Entry<CommunityVar, BoolExpr> entry2 : symbolicRoute.getCommunities().entrySet()) {
             CommunityVar cvar = entry2.getKey();
             BoolExpr expr = entry2.getValue();
-            if (cvar.getType() == Type.EXACT && boolVal(expr)) {
-              communities.add(cvar.asLong());
+            if (cvar.getType() == Type.EXACT && boolVal(expr) && cvar.getLiteralValue() != null) {
+              communities.add(cvar.getLiteralValue());
             }
           }
 
@@ -212,8 +214,8 @@ class CounterExample {
                   80,
                   zeroIp,
                   path,
-                  communities,
-                  new TreeSet<>(),
+                  communities.build(),
+                  ImmutableSortedSet.of(),
                   0);
 
           routes.add(adv);

@@ -1,6 +1,5 @@
 package org.batfish.grammar.f5_bigip_structured;
 
-import static org.batfish.common.util.CommonUtil.communityStringToLong;
 import static org.batfish.datamodel.Interface.DependencyType.AGGREGATE;
 import static org.batfish.datamodel.InterfaceType.AGGREGATED;
 import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PATH;
@@ -150,6 +149,7 @@ import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
 import org.batfish.datamodel.answers.InitInfoAnswerElement;
 import org.batfish.datamodel.answers.ParseStatus;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.flow.FirewallSessionTraceInfo;
 import org.batfish.datamodel.flow.Hop;
 import org.batfish.datamodel.flow.Step;
@@ -425,7 +425,7 @@ public final class F5BigipStructuredGrammarTest {
                       .build())
               .getBooleanValue());
       BgpRoute outputRoute = outputBuilder.build();
-      assertThat(outputRoute, hasCommunities(contains(communityStringToLong("2:2"))));
+      assertThat(outputRoute, hasCommunities(contains(StandardCommunity.parse("2:2"))));
     }
 
     {
@@ -507,7 +507,7 @@ public final class F5BigipStructuredGrammarTest {
                       .build())
               .getBooleanValue());
       BgpRoute outputRoute = outputBuilder.build();
-      assertThat(outputRoute, hasCommunities(contains(communityStringToLong("2:2"))));
+      assertThat(outputRoute, hasCommunities(contains(StandardCommunity.parse("2:2"))));
     }
   }
 
@@ -1295,10 +1295,7 @@ public final class F5BigipStructuredGrammarTest {
     assertThat(
         "rm1 sets communities 1:2 and 33:44 on the output route",
         outputRoute.build().getCommunities(),
-        equalTo(
-            Stream.of("1:2", "33:44")
-                .map(CommonUtil::communityStringToLong)
-                .collect(ImmutableSet.toImmutableSet())));
+        equalTo(ImmutableSet.of(StandardCommunity.of(1, 2), StandardCommunity.of(33, 44))));
 
     assertTrue(
         "rm1 rejects prefix 10.0.2.0/24 (no matching entry)",

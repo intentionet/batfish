@@ -256,7 +256,7 @@ class PropertyAdder {
 
     for (Entry<String, List<GraphEdge>> entry : g.getEdgeMap().entrySet()) {
       String router = entry.getKey();
-      List<GraphEdge> edges = entry.getValue();
+      List<GraphEdge> edges = entry.getRegex();
       BoolExpr reach = reachableVars.get(router);
 
       // Add the base case, reachable if we forward to a directly connected interface

@@ -1,7 +1,6 @@
 package org.batfish.symbolic;
 
 import javax.annotation.Nonnull;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.CommunityList;
 import org.batfish.datamodel.RegexCommunitySet;
 import org.batfish.datamodel.routing_policy.expr.CommunityHalvesExpr;
@@ -39,7 +38,7 @@ public class CommunitySetExprToRegex implements CommunitySetExprVisitor<RegexCom
   @Override
   public RegexCommunitySet visitLiteralCommunity(LiteralCommunity literalCommunity) {
     return new RegexCommunitySet(
-        String.format("^%s$", CommonUtil.longToCommunity(literalCommunity.getCommunity())));
+        String.format("^%s$", literalCommunity.getCommunity().matchString()));
   }
 
   @Override

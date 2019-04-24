@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.commons.lang3.SerializationUtils;
 import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.datamodel.GeneratedRoute.Builder;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -30,7 +31,7 @@ public class GeneratedRouteTest {
         .addEqualityGroup(gr.build(), gr.build())
         .addEqualityGroup(gr.setMetric(2L).build())
         .addEqualityGroup(gr.setDiscard(true).build())
-        .addEqualityGroup(gr.setCommunities(ImmutableSet.of(111L)).build())
+        .addEqualityGroup(gr.setCommunities(ImmutableSet.of(StandardCommunity.of(111L))).build())
         .addEqualityGroup(gr.setGenerationPolicy("GENERATE").build())
         .addEqualityGroup(gr.setAttributePolicy("Attribute").build())
         .addEqualityGroup(gr.setAdmin(100).build())
@@ -52,7 +53,7 @@ public class GeneratedRouteTest {
             .add(grb.build())
             .add(grb.setAsPath(AsPath.ofSingletonAsSets(ImmutableList.of(1L, 1L))).build())
             .add(grb.setGenerationPolicy(null).build())
-            .add(grb.setCommunities(ImmutableSet.of(111L)).build())
+            .add(grb.setCommunities(ImmutableSet.of(StandardCommunity.of(111L))).build())
             .add(grb.setDiscard(true).build())
             .add(grb.setAttributePolicy(null).build())
             .build();

@@ -16,6 +16,7 @@ import static org.batfish.representation.cisco.CiscoConfiguration.computeProtoco
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -83,6 +84,7 @@ import org.batfish.datamodel.TcpFlagsMatchConditions;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.AndMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.eigrp.EigrpMetric;
 import org.batfish.datamodel.isis.IsisLevelSettings;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
@@ -1367,8 +1369,11 @@ class CiscoConversions {
     Collection<Long> lineCommunities = sclLine.getCommunities();
     CommunitySetExpr expr =
         lineCommunities.size() == 1
-            ? new LiteralCommunity(lineCommunities.iterator().next())
-            : new LiteralCommunityConjunction(lineCommunities);
+            ? new LiteralCommunity(StandardCommunity.of(lineCommunities.iterator().next()))
+            : new LiteralCommunityConjunction(
+                lineCommunities.stream()
+                    .map(StandardCommunity::of)
+                    .collect(ImmutableSet.toImmutableSet()));
     return new CommunityListLine(sclLine.getAction(), expr);
   }
 

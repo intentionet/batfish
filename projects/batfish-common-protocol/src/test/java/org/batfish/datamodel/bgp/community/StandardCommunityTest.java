@@ -27,6 +27,11 @@ public class StandardCommunityTest {
   }
 
   @Test
+  public void testBoundaryConditions() {
+    assertThat(StandardCommunity.of(65535, 65535), equalTo(StandardCommunity.of(4294967295L)));
+  }
+
+  @Test
   public void testOfNegative() {
     _thrown.expect(IllegalArgumentException.class);
     StandardCommunity.of(-1);

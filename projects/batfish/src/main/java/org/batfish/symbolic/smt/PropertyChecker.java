@@ -1017,12 +1017,12 @@ public class PropertyChecker {
                   BoolExpr ce1 = entry.getValue();
                   BoolExpr ce2 = vars2.getCommunities().get(cvar);
                   if (ce2 == null) {
-                    if (!communities.contains(cvar.getValue())) {
-                      communities.add(cvar.getValue());
+                    if (!communities.contains(cvar.getRegex())) {
+                      communities.add(cvar.getRegex());
                       /* String msg =
                        String.format(
                            "Warning: community %s found for router %s but not %s.",
-                           cvar.getValue(), conf1.getEnvName(), conf2.getEnvName());
+                           cvar.getRegex(), conf1.getEnvName(), conf2.getEnvName());
                       System.out.println(msg); */
                     }
                     unsetComms = e1.mkAnd(unsetComms, e1.mkNot(ce1));
@@ -1035,12 +1035,12 @@ public class PropertyChecker {
                   BoolExpr ce2 = entry.getValue();
                   BoolExpr ce1 = vars1.getCommunities().get(cvar);
                   if (ce1 == null) {
-                    if (!communities.contains(cvar.getValue())) {
-                      communities.add(cvar.getValue());
+                    if (!communities.contains(cvar.getRegex())) {
+                      communities.add(cvar.getRegex());
                       /* String msg =
                        String.format(
                            "Warning: community %s found for router %s but not %s.",
-                           cvar.getValue(), conf2.getEnvName(), conf1.getEnvName());
+                           cvar.getRegex(), conf2.getEnvName(), conf1.getEnvName());
                       System.out.println(msg); */
                     }
                     unsetComms = e1.mkAnd(unsetComms, e1.mkNot(ce2));

@@ -634,8 +634,8 @@ public class Encoder {
             String c = valuation.get(e);
             // TODO: what about OTHER type?
             if ("true".equals(c) && displayCommunity(cvar)) {
-              String s = cvar.getValue();
-              String t = slice.getNamedCommunities().get(cvar.getValue());
+              String s = cvar.getRegex();
+              String t = slice.getNamedCommunities().get(cvar.getRegex());
               s = (t == null ? s : t);
               recordMap.put("community " + s, "");
             }

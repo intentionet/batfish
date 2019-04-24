@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.AsPath;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.bgp.community.Community;
 
 @ParametersAreNonnullByDefault
 public abstract class AbstractAggregateRoute implements Serializable {
@@ -26,7 +27,7 @@ public abstract class AbstractAggregateRoute implements Serializable {
 
   private AsPath _asPath;
 
-  private Set<Long> _communities;
+  private Set<Community> _communities;
 
   private Boolean _drop;
 
@@ -54,7 +55,7 @@ public abstract class AbstractAggregateRoute implements Serializable {
     return _asPath;
   }
 
-  public final @Nonnull Set<Long> getCommunities() {
+  public final @Nonnull Set<Community> getCommunities() {
     return _communities;
   }
 

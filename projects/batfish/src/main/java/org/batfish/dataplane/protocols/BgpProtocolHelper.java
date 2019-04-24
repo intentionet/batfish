@@ -26,6 +26,8 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Route;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.dataplane.exceptions.BgpRoutePropagationException;
 
 public class BgpProtocolHelper {
@@ -79,7 +81,7 @@ public class BgpProtocolHelper {
 
     // Extract original route's asPath and communities if it had them
     AsPath originalAsPath = AsPath.empty();
-    SortedSet<Long> originalCommunities = ImmutableSortedSet.of();
+    SortedSet<Community> originalCommunities = ImmutableSortedSet.of();
     if (route instanceof BgpRoute) {
       // Includes all routes with protocols BGP and IBGP, plus some with protocol AGGREGATE
       BgpRoute bgpRemoteRoute = (BgpRoute) route;
@@ -93,7 +95,7 @@ public class BgpProtocolHelper {
     }
     // Do not export route if it has NO_ADVERTISE community, or if its AS path contains the remote
     // peer's AS and local peer has not set getAllowRemoteOut
-    if (originalCommunities.contains(WellKnownCommunity.NO_ADVERTISE)
+    if (originalCommunities.contains(StandardCommunity.of(WellKnownCommunity.NO_ADVERTISE))
         || (sessionProperties.isEbgp()
             && originalAsPath.containsAs(toNeighbor.getLocalAs())
             && !fromNeighbor.getAllowRemoteAsOut())) {

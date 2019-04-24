@@ -18,6 +18,8 @@ import org.batfish.datamodel.CommunityListLine;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.NetworkFactory;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,7 +42,8 @@ public final class NamedCommunitySetTest {
     CommunityList referent =
         new CommunityList(
             COMMUNITY_LIST_NAME,
-            ImmutableList.of(CommunityListLine.accepting(new LiteralCommunity(1L))),
+            ImmutableList.of(
+                CommunityListLine.accepting(new LiteralCommunity(StandardCommunity.of(1L)))),
             false);
     c.getCommunityLists().put(COMMUNITY_LIST_NAME, referent);
     nf.vrfBuilder().setName(Configuration.DEFAULT_VRF_NAME).setOwner(c).build();
@@ -49,7 +52,7 @@ public final class NamedCommunitySetTest {
 
   @Test
   public void testAsLiteralCommunities() {
-    long val = 1L;
+    Community val = StandardCommunity.of(1L);
     NamedCommunitySet expr = new NamedCommunitySet(COMMUNITY_LIST_NAME);
 
     assertThat(expr, asLiteralCommunities(_env, equalTo(ImmutableSet.of(val))));
@@ -67,16 +70,18 @@ public final class NamedCommunitySetTest {
   @Test
   public void testMatchAnyCommunity() {
     NamedCommunitySet expr = new NamedCommunitySet(COMMUNITY_LIST_NAME);
-    Set<Long> communityCandidates = ImmutableSet.of(1L, 2L);
+    Set<Community> communityCandidates =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
 
     assertThat(expr, matchAnyCommunity(_env, communityCandidates));
   }
 
   @Test
   public void testMatchCommunities() {
-    Set<Long> matchingCommunitySetCandidate1 = ImmutableSet.of(1L, 2L);
-    Set<Long> matchingCommunitySetCandidate2 = ImmutableSet.of(1L);
-    Set<Long> nonMatchingCommunitySetCandidate = ImmutableSet.of(2L);
+    Set<Community> matchingCommunitySetCandidate1 =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
+    Set<Community> matchingCommunitySetCandidate2 = ImmutableSet.of(StandardCommunity.of(1L));
+    Set<Community> nonMatchingCommunitySetCandidate = ImmutableSet.of(StandardCommunity.of(2L));
     NamedCommunitySet expr = new NamedCommunitySet(COMMUNITY_LIST_NAME);
 
     assertThat(expr, matchCommunities(_env, matchingCommunitySetCandidate1));
@@ -88,15 +93,18 @@ public final class NamedCommunitySetTest {
   public void testMatchCommunity() {
     NamedCommunitySet expr = new NamedCommunitySet(COMMUNITY_LIST_NAME);
 
-    assertThat(expr, matchCommunity(_env, 1L));
-    assertThat(expr, not(matchCommunity(_env, 2L)));
+    assertThat(expr, matchCommunity(_env, StandardCommunity.of(1L)));
+    assertThat(expr, not(matchCommunity(_env, StandardCommunity.of(2L))));
   }
 
   @Test
   public void testMatchedCommunities() {
     NamedCommunitySet expr = new NamedCommunitySet(COMMUNITY_LIST_NAME);
-    Set<Long> communityCandidates = ImmutableSet.of(1L, 2L);
+    Set<Community> communityCandidates =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
 
-    assertThat(expr, matchedCommunities(_env, communityCandidates, ImmutableSet.of(1L)));
+    assertThat(
+        expr,
+        matchedCommunities(_env, communityCandidates, ImmutableSet.of(StandardCommunity.of(1L))));
   }
 }

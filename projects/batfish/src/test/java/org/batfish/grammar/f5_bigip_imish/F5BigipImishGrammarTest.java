@@ -1,6 +1,5 @@
 package org.batfish.grammar.f5_bigip_imish;
 
-import static org.batfish.common.util.CommonUtil.communityStringToLong;
 import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PATH;
 import static org.batfish.datamodel.Prefix.MAX_PREFIX_LENGTH;
 import static org.batfish.datamodel.Route.UNSET_ROUTE_NEXT_HOP_IP;
@@ -49,7 +48,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.batfish.common.BatfishLogger;
@@ -83,6 +81,7 @@ import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
 import org.batfish.datamodel.answers.InitInfoAnswerElement;
 import org.batfish.datamodel.answers.ParseStatus;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.Environment.Direction;
 import org.batfish.datamodel.routing_policy.Result;
@@ -527,7 +526,7 @@ public final class F5BigipImishGrammarTest {
                       .build())
               .getBooleanValue());
       BgpRoute outputRoute = outputBuilder.build();
-      assertThat(outputRoute, hasCommunities(contains(communityStringToLong("2:2"))));
+      assertThat(outputRoute, hasCommunities(contains(StandardCommunity.parse("2:2"))));
     }
 
     {
@@ -609,7 +608,7 @@ public final class F5BigipImishGrammarTest {
                       .build())
               .getBooleanValue());
       BgpRoute outputRoute = outputBuilder.build();
-      assertThat(outputRoute, hasCommunities(contains(communityStringToLong("2:2"))));
+      assertThat(outputRoute, hasCommunities(contains(StandardCommunity.parse("2:2"))));
     }
   }
 
@@ -767,10 +766,7 @@ public final class F5BigipImishGrammarTest {
     assertThat(
         "rm1 sets communities 1:2 and 33:44 on the output route",
         outputRoute.build().getCommunities(),
-        equalTo(
-            Stream.of("1:2", "33:44")
-                .map(CommonUtil::communityStringToLong)
-                .collect(ImmutableSet.toImmutableSet())));
+        equalTo(ImmutableSet.of(StandardCommunity.of(1, 2), StandardCommunity.of(33, 44))));
 
     assertTrue(
         "rm1 rejects prefix 10.0.2.0/24 (no matching entry)",

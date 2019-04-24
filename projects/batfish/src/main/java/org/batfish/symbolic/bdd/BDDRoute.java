@@ -133,7 +133,7 @@ public class BDDRoute implements IDeepCopy<BDDRoute> {
     for (CommunityVar comm : comms) {
       if (comm.getType() != Type.REGEX) {
         _communities.put(comm, factory.ithVar(idx));
-        _bitNames.put(idx, comm.getValue());
+        _bitNames.put(idx, comm.getRegex());
         idx++;
       }
     }

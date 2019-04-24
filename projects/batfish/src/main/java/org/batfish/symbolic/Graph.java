@@ -801,7 +801,7 @@ public class Graph {
     Map<CommunityVar, java.util.regex.Pattern> regexes = new HashMap<>();
     for (CommunityVar c : _allCommunities) {
       if (c.getType() == CommunityVar.Type.REGEX) {
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile(c.getValue());
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(c.getRegex());
         regexes.put(c, p);
       }
     }
@@ -816,12 +816,12 @@ public class Graph {
 
         for (CommunityVar c2 : _allCommunities) {
           if (c2.getType() == CommunityVar.Type.EXACT) {
-            Matcher m = p.matcher(c2.getValue());
+            Matcher m = p.matcher(c2.getRegex());
             if (m.find()) {
               list.add(c2);
             }
           }
-          if (c2.getType() == CommunityVar.Type.OTHER && c1.getValue().equals(c2.getValue())) {
+          if (c2.getType() == CommunityVar.Type.OTHER && c1.getRegex().equals(c2.getRegex())) {
             list.add(c2);
           }
         }
@@ -875,7 +875,7 @@ public class Graph {
     List<CommunityVar> others = new ArrayList<>();
     for (CommunityVar c : comms) {
       if (c.getType() == CommunityVar.Type.REGEX) {
-        CommunityVar x = new CommunityVar(CommunityVar.Type.OTHER, c.getValue(), c.asLong());
+        CommunityVar x = CommunityVar.other(c.getRegex());
         others.add(x);
       }
     }

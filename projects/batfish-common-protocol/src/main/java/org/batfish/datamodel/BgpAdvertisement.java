@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
 import org.batfish.common.BatfishException;
+import org.batfish.datamodel.bgp.community.Community;
 
 /**
  * Instances of this class represent hypothetical BGP advertisements used for testing, or where the
@@ -62,7 +63,7 @@ public class BgpAdvertisement implements Comparable<BgpAdvertisement>, Serializa
 
     private SortedSet<Long> _clusterList;
 
-    private SortedSet<Long> _communities;
+    private SortedSet<Community> _communities;
 
     private Ip _dstIp;
 
@@ -126,7 +127,7 @@ public class BgpAdvertisement implements Comparable<BgpAdvertisement>, Serializa
       return this;
     }
 
-    public Builder setCommunities(SortedSet<Long> communities) {
+    public Builder setCommunities(SortedSet<Community> communities) {
       _communities = communities;
       return this;
     }
@@ -256,7 +257,7 @@ public class BgpAdvertisement implements Comparable<BgpAdvertisement>, Serializa
 
   private final SortedSet<Long> _clusterList;
 
-  private final SortedSet<Long> _communities;
+  private final SortedSet<Community> _communities;
 
   private final Ip _dstIp;
 
@@ -305,7 +306,7 @@ public class BgpAdvertisement implements Comparable<BgpAdvertisement>, Serializa
       @JsonProperty(PROP_MED) long med,
       @JsonProperty(PROP_ORIGINATOR_IP) Ip originatorIp,
       @JsonProperty(PROP_AS_PATH) @Nonnull AsPath asPath,
-      @JsonProperty(PROP_COMMUNITIES) SortedSet<Long> communities,
+      @JsonProperty(PROP_COMMUNITIES) SortedSet<Community> communities,
       @JsonProperty(PROP_CLUSTER_LIST) SortedSet<Long> clusterList,
       @JsonProperty(PROP_WEIGHT) int weight) {
     _type = type;
@@ -498,7 +499,7 @@ public class BgpAdvertisement implements Comparable<BgpAdvertisement>, Serializa
   }
 
   @JsonProperty(PROP_COMMUNITIES)
-  public SortedSet<Long> getCommunities() {
+  public SortedSet<Community> getCommunities() {
     return _communities;
   }
 

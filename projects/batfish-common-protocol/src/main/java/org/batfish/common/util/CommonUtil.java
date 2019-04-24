@@ -157,24 +157,6 @@ public class CommonUtil {
   }
 
   /**
-   * Convert a BGP community string to its numeric representation. Only 16-bit AS numbers and
-   * community values are supported.
-   *
-   * @throws IllegalArgumentException if the AS number or community value is over 16 bits.
-   */
-  public static long communityStringToLong(@Nonnull String str) {
-    String[] parts = str.split(":");
-    long high = Long.parseLong(parts[0]);
-    // Bug: this function is called on both regular and extended communities.
-    // Do not perform checking of as "validity"
-    // https://github.com/batfish/batfish/issues/2103
-    //    checkLongWithin16Bit(high);
-    long low = Long.parseLong(parts[1]);
-    //    checkLongWithin16Bit(low);
-    return low + (high << 16);
-  }
-
-  /**
    * Returns a {@link ClientBuilder} with supplied settings
    *
    * @param noSsl {@link javax.ws.rs.client.Client} will use plain HTTP with no SSL if set to true
@@ -346,14 +328,6 @@ public class CommonUtil {
     intersectionSet.addAll(set1);
     intersectionSet.retainAll(set2);
     return intersectionSet;
-  }
-
-  /** Convert a given long to a string BGP community representation. */
-  @Nonnull
-  public static String longToCommunity(long l) {
-    long upper = l >> 16;
-    long lower = l & 0xFFFF;
-    return upper + ":" + lower;
   }
 
   @Nonnull

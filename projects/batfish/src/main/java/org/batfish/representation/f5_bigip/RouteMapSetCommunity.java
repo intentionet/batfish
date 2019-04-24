@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.Warnings;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet;
 import org.batfish.datamodel.routing_policy.statement.SetCommunity;
 import org.batfish.datamodel.routing_policy.statement.Statement;
@@ -31,6 +32,11 @@ public final class RouteMapSetCommunity implements RouteMapSet {
   @Override
   public @Nonnull Stream<Statement> toStatements(
       Configuration c, F5BigipConfiguration vc, Warnings w) {
-    return Stream.of(new SetCommunity(new LiteralCommunitySet(_communities)));
+    return Stream.of(
+        new SetCommunity(
+            new LiteralCommunitySet(
+                _communities.stream()
+                    .map(StandardCommunity::of)
+                    .collect(ImmutableSet.toImmutableSet()))));
   }
 }

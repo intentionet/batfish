@@ -1,6 +1,7 @@
 package org.batfish.representation.cisco;
 
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.routing_policy.expr.CommunityHalvesExpr;
 import org.batfish.datamodel.routing_policy.expr.CommunitySetExpr;
 import org.batfish.datamodel.routing_policy.expr.LiteralCommunity;
@@ -34,6 +35,7 @@ public class CommunitySetElemHalves implements CommunitySetElem {
     return _suffix;
   }
 
+  @Nonnull
   @Override
   public CommunitySetExpr toCommunitySetExpr() {
     if (_prefix instanceof LiteralCommunitySetElemHalf
@@ -42,7 +44,7 @@ public class CommunitySetElemHalves implements CommunitySetElem {
       LiteralCommunitySetElemHalf suffix = (LiteralCommunitySetElemHalf) _suffix;
       int prefixInt = prefix.getValue();
       int suffixInt = suffix.getValue();
-      return new LiteralCommunity((((long) prefixInt) << 16) | suffixInt);
+      return new LiteralCommunity(StandardCommunity.of(prefixInt, suffixInt));
     } else {
       return new CommunityHalvesExpr(_prefix.toCommunityHalfExpr(), _suffix.toCommunityHalfExpr());
     }

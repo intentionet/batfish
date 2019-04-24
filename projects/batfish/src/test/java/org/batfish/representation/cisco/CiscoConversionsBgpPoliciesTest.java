@@ -28,6 +28,8 @@ import org.batfish.datamodel.PrefixRange;
 import org.batfish.datamodel.RouteFilterLine;
 import org.batfish.datamodel.RouteFilterList;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.routing_policy.Environment.Direction;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet;
@@ -48,8 +50,10 @@ public class CiscoConversionsBgpPoliciesTest {
   private static final String ROUTE_MAP_NAME = "ROUTE_MAP";
   private static final Prefix PERMITTED_PREFIX = Prefix.parse("1.1.1.0/24");
   private static final Prefix DENIED_PREFIX = Prefix.parse("2.2.2.0/24");
-  private static final Set<Long> PERMITTED_COMMUNITY_SET = ImmutableSet.of(10L);
-  private static final Set<Long> DENIED_COMMUNITY_SET = ImmutableSet.of(20L);
+  private static final Set<Community> PERMITTED_COMMUNITY_SET =
+      ImmutableSet.of(StandardCommunity.of(10L));
+  private static final Set<Community> DENIED_COMMUNITY_SET =
+      ImmutableSet.of(StandardCommunity.of(20L));
 
   private Configuration _c;
   private Warnings _w;
@@ -140,7 +144,7 @@ public class CiscoConversionsBgpPoliciesTest {
             .setProtocol(RoutingProtocol.IBGP);
     BgpRoute permitted = r.setCommunities(PERMITTED_COMMUNITY_SET).build();
     BgpRoute denied = r.setCommunities(DENIED_COMMUNITY_SET).build();
-    BgpRoute unmatched = r.setCommunities(ImmutableSet.of(30L)).build();
+    BgpRoute unmatched = r.setCommunities(ImmutableSet.of(StandardCommunity.of(30L))).build();
     assertThat(
         p.process(permitted, permitted.toBuilder(), PEER_ADDRESS, DEFAULT_VRF_NAME, direction),
         equalTo(true));

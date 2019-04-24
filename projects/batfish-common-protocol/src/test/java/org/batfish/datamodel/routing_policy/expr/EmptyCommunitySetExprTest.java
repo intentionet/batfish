@@ -11,6 +11,8 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.junit.Test;
 
 public final class EmptyCommunitySetExprTest {
@@ -24,15 +26,18 @@ public final class EmptyCommunitySetExprTest {
   @Test
   public void testMatchAnyCommunity() {
     assertThat(EmptyCommunitySetExpr.INSTANCE, not(matchAnyCommunity(null, ImmutableSet.of())));
-    assertThat(EmptyCommunitySetExpr.INSTANCE, not(matchAnyCommunity(null, ImmutableSet.of(1L))));
+    assertThat(
+        EmptyCommunitySetExpr.INSTANCE,
+        not(matchAnyCommunity(null, ImmutableSet.of(StandardCommunity.of(1L)))));
   }
 
   @Test
   public void testMatchCommunities() {
-    Set<Long> matchingCommunitySetCandidate1 = ImmutableSet.of(1L, 2L);
-    Set<Long> matchingCommunitySetCandidate2 = ImmutableSet.of(1L);
-    Set<Long> nonMatchingCommunitySetCandidate = ImmutableSet.of(2L);
-    LiteralCommunity l = new LiteralCommunity(1L);
+    Set<Community> matchingCommunitySetCandidate1 =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
+    Set<Community> matchingCommunitySetCandidate2 = ImmutableSet.of(StandardCommunity.of(1L));
+    Set<Community> nonMatchingCommunitySetCandidate = ImmutableSet.of(StandardCommunity.of(2L));
+    LiteralCommunity l = new LiteralCommunity(StandardCommunity.of(1L));
 
     assertThat(l, matchCommunities(null, matchingCommunitySetCandidate1));
     assertThat(l, matchCommunities(null, matchingCommunitySetCandidate2));
@@ -41,13 +46,13 @@ public final class EmptyCommunitySetExprTest {
 
   @Test
   public void testMatchCommunity() {
-    assertThat(EmptyCommunitySetExpr.INSTANCE, not(matchCommunity(null, 1L)));
+    assertThat(EmptyCommunitySetExpr.INSTANCE, not(matchCommunity(null, StandardCommunity.of(1L))));
   }
 
   @Test
   public void testMatchedCommunities() {
-    Set<Long> communityCandidates = ImmutableSet.of(1L, 2L);
-
+    Set<Community> communityCandidates =
+        ImmutableSet.of(StandardCommunity.of(1L), StandardCommunity.of(2L));
     assertThat(
         EmptyCommunitySetExpr.INSTANCE,
         matchedCommunities(null, communityCandidates, ImmutableSet.of()));

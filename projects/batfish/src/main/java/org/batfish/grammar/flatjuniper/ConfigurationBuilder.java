@@ -148,6 +148,7 @@ import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.TcpFlagsMatchConditions;
 import org.batfish.datamodel.VrrpGroup;
 import org.batfish.datamodel.bgp.community.ExtendedCommunity;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.isis.IsisAuthenticationAlgorithm;
 import org.batfish.datamodel.isis.IsisHelloAuthenticationType;
 import org.batfish.datamodel.isis.IsisOption;
@@ -1356,30 +1357,30 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     }
   }
 
-  private static long toCommunityLong(Sc_literalContext ctx) {
+  private static StandardCommunity toStandardCommunity(Sc_literalContext ctx) {
     String text = ctx.STANDARD_COMMUNITY().getText();
-    return CommonUtil.communityStringToLong(text);
+    return StandardCommunity.parse(text);
   }
 
-  private @Nullable Long toCommunityLong(Sc_namedContext ctx) {
+  private @Nullable StandardCommunity toStandardCommunity(Sc_namedContext ctx) {
     if (ctx.NO_ADVERTISE() != null) {
-      return WellKnownCommunity.NO_ADVERTISE;
+      return StandardCommunity.of(WellKnownCommunity.NO_ADVERTISE);
     } else if (ctx.NO_EXPORT() != null) {
-      return WellKnownCommunity.NO_EXPORT;
+      return StandardCommunity.of(WellKnownCommunity.NO_EXPORT);
     } else if (ctx.NO_EXPORT_SUBCONFED() != null) {
-      return WellKnownCommunity.NO_EXPORT_SUBCONFED;
+      return StandardCommunity.of(WellKnownCommunity.NO_EXPORT_SUBCONFED);
     } else {
-      return convProblem(Long.class, ctx, null);
+      return convProblem(StandardCommunity.class, ctx, null);
     }
   }
 
-  private @Nullable Long toCommunityLong(Standard_communityContext ctx) {
+  private @Nullable StandardCommunity toStandardCommunity(Standard_communityContext ctx) {
     if (ctx.sc_literal() != null) {
-      return toCommunityLong(ctx.sc_literal());
+      return toStandardCommunity(ctx.sc_literal());
     } else if (ctx.sc_named() != null) {
-      return toCommunityLong(ctx.sc_named());
+      return toStandardCommunity(ctx.sc_named());
     } else {
-      return convProblem(Long.class, ctx, null);
+      return convProblem(StandardCommunity.class, ctx, null);
     }
   }
 
@@ -4597,20 +4598,19 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       String text = ctx.community_regex().getText();
       _currentCommunityList.getLines().add(new CommunityListLine(text));
       if (text.matches("[0-9]+:[0-9]+")) {
-        long communityVal = CommonUtil.communityStringToLong(text);
-        _configuration.getAllStandardCommunities().add(communityVal);
+        _configuration.getAllStandardCommunities().add(StandardCommunity.parse(text));
       }
     } else if (ctx.extended_community_regex() != null) {
       String text = ctx.extended_community_regex().getText();
       _currentCommunityList.getLines().add(new CommunityListLine(text));
     } else if (ctx.standard_community() != null) {
-      Long communityVal = toCommunityLong(ctx.standard_community());
-      if (communityVal == null) {
-        return;
+      StandardCommunity community = toStandardCommunity(ctx.standard_community());
+      if (community != null) {
+        _configuration
+            .getAllStandardCommunities()
+            .add(toStandardCommunity(ctx.standard_community()));
+        _currentCommunityList.getLines().add(new CommunityListLine(community.toString()));
       }
-      _configuration.getAllStandardCommunities().add(communityVal);
-      String communityStr = CommonUtil.longToCommunity(communityVal);
-      _currentCommunityList.getLines().add(new CommunityListLine(communityStr));
     } else if (ctx.extended_community() != null) {
       _currentCommunityList
           .getLines()
@@ -5011,7 +5011,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitRoa_community(Roa_communityContext ctx) {
-    long community = CommonUtil.communityStringToLong(ctx.STANDARD_COMMUNITY().getText());
+    StandardCommunity community = StandardCommunity.parse(ctx.STANDARD_COMMUNITY().getText());
     _configuration.getAllStandardCommunities().add(community);
     _currentAggregateRoute.getCommunities().add(community);
   }
@@ -5071,7 +5071,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitRog_community(Rog_communityContext ctx) {
-    _currentGeneratedRoute.getCommunities().add(toCommunityLong(ctx.standard_community()));
+    _currentGeneratedRoute.getCommunities().add(toStandardCommunity(ctx.standard_community()));
   }
 
   @Override
@@ -5116,7 +5116,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitRosr_community(Rosr_communityContext ctx) {
-    _currentStaticRoute.getCommunities().add(toCommunityLong(ctx.standard_community()));
+    _currentStaticRoute.getCommunities().add(toStandardCommunity(ctx.standard_community()));
   }
 
   @Override

@@ -6,18 +6,19 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.OriginType;
+import org.batfish.datamodel.bgp.community.Community;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
 @ParametersAreNonnullByDefault
 final class BgpRouteMatchersImpl {
-  static final class HasCommunities extends FeatureMatcher<BgpRoute, Set<Long>> {
-    HasCommunities(@Nonnull Matcher<? super Set<Long>> subMatcher) {
+  static final class HasCommunities extends FeatureMatcher<BgpRoute, Set<Community>> {
+    HasCommunities(@Nonnull Matcher<? super Set<Community>> subMatcher) {
       super(subMatcher, "A BgpRoute with communities:", "communities");
     }
 
     @Override
-    protected Set<Long> featureValueOf(BgpRoute actual) {
+    protected Set<Community> featureValueOf(BgpRoute actual) {
       return actual.getCommunities();
     }
   }

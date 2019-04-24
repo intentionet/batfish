@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import java.util.Set;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.visitors.CommunitySetExprVisitor;
 import org.batfish.datamodel.visitors.VoidCommunitySetExprVisitor;
@@ -37,8 +38,9 @@ public class EmptyCommunitySetExpr extends CommunitySetExpr {
    * When treated as a literal set of communities, {@link EmptyCommunitySetExpr} represents the
    * empty-set.
    */
+  @Nonnull
   @Override
-  public SortedSet<Long> asLiteralCommunities(Environment environment) {
+  public SortedSet<Community> asLiteralCommunities(@Nonnull Environment environment) {
     return ImmutableSortedSet.of();
   }
 
@@ -58,12 +60,12 @@ public class EmptyCommunitySetExpr extends CommunitySetExpr {
   }
 
   @Override
-  public boolean matchCommunities(Environment environment, Set<Long> communitySetCandidate) {
+  public boolean matchCommunities(Environment environment, Set<Community> communitySetCandidate) {
     return false;
   }
 
   @Override
-  public boolean matchCommunity(Environment environment, long community) {
+  public boolean matchCommunity(Environment environment, Community community) {
     return false;
   }
 

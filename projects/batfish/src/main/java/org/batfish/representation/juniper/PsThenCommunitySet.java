@@ -1,11 +1,14 @@
 package org.batfish.representation.juniper;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.Warnings;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.bgp.community.Community;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet;
 import org.batfish.datamodel.routing_policy.statement.Comment;
 import org.batfish.datamodel.routing_policy.statement.SetCommunity;
@@ -43,7 +46,10 @@ public final class PsThenCommunitySet extends PsThen {
        * community expressions, the entire configuration is invalid. As a best-effort, warn and
        * treat line as a NOP.
        */
-      Set<Long> literalCommunities = namedList.extractLiteralCommunities();
+      Set<Community> literalCommunities =
+          namedList.extractLiteralCommunities().stream()
+              .map(StandardCommunity::of)
+              .collect(ImmutableSet.toImmutableSet());
       if (literalCommunities.isEmpty()) {
         String msg =
             String.format(

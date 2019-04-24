@@ -27,6 +27,7 @@ import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.StaticRoute;
+import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,7 +54,7 @@ public class BgpRibTest {
         .setProtocol(RoutingProtocol.BGP)
         .setLocalPreference(100)
         .setClusterList(ImmutableSortedSet.of(3L, 4L))
-        .setCommunities(ImmutableSortedSet.of(5L, 6L))
+        .setCommunities(ImmutableSortedSet.of(StandardCommunity.of(5L), StandardCommunity.of(6L)))
         .setOriginatorIp(Ip.parse("1.1.1.1"))
         .setOriginType(OriginType.IGP)
         .setReceivedFromIp(Ip.parse("1.1.1.1"))
@@ -247,7 +248,7 @@ public class BgpRibTest {
 
     rib.mergeRoute(base);
     assertTrue("Exact AS path match, allow merge", rib.mergeRoute(candidate1));
-    assertTrue("Not an exact AS path match, don't merge", !rib.mergeRoute(candidate2));
+    assertFalse("Not an exact AS path match, don't merge", rib.mergeRoute(candidate2));
     assertThat(rib.getRoutes(), hasSize(2));
     assertThat(rib.getBestPathRoutes(), hasSize(1));
   }

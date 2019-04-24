@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.BgpRoute;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.Result;
 import org.batfish.datamodel.routing_policy.expr.CommunitySetExpr;
@@ -47,8 +48,9 @@ public final class DeleteCommunity extends Statement {
   @Override
   public Result execute(Environment environment) {
     BgpRoute.Builder outputRouteBuilder = (BgpRoute.Builder) environment.getOutputRoute();
-    SortedSet<Long> currentCommunities = outputRouteBuilder.getCommunities();
-    SortedSet<Long> matchingCommunities = _expr.matchedCommunities(environment, currentCommunities);
+    SortedSet<Community> currentCommunities = outputRouteBuilder.getCommunities();
+    SortedSet<Community> matchingCommunities =
+        _expr.matchedCommunities(environment, currentCommunities);
     outputRouteBuilder.removeCommunities(matchingCommunities);
     Result result = new Result();
     return result;

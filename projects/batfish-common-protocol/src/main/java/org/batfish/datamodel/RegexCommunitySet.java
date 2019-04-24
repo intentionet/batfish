@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
-import org.batfish.common.util.CommonUtil;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.expr.CommunitySetExpr;
 import org.batfish.datamodel.visitors.CommunitySetExprVisitor;
@@ -61,8 +61,9 @@ public final class RegexCommunitySet extends CommunitySetExpr {
     visitor.visitRegexCommunitySet(this);
   }
 
+  @Nonnull
   @Override
-  public SortedSet<Long> asLiteralCommunities(Environment environment) {
+  public SortedSet<Community> asLiteralCommunities(@Nonnull Environment environment) {
     throw new UnsupportedOperationException(
         "Cannot be represented as a list of literal communities");
   }
@@ -94,14 +95,14 @@ public final class RegexCommunitySet extends CommunitySetExpr {
   }
 
   @Override
-  public boolean matchCommunities(Environment environment, Set<Long> communitySetCandidate) {
+  public boolean matchCommunities(Environment environment, Set<Community> communitySetCandidate) {
     return communitySetCandidate.stream()
         .anyMatch(community -> matchCommunity(environment, community));
   }
 
   @Override
-  public boolean matchCommunity(Environment environment, long community) {
-    return _pattern.get().matcher(CommonUtil.longToCommunity(community)).find();
+  public boolean matchCommunity(Environment environment, Community community) {
+    return _pattern.get().matcher(community.matchString()).find();
   }
 
   @Override

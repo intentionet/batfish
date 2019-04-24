@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.visitors.CommunitySetExprVisitor;
 import org.batfish.datamodel.visitors.VoidCommunitySetExprVisitor;
@@ -26,13 +27,13 @@ public class LiteralCommunitySet extends CommunitySetExpr {
 
   @JsonCreator
   private static @Nonnull LiteralCommunitySet create(
-      @JsonProperty(PROP_COMMUNITIES) SortedSet<Long> communities) {
+      @JsonProperty(PROP_COMMUNITIES) SortedSet<Community> communities) {
     return new LiteralCommunitySet(firstNonNull(communities, ImmutableSortedSet.of()));
   }
 
-  private final SortedSet<Long> _communities;
+  private final SortedSet<Community> _communities;
 
-  public LiteralCommunitySet(@Nonnull Collection<Long> communities) {
+  public LiteralCommunitySet(@Nonnull Collection<? extends Community> communities) {
     _communities = ImmutableSortedSet.copyOf(communities);
   }
 
@@ -50,8 +51,9 @@ public class LiteralCommunitySet extends CommunitySetExpr {
    * When treated as a literal set of communities, represents exactly the set returned by {@link
    * #getCommunities()}.
    */
+  @Nonnull
   @Override
-  public SortedSet<Long> asLiteralCommunities(Environment environment) {
+  public SortedSet<Community> asLiteralCommunities(@Nonnull Environment environment) {
     return _communities;
   }
 
@@ -72,7 +74,7 @@ public class LiteralCommunitySet extends CommunitySetExpr {
   }
 
   @JsonProperty(PROP_COMMUNITIES)
-  public @Nonnull SortedSet<Long> getCommunities() {
+  public @Nonnull SortedSet<Community> getCommunities() {
     return _communities;
   }
 
@@ -82,12 +84,12 @@ public class LiteralCommunitySet extends CommunitySetExpr {
   }
 
   @Override
-  public boolean matchCommunities(Environment environment, Set<Long> communitySetCandidate) {
+  public boolean matchCommunities(Environment environment, Set<Community> communitySetCandidate) {
     return communitySetCandidate.stream().anyMatch(_communities::contains);
   }
 
   @Override
-  public boolean matchCommunity(Environment environment, long community) {
+  public boolean matchCommunity(Environment environment, Community community) {
     return _communities.contains(community);
   }
 
