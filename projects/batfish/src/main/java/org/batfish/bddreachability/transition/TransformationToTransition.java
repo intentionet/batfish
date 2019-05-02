@@ -50,20 +50,14 @@ public class TransformationToTransition {
     BDD erase = Arrays.stream(var.getBitvec()).reduce(var.getFactory().one(), BDD::and);
     BDD setValue =
         ranges.asRanges().stream()
-            .map(
-                range ->
-                    range.lowerEndpoint().equals(range.upperEndpoint())
-                        ? var.value(range.lowerEndpoint().asLong())
-                        : var.geq(range.lowerEndpoint().asLong())
-                            .and(var.leq(range.upperEndpoint().asLong())))
+            .map(range -> var.range(range.lowerEndpoint().asLong(), range.upperEndpoint().asLong()))
             .reduce(var.getFactory().zero(), BDD::or);
     return new EraseAndSet(erase, setValue);
   }
 
   private static EraseAndSet assignPortFromPool(BDDInteger var, int poolStart, int poolEnd) {
     BDD erase = Arrays.stream(var.getBitvec()).reduce(var.getFactory().one(), BDD::and);
-    BDD setValue =
-        poolStart == poolEnd ? var.value(poolStart) : var.geq(poolStart).and(var.leq(poolEnd));
+    BDD setValue = var.range(poolStart, poolEnd);
     return new EraseAndSet(erase, setValue);
   }
 

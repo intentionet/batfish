@@ -106,10 +106,7 @@ public final class BDDPrefix {
     SubRange r = prefixRange.getLengthRange();
     int lower = r.getStart();
     int upper = r.getEnd();
-    BDD lenMatch =
-        lower == upper
-            ? _prefixLength.value(lower)
-            : _prefixLength.geq(lower).and(_prefixLength.leq(upper));
+    BDD lenMatch = _prefixLength.range(lower, upper);
 
     return lenMatch.and(prefixMatch);
   }

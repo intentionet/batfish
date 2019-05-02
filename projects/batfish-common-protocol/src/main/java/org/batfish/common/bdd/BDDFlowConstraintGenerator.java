@@ -90,11 +90,7 @@ public final class BDDFlowConstraintGenerator {
   BDD computeUDPConstraint() {
     BDDInteger dstPort = _bddPacket.getDstPort();
     BDDInteger srcPort = _bddPacket.getSrcPort();
-    BDD bdd1 =
-        dstPort
-            .geq(33434)
-            .and(dstPort.leq(33534))
-            .and(srcPort.geq(NamedPort.EPHEMERAL_LOWEST.number()));
+    BDD bdd1 = dstPort.range(33434, 33534).and(srcPort.geq(NamedPort.EPHEMERAL_LOWEST.number()));
     BDD bdd2 = _bddPacket.swapSourceAndDestinationFields(bdd1);
     return _bddPacket.getIpProtocol().value(IpProtocol.UDP).and(bdd1.or(bdd2));
   }

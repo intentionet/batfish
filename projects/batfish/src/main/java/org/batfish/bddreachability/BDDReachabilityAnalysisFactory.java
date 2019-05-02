@@ -1472,8 +1472,7 @@ public final class BDDReachabilityAnalysisFactory {
           assignIpAddressFromPool.getIpRanges().asRanges().stream()
               .map(
                   range ->
-                      var.geq(range.lowerEndpoint().asLong())
-                          .and(var.leq(range.upperEndpoint().asLong())))
+                      var.range(range.lowerEndpoint().asLong(), range.upperEndpoint().asLong()))
               .reduce(var.getFactory().zero(), BDD::or);
       _ipRanges.merge(ipField, bdd, BDD::or);
       return null;
@@ -1496,8 +1495,7 @@ public final class BDDReachabilityAnalysisFactory {
     public Void visitAssignPortFromPool(AssignPortFromPool assignPortFromPool) {
       PortField portField = assignPortFromPool.getPortField();
       BDDInteger var = getPortVar(portField);
-      BDD bdd =
-          var.geq(assignPortFromPool.getPoolStart()).and(var.leq(assignPortFromPool.getPoolEnd()));
+      BDD bdd = var.range(assignPortFromPool.getPoolStart(), assignPortFromPool.getPoolEnd());
       _portRanges.merge(portField, bdd, BDD::or);
       return null;
     }

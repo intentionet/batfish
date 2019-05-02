@@ -704,10 +704,7 @@ class TransferBDD {
     SubRange r = range.getLengthRange();
     int lower = r.getStart();
     int upper = r.getEnd();
-    BDD lenMatch =
-        lower == upper
-            ? prefixLength.value(lower)
-            : prefixLength.geq(lower).and(prefixLength.leq(upper));
+    BDD lenMatch = prefixLength.range(lower, upper);
 
     return lenMatch.and(prefixMatch);
   }

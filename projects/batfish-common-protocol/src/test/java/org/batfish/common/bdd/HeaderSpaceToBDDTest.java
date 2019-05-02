@@ -89,9 +89,9 @@ public class HeaderSpaceToBDDTest {
     BDD bdd = _toBDD.toBDD(headerSpace);
 
     BDDInteger dstPort = _pkt.getDstPort();
-    BDD dstPortBDD = dstPort.leq(20).and(dstPort.geq(10));
+    BDD dstPortBDD = dstPort.range(10, 20);
     BDDInteger srcPort = _pkt.getSrcPort();
-    BDD srcPortBDD = srcPort.leq(20).and(srcPort.geq(10));
+    BDD srcPortBDD = srcPort.range(10, 20);
     assertThat(bdd, equalTo(dstPortBDD.or(srcPortBDD)));
   }
 

@@ -111,9 +111,7 @@ public final class HeaderSpaceToBDD {
   }
 
   private static BDD toBDD(SubRange range, BDDInteger var) {
-    long start = range.getStart();
-    long end = range.getEnd();
-    return start == end ? var.value(start) : var.geq(start).and(var.leq(end));
+    return var.range((long) range.getStart(), (long) range.getEnd());
   }
 
   private BDD toBDD(List<TcpFlagsMatchConditions> tcpFlags) {

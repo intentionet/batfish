@@ -119,4 +119,17 @@ public class BDDIntegerTest {
     // y == 31 ==> x == 30
     assertThat(x.getValuesSatisfying(yEqXPlus1.and(y.value(31)), 5), contains(30L));
   }
+
+  @Test
+  public void testRange() {
+    BDDFactory factory = BDDUtils.bddFactory(10);
+    BDDInteger x = BDDInteger.makeFromIndex(factory, 5, 0, false);
+    for (int a = 0; a < 32; ++a) {
+      for (int b = a; b < 32; ++b) {
+        BDD range = x.range(a, b);
+        BDD rangeEquiv = x.geq(a).and(x.leq(b));
+        assertThat(range, equalTo(rangeEquiv));
+      }
+    }
+  }
 }

@@ -147,21 +147,47 @@ public class BDDInteger {
     return bdd;
   }
 
+  // Helper function to compute leq on the last N bits of the input value.
+  private BDD leqN(long val, int n) {
+    assert n <= _bitvec.length;
+    long currentVal = val;
+    BDD acc = _factory.one(); // whether the suffix of BDD is leq suffix of val.
+    for (int i = 0; i < n; ++i) {
+      BDD bit = _bitvec[_bitvec.length - i - 1];
+      if ((currentVal & 1) != 0) {
+        // since this bit of val is 1: 0 implies lt OR 1 and suffix leq. ('1 and' is redundant).
+        acc = bit.imp(acc); // "not i or acc" rewritten "i implies acc".
+      } else {
+        // since this bit of val is 0: must be 0 and have leq suffix.
+        acc = bit.less(acc); // "not i and acc" rewritten "i less acc"
+      }
+      currentVal >>= 1;
+    }
+    return acc;
+  }
+
   /*
    * Less than or equal to on integers
    */
   public BDD leq(long val) {
     checkArgument(val >= 0, "value is negative");
     checkArgument(val < (1L << _bitvec.length), "value %s is out of range", val);
+    return leqN(val, _bitvec.length);
+  }
+
+  // Helper function to compute geq on the last N bits of the input value.
+  private BDD geqN(long val, int n) {
+    assert n <= _bitvec.length;
     long currentVal = val;
-    BDD acc = _factory.one(); // whether the suffix of BDD is leq suffix of val.
-    for (int i = _bitvec.length - 1; i >= 0; i--) {
+    BDD acc = _factory.one(); // whether the suffix of BDD is geq suffix of val.
+    for (int i = 0; i < n; ++i) {
+      BDD bit = _bitvec[_bitvec.length - i - 1];
       if ((currentVal & 1) != 0) {
-        // since this bit of val is 1: 0 implies lt OR 1 and suffix leq. ('1 and' is redundant).
-        acc = _bitvec[i].imp(acc); // "not i or acc" rewritten "i implies acc".
+        // since this bit of val is 1: must be 1 and have geq suffix.
+        acc = bit.and(acc);
       } else {
-        // since this bit of val is 0: must be 0 and have leq suffix.
-        acc = _bitvec[i].less(acc); // "not i and acc" rewritten "i less acc"
+        // since this bit of val is 0: 1 implies gt OR 0 and suffix geq. ('0 and' is redundant.)
+        acc = bit.or(acc);
       }
       currentVal >>= 1;
     }
@@ -174,19 +200,41 @@ public class BDDInteger {
   public BDD geq(long val) {
     checkArgument(val >= 0, "value is negative");
     checkArgument(val < (1L << _bitvec.length), "value %s is out of range", val);
-    long currentVal = val;
-    BDD acc = _factory.one(); // whether the suffix of BDD is geq suffix of val.
-    for (int i = _bitvec.length - 1; i >= 0; i--) {
+    return geqN(val, _bitvec.length);
+  }
+
+  /*
+   * Integers in the given range, inclusive, where {@code a} is less than or equal to {@code b}.
+   */
+  // This is basically this.geq(a).and(this.leq(b)). Two differences:
+  //   1. Short-circuit a == b
+  //   2. Save work in the case where a and b have a common prefix.
+  public BDD range(long a, long b) {
+    checkArgument(a <= b, "range is not ordered correctly");
+    checkArgument(a >= 0, "value is negative");
+    checkArgument(b < (1L << _bitvec.length), "value %s is out of range", b);
+
+    if (a == b) {
+      return value(a);
+    }
+
+    long bitOfFirstDifference = Long.highestOneBit(a ^ b);
+    int sizeOfDifferentSuffix = Long.numberOfTrailingZeros(bitOfFirstDifference) + 1;
+    BDD geqA = geqN(a, sizeOfDifferentSuffix);
+    BDD leqB = leqN(b, sizeOfDifferentSuffix);
+
+    BDD between = geqA.and(leqB);
+    long currentVal = a >> sizeOfDifferentSuffix;
+    for (int i = sizeOfDifferentSuffix; i < _bitvec.length; ++i) {
+      BDD bit = _bitvec[_bitvec.length - i - 1];
       if ((currentVal & 1) != 0) {
-        // since this bit of val is 1: must be 1 and have geq suffix.
-        acc = _bitvec[i].and(acc);
+        between = bit.and(between);
       } else {
-        // since this bit of val is 0: 1 implies gt OR 0 and suffix geq. ('0 and' is redundant.)
-        acc = _bitvec[i].or(acc);
+        between = bit.less(between); // "not i and x" rewritten "i less x"
       }
       currentVal >>= 1;
     }
-    return acc;
+    return between;
   }
 
   /*
