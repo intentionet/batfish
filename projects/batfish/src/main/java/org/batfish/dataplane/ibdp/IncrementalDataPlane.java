@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
+import javax.annotation.Nonnull;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AnnotatedRoute;
 import org.batfish.datamodel.Bgpv4Route;
@@ -111,10 +112,13 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
   private transient SortedMap<String, SortedMap<String, GenericRib<AnnotatedRoute<AbstractRoute>>>>
       _ribs;
 
+  @Nonnull private final Table<String, String, Set<Bgpv4Route>> _bgpRoutes;
+
   private IncrementalDataPlane(Builder builder) {
     _ipVrfOwners = builder._ipVrfOwners;
     _nodes = builder._nodes;
     _layer3Topology = builder._layer3Topology;
+    _bgpRoutes = computeBgpRoutes();
   }
 
   private Map<String, Configuration> computeConfigurations() {
@@ -149,8 +153,14 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
                 vrfEntry -> vrfEntry.getValue().getMainRib()));
   }
 
+  @Nonnull
   @Override
   public Table<String, String, Set<Bgpv4Route>> getBgpRoutes(boolean multipath) {
+    return _bgpRoutes;
+  }
+
+  @Nonnull
+  private Table<String, String, Set<Bgpv4Route>> computeBgpRoutes() {
     Table<String, String, Set<Bgpv4Route>> table = TreeBasedTable.create();
 
     _nodes.forEach(
@@ -158,7 +168,7 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
             node.getVirtualRouters()
                 .forEach(
                     (vrfName, vr) -> {
-                      table.put(hostname, vrfName, vr.getBgpRib().getTypedRoutes());
+                      table.put(hostname, vrfName, vr.getBgpRoutes());
                     }));
     return table;
   }

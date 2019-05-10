@@ -291,13 +291,14 @@ public class VirtualRouterTest {
                 .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
                 .setSourceAddress(Ip.parse("2.2.2.2"))
                 .build());
+    vr.initForEgpComputation(TopologyContext.builder().build());
 
     // Test
     vr.initEvpnRoutes();
 
     Ip vniSourceAddress = Ip.parse("2.2.2.2");
     assertThat(
-        vr._ebgpEvpnRib.getTypedRoutes(),
+        vr._bgpRoutingProcess._ebgpEvpnRib.getTypedRoutes(),
         equalTo(
             ImmutableSet.of(
                 EvpnType3Route.builder()
@@ -446,16 +447,6 @@ public class VirtualRouterTest {
     assertThat(vr._ripInternalRib.getRoutes(), empty());
     assertThat(vr._ripInternalStagingRib.getRoutes(), empty());
     assertThat(vr._ripRib.getRoutes(), empty());
-
-    // BGP ribs
-    // Ibgp
-    assertThat(vr._ibgpRib.getRoutes(), empty());
-    assertThat(vr._ibgpStagingRib.getRoutes(), empty());
-    // Ebgp
-    assertThat(vr._ebgpRib.getRoutes(), empty());
-    assertThat(vr._ebgpStagingRib.getRoutes(), empty());
-    // Combined bgp
-    assertThat(vr._bgpRib.getRoutes(), empty());
 
     // Main RIB
     assertThat(vr._mainRib.getRoutes(), empty());
@@ -609,51 +600,6 @@ public class VirtualRouterTest {
 
     Vrf vrf1 = nf.vrfBuilder().setName(DEFAULT_VRF_NAME).setOwner(c1).build();
     Vrf vrf2 = nf.vrfBuilder().setName(DEFAULT_VRF_NAME).setOwner(c2).build();
-
-    Interface.Builder ib = nf.interfaceBuilder().setActive(false);
-    ib.setAddress(new InterfaceAddress("1.1.1.1/30")).setOwner(c1).build();
-    ib.setAddress(new InterfaceAddress("1.1.1.2/30")).setOwner(c2).build();
-
-    Topology topology = synthesizeL3Topology(ImmutableMap.of("r1", c1, "r2", c2));
-
-    Map<String, Configuration> configs = ImmutableMap.of("r1", c1, "r2", c2);
-    BgpTopology bgpTopology =
-        initBgpTopology(configs, computeIpNodeOwners(configs, false), false, null);
-    IsisTopology isisTopology = initIsisTopology(configs, topology);
-
-    Map<String, Node> nodes =
-        ImmutableMap.of(c1.getHostname(), new Node(c1), c2.getHostname(), new Node(c2));
-
-    Map<String, VirtualRouter> vrs =
-        nodes.values().stream()
-            .map(n -> n.getVirtualRouters().get(DEFAULT_VRF_NAME))
-            .collect(
-                ImmutableMap.toImmutableMap(
-                    vr -> vr.getConfiguration().getHostname(), Function.identity()));
-    IsisTopology initialIsisTopology = initIsisTopology(configs, topology);
-
-    EigrpTopology eigrpTopology = initEigrpTopology(configs, topology);
-    vrs.values()
-        .forEach(
-            vr ->
-                vr.initQueuesAndDeltaBuilders(
-                    TopologyContext.builder()
-                        .setBgpTopology(bgpTopology)
-                        .setEigrpTopology(eigrpTopology)
-                        .setIsisTopology(initialIsisTopology)
-                        .build()));
-
-    // Assert that queues are empty as there are no OSPF, BGP, EIGRP, nor IS-IS processes
-    vrs.values()
-        .forEach(
-            vr -> {
-              assertThat(vr._bgpIncomingRoutes, anEmptyMap());
-              vr._virtualEigrpProcesses
-                  .values()
-                  .forEach(process -> assertThat(process._incomingRoutes, anEmptyMap()));
-              assertThat(vr._isisIncomingRoutes, anEmptyMap());
-            });
-
     // Set bgp processes and neighbors
     BgpProcess proc1 = nf.bgpProcessBuilder().setVrf(vrf1).setRouterId(Ip.parse("1.1.1.1")).build();
     BgpProcess proc2 = nf.bgpProcessBuilder().setVrf(vrf2).setRouterId(Ip.parse("1.1.1.2")).build();
@@ -672,13 +618,57 @@ public class VirtualRouterTest {
         .setLocalAs(2L)
         .build();
 
-    // Re-run
+    Interface.Builder ib = nf.interfaceBuilder().setActive(false);
+    ib.setAddress(new InterfaceAddress("1.1.1.1/30")).setOwner(c1).build();
+    ib.setAddress(new InterfaceAddress("1.1.1.2/30")).setOwner(c2).build();
+
+    Topology topology = synthesizeL3Topology(ImmutableMap.of("r1", c1, "r2", c2));
+
+    Map<String, Configuration> configs = ImmutableMap.of("r1", c1, "r2", c2);
+    BgpTopology bgpTopology = BgpTopology.EMPTY;
+    IsisTopology isisTopology = initIsisTopology(configs, topology);
+
+    Map<String, Node> nodes =
+        ImmutableMap.of(c1.getHostname(), new Node(c1), c2.getHostname(), new Node(c2));
+
+    Map<String, VirtualRouter> vrs =
+        nodes.values().stream()
+            .map(n -> n.getVirtualRouters().get(DEFAULT_VRF_NAME))
+            .collect(
+                ImmutableMap.toImmutableMap(
+                    vr -> vr.getConfiguration().getHostname(), Function.identity()));
+    IsisTopology initialIsisTopology = initIsisTopology(configs, topology);
+
+    EigrpTopology eigrpTopology = initEigrpTopology(configs, topology);
+    vrs.values()
+        .forEach(
+            vr ->
+                vr.initForEgpComputation(
+                    TopologyContext.builder()
+                        .setBgpTopology(bgpTopology)
+                        .setEigrpTopology(eigrpTopology)
+                        .setIsisTopology(initialIsisTopology)
+                        .build()));
+
+    // Assert that queues are empty as there are no OSPF, BGP, EIGRP, nor IS-IS processes if the
+    // topologies are empty
+    vrs.values()
+        .forEach(
+            vr -> {
+              assertThat(vr._bgpRoutingProcess._bgpIncomingRoutes, anEmptyMap());
+              vr._virtualEigrpProcesses
+                  .values()
+                  .forEach(process -> assertThat(process._incomingRoutes, anEmptyMap()));
+              assertThat(vr._isisIncomingRoutes, anEmptyMap());
+            });
+
+    // Re-run with non-empty topology
     BgpTopology bgpTopology2 =
         initBgpTopology(configs, computeIpNodeOwners(configs, false), false, null);
     for (Node n : nodes.values()) {
       n.getVirtualRouters()
           .get(DEFAULT_VRF_NAME)
-          .initQueuesAndDeltaBuilders(
+          .initForEgpComputation(
               TopologyContext.builder()
                   .setBgpTopology(bgpTopology2)
                   .setEigrpTopology(eigrpTopology)
@@ -689,8 +679,8 @@ public class VirtualRouterTest {
     vrs.values()
         .forEach(
             vr -> {
-              assertThat(vr._bgpIncomingRoutes, is(notNullValue()));
-              assertThat(vr._bgpIncomingRoutes.values(), hasSize(1));
+              assertThat(vr._bgpRoutingProcess._bgpIncomingRoutes, is(notNullValue()));
+              assertThat(vr._bgpRoutingProcess._bgpIncomingRoutes.values(), hasSize(1));
             });
   }
 

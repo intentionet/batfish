@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.batfish.common.util.CommonUtil.toImmutableSortedMap;
 import static org.batfish.common.util.CommonUtil.toOrderedHashCode;
-import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PATH;
 import static org.batfish.datamodel.routing_policy.Environment.Direction.IN;
 import static org.batfish.dataplane.protocols.IsisProtocolHelper.convertRouteLevel1ToLevel2;
 import static org.batfish.dataplane.protocols.IsisProtocolHelper.setOverloadOnAllRoutes;
@@ -23,9 +22,9 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Streams;
 import com.google.common.graph.Network;
-import com.google.common.graph.ValueGraph;
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,7 +34,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -54,8 +52,8 @@ import org.batfish.datamodel.BgpAdvertisement.BgpAdvertisementType;
 import org.batfish.datamodel.BgpPeerConfig;
 import org.batfish.datamodel.BgpPeerConfigId;
 import org.batfish.datamodel.BgpProcess;
+import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.BgpSessionProperties;
-import org.batfish.datamodel.BgpTieBreaker;
 import org.batfish.datamodel.Bgpv4Route;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConnectedRoute;
@@ -71,7 +69,6 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IsisRoute;
 import org.batfish.datamodel.LocalRoute;
 import org.batfish.datamodel.LongSpace;
-import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
@@ -125,21 +122,11 @@ public class VirtualRouter implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /** Parent configuration for this Virtual router */
-  private final Configuration _c;
+  /** The BGP routing process */
+  @Nullable transient BgpRoutingProcess _bgpRoutingProcess;
 
-  /** Route dependency tracker for BGP aggregate routes */
-  private transient RouteDependencyTracker<Bgpv4Route, AbstractRoute> _bgpAggDeps =
-      new RouteDependencyTracker<>();
-
-  /** Incoming messages into this router from each BGP neighbor */
-  transient SortedMap<EdgeId, Queue<RouteAdvertisement<Bgpv4Route>>> _bgpIncomingRoutes;
-
-  /** Combined BGP (both iBGP and eBGP) RIB */
-  Bgpv4Rib _bgpRib;
-
-  /** Builder for constructing {@link RibDelta} as pertains to the multipath BGP RIB */
-  private transient RibDelta.Builder<Bgpv4Route> _bgpDeltaBuilder;
+  /** Parent configuration for this virtual router */
+  @Nonnull private final Configuration _c;
 
   /** The RIB containing connected routes */
   private transient ConnectedRib _connectedRib;
@@ -151,29 +138,6 @@ public class VirtualRouter implements Serializable {
   private transient SortedMap<
           CrossVrfEdgeId, Queue<RouteAdvertisement<AnnotatedRoute<AbstractRoute>>>>
       _crossVrfIncomingRoutes;
-
-  /** Helper RIB containing all paths obtained with external BGP */
-  transient Bgpv4Rib _ebgpRib;
-
-  /**
-   * Helper RIB containing paths obtained with external eBGP during current iteration. An Adj-RIB of
-   * sorts.
-   */
-  transient Bgpv4Rib _ebgpStagingRib;
-
-  /** Helper RIB containing paths obtained with iBGP */
-  transient Bgpv4Rib _ibgpRib;
-
-  /**
-   * Helper RIB containing paths obtained with iBGP during current iteration. An Adj-RIB of sorts.
-   */
-  transient Bgpv4Rib _ibgpStagingRib;
-
-  /** Helper RIB containing paths obtained with EVPN over eBGP */
-  transient EvpnRib<EvpnRoute> _ebgpEvpnRib;
-
-  /** Helper RIB containing paths obtained with EVPN over iBGP */
-  transient EvpnRib<EvpnRoute> _ibgpEvpnRib;
 
   /**
    * The independent RIB contains connected and static routes, which are unaffected by BDP
@@ -237,7 +201,7 @@ public class VirtualRouter implements Serializable {
     _mainRibRouteDeltaBuilder = RibDelta.builder();
     // Init rest of the RIBs
     initRibs();
-    _bgpIncomingRoutes = new TreeMap<>();
+
     _prefixTracer = new PrefixTracer();
     _virtualEigrpProcesses = ImmutableMap.of();
     _ospfProcesses = ImmutableMap.of();
@@ -361,6 +325,15 @@ public class VirtualRouter implements Serializable {
    */
   void initForEgpComputation(TopologyContext topologyContext) {
     initQueuesAndDeltaBuilders(topologyContext);
+    // Handle BGP process state
+    if (_bgpRoutingProcess == null && _vrf.getBgpProcess() != null) {
+      // If the process does not exist, but should, init it.
+      _bgpRoutingProcess = new BgpRoutingProcess(_vrf.getBgpProcess(), _c, _name, _mainRib);
+    }
+    if (_bgpRoutingProcess != null) {
+      // If the process exists, update the topology
+      _bgpRoutingProcess.updateTopology(topologyContext.getBgpTopology());
+    }
   }
 
   /**
@@ -370,9 +343,6 @@ public class VirtualRouter implements Serializable {
    */
   @VisibleForTesting
   void initQueuesAndDeltaBuilders(TopologyContext topologyContext) {
-
-    // Initialize message queues for each BGP neighbor
-    initBgpQueues(topologyContext.getBgpTopology());
     // Initialize message queues for each EIGRP neighbor
     initEigrpQueues(topologyContext.getEigrpTopology());
     // Initialize message queues for each IS-IS neighbor
@@ -397,39 +367,6 @@ public class VirtualRouter implements Serializable {
           // TODO Will need to update once support is added for cross-VRF export policies
           exportingVR._mainRib.getTypedRoutes().stream().map(RouteAdvertisement::new),
           _vrf.getCrossVrfImportPolicy());
-    }
-  }
-
-  /**
-   * Initialize incoming BGP message queues.
-   *
-   * @param bgpTopology source of truth for which sessions get established.
-   */
-  void initBgpQueues(BgpTopology bgpTopology) {
-    ValueGraph<BgpPeerConfigId, BgpSessionProperties> graph = bgpTopology.getGraph();
-    if (_vrf.getBgpProcess() == null) {
-      _bgpIncomingRoutes = ImmutableSortedMap.of();
-    } else {
-      _bgpIncomingRoutes =
-          Streams.concat(
-                  _vrf.getBgpProcess().getActiveNeighbors().entrySet().stream()
-                      .filter(e -> e.getValue().getIpv4UnicastAddressFamily() != null)
-                      .map(
-                          e ->
-                              new BgpPeerConfigId(
-                                  getHostname(), _vrf.getName(), e.getKey(), false)),
-                  _vrf.getBgpProcess().getPassiveNeighbors().entrySet().stream()
-                      .filter(e -> e.getValue().getIpv4UnicastAddressFamily() != null)
-                      .map(
-                          e ->
-                              new BgpPeerConfigId(getHostname(), _vrf.getName(), e.getKey(), true)),
-                  _vrf.getBgpProcess().getInterfaceNeighbors().entrySet().stream()
-                      .filter(e -> e.getValue().getIpv4UnicastAddressFamily() != null)
-                      .map(e -> new BgpPeerConfigId(getHostname(), _vrf.getName(), e.getKey())))
-              .filter(graph.nodes()::contains)
-              .flatMap(dst -> graph.adjacentNodes(dst).stream().map(src -> new EdgeId(src, dst)))
-              .collect(
-                  toImmutableSortedMap(Function.identity(), e -> new ConcurrentLinkedQueue<>()));
     }
   }
 
@@ -512,7 +449,9 @@ public class VirtualRouter implements Serializable {
           .filter(RouteAdvertisement::isWithdrawn)
           .forEach(
               r ->
-                  _bgpDeltaBuilder.from(_bgpAggDeps.deleteRoute(r.getRoute().getRoute(), _bgpRib)));
+                  _bgpRoutingProcess._bgpDeltaBuilder.from(
+                      _bgpRoutingProcess._bgpAggDeps.deleteRoute(
+                          r.getRoute().getRoute(), _bgpRoutingProcess._bgpRib)));
     }
   }
 
@@ -556,16 +495,15 @@ public class VirtualRouter implements Serializable {
       BgpTopology bgpTopology,
       NetworkConfigurations networkConfigurations) {
 
-    BgpProcess proc = _vrf.getBgpProcess();
-    if (proc == null) {
+    if (_bgpRoutingProcess == null) {
       // Nothing to do
       return;
     }
 
     // Keep track of changes to the RIBs using delta builders, keyed by RIB type
     Map<Bgpv4Rib, RibDelta.Builder<Bgpv4Route>> ribDeltas = new IdentityHashMap<>();
-    ribDeltas.put(_ebgpStagingRib, RibDelta.builder());
-    ribDeltas.put(_ibgpStagingRib, RibDelta.builder());
+    ribDeltas.put(_bgpRoutingProcess._ebgpStagingRib, RibDelta.builder());
+    ribDeltas.put(_bgpRoutingProcess._ibgpStagingRib, RibDelta.builder());
 
     // initialize admin costs for routes
     int ebgpAdmin = RoutingProtocol.BGP.getDefaultAdministrativeCost(_c.getConfigurationFormat());
@@ -627,7 +565,8 @@ public class VirtualRouter implements Serializable {
           throw new BatfishException("Missing or invalid bgp advertisement type");
       }
 
-      Bgpv4Rib targetRib = ebgp ? _ebgpStagingRib : _ibgpStagingRib;
+      Bgpv4Rib targetRib =
+          ebgp ? _bgpRoutingProcess._ebgpStagingRib : _bgpRoutingProcess._ibgpStagingRib;
       RoutingProtocol targetProtocol = ebgp ? RoutingProtocol.BGP : RoutingProtocol.IBGP;
 
       if (received) {
@@ -781,7 +720,7 @@ public class VirtualRouter implements Serializable {
   @VisibleForTesting
   void initEvpnRoutes() {
     BgpProcess bgpProcess = _vrf.getBgpProcess();
-    if (bgpProcess == null) {
+    if (_bgpRoutingProcess == null) {
       // Nothing to do
       return;
     }
@@ -807,7 +746,8 @@ public class VirtualRouter implements Serializable {
               layer3VniConfig -> {
                 boolean ebgp =
                     !peerConfig.getRemoteAsns().equals(LongSpace.of(peerConfig.getLocalAs()));
-                EvpnRib<EvpnRoute> ribForThisRoute = ebgp ? _ebgpEvpnRib : _ibgpEvpnRib;
+                EvpnRib<EvpnRoute> ribForThisRoute =
+                    ebgp ? _bgpRoutingProcess._ebgpEvpnRib : _bgpRoutingProcess._ibgpEvpnRib;
                 VniSettings vniSettings = _vrf.getVniSettings().get(layer3VniConfig.getVni());
                 checkState(
                     vniSettings != null,
@@ -864,7 +804,7 @@ public class VirtualRouter implements Serializable {
    * accepting advertisements less desirable than the locally generated ones for a given network.
    */
   void initBgpAggregateRoutes() {
-    if (_vrf.getBgpProcess() == null) {
+    if (_bgpRoutingProcess == null) {
       return;
     }
     // first import aggregates
@@ -884,10 +824,10 @@ public class VirtualRouter implements Serializable {
           BgpProtocolHelper.convertGeneratedRouteToBgp(
               gr, _vrf.getBgpProcess().getRouterId(), true);
       /* TODO: tests for this */
-      RibDelta<Bgpv4Route> d1 = _bgpRib.mergeRouteGetDelta(br);
-      _bgpDeltaBuilder.from(d1);
+      RibDelta<Bgpv4Route> d1 = _bgpRoutingProcess._bgpRib.mergeRouteGetDelta(br);
+      _bgpRoutingProcess._bgpDeltaBuilder.from(d1);
       if (!d1.isEmpty()) {
-        _bgpAggDeps.addRouteDependency(br, gr);
+        _bgpRoutingProcess._bgpAggDeps.addRouteDependency(br, gr);
       }
     }
   }
@@ -1058,40 +998,6 @@ public class VirtualRouter implements Serializable {
     _generatedRib = new Rib();
     _independentRib = new Rib();
 
-    // BGP
-    BgpProcess proc = _vrf.getBgpProcess();
-    MultipathEquivalentAsPathMatchMode mpTieBreaker = getBgpMpTieBreaker();
-    BgpTieBreaker tieBreaker = getBestPathTieBreaker();
-    _ebgpRib =
-        new Bgpv4Rib(
-            _mainRib,
-            tieBreaker,
-            proc == null || proc.getMultipathEbgp() ? null : 1,
-            mpTieBreaker,
-            false);
-    _ibgpRib =
-        new Bgpv4Rib(
-            _mainRib,
-            tieBreaker,
-            proc == null || proc.getMultipathIbgp() ? null : 1,
-            mpTieBreaker,
-            false);
-    _bgpRib =
-        new Bgpv4Rib(
-            _mainRib,
-            tieBreaker,
-            proc == null || proc.getMultipathEbgp() || proc.getMultipathIbgp() ? null : 1,
-            mpTieBreaker,
-            false);
-    _bgpDeltaBuilder = RibDelta.builder();
-
-    _ebgpStagingRib = new Bgpv4Rib(_mainRib, tieBreaker, null, mpTieBreaker, false);
-    _ibgpStagingRib = new Bgpv4Rib(_mainRib, tieBreaker, null, mpTieBreaker, false);
-
-    // EVPN
-    _ebgpEvpnRib = new EvpnRib<>(_mainRib, tieBreaker, null, mpTieBreaker);
-    _ibgpEvpnRib = new EvpnRib<>(_mainRib, tieBreaker, null, mpTieBreaker);
-
     // ISIS
     _isisRib = new IsisRib(isL1Only());
     _isisL1Rib = new IsisLevelRib(true);
@@ -1107,20 +1013,6 @@ public class VirtualRouter implements Serializable {
     // Static
     _staticNextHopRib = new StaticRib();
     _staticInterfaceRib = new StaticRib();
-  }
-
-  private BgpTieBreaker getBestPathTieBreaker() {
-    BgpProcess proc = _vrf.getBgpProcess();
-    return proc == null
-        ? BgpTieBreaker.ARRIVAL_ORDER
-        : firstNonNull(_vrf.getBgpProcess().getTieBreaker(), BgpTieBreaker.ARRIVAL_ORDER);
-  }
-
-  private MultipathEquivalentAsPathMatchMode getBgpMpTieBreaker() {
-    BgpProcess proc = _vrf.getBgpProcess();
-    return proc == null
-        ? EXACT_PATH
-        : firstNonNull(proc.getMultipathEquivalentAsPathMatchMode(), EXACT_PATH);
   }
 
   private boolean isL1Only() {
@@ -1168,17 +1060,18 @@ public class VirtualRouter implements Serializable {
       BgpTopology bgpTopology, NetworkConfigurations nc, Map<String, Node> nodes) {
 
     // If we have no BGP process, nothing to do
-    if (_vrf.getBgpProcess() == null) {
+    if (_bgpRoutingProcess == null) {
       return ImmutableMap.of();
     }
 
     // Keep track of changes to the RIBs using delta builders, keyed by RIB type
     Map<Bgpv4Rib, RibDelta.Builder<Bgpv4Route>> ribDeltas = new IdentityHashMap<>();
-    ribDeltas.put(_ebgpStagingRib, RibDelta.builder());
-    ribDeltas.put(_ibgpStagingRib, RibDelta.builder());
+    ribDeltas.put(_bgpRoutingProcess._ebgpStagingRib, RibDelta.builder());
+    ribDeltas.put(_bgpRoutingProcess._ibgpStagingRib, RibDelta.builder());
 
     // Process updates from each neighbor
-    for (Entry<EdgeId, Queue<RouteAdvertisement<Bgpv4Route>>> e : _bgpIncomingRoutes.entrySet()) {
+    for (Entry<EdgeId, Queue<RouteAdvertisement<Bgpv4Route>>> e :
+        _bgpRoutingProcess._bgpIncomingRoutes.entrySet()) {
 
       // Grab the queue containing all messages from remoteBgpPeerConfig
       Queue<RouteAdvertisement<Bgpv4Route>> queue = e.getValue();
@@ -1192,7 +1085,10 @@ public class VirtualRouter implements Serializable {
       // sessionProperties represents the incoming edge, so its tailIp is the remote peer's IP
       Ip remoteIp = sessionProperties.getTailIp();
 
-      Bgpv4Rib targetRib = sessionProperties.isEbgp() ? _ebgpStagingRib : _ibgpStagingRib;
+      Bgpv4Rib targetRib =
+          sessionProperties.isEbgp()
+              ? _bgpRoutingProcess._ebgpStagingRib
+              : _bgpRoutingProcess._ibgpStagingRib;
       Builder<AnnotatedRoute<AbstractRoute>> perNeighborDeltaForRibGroups = RibDelta.builder();
 
       // Process all routes from neighbor
@@ -1449,20 +1345,22 @@ public class VirtualRouter implements Serializable {
   /**
    * Queue advertised BGP routes to all BGP neighbors.
    *
-   * @param ebgpBestPathDelta {@link RibDelta} indicating what changed in the {@link #_ebgpRib}
-   * @param bgpMultiPathDelta a {@link RibDelta} indicating what changed in the {@link #_bgpRib}
+   * @param ebgpBestPathDelta {@link RibDelta} indicating what changed in the {@link
+   *     BgpRoutingProcess#_ebgpRib}
+   * @param bgpMultiPathDelta a {@link RibDelta} indicating what changed in the {@link
+   *     BgpRoutingProcess#_bgpRib}
    * @param mainDelta a {@link RibDelta} indicating what changed in the {@link #_mainRib}
    * @param allNodes map of all nodes in the network, keyed by hostname
    * @param bgpTopology the bgp peering relationships
    */
   private void queueOutgoingBgpRoutes(
       RibDelta<Bgpv4Route> ebgpBestPathDelta,
-      RibDelta<Bgpv4Route> bgpMultiPathDelta,
+      RibDelta<BgpRoute> bgpMultiPathDelta,
       RibDelta<AnnotatedRoute<AbstractRoute>> mainDelta,
       final Map<String, Node> allNodes,
       BgpTopology bgpTopology,
       NetworkConfigurations networkConfigurations) {
-    for (EdgeId edge : _bgpIncomingRoutes.keySet()) {
+    for (EdgeId edge : _bgpRoutingProcess._bgpIncomingRoutes.keySet()) {
       final BgpSessionProperties session = getBgpSessionProperties(bgpTopology, edge);
 
       BgpPeerConfigId remoteConfigId = edge.tail();
@@ -1495,7 +1393,7 @@ public class VirtualRouter implements Serializable {
          */
         for (Prefix p : mainDelta.getPrefixes()) {
           preExportPolicyDeltaBuilder.add(
-              _bgpRib.getTypedRoutes().stream()
+              _bgpRoutingProcess._bgpRib.getTypedRoutes().stream()
                   .filter(r -> r.getNetwork().equals(p))
                   .map(r -> new AnnotatedRoute<AbstractRoute>(r, _name))
                   .collect(ImmutableSet.toImmutableSet()));
@@ -1632,7 +1530,7 @@ public class VirtualRouter implements Serializable {
    * happening, queue appropriate outgoing messages to neighbors as well.
    *
    * @param stagingDeltas a map of RIB to corresponding delta. Keys are expected to contain {@link
-   *     #_ebgpStagingRib} and {@link #_ibgpStagingRib}
+   *     BgpRoutingProcess#_ebgpStagingRib} and {@link BgpRoutingProcess#_ibgpStagingRib}
    * @param bgpTopology the bgp peering relationships
    */
   void finalizeBgpRoutesAndQueueOutgoingMessages(
@@ -1641,25 +1539,25 @@ public class VirtualRouter implements Serializable {
       BgpTopology bgpTopology,
       NetworkConfigurations networkConfigurations) {
 
-    if (_vrf.getBgpProcess() == null) {
+    if (_bgpRoutingProcess == null) {
       return;
     }
 
     RibDelta<Bgpv4Route> ebgpStagingDelta =
-        stagingDeltas.getOrDefault(_ebgpStagingRib, RibDelta.empty());
+        stagingDeltas.getOrDefault(_bgpRoutingProcess._ebgpStagingRib, RibDelta.empty());
     RibDelta<Bgpv4Route> ibgpStagingDelta =
-        stagingDeltas.getOrDefault(_ibgpStagingRib, RibDelta.empty());
+        stagingDeltas.getOrDefault(_bgpRoutingProcess._ibgpStagingRib, RibDelta.empty());
 
-    RibDelta<Bgpv4Route> ebgpDelta = importRibDelta(_ebgpRib, ebgpStagingDelta);
-    RibDelta<Bgpv4Route> ibgpDelta = importRibDelta(_ibgpRib, ibgpStagingDelta);
-    _bgpDeltaBuilder.from(importRibDelta(_bgpRib, ebgpDelta));
-    _bgpDeltaBuilder.from(importRibDelta(_bgpRib, ibgpDelta));
+    RibDelta<Bgpv4Route> ebgpDelta = importRibDelta(_bgpRoutingProcess._ebgpRib, ebgpStagingDelta);
+    RibDelta<Bgpv4Route> ibgpDelta = importRibDelta(_bgpRoutingProcess._ibgpRib, ibgpStagingDelta);
+    _bgpRoutingProcess._bgpDeltaBuilder.from(importRibDelta(_bgpRoutingProcess._bgpRib, ebgpDelta));
+    _bgpRoutingProcess._bgpDeltaBuilder.from(importRibDelta(_bgpRoutingProcess._bgpRib, ibgpDelta));
     _mainRibRouteDeltaBuilder.from(
-        RibDelta.importRibDelta(_mainRib, _bgpDeltaBuilder.build(), _name));
+        RibDelta.importRibDelta(_mainRib, _bgpRoutingProcess._bgpDeltaBuilder.build(), _name));
 
     queueOutgoingBgpRoutes(
         ebgpDelta,
-        _bgpDeltaBuilder.build(),
+        _bgpRoutingProcess._bgpDeltaBuilder.build(),
         _mainRibRouteDeltaBuilder.build(),
         allNodes,
         bgpTopology,
@@ -1704,20 +1602,11 @@ public class VirtualRouter implements Serializable {
   /** Re-initialize RIBs (at the start of each iteration). */
   void reinitForNewIteration() {
     _mainRibRouteDeltaBuilder = RibDelta.builder();
-    _bgpDeltaBuilder = RibDelta.builder();
 
     /*
      * RIBs not read from can just be re-initialized
      */
     _ripRib = new RipRib();
-
-    /*
-     * Staging RIBs can also be re-initialized
-     */
-    BgpTieBreaker tieBreaker = getBestPathTieBreaker();
-    MultipathEquivalentAsPathMatchMode mpTieBreaker = getBgpMpTieBreaker();
-    _ebgpStagingRib = new Bgpv4Rib(_mainRib, tieBreaker, null, mpTieBreaker, false);
-    _ibgpStagingRib = new Bgpv4Rib(_mainRib, tieBreaker, null, mpTieBreaker, false);
 
     /*
      * Add routes that cannot change (does not affect below computation)
@@ -1749,25 +1638,13 @@ public class VirtualRouter implements Serializable {
    */
   void queueInitialBgpMessages(
       final BgpTopology bgpTopology, final Map<String, Node> allNodes, NetworkConfigurations nc) {
-    if (_vrf.getBgpProcess() == null) {
+    if (_bgpRoutingProcess == null) {
       // nothing to do
       return;
     }
-    for (EdgeId edge : _bgpIncomingRoutes.keySet()) {
+    for (EdgeId edge : _bgpRoutingProcess._bgpIncomingRoutes.keySet()) {
       newBgpSessionEstablishedHook(edge, getBgpSessionProperties(bgpTopology, edge), allNodes, nc);
     }
-  }
-
-  /**
-   * Utility "message passing" method between virtual routers. Take a set of BGP {@link
-   * RouteAdvertisement}s and puts them onto a local queue corresponding to the session between
-   * given neighbors.
-   *
-   * @param routes a set of BGP routes that are being exchanged
-   */
-  private void enqueueBgpMessages(
-      @Nonnull EdgeId edgeId, @Nonnull Set<RouteAdvertisement<Bgpv4Route>> routes) {
-    _bgpIncomingRoutes.get(edgeId).addAll(routes);
   }
 
   /** Deal with a newly established BGP session. */
@@ -1881,12 +1758,24 @@ public class VirtualRouter implements Serializable {
     return _mainRib;
   }
 
-  Map<String, Rib> getMainRibs() {
-    return _mainRibs;
+  /** Get current BGP routes. To be used during dataplane computation only */
+  Set<Bgpv4Route> getBgpRoutes() {
+    return _bgpRoutingProcess == null
+        ? ImmutableSet.of()
+        : _bgpRoutingProcess._bgpRib.getTypedRoutes();
   }
 
-  Bgpv4Rib getBgpRib() {
-    return _bgpRib;
+  /** Get the number of best-path BGP routes. To be used during dataplane computation only */
+  int getNumBgpBestPaths() {
+    return _bgpRoutingProcess == null ? 0 : _bgpRoutingProcess._bgpRib.getBestPathRoutes().size();
+  }
+
+  /**
+   * Get the number of all BGP routes (with multipath, if applicable). To be used during dataplane
+   * computation only
+   */
+  int getNumBgpPaths() {
+    return _bgpRoutingProcess == null ? 0 : _bgpRoutingProcess._bgpRib.getRoutes().size();
   }
 
   /** Convenience method to get the VirtualRouter's hostname */
@@ -1899,8 +1788,8 @@ public class VirtualRouter implements Serializable {
    * following data structures:
    *
    * <ul>
-   *   <li>"external" RIBs ({@link #_mainRib}
-   *   <li>message queues ({@link #_bgpIncomingRoutes}
+   *   <li>RIBs (e.g., {@link #_mainRib}
+   *   <li>message queues
    *   <li>Routing processes
    * </ul>
    *
@@ -1911,14 +1800,15 @@ public class VirtualRouter implements Serializable {
             // RIB State
             Stream.of(_mainRib.getTypedRoutes()),
             // Message queues
-            Stream.of(_bgpIncomingRoutes, _isisIncomingRoutes, _crossVrfIncomingRoutes)
+            Stream.of(_isisIncomingRoutes, _crossVrfIncomingRoutes)
                 .flatMap(m -> m.values().stream())
                 .flatMap(Queue::stream),
             // Processes
             Stream.of(_ospfProcesses.values().stream().map(OspfRoutingProcess::iterationHashCode)),
             Stream.of(_virtualEigrpProcesses)
                 .flatMap(m -> m.values().stream())
-                .map(VirtualEigrpProcess::computeIterationHashCode))
+                .map(VirtualEigrpProcess::computeIterationHashCode),
+            Stream.of(_bgpRoutingProcess == null ? 0 : _bgpRoutingProcess.iterationHashCode()))
         .collect(toOrderedHashCode());
   }
 
@@ -2102,9 +1992,7 @@ public class VirtualRouter implements Serializable {
     return
     // Route Deltas
     !_mainRibRouteDeltaBuilder.build().isEmpty()
-        || !_bgpDeltaBuilder.build().isEmpty()
         // Message queues
-        || !_bgpIncomingRoutes.values().stream().allMatch(Queue::isEmpty)
         || !_isisIncomingRoutes.values().stream().allMatch(Queue::isEmpty)
         || !_crossVrfIncomingRoutes.values().stream().allMatch(Queue::isEmpty)
         // Processes
@@ -2137,5 +2025,11 @@ public class VirtualRouter implements Serializable {
             p ->
                 _mainRibRouteDeltaBuilder.from(
                     importRibDelta(_mainRib, p.getUpdatesForMainRib(), _name)));
+  }
+
+  /** Temporary wrapper for {@link BgpRoutingProcess#enqueueBgpMessages(EdgeId, Collection)} */
+  private void enqueueBgpMessages(
+      @Nonnull EdgeId edgeId, @Nonnull Collection<RouteAdvertisement<Bgpv4Route>> routes) {
+    _bgpRoutingProcess.enqueueBgpMessages(edgeId, routes);
   }
 }
