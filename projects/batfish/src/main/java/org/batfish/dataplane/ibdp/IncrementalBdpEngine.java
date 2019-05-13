@@ -383,6 +383,7 @@ class IncrementalBdpEngine {
           .flatMap(n -> n.getVirtualRouters().values().stream())
           .forEach(
               vr -> {
+                vr.bgpIteration(allNodes);
                 Map<Bgpv4Rib, RibDelta<Bgpv4Route>> deltas =
                     vr.processBgpMessages(bgpTopology, networkConfigurations, nodes);
                 vr.finalizeBgpRoutesAndQueueOutgoingMessages(

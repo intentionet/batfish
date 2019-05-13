@@ -24,18 +24,15 @@ public class BgpRoutingProcessTest {
             "vrf",
             new Rib());
     // iBGP
-    assertThat(process._ibgpRib.getRoutes(), empty());
-    assertThat(process._ibgpStagingRib.getRoutes(), empty());
+    assertThat(process._ibgpv4Rib.getRoutes(), empty());
+    assertThat(process._ibgpv4StagingRib.getRoutes(), empty());
     // eBGP
-    assertThat(process._ebgpRib.getRoutes(), empty());
-    assertThat(process._ebgpStagingRib.getRoutes(), empty());
+    assertThat(process._ebgpv4Rib.getRoutes(), empty());
+    assertThat(process._ebgpv4StagingRib.getRoutes(), empty());
     // EVPN
     assertThat(process._ebgpEvpnRib.getRoutes(), empty());
     assertThat(process._ibgpEvpnRib.getRoutes(), empty());
     // Combined bgp
-    assertThat(process._bgpRib.getRoutes(), empty());
+    assertThat(process._bgpv4Rib.getRoutes(), empty());
   }
-
-  @Test
-  public void testInitQueuesEmpty() {}
 }

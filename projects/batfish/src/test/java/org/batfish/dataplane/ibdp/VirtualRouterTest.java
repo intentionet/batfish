@@ -655,7 +655,7 @@ public class VirtualRouterTest {
     vrs.values()
         .forEach(
             vr -> {
-              assertThat(vr._bgpRoutingProcess._bgpIncomingRoutes, anEmptyMap());
+              assertThat(vr._bgpRoutingProcess._bgpv4IncomingRoutes, anEmptyMap());
               vr._virtualEigrpProcesses
                   .values()
                   .forEach(process -> assertThat(process._incomingRoutes, anEmptyMap()));
@@ -679,8 +679,8 @@ public class VirtualRouterTest {
     vrs.values()
         .forEach(
             vr -> {
-              assertThat(vr._bgpRoutingProcess._bgpIncomingRoutes, is(notNullValue()));
-              assertThat(vr._bgpRoutingProcess._bgpIncomingRoutes.values(), hasSize(1));
+              assertThat(vr._bgpRoutingProcess._bgpv4IncomingRoutes, is(notNullValue()));
+              assertThat(vr._bgpRoutingProcess._bgpv4IncomingRoutes.values(), hasSize(1));
             });
   }
 

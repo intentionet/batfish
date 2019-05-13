@@ -50,24 +50,24 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute> {
   /** Route dependency tracker for BGP aggregate routes */
   RouteDependencyTracker<Bgpv4Route, AbstractRoute> _bgpAggDeps = new RouteDependencyTracker<>();
   /** Incoming messages into this router from each BGP neighbor */
-  SortedMap<EdgeId, Queue<RouteAdvertisement<Bgpv4Route>>> _bgpIncomingRoutes;
+  SortedMap<EdgeId, Queue<RouteAdvertisement<Bgpv4Route>>> _bgpv4IncomingRoutes;
   /** Combined BGP (both iBGP and eBGP) RIB, for all address families */
-  Bgpv4Rib _bgpRib;
+  Bgpv4Rib _bgpv4Rib;
   /** Builder for constructing {@link RibDelta} as pertains to the multipath BGP RIB */
-  Builder<BgpRoute> _bgpDeltaBuilder;
+  Builder<Bgpv4Route> _bgpv4DeltaBuilder;
   /** Helper RIB containing all paths obtained with external BGP */
-  Bgpv4Rib _ebgpRib;
+  Bgpv4Rib _ebgpv4Rib;
   /**
    * Helper RIB containing paths obtained with external eBGP during current iteration. An Adj-RIB of
    * sorts.
    */
-  Bgpv4Rib _ebgpStagingRib;
+  Bgpv4Rib _ebgpv4StagingRib;
   /** Helper RIB containing paths obtained with iBGP */
-  Bgpv4Rib _ibgpRib;
+  Bgpv4Rib _ibgpv4Rib;
   /**
    * Helper RIB containing paths obtained with iBGP during current iteration. An Adj-RIB of sorts.
    */
-  Bgpv4Rib _ibgpStagingRib;
+  Bgpv4Rib _ibgpv4StagingRib;
   /** Helper RIB containing paths obtained with EVPN over eBGP */
   EvpnRib<EvpnRoute> _ebgpEvpnRib;
   /** Helper RIB containing paths obtained with EVPN over iBGP */
@@ -95,31 +95,31 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute> {
         firstNonNull(_process.getTieBreaker(), BgpTieBreaker.ARRIVAL_ORDER);
     MultipathEquivalentAsPathMatchMode multiPathMatchMode =
         firstNonNull(_process.getMultipathEquivalentAsPathMatchMode(), EXACT_PATH);
-    _ebgpRib =
+    _ebgpv4Rib =
         new Bgpv4Rib(
             _mainRib,
             bestPathTieBreaker,
             _process.getMultipathEbgp() ? null : 1,
             multiPathMatchMode,
             false);
-    _ibgpRib =
+    _ibgpv4Rib =
         new Bgpv4Rib(
             _mainRib,
             bestPathTieBreaker,
             _process.getMultipathIbgp() ? null : 1,
             multiPathMatchMode,
             false);
-    _bgpRib =
+    _bgpv4Rib =
         new Bgpv4Rib(
             _mainRib,
             bestPathTieBreaker,
             _process.getMultipathEbgp() || _process.getMultipathIbgp() ? null : 1,
             multiPathMatchMode,
             false);
-    _bgpDeltaBuilder = RibDelta.builder();
+    _bgpv4DeltaBuilder = RibDelta.builder();
 
-    _ebgpStagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
-    _ibgpStagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
+    _ebgpv4StagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
+    _ibgpv4StagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
     // Ribs
     _ebgpEvpnRib = new EvpnRib<>(_mainRib, bestPathTieBreaker, null, multiPathMatchMode);
     _ibgpEvpnRib = new EvpnRib<>(_mainRib, bestPathTieBreaker, null, multiPathMatchMode);
@@ -135,7 +135,7 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute> {
    */
   private void initBgpQueues(BgpTopology bgpTopology) {
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> graph = bgpTopology.getGraph();
-    _bgpIncomingRoutes =
+    _bgpv4IncomingRoutes =
         Streams.concat(
                 _process.getActiveNeighbors().entrySet().stream()
                     .filter(e -> e.getValue().getIpv4UnicastAddressFamily() != null)
@@ -159,19 +159,19 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute> {
   @Override
   public void executeIteration(Map<String, Node> allNodes) {
     // Reinitialize staging RIBs, delta builders
-    _bgpDeltaBuilder = RibDelta.builder();
+    _bgpv4DeltaBuilder = RibDelta.builder();
     BgpTieBreaker bestPathTieBreaker =
         firstNonNull(_process.getTieBreaker(), BgpTieBreaker.ARRIVAL_ORDER);
     MultipathEquivalentAsPathMatchMode multiPathMatchMode =
         firstNonNull(_process.getMultipathEquivalentAsPathMatchMode(), EXACT_PATH);
-    _ebgpStagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
-    _ibgpStagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
+    _ebgpv4StagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
+    _ibgpv4StagingRib = new Bgpv4Rib(_mainRib, bestPathTieBreaker, null, multiPathMatchMode, false);
   }
 
   @Nonnull
   @Override
   public RibDelta<BgpRoute> getUpdatesForMainRib() {
-    return _bgpDeltaBuilder.build();
+    return RibDelta.<BgpRoute>builder().from(_bgpv4DeltaBuilder.build()).build();
   }
 
   @Override
@@ -179,12 +179,22 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute> {
 
   @Override
   public boolean isDirty() {
-    return !_bgpDeltaBuilder.build().isEmpty()
-        || !_bgpIncomingRoutes.values().stream().allMatch(Queue::isEmpty);
+    return
+    // Message queues
+    !_bgpv4IncomingRoutes.values().stream().allMatch(Queue::isEmpty)
+        // Delta builders
+        || !_bgpv4DeltaBuilder.build().isEmpty();
   }
 
   int iterationHashCode() {
-    return Stream.of(_bgpIncomingRoutes, _bgpRib).collect(toOrderedHashCode());
+    return Stream.of(
+            // RIBs
+            _bgpv4Rib.getTypedRoutes(),
+            // Message queues
+            _bgpv4IncomingRoutes,
+            // Delta builders
+            _bgpv4DeltaBuilder.build())
+        .collect(toOrderedHashCode());
   }
 
   /**
@@ -194,7 +204,7 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute> {
    */
   void enqueueBgpMessages(
       @Nonnull EdgeId edgeId, @Nonnull Collection<RouteAdvertisement<Bgpv4Route>> routes) {
-    Queue<RouteAdvertisement<Bgpv4Route>> q = _bgpIncomingRoutes.get(edgeId);
+    Queue<RouteAdvertisement<Bgpv4Route>> q = _bgpv4IncomingRoutes.get(edgeId);
     assert q != null; // Invariant of the session being up
     q.addAll(routes);
   }
