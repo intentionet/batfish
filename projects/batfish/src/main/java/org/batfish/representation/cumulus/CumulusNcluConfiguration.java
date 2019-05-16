@@ -662,7 +662,6 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
    * {@code null}.
    */
   private @Nullable org.batfish.datamodel.BgpProcess toBgpProcess(String vrfName, BgpVrf bgpVrf) {
-    org.batfish.datamodel.BgpProcess newProc = new org.batfish.datamodel.BgpProcess();
     Ip routerId = bgpVrf.getRouterId();
     if (routerId == null) {
       if (_loopback.getConfigured() && !_loopback.getAddresses().isEmpty()) {
@@ -674,7 +673,7 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
         return null;
       }
     }
-    newProc.setRouterId(routerId);
+    org.batfish.datamodel.BgpProcess newProc = new org.batfish.datamodel.BgpProcess(routerId);
     newProc.setMultipathEquivalentAsPathMatchMode(EXACT_PATH);
     newProc.setMultipathEbgp(false);
     newProc.setMultipathIbgp(false);

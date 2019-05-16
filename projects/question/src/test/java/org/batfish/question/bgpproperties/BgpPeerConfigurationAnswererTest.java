@@ -93,7 +93,7 @@ public final class BgpPeerConfigurationAnswererTest {
             .setSendCommunity(false)
             .build();
 
-    BgpProcess process = new BgpProcess();
+    BgpProcess process = new BgpProcess(Ip.ZERO);
     process.setNeighbors(ImmutableSortedMap.of(Prefix.create(Ip.parse("1.1.1.0"), 24), activePeer));
     process.setPassiveNeighbors(
         ImmutableSortedMap.of(Prefix.create(Ip.parse("1.1.1.0"), 24), passivePeer));

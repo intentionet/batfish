@@ -39,9 +39,9 @@ public class BgpTopologyUtilsTest {
   private static String NODE1 = "n1";
   private static String NODE2 = "n2";
   private static String NODE3 = "n3";
-  private static BgpProcess _node1BgpProcess = new BgpProcess();
-  private static BgpProcess _node2BgpProcess = new BgpProcess();
-  private static BgpProcess _node3BgpProcess = new BgpProcess();
+  private static BgpProcess _node1BgpProcess = new BgpProcess(Ip.parse("0.0.0.1"));
+  private static BgpProcess _node2BgpProcess = new BgpProcess(Ip.parse("0.0.0.2"));
+  private static BgpProcess _node3BgpProcess = new BgpProcess(Ip.parse("0.0.0.3"));
   private static Map<String, Configuration> _configs;
 
   /** Sets up three nodes with a BGP process on each. Tests can populate BGP processes. */

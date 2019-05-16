@@ -37,7 +37,8 @@ public class ConfigurationTest {
     Vrf vrf = c.getVrfs().computeIfAbsent(Configuration.DEFAULT_VRF_NAME, Vrf::new);
 
     // BGP
-    BgpProcess bgpProcess = new BgpProcess();
+    Ip routerId = Ip.parse("1.1.1.1");
+    BgpProcess bgpProcess = new BgpProcess(routerId);
     vrf.setBgpProcess(bgpProcess);
     BgpPeerConfig neighbor =
         _factory

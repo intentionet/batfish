@@ -250,7 +250,7 @@ public class IspModelingUtilsTest {
             .setLocalIp(Ip.parse("2.2.2.2"))
             .setLocalAs(2L)
             .build();
-    BgpProcess bgpProcess = new BgpProcess();
+    BgpProcess bgpProcess = new BgpProcess(Ip.ZERO);
     bgpProcess.getActiveNeighbors().put(Prefix.parse("1.1.1.1/32"), peer);
     configuration.getDefaultVrf().setBgpProcess(bgpProcess);
 
@@ -300,7 +300,7 @@ public class IspModelingUtilsTest {
             .setLocalIp(Ip.parse("2.2.2.2"))
             .setLocalAs(2L)
             .build();
-    BgpProcess bgpProcess = new BgpProcess();
+    BgpProcess bgpProcess = new BgpProcess(Ip.ZERO);
     bgpProcess.getActiveNeighbors().put(Prefix.parse("1.1.1.1/32"), peer);
     ispConfiguration.getDefaultVrf().setBgpProcess(bgpProcess);
 
@@ -360,7 +360,7 @@ public class IspModelingUtilsTest {
             .setLocalIp(Ip.parse("2.2.2.2"))
             .setLocalAs(2L)
             .build();
-    BgpProcess bgpProcess = new BgpProcess();
+    BgpProcess bgpProcess = new BgpProcess(Ip.ZERO);
     bgpProcess.getActiveNeighbors().put(Prefix.parse("1.1.1.1/32"), peer);
     configuration.getDefaultVrf().setBgpProcess(bgpProcess);
 
@@ -399,7 +399,7 @@ public class IspModelingUtilsTest {
             .setLocalIp(Ip.parse("2.2.2.2"))
             .setLocalAs(2L)
             .build();
-    BgpProcess bgpProcess = new BgpProcess();
+    BgpProcess bgpProcess = new BgpProcess(Ip.ZERO);
     bgpProcess.getActiveNeighbors().put(Prefix.parse("1.1.1.1/32"), peer);
     configuration.getDefaultVrf().setBgpProcess(bgpProcess);
 
@@ -553,7 +553,8 @@ public class IspModelingUtilsTest {
         .setAddress(new InterfaceAddress(Ip.parse("1.1.1.1"), 24))
         .build();
     Vrf vrfConf1 = nf.vrfBuilder().setName(DEFAULT_VRF_NAME).setOwner(configuration1).build();
-    BgpProcess bgpProcess1 = nf.bgpProcessBuilder().setVrf(vrfConf1).build();
+    BgpProcess bgpProcess1 =
+        nf.bgpProcessBuilder().setRouterId(Ip.parse("1.1.1.1")).setVrf(vrfConf1).build();
     BgpActivePeerConfig.builder()
         .setBgpProcess(bgpProcess1)
         .setPeerAddress(Ip.parse("1.1.1.2"))
@@ -571,7 +572,8 @@ public class IspModelingUtilsTest {
         .setAddress(new InterfaceAddress(Ip.parse("2.2.2.2"), 24))
         .build();
     Vrf vrfConf2 = nf.vrfBuilder().setName(DEFAULT_VRF_NAME).setOwner(configuration2).build();
-    BgpProcess bgpProcess2 = nf.bgpProcessBuilder().setVrf(vrfConf2).build();
+    BgpProcess bgpProcess2 =
+        nf.bgpProcessBuilder().setVrf(vrfConf2).setRouterId(Ip.parse("2.2.2.2")).build();
     BgpActivePeerConfig.builder()
         .setBgpProcess(bgpProcess2)
         .setPeerAddress(Ip.parse("2.2.2.3"))
@@ -620,7 +622,8 @@ public class IspModelingUtilsTest {
         .setAddress(new InterfaceAddress(Ip.parse("1.1.1.1"), 24))
         .build();
     Vrf vrfConf1 = nf.vrfBuilder().setName(DEFAULT_VRF_NAME).setOwner(configuration1).build();
-    BgpProcess bgpProcess1 = nf.bgpProcessBuilder().setVrf(vrfConf1).build();
+    BgpProcess bgpProcess1 =
+        nf.bgpProcessBuilder().setRouterId(Ip.parse("1.1.1.1")).setVrf(vrfConf1).build();
     BgpActivePeerConfig.builder()
         .setBgpProcess(bgpProcess1)
         .setPeerAddress(Ip.parse("1.1.1.2"))

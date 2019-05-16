@@ -281,7 +281,6 @@ public final class JuniperConfiguration extends VendorConfiguration {
     initDefaultBgpImportPolicy();
     String vrfName = routingInstance.getName();
     Vrf vrf = _c.getVrfs().get(vrfName);
-    BgpProcess proc = new BgpProcess();
     Ip routerId = routingInstance.getRouterId();
     if (routerId == null) {
       routerId = _masterLogicalSystem.getDefaultRoutingInstance().getRouterId();
@@ -289,7 +288,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
         routerId = Ip.ZERO;
       }
     }
-    proc.setRouterId(routerId);
+    BgpProcess proc = new BgpProcess(routerId);
     boolean multipathEbgp = false;
     boolean multipathIbgp = false;
     boolean multipathMultipleAs = false;

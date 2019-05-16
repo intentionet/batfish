@@ -32,7 +32,7 @@ public class BgpProcessConfigurationAnswererTest {
   @Test
   public void testWithNeighbors() {
     // Create process with active, passive, and unnumbered peers
-    BgpProcess proc = new BgpProcess();
+    BgpProcess proc = new BgpProcess(Ip.ZERO);
     BgpActivePeerConfig.builder()
         .setBgpProcess(proc)
         .setLocalAs(100L)
@@ -78,7 +78,7 @@ public class BgpProcessConfigurationAnswererTest {
         Row.builder()
             .put(BgpProcessConfigurationAnswerer.COL_NODE, new Node("c"))
             .put(BgpProcessConfigurationAnswerer.COL_VRF, "vrf")
-            .put(BgpProcessConfigurationAnswerer.COL_ROUTER_ID, null)
+            .put(BgpProcessConfigurationAnswerer.COL_ROUTER_ID, Ip.ZERO)
             .put(BgpProcessPropertySpecifier.MULTIPATH_EQUIVALENT_AS_PATH_MATCH_MODE, null)
             .put(BgpProcessPropertySpecifier.MULTIPATH_EBGP, false)
             .put(BgpProcessPropertySpecifier.MULTIPATH_IBGP, false)
@@ -94,8 +94,7 @@ public class BgpProcessConfigurationAnswererTest {
   @Test
   public void getProperties() {
 
-    BgpProcess bgp1 = new BgpProcess();
-    bgp1.setRouterId(Ip.parse("1.1.1.1"));
+    BgpProcess bgp1 = new BgpProcess(Ip.parse("1.1.1.1"));
     bgp1.setMultipathEbgp(true);
     bgp1.setTieBreaker(BgpTieBreaker.ARRIVAL_ORDER);
 

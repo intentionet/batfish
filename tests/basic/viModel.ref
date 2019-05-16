@@ -4475,6 +4475,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "1.1.1.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -4577,7 +4578,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "1.1.1.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -5786,6 +5786,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "1.2.2.2",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -5874,7 +5875,6 @@
                   "sendCommunity" : false
                 }
               },
-              "routerId" : "1.2.2.2",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -6274,6 +6274,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "1.10.1.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -6325,7 +6326,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "1.10.1.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -7569,6 +7569,7 @@
               }
             ],
             "bgpProcess" : {
+              "routerId" : "2.1.1.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -7650,7 +7651,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "2.1.1.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -8838,6 +8838,7 @@
               }
             ],
             "bgpProcess" : {
+              "routerId" : "2.1.1.2",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -8919,7 +8920,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "2.1.1.2",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -9510,6 +9510,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "2.1.2.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -9607,7 +9608,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "2.1.2.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -10146,6 +10146,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "2.1.2.2",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -10243,7 +10244,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "2.1.2.2",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -11158,6 +11158,7 @@
           "default" : {
             "name" : "default",
             "bgpProcess" : {
+              "routerId" : "2.1.4.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -11223,7 +11224,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "2.1.4.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -11959,6 +11959,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "2.1.3.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -12040,7 +12041,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "2.1.3.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -12775,6 +12775,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "2.1.3.2",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -12856,7 +12857,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "2.1.3.2",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -13970,6 +13970,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "3.1.1.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -14028,7 +14029,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "3.1.1.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -15093,6 +15093,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "3.2.2.2",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -15151,7 +15152,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "3.2.2.2",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -15758,6 +15758,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "3.10.1.1",
               "multipathEbgp" : true,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : true,
@@ -15809,7 +15810,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "3.10.1.1",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [

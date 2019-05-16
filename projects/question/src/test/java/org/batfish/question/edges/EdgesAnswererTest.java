@@ -282,8 +282,8 @@ public class EdgesAnswererTest {
 
   @Test
   public void testGetBgpEdges() {
-    BgpProcess bgp1 = new BgpProcess();
-    BgpProcess bgp2 = new BgpProcess();
+    BgpProcess bgp1 = new BgpProcess(Ip.parse("1.1.1.1"));
+    BgpProcess bgp2 = new BgpProcess(Ip.parse("2.2.2.2"));
 
     // Edge between active peers
     Ip ip1 = Ip.parse("1.1.1.1");

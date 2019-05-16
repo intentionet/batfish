@@ -2828,6 +2828,7 @@
               }
             },
             "bgpProcess" : {
+              "routerId" : "10.10.255.8",
               "multipathEbgp" : false,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : false,
@@ -3005,7 +3006,6 @@
                   "sendCommunity" : false
                 }
               },
-              "routerId" : "10.10.255.8",
               "tieBreaker" : "ROUTER_ID"
             },
             "interfaces" : [
@@ -5263,6 +5263,7 @@
           "default" : {
             "name" : "default",
             "bgpProcess" : {
+              "routerId" : "169.254.15.193",
               "multipathEbgp" : false,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : false,
@@ -5332,7 +5333,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "169.254.15.193",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [
@@ -5418,6 +5418,7 @@
           "default" : {
             "name" : "default",
             "bgpProcess" : {
+              "routerId" : "240.0.0.7",
               "multipathEbgp" : false,
               "multipathEquivalentAsPathMatchMode" : "EXACT_PATH",
               "multipathIbgp" : false,
@@ -5445,7 +5446,6 @@
                   "sendCommunity" : true
                 }
               },
-              "routerId" : "240.0.0.7",
               "tieBreaker" : "ARRIVAL_ORDER"
             },
             "interfaces" : [

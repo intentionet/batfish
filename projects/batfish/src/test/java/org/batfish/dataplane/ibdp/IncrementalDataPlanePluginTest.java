@@ -782,7 +782,7 @@ public class IncrementalDataPlanePluginTest {
         .setVrf(vrf1)
         .build();
     // Bgp process and neighbor:
-    BgpProcess bgpp1 = _pb.setVrf(vrf1).build();
+    BgpProcess bgpp1 = _pb.setVrf(vrf1).setRouterId(Ip.parse("1.1.1.2")).build();
     _nb.setPeerAddress(lo2Ip)
         .setLocalAs(1L)
         .setLocalIp(lo1Ip)
@@ -817,7 +817,7 @@ public class IncrementalDataPlanePluginTest {
         .setLevel2(IsisLevelSettings.builder().build())
         .setVrf(vrf2)
         .build();
-    BgpProcess bgpp2 = _pb.setVrf(vrf2).build();
+    BgpProcess bgpp2 = _pb.setVrf(vrf2).setRouterId(Ip.parse("1.1.1.3")).build();
     // Bgp neighbor:
     _nb.setPeerAddress(lo1Ip)
         .setLocalAs(1L)

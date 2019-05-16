@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.empty;
 
 import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.ConfigurationFormat;
+import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.dataplane.rib.Rib;
 import org.junit.Test;
@@ -16,7 +17,7 @@ public class BgpRoutingProcessTest {
     NetworkFactory nf = new NetworkFactory();
     BgpRoutingProcess process =
         new BgpRoutingProcess(
-            new BgpProcess(),
+            new BgpProcess(Ip.ZERO),
             nf.configurationBuilder()
                 .setHostname("c")
                 .setConfigurationFormat(ConfigurationFormat.CISCO_IOS)

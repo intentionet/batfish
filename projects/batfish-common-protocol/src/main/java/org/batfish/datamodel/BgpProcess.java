@@ -1,7 +1,9 @@
 package org.batfish.datamodel;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Supplier;
@@ -29,12 +31,10 @@ public class BgpProcess implements Serializable {
 
     @Override
     public BgpProcess build() {
-      BgpProcess bgpProcess = new BgpProcess();
+      checkArgument(_routerId != null, "Missing %s", PROP_ROUTER_ID);
+      BgpProcess bgpProcess = new BgpProcess(_routerId);
       if (_vrf != null) {
         _vrf.setBgpProcess(bgpProcess);
-      }
-      if (_routerId != null) {
-        bgpProcess.setRouterId(_routerId);
       }
       return bgpProcess;
     }
@@ -95,18 +95,25 @@ public class BgpProcess implements Serializable {
   /** Space of prefixes to be advertised using explicit network statements */
   private PrefixSpace _originationSpace;
 
-  private Ip _routerId;
+  @Nonnull private Ip _routerId;
 
   private BgpTieBreaker _tieBreaker;
 
   /** Constructs a BgpProcess */
-  public BgpProcess() {
+  public BgpProcess(@Nonnull Ip routerId) {
     _activeNeighbors = new TreeMap<>();
     _interfaceNeighbors = new TreeMap<>();
     _tieBreaker = BgpTieBreaker.ARRIVAL_ORDER;
     _clusterIds = new ClusterIdsSupplier();
     _originationSpace = new PrefixSpace();
     _passiveNeighbors = new TreeMap<>();
+    _routerId = routerId;
+  }
+
+  @JsonCreator
+  private static BgpProcess create(@Nullable @JsonProperty(PROP_ROUTER_ID) Ip routerId) {
+    checkArgument(routerId != null, "Missing %s", routerId);
+    return new BgpProcess(routerId);
   }
 
   /**
@@ -181,6 +188,7 @@ public class BgpProcess implements Serializable {
    * The configured router ID for this BGP process. Note that it can be overridden for individual
    * neighbors.
    */
+  @Nonnull
   @JsonProperty(PROP_ROUTER_ID)
   public Ip getRouterId() {
     return _routerId;
@@ -228,7 +236,8 @@ public class BgpProcess implements Serializable {
   }
 
   @JsonProperty(PROP_ROUTER_ID)
-  public void setRouterId(Ip routerId) {
+  private void setRouterId(@Nullable Ip routerId) {
+    checkArgument(routerId != null, "Missing %s", PROP_ROUTER_ID);
     _routerId = routerId;
   }
 

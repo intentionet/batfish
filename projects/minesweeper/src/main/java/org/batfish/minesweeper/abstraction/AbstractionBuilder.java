@@ -555,10 +555,9 @@ class AbstractionBuilder {
 
       BgpProcess bgp = vrf.getBgpProcess();
       if (bgp != null) {
-        BgpProcess abstractBgp = new BgpProcess();
+        BgpProcess abstractBgp = new BgpProcess(bgp.getRouterId());
         abstractBgp.setMultipathEbgp(bgp.getMultipathEbgp());
         abstractBgp.setMultipathIbgp(bgp.getMultipathIbgp());
-        abstractBgp.setRouterId(bgp.getRouterId());
         abstractBgp.setOriginationSpace(bgp.getOriginationSpace());
         // TODO: set bgp neighbors accordingly, support dynamic neighbors
         // Copy over neighbors

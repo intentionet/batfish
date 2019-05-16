@@ -1295,14 +1295,12 @@ public final class CiscoConfiguration extends VendorConfiguration {
       CiscoNxBgpGlobalConfiguration nxBgpGlobal,
       CiscoNxBgpVrfConfiguration nxBgpVrf,
       String vrfName) {
-    org.batfish.datamodel.BgpProcess newBgpProcess = new org.batfish.datamodel.BgpProcess();
     org.batfish.datamodel.Vrf v = c.getVrfs().get(vrfName);
-
+    org.batfish.datamodel.BgpProcess newBgpProcess =
+        new org.batfish.datamodel.BgpProcess(CiscoNxConversions.getNxBgpRouterId(nxBgpVrf, v, _w));
     if (nxBgpVrf.getBestpathCompareRouterId()) {
       newBgpProcess.setTieBreaker(BgpTieBreaker.ROUTER_ID);
     }
-
-    newBgpProcess.setRouterId(CiscoNxConversions.getNxBgpRouterId(nxBgpVrf, v, _w));
 
     // From NX-OS docs for `bestpath as-path multipath-relax`
     //  Allows load sharing across providers with different (but equal-length) autonomous system
@@ -1551,8 +1549,10 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private org.batfish.datamodel.BgpProcess toBgpProcess(
       final Configuration c, BgpProcess proc, String vrfName) {
-    org.batfish.datamodel.BgpProcess newBgpProcess = new org.batfish.datamodel.BgpProcess();
     org.batfish.datamodel.Vrf v = c.getVrfs().get(vrfName);
+    Ip bgpRouterId = getBgpRouterId(c, vrfName, proc);
+    org.batfish.datamodel.BgpProcess newBgpProcess =
+        new org.batfish.datamodel.BgpProcess(bgpRouterId);
     BgpTieBreaker tieBreaker = proc.getTieBreaker();
     if (tieBreaker != null) {
       newBgpProcess.setTieBreaker(tieBreaker);
@@ -1576,8 +1576,6 @@ public final class CiscoConfiguration extends VendorConfiguration {
     newBgpProcess.setMultipathIbgp(multipathIbgp);
 
     int defaultMetric = proc.getDefaultMetric();
-    Ip bgpRouterId = getBgpRouterId(c, vrfName, proc);
-    newBgpProcess.setRouterId(bgpRouterId);
 
     /*
      * Create common bgp export policy. This policy encompasses network

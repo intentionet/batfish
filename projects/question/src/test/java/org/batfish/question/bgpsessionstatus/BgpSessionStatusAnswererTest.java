@@ -217,7 +217,7 @@ public class BgpSessionStatusAnswererTest {
             .setPeerAddress(remoteIp)
             .build();
 
-    BgpProcess bgpProcess = new BgpProcess();
+    BgpProcess bgpProcess = new BgpProcess(Ip.ZERO);
     bgpProcess.setNeighbors(ImmutableSortedMap.of(Prefix.create(remoteIp, 32), peerConfig));
 
     Vrf vrf1 = new Vrf("vrf");
@@ -244,7 +244,7 @@ public class BgpSessionStatusAnswererTest {
             .setPeerPrefix(remotePrefix)
             .build();
 
-    BgpProcess bgpProcess = new BgpProcess();
+    BgpProcess bgpProcess = new BgpProcess(Ip.ZERO);
     bgpProcess.setPassiveNeighbors(ImmutableSortedMap.of(remotePrefix, peerConfig));
 
     Vrf vrf1 = new Vrf("vrf");
@@ -382,8 +382,10 @@ public class BgpSessionStatusAnswererTest {
             .build();
     Vrf vrf1 = nf.vrfBuilder().setOwner(c1).setName(DEFAULT_VRF_NAME).build();
     Vrf vrf2 = nf.vrfBuilder().setOwner(c2).setName(DEFAULT_VRF_NAME).build();
-    BgpProcess proc1 = nf.bgpProcessBuilder().setVrf(vrf1).build(); // .setRouterId()
-    BgpProcess proc2 = nf.bgpProcessBuilder().setVrf(vrf2).build(); // .setRouterId()
+    BgpProcess proc1 =
+        nf.bgpProcessBuilder().setVrf(vrf1).setRouterId(Ip.ZERO).build(); // .setRouterId()
+    BgpProcess proc2 =
+        nf.bgpProcessBuilder().setVrf(vrf2).setRouterId(Ip.ZERO).build(); // .setRouterId()
 
     // Build interfaces and unnumbered peers
     String i1Name = "iface1";
@@ -552,7 +554,7 @@ public class BgpSessionStatusAnswererTest {
             .setHostname(id.getHostname())
             .build();
     Vrf vrf = nf.vrfBuilder().setOwner(c).setName(id.getVrfName()).build();
-    BgpProcess bgpProc = nf.bgpProcessBuilder().setVrf(vrf).build();
+    BgpProcess bgpProc = nf.bgpProcessBuilder().setVrf(vrf).setRouterId(Ip.ZERO).build();
 
     // Add peer in the appropriate map in the BgpProcess
     if (id.getType() == BgpPeerConfigType.ACTIVE) {

@@ -359,8 +359,7 @@ public class VpnConnection implements AwsVpcEntity, Serializable {
       if (ipsecTunnel.getVgwBgpAsn() != -1) {
         BgpProcess proc = vpnGatewayCfgNode.getDefaultVrf().getBgpProcess();
         if (proc == null) {
-          proc = new BgpProcess();
-          proc.setRouterId(ipsecTunnel.getVgwInsideAddress());
+          proc = new BgpProcess(ipsecTunnel.getVgwInsideAddress());
           proc.setMultipathEquivalentAsPathMatchMode(MultipathEquivalentAsPathMatchMode.EXACT_PATH);
           vpnGatewayCfgNode.getDefaultVrf().setBgpProcess(proc);
         }
@@ -407,11 +406,10 @@ public class VpnConnection implements AwsVpcEntity, Serializable {
         // iBGP connection from VPC
         BgpActivePeerConfig.Builder vpcToVgwBgpPeerConfig = BgpActivePeerConfig.builder();
         vpcToVgwBgpPeerConfig.setPeerAddress(vgwToVpcIfaceAddress);
-        BgpProcess vpcProc = new BgpProcess();
+        BgpProcess vpcProc = new BgpProcess(vpcIfaceAddress);
         vpcNode.getDefaultVrf().setBgpProcess(vpcProc);
         vpcProc.setMultipathEquivalentAsPathMatchMode(
             MultipathEquivalentAsPathMatchMode.EXACT_PATH);
-        vpcProc.setRouterId(vpcIfaceAddress);
         vpcToVgwBgpPeerConfig.setBgpProcess(vpcProc);
         vpcToVgwBgpPeerConfig.setLocalAs(ipsecTunnel.getVgwBgpAsn());
         vpcToVgwBgpPeerConfig.setLocalIp(vpcIfaceAddress);

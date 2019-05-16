@@ -509,7 +509,7 @@ public class BgpSessionCompatibilityAnswererTest {
               .setHostname(id.getHostname())
               .build();
       Vrf vrf = nf.vrfBuilder().setOwner(c).setName(id.getVrfName()).build();
-      BgpProcess bgpProc = nf.bgpProcessBuilder().setVrf(vrf).build();
+      BgpProcess bgpProc = nf.bgpProcessBuilder().setVrf(vrf).setRouterId(Ip.ZERO).build();
       configs.put(c.getHostname(), c);
 
       // Add interface to make IpOwners accurate
