@@ -13,7 +13,6 @@ import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.main.TestrigText;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -24,13 +23,11 @@ public final class BgpFilterInactiveTest {
   private static final String AS2_ADVERTISE_INACTIVE_NAME = "as2-advertise-inactive";
   private static final String AS2_NO_ADVERTISE_INACTIVE_NAME = "as2-no-advertise-inactive";
   private static final String AS3_NAME = "as3";
-  private static final String SNAPSHOT_PATH = "org/batfish/dataplane/ibdp/bgp-filter-inactive/";
+  private static final String SNAPSHOT_PATH = "org/batfish/dataplane/ibdp/bgp-filter-inactive";
   private static final Ip STATIC_NEXT_HOP = Ip.parse("10.0.12.254");
 
   @Rule public TemporaryFolder _folder = new TemporaryFolder();
 
-  // TODO: fix handling of advertise-inactive in iBDP
-  @Ignore
   @Test
   public void testNoAdvertiseInactive() throws IOException {
     Batfish batfish =
@@ -56,8 +53,6 @@ public final class BgpFilterInactiveTest {
     assertNoRoute(routes, AS3_NAME, Prefix.ZERO);
   }
 
-  // TODO: fix handling of advertise-inactive in iBDP
-  @Ignore
   @Test
   public void testAdvertiseInactive() throws IOException {
     Batfish batfish =

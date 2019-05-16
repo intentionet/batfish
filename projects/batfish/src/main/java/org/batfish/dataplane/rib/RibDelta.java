@@ -187,16 +187,23 @@ public final class RibDelta<R> {
     /** Process all added and removed routes from a given delta */
     @Nonnull
     public <T extends R> Builder<R> from(RibDelta<T> delta) {
-      delta
-          .getActions()
-          .forEach(
-              ra -> {
-                if (ra.isWithdrawn()) {
-                  remove(ra.getRoute(), ra.getReason());
-                } else {
-                  add(ra.getRoute());
-                }
-              });
+      return from(delta.getActions());
+    }
+
+    /** Process all added and removed routes from a given delta */
+    @Nonnull
+    public <T extends R> Builder<R> from(Stream<RouteAdvertisement<T>> actions) {
+      actions.forEach(this::from);
+      return this;
+    }
+
+    @Nonnull
+    public <T extends R> Builder<R> from(RouteAdvertisement<T> routeAdvertisement) {
+      if (routeAdvertisement.isWithdrawn()) {
+        remove(routeAdvertisement.getRoute(), routeAdvertisement.getReason());
+      } else {
+        add(routeAdvertisement.getRoute());
+      }
       return this;
     }
   }

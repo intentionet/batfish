@@ -1347,7 +1347,7 @@ public class VirtualRouter implements Serializable {
    *
    * @param ebgpBestPathDelta {@link RibDelta} indicating what changed in the {@link
    *     BgpRoutingProcess#_ebgpv4Rib}
-   * @param bgpMultiPathDelta a {@link RibDelta} indicating what changed in the {@link
+   * @param bgpDelta a {@link RibDelta} indicating what changed in the {@link
    *     BgpRoutingProcess#_bgpv4Rib}
    * @param mainDelta a {@link RibDelta} indicating what changed in the {@link #_mainRib}
    * @param allNodes map of all nodes in the network, keyed by hostname
@@ -1355,7 +1355,7 @@ public class VirtualRouter implements Serializable {
    */
   private void queueOutgoingBgpRoutes(
       RibDelta<Bgpv4Route> ebgpBestPathDelta,
-      RibDelta<Bgpv4Route> bgpMultiPathDelta,
+      RibDelta<Bgpv4Route> bgpDelta,
       RibDelta<AnnotatedRoute<AbstractRoute>> mainDelta,
       final Map<String, Node> allNodes,
       BgpTopology bgpTopology,
@@ -1375,38 +1375,52 @@ public class VirtualRouter implements Serializable {
       // Needs to retain annotations since export policy will be run on routes from resulting delta.
       Builder<AnnotatedRoute<AbstractRoute>> preExportPolicyDeltaBuilder = RibDelta.builder();
 
-      // Definitely queue mainRib updates
-      preExportPolicyDeltaBuilder.from(mainDelta);
-      // These knobs control which additional BGP routes get advertised
+      // Queue mainRib updates that were not introduced by BGP process (i.e., IGP routes)
+      preExportPolicyDeltaBuilder.from(
+          mainDelta.getActions().filter(adv -> !(adv.getRoute().getRoute() instanceof BgpRoute)));
+
+      /*
+       * By default only best-path routes from the BGP RIB that are **also installed in the main RIB**
+       * will be advertised to our neighbors.
+       *
+       * However, there are additional knobs that control re-advertisement behavior:
+       *
+       * 1. Advertise external: advertise best-path eBGP routes to iBGP peers regardless of whether
+       *    they are global BGP best-paths.
+       * 2. Advertise inactive: advertise best-path BGP routes to neighboring peers even if
+       *    they are not active in the main RIB.
+       */
       if (session.getAdvertiseExternal()) {
-        /*
-         * Advertise external ensures that even if we withdrew an external route from the RIB
-         */
         importDeltaToBuilder(preExportPolicyDeltaBuilder, ebgpBestPathDelta, _name);
       }
       if (session.getAdvertiseInactive()) {
-        /*
-         * In case BGP routes were deleted from the main RIB
-         * (e.g., preempted by a better IGP route)
-         * and advertiseInactive is true, re-add inactive BGP routes from the BGP best-path RIB.
-         * If the BGP routes are already active, this will have no effect.
-         */
-        for (Prefix p : mainDelta.getPrefixes()) {
-          preExportPolicyDeltaBuilder.add(
-              _bgpRoutingProcess._bgpv4Rib.getTypedRoutes().stream()
-                  .filter(r -> r.getNetwork().equals(p))
-                  .map(r -> new AnnotatedRoute<AbstractRoute>(r, _name))
-                  .collect(ImmutableSet.toImmutableSet()));
-        }
+        importDeltaToBuilder(preExportPolicyDeltaBuilder, bgpDelta, _name);
+      } else {
+        // Default behavior
+        preExportPolicyDeltaBuilder.from(
+            bgpDelta
+                .getActions()
+                .map(
+                    r ->
+                        RouteAdvertisement.<AnnotatedRoute<AbstractRoute>>builder()
+                            .setReason(r.getReason())
+                            .setRoute(annotateRoute(r.getRoute()))
+                            .build())
+                .filter(r -> _mainRib.containsRoute(r.getRoute())));
       }
-      if (session.getAdditionalPaths()) {
-        importDeltaToBuilder(preExportPolicyDeltaBuilder, bgpMultiPathDelta, _name);
-      }
-      RibDelta<AnnotatedRoute<AbstractRoute>> routesToExport = preExportPolicyDeltaBuilder.build();
-      if (routesToExport.isEmpty()) {
+
+      /*
+      * TODO: https://github.com/batfish/batfish/issues/704
+         Support for additional-paths based on https://tools.ietf.org/html/rfc7911
+         AND the combination of vendor-specific knobs, none of which are currently supported.
+      */
+
+      if (preExportPolicyDeltaBuilder.isEmpty()) {
+        // Nothing to advertise
         continue;
       }
 
+      RibDelta<AnnotatedRoute<AbstractRoute>> routesToExport = preExportPolicyDeltaBuilder.build();
       // Compute a set of advertisements that can be queued on remote VR
       Set<RouteAdvertisement<Bgpv4Route>> exportedAdvertisements =
           routesToExport
