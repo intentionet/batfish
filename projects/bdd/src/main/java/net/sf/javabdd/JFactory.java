@@ -2162,6 +2162,7 @@ public final class JFactory extends BDDFactory {
       cachestats.opMiss++;
     }
 
+    int pushed = 0;
     if (INVARSET(LEVEL(r))) {
       // The current node tests a variable that is to be quantified away. Commonly, the range of
       // variables to be quantified away is continuous, so it is relatively likely that
@@ -2186,15 +2187,22 @@ public final class JFactory extends BDDFactory {
             remainingChildren.clear();
             remainingChildren.add(BDDONE);
             break;
-          } else if (!ISZERO(node)) {
+          } else if (ISZERO(node)) {
             // Do not include ZERO nodes in the remainingChildren set.
+            continue;
+          } else if (level > quantlast) {
+            // quant_rec(node) will be node
             remainingChildren.add(node);
+          } else {
+            remainingChildren.add(PUSHREF(quant_rec(node)));
+            ++pushed;
           }
         }
         res = orAll_rec(Ints.toArray(remainingChildren));
       } else {
         int left = PUSHREF(quant_rec(LOW(r)));
         int right = PUSHREF(quant_rec(HIGH(r)));
+        pushed = 2;
         switch (applyop) {
           case bddop_and:
             res = and_rec(left, right);
@@ -2203,14 +2211,14 @@ public final class JFactory extends BDDFactory {
             res = apply_rec(left, right);
             break;
         }
-        POPREF(2);
       }
     } else {
       int left = PUSHREF(quant_rec(LOW(r)));
       int right = PUSHREF(quant_rec(HIGH(r)));
+      pushed = 2;
       res = bdd_makenode(LEVEL(r), left, right);
-      POPREF(2);
     }
+    POPREF(pushed);
 
     if (CACHESTATS && entry.a != -1) {
       cachestats.opOverwrite++;
