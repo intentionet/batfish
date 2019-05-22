@@ -28,6 +28,7 @@
  */
 package net.sf.javabdd;
 
+import com.google.common.primitives.Ints;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -35,6 +36,8 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import javax.annotation.Nonnull;
 
@@ -2159,27 +2162,55 @@ public final class JFactory extends BDDFactory {
       cachestats.opMiss++;
     }
 
-    PUSHREF(quant_rec(LOW(r)));
-    PUSHREF(quant_rec(HIGH(r)));
-
     if (INVARSET(LEVEL(r))) {
-      int r2 = READREF(2), r1 = READREF(1);
-      switch (applyop) {
-        case bddop_and:
-          res = and_rec(r2, r1);
-          break;
-        case bddop_or:
-          res = or_rec(r2, r1);
-          break;
-        default:
-          res = apply_rec(r2, r1);
-          break;
+      // The current node tests a variable that is to be quantified away. Commonly, the range of
+      // variables to be quantified away is continuous, so it is relatively likely that
+      // LOW(r) or HIGH(r) is also a variable to be quantified away. When we have multi-BDD
+      // operations and it is correct to use them, collect all not-to-be-quantified-away
+      // ("remaining") children of this node.
+      if (applyop == bddop_or) {
+        HashSet<Integer> remainingChildren = new HashSet<>();
+        LinkedList<Integer> toInvestigate = new LinkedList<>();
+        toInvestigate.add(LOW(r));
+        toInvestigate.add(HIGH(r));
+
+        while (!toInvestigate.isEmpty()) {
+          int node = toInvestigate.removeFirst();
+          int level = LEVEL(node);
+          if (level <= quantlast && INVARSET(level)) {
+            // `node` is also to be quantified away. See if that's also true for its children.
+            toInvestigate.add(LOW(node));
+            toInvestigate.add(HIGH(node));
+          } else if (ISONE(node)) {
+            // Short-circuit orAll(...ONE...) = ONE.
+            remainingChildren.clear();
+            remainingChildren.add(BDDONE);
+            break;
+          } else if (!ISZERO(node)) {
+            // Do not include ZERO nodes in the remainingChildren set.
+            remainingChildren.add(node);
+          }
+        }
+        res = orAll_rec(Ints.toArray(remainingChildren));
+      } else {
+        int left = PUSHREF(quant_rec(LOW(r)));
+        int right = PUSHREF(quant_rec(HIGH(r)));
+        switch (applyop) {
+          case bddop_and:
+            res = and_rec(left, right);
+            break;
+          default:
+            res = apply_rec(left, right);
+            break;
+        }
+        POPREF(2);
       }
     } else {
-      res = bdd_makenode(LEVEL(r), READREF(2), READREF(1));
+      int left = PUSHREF(quant_rec(LOW(r)));
+      int right = PUSHREF(quant_rec(HIGH(r)));
+      res = bdd_makenode(LEVEL(r), left, right);
+      POPREF(2);
     }
-
-    POPREF(2);
 
     if (CACHESTATS && entry.a != -1) {
       cachestats.opOverwrite++;
@@ -2417,6 +2448,9 @@ public final class JFactory extends BDDFactory {
     }
     if (quantcache == null) {
       quantcache = BddCacheI_init(cachesize);
+    }
+    if (multiopcache == null) {
+      multiopcache = BddCacheMultiOp_init(cachesize);
     }
     applyop = bddop_or;
     quantid = (var << 3) | CACHEID_EXIST; /* FIXME: range */

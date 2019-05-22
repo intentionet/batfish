@@ -9,6 +9,7 @@ java_library(
     ]),
     deps = [
         "@jsr305//:compile",
+        "@guava//:compile",
     ],
 )
 
