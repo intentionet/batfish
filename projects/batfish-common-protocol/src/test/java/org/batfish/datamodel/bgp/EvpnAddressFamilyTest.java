@@ -8,6 +8,7 @@ import com.google.common.testing.EqualsTester;
 import java.io.IOException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.batfish.common.util.BatfishObjectMapper;
+import org.batfish.datamodel.bgp.Layer3VniConfig.Builder;
 import org.batfish.datamodel.bgp.community.ExtendedCommunity;
 import org.junit.Test;
 
@@ -28,12 +29,14 @@ public class EvpnAddressFamilyTest {
             new EvpnAddressFamily(
                 ImmutableSet.of(),
                 ImmutableSet.of(
-                    new Layer3VniConfig(
-                        1,
-                        "v",
-                        RouteDistinguisher.from(1L, 1),
-                        ExtendedCommunity.of(0, 1, 1),
-                        false))))
+                    new Builder()
+                        .setVni(1)
+                        .setVrf("v")
+                        .setRouteDistinguisher(RouteDistinguisher.from(1L, 1))
+                        .setRouteTarget(ExtendedCommunity.of(0, 1, 1))
+                        .setImportRouteTarget(Layer3VniConfig.importRtPatternForAnyAs(1))
+                        .setAdvertisev4Unicast(false)
+                        .build())))
         .addEqualityGroup(new Object())
         .testEquals();
   }

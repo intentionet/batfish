@@ -9,6 +9,8 @@ import com.google.common.base.MoreObjects;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -25,12 +27,14 @@ public final class Layer3VniConfig implements Serializable, Comparable<Layer3Vni
   private static final String PROP_VRF = "vrf";
   private static final String PROP_ROUTE_DISTINGUISHER = "routeDistinguisher";
   private static final String PROP_ROUTE_TARGET = "routeTarget";
+  private static final String PROP_IMPORT_ROUTE_TARGET = "importRouteTarget";
   private static final String PROP_ADVERTISE_V4_UNICAST = "advertiseV4UnicastRoutes";
 
   private final int _vni;
   @Nonnull private final String _vrf;
   @Nonnull private final RouteDistinguisher _rd;
   @Nonnull private final ExtendedCommunity _routeTarget;
+  @Nonnull private final String _importRouteTarget;
   private final boolean _advertisev4Unicast;
 
   public Layer3VniConfig(
@@ -38,11 +42,13 @@ public final class Layer3VniConfig implements Serializable, Comparable<Layer3Vni
       String vrf,
       RouteDistinguisher rd,
       ExtendedCommunity routeTarget,
+      String importRouteTarget,
       boolean advertisev4Unicast) {
     _vni = vni;
     _vrf = vrf;
     _rd = rd;
     _routeTarget = routeTarget;
+    _importRouteTarget = importRouteTarget;
     _advertisev4Unicast = advertisev4Unicast;
   }
 
@@ -52,13 +58,21 @@ public final class Layer3VniConfig implements Serializable, Comparable<Layer3Vni
       @Nullable @JsonProperty(PROP_VRF) String vrf,
       @Nullable @JsonProperty(PROP_ROUTE_DISTINGUISHER) RouteDistinguisher rd,
       @Nullable @JsonProperty(PROP_ROUTE_TARGET) ExtendedCommunity routeTarget,
+      @Nullable @JsonProperty(PROP_IMPORT_ROUTE_TARGET) String importRouteTarget,
       @Nullable @JsonProperty(PROP_ADVERTISE_V4_UNICAST) Boolean advertisev4Unicast) {
     checkArgument(vni != null, "Missing %s", PROP_VNI);
     checkArgument(vrf != null, "Missing %s", PROP_VRF);
     checkArgument(rd != null, "Missing %s", PROP_ROUTE_DISTINGUISHER);
     checkArgument(routeTarget != null, "Missing %s", PROP_ROUTE_TARGET);
-    return new Layer3VniConfig(
-        vni, vrf, rd, routeTarget, firstNonNull(advertisev4Unicast, Boolean.FALSE));
+    checkArgument(importRouteTarget != null, "Missing %s", PROP_ROUTE_TARGET);
+    return new Builder()
+        .setVni(vni)
+        .setVrf(vrf)
+        .setRouteDistinguisher(rd)
+        .setRouteTarget(routeTarget)
+        .setImportRouteTarget(importRouteTarget)
+        .setAdvertisev4Unicast(firstNonNull(advertisev4Unicast, Boolean.FALSE))
+        .build();
   }
 
   @JsonProperty(PROP_VNI)
@@ -80,11 +94,17 @@ public final class Layer3VniConfig implements Serializable, Comparable<Layer3Vni
     return _rd;
   }
 
-  /** Route target to use when advertising this VNI */
+  /** Route target to use when advertising this VNI (i.e., the export route target) */
   @Nonnull
   @JsonProperty(PROP_ROUTE_TARGET)
   public ExtendedCommunity getRouteTarget() {
     return _routeTarget;
+  }
+
+  /** The import route target pattern. Can be compiled into a {@link Pattern} */
+  @Nonnull
+  public String getImportRouteTarget() {
+    return _importRouteTarget;
   }
 
   /**
@@ -135,5 +155,68 @@ public final class Layer3VniConfig implements Serializable, Comparable<Layer3Vni
         .add(PROP_ROUTE_TARGET, _routeTarget)
         .add(PROP_ADVERTISE_V4_UNICAST, _advertisev4Unicast)
         .toString();
+  }
+
+  /** Return an import route target pattern equivalent to "*:VNI" */
+  @Nonnull
+  public static String importRtPatternForAnyAs(int vni) {
+    checkArgument(vni > 0 && vni < 1 << 24, "VNI value %d is not in the valid range 1-16777215");
+    return String.format("^\\d+:%d$", vni);
+  }
+
+  public static final class Builder {
+
+    @Nullable private Integer _vni;
+    @Nullable private String _vrf;
+    @Nullable private RouteDistinguisher _rd;
+    @Nullable private ExtendedCommunity _routeTarget;
+    @Nullable private String _importRouteTarget;
+    private boolean _advertisev4Unicast;
+
+    public Builder setVni(int vni) {
+      _vni = vni;
+      return this;
+    }
+
+    public Builder setVrf(String vrf) {
+      _vrf = vrf;
+      return this;
+    }
+
+    public Builder setRouteDistinguisher(RouteDistinguisher rd) {
+      _rd = rd;
+      return this;
+    }
+
+    public Builder setRouteTarget(ExtendedCommunity routeTarget) {
+      _routeTarget = routeTarget;
+      return this;
+    }
+
+    public Builder setImportRouteTarget(String importRouteTarget) {
+      _importRouteTarget = importRouteTarget;
+      return this;
+    }
+
+    public Builder setAdvertisev4Unicast(boolean advertisev4Unicast) {
+      _advertisev4Unicast = advertisev4Unicast;
+      return this;
+    }
+
+    public Layer3VniConfig build() {
+      checkArgument(_vni != null, "Missing %s", PROP_VNI);
+      checkArgument(_vrf != null, "Missing %s", PROP_VRF);
+      checkArgument(_rd != null, "Missing %s", PROP_ROUTE_DISTINGUISHER);
+      checkArgument(_routeTarget != null, "Missing %s", PROP_ROUTE_TARGET);
+      String importRt = firstNonNull(_importRouteTarget, importRtPatternForAnyAs(_vni));
+      // check pattern for validity
+      try {
+        Pattern.compile(importRt);
+      } catch (PatternSyntaxException e) {
+        throw new IllegalArgumentException(
+            String.format("Invalid patthern %s for %s", importRt, PROP_IMPORT_ROUTE_TARGET));
+      }
+      return new Layer3VniConfig(_vni, _vrf, _rd, _routeTarget, importRt, _advertisev4Unicast);
+    }
   }
 }

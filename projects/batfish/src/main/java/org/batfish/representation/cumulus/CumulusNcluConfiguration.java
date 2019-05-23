@@ -3,6 +3,7 @@ package org.batfish.representation.cumulus;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.Comparator.naturalOrder;
 import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PATH;
+import static org.batfish.datamodel.bgp.Layer3VniConfig.importRtPatternForAnyAs;
 import static org.batfish.representation.cumulus.CumulusRoutingProtocol.VI_PROTOCOLS_MAP;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -57,6 +58,7 @@ import org.batfish.datamodel.bgp.EvpnAddressFamily;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.Layer2VniConfig;
 import org.batfish.datamodel.bgp.Layer3VniConfig;
+import org.batfish.datamodel.bgp.Layer3VniConfig.Builder;
 import org.batfish.datamodel.bgp.RouteDistinguisher;
 import org.batfish.datamodel.bgp.community.ExtendedCommunity;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
@@ -213,7 +215,15 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
           l2Vnis.add(new Layer2VniConfig(vxlan.getVni(), bgpVrf.getVrfName(), rd, rt));
           if (evpnConfig.getAdvertiseDefaultGw()) {
             // Advertise VTEP gateway IP address for the L2 VNI as type 3 route
-            l3Vnis.add(new Layer3VniConfig(vxlan.getVni(), bgpVrf.getVrfName(), rd, rt, false));
+            l3Vnis.add(
+                new Builder()
+                    .setVni(vxlan.getVni())
+                    .setVrf(bgpVrf.getVrfName())
+                    .setRouteDistinguisher(rd)
+                    .setRouteTarget(rt)
+                    .setImportRouteTarget(importRtPatternForAnyAs(vxlan.getVni()))
+                    .setAdvertisev4Unicast(false)
+                    .build());
           }
         }
       }
@@ -231,12 +241,14 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
                           vniToIndex.get(l3Vni));
                   ExtendedCommunity rt = ExtendedCommunity.target(localAs, l3Vni);
                   l3Vnis.add(
-                      new Layer3VniConfig(
-                          l3Vni,
-                          aBgpVrf.getVrfName(),
-                          rd,
-                          rt,
-                          evpnConfig.getAdvertiseIpv4Unicast() != null));
+                      new Builder()
+                          .setVni(l3Vni)
+                          .setVrf(aBgpVrf.getVrfName())
+                          .setRouteDistinguisher(rd)
+                          .setRouteTarget(rt)
+                          .setImportRouteTarget(importRtPatternForAnyAs(l3Vni))
+                          .setAdvertisev4Unicast(evpnConfig.getAdvertiseIpv4Unicast() != null)
+                          .build());
                 }
               });
 
