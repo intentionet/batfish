@@ -25,6 +25,7 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_S
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_SOURCE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_TO_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SERVICE_GROUP_MEMBER;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.STATIC_ROUTE_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.VIRTUAL_ROUTER_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.ZONE_INTERFACE;
 
@@ -772,7 +773,10 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
 
   @Override
   public void exitSnvrrt_interface(Snvrrt_interfaceContext ctx) {
-    _currentStaticRoute.setNextHopInterface(ctx.iface.getText());
+    String name = ctx.iface.getText();
+    _currentStaticRoute.setNextHopInterface(name);
+    _configuration.referenceStructure(
+        INTERFACE, name, STATIC_ROUTE_INTERFACE, getLine(ctx.iface.start));
   }
 
   @Override

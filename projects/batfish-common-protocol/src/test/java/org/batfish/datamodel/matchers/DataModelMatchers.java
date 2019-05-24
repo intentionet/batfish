@@ -340,16 +340,16 @@ public final class DataModelMatchers {
 
   /**
    * Provides a matcher that matches if the provided {@link ConvertConfigurationAnswerElement} has
-   * an undefined reference in {@code hostname} to a structure of type {@code type} named {@code
+   * an undefined reference in {@code filename} to a structure of type {@code type} named {@code
    * structureName} of usage type {@code usage}.
    */
   public static @Nonnull Matcher<ConvertConfigurationAnswerElement> hasUndefinedReference(
-      @Nonnull String hostname,
+      @Nonnull String filename,
       @Nonnull StructureType type,
       @Nonnull String structureName,
       @Nonnull StructureUsage usage) {
     return new ConvertConfigurationAnswerElementMatchers.HasUndefinedReferenceWithUsage(
-        hostname, type, structureName, usage);
+        filename, type, structureName, usage);
   }
 
   /**

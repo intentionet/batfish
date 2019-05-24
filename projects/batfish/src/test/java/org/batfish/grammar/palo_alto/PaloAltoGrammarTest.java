@@ -40,6 +40,7 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE_GROUP;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE_OR_SERVICE_GROUP;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ZONE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.STATIC_ROUTE_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.VIRTUAL_ROUTER_INTERFACE;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -818,7 +819,9 @@ public class PaloAltoGrammarTest {
   @Test
   public void testStaticRoute() throws IOException {
     String vrName = "somename";
-    Configuration c = parseConfig("static-route");
+    String hostname = "static-route";
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    Configuration c = batfish.loadConfigurations().get(hostname);
 
     // Confirm static route shows up with correct extractions
     assertThat(c, hasVrf(vrName, hasStaticRoutes(hasItem(hasAdministrativeCost(equalTo(123))))));
@@ -828,6 +831,13 @@ public class PaloAltoGrammarTest {
     assertThat(
         c, hasVrf(vrName, hasStaticRoutes(hasItem(hasNextHopInterface(equalTo("ethernet1/1"))))));
     assertThat(c, hasVrf(vrName, hasStaticRoutes(hasItem(hasPrefix(Prefix.parse("0.0.0.0/0"))))));
+
+    // assert static interface route reference
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse();
+    String filename = "configs/" + hostname;
+    assertThat(
+        ccae, hasUndefinedReference(filename, INTERFACE, "ethernet1/1", STATIC_ROUTE_INTERFACE));
   }
 
   @Test
