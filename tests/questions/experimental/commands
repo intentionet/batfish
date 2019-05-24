@@ -33,6 +33,9 @@ test -raw tests/questions/experimental/f5BigipVipConfiguration.ref validate-temp
 # validate filterTable
 test -raw tests/questions/experimental/filterTable.ref validate-template filterTable filter = "mtu == 1500", innerQuestion={"class": "org.batfish.question.interfaceproperties.InterfacePropertiesQuestion"}, columns=["interface", "mtu"]
 
+# validate findMatchingFilterLines
+test -raw tests/questions/experimental/findMatchingFilterLines.ref validate-template findmatchingfilterlines action="deny", filters=".*", ignoreComposites=false, headers={dstIps="2.2.2.2", ipProtocols="tcp", srcIps="1.1.1.1", srcPorts="0", dstPorts="0-1000,!22"}, nodes=".*"
+
 # validate loopbackMultipathConsistency
 test -raw tests/questions/experimental/loopbackMultipathConsistency.ref validate-template loopbackMultipathConsistency maxTraces=1
 

@@ -1,0 +1,66 @@
+{
+    "class": "org.batfish.question.findmatchingfilterlines.FindMatchingFilterLinesQuestion",
+    "differential": false,
+    "action": "${action}",
+    "filters": "${filters}",
+    "headers": "${headers}",
+    "ignoreComposites": "${ignoreComposites}",
+    "nodes": "${nodes}",
+    "instance": {
+        "description": "Returns lines in filters (ACLs and firewall rules) that match packets in common with a given header constraint.",
+        "instanceName": "findMatchingFilterLines",
+        "longDescription": "Finds all lines in the specified filters that match any packets in common with the given packet header constraint. Does not consider whether those packets can reach those lines in the context of prior lines in the filter.",
+        "tags": [
+            "acl"
+        ],
+        "variables": {
+            "action": {
+                "description": "Show filter lines with this action. Options are: permit|deny. By default returns lines with either action",
+                "optional": true,
+                "type": "string",
+                "displayName": "Action"
+            },
+            "filters": {
+                "description": "Specifier for filters to check",
+                "type": "filterSpec",
+                "optional": true,
+                "displayName": "Filters"
+            },
+            "headers": {
+                "description": "Packet header constraints for which to find matching filter lines",
+                "optional": true,
+                "type": "headerConstraint",
+                "displayName": "Headers",
+                "fields": {
+                    "applications": { "optional": true, "type": "applicationSpec"},
+                    "dscps": { "optional": true },
+                    "dstIps": { "optional": true, "type": "ipSpaceSpec"},
+                    "dstPorts": { "optional": true },
+                    "ecns": { "optional": true },
+                    "flowStates": { "optional": true },
+                    "fragmentOffsets": { "optional": true },
+                    "icmpCodes": { "optional": true },
+                    "icmpTypes": { "optional": true },
+                    "ipProtocols": { "optional": true, "type": "ipProtocolSpec"},
+                    "packetLengths": { "optional": true },
+                    "srcIps": { "optional": true, "type": "ipSpaceSpec"},
+                    "srcPorts": { "optional": true },
+                    "tcpFlags": { "optional": true }
+                }
+            },
+            "ignoreComposites": {
+                "description": "Whether to ignore filters that are composed of multiple filters defined in the configs",
+                "type": "boolean",
+                "optional": true,
+                "value": false,
+                "displayName": "Ignore composite filters"
+            },
+            "nodes": {
+                "description": "Examine filters on nodes matching this specifier",
+                "type": "nodeSpec",
+                "optional": true,
+                "displayName": "Nodes"
+            }
+        }
+    }
+}

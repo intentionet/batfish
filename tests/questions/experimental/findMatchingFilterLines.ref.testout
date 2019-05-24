@@ -1,0 +1,115 @@
+{
+  "class" : "org.batfish.question.findmatchingfilterlines.FindMatchingFilterLinesQuestion",
+  "action" : "DENY",
+  "filters" : ".*",
+  "headers" : {
+    "dstIps" : "2.2.2.2",
+    "dstPorts" : "0-21,23-1000",
+    "ipProtocols" : "TCP",
+    "srcIps" : "1.1.1.1",
+    "srcPorts" : "0"
+  },
+  "ignoreComposites" : false,
+  "nodes" : ".*",
+  "differential" : false,
+  "includeOneTableKeys" : true,
+  "instance" : {
+    "description" : "Returns lines in filters (ACLs and firewall rules) that match packets in common with a given header constraint.",
+    "instanceName" : "qname",
+    "longDescription" : "Finds all lines in the specified filters that match any packets in common with the given packet header constraint. Does not consider whether those packets can reach those lines in the context of prior lines in the filter.",
+    "tags" : [
+      "acl"
+    ],
+    "variables" : {
+      "action" : {
+        "description" : "Show filter lines with this action. Options are: permit|deny. By default returns lines with either action",
+        "displayName" : "Action",
+        "optional" : true,
+        "type" : "string",
+        "value" : "deny"
+      },
+      "filters" : {
+        "description" : "Specifier for filters to check",
+        "displayName" : "Filters",
+        "optional" : true,
+        "type" : "filterSpec",
+        "value" : ".*"
+      },
+      "headers" : {
+        "description" : "Packet header constraints for which to find matching filter lines",
+        "displayName" : "Headers",
+        "fields" : {
+          "applications" : {
+            "optional" : true,
+            "type" : "applicationSpec"
+          },
+          "dscps" : {
+            "optional" : true
+          },
+          "dstIps" : {
+            "optional" : true,
+            "type" : "ipSpaceSpec"
+          },
+          "dstPorts" : {
+            "optional" : true
+          },
+          "ecns" : {
+            "optional" : true
+          },
+          "flowStates" : {
+            "optional" : true
+          },
+          "fragmentOffsets" : {
+            "optional" : true
+          },
+          "icmpCodes" : {
+            "optional" : true
+          },
+          "icmpTypes" : {
+            "optional" : true
+          },
+          "ipProtocols" : {
+            "optional" : true,
+            "type" : "ipProtocolSpec"
+          },
+          "packetLengths" : {
+            "optional" : true
+          },
+          "srcIps" : {
+            "optional" : true,
+            "type" : "ipSpaceSpec"
+          },
+          "srcPorts" : {
+            "optional" : true
+          },
+          "tcpFlags" : {
+            "optional" : true
+          }
+        },
+        "optional" : true,
+        "type" : "headerConstraint",
+        "value" : {
+          "dstIps" : "2.2.2.2",
+          "ipProtocols" : "tcp",
+          "srcIps" : "1.1.1.1",
+          "srcPorts" : "0",
+          "dstPorts" : "0-1000,!22"
+        }
+      },
+      "ignoreComposites" : {
+        "description" : "Whether to ignore filters that are composed of multiple filters defined in the configs",
+        "displayName" : "Ignore composite filters",
+        "optional" : true,
+        "type" : "boolean",
+        "value" : false
+      },
+      "nodes" : {
+        "description" : "Examine filters on nodes matching this specifier",
+        "displayName" : "Nodes",
+        "optional" : true,
+        "type" : "nodeSpec",
+        "value" : ".*"
+      }
+    }
+  }
+}
