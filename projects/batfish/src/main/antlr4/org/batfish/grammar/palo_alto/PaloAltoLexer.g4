@@ -696,14 +696,19 @@ VIRTUAL_ROUTER
     'virtual-router'
 ;
 
-YES
+VLAN
 :
-    'yes'
+    'vlan'
 ;
 
 VSYS
 :
     'vsys'
+;
+
+YES
+:
+    'yes'
 ;
 
 ZONE

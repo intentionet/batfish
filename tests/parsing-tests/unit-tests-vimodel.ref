@@ -29681,6 +29681,32 @@
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "PHYSICAL",
             "vrf" : "~NULL_VRF~"
+          },
+          "vlan" : {
+            "name" : "vlan",
+            "active" : false,
+            "additionalArpIps" : {
+              "class" : "org.batfish.datamodel.EmptyIpSpace"
+            },
+            "allowedVlans" : "",
+            "autostate" : true,
+            "description" : "vlan comment",
+            "mtu" : 1500,
+            "ospfDeadInterval" : 0,
+            "ospfEnabled" : false,
+            "ospfHelloMultiplier" : 0,
+            "ospfPassive" : false,
+            "ospfPointToPoint" : false,
+            "outgoingFilter" : "~vlan~OUTGOING_FILTER~",
+            "proxyArp" : false,
+            "ripEnabled" : false,
+            "ripPassive" : false,
+            "spanningTreePortfast" : false,
+            "switchport" : false,
+            "switchportMode" : "NONE",
+            "switchportTrunkEncapsulation" : "DOT1Q",
+            "type" : "PHYSICAL",
+            "vrf" : "~NULL_VRF~"
           }
         },
         "ipAccessLists" : {
@@ -29738,6 +29764,17 @@
                 }
               }
             ]
+          },
+          "~vlan~OUTGOING_FILTER~" : {
+            "name" : "~vlan~OUTGOING_FILTER~",
+            "lines" : [
+              {
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.TrueExpr"
+                }
+              }
+            ]
           }
         },
         "vendorFamily" : { },
@@ -29749,7 +29786,8 @@
               "ethernet1/1.5",
               "loopback",
               "tunnel",
-              "tunnel.3"
+              "tunnel.3",
+              "vlan"
             ]
           }
         }

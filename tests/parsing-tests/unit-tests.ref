@@ -70216,6 +70216,25 @@
             "                    text = (variable",
             "                      DOUBLE_QUOTED_STRING:'\"tunnel.3 comment\"')))))))))",
             "    NEWLINE:'\\n')",
+            "  (set_line_config_devices",
+            "    SET:'set'",
+            "    CONFIG:'config'",
+            "    DEVICES:'devices'",
+            "    name = (variable",
+            "      VARIABLE:'localhost.localdomain')",
+            "    (statement_config_devices",
+            "      (s_network",
+            "        NETWORK:'network'",
+            "        (sn_interface",
+            "          INTERFACE:'interface'",
+            "          (sni_vlan",
+            "            VLAN:'vlan'",
+            "            (if_common",
+            "              (if_comment",
+            "                COMMENT:'comment'",
+            "                text = (variable",
+            "                  DOUBLE_QUOTED_STRING:'\"vlan comment\"')))))))",
+            "    NEWLINE:'\\n')",
             "  EOF:<EOF>)"
           ]
         },
@@ -81524,6 +81543,13 @@
                 31
               ],
               "numReferrers" : 0
+            },
+            "vlan" : {
+              "definitionLines" : [
+                35,
+                36
+              ],
+              "numReferrers" : 0
             }
           }
         },
@@ -89796,6 +89822,10 @@
             {
               "tag" : "MISCELLANEOUS",
               "text" : "Interface tunnel.3 is not in a virtual-router, placing in ~NULL_VRF~ and shutting it down."
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "Interface vlan is not in a virtual-router, placing in ~NULL_VRF~ and shutting it down."
             }
           ]
         },

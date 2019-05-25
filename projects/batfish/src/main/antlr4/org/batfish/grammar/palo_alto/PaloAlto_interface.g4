@@ -13,6 +13,7 @@ sn_interface
         sni_ethernet
         | sni_loopback
         | sni_tunnel
+        | sni_vlan
     )
 ;
 
@@ -49,6 +50,15 @@ sni_loopback
 sni_tunnel
 :
     TUNNEL snit_units?
+;
+
+sni_vlan
+:
+    VLAN
+    (
+        if_common
+        | sniv_units
+    )?
 ;
 
 snie_layer3
@@ -143,4 +153,17 @@ snit_unit
 snit_units
 :
     UNITS snit_unit?
+;
+
+sniv_unit
+:
+    name = variable
+    (
+        if_common
+    )?
+;
+
+sniv_units
+:
+    UNITS sniv_unit?
 ;

@@ -85,6 +85,7 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Sn_virtual_routerContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Sni_ethernetContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Sni_loopbackContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Sni_tunnelContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Sni_vlanContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snicp_global_protectContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snicp_ike_crypto_profilesContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snicp_ipsec_crypto_profilesContext;
@@ -95,6 +96,7 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Sniel3_unitsContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Sniel3u_tagContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snil_unitContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snit_unitContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Sniv_unitContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snvr_interfaceContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snvr_routing_tableContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snvrrt_admin_distContext;
@@ -703,6 +705,20 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
   }
 
   @Override
+  public void enterSni_vlan(Sni_vlanContext ctx) {
+    String name = ctx.VLAN().getText();
+    _currentParentInterface = _configuration.getInterfaces().computeIfAbsent(name, Interface::new);
+    _currentInterface = _currentParentInterface;
+    defineStructure(INTERFACE, name, ctx);
+  }
+
+  @Override
+  public void exitSni_vlan(Sni_vlanContext ctx) {
+    _currentParentInterface = null;
+    _currentInterface = null;
+  }
+
+  @Override
   public void enterSnicp_global_protect(Snicp_global_protectContext ctx) {
     String name = ctx.name.getText();
     _currentCrytoProfile = _configuration.getCryptoProfileOrCreate(name, Type.GLOBAL_PROTECT_APP);
@@ -793,6 +809,19 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
 
   @Override
   public void exitSnit_unit(Snit_unitContext ctx) {
+    _currentInterface = _currentParentInterface;
+  }
+
+  @Override
+  public void enterSniv_unit(Sniv_unitContext ctx) {
+    String name = ctx.name.getText();
+    _currentInterface = _currentParentInterface.getUnits().computeIfAbsent(name, Interface::new);
+    _currentInterface.setParent(_currentParentInterface);
+    defineStructure(INTERFACE, name, ctx);
+  }
+
+  @Override
+  public void exitSniv_unit(Sniv_unitContext ctx) {
     _currentInterface = _currentParentInterface;
   }
 

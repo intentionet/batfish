@@ -32,6 +32,9 @@ config {
               }
             }
           }
+          vlan {
+            comment "vlan comment";
+          }
         }
       }
     }
