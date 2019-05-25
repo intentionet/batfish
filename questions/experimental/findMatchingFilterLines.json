@@ -13,6 +13,13 @@
         "tags": [
             "acl"
         ],
+        "orderedVariableNames": [
+            "nodes",
+            "filters",
+            "headers",
+            "action",
+            "ignoreComposites"
+        ],
         "variables": {
             "action": {
                 "description": "Show filter lines with this action. Options are: permit|deny. By default returns lines with either action",

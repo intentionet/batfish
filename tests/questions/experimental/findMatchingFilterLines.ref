@@ -17,6 +17,13 @@
     "description" : "Returns lines in filters (ACLs and firewall rules) that match packets in common with a given header constraint.",
     "instanceName" : "qname",
     "longDescription" : "Finds all lines in the specified filters that match any packets in common with the given packet header constraint. Does not consider whether those packets can reach those lines in the context of prior lines in the filter.",
+    "orderedVariableNames" : [
+      "nodes",
+      "filters",
+      "headers",
+      "action",
+      "ignoreComposites"
+    ],
     "tags" : [
       "acl"
     ],
