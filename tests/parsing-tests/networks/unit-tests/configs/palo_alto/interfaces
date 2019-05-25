@@ -21,6 +21,10 @@ config {
               }
             }
           }
+          loopback {
+            comment "loopback comment";
+            units;
+          }
           tunnel {
             units {
               tunnel.3 {

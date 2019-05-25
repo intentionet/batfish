@@ -3278,14 +3278,26 @@
       },
       {
         "Structure_Type" : "interface",
-        "Structure_Name" : "tunnel",
+        "Structure_Name" : "loopback",
         "Source_Lines" : {
           "filename" : "configs/palo_alto/interfaces",
           "lines" : [
             24,
             25,
-            26,
-            27
+            26
+          ]
+        }
+      },
+      {
+        "Structure_Type" : "interface",
+        "Structure_Name" : "tunnel",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/interfaces",
+          "lines" : [
+            28,
+            29,
+            30,
+            31
           ]
         }
       },
@@ -3295,8 +3307,8 @@
         "Source_Lines" : {
           "filename" : "configs/palo_alto/interfaces",
           "lines" : [
-            26,
-            27
+            30,
+            31
           ]
         }
       },
@@ -3530,10 +3542,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 236 results",
+      "notes" : "Found 237 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 236
+      "numResults" : 237
     }
   }
 ]

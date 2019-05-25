@@ -366,6 +366,11 @@ LOG_SETTINGS
     'log-settings'
 ;
 
+LOOPBACK
+:
+    'loopback'
+;
+
 MD5
 :
     'md5'

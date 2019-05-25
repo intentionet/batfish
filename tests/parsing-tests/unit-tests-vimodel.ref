@@ -29605,6 +29605,32 @@
             "type" : "PHYSICAL",
             "vrf" : "~NULL_VRF~"
           },
+          "loopback" : {
+            "name" : "loopback",
+            "active" : false,
+            "additionalArpIps" : {
+              "class" : "org.batfish.datamodel.EmptyIpSpace"
+            },
+            "allowedVlans" : "",
+            "autostate" : true,
+            "description" : "loopback comment",
+            "mtu" : 1500,
+            "ospfDeadInterval" : 0,
+            "ospfEnabled" : false,
+            "ospfHelloMultiplier" : 0,
+            "ospfPassive" : false,
+            "ospfPointToPoint" : false,
+            "outgoingFilter" : "~loopback~OUTGOING_FILTER~",
+            "proxyArp" : false,
+            "ripEnabled" : false,
+            "ripPassive" : false,
+            "spanningTreePortfast" : false,
+            "switchport" : false,
+            "switchportMode" : "NONE",
+            "switchportTrunkEncapsulation" : "DOT1Q",
+            "type" : "PHYSICAL",
+            "vrf" : "~NULL_VRF~"
+          },
           "tunnel" : {
             "name" : "tunnel",
             "active" : false,
@@ -29680,6 +29706,17 @@
               }
             ]
           },
+          "~loopback~OUTGOING_FILTER~" : {
+            "name" : "~loopback~OUTGOING_FILTER~",
+            "lines" : [
+              {
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.TrueExpr"
+                }
+              }
+            ]
+          },
           "~tunnel.3~OUTGOING_FILTER~" : {
             "name" : "~tunnel.3~OUTGOING_FILTER~",
             "lines" : [
@@ -29710,6 +29747,7 @@
             "interfaces" : [
               "ethernet1/1",
               "ethernet1/1.5",
+              "loopback",
               "tunnel",
               "tunnel.3"
             ]

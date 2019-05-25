@@ -70168,6 +70168,41 @@
             "        NETWORK:'network'",
             "        (sn_interface",
             "          INTERFACE:'interface'",
+            "          (sni_loopback",
+            "            LOOPBACK:'loopback'",
+            "            (if_common",
+            "              (if_comment",
+            "                COMMENT:'comment'",
+            "                text = (variable",
+            "                  DOUBLE_QUOTED_STRING:'\"loopback comment\"')))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line_config_devices",
+            "    SET:'set'",
+            "    CONFIG:'config'",
+            "    DEVICES:'devices'",
+            "    name = (variable",
+            "      VARIABLE:'localhost.localdomain')",
+            "    (statement_config_devices",
+            "      (s_network",
+            "        NETWORK:'network'",
+            "        (sn_interface",
+            "          INTERFACE:'interface'",
+            "          (sni_loopback",
+            "            LOOPBACK:'loopback'",
+            "            (snil_units",
+            "              UNITS:'units')))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line_config_devices",
+            "    SET:'set'",
+            "    CONFIG:'config'",
+            "    DEVICES:'devices'",
+            "    name = (variable",
+            "      VARIABLE:'localhost.localdomain')",
+            "    (statement_config_devices",
+            "      (s_network",
+            "        NETWORK:'network'",
+            "        (sn_interface",
+            "          INTERFACE:'interface'",
             "          (sni_tunnel",
             "            TUNNEL:'tunnel'",
             "            (snit_units",
@@ -81466,19 +81501,27 @@
               ],
               "numReferrers" : 0
             },
-            "tunnel" : {
+            "loopback" : {
               "definitionLines" : [
                 24,
                 25,
-                26,
-                27
+                26
+              ],
+              "numReferrers" : 0
+            },
+            "tunnel" : {
+              "definitionLines" : [
+                28,
+                29,
+                30,
+                31
               ],
               "numReferrers" : 0
             },
             "tunnel.3" : {
               "definitionLines" : [
-                26,
-                27
+                30,
+                31
               ],
               "numReferrers" : 0
             }
@@ -89741,6 +89784,10 @@
             {
               "tag" : "MISCELLANEOUS",
               "text" : "Interface ethernet1/1.5 is not in a virtual-router, placing in ~NULL_VRF~ and shutting it down."
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "Interface loopback is not in a virtual-router, placing in ~NULL_VRF~ and shutting it down."
             },
             {
               "tag" : "MISCELLANEOUS",
