@@ -12,7 +12,9 @@ public enum IssueType {
   ConvertWarningUnimplemented("Convert warning (unimplemented)"),
   ParseError("Parse error"),
   ParseStatus("Parse status"),
-  ParseWarning("Parse warning");
+  ParseWarning("Parse warning"),
+  ParseWarningRedFlag("Parse warning (redflag)"),
+  ParseWarningUnimplemented("Parse warning (unimplemented)");
 
   private static final Map<String, IssueType> _map = buildMap();
 

@@ -34,6 +34,13 @@ import org.batfish.datamodel.table.TableMetadata;
 
 /** Implements {@link InitIssuesQuestion}. */
 public class InitIssuesAnswerer extends Answerer {
+  private static List<FileLines> filenamesToFileLines(Set<String> filenames) {
+    return filenames.stream()
+        .sorted()
+        .map(n -> new FileLines(n, ImmutableSortedSet.of()))
+        .collect(ImmutableList.toImmutableList());
+  }
+
   @Override
   public TableAnswerElement answer() {
     ConvertConfigurationAnswerElement ccae =
@@ -71,6 +78,24 @@ public class InitIssuesAnswerer extends Answerer {
                         firstNonNull(triplet._comment, "(details not provided)"),
                         triplet._text,
                         triplet._parserContext)));
+    aggregateDuplicateWarnings(fileWarnings, Warnings::getRedFlagWarnings)
+        .forEach(
+            (warning, filenames) ->
+                rows.add(
+                    getRow(
+                        null,
+                        filenamesToFileLines(filenames),
+                        IssueType.ParseWarningRedFlag,
+                        warning.getText())));
+    aggregateDuplicateWarnings(fileWarnings, Warnings::getUnimplementedWarnings)
+        .forEach(
+            (warning, filenames) ->
+                rows.add(
+                    getRow(
+                        null,
+                        filenamesToFileLines(filenames),
+                        IssueType.ParseWarningUnimplemented,
+                        warning.getText())));
 
     for (Entry<ParseStatus, Set<String>> entry :
         aggregateParseStatuses(pvcae.getParseStatus()).entrySet()) {
@@ -90,9 +115,7 @@ public class InitIssuesAnswerer extends Answerer {
           rows.add(
               getRow(
                   null,
-                  entry.getValue().stream()
-                      .map(s -> new FileLines(s, ImmutableSortedSet.of()))
-                      .collect(ImmutableList.toImmutableList()),
+                  filenamesToFileLines(entry.getValue()),
                   IssueType.ParseStatus,
                   ParseStatus.explanation(status)));
       }
