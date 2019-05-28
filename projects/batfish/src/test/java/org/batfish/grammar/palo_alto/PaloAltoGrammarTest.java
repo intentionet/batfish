@@ -35,11 +35,13 @@ import static org.batfish.representation.palo_alto.PaloAltoConfiguration.NULL_VR
 import static org.batfish.representation.palo_alto.PaloAltoConfiguration.SHARED_VSYS_NAME;
 import static org.batfish.representation.palo_alto.PaloAltoConfiguration.computeObjectName;
 import static org.batfish.representation.palo_alto.PaloAltoConfiguration.computeServiceGroupMemberAclName;
+import static org.batfish.representation.palo_alto.PaloAltoStructureType.APPLICATION_GROUP_OR_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE_GROUP;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE_OR_SERVICE_GROUP;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ZONE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.STATIC_ROUTE_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.VIRTUAL_ROUTER_INTERFACE;
 import static org.hamcrest.Matchers.allOf;
@@ -368,6 +370,21 @@ public class PaloAltoGrammarTest {
         ccae2,
         hasUndefinedReference(
             filename2, PaloAltoStructureType.ADDRESS_GROUP_OR_ADDRESS_OBJECT, "addr3"));
+  }
+
+  @Test
+  public void testApplications() throws IOException {
+    String hostname = "applications";
+    String filename = "configs/" + hostname;
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse();
+
+    // Confirm undefined application is detected
+    assertThat(
+        ccae,
+        hasUndefinedReference(
+            filename, APPLICATION_GROUP_OR_APPLICATION, "undefined", RULE_APPLICATION));
   }
 
   @Test

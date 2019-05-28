@@ -12,6 +12,7 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureType.ADDRESS
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ADDRESS_GROUP_OR_ADDRESS_OBJECT;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ADDRESS_GROUP_OR_ADDRESS_OBJECT_OR_NONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ADDRESS_OBJECT;
+import static org.batfish.representation.palo_alto.PaloAltoStructureType.APPLICATION_GROUP_OR_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.RULE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE_GROUP;
@@ -20,6 +21,7 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.ADDRESS_GROUP_STATIC;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULEBASE_SERVICE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_DESTINATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_FROM_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_SELF_REF;
@@ -921,8 +923,10 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
     for (Variable_list_itemContext var : ctx.variable_list().variable_list_item()) {
       String name = getText(var);
       if (!name.equals(CATCHALL_APPLICATION_NAME)) {
-        _w.redFlag("Unhandled application: " + name);
+        _configuration.referenceStructure(
+            APPLICATION_GROUP_OR_APPLICATION, name, RULE_APPLICATION, getLine(var.start));
       }
+      _currentRule.getApplications().add(name);
     }
   }
 

@@ -640,6 +640,13 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
         PaloAltoStructureUsage.RULE_DESTINATION,
         PaloAltoStructureUsage.RULE_SOURCE);
 
+    // Applications or Application-Groups
+    markAbstractStructureFromUnknownNamespace(
+        PaloAltoStructureType.APPLICATION_GROUP_OR_APPLICATION,
+        ImmutableList.of(
+            PaloAltoStructureType.APPLICATION_GROUP, PaloAltoStructureType.APPLICATION),
+        PaloAltoStructureUsage.RULE_APPLICATION);
+
     return ImmutableList.of(_c);
   }
 

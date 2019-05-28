@@ -13,6 +13,8 @@ public final class Rule implements Serializable {
 
   private LineAction _action;
 
+  private SortedSet<String> _applications;
+
   private String _description;
 
   private List<RuleEndpoint> _destination;
@@ -32,6 +34,7 @@ public final class Rule implements Serializable {
   private final Vsys _vsys;
 
   public Rule(String name, Vsys vsys) {
+    _applications = new TreeSet<>();
     _destination = new LinkedList<>();
     _disabled = false;
     _from = new TreeSet<>();
@@ -48,6 +51,10 @@ public final class Rule implements Serializable {
 
   public LineAction getAction() {
     return _action;
+  }
+
+  public SortedSet<String> getApplications() {
+    return _applications;
   }
 
   public String getDescription() {

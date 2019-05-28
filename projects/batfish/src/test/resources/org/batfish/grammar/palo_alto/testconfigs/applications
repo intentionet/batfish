@@ -1,0 +1,3 @@
+set deviceconfig system hostname applications
+
+set config devices localhost.localdomain vsys vsys1 rulebase security rules rule1 application undefined
