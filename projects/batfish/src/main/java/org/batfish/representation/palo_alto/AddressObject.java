@@ -1,27 +1,26 @@
 package org.batfish.representation.palo_alto;
 
 import java.io.Serializable;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.EmptyIpSpace;
 import org.batfish.datamodel.IpSpace;
 
 /** Represents a Palo Alto address object */
+@ParametersAreNonnullByDefault
 public final class AddressObject implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private String _description;
+  @Nullable private String _description;
 
-  private IpSpace _ipSpace;
+  @Nonnull private IpSpace _ipSpace;
 
-  private final String _name;
+  @Nonnull private final String _name;
 
   public AddressObject(String name) {
-    this(name, EmptyIpSpace.INSTANCE);
-  }
-
-  public AddressObject(String name, IpSpace ipSpace) {
     _name = name;
-    _ipSpace = ipSpace;
+    _ipSpace = EmptyIpSpace.INSTANCE;
   }
 
   @Nullable
@@ -29,11 +28,12 @@ public final class AddressObject implements Serializable {
     return _description;
   }
 
-  @Nullable
+  @Nonnull
   public IpSpace getIpSpace() {
     return _ipSpace;
   }
 
+  @Nonnull
   public String getName() {
     return _name;
   }

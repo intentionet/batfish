@@ -29,7 +29,8 @@ set rulebase security rules RULE1 action deny
 
 set rulebase security rules RULE2 from any
 set rulebase security rules RULE2 to [ z1 z2 ]
-set rulebase security rules RULE2 source any
+set rulebase security rules RULE2 source [ 2.2.2.2 ]
+set rulebase security rules RULE2 negate-source yes
 set rulebase security rules RULE2 destination [ 1.1.1.2 1.1.4.2 ]
 set rulebase security rules RULE2 service any
 set rulebase security rules RULE2 application any

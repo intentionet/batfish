@@ -118,6 +118,8 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_descriptionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_destinationContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_disabledContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_fromContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_negate_destinationContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_negate_sourceContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_serviceContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_sourceContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_toContext;
@@ -973,6 +975,16 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
         _configuration.referenceStructure(ZONE, uniqueName, RULE_FROM_ZONE, getLine(var.start));
       }
     }
+  }
+
+  @Override
+  public void exitSrs_negate_destination(Srs_negate_destinationContext ctx) {
+    _currentRule.setNegateDestination(ctx.YES() != null);
+  }
+
+  @Override
+  public void exitSrs_negate_source(Srs_negate_sourceContext ctx) {
+    _currentRule.setNegateSource(ctx.YES() != null);
   }
 
   @Override

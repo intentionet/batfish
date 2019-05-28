@@ -406,6 +406,16 @@ NDP_PROXY
     'ndp-proxy'
 ;
 
+NEGATE_DESTINATION
+:
+    'negate-destination'
+;
+
+NEGATE_SOURCE
+:
+    'negate-source'
+;
+
 NETMASK
 :
     'netmask'

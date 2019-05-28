@@ -26,6 +26,8 @@ sr_security
         | srs_disabled
         | srs_from
         | srs_hip_profiles
+        | srs_negate_destination
+        | srs_negate_source
         | srs_service
         | srs_source
         | srs_source_user
@@ -84,6 +86,16 @@ srs_from
 srs_hip_profiles
 :
     HIP_PROFILES ANY // only support any
+;
+
+srs_negate_destination
+:
+    NEGATE_DESTINATION (YES | NO)
+;
+
+srs_negate_source
+:
+    NEGATE_SOURCE (YES | NO)
 ;
 
 srs_service

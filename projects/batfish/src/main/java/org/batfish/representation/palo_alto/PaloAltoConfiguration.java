@@ -22,12 +22,17 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.collections4.list.TreeList;
 import org.batfish.common.VendorConversionException;
+import org.batfish.common.Warnings;
+import org.batfish.datamodel.AclIpSpace;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.DefinedStructureInfo;
+import org.batfish.datamodel.EmptyIpSpace;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Interface.Dependency;
 import org.batfish.datamodel.Interface.DependencyType;
@@ -46,6 +51,7 @@ import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.AndMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.acl.MatchSrcInterface;
+import org.batfish.datamodel.acl.NotMatchExpr;
 import org.batfish.datamodel.acl.OrMatchExpr;
 import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.acl.TrueExpr;
@@ -337,35 +343,43 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     return IpAccessList.builder().setName(name).setLines(lines).build();
   }
 
+  @Nullable
+  private static IpSpace ipSpaceFromRuleEndpoints(
+      Collection<RuleEndpoint> endpoints, Vsys vsys, Warnings w) {
+    return AclIpSpace.union(
+        endpoints.stream()
+            .map(source -> ruleEndpointToIpSpace(source, vsys, w))
+            .collect(Collectors.toList()));
+  }
+
   /** Convert specified firewall rule into an IpAccessListLine */
   private IpAccessListLine toIpAccessListLine(Rule rule, Vsys vsys) {
-    List<AclLineMatchExpr> conjuncts = new TreeList<>();
+    assert !rule.getDisabled(); // handled by caller.
+
     IpAccessListLine.Builder ipAccessListLineBuilder =
-        IpAccessListLine.builder().setName(rule.getName());
-    if (rule.getAction() == LineAction.PERMIT) {
-      ipAccessListLineBuilder.accepting();
-    } else {
-      ipAccessListLineBuilder.rejecting();
-    }
+        IpAccessListLine.builder().setName(rule.getName()).setAction(rule.getAction());
 
-    // TODO(https://github.com/batfish/batfish/issues/2097): need to handle matching specified
-    // applications
-
-    // Construct headerspace match expression
-    HeaderSpace.Builder headerSpaceBuilder = HeaderSpace.builder();
-    for (RuleEndpoint source : rule.getSource()) {
-      IpSpace ipSpace = ruleEndpointToIpSpace(source, vsys);
-      if (ipSpace != null) {
-        headerSpaceBuilder.addSrcIp(ipSpace);
+    List<AclLineMatchExpr> conjuncts = new TreeList<>();
+    // Match SRC IPs if specified.
+    IpSpace srcIps = ipSpaceFromRuleEndpoints(rule.getSource(), vsys, _w);
+    if (srcIps != null) {
+      AclLineMatchExpr match =
+          new MatchHeaderSpace(HeaderSpace.builder().setSrcIps(srcIps).build());
+      if (rule.getNegateSource()) {
+        match = new NotMatchExpr(match);
       }
+      conjuncts.add(match);
     }
-    for (RuleEndpoint destination : rule.getDestination()) {
-      IpSpace ipSpace = ruleEndpointToIpSpace(destination, vsys);
-      if (ipSpace != null) {
-        headerSpaceBuilder.addDstIp(ipSpace);
+    // Match DST IPs if specified.
+    IpSpace dstIps = ipSpaceFromRuleEndpoints(rule.getDestination(), vsys, _w);
+    if (dstIps != null) {
+      AclLineMatchExpr match =
+          new MatchHeaderSpace(HeaderSpace.builder().setDstIps(dstIps).build());
+      if (rule.getNegateDestination()) {
+        match = new NotMatchExpr(match);
       }
+      conjuncts.add(match);
     }
-    conjuncts.add(new MatchHeaderSpace(headerSpaceBuilder.build()));
 
     // Construct source zone (source interface) match expression
     SortedSet<String> ruleFroms = rule.getFrom();
@@ -382,6 +396,9 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
       }
       conjuncts.add(new MatchSrcInterface(srcInterfaces));
     }
+
+    // TODO(https://github.com/batfish/batfish/issues/2097): need to handle matching specified
+    // applications
 
     // Construct service match expression
     SortedSet<ServiceOrServiceGroupReference> ruleServices = rule.getService();
@@ -417,7 +434,8 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
   }
 
   /** Converts {@link RuleEndpoint} to {@code IpSpace} */
-  private IpSpace ruleEndpointToIpSpace(RuleEndpoint endpoint, Vsys vsys) {
+  @Nonnull
+  private static IpSpace ruleEndpointToIpSpace(RuleEndpoint endpoint, Vsys vsys, Warnings w) {
     String endpointValue = endpoint.getValue();
     // Palo Alto allows object references that look like IP addresses, ranges, etc.
     // Devices use objects over constants when possible, so, check to see if there is a matching
@@ -442,11 +460,11 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
           return IpRange.range(Ip.parse(ips[0]), Ip.parse(ips[1]));
         case REFERENCE:
           // Undefined reference
-          _w.redFlag("No matching address group/object found for RuleEndpoint: " + endpoint);
-          return null;
+          w.redFlag("No matching address group/object found for RuleEndpoint: " + endpoint);
+          return EmptyIpSpace.INSTANCE;
         default:
-          _w.redFlag("Could not convert RuleEndpoint to IpSpace: " + endpoint);
-          return null;
+          w.redFlag("Could not convert RuleEndpoint to IpSpace: " + endpoint);
+          return EmptyIpSpace.INSTANCE;
       }
     }
   }

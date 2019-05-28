@@ -688,6 +688,7 @@ public class PaloAltoGrammarTest {
     String if3name = "ethernet1/3";
     String if4name = "ethernet1/4";
     Flow z1ToZ1permitted = createFlow("1.1.2.255", "1.1.1.2");
+    Flow z1ToZ1rejectedSource = createFlow("2.2.2.2", "1.1.1.2");
     Flow z1ToZ1rejectedDestination = createFlow("1.1.2.2", "1.1.1.3");
     Flow z1ToZ1rejectedService = createFlow("1.1.2.2", "1.1.1.3", IpProtocol.TCP, 1, 999);
     Flow z2ToZ1permitted = createFlow("1.1.4.255", "1.1.1.2");
@@ -703,6 +704,9 @@ public class PaloAltoGrammarTest {
     assertThat(
         c,
         hasInterface(if1name, hasOutgoingFilter(rejects(z1ToZ1rejectedDestination, if2name, c))));
+    // Confirm intrazone flow not matching allow rule (source address negated) is rejected
+    assertThat(
+        c, hasInterface(if1name, hasOutgoingFilter(rejects(z1ToZ1rejectedSource, if2name, c))));
 
     // Confirm interzone flow matching allow rule is accepted
     assertThat(c, hasInterface(if1name, hasOutgoingFilter(accepts(z2ToZ1permitted, if4name, c))));
