@@ -46,20 +46,16 @@ import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AbstractRouteBuilder;
 import org.batfish.datamodel.AnnotatedRoute;
 import org.batfish.datamodel.AsPath;
-import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.BgpAdvertisement.BgpAdvertisementType;
 import org.batfish.datamodel.BgpPeerConfig;
 import org.batfish.datamodel.BgpPeerConfigId;
-import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.BgpSessionProperties;
 import org.batfish.datamodel.Bgpv4Route;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConnectedRoute;
 import org.batfish.datamodel.Edge;
-import org.batfish.datamodel.EvpnRoute;
-import org.batfish.datamodel.EvpnType3Route;
 import org.batfish.datamodel.Fib;
 import org.batfish.datamodel.FibImpl;
 import org.batfish.datamodel.GeneratedRoute;
@@ -68,7 +64,6 @@ import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IsisRoute;
 import org.batfish.datamodel.LocalRoute;
-import org.batfish.datamodel.LongSpace;
 import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
@@ -78,11 +73,9 @@ import org.batfish.datamodel.Route;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.Topology;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.BgpTopology;
 import org.batfish.datamodel.bgp.BgpTopology.EdgeId;
-import org.batfish.datamodel.bgp.EvpnAddressFamily;
 import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.dataplane.rib.RibGroup;
 import org.batfish.datamodel.dataplane.rib.RibId;
@@ -103,7 +96,6 @@ import org.batfish.dataplane.protocols.GeneratedRouteHelper;
 import org.batfish.dataplane.rib.AnnotatedRib;
 import org.batfish.dataplane.rib.Bgpv4Rib;
 import org.batfish.dataplane.rib.ConnectedRib;
-import org.batfish.dataplane.rib.EvpnRib;
 import org.batfish.dataplane.rib.IsisLevelRib;
 import org.batfish.dataplane.rib.IsisRib;
 import org.batfish.dataplane.rib.KernelRib;
@@ -121,7 +113,7 @@ public class VirtualRouter implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /** The BGP routing process */
+  /** The BGP routing process. Null if BGP is not configured for this VRF */
   @Nullable transient BgpRoutingProcess _bgpRoutingProcess;
 
   /** Parent configuration for this virtual router */
@@ -327,7 +319,10 @@ public class VirtualRouter implements Serializable {
     // Handle BGP process state
     if (_bgpRoutingProcess == null && _vrf.getBgpProcess() != null) {
       // If the process does not exist, but should, init it.
-      _bgpRoutingProcess = new BgpRoutingProcess(_vrf.getBgpProcess(), _c, _name, _mainRib);
+      _bgpRoutingProcess =
+          new BgpRoutingProcess(
+              _vrf.getBgpProcess(), _c, _name, _mainRib, topologyContext.getBgpTopology());
+      _bgpRoutingProcess.initialize(_node);
     }
     if (_bgpRoutingProcess != null) {
       // If the process exists, update the topology
@@ -705,59 +700,6 @@ public class VirtualRouter implements Serializable {
             .filter(e -> !e.getValue().isEmpty())
             .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().build()));
     finalizeBgpRoutesAndQueueOutgoingMessages(deltas, allNodes, bgpTopology, networkConfigurations);
-  }
-
-  /**
-   * Initialize the EVPN RIBs using the EVPN address families configured on the active BGP neighbors
-   * on this Virtual Router
-   */
-  @VisibleForTesting
-  void initEvpnRoutes() {
-    BgpProcess bgpProcess = _vrf.getBgpProcess();
-    if (_bgpRoutingProcess == null) {
-      // Nothing to do
-      return;
-    }
-
-    for (BgpActivePeerConfig peerConfig : bgpProcess.getActiveNeighbors().values()) {
-      EvpnAddressFamily evpnAddressFamily = peerConfig.getEvpnAddressFamily();
-      if (peerConfig.getLocalAs() == null
-          || peerConfig.getRemoteAsns().isEmpty()
-          || evpnAddressFamily == null) {
-        // nothing to do if we cannot figure out local and remote AS or if the neighbor cannot talk
-        // EVPN
-        continue;
-      }
-
-      // just initialize EVPN type 3 routes for now
-      evpnAddressFamily
-          .getL3VNIs()
-          .forEach(
-              layer3VniConfig -> {
-                boolean ebgp =
-                    !peerConfig.getRemoteAsns().equals(LongSpace.of(peerConfig.getLocalAs()));
-                EvpnRib<EvpnRoute<?, ?>> ribForThisRoute =
-                    ebgp ? _bgpRoutingProcess._ebgpEvpnRib : _bgpRoutingProcess._ibgpEvpnRib;
-                VniSettings vniSettings = _vrf.getVniSettings().get(layer3VniConfig.getVni());
-                checkState(
-                    vniSettings != null,
-                    String.format(
-                        "Cannot find VNI settings for VNI: %s", layer3VniConfig.getVni()));
-                EvpnType3Route.Builder type3RouteBuilder = EvpnType3Route.builder();
-                type3RouteBuilder.setAdmin(
-                    bgpProcess.getAdminCost(ebgp ? RoutingProtocol.BGP : RoutingProtocol.IBGP));
-                type3RouteBuilder.setCommunities(ImmutableSet.of(layer3VniConfig.getRouteTarget()));
-                type3RouteBuilder.setLocalPreference(Bgpv4Route.DEFAULT_LOCAL_PREFERENCE);
-                type3RouteBuilder.setOriginatorIp(vniSettings.getSourceAddress());
-                type3RouteBuilder.setOriginType(ebgp ? OriginType.EGP : OriginType.IGP);
-                type3RouteBuilder.setProtocol(RoutingProtocol.BGP);
-                type3RouteBuilder.setReceivedFromRouteReflectorClient(false);
-                type3RouteBuilder.setRouteDistinguisher(layer3VniConfig.getRouteDistinguisher());
-                type3RouteBuilder.setSrcProtocol(RoutingProtocol.BGP);
-                type3RouteBuilder.setVniIp(vniSettings.getSourceAddress());
-                ribForThisRoute.mergeRouteGetDelta(type3RouteBuilder.build());
-              });
-    }
   }
 
   /** Initialize RIP routes from the interface prefixes */
@@ -2092,6 +2034,11 @@ public class VirtualRouter implements Serializable {
 
   private <R extends AbstractRoute> AnnotatedRoute<R> annotateRoute(@Nonnull R route) {
     return new AnnotatedRoute<>(route, _name);
+  }
+
+  @Nullable
+  BgpRoutingProcess getBgpRoutingProcess() {
+    return _bgpRoutingProcess;
   }
 
   public Map<String, OspfRoutingProcess> getOspfProcesses() {

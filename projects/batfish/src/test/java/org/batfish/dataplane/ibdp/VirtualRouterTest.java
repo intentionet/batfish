@@ -31,16 +31,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AnnotatedRoute;
-import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.Bgpv4Route;
-import org.batfish.datamodel.BumTransportMethod;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.ConnectedRoute;
 import org.batfish.datamodel.EigrpExternalRoute;
 import org.batfish.datamodel.EigrpInternalRoute;
-import org.batfish.datamodel.EvpnType3Route;
 import org.batfish.datamodel.GeneratedRoute;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
@@ -62,13 +59,8 @@ import org.batfish.datamodel.Route;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.Topology;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.BgpTopology;
-import org.batfish.datamodel.bgp.EvpnAddressFamily;
-import org.batfish.datamodel.bgp.Layer3VniConfig;
-import org.batfish.datamodel.bgp.RouteDistinguisher;
-import org.batfish.datamodel.bgp.community.ExtendedCommunity;
 import org.batfish.datamodel.eigrp.EigrpMetric;
 import org.batfish.datamodel.eigrp.EigrpProcessMode;
 import org.batfish.datamodel.eigrp.EigrpTopology;
@@ -253,72 +245,6 @@ public class VirtualRouterTest {
                             new ConnectedRoute(e.getValue().getPrefix(), e.getKey()),
                             DEFAULT_VRF_NAME))
                 .collect(ImmutableSet.toImmutableSet())));
-  }
-
-  @Test
-  public void testInitEvpnRoutes() {
-    // Setup
-    NetworkFactory nf = new NetworkFactory();
-    VirtualRouter vr = makeIosVirtualRouter("c");
-    Ip routerId = Ip.parse("1.1.1.1");
-    vr.initRibs();
-    BgpActivePeerConfig evpnPeer =
-        BgpActivePeerConfig.builder()
-            .setPeerAddress(Ip.parse("1.1.1.1"))
-            .setRemoteAs(1L)
-            .setLocalIp(Ip.parse("2.2.2.2"))
-            .setLocalAs(2L)
-            .setEvpnAddressFamily(
-                new EvpnAddressFamily(
-                    ImmutableSet.of(),
-                    ImmutableSet.of(
-                        Layer3VniConfig.builder()
-                            .setVni(1)
-                            .setVrf(DEFAULT_VRF_NAME)
-                            .setRouteDistinguisher(RouteDistinguisher.from(routerId, 2))
-                            .setRouteTarget(ExtendedCommunity.target(65500, 10001))
-                            .setImportRouteTarget(Layer3VniConfig.importRtPatternForAnyAs(1))
-                            .setAdvertiseV4Unicast(false)
-                            .build())))
-            .build();
-    BgpProcess bgpProcess =
-        nf.bgpProcessBuilder()
-            .setVrf(vr._vrf)
-            .setRouterId(routerId)
-            .setAdminCostsToVendorDefaults(ConfigurationFormat.CISCO_IOS)
-            .build();
-    bgpProcess.getActiveNeighbors().put(Prefix.parse("2.2.2.2/32"), evpnPeer);
-    vr._vrf
-        .getVniSettings()
-        .put(
-            1,
-            VniSettings.builder()
-                .setVni(1)
-                .setVlan(1)
-                .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
-                .setSourceAddress(Ip.parse("2.2.2.2"))
-                .build());
-    vr.initForEgpComputation(TopologyContext.builder().build());
-
-    // Test
-    vr.initEvpnRoutes();
-
-    Ip vniSourceAddress = Ip.parse("2.2.2.2");
-    assertThat(
-        vr._bgpRoutingProcess._ebgpEvpnRib.getTypedRoutes(),
-        equalTo(
-            ImmutableSet.of(
-                EvpnType3Route.builder()
-                    .setVniIp(vniSourceAddress)
-                    .setRouteDistinguisher(RouteDistinguisher.from(Ip.parse("1.1.1.1"), 2))
-                    .setCommunities(ImmutableSet.of(ExtendedCommunity.target(65500, 10001)))
-                    .setLocalPreference(Bgpv4Route.DEFAULT_LOCAL_PREFERENCE)
-                    .setOriginType(OriginType.EGP)
-                    .setProtocol(RoutingProtocol.BGP)
-                    .setSrcProtocol(RoutingProtocol.BGP)
-                    .setAdmin(20)
-                    .setOriginatorIp(vniSourceAddress)
-                    .build())));
   }
 
   /** Check that initialization of Kernel RIB is as expected */
