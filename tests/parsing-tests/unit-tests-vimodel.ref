@@ -29992,61 +29992,65 @@
           }
         },
         "ipAccessLists" : {
-          "~zl2~vsys10~OUTGOING_FILTER~" : {
-            "name" : "~zl2~vsys10~OUTGOING_FILTER~",
+          "zone~zl2~vsys10~to~zone~zl2~vsys10" : {
+            "name" : "zone~zl2~vsys10~to~zone~zl2~vsys10",
             "lines" : [
               {
                 "action" : "PERMIT",
                 "matchCondition" : {
-                  "class" : "org.batfish.datamodel.acl.MatchSrcInterface",
-                  "srcInterfaces" : [
-                    "ethernet1/1"
-                  ]
-                }
+                  "class" : "org.batfish.datamodel.acl.TrueExpr"
+                },
+                "name" : "Accept intrazone by default"
               }
             ]
+          },
+          "zone~zl3~vsys10~to~zone~zl3~vsys10" : {
+            "name" : "zone~zl3~vsys10~to~zone~zl3~vsys10",
+            "lines" : [
+              {
+                "action" : "PERMIT",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.TrueExpr"
+                },
+                "name" : "Accept intrazone by default"
+              }
+            ]
+          },
+          "zone~ztap~vsys10~to~zone~ztap~vsys10" : {
+            "name" : "zone~ztap~vsys10~to~zone~ztap~vsys10",
+            "lines" : [
+              {
+                "action" : "PERMIT",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.TrueExpr"
+                },
+                "name" : "Accept intrazone by default"
+              }
+            ]
+          },
+          "zone~zvirtual-wire~vsys10~to~zone~zvirtual-wire~vsys10" : {
+            "name" : "zone~zvirtual-wire~vsys10~to~zone~zvirtual-wire~vsys10",
+            "lines" : [
+              {
+                "action" : "PERMIT",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.TrueExpr"
+                },
+                "name" : "Accept intrazone by default"
+              }
+            ]
+          },
+          "~zl2~vsys10~OUTGOING_FILTER~" : {
+            "name" : "~zl2~vsys10~OUTGOING_FILTER~"
           },
           "~zl3~vsys10~OUTGOING_FILTER~" : {
-            "name" : "~zl3~vsys10~OUTGOING_FILTER~",
-            "lines" : [
-              {
-                "action" : "PERMIT",
-                "matchCondition" : {
-                  "class" : "org.batfish.datamodel.acl.MatchSrcInterface",
-                  "srcInterfaces" : [
-                    "ethernet1/2"
-                  ]
-                }
-              }
-            ]
+            "name" : "~zl3~vsys10~OUTGOING_FILTER~"
           },
           "~ztap~vsys10~OUTGOING_FILTER~" : {
-            "name" : "~ztap~vsys10~OUTGOING_FILTER~",
-            "lines" : [
-              {
-                "action" : "PERMIT",
-                "matchCondition" : {
-                  "class" : "org.batfish.datamodel.acl.MatchSrcInterface",
-                  "srcInterfaces" : [
-                    "ethernet1/3"
-                  ]
-                }
-              }
-            ]
+            "name" : "~ztap~vsys10~OUTGOING_FILTER~"
           },
           "~zvirtual-wire~vsys10~OUTGOING_FILTER~" : {
-            "name" : "~zvirtual-wire~vsys10~OUTGOING_FILTER~",
-            "lines" : [
-              {
-                "action" : "PERMIT",
-                "matchCondition" : {
-                  "class" : "org.batfish.datamodel.acl.MatchSrcInterface",
-                  "srcInterfaces" : [
-                    "ethernet1/4"
-                  ]
-                }
-              }
-            ]
+            "name" : "~zvirtual-wire~vsys10~OUTGOING_FILTER~"
           }
         },
         "vendorFamily" : { },

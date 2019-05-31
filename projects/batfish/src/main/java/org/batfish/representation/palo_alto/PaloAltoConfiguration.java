@@ -2,15 +2,20 @@ package org.batfish.representation.palo_alto;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+import static org.batfish.datamodel.Names.zoneToZoneFilter;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ADDRESS_GROUP;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ADDRESS_OBJECT;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Sets;
 import com.google.common.collect.SortedMultiset;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeMultiset;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -25,6 +30,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.commons.collections4.list.TreeList;
@@ -52,11 +58,11 @@ import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.AndMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
-import org.batfish.datamodel.acl.MatchSrcInterface;
 import org.batfish.datamodel.acl.NotMatchExpr;
 import org.batfish.datamodel.acl.OrMatchExpr;
 import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.acl.TrueExpr;
+import org.batfish.representation.palo_alto.Zone.Type;
 import org.batfish.vendor.StructureUsage;
 import org.batfish.vendor.VendorConfiguration;
 
@@ -257,14 +263,13 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     return parts[0];
   }
 
-  // Visible for testing
-
   /**
    * Generate the {@link IpAccessList} name for the specified {@code serviceGroupMemberName} in the
    * specified {@code vsysName}.
    *
    * <p>Note that this is <strong>not</strong> a generated name, just a namespaced name.
    */
+  @VisibleForTesting
   public static String computeServiceGroupMemberAclName(
       String vsysName, String serviceGroupMemberName) {
     return String.format("%s~%s~SERVICE_GROUP_MEMBER", serviceGroupMemberName, vsysName);
@@ -297,14 +302,42 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
                 _c.getIpSpaceMetadata()
                     .put(name, new IpSpaceMetadata(name, ADDRESS_GROUP.getDescription()));
               });
-      // Convert PAN zones and create their corresponding outgoing ACLs
+
+      List<Map.Entry<Rule, Vsys>> rules = getAllRules(vsys);
+      // Convert PAN zones
       for (Entry<String, Zone> zoneEntry : vsys.getZones().entrySet()) {
         Zone zone = zoneEntry.getValue();
-        String zoneName = computeObjectName(vsysName, zone.getName());
-        _c.getZones().put(zoneName, toZone(zoneName, zone));
+        org.batfish.datamodel.Zone newZone =
+            toZone(computeObjectName(vsysName, zone.getName()), zone);
+        _c.getZones().put(newZone.getName(), newZone);
+      }
 
-        IpAccessList acl = generateOutgoingFilter(computeOutgoingFilterName(zoneName), zone, vsys);
+      // Create zone-specific outgoing ACLs.
+      for (Zone zone : vsys.getZones().values()) {
+        IpAccessList acl =
+            generateOutgoingFilter(
+                computeOutgoingFilterName(computeObjectName(vsysName, zone.getName())),
+                zone,
+                rules);
         _c.getIpAccessLists().put(acl.getName(), acl);
+      }
+
+      // Create cross-zone ACLs for each pair of zones, including self-zone.
+      for (Zone fromZone : vsys.getZones().values()) {
+        for (Zone toZone : vsys.getZones().values()) {
+          if (fromZone.getType() == Type.EXTERNAL && toZone.getType() == Type.EXTERNAL) {
+            // Don't add ACLs for zones when both are external.
+            continue;
+          }
+          if (fromZone.getType() != Type.EXTERNAL
+              && toZone.getType() != Type.EXTERNAL
+              && fromZone.getType() != toZone.getType()) {
+            // If one zone is not external, they have to match.
+            continue;
+          }
+          IpAccessList acl = generateCrossZoneFilter(fromZone, toZone, rules);
+          _c.getIpAccessLists().put(acl.getName(), acl);
+        }
       }
 
       // Services
@@ -322,58 +355,90 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     _c.setLoggingServers(loggingServers);
   }
 
-  /** Generate outgoing IpAccessList for the specified zone */
-  private IpAccessList generateOutgoingFilter(String name, Zone toZone, Vsys vsys) {
-    List<IpAccessListLine> lines = new TreeList<>();
+  /** Generates a cross-zone ACL from the two given zones in the same Vsys using the given rules. */
+  private IpAccessList generateCrossZoneFilter(
+      Zone fromZone, Zone toZone, List<Map.Entry<Rule, Vsys>> rules) {
+    assert fromZone.getVsys() == toZone.getVsys();
 
+    String crossZoneFilterName =
+        zoneToZoneFilter(
+            computeObjectName(fromZone.getVsys().getName(), fromZone.getName()),
+            computeObjectName(toZone.getVsys().getName(), toZone.getName()));
+
+    if (fromZone.getInterfaceNames().isEmpty() || toZone.getInterfaceNames().isEmpty()) {
+      return IpAccessList.builder()
+          .setName(crossZoneFilterName)
+          .setLines(
+              ImmutableList.of(
+                  IpAccessListLine.rejecting("No interfaces in zone", TrueExpr.INSTANCE)))
+          .build();
+    }
+
+    // Build an ACL Line for each rule that is enabled and applies to this from/to zone pair.
+    List<IpAccessListLine> lines =
+        rules.stream()
+            .filter(
+                e -> {
+                  Rule rule = e.getKey();
+                  if (rule.getDisabled()) {
+                    return false;
+                  } else if (Sets.intersection(
+                          rule.getFrom(), ImmutableSet.of(fromZone.getName(), CATCHALL_ZONE_NAME))
+                      .isEmpty()) {
+                    return false;
+                  }
+                  return !Sets.intersection(
+                          rule.getTo(), ImmutableSet.of(toZone.getName(), CATCHALL_ZONE_NAME))
+                      .isEmpty();
+                })
+            .map(entry -> toIpAccessListLine(entry.getKey(), entry.getValue()))
+            .collect(ImmutableList.toImmutableList());
+    // Intrazone traffic is allowed by default.
+    if (fromZone == toZone) {
+      lines =
+          ImmutableList.<IpAccessListLine>builder()
+              .addAll(lines)
+              .add(IpAccessListLine.accepting("Accept intrazone by default", TrueExpr.INSTANCE))
+              .build();
+    }
+
+    // Create a new ACL with a vsys-specific name.
+    return IpAccessList.builder().setName(crossZoneFilterName).setLines(lines).build();
+  }
+
+  /** Collects the rules from this Vsys and merges the common pre-/post-rulebases from Panorama. */
+  private List<Map.Entry<Rule, Vsys>> getAllRules(Vsys vsys) {
     @Nullable Vsys panorama = _virtualSystems.get(PANORAMA_VSYS_NAME);
-    if (panorama != null) {
-      panorama
-          .getPreRules()
-          .values()
-          .forEach(
-              rule -> {
-                if (!rule.getDisabled()
-                    && (rule.getTo().contains(toZone.getName())
-                        || rule.getTo().contains(CATCHALL_ZONE_NAME))) {
-                  lines.add(toIpAccessListLine(rule, panorama));
-                }
-              });
-    }
+    Stream<Map.Entry<Rule, Vsys>> pre =
+        panorama == null
+            ? Stream.of()
+            : panorama.getPreRules().values().stream()
+                .map(r -> new SimpleImmutableEntry<>(r, panorama));
+    Stream<Map.Entry<Rule, Vsys>> post =
+        panorama == null
+            ? Stream.of()
+            : panorama.getPostRules().values().stream()
+                .map(r -> new SimpleImmutableEntry<>(r, panorama));
+    Stream<Map.Entry<Rule, Vsys>> rules =
+        vsys.getRules().values().stream().map(r -> new SimpleImmutableEntry<>(r, vsys));
 
-    toZone
-        .getVsys()
-        .getRules()
-        .values()
-        .forEach(
-            rule -> {
-              if (!rule.getDisabled()
-                  && (rule.getTo().contains(toZone.getName())
-                      || rule.getTo().contains(CATCHALL_ZONE_NAME))) {
-                lines.add(toIpAccessListLine(rule, vsys));
-              }
-            });
+    return Stream.concat(Stream.concat(pre, rules), post).collect(ImmutableList.toImmutableList());
+  }
 
-    if (panorama != null) {
-      panorama
-          .getPostRules()
-          .values()
-          .forEach(
-              rule -> {
-                if (!rule.getDisabled()
-                    && (rule.getTo().contains(toZone.getName())
-                        || rule.getTo().contains(CATCHALL_ZONE_NAME))) {
-                  lines.add(toIpAccessListLine(rule, panorama));
-                }
-              });
-    }
-
-    // Intrazone traffic is allowed by default
-    lines.add(
-        IpAccessListLine.builder()
-            .accepting()
-            .setMatchCondition(new MatchSrcInterface(toZone.getInterfaceNames()))
-            .build());
+  /** Generate outgoing IpAccessList for the specified zone */
+  private IpAccessList generateOutgoingFilter(
+      String name, Zone toZone, List<Map.Entry<Rule, Vsys>> rules) {
+    List<IpAccessListLine> lines =
+        rules.stream()
+            .filter(
+                entry -> {
+                  Rule rule = entry.getKey();
+                  return (!rule.getDisabled()
+                      && (rule.getTo().contains(toZone.getName())
+                          || rule.getTo().contains(CATCHALL_ZONE_NAME)));
+                })
+            .map(entry -> toIpAccessListLine(entry.getKey(), entry.getValue()))
+            .collect(ImmutableList.toImmutableList());
 
     return IpAccessList.builder().setName(name).setLines(lines).build();
   }
@@ -429,7 +494,9 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
         }
         srcInterfaces.addAll(rule.getVsys().getZones().get(zoneName).getInterfaceNames());
       }
-      conjuncts.add(new MatchSrcInterface(srcInterfaces));
+      // TODO: uncomment when we fix inheritance from panorama
+      assert srcInterfaces != null;
+      // conjuncts.add(new MatchSrcInterface(srcInterfaces));
     }
 
     // TODO(https://github.com/batfish/batfish/issues/2097): need to handle matching specified
