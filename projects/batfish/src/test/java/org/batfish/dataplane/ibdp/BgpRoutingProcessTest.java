@@ -7,7 +7,10 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.BgpRoute;
@@ -207,5 +210,48 @@ public class BgpRoutingProcessTest {
                 .setAdmin(20)
                 .setOriginatorIp(_bgpProcess.getRouterId())
                 .build()));
+  }
+
+  @Test
+  public void testComputeRtToVrfMapping() {
+    Ip localIp = Ip.parse("2.2.2.2");
+    int vni = 10001;
+    int vni2 = 10002;
+    Builder vniConfigBuilder =
+        Layer3VniConfig.builder()
+            .setVni(vni)
+            .setVrf(DEFAULT_VRF_NAME)
+            .setRouteDistinguisher(RouteDistinguisher.from(_bgpProcess.getRouterId(), 2))
+            .setRouteTarget(ExtendedCommunity.target(65500, vni))
+            .setAdvertiseV4Unicast(false);
+    Layer3VniConfig vniConfig1 = vniConfigBuilder.build();
+    Layer3VniConfig vniConfig2 =
+        vniConfigBuilder
+            .setVni(vni2)
+            .setVrf(_vrf2.getName())
+            .setRouteTarget(ExtendedCommunity.target(65500, vni2))
+            .build();
+    BgpActivePeerConfig evpnPeer =
+        BgpActivePeerConfig.builder()
+            .setPeerAddress(Ip.parse("1.1.1.1"))
+            .setRemoteAs(1L)
+            .setLocalIp(localIp)
+            .setLocalAs(2L)
+            .setEvpnAddressFamily(
+                new EvpnAddressFamily(ImmutableSet.of(), ImmutableSet.of(vniConfig1, vniConfig2)))
+            .build();
+    _bgpProcess
+        .getActiveNeighbors()
+        .put(Prefix.create(localIp, Prefix.MAX_PREFIX_LENGTH), evpnPeer);
+
+    Map<String, String> actual = BgpRoutingProcess.computeRouteTargetToVrfMap(Stream.of(evpnPeer));
+    assertThat(
+        actual,
+        equalTo(
+            ImmutableMap.of(
+                Layer3VniConfig.importRtPatternForAnyAs(vni),
+                DEFAULT_VRF_NAME,
+                Layer3VniConfig.importRtPatternForAnyAs(vni2),
+                _vrf2.getName())));
   }
 }

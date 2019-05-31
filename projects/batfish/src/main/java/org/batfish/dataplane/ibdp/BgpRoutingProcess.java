@@ -7,11 +7,13 @@ import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PAT
 import static org.batfish.dataplane.rib.RibDelta.importRibDelta;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Streams;
 import com.google.common.graph.ValueGraph;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
@@ -111,6 +113,8 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
   /* Hacky way to non re-init the process across topology computations. Not a permanent solution */
   private boolean _initialized = false;
 
+  @Nonnull private final Map<String, String> _rtVrfMapping;
+
   /**
    * Create a new BGP process
    *
@@ -170,6 +174,23 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
     // EVPN Ribs
     _evpnType3Rib = new EvpnRib<>(_mainRib, bestPathTieBreaker, null, multiPathMatchMode);
     _evpnRib = new EvpnRib<>(_mainRib, bestPathTieBreaker, null, multiPathMatchMode);
+    _rtVrfMapping = computeRouteTargetToVrfMap(getAllPeerConfigs(_process));
+    assert _rtVrfMapping != null; // Avoid unused warning
+  }
+
+  /**
+   * Computes the mapping route targets to VRF names, for all layer 3 EVPN VNIs, across all bgp
+   * neighbors in our VRF.
+   */
+  @VisibleForTesting
+  static Map<String, String> computeRouteTargetToVrfMap(Stream<BgpPeerConfig> peerConfigs) {
+    HashMap<String, String> rtVrfMappingBuilder = new HashMap<>();
+    peerConfigs
+        .map(BgpPeerConfig::getEvpnAddressFamily)
+        .filter(Objects::nonNull)
+        .flatMap(af -> af.getL3VNIs().stream())
+        .forEach(l3vni -> rtVrfMappingBuilder.put(l3vni.getImportRouteTarget(), l3vni.getVrf()));
+    return ImmutableMap.copyOf(rtVrfMappingBuilder);
   }
 
   @Override
