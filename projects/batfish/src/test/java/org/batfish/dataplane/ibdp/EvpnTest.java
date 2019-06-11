@@ -3,7 +3,11 @@ package org.batfish.dataplane.ibdp;
 import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
 import static org.batfish.datamodel.matchers.AbstractRouteDecoratorMatchers.hasPrefix;
 import static org.batfish.datamodel.matchers.BgpRouteMatchers.isEvpnType3RouteThat;
+import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasBumTransportIps;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasItem;
 
 import com.google.common.collect.ImmutableSet;
@@ -160,9 +164,17 @@ public class EvpnTest {
         dp.getRibs();
     Set<AbstractRoute> n1Routes = ribs.get("n1").get(DEFAULT_VRF_NAME).getRoutes();
     Set<AbstractRoute> n2Routes = ribs.get("n2").get(DEFAULT_VRF_NAME).getRoutes();
+    // Ensure routes are present in the main RIB
     assertThat(
         n1Routes, hasItem(isEvpnType3RouteThat(hasPrefix(Prefix.parse("2.222.222.222/32")))));
     assertThat(
         n2Routes, hasItem(isEvpnType3RouteThat(hasPrefix(Prefix.parse("1.111.111.111/32")))));
+    // Ensure VNI flood lists were updated with peer's VTEP address
+    assertThat(
+        dp.getVniSettings().column(DEFAULT_VRF_NAME),
+        hasEntry(equalTo("n1"), contains(hasBumTransportIps(contains(Ip.parse("2.222.222.222"))))));
+    assertThat(
+        dp.getVniSettings().column(DEFAULT_VRF_NAME),
+        hasEntry(equalTo("n2"), contains(hasBumTransportIps(contains(Ip.parse("1.111.111.111"))))));
   }
 }

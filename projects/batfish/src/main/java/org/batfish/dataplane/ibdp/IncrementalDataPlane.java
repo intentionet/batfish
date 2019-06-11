@@ -27,6 +27,7 @@ import org.batfish.datamodel.GenericRib;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Topology;
+import org.batfish.datamodel.VniSettings;
 
 public final class IncrementalDataPlane implements Serializable, DataPlane {
 
@@ -115,6 +116,7 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
 
   @Nonnull private final Table<String, String, Set<Bgpv4Route>> _bgpRoutes;
   @Nonnull private final Table<String, String, Set<EvpnRoute<?, ?>>> _evpnRoutes;
+  @Nonnull private final Table<String, String, Set<VniSettings>> _vniSettings;
 
   private IncrementalDataPlane(Builder builder) {
     _ipVrfOwners = builder._ipVrfOwners;
@@ -122,6 +124,7 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
     _layer3Topology = builder._layer3Topology;
     _bgpRoutes = computeBgpRoutes();
     _evpnRoutes = computeEvpnRoutes();
+    _vniSettings = computeVniSettings();
   }
 
   private Map<String, Configuration> computeConfigurations() {
@@ -195,6 +198,18 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
     return table;
   }
 
+  @Nonnull
+  private Table<String, String, Set<VniSettings>> computeVniSettings() {
+    Table<String, String, Set<VniSettings>> result = HashBasedTable.create();
+    for (Node node : _nodes.values()) {
+      for (Entry<String, VirtualRouter> vr : node.getVirtualRouters().entrySet()) {
+        result.put(
+            node.getConfiguration().getHostname(), vr.getKey(), vr.getValue().getVniSettings());
+      }
+    }
+    return result;
+  }
+
   @Override
   public Map<String, Configuration> getConfigurations() {
     return _configurations.get();
@@ -213,6 +228,12 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
   @Override
   public Map<Ip, Map<String, Set<String>>> getIpVrfOwners() {
     return _ipVrfOwners;
+  }
+
+  @Nonnull
+  @Override
+  public Table<String, String, Set<VniSettings>> getVniSettings() {
+    return _vniSettings;
   }
 
   public Map<String, Node> getNodes() {

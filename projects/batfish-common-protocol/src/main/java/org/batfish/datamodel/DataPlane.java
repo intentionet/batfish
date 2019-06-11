@@ -16,6 +16,7 @@ public interface DataPlane extends Serializable {
 
   Map<String, Configuration> getConfigurations();
 
+  /** Return a {@link Fib} for each node/VRF */
   Map<String, Map<String, Fib>> getFibs();
 
   ForwardingAnalysis getForwardingAnalysis();
@@ -35,4 +36,11 @@ public interface DataPlane extends Serializable {
    */
   SortedMap<String, SortedMap<String, Map<Prefix, Map<String, Set<String>>>>>
       getPrefixTracingInfoSummary();
+
+  /**
+   * Return {@link VniSettings} for each node/VRF. Returned settings are based on the vni settings
+   * in a {@link Vrf}, but may include additional information obtained during dataplane computation,
+   * such as updated flood lists due to EVPN route exchange.
+   */
+  Table<String, String, Set<VniSettings>> getVniSettings();
 }

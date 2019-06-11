@@ -335,8 +335,10 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
     DeltaPair<EvpnType3Route> type3Delta = processEvpnType3Messages(nc, allNodes);
     sendOutEvpnRoutes(type3Delta._toAdvertise, nc, allNodes);
     // Merge EVPN routes into EVPN RIB and prepare for merging into main RIB
-    _changeSet.from(importRibDelta(_evpnRib, type3Delta._toMerge._ebgpDelta));
-    _changeSet.from(importRibDelta(_evpnRib, type3Delta._toMerge._ibgpDelta));
+    _changeSet.from(
+        importRibDelta(_evpnRib, importRibDelta(_evpnType3Rib, type3Delta._toMerge._ebgpDelta)));
+    _changeSet.from(
+        importRibDelta(_evpnRib, importRibDelta(_evpnType3Rib, type3Delta._toMerge._ibgpDelta)));
 
     // TODO: migrate v4 route propagation here
   }
@@ -703,6 +705,11 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
   @Nonnull
   public Ip getRouterId() {
     return _process.getRouterId();
+  }
+
+  /** Return all type 3 EVPN routes */
+  public Set<EvpnType3Route> getEvpnType3Routes() {
+    return _evpnType3Rib.getTypedRoutes();
   }
 
   /**
