@@ -165,6 +165,7 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
   private static final Pattern PHYSICAL_INTERFACE_PATTERN = Pattern.compile("(swp|eth)[0-9]+");
   private static final Pattern SUBINTERFACE_PATTERN = Pattern.compile("^(.*)\\.([0-9]+)$");
   private static final Pattern VLAN_INTERFACE_PATTERN = Pattern.compile("^vlan([0-9]+)$");
+  private static final int MAX_VXLAN_ID = (1 << 24) - 1; // 24 bit number
 
   private static int toInteger(Uint16Context ctx) {
     return Integer.parseInt(ctx.getText(), 10);
@@ -614,7 +615,7 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
 
   @Override
   public void enterA_vxlan(A_vxlanContext ctx) {
-    Set<String> names = toStrings(ctx.names, (1 << 24) - 1);
+    Set<String> names = toStrings(ctx.names, MAX_VXLAN_ID);
     if (ctx.vx_vxlan() != null && ctx.vx_vxlan().vxv_id() != null) {
       // create them if necessary when setting id
       _currentVxlans = initVxlansIfAbsent(names, ctx);
