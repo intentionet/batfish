@@ -744,7 +744,7 @@
       },
       {
         "Filename" : "configs/cumulus_nclu",
-        "Line" : 90,
+        "Line" : 91,
         "Text" : "username cumulus nopassword\\n",
         "Parser_Context" : "[frr_username s_extra_configuration statement cumulus_nclu_configuration]",
         "Comment" : "This feature is not currently supported"

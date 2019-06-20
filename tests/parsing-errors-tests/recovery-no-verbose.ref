@@ -32,7 +32,7 @@
             {
               "Comment" : "This syntax is unrecognized",
               "Line" : 6,
-              "Parser_Context" : "[uint16 glob_range_set glob a_vxlan s_net_add statement cumulus_nclu_configuration]",
+              "Parser_Context" : "[uint32 glob_range_set glob a_vxlan s_net_add statement cumulus_nclu_configuration]",
               "Text" : "net add vxlan vni4294967295-4294967296 vxlan local-tunnelip 1.1.1.1"
             }
           ]

@@ -82,6 +82,7 @@ net add vxlan vni10001,10002-10003 stp portbpdufilter
 net add vxlan vni10001,10002-10003 vxlan local-tunnelip 192.0.2.10
 net add vxlan vni10004 vxlan id 10004
 net add vxlan vni10004 vxlan local-tunnelip 192.0.2.10
+net add vxlan vni70004-70007 vxlan local-tunnelip 192.0.2.10
 net commit
 
 # The following will append those commands to the appropriate files.

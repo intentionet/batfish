@@ -19,7 +19,7 @@ glob_range_set
   (
     base_word = numbered_word
     (
-      DASH first_interval_end = uint16
+      DASH first_interval_end = uint32
     )?
     (
       COMMA other_numeric_ranges = range_set
@@ -75,9 +75,9 @@ numbered_word
 
 range
 :
-  low = uint16
+  low = uint32
   (
-    DASH high = uint16
+    DASH high = uint32
   )?
 ;
 
