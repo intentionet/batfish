@@ -3388,22 +3388,28 @@ s_vpn_dialer
    )*
 ;
 
+// A way to define a VRF on NX-OS (keeping separate from IOS)
 s_vrf_context
 :
    VRF CONTEXT name = variable NEWLINE
    (
       vrfc_address_family
       | vrfc_ip_route
+      | vrfc_rd
+      | vrfc_shutdown
+      | vrfc_vni
       | vrfc_null
    )*
 ;
 
+// a way to define a VRF on IOS
 s_vrf_definition
 :
    VRF DEFINITION? name = variable NEWLINE
    (
       vrfd_address_family
       | vrfd_description
+      | vrfd_rd
       | vrfd_null
    )*
    (
@@ -4660,12 +4666,36 @@ vpn_null
 vrfc_address_family
 :
    ADDRESS_FAMILY (IPV4 | IPV6) UNICAST NEWLINE
+   (
+      vrfc_route_target
+   )*
 ;
 
 vrfc_ip_route
 :
    IP ROUTE ip_route_tail
 ;
+
+vrfc_rd
+:
+   RD (AUTO | route_distinguisher) NEWLINE
+;
+
+vrfc_route_target
+:
+   ROUTE_TARGET (IMPORT | EXPORT | BOTH) (AUTO | route_target) EVPN? NEWLINE
+;
+
+vrfc_shutdown
+:
+   NO? SHUTDOWN NEWLINE
+;
+
+vrfc_vni
+:
+   VNI vni = DEC NEWLINE
+;
+
 
 vrfc_null
 :
@@ -4716,17 +4746,17 @@ vrfd_description
    description_line
 ;
 
+vrfd_rd
+:
+   RD (AUTO | rd = route_distinguisher) NEWLINE
+;
+
 vrfd_null
 :
    NO?
    (
       AUTO_IMPORT
-      | RD
       | ROUTE_TARGET
-      |
-      (
-         NO SHUTDOWN
-      )
    ) null_rest_of_line
 ;
 

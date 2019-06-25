@@ -607,6 +607,16 @@ range
    | NONE
 ;
 
+route_distinguisher
+:
+   (IP_ADDRESS | bgp_asn) COLON DEC
+;
+
+route_target
+:
+   (IP_ADDRESS | bgp_asn) COLON DEC
+;
+
 route_policy_params_list
 :
    params_list += variable

@@ -4373,6 +4373,11 @@ EVENTS
    'events'
 ;
 
+EVPN
+:
+   'evpn'
+;
+
 EXACT
 :
    'exact'
