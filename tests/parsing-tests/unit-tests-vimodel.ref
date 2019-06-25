@@ -12826,40 +12826,6 @@
           }
         }
       },
-      "cisco_vrf" : {
-        "configurationFormat" : "CISCO_IOS",
-        "name" : "cisco_vrf",
-        "defaultCrossZoneAction" : "PERMIT",
-        "defaultInboundAction" : "PERMIT",
-        "deviceType" : "SWITCH",
-        "vendorFamily" : {
-          "cisco" : {
-            "hostname" : "cisco_vrf",
-            "logging" : {
-              "on" : true
-            }
-          }
-        },
-        "vrfs" : {
-          "default" : {
-            "name" : "default"
-          },
-          "management" : {
-            "name" : "management",
-            "staticRoutes" : [
-              {
-                "class" : "org.batfish.datamodel.StaticRoute",
-                "administrativeCost" : 1,
-                "metric" : 0,
-                "network" : "0.0.0.0/0",
-                "nextHopInterface" : "dynamic",
-                "nextHopIp" : "1.2.3.4",
-                "tag" : -1
-              }
-            ]
-          }
-        }
-      },
       "cisco_vrrp" : {
         "configurationFormat" : "CISCO_IOS",
         "name" : "cisco_vrrp",
@@ -29326,6 +29292,54 @@
           }
         }
       },
+      "nxos_vrf" : {
+        "configurationFormat" : "CISCO_IOS",
+        "name" : "nxos_vrf",
+        "defaultCrossZoneAction" : "PERMIT",
+        "defaultInboundAction" : "PERMIT",
+        "deviceType" : "SWITCH",
+        "vendorFamily" : {
+          "cisco" : {
+            "hostname" : "nxos_vrf",
+            "logging" : {
+              "on" : true
+            }
+          }
+        },
+        "vrfs" : {
+          "default" : {
+            "name" : "default"
+          },
+          "management" : {
+            "name" : "management",
+            "staticRoutes" : [
+              {
+                "class" : "org.batfish.datamodel.StaticRoute",
+                "administrativeCost" : 1,
+                "metric" : 0,
+                "network" : "0.0.0.0/0",
+                "nextHopInterface" : "dynamic",
+                "nextHopIp" : "1.2.3.4",
+                "tag" : -1
+              }
+            ]
+          },
+          "vrf1" : {
+            "name" : "vrf1",
+            "staticRoutes" : [
+              {
+                "class" : "org.batfish.datamodel.StaticRoute",
+                "administrativeCost" : 1,
+                "metric" : 0,
+                "network" : "0.0.0.0/0",
+                "nextHopInterface" : "dynamic",
+                "nextHopIp" : "1.2.3.4",
+                "tag" : -1
+              }
+            ]
+          }
+        }
+      },
       "openflow" : {
         "configurationFormat" : "CISCO_IOS",
         "name" : "openflow",
@@ -36425,51 +36439,6 @@
             "name" : "vr",
             "interfaces" : [
               "lo0.1"
-            ]
-          }
-        }
-      },
-      "vrf_context" : {
-        "configurationFormat" : "CISCO_IOS",
-        "name" : "vrf_context",
-        "defaultCrossZoneAction" : "PERMIT",
-        "defaultInboundAction" : "PERMIT",
-        "deviceType" : "SWITCH",
-        "vendorFamily" : {
-          "cisco" : {
-            "hostname" : "vrf_context",
-            "logging" : {
-              "on" : true
-            }
-          }
-        },
-        "vrfs" : {
-          "default" : {
-            "name" : "default",
-            "staticRoutes" : [
-              {
-                "class" : "org.batfish.datamodel.StaticRoute",
-                "administrativeCost" : 1,
-                "metric" : 0,
-                "network" : "1.1.1.0/24",
-                "nextHopInterface" : "dynamic",
-                "nextHopIp" : "5.6.7.8",
-                "tag" : -1
-              }
-            ]
-          },
-          "management" : {
-            "name" : "management",
-            "staticRoutes" : [
-              {
-                "class" : "org.batfish.datamodel.StaticRoute",
-                "administrativeCost" : 1,
-                "metric" : 0,
-                "network" : "0.0.0.0/0",
-                "nextHopInterface" : "dynamic",
-                "nextHopIp" : "1.2.3.4",
-                "tag" : -1
-              }
             ]
           }
         }
