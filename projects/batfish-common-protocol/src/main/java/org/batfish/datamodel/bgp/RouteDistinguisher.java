@@ -107,6 +107,22 @@ public final class RouteDistinguisher implements Serializable, Comparable<RouteD
     return new RouteDistinguisher((asn1 << 16) | asn2, Type.TYPE2);
   }
 
+  /**
+   * Create a new route distinguisher, infer the correct type (1 or 2) based on passed in values.
+   *
+   * @param asn1 a valid 4-byte administrator subfield
+   * @param asn2 a valid 2-byte assigned number subfield
+   * @throws IllegalArgumentException if the values are not
+   */
+  @Nonnull
+  public static RouteDistinguisher from(long asn1, long asn2) {
+    if (asn1 <= 0xFFFF) {
+      return from((int) asn1, asn2);
+    }
+    checkArgument(asn2 <= 0xFFFF, ERR_MSG_SHORT_TEMPLATE, asn2);
+    return from(asn1, (int) asn2);
+  }
+
   public long getValue() {
     return _value;
   }

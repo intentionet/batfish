@@ -323,6 +323,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
@@ -383,6 +384,8 @@ import org.batfish.datamodel.SwitchportEncapsulationType;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.TcpFlagsMatchConditions;
+import org.batfish.datamodel.bgp.RouteDistinguisher;
+import org.batfish.datamodel.bgp.community.ExtendedCommunity;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.eigrp.EigrpMetric;
 import org.batfish.datamodel.eigrp.EigrpProcessMode;
@@ -981,12 +984,14 @@ import org.batfish.grammar.cisco.CiscoParser.Roa_interfaceContext;
 import org.batfish.grammar.cisco.CiscoParser.Roa_rangeContext;
 import org.batfish.grammar.cisco.CiscoParser.Roi_costContext;
 import org.batfish.grammar.cisco.CiscoParser.Roi_passiveContext;
+import org.batfish.grammar.cisco.CiscoParser.Route_distinguisherContext;
 import org.batfish.grammar.cisco.CiscoParser.Route_map_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Route_map_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Route_policy_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Route_policy_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Route_reflector_client_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Route_tailContext;
+import org.batfish.grammar.cisco.CiscoParser.Route_targetContext;
 import org.batfish.grammar.cisco.CiscoParser.Router_bgp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Router_id_bgp_tailContext;
 import org.batfish.grammar.cisco.CiscoParser.Router_isis_stanzaContext;
@@ -1150,6 +1155,10 @@ import org.batfish.grammar.cisco.CiscoParser.Viafv_preemptContext;
 import org.batfish.grammar.cisco.CiscoParser.Viafv_priorityContext;
 import org.batfish.grammar.cisco.CiscoParser.Vlan_idContext;
 import org.batfish.grammar.cisco.CiscoParser.Vrf_block_rb_stanzaContext;
+import org.batfish.grammar.cisco.CiscoParser.Vrfc_rdContext;
+import org.batfish.grammar.cisco.CiscoParser.Vrfc_route_targetContext;
+import org.batfish.grammar.cisco.CiscoParser.Vrfc_shutdownContext;
+import org.batfish.grammar.cisco.CiscoParser.Vrfc_vniContext;
 import org.batfish.grammar.cisco.CiscoParser.Vrfd_descriptionContext;
 import org.batfish.grammar.cisco.CiscoParser.Vrrp_interfaceContext;
 import org.batfish.grammar.cisco.CiscoParser.Wccp_idContext;
@@ -4507,6 +4516,37 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void enterS_vrf_context(S_vrf_contextContext ctx) {
     _currentVrf = ctx.name.getText();
+  }
+
+  @Override
+  public void enterVrfc_rd(Vrfc_rdContext ctx) {
+    if (ctx.AUTO() == null) {
+      currentVrf().setRouteDistinguisher(toRouteDistinguisher(ctx.route_distinguisher()));
+    }
+  }
+
+  @Override
+  public void enterVrfc_route_target(Vrfc_route_targetContext ctx) {
+    ExtendedCommunity rt = ctx.AUTO() != null ? null : toRouteTarget(ctx.route_target());
+    if (ctx.IMPORT() != null || ctx.BOTH() != null) {
+      currentVrf().setRouteImportTarget(rt);
+    }
+    if (ctx.EXPORT() != null || ctx.BOTH() != null) {
+      currentVrf().setRouteExportTarget(rt);
+    }
+  }
+
+  @Override
+  public void enterVrfc_shutdown(Vrfc_shutdownContext ctx) {
+    if (ctx.NO() == null) {
+      todo(ctx);
+    }
+    currentVrf().setShutdown(ctx.NO() != null);
+  }
+
+  @Override
+  public void enterVrfc_vni(Vrfc_vniContext ctx) {
+    currentVrf().setVni(toInteger(ctx.vni));
   }
 
   @Override
@@ -12197,6 +12237,25 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   private List<RoutePolicyStatement> toRoutePolicyStatementList(List<Rp_stanzaContext> ctxts) {
     return ctxts.stream().map(this::toRoutePolicyStatement).collect(Collectors.toList());
+  }
+
+  @Nonnull
+  private RouteDistinguisher toRouteDistinguisher(Route_distinguisherContext ctx) {
+    long dec = toLong(ctx.DEC());
+    if (ctx.IP_ADDRESS() != null) {
+      checkArgument(dec <= 0xFFFFL, "Invalid route distinguisher %s", ctx.getText());
+      return RouteDistinguisher.from(toIp(ctx.IP_ADDRESS()), (int) dec);
+    }
+    return RouteDistinguisher.from(toAsNum(ctx.bgp_asn()), dec);
+  }
+
+  @Nonnull
+  private ExtendedCommunity toRouteTarget(Route_targetContext ctx) {
+    long la = toLong(ctx.DEC());
+    if (ctx.IP_ADDRESS() != null) {
+      return ExtendedCommunity.target(toIp(ctx.IP_ADDRESS()).asLong(), la);
+    }
+    return ExtendedCommunity.target(toAsNum(ctx.bgp_asn()), la);
   }
 
   private RouteTypeExpr toRouteType(Rp_route_typeContext ctx) {

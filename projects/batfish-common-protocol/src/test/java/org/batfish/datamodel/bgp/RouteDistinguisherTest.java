@@ -56,6 +56,20 @@ public class RouteDistinguisherTest {
         equalTo(RouteDistinguisher.from(Ip.parse("8.8.8.8"), 999)));
   }
 
+  /** Test that generic creator is equivalent to specific creators */
+  @Test
+  public void testFromInference() {
+    assertThat(from(1L, 1L), equalTo(from(1, 1L)));
+    assertThat(from(1L, 65555L), equalTo(from(1, 65555L)));
+    assertThat(from(65555L, 1L), equalTo(from(65555L, 1)));
+  }
+
+  @Test
+  public void testInvalidCombo() {
+    _thrown.expect(IllegalArgumentException.class);
+    from(65555L, 65555L);
+  }
+
   @Test
   public void testParsing() {
     assertThat(parse("1:1").getValue(), equalTo(4294967297L));
