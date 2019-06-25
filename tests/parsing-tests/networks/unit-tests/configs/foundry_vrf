@@ -1,15 +1,7 @@
-! 
-hostname vrf_context
 !
-vrf context aa
+!RANCID-CONTENT-TYPE: foundry_vrf
 !
-vrf context management
-    ip route 0.0.0.0/0 1.2.3.4
-!
-spanning-tree mode mst
-! 
-ip route 1.1.1.0/24 5.6.7.8
-!
+set hostname foundry_vrf
 ! max route shows up in foundry
 vrf LHCONE
    rd 2153:1001
@@ -20,5 +12,3 @@ vrf LHCONE
    address-family ipv6 max-route 129
    exit-address-family
 exit-vrf
-!
-end
