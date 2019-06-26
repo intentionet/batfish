@@ -48,6 +48,8 @@ import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.bgp.AddressFamily;
+import org.batfish.datamodel.bgp.AddressFamily.Type;
 import org.batfish.datamodel.bgp.BgpTopology;
 import org.batfish.datamodel.bgp.BgpTopology.EdgeId;
 import org.batfish.datamodel.bgp.RouteDistinguisher;
@@ -242,34 +244,56 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> graph = bgpTopology.getGraph();
     // Create incoming message queues for sessions that exchange IPv4 unicast info
     _bgpv4IncomingRoutes =
-        Streams.concat(
-                _process.getActiveNeighbors().entrySet().stream()
-                    .filter(e -> e.getValue().getIpv4UnicastAddressFamily() != null)
-                    .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey(), false)),
-                _process.getPassiveNeighbors().entrySet().stream()
-                    .filter(e -> e.getValue().getIpv4UnicastAddressFamily() != null)
-                    .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey(), true)),
-                _process.getInterfaceNeighbors().entrySet().stream()
-                    .filter(e -> e.getValue().getIpv4UnicastAddressFamily() != null)
-                    .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey())))
-            .filter(graph.nodes()::contains)
-            .flatMap(dst -> graph.adjacentNodes(dst).stream().map(src -> new EdgeId(src, dst)))
+        getEdgeIdStream(graph, BgpPeerConfig::getIpv4UnicastAddressFamily, Type.IPV4_UNICAST)
             .collect(toImmutableSortedMap(Function.identity(), e -> new ConcurrentLinkedQueue<>()));
     // Create incoming message queues for sessions that exchange EVPN info
     _evpnType3IncomingRoutes =
-        Streams.concat(
-                _process.getActiveNeighbors().entrySet().stream()
-                    .filter(e -> e.getValue().getEvpnAddressFamily() != null)
-                    .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey(), false)),
-                _process.getPassiveNeighbors().entrySet().stream()
-                    .filter(e -> e.getValue().getEvpnAddressFamily() != null)
-                    .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey(), true)),
-                _process.getInterfaceNeighbors().entrySet().stream()
-                    .filter(e -> e.getValue().getEvpnAddressFamily() != null)
-                    .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey())))
-            .filter(graph.nodes()::contains)
-            .flatMap(dst -> graph.adjacentNodes(dst).stream().map(src -> new EdgeId(src, dst)))
+        getEdgeIdStream(graph, BgpPeerConfig::getEvpnAddressFamily, Type.EVPN)
             .collect(toImmutableSortedMap(Function.identity(), e -> new ConcurrentLinkedQueue<>()));
+  }
+
+  /**
+   * Return a stream of BGP topology {@link EdgeId} based on BGP neighbors configured for this BGP
+   * process.
+   *
+   * <p>Additionally filters the neighbors based on the desired address family (family must be
+   * non-null for the neighbor to be considered).
+   *
+   * @param graph the BGP topology graph
+   * @param familyExtractor function to execute on the {@link BgpPeerConfig} that returns the
+   *     desired {@link AddressFamily}. If the address family is null, the peer will be omitted from
+   *     edge computation
+   */
+  @Nonnull
+  @VisibleForTesting
+  Stream<EdgeId> getEdgeIdStream(
+      ValueGraph<BgpPeerConfigId, BgpSessionProperties> graph,
+      Function<BgpPeerConfig, AddressFamily> familyExtractor,
+      Type familyType) {
+    return Streams.concat(
+            _process.getActiveNeighbors().entrySet().stream()
+                .filter(e -> familyExtractor.apply(e.getValue()) != null)
+                .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey(), false)),
+            _process.getPassiveNeighbors().entrySet().stream()
+                .filter(e -> familyExtractor.apply(e.getValue()) != null)
+                .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey(), true)),
+            _process.getInterfaceNeighbors().entrySet().stream()
+                .filter(e -> familyExtractor.apply(e.getValue()) != null)
+                .map(e -> new BgpPeerConfigId(_c.getHostname(), _vrfName, e.getKey())))
+        .filter(graph.nodes()::contains) // avoid missing node exceptions
+        .flatMap(
+            id ->
+                graph.incidentEdges(id).stream()
+                    .filter(
+                        pair -> pair.nodeV().equals(id))) // get all incoming edges for this node
+        .filter(
+            edge ->
+                graph
+                    .edgeValue(edge.nodeU(), edge.nodeV())
+                    .get()
+                    .getAddressFamilies()
+                    .contains(familyType)) // ensure the session contains desired address family
+        .map(edge -> new EdgeId(edge.nodeU(), edge.nodeV()));
   }
 
   @Override

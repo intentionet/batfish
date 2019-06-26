@@ -9,11 +9,18 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.graph.MutableValueGraph;
+import com.google.common.graph.ValueGraphBuilder;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.batfish.datamodel.BgpActivePeerConfig;
+import org.batfish.datamodel.BgpPeerConfig;
+import org.batfish.datamodel.BgpPeerConfigId;
 import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.BgpRoute;
+import org.batfish.datamodel.BgpSessionProperties;
 import org.batfish.datamodel.Bgpv4Route;
 import org.batfish.datamodel.BumTransportMethod;
 import org.batfish.datamodel.Configuration;
@@ -26,8 +33,11 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
+import org.batfish.datamodel.bgp.AddressFamily.Type;
 import org.batfish.datamodel.bgp.BgpTopology;
+import org.batfish.datamodel.bgp.BgpTopology.EdgeId;
 import org.batfish.datamodel.bgp.EvpnAddressFamily;
+import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.Layer3VniConfig;
 import org.batfish.datamodel.bgp.Layer3VniConfig.Builder;
 import org.batfish.datamodel.bgp.RouteDistinguisher;
@@ -255,5 +265,76 @@ public class BgpRoutingProcessTest {
                 _vrf.getName(),
                 VniConfig.importRtPatternForAnyAs(vni2),
                 _vrf2.getName())));
+  }
+
+  @Test
+  public void testQueueInitializationAddressFamiliesMustOverlap() {
+    Ip ip1 = Ip.parse("1.1.1.1");
+    Ip ip2 = Ip.parse("2.2.2.2");
+    Prefix remotePeerPrefix = Prefix.create(ip1, Prefix.MAX_PREFIX_LENGTH);
+    BgpActivePeerConfig peer1 =
+        BgpActivePeerConfig.builder()
+            .setLocalIp(ip1)
+            .setLocalAs(1L)
+            .setRemoteAs(1L)
+            .setPeerAddress(ip2)
+            .setIpv4UnicastAddressFamily(Ipv4UnicastAddressFamily.instance())
+            .build();
+
+    BgpProcess bpgProc =
+        BgpProcess.builder()
+            .setRouterId(Ip.ZERO)
+            .setAdminCostsToVendorDefaults(ConfigurationFormat.CISCO_IOS)
+            .setActiveNeighbors(ImmutableSortedMap.of(remotePeerPrefix, peer1))
+            .build();
+    MutableValueGraph<BgpPeerConfigId, BgpSessionProperties> graph =
+        ValueGraphBuilder.directed().build();
+
+    BgpPeerConfigId peer1Id =
+        new BgpPeerConfigId(_c.getHostname(), DEFAULT_VRF_NAME, remotePeerPrefix, false);
+    BgpPeerConfigId peer2Id =
+        new BgpPeerConfigId(
+            "someHost", DEFAULT_VRF_NAME, Prefix.create(ip1, Prefix.MAX_PREFIX_LENGTH), false);
+    BgpSessionProperties.Builder sessionBuilderForward =
+        BgpSessionProperties.builder()
+            .setHeadIp(ip2)
+            .setTailIp(ip1)
+            .setAddressFamilies(ImmutableSet.of(Type.EVPN));
+    BgpSessionProperties.Builder sessionBuilderReverse =
+        BgpSessionProperties.builder()
+            .setHeadIp(ip1)
+            .setTailIp(ip2)
+            .setAddressFamilies(ImmutableSet.of(Type.EVPN));
+    graph.putEdgeValue(peer1Id, peer2Id, sessionBuilderForward.build());
+    graph.putEdgeValue(peer2Id, peer1Id, sessionBuilderReverse.build());
+
+    BgpTopology topology = new BgpTopology(graph);
+    BgpRoutingProcess routingProcess =
+        new BgpRoutingProcess(bpgProc, _c, DEFAULT_VRF_NAME, new Rib(), topology);
+
+    // No compatible peers for IPv4
+    assertThat(
+        routingProcess
+            .getEdgeIdStream(graph, BgpPeerConfig::getIpv4UnicastAddressFamily, Type.IPV4_UNICAST)
+            .collect(Collectors.toSet()),
+        empty());
+
+    // Replace session to include IPv4 AF. Let routingProcess know we made the new topology
+    graph.putEdgeValue(
+        peer1Id,
+        peer2Id,
+        sessionBuilderForward.setAddressFamilies(ImmutableSet.of(Type.IPV4_UNICAST)).build());
+    graph.putEdgeValue(
+        peer2Id,
+        peer1Id,
+        sessionBuilderReverse.setAddressFamilies(ImmutableSet.of(Type.IPV4_UNICAST)).build());
+    topology = new BgpTopology(graph);
+    routingProcess.updateTopology(topology);
+
+    assertThat(
+        routingProcess
+            .getEdgeIdStream(graph, BgpPeerConfig::getIpv4UnicastAddressFamily, Type.IPV4_UNICAST)
+            .collect(Collectors.toSet()),
+        contains(new EdgeId(peer2Id, peer1Id)));
   }
 }

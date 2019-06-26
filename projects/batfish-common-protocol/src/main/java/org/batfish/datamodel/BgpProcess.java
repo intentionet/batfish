@@ -8,8 +8,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedMap;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
@@ -23,13 +26,19 @@ public class BgpProcess implements Serializable {
 
   public static class Builder extends NetworkFactoryBuilder<BgpProcess> {
 
-    private Integer _ebgpAdminCost;
-    private Integer _ibgpAdminCost;
-    private Ip _routerId;
-    private Vrf _vrf;
+    @Nonnull private Map<Prefix, BgpActivePeerConfig> _activeNeighbors;
+    @Nonnull private Map<Prefix, BgpPassivePeerConfig> _passiveNeighbors;
+    @Nonnull private Map<String, BgpUnnumberedPeerConfig> _interfaceNeighbors;
+    @Nullable private Integer _ebgpAdminCost;
+    @Nullable private Integer _ibgpAdminCost;
+    @Nullable private Ip _routerId;
+    @Nullable private Vrf _vrf;
 
     private Builder(@Nullable NetworkFactory networkFactory) {
       super(networkFactory, BgpProcess.class);
+      _activeNeighbors = ImmutableMap.of();
+      _passiveNeighbors = ImmutableMap.of();
+      _interfaceNeighbors = ImmutableMap.of();
     }
 
     @Override
@@ -38,36 +47,64 @@ public class BgpProcess implements Serializable {
       checkArgument(_ebgpAdminCost != null, "Missing %s", PROP_EBGP_ADMIN_COST);
       checkArgument(_ibgpAdminCost != null, "Missing %s", PROP_IBGP_ADMIN_COST);
       BgpProcess bgpProcess = new BgpProcess(_routerId, _ebgpAdminCost, _ibgpAdminCost);
+      bgpProcess.setNeighbors(ImmutableSortedMap.copyOf(_activeNeighbors));
+      bgpProcess.setPassiveNeighbors(ImmutableSortedMap.copyOf(_passiveNeighbors));
+      bgpProcess.setInterfaceNeighbors(ImmutableSortedMap.copyOf(_interfaceNeighbors));
       if (_vrf != null) {
         _vrf.setBgpProcess(bgpProcess);
       }
       return bgpProcess;
     }
 
+    @Nonnull
+    public Builder setActiveNeighbors(@Nonnull Map<Prefix, BgpActivePeerConfig> activeNeighbors) {
+      _activeNeighbors = activeNeighbors;
+      return this;
+    }
+
+    @Nonnull
+    public Builder setPassiveNeighbors(
+        @Nonnull Map<Prefix, BgpPassivePeerConfig> passiveNeighbors) {
+      _passiveNeighbors = passiveNeighbors;
+      return this;
+    }
+
+    @Nonnull
+    public Builder setInterfaceNeighbors(
+        @Nonnull Map<String, BgpUnnumberedPeerConfig> interfaceNeighbors) {
+      _interfaceNeighbors = interfaceNeighbors;
+      return this;
+    }
+
     /**
      * Sets {@link #setEbgpAdminCost(int) ebgpAdminCost} and {@link #setIbgpAdminCost(int)
      * ibgpAdminCost} to default BGP administrative costs for the given {@link ConfigurationFormat}.
      */
+    @Nonnull
     public Builder setAdminCostsToVendorDefaults(@Nonnull ConfigurationFormat format) {
       return setEbgpAdminCost(RoutingProtocol.BGP.getDefaultAdministrativeCost(format))
           .setIbgpAdminCost(RoutingProtocol.IBGP.getDefaultAdministrativeCost(format));
     }
 
+    @Nonnull
     public Builder setEbgpAdminCost(int ebgpAdminCost) {
       _ebgpAdminCost = ebgpAdminCost;
       return this;
     }
 
+    @Nonnull
     public Builder setIbgpAdminCost(int ibgpAdminCost) {
       _ibgpAdminCost = ibgpAdminCost;
       return this;
     }
 
+    @Nonnull
     public Builder setRouterId(Ip routerId) {
       _routerId = routerId;
       return this;
     }
 
+    @Nonnull
     public Builder setVrf(Vrf vrf) {
       _vrf = vrf;
       return this;
