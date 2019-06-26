@@ -180,7 +180,6 @@ def test_types(question):
 NO_ORDERED_VARIABLE_NAMES_QUESTIONS = {
     'questions/stable/bgpEdges.json',
     'questions/stable/definedStructures.json',
-    'questions/stable/edges.json',
     'questions/stable/eigrpEdges.json',
     'questions/stable/ipsecSessionStatus.json',
     'questions/stable/referencedStructures.json',
