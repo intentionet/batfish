@@ -52,10 +52,17 @@
                 "type": "nodeSpec",
                 "value": ".*",
                 "displayName": "Remote Nodes"
+            },
+            "initial": {
+              "description": "Use the initial topology (pre-dataplane computation)",
+              "type": "boolean",
+              "value": false,
+              "displayName": "Use Initial Topology"
             }
         }
     },
     "edgeType": "${edgeType}",
+    "initial": "${initial}",
     "nodes": "${nodes}",
     "remoteNodes": "${remoteNodes}"
 }

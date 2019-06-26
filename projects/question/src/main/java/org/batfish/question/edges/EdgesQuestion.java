@@ -17,32 +17,39 @@ import org.batfish.specifier.SpecifierFactories;
 @ParametersAreNonnullByDefault
 public class EdgesQuestion extends Question {
   private static final String PROP_EDGE_TYPE = "edgeType";
+  private static final String PROP_INITIAL = "initial";
   private static final String PROP_NODES = "nodes";
   private static final String PROP_REMOTE_NODES = "remoteNodes";
 
   @Nonnull private final EdgeType _edgeType;
-
+  private final boolean _initial;
   @Nullable private final String _nodes;
-
   @Nullable private final String _remoteNodes;
 
   @JsonCreator
   private static EdgesQuestion create(
       @Nullable @JsonProperty(PROP_NODES) String nodes,
+      @Nullable @JsonProperty(PROP_INITIAL) Boolean initial,
       @Nullable @JsonProperty(PROP_REMOTE_NODES) String remoteNodes,
       @Nullable @JsonProperty(PROP_EDGE_TYPE) EdgeType edgeType) {
-    return new EdgesQuestion(nodes, remoteNodes, firstNonNull(edgeType, EdgeType.LAYER3));
+    return new EdgesQuestion(
+        nodes,
+        remoteNodes,
+        firstNonNull(edgeType, EdgeType.LAYER3),
+        firstNonNull(initial, Boolean.FALSE));
   }
 
-  public EdgesQuestion(@Nullable String nodes, @Nullable String remoteNodes, EdgeType edgeType) {
+  public EdgesQuestion(
+      @Nullable String nodes, @Nullable String remoteNodes, EdgeType edgeType, boolean initial) {
     _nodes = nodes;
+    _initial = initial;
     _remoteNodes = remoteNodes;
     _edgeType = edgeType;
   }
 
   @Override
   public boolean getDataPlane() {
-    return false;
+    return !_initial;
   }
 
   @Override
@@ -54,6 +61,12 @@ public class EdgesQuestion extends Question {
   @JsonProperty(PROP_EDGE_TYPE)
   public EdgeType getEdgeType() {
     return _edgeType;
+  }
+
+  /** Returns true iff this question uses the initial (pre-dataplane) topology. */
+  @JsonProperty(PROP_INITIAL)
+  public boolean getInitial() {
+    return _initial;
   }
 
   @Nullable

@@ -108,6 +108,12 @@ public class IBatfishTestAdapter implements IBatfish {
 
     @Nonnull
     @Override
+    public OspfTopology getOspfTopology(NetworkSnapshot networkSnapshot) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Nonnull
+    @Override
     public OspfTopology getInitialOspfTopology(@Nonnull NetworkSnapshot networkSnapshot) {
       throw new UnsupportedOperationException();
     }

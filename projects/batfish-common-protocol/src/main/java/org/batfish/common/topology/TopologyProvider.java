@@ -118,6 +118,9 @@ public interface TopologyProvider {
   @Nonnull
   Topology getLayer3Topology(NetworkSnapshot snapshot);
 
+  @Nonnull
+  OspfTopology getOspfTopology(NetworkSnapshot networkSnapshot);
+
   /**
    * Return the raw {@link Layer1Topology} provided by the user in the snapshot, or {@link
    * Optional#empty()} if none provided by user.

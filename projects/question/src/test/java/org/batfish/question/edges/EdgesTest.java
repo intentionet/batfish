@@ -104,7 +104,7 @@ public final class EdgesTest {
     TableAnswerElement answer =
         (TableAnswerElement)
             new EdgesAnswerer(
-                    new EdgesQuestion(null, null, EdgeType.LAYER1),
+                    new EdgesQuestion(null, null, EdgeType.LAYER1, true),
                     new IBatfishTestAdapter() {
                       @Override
                       public SortedMap<String, Configuration> loadConfigurations(
@@ -189,7 +189,7 @@ public final class EdgesTest {
     TableAnswerElement answer =
         (TableAnswerElement)
             new EdgesAnswerer(
-                    new EdgesQuestion(null, null, EdgeType.VXLAN),
+                    new EdgesQuestion(null, null, EdgeType.VXLAN, true),
                     new IBatfishTestAdapter() {
                       @Override
                       public SortedMap<String, Configuration> loadConfigurations(

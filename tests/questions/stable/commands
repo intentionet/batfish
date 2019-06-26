@@ -16,7 +16,7 @@ test -raw tests/questions/stable/ipOwners.ref validate-template ipOwners duplica
 test -raw tests/questions/stable/initIssues.ref validate-template initIssues
 
 # validate edges
-test -raw tests/questions/stable/edges.ref validate-template edges edgeType="bgp", nodes=".*", remoteNodes=".*"
+test -raw tests/questions/stable/edges.ref validate-template edges edgeType="bgp", nodes=".*", remoteNodes=".*", initial=true
 
 # validate bgpEdges
 test -raw tests/questions/stable/bgpEdges.ref validate-template bgpEdges nodes=".*", remoteNodes=".*"

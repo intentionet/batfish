@@ -1,6 +1,7 @@
 {
   "class" : "org.batfish.question.edges.EdgesQuestion",
   "edgeType" : "BGP",
+  "initial" : true,
   "nodes" : ".*",
   "remoteNodes" : ".*",
   "differential" : false,
@@ -55,6 +56,13 @@
             "name" : "vxlan"
           }
         ]
+      },
+      "initial" : {
+        "description" : "Use the initial topology (pre-dataplane computation)",
+        "displayName" : "Use Initial Topology",
+        "optional" : false,
+        "type" : "boolean",
+        "value" : true
       },
       "nodes" : {
         "description" : "Include edges whose first node matches this name or regex",

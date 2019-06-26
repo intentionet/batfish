@@ -1,6 +1,7 @@
 {
   "class" : "org.batfish.question.edges.EdgesQuestion",
   "edgeType" : "VXLAN",
+  "initial" : false,
   "nodes" : ".*",
   "remoteNodes" : ".*",
   "differential" : false,

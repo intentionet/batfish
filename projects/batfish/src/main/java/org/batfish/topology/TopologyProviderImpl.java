@@ -251,6 +251,22 @@ public final class TopologyProviderImpl implements TopologyProvider {
   }
 
   @Override
+  public OspfTopology getOspfTopology(NetworkSnapshot networkSnapshot) {
+    try {
+      return _ospfTopologies.get(
+          networkSnapshot,
+          () ->
+              computeOspfTopology(
+                  NetworkConfigurations.of(_batfish.loadConfigurations(networkSnapshot)),
+                  getLayer3Topology(networkSnapshot)));
+    } catch (ExecutionException e) {
+      return computeOspfTopology(
+          NetworkConfigurations.of(_batfish.loadConfigurations(networkSnapshot)),
+          getLayer3Topology(networkSnapshot));
+    }
+  }
+
+  @Override
   public Optional<Layer1Topology> getRawLayer1PhysicalTopology(NetworkSnapshot networkSnapshot) {
     try {
       return _rawLayer1PhysicalTopologies.get(
