@@ -96,6 +96,11 @@ public final class BooleanExprs {
     }
 
     @Override
+    public String toString() {
+      return _type.toString();
+    }
+
+    @Override
     public int hashCode() {
       return _type.ordinal();
     }

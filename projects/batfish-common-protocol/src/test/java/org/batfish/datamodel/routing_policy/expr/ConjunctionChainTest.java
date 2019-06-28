@@ -188,6 +188,6 @@ public class ConjunctionChainTest {
   @Test
   public void testToString() {
     ConjunctionChain cc = new ConjunctionChain(ImmutableList.of(BooleanExprs.TRUE));
-    assertThat(cc.toString(), equalTo("ConjunctionChain{subroutines=[StaticBooleanExpr{}]}"));
+    assertThat(cc.toString(), equalTo("ConjunctionChain{subroutines=[True]}"));
   }
 }

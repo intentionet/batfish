@@ -1,5 +1,6 @@
 package org.batfish.datamodel.routing_policy;
 
+import com.google.common.base.MoreObjects;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.routing_policy.expr.BooleanExpr;
@@ -84,6 +85,16 @@ public final class Result {
   @Override
   public int hashCode() {
     return Objects.hash(_booleanValue, _exit, _fallThrough, _return);
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(Result.class)
+        .add("booleanValue", _booleanValue)
+        .add("exit", _exit)
+        .add("fallThrough", _fallThrough)
+        .add("return", _return)
+        .toString();
   }
 
   public Builder toBuilder() {

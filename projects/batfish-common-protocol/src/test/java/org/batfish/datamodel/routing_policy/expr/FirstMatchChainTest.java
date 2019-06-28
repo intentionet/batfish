@@ -155,6 +155,6 @@ public class FirstMatchChainTest {
   @Test
   public void testToString() {
     FirstMatchChain fmc = new FirstMatchChain(ImmutableList.of(BooleanExprs.TRUE));
-    assertThat(fmc.toString(), equalTo("FirstMatchChain{subroutines=[StaticBooleanExpr{}]}"));
+    assertThat(fmc.toString(), equalTo("FirstMatchChain{subroutines=[True]}"));
   }
 }
