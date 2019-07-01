@@ -44,6 +44,25 @@ bi4_network
   NETWORK network = ip_prefix NEWLINE
 ;
 
+bi4_neighbor
+:
+  NEIGHBOR name = word
+  (
+    bi4n_activate
+    | bi4n_route_reflector_client
+  )
+;
+
+bi4n_activate
+:
+  ACTIVATE NEWLINE
+;
+
+bi4n_route_reflector_client
+:
+  ROUTE_REFLECTOR_CLIENT NEWLINE
+;
+
 bi4_redistribute_connected
 :
   REDISTRIBUTE CONNECTED
@@ -96,6 +115,12 @@ blen_activate
   ACTIVATE NEWLINE
 ;
 
+blen_route_reflector_client
+:
+  ROUTE_REFLECTOR_CLIENT NEWLINE
+;
+
+
 /*
  * This is a mess. The Cumulus grammar is ambiguous - you can't quite tell what grammar is legal
  * without knowing the type of the peer and without looking several tokens down the line.
@@ -120,7 +145,7 @@ bn_interface
 :
   INTERFACE
   (
-    bnp_peer_group
+    | bnp_peer_group
     | bnp_remote_as
   )
 ;

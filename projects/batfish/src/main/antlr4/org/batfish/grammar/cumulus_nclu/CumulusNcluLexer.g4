@@ -396,6 +396,11 @@ ROUTE_MAP
   'route-map'
 ;
 
+ROUTE_REFLECTOR_CLIENT
+:
+  'route-reflector-client'
+;
+
 ROUTER_ID
 :
   'router-id'
