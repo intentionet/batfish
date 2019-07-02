@@ -107,7 +107,11 @@ ble_advertise_ipv4_unicast
 
 ble_neighbor
 :
-  NEIGHBOR name = word blen_activate
+  NEIGHBOR name = word
+  (
+    blen_activate
+    | blen_route_reflector_client
+  )
 ;
 
 blen_activate

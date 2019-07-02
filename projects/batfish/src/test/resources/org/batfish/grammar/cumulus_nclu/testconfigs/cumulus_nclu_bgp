@@ -5,15 +5,17 @@ net add hostname cumulus_nclu_bgp
 net add bgp autonomous-system 65500
 net add bgp ipv4 unicast network 192.0.2.1/32
 net add bgp ipv4 unicast redistribute connected route-map rm1
+net add bgp neighbor swp1 interface remote-as external
+net add bgp neighbor swp2 interface remote-as internal
+net add bgp neighbor swp3 interface remote-as 65000
 net add bgp l2vpn evpn advertise-all-vni
 net add bgp l2vpn evpn advertise-default-gw
 net add bgp l2vpn evpn advertise ipv4 unicast
 net add bgp l2vpn evpn neighbor swp1 activate
+net add bgp l2vpn evpn neighbor swp2 route-reflector-client
 net add bgp l2vpn evpn neighbor swp2 activate
 net add bgp l2vpn evpn neighbor swp3 activate
-net add bgp neighbor swp1 interface remote-as external
-net add bgp neighbor swp2 interface remote-as internal
-net add bgp neighbor swp3 interface remote-as 65000
+net add bgp l2vpn evpn neighbor swp3 route-reflector-client
 net add bgp router-id 192.0.2.2
 net add bgp vrf vrf1 autonomous-system 65501
 net add bgp vrf vrf1 ipv4 unicast redistribute connected

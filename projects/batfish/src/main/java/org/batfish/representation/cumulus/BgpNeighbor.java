@@ -15,6 +15,8 @@ public abstract class BgpNeighbor implements Serializable {
   // Inheritable properties
   private @Nullable Long _remoteAs;
   private @Nullable RemoteAsType _remoteAsType;
+  private @Nullable BgpNeighborIpv4UnicastAddressFamily _ipv4UnicastAddressFamily;
+  private @Nullable BgpNeighborL2vpnEvpnAddressFamily _l2vpnEvpnAddressFamily;
 
   // Whether this configuration has inherited from its parent.
   private boolean _inherited = false;
@@ -34,6 +36,28 @@ public abstract class BgpNeighbor implements Serializable {
 
   public void setDescription(@Nullable String description) {
     _description = description;
+  }
+
+  @Nullable
+  public BgpNeighborIpv4UnicastAddressFamily getIpv4UnicastAddressFamily() {
+    return _ipv4UnicastAddressFamily;
+  }
+
+  public BgpNeighbor setIpv4UnicastAddressFamily(
+      @Nullable BgpNeighborIpv4UnicastAddressFamily ipv4UnicastAddressFamily) {
+    _ipv4UnicastAddressFamily = ipv4UnicastAddressFamily;
+    return this;
+  }
+
+  @Nullable
+  public BgpNeighborL2vpnEvpnAddressFamily getL2vpnEvpnAddressFamily() {
+    return _l2vpnEvpnAddressFamily;
+  }
+
+  public BgpNeighbor setL2vpnEvpnAddressFamily(
+      @Nullable BgpNeighborL2vpnEvpnAddressFamily l2vpnEvpnAddressFamily) {
+    _l2vpnEvpnAddressFamily = l2vpnEvpnAddressFamily;
+    return this;
   }
 
   @Nullable
@@ -84,6 +108,18 @@ public abstract class BgpNeighbor implements Serializable {
       // These properties are coupled, but remoteAsType will be non-null if they have been set.
       _remoteAs = other.getRemoteAs();
       _remoteAsType = other.getRemoteAsType();
+    }
+
+    if (_ipv4UnicastAddressFamily == null) {
+      _ipv4UnicastAddressFamily = other.getIpv4UnicastAddressFamily();
+    } else if (other.getIpv4UnicastAddressFamily() != null) {
+      _ipv4UnicastAddressFamily.inheritFrom(other.getIpv4UnicastAddressFamily());
+    }
+
+    if (_l2vpnEvpnAddressFamily == null) {
+      _l2vpnEvpnAddressFamily = other.getL2vpnEvpnAddressFamily();
+    } else if (other.getL2vpnEvpnAddressFamily() != null) {
+      _l2vpnEvpnAddressFamily.inheritFrom(other.getL2vpnEvpnAddressFamily());
     }
   }
 }

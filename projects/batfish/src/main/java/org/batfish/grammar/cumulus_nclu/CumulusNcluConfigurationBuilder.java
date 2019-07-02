@@ -57,12 +57,18 @@ import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.B_l2vpnContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.B_neighborContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.B_router_idContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.B_vrfContext;
+import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bi4_neighborContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bi4_networkContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bi4_redistribute_connectedContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bi4_redistribute_staticContext;
+import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bi4n_activateContext;
+import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bi4n_route_reflector_clientContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Ble_advertise_all_vniContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Ble_advertise_default_gwContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Ble_advertise_ipv4_unicastContext;
+import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Ble_neighborContext;
+import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Blen_activateContext;
+import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Blen_route_reflector_clientContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bn_interfaceContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bn_peerContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Bn_peer_groupContext;
@@ -141,6 +147,8 @@ import org.batfish.representation.cumulus.BgpIpv4UnicastAddressFamily;
 import org.batfish.representation.cumulus.BgpL2VpnEvpnIpv4Unicast;
 import org.batfish.representation.cumulus.BgpL2vpnEvpnAddressFamily;
 import org.batfish.representation.cumulus.BgpNeighbor;
+import org.batfish.representation.cumulus.BgpNeighborIpv4UnicastAddressFamily;
+import org.batfish.representation.cumulus.BgpNeighborL2vpnEvpnAddressFamily;
 import org.batfish.representation.cumulus.BgpNetwork;
 import org.batfish.representation.cumulus.BgpPeerGroupNeighbor;
 import org.batfish.representation.cumulus.BgpProcess;
@@ -663,6 +671,43 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
   }
 
   @Override
+  public void enterBi4_neighbor(Bi4_neighborContext ctx) {
+    _currentBgpNeighborName = ctx.name.getText();
+    _currentBgpNeighbor = _currentBgpVrf.getNeighbors().get(_currentBgpNeighborName);
+
+    assert _currentBgpNeighbor != null; // Ensure neighbor exists
+    if (_currentBgpNeighbor.getIpv4UnicastAddressFamily() == null) {
+      _currentBgpNeighbor.setIpv4UnicastAddressFamily(new BgpNeighborIpv4UnicastAddressFamily());
+    }
+  }
+
+  @Override
+  public void exitBi4_neighbor(Bi4_neighborContext ctx) {
+    _currentBgpNeighborName = null;
+    _currentBgpNeighbor = null;
+  }
+
+  @Override
+  public void exitBi4n_activate(Bi4n_activateContext ctx) {
+    assert _currentBgpNeighbor != null; // Ensure neighbor exists
+    assert _currentBgpNeighbor.getIpv4UnicastAddressFamily() != null;
+    _currentBgpNeighbor.getIpv4UnicastAddressFamily().setActivated(true);
+  }
+
+  @Override
+  public void exitBi4n_route_reflector_client(Bi4n_route_reflector_clientContext ctx) {
+    assert _currentBgpNeighbor != null; // Ensure neighbor exists
+    BgpNeighborIpv4UnicastAddressFamily ipv4UnicastAddressFamily =
+        _currentBgpNeighbor.getIpv4UnicastAddressFamily();
+    assert ipv4UnicastAddressFamily != null;
+    // The neighbor must have been explicitly activated for route-reflector-client to take effect
+    // https://docs.cumulusnetworks.com/display/DOCS/Border+Gateway+Protocol+-+BGP#BorderGatewayProtocol-BGP-RouteReflectors
+    if (Boolean.TRUE.equals(ipv4UnicastAddressFamily.getActivated())) {
+      ipv4UnicastAddressFamily.setRouteReflectorClient(true);
+    }
+  }
+
+  @Override
   public void enterB_l2vpn(B_l2vpnContext ctx) {
     if (_currentBgpVrf.getL2VpnEvpn() == null) {
       _currentBgpVrf.setL2VpnEvpn(new BgpL2vpnEvpnAddressFamily());
@@ -896,6 +941,43 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
   public void exitBle_advertise_ipv4_unicast(Ble_advertise_ipv4_unicastContext ctx) {
     if (_currentBgpVrf.getL2VpnEvpn().getAdvertiseIpv4Unicast() == null) {
       _currentBgpVrf.getL2VpnEvpn().setAdvertiseIpv4Unicast(new BgpL2VpnEvpnIpv4Unicast());
+    }
+  }
+
+  @Override
+  public void enterBle_neighbor(Ble_neighborContext ctx) {
+    _currentBgpNeighborName = ctx.name.getText();
+    _currentBgpNeighbor = _currentBgpVrf.getNeighbors().get(_currentBgpNeighborName);
+
+    assert _currentBgpNeighbor != null; // Ensure neighbor exists
+    if (_currentBgpNeighbor.getL2vpnEvpnAddressFamily() == null) {
+      _currentBgpNeighbor.setL2vpnEvpnAddressFamily(new BgpNeighborL2vpnEvpnAddressFamily());
+    }
+  }
+
+  @Override
+  public void exitBle_neighbor(Ble_neighborContext ctx) {
+    _currentBgpNeighborName = null;
+    _currentBgpNeighbor = null;
+  }
+
+  @Override
+  public void exitBlen_activate(Blen_activateContext ctx) {
+    assert _currentBgpNeighbor != null; // Ensure neighbor exists
+    assert _currentBgpNeighbor.getL2vpnEvpnAddressFamily() != null;
+    _currentBgpNeighbor.getL2vpnEvpnAddressFamily().setActivated(true);
+  }
+
+  @Override
+  public void exitBlen_route_reflector_client(Blen_route_reflector_clientContext ctx) {
+    assert _currentBgpNeighbor != null; // Ensure neighbor exists
+    BgpNeighborL2vpnEvpnAddressFamily l2vpnEvpnAddressFamily =
+        _currentBgpNeighbor.getL2vpnEvpnAddressFamily();
+    assert l2vpnEvpnAddressFamily != null;
+    // The neighbor must have been explicitly activated for route-reflector-client to take effect
+    // https://docs.cumulusnetworks.com/display/DOCS/Border+Gateway+Protocol+-+BGP#BorderGatewayProtocol-BGP-RouteReflectors
+    if (Boolean.TRUE.equals(l2vpnEvpnAddressFamily.getActivated())) {
+      l2vpnEvpnAddressFamily.setRouteReflectorClient(true);
     }
   }
 

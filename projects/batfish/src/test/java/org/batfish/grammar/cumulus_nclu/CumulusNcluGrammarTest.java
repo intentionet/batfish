@@ -439,6 +439,29 @@ public final class CumulusNcluGrammarTest {
         in.getRemoteAsType(),
         equalTo(RemoteAsType.EXTERNAL));
 
+    // l2vpn evpn route activation and reflector settings
+    assertTrue(
+        "Ensure swp2 has l2vpn evpn activated",
+        proc.getDefaultVrf().getNeighbors().get("swp2").getL2vpnEvpnAddressFamily().getActivated());
+    assertThat(
+        "Ensure swp2 does not have route reflector client enabled (wrong order)",
+        proc.getDefaultVrf()
+            .getNeighbors()
+            .get("swp2")
+            .getL2vpnEvpnAddressFamily()
+            .getRouteReflectorClient(),
+        nullValue());
+    assertTrue(
+        "Ensure swp3 has l2vpn evpn activated",
+        proc.getDefaultVrf().getNeighbors().get("swp3").getL2vpnEvpnAddressFamily().getActivated());
+    assertTrue(
+        "Ensure swp3 has route reflector client enabled",
+        proc.getDefaultVrf()
+            .getNeighbors()
+            .get("swp3")
+            .getL2vpnEvpnAddressFamily()
+            .getRouteReflectorClient());
+
     // router-id
     assertThat(
         "Ensure router-id is extracted",
