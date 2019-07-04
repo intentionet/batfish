@@ -575,6 +575,7 @@ import org.batfish.representation.juniper.AddressAddressBookEntry;
 import org.batfish.representation.juniper.AddressBook;
 import org.batfish.representation.juniper.AddressBookEntry;
 import org.batfish.representation.juniper.AddressFamily;
+import org.batfish.representation.juniper.AddressRangeAddressBookEntry;
 import org.batfish.representation.juniper.AddressSetAddressBookEntry;
 import org.batfish.representation.juniper.AddressSetEntry;
 import org.batfish.representation.juniper.AggregateRoute;
@@ -3084,12 +3085,17 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
       AddressBookEntry addressEntry = new AddressAddressBookEntry(name, ipWildcard);
       _currentAddressBook.getEntries().put(name, addressEntry);
     } else if (ctx.address != null) {
-      IpWildcard ipWildcard = IpWildcard.create(Ip.parse(ctx.address.getText()));
+      IpWildcard ipWildcard = IpWildcard.parse(ctx.address.getText());
       AddressBookEntry addressEntry = new AddressAddressBookEntry(name, ipWildcard);
       _currentAddressBook.getEntries().put(name, addressEntry);
     } else if (ctx.prefix != null) {
-      IpWildcard ipWildcard = IpWildcard.create(Prefix.parse(ctx.prefix.getText()));
+      IpWildcard ipWildcard = IpWildcard.parse(ctx.prefix.getText());
       AddressBookEntry addressEntry = new AddressAddressBookEntry(name, ipWildcard);
+      _currentAddressBook.getEntries().put(name, addressEntry);
+    } else if (ctx.RANGE_ADDRESS() != null) {
+      Ip lower = Ip.parse(ctx.lower_limit.getText());
+      Ip upper = Ip.parse(ctx.upper_limit.getText());
+      AddressBookEntry addressEntry = new AddressRangeAddressBookEntry(name, lower, upper);
       _currentAddressBook.getEntries().put(name, addressEntry);
     } else if (ctx.DESCRIPTION() != null) {
       /* TODO - data model doesn't have a place to put this yet. */

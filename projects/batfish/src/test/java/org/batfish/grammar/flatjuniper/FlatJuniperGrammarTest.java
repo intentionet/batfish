@@ -1155,6 +1155,7 @@ public final class FlatJuniperGrammarTest {
     String interfaceNameUntrust = "ge-0/0/1.0";
     String specificSpaceName = "global~ADDR1";
     String wildcardSpaceName = "global~ADDR2";
+    String rangeSpaceName = "global~ADDR3";
     String indirectSpaceName = "global~ADDRSET";
 
     // Address on untrust interface's subnet
@@ -1175,11 +1176,13 @@ public final class FlatJuniperGrammarTest {
     // Should have three global IpSpaces in the config
     assertThat(
         c.getIpSpaces().keySet(),
-        containsInAnyOrder(specificSpaceName, wildcardSpaceName, indirectSpaceName));
+        containsInAnyOrder(
+            specificSpaceName, wildcardSpaceName, indirectSpaceName, rangeSpaceName));
     // And associated metadata
     assertThat(
         c.getIpSpaceMetadata().keySet(),
-        containsInAnyOrder(specificSpaceName, wildcardSpaceName, indirectSpaceName));
+        containsInAnyOrder(
+            specificSpaceName, wildcardSpaceName, indirectSpaceName, rangeSpaceName));
 
     IpSpace specificSpace = c.getIpSpaces().get(specificSpaceName);
     IpSpace wildcardSpace = c.getIpSpaces().get(wildcardSpaceName);
@@ -1211,6 +1214,22 @@ public final class FlatJuniperGrammarTest {
         untrustAcl,
         rejects(
             flowFromNotWildcardAddr, interfaceNameTrust, c.getIpAccessLists(), c.getIpSpaces()));
+
+    // Range
+    IpSpace rangeSpace = c.getIpSpaces().get(rangeSpaceName);
+    Ip before = Ip.parse("5.5.5.4");
+    Ip min = Ip.parse("5.5.5.5");
+    Ip inside = Ip.parse("5.5.5.6");
+    Ip max = Ip.parse("5.5.5.7");
+    Ip after = Ip.parse("5.5.5.8");
+    assertThat(
+        rangeSpace,
+        allOf(
+            not(containsIp(before)),
+            containsIp(min),
+            containsIp(inside),
+            containsIp(max),
+            not(containsIp(after))));
   }
 
   @Test

@@ -587,6 +587,7 @@ sead_address
       | DESCRIPTION null_filler
       | address = IP_ADDRESS
       | prefix = IP_PREFIX
+      | RANGE_ADDRESS lower_limit = IP_ADDRESS TO upper_limit = IP_ADDRESS
       | WILDCARD_ADDRESS wildcard_address
    )
 ;

@@ -4763,6 +4763,11 @@ RANGE
    'range'
 ;
 
+RANGE_ADDRESS
+:
+   'range-address'
+;
+
 RAS
 :
    'ras'
