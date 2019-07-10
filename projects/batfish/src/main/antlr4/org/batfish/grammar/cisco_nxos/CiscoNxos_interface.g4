@@ -12,6 +12,7 @@ s_interface
   (
     i_bandwidth
     | i_channel_group
+    | i_description
     | i_encapsulation
     | i_ip
     | i_no
@@ -45,6 +46,11 @@ channel_id
 // 1-4096
   UINT8
   | UINT16
+;
+
+i_description
+:
+  DESCRIPTION desc = REMARK_TEXT NEWLINE
 ;
 
 i_encapsulation

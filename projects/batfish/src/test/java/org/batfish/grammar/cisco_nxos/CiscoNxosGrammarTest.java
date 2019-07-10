@@ -20,6 +20,7 @@ import static org.batfish.datamodel.matchers.InterfaceMatchers.hasBandwidth;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasChannelGroup;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasChannelGroupMembers;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasDependencies;
+import static org.batfish.datamodel.matchers.InterfaceMatchers.hasDescription;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasInterfaceType;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasSwitchPortMode;
 import static org.batfish.datamodel.matchers.InterfaceMatchers.hasVlan;
@@ -32,6 +33,7 @@ import static org.batfish.main.BatfishTestUtils.configureBatfishTestSettings;
 import static org.batfish.representation.cisco_nxos.CiscoNxosConfiguration.NULL_VRF_NAME;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -258,6 +260,24 @@ public final class CiscoNxosGrammarTest {
     assertThat(
         vc.getInterfaces(),
         hasKeys("Ethernet1/1", "Ethernet1/2", "Ethernet1/1.1", "Ethernet1/1.2"));
+  }
+
+  /**
+   * A generic test that exercised basic interface property extraction and conversion.
+   *
+   * <p>Note that this should only be for <strong>simple</strong> properties; anything with many
+   * cases deserves its own unit test. (See, e.g., {@link #testInterfaceSwitchportExtraction()}.
+   */
+  @Test
+  public void testInterfaceProperties() throws Exception {
+    Configuration c = parseConfig("nxos_interface_properties");
+    assertThat(c, hasInterface("Ethernet1/1", any(org.batfish.datamodel.Interface.class)));
+
+    org.batfish.datamodel.Interface eth11 = c.getAllInterfaces().get("Ethernet1/1");
+    // TODO: remove the leading space
+    assertThat(
+        eth11,
+        hasDescription(" here is a description with punctuation! and IP address 1.2.3.4/24 etc."));
   }
 
   @Test

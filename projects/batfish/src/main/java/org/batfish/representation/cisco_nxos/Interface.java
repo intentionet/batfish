@@ -111,6 +111,7 @@ public final class Interface implements Serializable {
   private @Nullable Integer _bandwidth;
   private @Nullable String _channelGroup;
   private final @Nonnull Set<String> _declaredNames;
+  private @Nullable String _description;
   private @Nullable Integer _encapsulationVlan;
   private final @Nonnull String _name;
   private @Nullable Integer _nativeVlan;
@@ -168,6 +169,10 @@ public final class Interface implements Serializable {
 
   public @Nonnull Set<String> getDeclaredNames() {
     return _declaredNames;
+  }
+
+  public @Nullable String getDescription() {
+    return _description;
   }
 
   public @Nullable Integer getEncapsulationVlan() {
@@ -256,6 +261,10 @@ public final class Interface implements Serializable {
 
   public void setChannelGroup(@Nullable String channelGroup) {
     _channelGroup = channelGroup;
+  }
+
+  public void setDescription(@Nullable String description) {
+    _description = description;
   }
 
   public void setEncapsulationVlan(@Nullable Integer encapsulationVlan) {

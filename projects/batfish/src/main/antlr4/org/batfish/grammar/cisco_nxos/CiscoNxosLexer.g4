@@ -475,7 +475,7 @@ DENY_ALL
 
 DESCRIPTION
 :
-  'description'
+  'description' -> pushMode ( M_Remark )
 ;
 
 DETAIL

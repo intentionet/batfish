@@ -49,6 +49,7 @@ public final class Interface extends ComparableStructure<String> {
     private @Nonnull SortedSet<String> _channelGroupMembers;
     private SortedSet<String> _declaredNames;
     @Nonnull private Set<Dependency> _dependencies = ImmutableSet.of();
+    @Nullable private String _description;
     @Nullable private EigrpInterfaceSettings _eigrp;
     @Nullable private Integer _encapsulationVlan;
     private Map<Integer, HsrpGroup> _hsrpGroups;
@@ -124,6 +125,7 @@ public final class Interface extends ComparableStructure<String> {
       iface.setChannelGroupMembers(_channelGroupMembers);
       iface.setDeclaredNames(_declaredNames);
       iface.setDependencies(_dependencies);
+      iface.setDescription(_description);
       iface.setEigrp(_eigrp);
       iface.setEncapsulationVlan(_encapsulationVlan);
       iface.setHsrpGroups(_hsrpGroups);
@@ -277,6 +279,11 @@ public final class Interface extends ComparableStructure<String> {
 
     public Builder setDependencies(@Nonnull Iterable<Dependency> dependencies) {
       _dependencies = ImmutableSet.copyOf(dependencies);
+      return this;
+    }
+
+    public Builder setDescription(@Nullable String description) {
+      _description = description;
       return this;
     }
 

@@ -84,6 +84,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Dscp_numberContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Dscp_specContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_bandwidthContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_channel_groupContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_descriptionContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_encapsulationContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_ip_addressContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_no_autostateContext;
@@ -968,6 +969,12 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
           iface.setChannelGroup(channelGroup);
           copyPortChannelCompatibilitySettings(referenceIface, iface);
         });
+  }
+
+  @Override
+  public void exitI_description(I_descriptionContext ctx) {
+    String description = ctx.desc.getText();
+    _currentInterfaces.forEach(i -> i.setDescription(description));
   }
 
   @Override

@@ -247,6 +247,8 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
 
     newIfaceBuilder.setAddresses(iface.getAddress(), iface.getSecondaryAddresses());
 
+    newIfaceBuilder.setDescription(iface.getDescription());
+
     // switchport+vlan settings
     SwitchportMode switchportMode = iface.getSwitchportMode();
     newIfaceBuilder.setSwitchportMode(switchportMode);
