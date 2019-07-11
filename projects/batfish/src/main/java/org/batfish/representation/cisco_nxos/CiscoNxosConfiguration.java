@@ -284,7 +284,13 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
 
     newIfaceBuilder.setActive(!iface.getShutdown());
 
-    newIfaceBuilder.setAddresses(iface.getAddress(), iface.getSecondaryAddresses());
+    if (iface.getAddress() != null) {
+      newIfaceBuilder.setAddress(iface.getAddress().getAddress());
+    }
+    newIfaceBuilder.setSecondaryAddresses(
+        iface.getSecondaryAddresses().stream()
+            .map(InterfaceAddressWithAttributes::getAddress)
+            .collect(ImmutableSet.toImmutableSet()));
 
     newIfaceBuilder.setDescription(iface.getDescription());
 

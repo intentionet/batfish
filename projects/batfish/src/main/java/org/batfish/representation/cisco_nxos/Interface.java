@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.IntegerSpace;
-import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.SwitchportMode;
 
 /** A layer-2- or layer-3-capable network interface */
@@ -105,7 +104,7 @@ public final class Interface implements Serializable {
   }
 
   private @Nullable Integer _accessVlan;
-  private @Nullable InterfaceAddress _address;
+  private @Nullable InterfaceAddressWithAttributes _address;
   private @Nullable IntegerSpace _allowedVlans;
   private boolean _autostate;
   private @Nullable Integer _bandwidth;
@@ -117,7 +116,7 @@ public final class Interface implements Serializable {
   private final @Nonnull String _name;
   private @Nullable Integer _nativeVlan;
   private final @Nullable String _parentInterface;
-  private final @Nonnull Set<InterfaceAddress> _secondaryAddresses;
+  private final @Nonnull Set<InterfaceAddressWithAttributes> _secondaryAddresses;
   private @Nullable Boolean _shutdown;
   private @Nonnull SwitchportMode _switchportMode;
   private final @Nonnull CiscoNxosInterfaceType _type;
@@ -150,7 +149,7 @@ public final class Interface implements Serializable {
   }
 
   /** The primary IPv4 address of the interface. */
-  public @Nullable InterfaceAddress getAddress() {
+  public @Nullable InterfaceAddressWithAttributes getAddress() {
     return _address;
   }
 
@@ -200,7 +199,7 @@ public final class Interface implements Serializable {
   }
 
   /** The set of secondary IPv4 addresses of the interface. */
-  public @Nonnull Set<InterfaceAddress> getSecondaryAddresses() {
+  public @Nonnull Set<InterfaceAddressWithAttributes> getSecondaryAddresses() {
     return _secondaryAddresses;
   }
 
@@ -251,7 +250,7 @@ public final class Interface implements Serializable {
     _accessVlan = accessVlan;
   }
 
-  public void setAddress(@Nullable InterfaceAddress address) {
+  public void setAddress(@Nullable InterfaceAddressWithAttributes address) {
     _address = address;
   }
 

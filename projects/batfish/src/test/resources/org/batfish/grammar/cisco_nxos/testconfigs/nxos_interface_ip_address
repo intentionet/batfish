@@ -8,7 +8,7 @@ interface Ethernet1/1
   ip address 10.0.0.4/24
   ! below assignment should replace above assignment
   ip address 10.0.0.1/24 
-  ip address 10.0.0.3/24 secondary 
+  ip address 10.0.0.3/24 secondary tag 3
   ! below assignment should append to secondary addresses
   ip address 10.0.0.2 255.255.255.0 secondary
 !

@@ -37,7 +37,6 @@ import org.batfish.datamodel.DscpType;
 import org.batfish.datamodel.IcmpCode;
 import org.batfish.datamodel.IcmpType;
 import org.batfish.datamodel.IntegerSpace;
-import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
@@ -160,6 +159,7 @@ import org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage;
 import org.batfish.representation.cisco_nxos.FragmentsBehavior;
 import org.batfish.representation.cisco_nxos.IcmpOptions;
 import org.batfish.representation.cisco_nxos.Interface;
+import org.batfish.representation.cisco_nxos.InterfaceAddressWithAttributes;
 import org.batfish.representation.cisco_nxos.IpAccessList;
 import org.batfish.representation.cisco_nxos.IpAccessListLine;
 import org.batfish.representation.cisco_nxos.IpAddressSpec;
@@ -241,11 +241,13 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
     return Integer.parseInt(ctx.getText());
   }
 
-  private static @Nonnull InterfaceAddress toInterfaceAddress(Interface_addressContext ctx) {
+  private static @Nonnull InterfaceAddressWithAttributes toInterfaceAddress(
+      Interface_addressContext ctx) {
     // TODO: support exotic address types
     return ctx.iaddress != null
-        ? ConcreteInterfaceAddress.parse(ctx.getText())
-        : ConcreteInterfaceAddress.create(toIp(ctx.address), toInteger(ctx.mask));
+        ? new InterfaceAddressWithAttributes(ConcreteInterfaceAddress.parse(ctx.getText()))
+        : new InterfaceAddressWithAttributes(
+            ConcreteInterfaceAddress.create(toIp(ctx.address), toInteger(ctx.mask)));
   }
 
   private static @Nonnull Ip toIp(Ip_addressContext ctx) {
@@ -320,7 +322,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   private @Nullable CiscoNxosConfiguration _configuration;
   private @Nullable ActionIpAccessListLine.Builder _currentActionIpAccessListLineBuilder;
   private @Nullable Boolean _currentActionIpAccessListLineUnusable;
-  private @Nullable List<Interface> _currentInterfaces;
+  private @Nonnull List<Interface> _currentInterfaces = ImmutableList.of();
   private @Nullable IpAccessList _currentIpAccessList;
   private @Nullable Optional<Long> _currentIpAccessListLineNum;
   private @Nullable IpPrefixList _currentIpPrefixList;
@@ -1115,13 +1117,17 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
 
   @Override
   public void exitI_ip_address(I_ip_addressContext ctx) {
-    InterfaceAddress address = toInterfaceAddress(ctx.addr);
+    InterfaceAddressWithAttributes address = toInterfaceAddress(ctx.addr);
     if (ctx.SECONDARY() != null) {
       // secondary addresses are appended
       _currentInterfaces.forEach(iface -> iface.getSecondaryAddresses().add(address));
     } else {
       // primary address is replaced
       _currentInterfaces.forEach(iface -> iface.setAddress(address));
+    }
+    if (ctx.tag != null) {
+      todo(ctx, "Unsupported: tag on interface ip address");
+      address.setTag(toLong(ctx.tag));
     }
   }
 
@@ -1384,7 +1390,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
 
   @Override
   public void exitS_interface(S_interfaceContext ctx) {
-    _currentInterfaces = null;
+    _currentInterfaces = ImmutableList.of();
   }
 
   @Override
@@ -1439,6 +1445,10 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
 
   private void todo(ParserRuleContext ctx) {
     _w.todo(ctx, getFullText(ctx), _parser);
+  }
+
+  private void todo(ParserRuleContext ctx, String message) {
+    _w.addWarning(ctx, getFullText(ctx), _parser, message);
   }
 
   private @Nonnull Optional<Integer> toInteger(
@@ -1972,7 +1982,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
 
   /**
    * Return the text of the provided {@code ctx} if its length is within the provided {@link
-   * lengthSpace}, or else {@link Optional#empty}.
+   * IntegerSpace lengthSpace}, or else {@link Optional#empty}.
    */
   private @Nonnull Optional<String> toStringWithLengthInSpace(
       ParserRuleContext messageCtx, ParserRuleContext ctx, IntegerSpace lengthSpace, String name) {

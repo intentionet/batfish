@@ -71,7 +71,7 @@ i_ip
 
 i_ip_address
 :
-  ADDRESS addr = interface_address SECONDARY? NEWLINE
+  ADDRESS addr = interface_address SECONDARY? (TAG tag = uint32)? NEWLINE
 ;
 
 i_mtu

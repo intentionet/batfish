@@ -101,6 +101,7 @@ import org.batfish.representation.cisco_nxos.CiscoNxosStructureType;
 import org.batfish.representation.cisco_nxos.FragmentsBehavior;
 import org.batfish.representation.cisco_nxos.IcmpOptions;
 import org.batfish.representation.cisco_nxos.Interface;
+import org.batfish.representation.cisco_nxos.InterfaceAddressWithAttributes;
 import org.batfish.representation.cisco_nxos.IpAccessList;
 import org.batfish.representation.cisco_nxos.IpAccessListLine;
 import org.batfish.representation.cisco_nxos.IpAddressSpec;
@@ -251,13 +252,16 @@ public final class CiscoNxosGrammarTest {
     assertThat(vc.getInterfaces(), hasKey(ifaceName));
 
     Interface iface = vc.getInterfaces().get(ifaceName);
+    InterfaceAddressWithAttributes primary =
+        new InterfaceAddressWithAttributes(ConcreteInterfaceAddress.parse("10.0.0.1/24"));
+    InterfaceAddressWithAttributes secondary2 =
+        new InterfaceAddressWithAttributes(ConcreteInterfaceAddress.parse("10.0.0.2/24"));
+    InterfaceAddressWithAttributes secondary3 =
+        new InterfaceAddressWithAttributes(ConcreteInterfaceAddress.parse("10.0.0.3/24"));
+    secondary3.setTag(3L);
 
-    assertThat(iface.getAddress(), equalTo(ConcreteInterfaceAddress.parse("10.0.0.1/24")));
-    assertThat(
-        iface.getSecondaryAddresses(),
-        containsInAnyOrder(
-            ConcreteInterfaceAddress.parse("10.0.0.2/24"),
-            ConcreteInterfaceAddress.parse("10.0.0.3/24")));
+    assertThat(iface.getAddress(), equalTo(primary));
+    assertThat(iface.getSecondaryAddresses(), containsInAnyOrder(secondary2, secondary3));
   }
 
   @Test
@@ -2233,13 +2237,15 @@ public final class CiscoNxosGrammarTest {
       Interface iface = vc.getInterfaces().get("Ethernet1/4");
       assertFalse(iface.getShutdown());
       assertThat(iface.getVrfMember(), equalTo("vrf1"));
-      assertThat(iface.getAddress(), equalTo(ConcreteInterfaceAddress.parse("10.0.4.1/24")));
+      assertThat(
+          iface.getAddress().getAddress(), equalTo(ConcreteInterfaceAddress.parse("10.0.4.1/24")));
     }
     {
       Interface iface = vc.getInterfaces().get("Ethernet1/5");
       assertFalse(iface.getShutdown());
       assertThat(iface.getVrfMember(), equalTo("vrf3"));
-      assertThat(iface.getAddress(), equalTo(ConcreteInterfaceAddress.parse("10.0.5.1/24")));
+      assertThat(
+          iface.getAddress().getAddress(), equalTo(ConcreteInterfaceAddress.parse("10.0.5.1/24")));
     }
   }
 
