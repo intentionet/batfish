@@ -135,6 +135,19 @@ quoted_text
   QUOTED_TEXT
 ;
 
+route_distinguisher
+:
+  hi0 = uint16 COLON lo0 = uint32
+  | hi1 = ip_address COLON lo1 = uint16
+  | hi2 = uint32 COLON lo2 = uint16
+;
+
+route_distinguisher_or_auto
+:
+  AUTO
+  | route_distinguisher
+;
+
 route_map_name
 :
 // 1-63 chars

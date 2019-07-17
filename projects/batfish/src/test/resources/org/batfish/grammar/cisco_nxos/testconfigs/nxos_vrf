@@ -57,6 +57,19 @@ interface Ethernet1/5
 
 !!! Keep VRF definitions under default VRF configuration to avoid accidental leakage
 vrf context vrf1
+  vni 10001
+  rd 65001:10
+  address-family ipv4 unicast
+    route-target both auto evpn
+    route-target import 11:65536
+  address-family ipv6 unicast
+    route-target both 65001:11 evpn
+    route-target both auto
 
+!!! Has VXLAN config
 vrf context vrf3
+  vni 10003
+  ! overridden, should not show up.
+  rd 1.2.3.4:65535
+  rd auto
   shutdown

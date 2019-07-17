@@ -48,6 +48,7 @@ import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.UniverseIpSpace;
+import org.batfish.datamodel.bgp.RouteDistinguisher;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.grammar.BatfishParseTreeWalker;
 import org.batfish.grammar.ControlPlaneExtractor;
@@ -159,6 +160,8 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rmsapp_last_asContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rmsapp_literalContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rmsipnh_literalContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rmsipnh_unchangedContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Route_distinguisherContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Route_distinguisher_or_autoContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Route_map_nameContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Route_map_sequenceContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Route_networkContext;
@@ -181,7 +184,11 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Uint16Context;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Uint32Context;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Uint8Context;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_no_shutdownContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_rdContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_shutdownContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_vniContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vcaf4u_route_targetContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vcaf6u_route_targetContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vlan_idContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vlan_id_rangeContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vlan_vlanContext;
@@ -190,6 +197,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vrf_nameContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vv_vn_segmentContext;
 import org.batfish.representation.cisco_nxos.ActionIpAccessListLine;
 import org.batfish.representation.cisco_nxos.AddrGroupIpAddressSpec;
+import org.batfish.representation.cisco_nxos.AddressFamily;
 import org.batfish.representation.cisco_nxos.CiscoNxosConfiguration;
 import org.batfish.representation.cisco_nxos.CiscoNxosInterfaceType;
 import org.batfish.representation.cisco_nxos.CiscoNxosStructureType;
@@ -217,6 +225,7 @@ import org.batfish.representation.cisco_nxos.NveVni;
 import org.batfish.representation.cisco_nxos.PortGroupPortSpec;
 import org.batfish.representation.cisco_nxos.PortSpec;
 import org.batfish.representation.cisco_nxos.RemarkIpAccessListLine;
+import org.batfish.representation.cisco_nxos.RouteDistinguisherOrAuto;
 import org.batfish.representation.cisco_nxos.RouteMap;
 import org.batfish.representation.cisco_nxos.RouteMapEntry;
 import org.batfish.representation.cisco_nxos.RouteMapMatchAsPath;
@@ -242,6 +251,7 @@ import org.batfish.representation.cisco_nxos.TcpOptions;
 import org.batfish.representation.cisco_nxos.UdpOptions;
 import org.batfish.representation.cisco_nxos.Vlan;
 import org.batfish.representation.cisco_nxos.Vrf;
+import org.batfish.representation.cisco_nxos.VrfAddressFamily;
 import org.batfish.vendor.VendorConfiguration;
 
 @ParametersAreNonnullByDefault
@@ -403,6 +413,29 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
     } else {
       return toPrefix(ctx.prefix);
     }
+  }
+
+  private static @Nonnull RouteDistinguisher toRouteDistinguisher(Route_distinguisherContext ctx) {
+    if (ctx.hi0 != null) {
+      assert ctx.lo0 != null;
+      return RouteDistinguisher.from(toInteger(ctx.hi0), toLong(ctx.lo0));
+    } else if (ctx.hi1 != null) {
+      assert ctx.lo1 != null;
+      return RouteDistinguisher.from(toIp(ctx.hi1), toInteger(ctx.lo1));
+    } else {
+      assert ctx.hi2 != null;
+      assert ctx.lo2 != null;
+      return RouteDistinguisher.from(toLong(ctx.hi2), toInteger(ctx.lo2));
+    }
+  }
+
+  private static @Nonnull RouteDistinguisherOrAuto toRouteDistinguisher(
+      Route_distinguisher_or_autoContext ctx) {
+    if (ctx.AUTO() != null) {
+      return RouteDistinguisherOrAuto.auto();
+    }
+    assert ctx.route_distinguisher() != null;
+    return RouteDistinguisherOrAuto.of(toRouteDistinguisher(ctx.route_distinguisher()));
   }
 
   private CiscoNxosConfiguration _configuration;
@@ -1912,8 +1945,65 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   }
 
   @Override
+  public void exitVc_rd(Vc_rdContext ctx) {
+    _currentVrf.setRd(toRouteDistinguisher(ctx.rd));
+  }
+
+  @Override
   public void exitVc_shutdown(Vc_shutdownContext ctx) {
     _currentVrf.setShutdown(true);
+  }
+
+  @Override
+  public void exitVc_vni(Vc_vniContext ctx) {
+    Optional<Integer> vniOrError = toInteger(ctx, ctx.vni_number());
+    if (!vniOrError.isPresent()) {
+      return;
+    }
+    Integer vni = vniOrError.get();
+    _currentVrf.setVni(vni);
+  }
+
+  @Override
+  public void exitVcaf4u_route_target(Vcaf4u_route_targetContext ctx) {
+    VrfAddressFamily af = _currentVrf.getAddressFamily(AddressFamily.IPV4_UNICAST);
+    RouteDistinguisherOrAuto rd = toRouteDistinguisher(ctx.rd);
+    boolean setExport = ctx.BOTH() != null || ctx.EXPORT() != null;
+    boolean setImport = ctx.BOTH() != null || ctx.IMPORT() != null;
+    boolean evpn = ctx.EVPN() != null;
+    if (!evpn && setExport) {
+      af.setExportRt(rd);
+    }
+    if (evpn && setExport) {
+      af.setExportRtEvpn(rd);
+    }
+    if (!evpn && setImport) {
+      af.setImportRt(rd);
+    }
+    if (evpn && setImport) {
+      af.setImportRtEvpn(rd);
+    }
+  }
+
+  @Override
+  public void exitVcaf6u_route_target(Vcaf6u_route_targetContext ctx) {
+    VrfAddressFamily af = _currentVrf.getAddressFamily(AddressFamily.IPV6_UNICAST);
+    RouteDistinguisherOrAuto rd = toRouteDistinguisher(ctx.rd);
+    boolean setExport = ctx.BOTH() != null || ctx.EXPORT() != null;
+    boolean setImport = ctx.BOTH() != null || ctx.IMPORT() != null;
+    boolean evpn = ctx.EVPN() != null;
+    if (!evpn && setExport) {
+      af.setExportRt(rd);
+    }
+    if (evpn && setExport) {
+      af.setExportRtEvpn(rd);
+    }
+    if (!evpn && setImport) {
+      af.setImportRt(rd);
+    }
+    if (evpn && setImport) {
+      af.setImportRtEvpn(rd);
+    }
   }
 
   @Override

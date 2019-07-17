@@ -273,6 +273,11 @@ ATTRIBUTE_MAP
   'attribute-map'
 ;
 
+AUTO
+:
+  'auto'
+;
+
 AUTOSTATE
 :
   'autostate'
@@ -730,6 +735,11 @@ EXPLICIT_TRACKING
   'explicit-tracking'
 ;
 
+EXPORT
+:
+  'export'
+;
+
 EXTENDED
 :
   'extended'
@@ -982,6 +992,11 @@ IGNORE
 IMMEDIATE
 :
   'immediate'
+;
+
+IMPORT
+:
+  'import'
 ;
 
 IN
@@ -1728,6 +1743,11 @@ RANGE
   'range'
 ;
 
+RD
+:
+  'rd'
+;
+
 REASSEMBLY_TIMEOUT
 :
   'reassembly-timeout'
@@ -1841,6 +1861,11 @@ ROUTE_MAP
 ROUTE_REFLECTOR_CLIENT
 :
   'route-reflector-client'
+;
+
+ROUTE_TARGET
+:
+  'route-target'
 ;
 
 ROUTER

@@ -14,7 +14,9 @@ s_vrf_context
     | vc_ip
     | vc_no
     | vc_null
+    | vc_rd
     | vc_shutdown
+    | vc_vni
   )*
 ;
 
@@ -23,11 +25,19 @@ vc_address_family
   ADDRESS_FAMILY
   (
     (
-      IPV4 UNICAST NEWLINE vcaf4u_null*
+      IPV4 UNICAST NEWLINE
+      (
+        vcaf4u_null
+        | vcaf4u_route_target
+      )*
     )
     |
     (
-      IPV6 UNICAST NEWLINE vcaf6u_null*
+      IPV6 UNICAST NEWLINE
+      (
+        vcaf6u_null
+        | vcaf6u_route_target
+      )*
     )
   )
 ;
@@ -40,12 +50,22 @@ vcaf4u_null
   ) null_rest_of_line
 ;
 
+vcaf4u_route_target
+:
+  ROUTE_TARGET (BOTH | EXPORT | IMPORT) rd = route_distinguisher_or_auto EVPN? NEWLINE
+;
+
 vcaf6u_null
 :
   NO?
   (
     MAXIMUM
   ) null_rest_of_line
+;
+
+vcaf6u_route_target
+:
+  ROUTE_TARGET (BOTH | EXPORT | IMPORT) rd = route_distinguisher_or_auto EVPN? NEWLINE
 ;
 
 vc_ip
@@ -71,7 +91,17 @@ vc_null
   ) null_rest_of_line
 ;
 
+vc_rd
+:
+  RD rd = route_distinguisher_or_auto NEWLINE
+;
+
 vc_shutdown
 :
   SHUTDOWN NEWLINE
+;
+
+vc_vni
+:
+  VNI vni_number NEWLINE
 ;

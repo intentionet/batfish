@@ -91,6 +91,7 @@ import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
+import org.batfish.datamodel.bgp.RouteDistinguisher;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.matchers.RouteFilterListMatchers;
 import org.batfish.datamodel.matchers.VrfMatchers;
@@ -98,6 +99,7 @@ import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.representation.cisco_nxos.ActionIpAccessListLine;
 import org.batfish.representation.cisco_nxos.AddrGroupIpAddressSpec;
+import org.batfish.representation.cisco_nxos.AddressFamily;
 import org.batfish.representation.cisco_nxos.CiscoNxosConfiguration;
 import org.batfish.representation.cisco_nxos.CiscoNxosInterfaceType;
 import org.batfish.representation.cisco_nxos.CiscoNxosStructureType;
@@ -122,6 +124,7 @@ import org.batfish.representation.cisco_nxos.Nve.IngressReplicationProtocol;
 import org.batfish.representation.cisco_nxos.NveVni;
 import org.batfish.representation.cisco_nxos.PortGroupPortSpec;
 import org.batfish.representation.cisco_nxos.PortSpec;
+import org.batfish.representation.cisco_nxos.RouteDistinguisherOrAuto;
 import org.batfish.representation.cisco_nxos.RouteMap;
 import org.batfish.representation.cisco_nxos.RouteMapEntry;
 import org.batfish.representation.cisco_nxos.RouteMapMatchAsPath;
@@ -146,6 +149,7 @@ import org.batfish.representation.cisco_nxos.TcpOptions;
 import org.batfish.representation.cisco_nxos.UdpOptions;
 import org.batfish.representation.cisco_nxos.Vlan;
 import org.batfish.representation.cisco_nxos.Vrf;
+import org.batfish.representation.cisco_nxos.VrfAddressFamily;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -2591,10 +2595,30 @@ public final class CiscoNxosGrammarTest {
     {
       Vrf vrf = vc.getVrfs().get("vrf1");
       assertFalse(vrf.getShutdown());
+      assertThat(
+          vrf.getRd(), equalTo(RouteDistinguisherOrAuto.of(RouteDistinguisher.from(65001, 10L))));
+      VrfAddressFamily af4 = vrf.getAddressFamily(AddressFamily.IPV4_UNICAST);
+      assertThat(af4.getImportRtEvpn(), equalTo(RouteDistinguisherOrAuto.auto()));
+      assertThat(af4.getExportRtEvpn(), equalTo(RouteDistinguisherOrAuto.auto()));
+      assertThat(
+          af4.getImportRt(),
+          equalTo(RouteDistinguisherOrAuto.of(RouteDistinguisher.from(11, 65536L))));
+      assertThat(af4.getExportRt(), nullValue());
+
+      VrfAddressFamily af6 = vrf.getAddressFamily(AddressFamily.IPV6_UNICAST);
+      assertThat(
+          af6.getImportRtEvpn(),
+          equalTo(RouteDistinguisherOrAuto.of(RouteDistinguisher.from(65001, 11L))));
+      assertThat(
+          af6.getExportRtEvpn(),
+          equalTo(RouteDistinguisherOrAuto.of(RouteDistinguisher.from(65001, 11L))));
+      assertThat(af6.getImportRt(), equalTo(RouteDistinguisherOrAuto.auto()));
+      assertThat(af6.getExportRt(), equalTo(RouteDistinguisherOrAuto.auto()));
     }
     {
       Vrf vrf = vc.getVrfs().get("vrf3");
       assertTrue(vrf.getShutdown());
+      assertThat(vrf.getRd(), equalTo(RouteDistinguisherOrAuto.auto()));
     }
 
     assertThat(
