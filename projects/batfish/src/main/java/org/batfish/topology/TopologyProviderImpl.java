@@ -19,6 +19,7 @@ import org.batfish.common.topology.Layer1Topology;
 import org.batfish.common.topology.Layer2Topology;
 import org.batfish.common.topology.TopologyProvider;
 import org.batfish.common.topology.TopologyUtil;
+import org.batfish.common.topology.TunnelTopology;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.Topology;
@@ -130,6 +131,12 @@ public final class TopologyProviderImpl implements TopologyProvider {
     }
   }
 
+  @Nonnull
+  @Override
+  public TunnelTopology getInitialTunnelTopology(NetworkSnapshot snapshot) {
+    return _initialTunnelTopologies.getUnchecked(snapshot);
+  }
+
   ///////////////////////////////////////////////////////////////////////////////////////////////
   // PRIVATE IMPLEMENTATION
   ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,6 +198,11 @@ public final class TopologyProviderImpl implements TopologyProvider {
       CacheBuilder.newBuilder()
           .maximumSize(MAX_CACHED_SNAPSHOTS)
           .build(CacheLoader.from(this::computeInitialIpsecTopology));
+  private final LoadingCache<NetworkSnapshot, TunnelTopology> _initialTunnelTopologies =
+      CacheBuilder.newBuilder()
+          .maximumSize(MAX_CACHED_SNAPSHOTS)
+          .build(CacheLoader.from(this::computeInitialTunnelTopology));
+
   private final LoadingCache<NetworkSnapshot, VxlanTopology> _initialVxlanTopologies =
       CacheBuilder.newBuilder()
           .maximumSize(MAX_CACHED_SNAPSHOTS)
@@ -317,6 +329,16 @@ public final class TopologyProviderImpl implements TopologyProvider {
       return OspfTopologyUtils.computeOspfTopology(
           NetworkConfigurations.of(_batfish.loadConfigurations(snapshot)),
           getLayer3Topology(snapshot));
+    }
+  }
+
+  private @Nonnull TunnelTopology computeInitialTunnelTopology(NetworkSnapshot snapshot) {
+    try (ActiveSpan span =
+        GlobalTracer.get()
+            .buildSpan("TopologyProviderImpl::computeInitialTunnelTopology")
+            .startActive()) {
+      assert span != null; // avoid unused warning
+      return TopologyUtil.computeInitialTunnelTopology(_batfish.loadConfigurations(snapshot));
     }
   }
 

@@ -8,6 +8,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.topology.Layer1Topology;
 import org.batfish.common.topology.Layer2Topology;
 import org.batfish.common.topology.TopologyContainer;
+import org.batfish.common.topology.TunnelTopology;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.bgp.BgpTopology;
 import org.batfish.datamodel.eigrp.EigrpTopology;
@@ -31,6 +32,7 @@ public final class TopologyContext implements TopologyContainer {
     private @Nonnull Topology _layer3Topology;
     private @Nonnull OspfTopology _ospfTopology;
     private @Nonnull Optional<Layer1Topology> _rawLayer1PhysicalTopology;
+    @Nonnull private TunnelTopology _tunnelTopology;
     private @Nonnull VxlanTopology _vxlanTopology;
 
     public @Nonnull TopologyContext build() {
@@ -44,6 +46,7 @@ public final class TopologyContext implements TopologyContainer {
           _layer3Topology,
           _ospfTopology,
           _rawLayer1PhysicalTopology,
+          _tunnelTopology,
           _vxlanTopology);
     }
 
@@ -57,6 +60,7 @@ public final class TopologyContext implements TopologyContainer {
       _layer3Topology = Topology.EMPTY;
       _ospfTopology = OspfTopology.EMPTY;
       _rawLayer1PhysicalTopology = Optional.empty();
+      _tunnelTopology = TunnelTopology.EMPTY;
       _vxlanTopology = VxlanTopology.EMPTY;
     }
 
@@ -107,6 +111,11 @@ public final class TopologyContext implements TopologyContainer {
       return this;
     }
 
+    public Builder setTunnelTopology(TunnelTopology tunnelTopology) {
+      _tunnelTopology = tunnelTopology;
+      return this;
+    }
+
     public @Nonnull Builder setVxlanTopology(VxlanTopology vxlanTopology) {
       _vxlanTopology = vxlanTopology;
       return this;
@@ -126,6 +135,7 @@ public final class TopologyContext implements TopologyContainer {
   private final @Nonnull Topology _layer3Topology;
   private final @Nonnull OspfTopology _ospfTopology;
   private final @Nonnull Optional<Layer1Topology> _rawLayer1PhysicalTopology;
+  @Nonnull private final TunnelTopology _tunnelTopology;
   private final @Nonnull VxlanTopology _vxlanTopology;
 
   private TopologyContext(
@@ -138,6 +148,7 @@ public final class TopologyContext implements TopologyContainer {
       Topology layer3Topology,
       OspfTopology ospfTopology,
       Optional<Layer1Topology> rawLayer1PhysicalTopology,
+      TunnelTopology tunnelTopology,
       VxlanTopology vxlanTopology) {
     _bgpTopology = bgpTopology;
     _eigrpTopology = eigrpTopology;
@@ -149,6 +160,7 @@ public final class TopologyContext implements TopologyContainer {
     _ospfTopology = ospfTopology;
     _rawLayer1PhysicalTopology = rawLayer1PhysicalTopology;
     _vxlanTopology = vxlanTopology;
+    _tunnelTopology = tunnelTopology;
   }
 
   @Override
@@ -199,6 +211,12 @@ public final class TopologyContext implements TopologyContainer {
   }
 
   @Override
+  @Nonnull
+  public TunnelTopology getTunnelTopology() {
+    return _tunnelTopology;
+  }
+
+  @Override
   public boolean equals(@Nullable Object obj) {
     if (this == obj) {
       return true;
@@ -216,6 +234,7 @@ public final class TopologyContext implements TopologyContainer {
         && _layer3Topology.equals(rhs._layer3Topology)
         && _ospfTopology.equals(rhs._ospfTopology)
         && _rawLayer1PhysicalTopology.equals(rhs._rawLayer1PhysicalTopology)
+        && _tunnelTopology.equals(rhs._tunnelTopology)
         && _vxlanTopology.equals(rhs._vxlanTopology);
   }
 
@@ -231,6 +250,7 @@ public final class TopologyContext implements TopologyContainer {
         _layer3Topology,
         _ospfTopology,
         _rawLayer1PhysicalTopology,
+        _tunnelTopology,
         _vxlanTopology);
   }
 
@@ -245,6 +265,7 @@ public final class TopologyContext implements TopologyContainer {
         .setLayer3Topology(_layer3Topology)
         .setOspfTopology(_ospfTopology)
         .setRawLayer1PhysicalTopology(_rawLayer1PhysicalTopology)
+        .setTunnelTopology(_tunnelTopology)
         .setVxlanTopology(_vxlanTopology);
   }
 }

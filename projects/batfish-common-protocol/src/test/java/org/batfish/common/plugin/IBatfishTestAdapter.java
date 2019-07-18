@@ -20,6 +20,7 @@ import org.batfish.common.topology.Layer1Topology;
 import org.batfish.common.topology.Layer2Topology;
 import org.batfish.common.topology.TopologyProvider;
 import org.batfish.common.topology.TopologyUtil;
+import org.batfish.common.topology.TunnelTopology;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.DataPlane;
@@ -88,6 +89,12 @@ public class IBatfishTestAdapter implements IBatfish {
 
     @Override
     public VxlanTopology getVxlanTopology(NetworkSnapshot snapshot) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Nonnull
+    @Override
+    public TunnelTopology getInitialTunnelTopology(NetworkSnapshot snapshot) {
       throw new UnsupportedOperationException();
     }
 

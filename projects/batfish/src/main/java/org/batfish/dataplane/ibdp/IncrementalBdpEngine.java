@@ -4,6 +4,7 @@ import static org.batfish.common.topology.IpOwners.computeIpNodeOwners;
 import static org.batfish.common.topology.TopologyUtil.computeLayer2Topology;
 import static org.batfish.common.topology.TopologyUtil.computeLayer3Topology;
 import static org.batfish.common.topology.TopologyUtil.computeRawLayer3Topology;
+import static org.batfish.common.topology.TopologyUtil.pruneUnreachableTunnelEdges;
 import static org.batfish.common.util.CollectionUtil.toImmutableSortedMap;
 import static org.batfish.common.util.IpsecUtil.retainReachableIpsecEdges;
 import static org.batfish.common.util.IpsecUtil.toEdgeSet;
@@ -14,6 +15,7 @@ import static org.batfish.dataplane.rib.AbstractRib.importRib;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import io.opentracing.ActiveSpan;
 import io.opentracing.util.GlobalTracer;
 import java.util.HashMap;
@@ -31,6 +33,8 @@ import org.batfish.common.Version;
 import org.batfish.common.plugin.DataPlanePlugin.ComputeDataPlaneResult;
 import org.batfish.common.plugin.TracerouteEngine;
 import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.TopologyUtil;
+import org.batfish.common.topology.TunnelTopology;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.Bgpv4Route;
@@ -89,6 +93,7 @@ class IncrementalBdpEngine {
                   IsisTopology.initIsisTopology(
                       configurations, callerTopologyContext.getLayer3Topology()))
               .setVxlanTopology(VxlanTopologyUtils.computeVxlanTopology(configurations))
+              .setTunnelTopology(TopologyUtil.computeInitialTunnelTopology(configurations))
               .build();
 
       // Generate our nodes, keyed by name, sorted for determinism
@@ -148,6 +153,14 @@ class IncrementalBdpEngine {
               currentTopologyContext
                   .getLayer1LogicalTopology()
                   .map(l1 -> computeLayer2Topology(l1, newVxlanTopology, configurations));
+
+          // Tunnel topology
+          TunnelTopology newTunnelTopology =
+              pruneUnreachableTunnelEdges(
+                  initialTopologyContext.getTunnelTopology(),
+                  networkConfigurations,
+                  trEngCurrentL3Topogy);
+
           // Layer-3
           Topology newLayer3Topology =
               computeLayer3Topology(
@@ -156,7 +169,9 @@ class IncrementalBdpEngine {
                       initialTopologyContext.getLayer1LogicalTopology(),
                       newLayer2Topology,
                       configurations),
-                  toEdgeSet(newIpsecTopology, configurations));
+                  // Overlay edges consist of "plain" tunnels and IPSec tunnels
+                  Sets.union(
+                      toEdgeSet(newIpsecTopology, configurations), newTunnelTopology.asEdgeSet()));
 
           // Initialize BGP topology
           BgpTopology newBgpTopology =
@@ -175,6 +190,7 @@ class IncrementalBdpEngine {
                   .setLayer3Topology(newLayer3Topology)
                   .setVxlanTopology(newVxlanTopology)
                   .setIpsecTopology(newIpsecTopology)
+                  .setTunnelTopology(newTunnelTopology)
                   .build();
 
           boolean isOscillating =

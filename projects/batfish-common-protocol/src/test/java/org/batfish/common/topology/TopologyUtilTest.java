@@ -2,6 +2,7 @@ package org.batfish.common.topology;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.batfish.common.topology.IpOwners.computeIpInterfaceOwners;
+import static org.batfish.common.topology.TopologyUtil.computeInitialTunnelTopology;
 import static org.batfish.common.topology.TopologyUtil.computeLayer1LogicalTopology;
 import static org.batfish.common.topology.TopologyUtil.computeLayer1PhysicalTopology;
 import static org.batfish.common.topology.TopologyUtil.computeLayer2SelfEdges;
@@ -1376,5 +1377,35 @@ public final class TopologyUtilTest {
             new NodeInterfacePair(c1.getHostname(), i1.getName()),
             new NodeInterfacePair(c2.getHostname(), i2.getName()));
     assertThat(t.getEdges(), containsInAnyOrder(edge, edge.reverse()));
+  }
+
+  @Test
+  public void testComputeInitialTunnelTopology() {
+    _cb.setConfigurationFormat(ConfigurationFormat.CISCO_IOS);
+    Configuration c1 = _cb.build();
+    Configuration c2 = _cb.build();
+    Ip ip1 = Ip.parse("1.1.1.1");
+    Ip ip2 = Ip.parse("1.1.1.2");
+    Ip ip3 = Ip.parse("1.1.1.3");
+    int subnetMask = 24;
+    Interface i1 =
+        _ib.setOwner(c1)
+            .setAddress(ConcreteInterfaceAddress.create(ip1, subnetMask))
+            .setType(InterfaceType.TUNNEL)
+            .build();
+    Interface i2 =
+        _ib.setOwner(c2)
+            .setAddress(ConcreteInterfaceAddress.create(ip2, subnetMask))
+            .setType(InterfaceType.TUNNEL)
+            .build();
+    _ib.setOwner(c2)
+        .setAddress(ConcreteInterfaceAddress.create(ip3, subnetMask))
+        .setType(InterfaceType.PHYSICAL)
+        .build();
+
+    assertThat(
+        computeInitialTunnelTopology(ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2))
+            .asEdgeSet(),
+        containsInAnyOrder(new Edge(i1, i2), new Edge(i2, i1)));
   }
 }

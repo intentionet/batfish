@@ -23,17 +23,22 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.batfish.common.plugin.TracerouteEngine;
+import org.batfish.common.topology.TunnelTopology.Builder;
 import org.batfish.common.util.CollectionUtil;
 import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Edge;
+import org.batfish.datamodel.Flow;
+import org.batfish.datamodel.FlowDisposition;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Interface.DependencyType;
 import org.batfish.datamodel.InterfaceType;
@@ -45,6 +50,7 @@ import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.collections.NodeInterfacePair;
+import org.batfish.datamodel.flow.TraceAndReverseFlow;
 import org.batfish.datamodel.ipsec.IpsecTopology;
 import org.batfish.datamodel.vxlan.VxlanNode;
 import org.batfish.datamodel.vxlan.VxlanTopology;
@@ -557,6 +563,55 @@ public final class TopologyUtil {
    * <p>Ignores {@code Loopback} interfaces and inactive interfaces.
    */
   public static Topology synthesizeL3Topology(Map<String, Configuration> configurations) {
+    Map<Prefix, List<Interface>> prefixInterfaces = computeInterfacesBucketByPrefix(configurations);
+
+    ImmutableSortedSet.Builder<Edge> edges = ImmutableSortedSet.naturalOrder();
+    for (Entry<Prefix, List<Interface>> bucketEntry : prefixInterfaces.entrySet()) {
+      Prefix p = bucketEntry.getKey();
+      Set<Interface> candidateInterfaces = candidateInterfacesForPrefix(prefixInterfaces, p);
+
+      for (Interface iface1 : bucketEntry.getValue()) {
+        for (Interface iface2 : candidateInterfaces) {
+          // No device self-adjacencies in the same VRF.
+          if (!isValidLayer3Adjacency(iface1, iface2)) {
+            continue;
+          }
+          // Additionally, don't connect if any of the two endpoint interfaces have Tunnel or VPN
+          // interfaceTypes
+          if (TUNNEL_INTERFACE_TYPES.contains(iface1.getInterfaceType())
+              || TUNNEL_INTERFACE_TYPES.contains(iface2.getInterfaceType())) {
+            continue;
+          }
+          edges.add(new Edge(iface1, iface2));
+        }
+      }
+    }
+    return new Topology(edges.build());
+  }
+
+  /**
+   * Collect all interfaces that have subnets overlapping P iff they have an IP address in P. Use an
+   * IdentityHashSet to prevent duplicates.
+   */
+  @Nonnull
+  private static Set<Interface> candidateInterfacesForPrefix(
+      Map<Prefix, List<Interface>> prefixBuckets, Prefix p) {
+    Set<Interface> candidateInterfaces = Sets.newIdentityHashSet();
+    IntStream.range(0, Prefix.MAX_PREFIX_LENGTH)
+        .mapToObj(
+            i -> prefixBuckets.getOrDefault(Prefix.create(p.getStartIp(), i), ImmutableList.of()))
+        .flatMap(Collection::stream)
+        .filter(
+            iface ->
+                iface.getAllConcreteAddresses().stream().anyMatch(ia -> p.containsIp(ia.getIp())))
+        .forEach(candidateInterfaces::add);
+    return candidateInterfaces;
+  }
+
+  /** Bucket Interfaces that are not loopbacks and not /32s by their prefix */
+  @Nonnull
+  private static Map<Prefix, List<Interface>> computeInterfacesBucketByPrefix(
+      Map<String, Configuration> configurations) {
     Map<Prefix, List<Interface>> prefixInterfaces = new HashMap<>();
     configurations.forEach(
         (nodeName, node) -> {
@@ -575,47 +630,20 @@ public final class TopologyUtil {
             }
           }
         });
+    return prefixInterfaces;
+  }
 
-    ImmutableSortedSet.Builder<Edge> edges = ImmutableSortedSet.naturalOrder();
-    for (Entry<Prefix, List<Interface>> bucketEntry : prefixInterfaces.entrySet()) {
-      Prefix p = bucketEntry.getKey();
-
-      // Collect all interfaces that have subnets overlapping P iff they have an IP address in P.
-      // Use an IdentityHashSet to prevent duplicates.
-      Set<Interface> candidateInterfaces = Sets.newIdentityHashSet();
-      IntStream.range(0, Prefix.MAX_PREFIX_LENGTH)
-          .mapToObj(
-              i ->
-                  prefixInterfaces.getOrDefault(
-                      Prefix.create(p.getStartIp(), i), ImmutableList.of()))
-          .flatMap(Collection::stream)
-          .filter(
-              iface ->
-                  iface.getAllConcreteAddresses().stream().anyMatch(ia -> p.containsIp(ia.getIp())))
-          .forEach(candidateInterfaces::add);
-
-      for (Interface iface1 : bucketEntry.getValue()) {
-        for (Interface iface2 : candidateInterfaces) {
-          // No device self-adjacencies in the same VRF.
-          if (iface1.getOwner() == iface2.getOwner()
-              && iface1.getVrfName().equals(iface2.getVrfName())) {
-            continue;
-          }
-
-          // Don't connect interfaces that have any IP address in common
-          if (haveIpInCommon(iface1, iface2)) {
-            continue;
-          }
-          // don't connect if any of the two endpoint interfaces have Tunnel or VPN interfaceTypes
-          if (TUNNEL_INTERFACE_TYPES.contains(iface1.getInterfaceType())
-              || TUNNEL_INTERFACE_TYPES.contains(iface2.getInterfaceType())) {
-            continue;
-          }
-          edges.add(new Edge(iface1, iface2));
-        }
-      }
+  /**
+   * Check if the link between two given interfaces is a valid layer 3 edge (e.g., not a self loop,
+   * doesn't have overlapping IPs)
+   */
+  private static boolean isValidLayer3Adjacency(Interface iface1, Interface iface2) {
+    // No device self-adjacencies in the same VRF.
+    if (iface1.getOwner() == iface2.getOwner() && iface1.getVrfName().equals(iface2.getVrfName())) {
+      return false;
     }
-    return new Topology(edges.build());
+    // Don't connect interfaces that have any IP address in common
+    return !haveIpInCommon(iface1, iface2);
   }
 
   public static @Nonnull Layer1Topology computeLayer1LogicalTopology(
@@ -625,5 +653,93 @@ public final class TopologyUtil {
             .map(pEdge -> pEdge.toLogicalEdge(NetworkConfigurations.of(configurations)))
             .filter(Objects::nonNull)
             .collect(ImmutableSet.toImmutableSet()));
+  }
+
+  /**
+   * Compute candidate tunnel topology (see {@link TunnelTopology} for definition). Includes all
+   * possibly valid edges (according to IP addresse and interface types), but not verified using
+   * reachability checks.
+   */
+  @Nonnull
+  public static TunnelTopology computeInitialTunnelTopology(
+      Map<String, Configuration> configurations) {
+    Map<Prefix, List<Interface>> prefixInterfaces = computeInterfacesBucketByPrefix(configurations);
+    TunnelTopology.Builder builder = TunnelTopology.builder();
+    for (Entry<Prefix, List<Interface>> bucketEntry : prefixInterfaces.entrySet()) {
+      Prefix p = bucketEntry.getKey();
+      Set<Interface> candidateInterfaces = candidateInterfacesForPrefix(prefixInterfaces, p);
+
+      for (Interface iface1 : bucketEntry.getValue()) {
+        for (Interface iface2 : candidateInterfaces) {
+          if (!isValidLayer3Adjacency(iface1, iface2)) {
+            continue;
+          }
+
+          // connect only if of both of the endpoints have Tunnel interface type
+          if (iface1.getInterfaceType() == InterfaceType.TUNNEL
+              && iface2.getInterfaceType() == InterfaceType.TUNNEL) {
+            builder.add(new NodeInterfacePair(iface1), new NodeInterfacePair(iface2));
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+
+  /** Return a {@link TunnelTopology} where tunnel endpoints can reach each other. */
+  @Nonnull
+  public static TunnelTopology pruneUnreachableTunnelEdges(
+      TunnelTopology initialTunnelTopology,
+      NetworkConfigurations configurations,
+      TracerouteEngine tracerouteEngine) {
+    Builder builder = TunnelTopology.builder();
+    initialTunnelTopology
+        .getGraph()
+        .edges()
+        .forEach(
+            edge -> {
+              if (tracerouteForTunnelEdge(configurations, tracerouteEngine, edge)) {
+                builder.add(edge.nodeU(), edge.nodeV());
+              }
+            });
+    return builder.build();
+  }
+
+  /** Traceroute between two tunnel interfaces. Returns true if traceroute succeeds. */
+  private static boolean tracerouteForTunnelEdge(
+      NetworkConfigurations configurations,
+      TracerouteEngine tracerouteEngine,
+      EndpointPair<NodeInterfacePair> edge) {
+    NodeInterfacePair src = edge.nodeU();
+    NodeInterfacePair dst = edge.nodeV();
+    Interface startInterface =
+        configurations
+            .getInterface(src.getHostname(), src.getInterface())
+            .orElseThrow(
+                () -> new IllegalStateException(String.format("Invalid tunnel interface %s", src)));
+    Interface dstInterface =
+        configurations
+            .getInterface(dst.getHostname(), dst.getInterface())
+            .orElseThrow(
+                () -> new IllegalStateException(String.format("Invalid tunnel interface %s", dst)));
+    // TODO: see if traceroute flow needs to be customized (ICMP ping? some GRE port?
+    //   something else?)
+    Flow flow =
+        Flow.builder()
+            .setTag("Tunnel reachability check")
+            .setIngressNode(src.getHostname())
+            .setIngressVrf(startInterface.getVrfName())
+            .setDstIp(dstInterface.getConcreteAddress().getIp())
+            .build();
+    SortedMap<Flow, List<TraceAndReverseFlow>> tracerouteResult =
+        tracerouteEngine.computeTracesAndReverseFlows(ImmutableSet.of(flow), false);
+    List<TraceAndReverseFlow> traceAndReverseFlows = tracerouteResult.get(flow);
+    return traceAndReverseFlows != null
+        && traceAndReverseFlows.stream().anyMatch(TopologyUtil::isSuccessfulFlow);
+  }
+
+  private static boolean isSuccessfulFlow(TraceAndReverseFlow tr) {
+    return tr.getTrace().getDisposition() == FlowDisposition.ACCEPTED
+        && tr.getReverseFlow() != null;
   }
 }

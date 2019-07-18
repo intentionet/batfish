@@ -134,4 +134,7 @@ public interface TopologyProvider {
    */
   @Nonnull
   VxlanTopology getVxlanTopology(NetworkSnapshot snapshot);
+
+  @Nonnull
+  TunnelTopology getInitialTunnelTopology(NetworkSnapshot snapshot);
 }

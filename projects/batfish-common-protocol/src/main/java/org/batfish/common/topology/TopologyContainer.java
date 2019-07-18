@@ -33,4 +33,8 @@ public interface TopologyContainer {
 
   @Nonnull
   VxlanTopology getVxlanTopology();
+
+  /** See {@link TunnelTopology} */
+  @Nonnull
+  TunnelTopology getTunnelTopology();
 }

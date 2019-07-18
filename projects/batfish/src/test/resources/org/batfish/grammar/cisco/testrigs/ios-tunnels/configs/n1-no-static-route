@@ -1,0 +1,12 @@
+!
+!
+hostname n1-no-static-route
+!
+interface TenGigabitEthernet0/0
+  ip address 1.1.1.1 255.255.255.0
+!
+interface Tunnel1
+  ip address 9.9.9.1 255.255.255.0
+  tunnel source TenGigabitEthernet0/0
+  tunnel destination 1.1.1.2
+  tunnel mode gre ipv4
