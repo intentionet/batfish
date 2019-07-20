@@ -155,6 +155,7 @@ import org.batfish.datamodel.answers.RunAnalysisAnswerElement;
 import org.batfish.datamodel.collections.BgpAdvertisementsByVrf;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.collections.RoutesByVrf;
+import org.batfish.datamodel.eigrp.EigrpTopologyUtils;
 import org.batfish.datamodel.flow.Trace;
 import org.batfish.datamodel.flow.TraceWrapperAsAnswerElement;
 import org.batfish.datamodel.isp_configuration.IspConfiguration;
@@ -2255,8 +2256,10 @@ public class Batfish extends PluginConsumer implements IBatfish {
   private void postProcessSnapshot(Map<String, Configuration> configurations) {
     updateBlacklistedAndInactiveConfigs(configurations);
     postProcessAggregatedInterfaces(configurations);
-    OspfTopologyUtils.initNeighborConfigs(NetworkConfigurations.of(configurations));
+    NetworkConfigurations nc = NetworkConfigurations.of(configurations);
+    OspfTopologyUtils.initNeighborConfigs(nc);
     postProcessOspfCosts(configurations);
+    EigrpTopologyUtils.initNeighborConfigs(nc);
     computeAndStoreCompletionMetadata(configurations);
   }
 

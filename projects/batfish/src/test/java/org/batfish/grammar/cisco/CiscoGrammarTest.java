@@ -352,6 +352,7 @@ import org.batfish.datamodel.bgp.BgpTopologyUtils;
 import org.batfish.datamodel.bgp.community.Community;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.eigrp.EigrpMetric;
+import org.batfish.datamodel.eigrp.EigrpNeighborConfig;
 import org.batfish.datamodel.eigrp.EigrpProcessMode;
 import org.batfish.datamodel.matchers.CommunityListLineMatchers;
 import org.batfish.datamodel.matchers.CommunityListMatchers;
@@ -2588,6 +2589,40 @@ public class CiscoGrammarTest {
     Configuration c = parseConfig("ios-eigrp-distribute-list");
 
     assertThat(c.getRouteFilterLists(), hasKey("2"));
+  }
+
+  @Test
+  public void testIosEigrpNeighborConfigs() throws IOException {
+    Configuration c = parseConfig("ios-eigrp-classic");
+
+    assertThat(
+        c.getDefaultVrf().getEigrpProcesses().get(1L).getNeighbors(),
+        equalTo(
+            ImmutableMap.of(
+                "Ethernet0",
+                    EigrpNeighborConfig.builder()
+                        .setInterfaceName("Ethernet0")
+                        .setPassive(false)
+                        .setHostname("ios-eigrp-classic")
+                        .setVrfName("default")
+                        .setIp(Ip.parse("10.0.0.1"))
+                        .build(),
+                "Ethernet1",
+                    EigrpNeighborConfig.builder()
+                        .setInterfaceName("Ethernet1")
+                        .setPassive(false)
+                        .setHostname("ios-eigrp-classic")
+                        .setVrfName("default")
+                        .setIp(Ip.parse("10.0.1.1"))
+                        .build(),
+                "Ethernet2",
+                    EigrpNeighborConfig.builder()
+                        .setInterfaceName("Ethernet2")
+                        .setPassive(true)
+                        .setHostname("ios-eigrp-classic")
+                        .setVrfName("default")
+                        .setIp(Ip.parse("10.0.2.1"))
+                        .build())));
   }
 
   @Test

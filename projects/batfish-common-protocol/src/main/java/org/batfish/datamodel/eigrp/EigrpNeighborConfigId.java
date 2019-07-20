@@ -17,46 +17,45 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.NetworkConfigurations;
 
 /**
- * Represents a configured EIGRP interface, at the control plane level. Hostname, prefix, and VRF
- * uniquely define the interface and process, even in the presence of misconfiguration.
+ * Uniquely identifies an {@link EigrpNeighborConfig EIGRP neighbor configuration} in the network.
  */
 @ParametersAreNonnullByDefault
-public class EigrpInterface implements Serializable, Comparable<EigrpInterface> {
+public class EigrpNeighborConfigId implements Serializable, Comparable<EigrpNeighborConfigId> {
 
   private static final String PROP_HOSTNAME = "hostname";
   private static final String PROP_INTERFACE = "interface";
   private static final String PROP_VRF = "vrf";
 
-  private final String _hostname;
-  private final String _interfaceName;
-  private final String _vrfName;
+  @Nonnull private final String _hostname;
+  @Nonnull private final String _interfaceName;
+  @Nonnull private final String _vrfName;
 
-  public EigrpInterface(String hostname, String interfaceName, String vrfName) {
+  public EigrpNeighborConfigId(String hostname, String interfaceName, String vrfName) {
     _hostname = hostname;
     _interfaceName = interfaceName;
     _vrfName = vrfName;
   }
 
   @JsonCreator
-  private static EigrpInterface create(
+  private static EigrpNeighborConfigId create(
       @Nullable @JsonProperty(PROP_HOSTNAME) String hostname,
       @Nullable @JsonProperty(PROP_INTERFACE) String iface,
       @Nullable @JsonProperty(PROP_VRF) String vrf) {
     checkArgument(hostname != null, "Missing %s", PROP_HOSTNAME);
     checkArgument(iface != null, "Missing %s", PROP_INTERFACE);
     checkArgument(vrf != null, "Missing %s", PROP_VRF);
-    return new EigrpInterface(hostname, iface, vrf);
+    return new EigrpNeighborConfigId(hostname, iface, vrf);
   }
 
-  public EigrpInterface(String hostname, Interface iface) {
+  public EigrpNeighborConfigId(String hostname, Interface iface) {
     this(hostname, iface.getName(), iface.getVrfName());
   }
 
   @Override
-  public int compareTo(EigrpInterface o) {
-    return Comparator.comparing(EigrpInterface::getHostname)
-        .thenComparing(EigrpInterface::getInterfaceName)
-        .thenComparing(EigrpInterface::getVrf)
+  public int compareTo(EigrpNeighborConfigId o) {
+    return Comparator.comparing(EigrpNeighborConfigId::getHostname)
+        .thenComparing(EigrpNeighborConfigId::getInterfaceName)
+        .thenComparing(EigrpNeighborConfigId::getVrf)
         .compare(this, o);
   }
 
@@ -65,10 +64,10 @@ public class EigrpInterface implements Serializable, Comparable<EigrpInterface> 
     if (this == o) {
       return true;
     }
-    if (!(o instanceof EigrpInterface)) {
+    if (!(o instanceof EigrpNeighborConfigId)) {
       return false;
     }
-    EigrpInterface rhs = (EigrpInterface) o;
+    EigrpNeighborConfigId rhs = (EigrpNeighborConfigId) o;
     return _hostname.equals(rhs._hostname)
         && _interfaceName.equals(rhs._interfaceName)
         && _vrfName.equals(rhs._vrfName);

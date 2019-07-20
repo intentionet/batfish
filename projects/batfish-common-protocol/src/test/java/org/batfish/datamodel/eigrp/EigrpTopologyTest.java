@@ -16,10 +16,10 @@ import org.junit.Test;
 public final class EigrpTopologyTest {
 
   private static @Nonnull EigrpTopology nonTrivialTopology() {
-    MutableNetwork<EigrpInterface, EigrpEdge> network =
+    MutableNetwork<EigrpNeighborConfigId, EigrpEdge> network =
         NetworkBuilder.directed().allowsParallelEdges(false).allowsSelfLoops(false).build();
-    EigrpInterface n1 = new EigrpInterface("a", "b", "c");
-    EigrpInterface n2 = new EigrpInterface("d", "e", "f");
+    EigrpNeighborConfigId n1 = new EigrpNeighborConfigId("a", "b", "c");
+    EigrpNeighborConfigId n2 = new EigrpNeighborConfigId("d", "e", "f");
     network.addEdge(n1, n2, new EigrpEdge(n1, n2));
     return new EigrpTopology(network);
   }

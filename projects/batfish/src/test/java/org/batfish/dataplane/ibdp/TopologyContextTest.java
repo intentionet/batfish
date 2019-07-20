@@ -28,7 +28,7 @@ import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.bgp.BgpTopology;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.eigrp.EigrpEdge;
-import org.batfish.datamodel.eigrp.EigrpInterface;
+import org.batfish.datamodel.eigrp.EigrpNeighborConfigId;
 import org.batfish.datamodel.eigrp.EigrpTopology;
 import org.batfish.datamodel.ipsec.IpsecTopology;
 import org.batfish.datamodel.isis.IsisEdge;
@@ -57,8 +57,9 @@ public final class TopologyContextTest {
         new IpsecPeerConfigId("a", "b"),
         new IpsecPeerConfigId("c", "d"),
         IpsecSession.builder().build());
-    MutableNetwork<EigrpInterface, EigrpEdge> eigrpTopology = NetworkBuilder.directed().build();
-    eigrpTopology.addNode(new EigrpInterface("a", "b", "c"));
+    MutableNetwork<EigrpNeighborConfigId, EigrpEdge> eigrpTopology =
+        NetworkBuilder.directed().build();
+    eigrpTopology.addNode(new EigrpNeighborConfigId("a", "b", "c"));
     MutableNetwork<IsisNode, IsisEdge> isisTopology = NetworkBuilder.directed().build();
     isisTopology.addNode(new IsisNode("a", "b"));
     MutableValueGraph<OspfNeighborConfigId, OspfSessionProperties> ospfTopology =
@@ -116,8 +117,9 @@ public final class TopologyContextTest {
     MutableValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
         ValueGraphBuilder.directed().build();
     bgpTopology.addNode(new BgpPeerConfigId("a", "b", "c"));
-    MutableNetwork<EigrpInterface, EigrpEdge> eigrpTopology = NetworkBuilder.directed().build();
-    eigrpTopology.addNode(new EigrpInterface("a", "b", "c"));
+    MutableNetwork<EigrpNeighborConfigId, EigrpEdge> eigrpTopology =
+        NetworkBuilder.directed().build();
+    eigrpTopology.addNode(new EigrpNeighborConfigId("a", "b", "c"));
     MutableValueGraph<IpsecPeerConfigId, IpsecSession> ipsecTopology =
         ValueGraphBuilder.directed().allowsSelfLoops(false).build();
     ipsecTopology.putEdgeValue(

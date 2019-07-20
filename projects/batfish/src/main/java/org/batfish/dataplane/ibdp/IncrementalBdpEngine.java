@@ -45,7 +45,7 @@ import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.answers.IncrementalBdpAnswerElement;
 import org.batfish.datamodel.bgp.BgpTopology;
-import org.batfish.datamodel.eigrp.EigrpTopology;
+import org.batfish.datamodel.eigrp.EigrpTopologyUtils;
 import org.batfish.datamodel.ipsec.IpsecTopology;
 import org.batfish.datamodel.isis.IsisTopology;
 import org.batfish.datamodel.ospf.OspfTopology;
@@ -87,7 +87,7 @@ class IncrementalBdpEngine {
           callerTopologyContext
               .toBuilder()
               .setEigrpTopology(
-                  EigrpTopology.initEigrpTopology(
+                  EigrpTopologyUtils.initEigrpTopology(
                       configurations, callerTopologyContext.getLayer3Topology()))
               .setIsisTopology(
                   IsisTopology.initIsisTopology(

@@ -21,13 +21,13 @@ public final class EigrpEdge implements Serializable, Comparable<EigrpEdge> {
   private static final String PROP_NODE1 = "node1";
   private static final String PROP_NODE2 = "node2";
 
-  @Nonnull private final EigrpInterface _node1;
-  @Nonnull private final EigrpInterface _node2;
+  @Nonnull private final EigrpNeighborConfigId _node1;
+  @Nonnull private final EigrpNeighborConfigId _node2;
 
   @JsonCreator
   public EigrpEdge(
-      @Nonnull @JsonProperty(PROP_NODE1) EigrpInterface node1,
-      @Nonnull @JsonProperty(PROP_NODE2) EigrpInterface node2) {
+      @Nonnull @JsonProperty(PROP_NODE1) EigrpNeighborConfigId node1,
+      @Nonnull @JsonProperty(PROP_NODE2) EigrpNeighborConfigId node2) {
     _node1 = node1;
     _node2 = node2;
   }
@@ -57,8 +57,8 @@ public final class EigrpEdge implements Serializable, Comparable<EigrpEdge> {
     }
     return Optional.of(
         new EigrpEdge(
-            new EigrpInterface(c1.getHostname(), iface1),
-            new EigrpInterface(c2.getHostname(), iface2)));
+            new EigrpNeighborConfigId(c1.getHostname(), iface1),
+            new EigrpNeighborConfigId(c2.getHostname(), iface2)));
   }
 
   @Override
@@ -91,13 +91,13 @@ public final class EigrpEdge implements Serializable, Comparable<EigrpEdge> {
 
   @Nonnull
   @JsonProperty(PROP_NODE1)
-  public EigrpInterface getNode1() {
+  public EigrpNeighborConfigId getNode1() {
     return _node1;
   }
 
   @Nonnull
   @JsonProperty(PROP_NODE2)
-  public EigrpInterface getNode2() {
+  public EigrpNeighborConfigId getNode2() {
     return _node2;
   }
 

@@ -31,8 +31,8 @@ import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.eigrp.EigrpEdge;
-import org.batfish.datamodel.eigrp.EigrpInterface;
 import org.batfish.datamodel.eigrp.EigrpMetric;
+import org.batfish.datamodel.eigrp.EigrpNeighborConfigId;
 import org.batfish.datamodel.eigrp.EigrpProcess;
 import org.batfish.datamodel.eigrp.EigrpTopology;
 import org.batfish.datamodel.routing_policy.Environment.Direction;
@@ -56,7 +56,7 @@ class VirtualEigrpProcess {
   /** Helper RIB containing EIGRP external paths */
   private final EigrpExternalRib _externalRib;
 
-  private final List<EigrpInterface> _interfaces;
+  private final List<EigrpNeighborConfigId> _interfaces;
 
   /** Helper RIB containing all EIGRP paths internal to this router's ASN. */
   private final EigrpInternalRib _internalRib;
@@ -104,7 +104,7 @@ class VirtualEigrpProcess {
           && iface.getEigrp() != null
           && iface.getEigrp().getAsn() == _asn
           && iface.getEigrp().getEnabled()) {
-        _interfaces.add(new EigrpInterface(c.getHostname(), iface));
+        _interfaces.add(new EigrpNeighborConfigId(c.getHostname(), iface));
         requireNonNull(iface.getEigrp());
         Set<Prefix> allNetworkPrefixes =
             iface.getAllConcreteAddresses().stream()
@@ -221,7 +221,7 @@ class VirtualEigrpProcess {
    * @param eigrpTopology The topology representing EIGRP adjacencies
    */
   void initQueues(EigrpTopology eigrpTopology) {
-    Network<EigrpInterface, EigrpEdge> network = eigrpTopology.getNetwork();
+    Network<EigrpNeighborConfigId, EigrpEdge> network = eigrpTopology.getNetwork();
     _incomingRoutes =
         _interfaces.stream()
             .filter(network.nodes()::contains)
@@ -289,8 +289,8 @@ class VirtualEigrpProcess {
    */
   boolean propagateInternalRoutes(
       Map<String, Node> nodes, EigrpTopology eigrpTopology, NetworkConfigurations nc) {
-    Network<EigrpInterface, EigrpEdge> network = eigrpTopology.getNetwork();
-    Set<EigrpInterface> eigrpNodes = network.nodes();
+    Network<EigrpNeighborConfigId, EigrpEdge> network = eigrpTopology.getNetwork();
+    Set<EigrpNeighborConfigId> eigrpNodes = network.nodes();
     return _interfaces.stream()
         .filter(eigrpNodes::contains)
         .flatMap(n -> network.inEdges(n).stream())

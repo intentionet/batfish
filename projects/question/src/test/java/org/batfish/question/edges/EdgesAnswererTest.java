@@ -89,7 +89,7 @@ import org.batfish.datamodel.bgp.BgpTopology;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.eigrp.EigrpEdge;
-import org.batfish.datamodel.eigrp.EigrpInterface;
+import org.batfish.datamodel.eigrp.EigrpNeighborConfigId;
 import org.batfish.datamodel.eigrp.EigrpTopology;
 import org.batfish.datamodel.isis.IsisEdge;
 import org.batfish.datamodel.isis.IsisLevel;
@@ -251,14 +251,18 @@ public class EdgesAnswererTest {
 
   @Test
   public void testGetEigrpEdges() {
-    MutableNetwork<EigrpInterface, EigrpEdge> eigrpTopology =
+    MutableNetwork<EigrpNeighborConfigId, EigrpEdge> eigrpTopology =
         NetworkBuilder.directed().allowsParallelEdges(false).allowsSelfLoops(false).build();
 
-    EigrpInterface eigrpInterface1 = new EigrpInterface("host1", "int1", "vrf1");
-    EigrpInterface eigrpInterface2 = new EigrpInterface("host2", "int2", "vrf2");
+    EigrpNeighborConfigId eigrpNeighborConfigId1 =
+        new EigrpNeighborConfigId("host1", "int1", "vrf1");
+    EigrpNeighborConfigId eigrpNeighborConfigId2 =
+        new EigrpNeighborConfigId("host2", "int2", "vrf2");
 
     eigrpTopology.addEdge(
-        eigrpInterface1, eigrpInterface2, new EigrpEdge(eigrpInterface1, eigrpInterface2));
+        eigrpNeighborConfigId1,
+        eigrpNeighborConfigId2,
+        new EigrpEdge(eigrpNeighborConfigId1, eigrpNeighborConfigId2));
 
     Multiset<Row> rows =
         getEigrpEdges(_includeNodes, _includeRemoteNodes, new EigrpTopology(eigrpTopology));
@@ -596,8 +600,8 @@ public class EdgesAnswererTest {
   public void testEigrpToRow() {
     EigrpEdge testEdge =
         new EigrpEdge(
-            new EigrpInterface("host1", "int1", "vrf1"),
-            new EigrpInterface("host2", "int2", "vrf2"));
+            new EigrpNeighborConfigId("host1", "int1", "vrf1"),
+            new EigrpNeighborConfigId("host2", "int2", "vrf2"));
     Row row = eigrpEdgeToRow(testEdge);
 
     assertThat(
