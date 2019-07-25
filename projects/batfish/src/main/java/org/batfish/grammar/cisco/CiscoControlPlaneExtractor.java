@@ -1090,6 +1090,7 @@ import org.batfish.grammar.cisco.CiscoParser.Set_level_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_local_preference_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_local_preference_rp_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_med_rp_stanzaContext;
+import org.batfish.grammar.cisco.CiscoParser.Set_metric_eigrp_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_metric_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_metric_type_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_metric_type_rp_stanzaContext;
@@ -1283,6 +1284,7 @@ import org.batfish.representation.cisco.RouteMapSetCommunityNoneLine;
 import org.batfish.representation.cisco.RouteMapSetDeleteCommunityLine;
 import org.batfish.representation.cisco.RouteMapSetLine;
 import org.batfish.representation.cisco.RouteMapSetLocalPreferenceLine;
+import org.batfish.representation.cisco.RouteMapSetMetricEigrpLine;
 import org.batfish.representation.cisco.RouteMapSetMetricLine;
 import org.batfish.representation.cisco.RouteMapSetNextHopLine;
 import org.batfish.representation.cisco.RouteMapSetNextHopPeerAddress;
@@ -7823,7 +7825,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     }
     if (ctx.NO() == null) {
       EigrpMetric metric =
-          toEigrpMetric(ctx, ctx.bw_kbps, ctx.delay_10us, ctx.reliability, ctx.eff_bw, ctx.mtu);
+          toEigrpMetric(
+              ctx,
+              ctx.bw_kbps,
+              ctx.delay_10us,
+              ctx.reliability,
+              ctx.eff_bw,
+              ctx.mtu,
+              _currentEigrpProcess.getMode());
       _currentEigrpProcess.setDefaultMetric(metric);
     } else {
       _currentEigrpProcess.setDefaultMetric(null);
@@ -7903,7 +7912,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
     if (!ctx.METRIC().isEmpty()) {
       EigrpMetric metric =
-          toEigrpMetric(ctx, ctx.bw_kbps, ctx.delay_10us, ctx.reliability, ctx.eff_bw, ctx.mtu);
+          toEigrpMetric(
+              ctx,
+              ctx.bw_kbps,
+              ctx.delay_10us,
+              ctx.reliability,
+              ctx.eff_bw,
+              ctx.mtu,
+              _currentEigrpProcess.getMode());
       r.setMetric(metric);
     }
 
@@ -7929,7 +7945,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
     if (!ctx.METRIC().isEmpty()) {
       EigrpMetric metric =
-          toEigrpMetric(ctx, ctx.bw_kbps, ctx.delay_10us, ctx.reliability, ctx.eff_bw, ctx.mtu);
+          toEigrpMetric(
+              ctx,
+              ctx.bw_kbps,
+              ctx.delay_10us,
+              ctx.reliability,
+              ctx.eff_bw,
+              ctx.mtu,
+              _currentEigrpProcess.getMode());
       r.setMetric(metric);
     }
 
@@ -7958,7 +7981,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
     if (!ctx.METRIC().isEmpty()) {
       EigrpMetric metric =
-          toEigrpMetric(ctx, ctx.bw_kbps, ctx.delay_10us, ctx.reliability, ctx.eff_bw, ctx.mtu);
+          toEigrpMetric(
+              ctx,
+              ctx.bw_kbps,
+              ctx.delay_10us,
+              ctx.reliability,
+              ctx.eff_bw,
+              ctx.mtu,
+              _currentEigrpProcess.getMode());
       r.setMetric(metric);
     }
 
@@ -8001,7 +8031,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
     if (!ctx.METRIC().isEmpty()) {
       EigrpMetric metric =
-          toEigrpMetric(ctx, ctx.bw_kbps, ctx.delay_10us, ctx.reliability, ctx.eff_bw, ctx.mtu);
+          toEigrpMetric(
+              ctx,
+              ctx.bw_kbps,
+              ctx.delay_10us,
+              ctx.reliability,
+              ctx.eff_bw,
+              ctx.mtu,
+              _currentEigrpProcess.getMode());
       r.setMetric(metric);
     }
 
@@ -8027,7 +8064,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
     if (!ctx.METRIC().isEmpty()) {
       EigrpMetric metric =
-          toEigrpMetric(ctx, ctx.bw_kbps, ctx.delay_10us, ctx.reliability, ctx.eff_bw, ctx.mtu);
+          toEigrpMetric(
+              ctx,
+              ctx.bw_kbps,
+              ctx.delay_10us,
+              ctx.reliability,
+              ctx.eff_bw,
+              ctx.mtu,
+              _currentEigrpProcess.getMode());
       r.setMetric(metric);
     }
 
@@ -8053,7 +8097,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
     if (!ctx.METRIC().isEmpty()) {
       EigrpMetric metric =
-          toEigrpMetric(ctx, ctx.bw_kbps, ctx.delay_10us, ctx.reliability, ctx.eff_bw, ctx.mtu);
+          toEigrpMetric(
+              ctx,
+              ctx.bw_kbps,
+              ctx.delay_10us,
+              ctx.reliability,
+              ctx.eff_bw,
+              ctx.mtu,
+              _currentEigrpProcess.getMode());
       r.setMetric(metric);
     }
 
@@ -9933,6 +9984,15 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void enterSet_metric_eigrp_rm_stanza(Set_metric_eigrp_rm_stanzaContext ctx) {
+    EigrpMetric metric =
+        toEigrpMetric(
+            // TODO: remove mode from here
+            ctx, ctx.bw, ctx.delay, ctx.reliability, ctx.load, ctx.mtu, EigrpProcessMode.CLASSIC);
+    _currentRouteMapClause.addSetLine(new RouteMapSetMetricEigrpLine(metric));
+  }
+
+  @Override
   public void exitSet_metric_rm_stanza(Set_metric_rm_stanzaContext ctx) {
     LongExpr metric = toMetricLongExpr(ctx.metric);
     RouteMapSetMetricLine line = new RouteMapSetMetricLine(metric);
@@ -10601,10 +10661,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       Token ctxDelay,
       Token ctxReliability,
       Token ctxEffBw,
-      Token ctxMtu) {
-    if (_currentEigrpProcess == null) {
-      return null;
-    }
+      Token ctxMtu,
+      EigrpProcessMode mode) {
     EigrpMetric.Builder builder = EigrpMetric.builder();
 
     long bandwidthLong = toLong(ctxBw);
@@ -10628,7 +10686,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
      * the K constants are configured.
      * See https://github.com/batfish/batfish/issues/1946
      */
-    builder.setMode(_currentEigrpProcess.getMode());
+    builder.setMode(mode);
     return builder.build();
   }
 

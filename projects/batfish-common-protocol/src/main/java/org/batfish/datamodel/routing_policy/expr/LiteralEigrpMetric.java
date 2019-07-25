@@ -29,7 +29,7 @@ public final class LiteralEigrpMetric extends EigrpMetricExpr {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(@Nullable Object obj) {
     if (this == obj) {
       return true;
     } else if (!(obj instanceof LiteralEigrpMetric)) {
@@ -37,6 +37,11 @@ public final class LiteralEigrpMetric extends EigrpMetricExpr {
     }
     LiteralEigrpMetric rhs = (LiteralEigrpMetric) obj;
     return Objects.equals(_metric, rhs._metric);
+  }
+
+  @Override
+  public int hashCode() {
+    return _metric.hashCode();
   }
 
   @Override
@@ -48,10 +53,5 @@ public final class LiteralEigrpMetric extends EigrpMetricExpr {
   @Nonnull
   public EigrpMetric getMetric() {
     return _metric;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(_metric);
   }
 }

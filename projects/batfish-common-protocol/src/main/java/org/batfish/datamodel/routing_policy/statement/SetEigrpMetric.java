@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -32,7 +31,7 @@ public final class SetEigrpMetric extends Statement {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(@Nullable Object obj) {
     if (this == obj) {
       return true;
     } else if (!(obj instanceof SetEigrpMetric)) {
@@ -40,6 +39,11 @@ public final class SetEigrpMetric extends Statement {
     }
     SetEigrpMetric rhs = (SetEigrpMetric) obj;
     return _metric.equals(rhs._metric);
+  }
+
+  @Override
+  public int hashCode() {
+    return _metric.hashCode();
   }
 
   @Override
@@ -54,10 +58,5 @@ public final class SetEigrpMetric extends Statement {
   @Nonnull
   public EigrpMetricExpr getMetric() {
     return _metric;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(_metric);
   }
 }

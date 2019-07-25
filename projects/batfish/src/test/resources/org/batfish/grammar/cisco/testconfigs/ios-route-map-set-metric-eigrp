@@ -1,0 +1,5 @@
+!
+hostname ios-route-map-set-metric-eigrp
+!
+route-map rm_set_metric permit 10
+  set metric 1 2 3 4 5
