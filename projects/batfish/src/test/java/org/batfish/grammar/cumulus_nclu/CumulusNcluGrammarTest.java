@@ -69,6 +69,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Range;
+import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
@@ -603,16 +604,25 @@ public final class CumulusNcluGrammarTest {
     String bond4Name = "bond4";
     String bond5Name = "bond5";
 
-    String[] expectedSlaves =
+    String[] bond1Slaves =
         new String[] {"swp1", "swp2", "swp3", "swp4", "swp5", "swp6", "swp7", "swp8"};
+    Set<String> allSlaves =
+        Sets.union(ImmutableSet.copyOf(bond1Slaves), ImmutableSet.of("swp67", "swp89"));
 
     // referenced interfaces should have been created
-    assertThat(vc.getInterfaces().keySet(), containsInAnyOrder(expectedSlaves));
+    assertThat(vc.getInterfaces().keySet(), equalTo(allSlaves));
 
     assertThat(
         "Ensure bonds were extracted",
         vc.getBonds().keySet(),
-        containsInAnyOrder(bond1Name, bond2Name, bond3Name, bond4Name, bond5Name));
+        containsInAnyOrder(
+            bond1Name,
+            bond2Name,
+            bond3Name,
+            bond4Name,
+            bond5Name,
+            "ts975zpe-c06-07",
+            "ts975zpe-c08-9"));
 
     Bond bond1 = vc.getBonds().get(bond1Name);
     Bond bond2 = vc.getBonds().get(bond2Name);
@@ -620,7 +630,7 @@ public final class CumulusNcluGrammarTest {
 
     assertThat("Ensure access VLAN ID was set", bond1.getBridge().getAccess(), equalTo(2));
     assertThat("Ensure CLAG ID was set", bond1.getClagId(), equalTo(1));
-    assertThat("Ensure slaves were set", bond1.getSlaves(), containsInAnyOrder(expectedSlaves));
+    assertThat("Ensure slaves were set", bond1.getSlaves(), containsInAnyOrder(bond1Slaves));
     assertThat(
         "Ensure trunk VLAN IDs were set",
         bond2.getBridge().getVids(),

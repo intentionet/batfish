@@ -12,24 +12,16 @@ glob
   )*
 ;
 
-glob_range_set
+glob_range
 :
-  unnumbered = glob_word
-  |
-  (
-    base_word = numbered_word
-    (
-      DASH first_interval_end = uint32
-    )?
-    (
-      COMMA other_numeric_ranges = range_set
-    )?
-  )
+  GLOB_RANGE
 ;
 
-glob_word
+glob_range_set
 :
-  ~( NEWLINE | NUMBERED_WORD | DEC )
+  glob_range
+  | range
+  | (aword = word)
 ;
 
 interface_address
@@ -68,17 +60,9 @@ null_rest_of_line
   ~NEWLINE* NEWLINE
 ;
 
-numbered_word
-:
-  NUMBERED_WORD
-;
-
 range
 :
-  low = uint32
-  (
-    DASH high = uint32
-  )?
+  NUMERIC_RANGE | DEC
 ;
 
 range_set
@@ -93,36 +77,25 @@ uint16
 :
   d = DEC
   {isUint16($d)}?
-
 ;
 
 uint32
 :
   d = DEC
   {isUint32($d)}?
-
 ;
 
 vlan_id
 :
   v = DEC
   {isVlanId($v)}?
-
-;
-
-vlan_range
-:
-  low = vlan_id
-  (
-    DASH high = vlan_id
-  )?
 ;
 
 vlan_range_set
 :
-  vlan_range
+  (range | vlan_id)
   (
-    COMMA vlan_range
+    COMMA (range | vlan_id)
   )*
 ;
 

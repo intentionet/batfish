@@ -7,7 +7,17 @@
         "configs/as1r2.cfg" : "PASSED",
         "configs/as2r1.cfg" : "PASSED",
         "configs/cumulus_nclu_invalid_bonds" : "WILL_NOT_COMMIT",
-        "configs/cumulus_nclu_range" : "FAILED"
+        "configs/cumulus_nclu_range" : "PASSED"
+      },
+      "warnings" : {
+        "configs/cumulus_nclu_range" : {
+          "Red flags" : [
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "All referenced vxlan instances must be created via 'net add vxlan <name> vxlan id <id>' before line: net add vxlan vni4294967295-4294967296 vxlan local-tunnelip 1.1.1.1\n\n"
+            }
+          ]
+        }
       }
     }
   ],

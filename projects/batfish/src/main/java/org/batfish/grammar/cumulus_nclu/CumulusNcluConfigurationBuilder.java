@@ -5,10 +5,12 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.not;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Strings;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableRangeSet;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
@@ -20,6 +22,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -138,7 +141,6 @@ import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.V_vlan_idContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.V_vlan_raw_deviceContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.V_vrfContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Vlan_idContext;
-import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Vlan_rangeContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Vlan_range_setContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Vni_numberContext;
 import org.batfish.grammar.cumulus_nclu.CumulusNcluParser.Vrf_ip_addressContext;
@@ -184,7 +186,9 @@ import org.batfish.representation.cumulus.Vxlan;
  */
 public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListener {
 
-  private static final Pattern NUMBERED_WORD_PATTERN = Pattern.compile("^(.*[^0-9])([0-9]+)$");
+  private static final Pattern GLOB_RANGE_PATTERN =
+      Pattern.compile("^(.*[^0-9])?([0-9]+)-([0-9]+)$");
+  private static final Pattern NON_NUMBERED_PREFIX_PATTERN = Pattern.compile("^(.*[^0-9])+");
   private static final Pattern PHYSICAL_INTERFACE_PATTERN =
       Pattern.compile("(swp[0-9]+(s[0-9])?)|(eth[0-9]+)");
   private static final Pattern SUBINTERFACE_PATTERN = Pattern.compile("^(.*)\\.([0-9]+)$");
@@ -247,8 +251,12 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
   }
 
   private static @Nonnull Range<Long> toRange(RangeContext ctx) {
-    long low = toLong(ctx.low);
-    long high = ctx.high != null ? toLong(ctx.high) : low;
+    String[] arr = ctx.getText().split("-", 2);
+    if (arr.length == 1) {
+      return Range.singleton(Long.parseUnsignedLong(arr[0]));
+    }
+    long low = Long.parseUnsignedLong(arr[0]);
+    long high = Long.parseUnsignedLong(arr[1]);
     return Range.closed(low, high);
   }
 
@@ -258,19 +266,14 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
    * @throws IllegalArgumentException if the values are out of range
    */
   private static @Nonnull Range<Integer> toRangeInt(RangeContext ctx) {
-    long low = toLong(ctx.low);
-    long high = ctx.high != null ? toLong(ctx.high) : low;
+    Range<Long> range = toRange(ctx);
+    long low = range.lowerEndpoint();
+    long high = range.upperEndpoint();
     checkArgument(
         low <= Integer.MAX_VALUE && high <= Integer.MAX_VALUE,
         "Invalid integer range: %s",
         ctx.getText());
     return Range.closed((int) low, (int) high);
-  }
-
-  private static @Nonnull Range<Integer> toRange(Vlan_rangeContext ctx) {
-    int low = toInteger(ctx.low);
-    int high = ctx.high != null ? toInteger(ctx.high) : low;
-    return Range.closed(low, high);
   }
 
   private static @Nonnull RangeSet<Long> toRangeSet(Range_setContext ctx) {
@@ -309,41 +312,45 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
   }
 
   private static @Nonnull RangeSet<Integer> toRangeSet(Vlan_range_setContext ctx) {
-    return ctx.vlan_range().stream()
-        .map(CumulusNcluConfigurationBuilder::toRange)
+    return Stream.concat(
+            ctx.range().stream().map(CumulusNcluConfigurationBuilder::toRangeInt),
+            ctx.vlan_id().stream()
+                .map(CumulusNcluConfigurationBuilder::toInteger)
+                .map(Range::singleton))
         .collect(ImmutableRangeSet.toImmutableRangeSet());
   }
 
-  private static @Nonnull Set<String> toStrings(Glob_range_setContext ctx, long maxValue) {
-    if (ctx.unnumbered != null) {
-      return ImmutableSet.of(ctx.unnumbered.getText());
+  private static @Nonnull List<String> toStrings(
+      Glob_range_setContext ctx, long maxValue, @Nullable String lastWellFormedPrefix) {
+    if (ctx.aword != null) {
+      return ImmutableList.of(ctx.aword.getText());
+    } else if (ctx.range() != null) {
+      checkArgument(lastWellFormedPrefix != null);
+      Range<Long> range = toRange(ctx.range());
+      return LongStream.rangeClosed(range.lowerEndpoint(), range.upperEndpoint())
+          .mapToObj(i -> String.format("%s%d", lastWellFormedPrefix, i))
+          .collect(ImmutableList.toImmutableList());
+    } else if (ctx.glob_range() != null) {
+      String globRange = ctx.glob_range().getText();
+      Matcher matcher = GLOB_RANGE_PATTERN.matcher(globRange);
+      checkState(matcher.matches()); // parser+lexer guarantee match
+      String prefix = matcher.group(1);
+      if (prefix.isEmpty()) {
+        checkArgument(lastWellFormedPrefix != null);
+      }
+      final String finalPrefix = prefix.isEmpty() ? lastWellFormedPrefix : prefix;
+      long firstIntervalStart = Long.parseUnsignedLong(matcher.group(2), 10);
+      long firstIntervalEnd = Long.parseUnsignedLong(matcher.group(3), 10);
+      checkArgument(firstIntervalStart <= maxValue && firstIntervalEnd <= maxValue);
+      // add first interval
+      ImmutableRangeSet.Builder<Long> builder =
+          ImmutableRangeSet.<Long>builder().add(Range.closed(firstIntervalStart, firstIntervalEnd));
+      return builder.build().asRanges().stream()
+          .flatMapToLong(r -> LongStream.rangeClosed(r.lowerEndpoint(), r.upperEndpoint()))
+          .mapToObj(i -> String.format("%s%d", finalPrefix, i))
+          .collect(ImmutableList.toImmutableList());
     }
-    String baseWord = ctx.base_word.getText();
-    if (ctx.first_interval_end == null && ctx.other_numeric_ranges == null) {
-      return ImmutableSet.of(baseWord);
-    }
-    Matcher matcher = NUMBERED_WORD_PATTERN.matcher(baseWord);
-    matcher.matches(); // parser+lexer guarantee match
-    String prefix = matcher.group(1);
-    long firstIntervalStart = Long.parseLong(matcher.group(2), 10);
-    long firstIntervalEnd =
-        ctx.first_interval_end != null
-            ? Long.parseLong(ctx.first_interval_end.getText(), 10)
-            : firstIntervalStart;
-    checkArgument(firstIntervalStart <= maxValue && firstIntervalEnd <= maxValue);
-    // add first interval
-    ImmutableRangeSet.Builder<Long> builder =
-        ImmutableRangeSet.<Long>builder().add(Range.closed(firstIntervalStart, firstIntervalEnd));
-    if (ctx.other_numeric_ranges != null) {
-      // add other intervals
-      RangeSet<Long> rangeSet = toRangeSet(ctx.other_numeric_ranges);
-      checkUpperBound(rangeSet, maxValue);
-      builder.addAll(rangeSet);
-    }
-    return builder.build().asRanges().stream()
-        .flatMapToLong(r -> LongStream.rangeClosed(r.lowerEndpoint(), r.upperEndpoint()))
-        .mapToObj(i -> String.format("%s%d", prefix, i))
-        .collect(ImmutableSet.toImmutableSet());
+    throw new BatfishException("Unrecognized alternative in glob_range_set");
   }
 
   private static @Nonnull Set<String> toStrings(GlobContext ctx) {
@@ -351,9 +358,17 @@ public class CumulusNcluConfigurationBuilder extends CumulusNcluParserBaseListen
   }
 
   private static @Nonnull Set<String> toStrings(GlobContext ctx, long maxValue) {
-    return ctx.glob_range_set().stream()
-        .flatMap(grs -> toStrings(grs, maxValue).stream())
-        .collect(ImmutableSet.toImmutableSet());
+    Builder<String> builder = ImmutableSet.builder();
+    String prefix = null;
+    for (Glob_range_setContext grs : ctx.glob_range_set()) {
+      List<String> names = toStrings(grs, maxValue, prefix);
+      builder.addAll(names);
+      Matcher matcher = NON_NUMBERED_PREFIX_PATTERN.matcher(names.get(0));
+      if (matcher.find() && !Strings.isNullOrEmpty(matcher.group(1))) {
+        prefix = matcher.group(1);
+      }
+    }
+    return builder.build();
   }
 
   private @Nullable CumulusNcluConfiguration _c;

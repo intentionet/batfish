@@ -12,5 +12,8 @@ net add bond bond4 bond slaves swp1
 net add bond bond5 bond slaves swp2
 net add bond bond4,bond5 bridge access 5
 net add bridge bridge ports bond1-2,4-5
+# Esoteric bond names
+net add bond ts975zpe-c06-07 bond slaves swp67
+net add bond ts975zpe-c08-9 bond slaves swp89
 #
 net commit

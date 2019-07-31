@@ -696,12 +696,16 @@ NEWLINE
   F_Newline+
 ;
 
-NUMBERED_WORD
+NUMERIC_RANGE
 :
-  F_NumberedWord
+  F_NumericRange
 ;
 
-// Do NOT move above NUMBERED_WORD
+// Do not move above NUMERIC_RANGE
+GLOB_RANGE
+:
+  F_GlobRange
+;
 
 WORD
 :
@@ -954,12 +958,6 @@ F_NonWhitespaceChar
 ;
 
 fragment
-F_NumberedWord
-:
-  F_Word F_Uint32
-;
-
-fragment
 F_PositiveDigit
 :
   '1' .. '9'
@@ -1011,28 +1009,31 @@ F_Whitespace
 ;
 
 fragment
+F_NumericRange
+:
+  F_Uint32 '-' F_Uint32
+;
+
+// Do not move above F_NumericRange
+// Note that the numeric range here cannot be prefixed by a '0'.
+// If it is, it should lex as a F_Word
+fragment
+F_GlobRange
+:
+  (F_WordChar* ~[ 0\t\n\r{}[\],\\])? F_Uint32 '-' F_Uint32
+;
+
+// Do not move above F_GlobRange
+fragment
 F_Word
 :
-  F_WordSegment
-  (
-    (
-      '-' F_WordSegment
-    )*
-    | F_Digit+
-  )
+  F_WordChar+
 ;
 
 fragment
 F_WordChar
 :
-  ~( [ \t\n\r{}[\],\\] | '-' )
-;
-
-fragment
-F_WordSegment
-:
-  F_Alpha F_WordChar*
-  | F_Digit F_WordChar* F_Alpha F_WordChar*
+  ~( [ \t\n\r{}[\],\\] )
 ;
 
 // Lexer Modes

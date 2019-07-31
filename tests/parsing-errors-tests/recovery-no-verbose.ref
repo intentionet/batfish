@@ -7,7 +7,7 @@
         "configs/as1r2.cfg" : "PASSED",
         "configs/as2r1.cfg" : "PASSED",
         "configs/cumulus_nclu_invalid_bonds" : "WILL_NOT_COMMIT",
-        "configs/cumulus_nclu_range" : "PARTIALLY_UNRECOGNIZED"
+        "configs/cumulus_nclu_range" : "PASSED"
       },
       "warnings" : {
         "as1r1" : {
@@ -29,12 +29,10 @@
           ]
         },
         "configs/cumulus_nclu_range" : {
-          "Parse warnings" : [
+          "Red flags" : [
             {
-              "Comment" : "This syntax is unrecognized",
-              "Line" : 6,
-              "Parser_Context" : "[uint32 glob_range_set glob a_vxlan s_net_add statement cumulus_nclu_configuration]",
-              "Text" : "net add vxlan vni4294967295-4294967296 vxlan local-tunnelip 1.1.1.1"
+              "tag" : "MISCELLANEOUS",
+              "text" : "All referenced vxlan instances must be created via 'net add vxlan <name> vxlan id <id>' before line: net add vxlan vni4294967295-4294967296 vxlan local-tunnelip 1.1.1.1\n\n"
             }
           ]
         }
