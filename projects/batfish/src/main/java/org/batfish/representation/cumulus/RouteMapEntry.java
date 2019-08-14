@@ -71,6 +71,10 @@ public final class RouteMapEntry implements Serializable {
     return _setIpNextHop;
   }
 
+  public @Nullable RouteMapSetCommunity getSetCommunity() {
+    return _setCommunity;
+  }
+
   public void setMatchInterface(@Nullable RouteMapMatchInterface matchInterface) {
     _matchInterface = matchInterface;
   }

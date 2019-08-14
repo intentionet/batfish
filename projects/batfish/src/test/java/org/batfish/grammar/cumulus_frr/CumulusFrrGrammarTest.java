@@ -366,4 +366,16 @@ public class CumulusFrrGrammarTest {
     RouteMapEntry entry = CONFIG.getRouteMaps().get(name).getEntries().get(10);
     assertThat(entry.getSetIpNextHop().getNextHop(), equalTo(Ip.parse("10.0.0.1")));
   }
+
+  @Test
+  public void testCumulusFrrVrfRouteMapSetCommunity() {
+    String name = "ROUTE-MAP-NAME";
+
+    parse(String.format("route-map %s permit 10\nset community 10000:1 20000:2\n", name));
+
+    RouteMapEntry entry = CONFIG.getRouteMaps().get(name).getEntries().get(10);
+    assertThat(
+        entry.getSetCommunity().getCommunities(),
+        equalTo(ImmutableList.of(StandardCommunity.of(10000, 1), StandardCommunity.of(20000, 2))));
+  }
 }

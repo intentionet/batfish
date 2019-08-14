@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
@@ -23,10 +24,12 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.grammar.UnrecognizedLineToken;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Icl_expandedContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Literal_standard_communityContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rm_descriptionContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmm_communityContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmm_interfaceContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmmipa_prefix_listContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rms_communityContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rms_metricContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmsipnh_literalContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_bgpContext;
@@ -65,6 +68,7 @@ import org.batfish.representation.cumulus.RouteMapEntry;
 import org.batfish.representation.cumulus.RouteMapMatchCommunity;
 import org.batfish.representation.cumulus.RouteMapMatchInterface;
 import org.batfish.representation.cumulus.RouteMapMatchIpAddressPrefixList;
+import org.batfish.representation.cumulus.RouteMapSetCommunity;
 import org.batfish.representation.cumulus.RouteMapSetIpNextHopLiteral;
 import org.batfish.representation.cumulus.RouteMapSetMetric;
 import org.batfish.representation.cumulus.StaticRoute;
@@ -89,6 +93,11 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
 
   CumulusNcluConfiguration getVendorConfiguration() {
     return _c;
+  }
+
+  private @Nonnull StandardCommunity toStandardCommunity(Literal_standard_communityContext ctx) {
+    return StandardCommunity.of(
+        Integer.parseInt(ctx.high.getText()), Integer.parseInt(ctx.low.getText()));
   }
 
   @Override
@@ -368,6 +377,15 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     }
 
     _currentRouteMapEntry.setSetIpNextHop(new RouteMapSetIpNextHopLiteral(ip));
+  }
+
+  @Override
+  public void exitRms_community(Rms_communityContext ctx) {
+    RouteMapSetCommunity old = _currentRouteMapEntry.getSetCommunity();
+    List<StandardCommunity> communityList =
+        old == null ? new ArrayList<>() : new ArrayList<>(old.getCommunities());
+    ctx.communities.stream().map(this::toStandardCommunity).forEach(communityList::add);
+    _currentRouteMapEntry.setSetCommunity(new RouteMapSetCommunity(communityList));
   }
 
   @Override
