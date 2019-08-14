@@ -186,7 +186,7 @@ ihg_ip
   (
     ip = ip_address
     | prefix = ip_prefix
-  ) NEWLINE
+  ) SECONDARY? NEWLINE
 ;
 
 ihg_preempt

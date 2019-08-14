@@ -13,11 +13,15 @@ interface Ethernet1/1
   no switchport
   no shutdown
   ip address 192.0.2.2/24
+  ip address 192.168.0.2/24 secondary
+  ip address 192.168.1.2/24 secondary
   hsrp version 2
   hsrp delay reload 60
   hsrp 2
     authentication md5 key-chain hsrp-keys
     ip 192.0.2.1
+    ip 192.168.0.1 secondary
+    ip 192.168.1.1 secondary
     preempt delay minimum 30 reload 40 sync 50
     priority 105 forwarding-threshold lower 0 upper 255
     timers msec 250 msec 750
