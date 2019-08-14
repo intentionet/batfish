@@ -9,4 +9,6 @@ interface Ethernet1/1
   duplex full
   no negotiate auto
   channel-group 1
-!
+
+interface Ethernet1/2
+  speed auto

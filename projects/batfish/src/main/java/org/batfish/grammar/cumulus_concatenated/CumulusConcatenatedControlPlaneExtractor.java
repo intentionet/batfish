@@ -1,5 +1,7 @@
 package org.batfish.grammar.cumulus_concatenated;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -39,6 +41,7 @@ public class CumulusConcatenatedControlPlaneExtractor implements ControlPlaneExt
   private CumulusNcluConfiguration _configuration;
   private int _line = -1;
   private int _offset = -1;
+  private List<String> _errors = new ArrayList<>();
 
   public CumulusConcatenatedControlPlaneExtractor(
       String fileText,
@@ -68,6 +71,7 @@ public class CumulusConcatenatedControlPlaneExtractor implements ControlPlaneExt
     parseInterfacesFile();
     parsePortsFile();
     parseFrrFile();
+    checkErrors();
   }
 
   private void parseFrrFile() {
@@ -92,7 +96,7 @@ public class CumulusConcatenatedControlPlaneExtractor implements ControlPlaneExt
     checkErrors(parser);
     ParseTreeWalker walker = new BatfishParseTreeWalker(parser);
     CumulusInterfacesConfigurationBuilder cb =
-        new CumulusInterfacesConfigurationBuilder(_configuration, parser, _w);
+        new CumulusInterfacesConfigurationBuilder(_configuration, parser, _text, _w);
     walker.walk(cb, ctxt);
     mergeParseTree(ctxt, parser);
 
@@ -142,10 +146,16 @@ public class CumulusConcatenatedControlPlaneExtractor implements ControlPlaneExt
 
   private void checkErrors(BatfishCombinedParser<?, ?> parser) {
     if (!parser.getErrors().isEmpty()) {
+      _errors.addAll(parser.getErrors());
+    }
+  }
+
+  private void checkErrors() {
+    if (!_errors.isEmpty()) {
       throw new BatfishException(
           String.format(
               "Configuration file: '%s' contains unrecognized lines:\n%s",
-              _filename, String.join("\n", parser.getErrors())));
+              _filename, String.join("\n", _errors)));
     }
   }
 }

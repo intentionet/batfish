@@ -110,9 +110,11 @@ public final class Interface implements Serializable {
   private @Nullable Integer _bandwidth;
   private @Nullable String _channelGroup;
   private final @Nonnull Set<String> _declaredNames;
+  private @Nullable Integer _delayTensOfMicroseconds;
   private @Nullable String _description;
   private @Nullable Integer _encapsulationVlan;
   private @Nullable InterfaceHsrp _hsrp;
+  private @Nullable Lacp _lacp;
   private @Nullable Integer _mtu;
   private final @Nonnull String _name;
   private @Nullable Integer _nativeVlan;
@@ -123,6 +125,7 @@ public final class Interface implements Serializable {
   private @Nullable Boolean _shutdown;
   private @Nullable Integer _speedMbps;
   private @Nonnull SwitchportMode _switchportMode;
+  private boolean _switchportMonitor;
   private final @Nonnull CiscoNxosInterfaceType _type;
   private final @Nullable Integer _vlan;
   private @Nullable String _vrfMember;
@@ -178,6 +181,10 @@ public final class Interface implements Serializable {
     return _declaredNames;
   }
 
+  public @Nullable Integer getDelayTensOfMicroseconds() {
+    return _delayTensOfMicroseconds;
+  }
+
   public @Nullable String getDescription() {
     return _description;
   }
@@ -195,6 +202,17 @@ public final class Interface implements Serializable {
       _hsrp = new InterfaceHsrp();
     }
     return _hsrp;
+  }
+
+  public @Nullable Lacp getLacp() {
+    return _lacp;
+  }
+
+  public @Nonnull Lacp getOrCreateLacp() {
+    if (_lacp == null) {
+      _lacp = new Lacp();
+    }
+    return _lacp;
   }
 
   public @Nullable Integer getMtu() {
@@ -257,6 +275,10 @@ public final class Interface implements Serializable {
     return _switchportMode;
   }
 
+  public boolean getSwitchportMonitor() {
+    return _switchportMonitor;
+  }
+
   public @Nonnull CiscoNxosInterfaceType getType() {
     return _type;
   }
@@ -313,6 +335,10 @@ public final class Interface implements Serializable {
     _channelGroup = channelGroup;
   }
 
+  public void setDelayTensOfMicroseconds(@Nullable Integer delayTensOfMicroseconds) {
+    _delayTensOfMicroseconds = delayTensOfMicroseconds;
+  }
+
   public void setDescription(@Nullable String description) {
     _description = description;
   }
@@ -339,6 +365,10 @@ public final class Interface implements Serializable {
 
   public void setSwitchportMode(SwitchportMode switchportMode) {
     _switchportMode = switchportMode;
+  }
+
+  public void setSwitchportMonitor(boolean switchportMonitor) {
+    _switchportMonitor = switchportMonitor;
   }
 
   public void setVrfMember(String vrfMember) {

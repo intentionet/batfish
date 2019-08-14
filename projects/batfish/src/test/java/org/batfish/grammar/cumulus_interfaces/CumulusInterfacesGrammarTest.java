@@ -3,6 +3,7 @@ package org.batfish.grammar.cumulus_interfaces;
 import static org.batfish.datamodel.matchers.MapMatchers.hasKeys;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -42,6 +43,7 @@ public class CumulusInterfacesGrammarTest {
     CONFIG = new CumulusNcluConfiguration();
     CONFIG.setFilename(FILENAME);
     CONFIG.setAnswerElement(new ConvertConfigurationAnswerElement());
+    CONFIG.setWarnings(new Warnings());
   }
 
   private static DefinedStructureInfo getDefinedStructureInfo(
@@ -76,9 +78,8 @@ public class CumulusInterfacesGrammarTest {
     CumulusInterfacesCombinedParser parser =
         new CumulusInterfacesCombinedParser(input, settings, 1, 0);
     Cumulus_interfaces_configurationContext ctxt = parser.parse();
-    Warnings w = new Warnings();
     CumulusInterfacesConfigurationBuilder configurationBuilder =
-        new CumulusInterfacesConfigurationBuilder(CONFIG, parser, w);
+        new CumulusInterfacesConfigurationBuilder(CONFIG, parser, input, CONFIG.getWarnings());
     new BatfishParseTreeWalker(parser).walk(configurationBuilder, ctxt);
     return configurationBuilder.getInterfaces();
   }
@@ -203,6 +204,13 @@ public class CumulusInterfacesGrammarTest {
   }
 
   @Test
+  public void testIfaceBridgePorts_multiline() {
+    String input = "iface bridge\n bridge-ports i2 \\\n i3 i4\n";
+    Interface iface = parse(input).getInterfaces().get("bridge");
+    assertThat(iface.getBridgePorts(), contains("i2", "i3", "i4"));
+  }
+
+  @Test
   public void testIfaceBridgePorts() {
     String input = "iface bridge\n bridge-ports i2 i3 i4\n";
     Interface iface = parse(input).getInterfaces().get("bridge");
@@ -223,6 +231,18 @@ public class CumulusInterfacesGrammarTest {
     InterfaceBridgeSettings bridgeSettings =
         parse(input).getInterfaces().get("swp1").getBridgeSettings();
     assertThat(bridgeSettings.getVids().enumerate(), contains(1, 2, 3, 4));
+  }
+
+  @Test
+  public void testIfaceBridgeVlanAware_no() {
+    parse("iface bridge\n bridge-vlan-aware no\n");
+    assertThat(CONFIG.getWarnings().getParseWarnings().size(), equalTo(1));
+  }
+
+  @Test
+  public void testIfaceBridgeVlanAware_yes() {
+    parse("iface bridge\n bridge-vlan-aware yes\n");
+    assertThat(CONFIG.getWarnings().getParseWarnings(), empty());
   }
 
   @Test

@@ -1,0 +1,92 @@
+{
+ "NetworkInterfaces": [
+  {
+   "Association": {
+    "IpOwnerId": "amazon",
+    "PublicDnsName": "ec2-13-58-55-60.us-east-2.compute.amazonaws.com",
+    "PublicIp": "13.58.55.60"
+   },
+   "Attachment": {
+    "AttachTime": "2019-08-08 03:57:51+00:00",
+    "AttachmentId": "eni-attach-0f7a9032d054bc406",
+    "DeleteOnTermination": true,
+    "DeviceIndex": 0,
+    "InstanceId": "i-094a9e5b545a4fde4",
+    "InstanceOwnerId": "554773406868",
+    "Status": "attached"
+   },
+   "AvailabilityZone": "us-east-2b",
+   "Description": "Primary network interface",
+   "Groups": [
+    {
+     "GroupId": "sg-0662342465612f419",
+     "GroupName": "launch-wizard-2"
+    }
+   ],
+   "InterfaceType": "interface",
+   "Ipv6Addresses": [],
+   "MacAddress": "06:4c:9d:b5:68:50",
+   "NetworkInterfaceId": "eni-09da8cad43844dc1f",
+   "OwnerId": "554773406868",
+   "PrivateDnsName": "ip-10-0-0-47.us-east-2.compute.internal",
+   "PrivateIpAddress": "10.0.0.47",
+   "PrivateIpAddresses": [
+    {
+     "Association": {
+      "IpOwnerId": "amazon",
+      "PublicDnsName": "ec2-13-58-55-60.us-east-2.compute.amazonaws.com",
+      "PublicIp": "13.58.55.60"
+     },
+     "Primary": true,
+     "PrivateDnsName": "ip-10-0-0-47.us-east-2.compute.internal",
+     "PrivateIpAddress": "10.0.0.47"
+    }
+   ],
+   "RequesterManaged": false,
+   "SourceDestCheck": true,
+   "Status": "in-use",
+   "SubnetId": "subnet-0cf7a93fbd779f3a3",
+   "TagSet": [],
+   "VpcId": "vpc-0b966fdeb36d5e43f"
+  },
+  {
+   "Attachment": {
+    "AttachTime": "2019-08-08 03:59:27+00:00",
+    "AttachmentId": "eni-attach-09233ce6b95f3aec1",
+    "DeleteOnTermination": true,
+    "DeviceIndex": 0,
+    "InstanceId": "i-099cf38911942421c",
+    "InstanceOwnerId": "554773406868",
+    "Status": "attached"
+   },
+   "AvailabilityZone": "us-east-2b",
+   "Description": "Primary network interface",
+   "Groups": [
+    {
+     "GroupId": "sg-063f2bb51713c3236",
+     "GroupName": "launch-wizard-3"
+    }
+   ],
+   "InterfaceType": "interface",
+   "Ipv6Addresses": [],
+   "MacAddress": "06:cd:1f:5b:fd:7e",
+   "NetworkInterfaceId": "eni-07c1506e49d784fe0",
+   "OwnerId": "554773406868",
+   "PrivateDnsName": "ip-10-0-1-204.us-east-2.compute.internal",
+   "PrivateIpAddress": "10.0.1.204",
+   "PrivateIpAddresses": [
+    {
+     "Primary": true,
+     "PrivateDnsName": "ip-10-0-1-204.us-east-2.compute.internal",
+     "PrivateIpAddress": "10.0.1.204"
+    }
+   ],
+   "RequesterManaged": false,
+   "SourceDestCheck": true,
+   "Status": "in-use",
+   "SubnetId": "subnet-0f263105946ad1a1d",
+   "TagSet": [],
+   "VpcId": "vpc-0b966fdeb36d5e43f"
+  }
+ ]
+}

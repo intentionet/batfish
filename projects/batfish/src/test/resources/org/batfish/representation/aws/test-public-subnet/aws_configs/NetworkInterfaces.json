@@ -1,0 +1,53 @@
+{
+ "NetworkInterfaces": [
+  {
+   "Association": {
+    "IpOwnerId": "amazon",
+    "PublicDnsName": "ec2-18-216-80-133.us-east-2.compute.amazonaws.com",
+    "PublicIp": "18.216.80.133"
+   },
+   "Attachment": {
+    "AttachTime": "2019-08-06 23:40:11+00:00",
+    "AttachmentId": "eni-attach-0bf3057f2bbe3e967",
+    "DeleteOnTermination": true,
+    "DeviceIndex": 0,
+    "InstanceId": "i-06669a407b2ef3ae5",
+    "InstanceOwnerId": "554773406868",
+    "Status": "attached"
+   },
+   "AvailabilityZone": "us-east-2b",
+   "Description": "Primary network interface",
+   "Groups": [
+    {
+     "GroupId": "sg-09ccba6656672061b",
+     "GroupName": "launch-wizard-1"
+    }
+   ],
+   "InterfaceType": "interface",
+   "Ipv6Addresses": [],
+   "MacAddress": "06:ee:0b:85:d1:1e",
+   "NetworkInterfaceId": "eni-00064850627e198ee",
+   "OwnerId": "554773406868",
+   "PrivateDnsName": "ip-10-0-0-91.us-east-2.compute.internal",
+   "PrivateIpAddress": "10.0.0.91",
+   "PrivateIpAddresses": [
+    {
+     "Association": {
+      "IpOwnerId": "amazon",
+      "PublicDnsName": "ec2-18-216-80-133.us-east-2.compute.amazonaws.com",
+      "PublicIp": "18.216.80.133"
+     },
+     "Primary": true,
+     "PrivateDnsName": "ip-10-0-0-91.us-east-2.compute.internal",
+     "PrivateIpAddress": "10.0.0.91"
+    }
+   ],
+   "RequesterManaged": false,
+   "SourceDestCheck": true,
+   "Status": "in-use",
+   "SubnetId": "subnet-0bb82ae8b3ea5dc78",
+   "TagSet": [],
+   "VpcId": "vpc-0672bce73895d7252"
+  }
+ ]
+}

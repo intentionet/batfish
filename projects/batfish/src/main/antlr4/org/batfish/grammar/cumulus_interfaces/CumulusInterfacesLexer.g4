@@ -69,6 +69,11 @@ BRIDGE_VIDS
   'bridge-vids'
 ;
 
+BRIDGE_VLAN_AWARE
+:
+  'bridge-vlan-aware'
+;
+
 CLAG_ID
 :
   'clag-id'
@@ -124,6 +129,10 @@ MSTPCTL_PORTBPDUFILTER
   'mstpctl-portbpdufilter' -> pushMode(M_DropUntilNewline)
 ;
 
+NO
+:
+  'no'
+;
 
 VLAN_ID
 :
@@ -153,6 +162,11 @@ VXLAN_ID
 VXLAN_LOCAL_TUNNEL_IP
 :
   'vxlan-local-tunnelip'
+;
+
+YES
+:
+  'yes'
 ;
 
 // Complex tokens
@@ -293,6 +307,7 @@ F_Whitespace
   | '\t'
   | '\u000C'
   | '\u00A0'
+  | '\\\n'  // continue on next line
 ;
 
 fragment

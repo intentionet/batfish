@@ -2,13 +2,10 @@ package org.batfish.representation.aws;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.batfish.common.util.IspModelingUtils.installRoutingPolicyAdvertiseStatic;
-import static org.batfish.representation.aws.Utils.addStaticRoute;
-import static org.batfish.representation.aws.Utils.toStaticRoute;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedMap;
 import java.io.Serializable;
@@ -95,56 +92,17 @@ final class InternetGateway implements AwsVpcEntity, Serializable {
     return _internetGatewayId;
   }
 
+  @Nonnull
+  public List<String> getAttachmentVpcIds() {
+    return _attachmentVpcIds;
+  }
+
   Configuration toConfigurationNode(AwsConfiguration awsConfiguration, Region region) {
     Configuration cfgNode = Utils.newAwsConfiguration(_internetGatewayId, "aws");
     cfgNode.getVendorFamily().getAws().setRegion(region.getName());
-    PrefixSpace publicPrefixSpace = new PrefixSpace();
 
-    for (String vpcId : _attachmentVpcIds) {
-
-      String igwIfaceName = vpcId;
-      Prefix igwAddresses = awsConfiguration.getNextGeneratedLinkSubnet();
-      ConcreteInterfaceAddress igwIfaceAddress =
-          ConcreteInterfaceAddress.create(
-              igwAddresses.getStartIp(), igwAddresses.getPrefixLength());
-      Utils.newInterface(igwIfaceName, cfgNode, igwIfaceAddress, "To VPC " + vpcId);
-
-      // add the interface to the vpc router
-      Configuration vpcConfigNode = awsConfiguration.getConfigurationNodes().get(vpcId);
-      String vpcIfaceName = _internetGatewayId;
-      ConcreteInterfaceAddress vpcIfaceAddress =
-          ConcreteInterfaceAddress.create(igwAddresses.getEndIp(), igwAddresses.getPrefixLength());
-      Utils.newInterface(
-          vpcIfaceName, vpcConfigNode, vpcIfaceAddress, "To InternetGateway " + _internetGatewayId);
-
-      // associate this gateway with the vpc
-      region.getVpcs().get(vpcId).setInternetGatewayId(_internetGatewayId);
-
-      // add a route on the gateway to the vpc for public IPs in the VPC
-      region.getNetworkInterfaces().values().stream()
-          .filter(ni -> ni.getVpcId().equals(vpcId))
-          .flatMap(ni -> ni.getPrivateIpAddresses().stream())
-          .map(PrivateIpAddress::getPublicIp)
-          .filter(Objects::nonNull)
-          .forEach(
-              ip -> {
-                Prefix publicPrefix = Prefix.create(ip, Prefix.MAX_PREFIX_LENGTH);
-                publicPrefixSpace.addPrefix(publicPrefix);
-                addStaticRoute(cfgNode, toStaticRoute(publicPrefix, vpcIfaceAddress.getIp()));
-              });
-    }
-
-    createBackboneConnection(
-        cfgNode, awsConfiguration.getNextGeneratedLinkSubnet(), publicPrefixSpace);
-    return cfgNode;
-  }
-
-  /**
-   * Creates an interface facing the backbone and run a BGP process that advertises static routes
-   */
-  @VisibleForTesting
-  static void createBackboneConnection(
-      Configuration cfgNode, Prefix bbInterfaceSubnet, PrefixSpace publicPrefixSpace) {
+    // Create an interface facing the backbone and run a BGP process that advertises static routes
+    Prefix bbInterfaceSubnet = awsConfiguration.getNextGeneratedLinkSubnet();
     ConcreteInterfaceAddress bbInterfaceAddress =
         ConcreteInterfaceAddress.create(
             bbInterfaceSubnet.getStartIp(), bbInterfaceSubnet.getPrefixLength());
@@ -157,6 +115,20 @@ final class InternetGateway implements AwsVpcEntity, Serializable {
             .setAdminCostsToVendorDefaults(ConfigurationFormat.CISCO_IOS)
             .build();
 
+    /*
+     collect all public IPs in attached VPCs to we can create the right backbone facing policy.
+     internet gateway also needs static routes to these public IPs that point to the right subnet.
+     these routes, along with interfaces to subnet, are created when we process subnets
+    */
+    PrefixSpace publicPrefixSpace = new PrefixSpace();
+    for (String vpcId : _attachmentVpcIds) {
+      region.getNetworkInterfaces().values().stream()
+          .filter(ni -> ni.getVpcId().equals(vpcId))
+          .flatMap(ni -> ni.getPrivateIpAddresses().stream())
+          .map(PrivateIpAddress::getPublicIp)
+          .filter(Objects::nonNull)
+          .forEach(ip -> publicPrefixSpace.addPrefix(Prefix.create(ip, Prefix.MAX_PREFIX_LENGTH)));
+    }
     cfgNode.setRoutingPolicies(
         ImmutableSortedMap.of(
             BACKBONE_EXPORT_POLICY_NAME,
@@ -172,6 +144,8 @@ final class InternetGateway implements AwsVpcEntity, Serializable {
         .setIpv4UnicastAddressFamily(
             Ipv4UnicastAddressFamily.builder().setExportPolicy(BACKBONE_EXPORT_POLICY_NAME).build())
         .build();
+
+    return cfgNode;
   }
 
   @Override

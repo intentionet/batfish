@@ -68,10 +68,6 @@ final class Vpc implements AwsVpcEntity, Serializable {
 
   @Nonnull private final String _vpcId;
 
-  @Nullable private transient String _vpnGatewayId;
-
-  @Nullable private transient String _internetGatewayId;
-
   @JsonCreator
   private static Vpc create(
       @Nullable @JsonProperty(JSON_KEY_VPC_ID) String vpcId,
@@ -102,24 +98,6 @@ final class Vpc implements AwsVpcEntity, Serializable {
   @Override
   public String getId() {
     return _vpcId;
-  }
-
-  @Nullable
-  String getInternetGatewayId() {
-    return _internetGatewayId;
-  }
-
-  @Nullable
-  String getVpnGatewayId() {
-    return _vpnGatewayId;
-  }
-
-  void setInternetGatewayId(String internetGatewayId) {
-    _internetGatewayId = internetGatewayId;
-  }
-
-  void setVpnGatewayId(String vpnGatewayId) {
-    _vpnGatewayId = vpnGatewayId;
   }
 
   /**
@@ -158,14 +136,11 @@ final class Vpc implements AwsVpcEntity, Serializable {
     }
     Vpc vpc = (Vpc) o;
     return Objects.equals(_cidrBlockAssociations, vpc._cidrBlockAssociations)
-        && Objects.equals(_vpcId, vpc._vpcId)
-        && Objects.equals(_vpnGatewayId, vpc._vpnGatewayId)
-        && Objects.equals(_internetGatewayId, vpc._internetGatewayId);
+        && Objects.equals(_vpcId, vpc._vpcId);
   }
 
   @Override
   public int hashCode() {
-    return com.google.common.base.Objects.hashCode(
-        _cidrBlockAssociations, _vpcId, _vpnGatewayId, _internetGatewayId);
+    return com.google.common.base.Objects.hashCode(_cidrBlockAssociations, _vpcId);
   }
 }

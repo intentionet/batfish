@@ -6,7 +6,9 @@ hostname nxos_port_channel
 ! port-channel with no members:
 ! - shutdown = false (default)
 ! - active = false (no members)
+! - lacp min-links = 2
 interface port-channel1
+  lacp min-links 2
 !
 
 ! port-channel with shutdown member:

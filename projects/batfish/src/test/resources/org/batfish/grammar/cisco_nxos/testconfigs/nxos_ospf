@@ -220,6 +220,9 @@ interface Ethernet1/1
   no switchport
   no shutdown
   ip address 10.0.0.1/24
+  ip ospf bfd
+  ! 1-65535
+  ip ospf cost 12
   ! can use type 0,3,7 password
   ip ospf message-digest-key 0 foobar
   ! 1-65535 (default is 40) (s)
@@ -240,3 +243,10 @@ interface Ethernet1/3
   no shutdown
   ip address 172.16.0.1/24
   ip ospf network point-to-point
+interface Ethernet1/4
+  no switchport
+  no shutdown
+  ip address 172.16.1.1/24
+  ip ospf passive-interface
+  ! use arbitrary process with active default
+  ip router ospf router_id area 0

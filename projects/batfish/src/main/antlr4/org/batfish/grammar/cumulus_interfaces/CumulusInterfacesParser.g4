@@ -39,6 +39,7 @@ s_iface
   | i_bridge_ports
   | i_bridge_pvid
   | i_bridge_vids
+  | i_bridge_vlan_aware
   | i_clag_id
   | i_clagd_backup_ip
   | i_clagd_peer_ip
@@ -111,6 +112,11 @@ i_bridge_pvid
 i_bridge_vids
 :
   BRIDGE_VIDS number+ NEWLINE
+;
+
+i_bridge_vlan_aware
+:
+  BRIDGE_VLAN_AWARE (YES | NO) NEWLINE
 ;
 
 i_clag_id

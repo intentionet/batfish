@@ -71,7 +71,10 @@ public final class IspModelingUtils {
   static final String INTERNET_OUT_INTERFACE = "Internet_out_interface";
   static final int INTERNET_OUT_SUBNET = 30;
   private static final int ISP_INTERNET_SUBNET = 31;
-  private static final String ISP_HOSTNAME_PREFIX = "isp";
+
+  public static String getIspNodeName(Long asn) {
+    return String.format("%s_%s", "isp", asn);
+  }
 
   private IspModelingUtils() {}
 
@@ -420,7 +423,7 @@ public final class IspModelingUtils {
       return null;
     }
 
-    String ispNodeName = String.format("%s_%s", ISP_HOSTNAME_PREFIX, asn);
+    String ispNodeName = getIspNodeName(asn);
     Configuration ispConfiguration =
         nf.configurationBuilder()
             .setHostname(ispNodeName)

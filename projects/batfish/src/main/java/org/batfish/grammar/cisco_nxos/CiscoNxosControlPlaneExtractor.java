@@ -180,6 +180,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Evv_rdContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Evv_route_targetContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_bandwidthContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_channel_groupContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_delayContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_descriptionContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_encapsulationContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_ip_addressContext;
@@ -189,12 +190,13 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_no_autostateContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_no_shutdownContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_no_switchportContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_shutdownContext;
-import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_speedContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_speed_numberContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_accessContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_mode_accessContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_mode_dot1q_tunnelContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_mode_fex_fabricContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_mode_trunkContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_monitorContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_switchportContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_trunk_allowedContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.I_switchport_trunk_nativeContext;
@@ -209,10 +211,14 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ihg_priorityContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ihg_timersContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ihg_trackContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ihgam_key_chainContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Iipo_bfdContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Iipo_costContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Iipo_dead_intervalContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Iipo_hello_intervalContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Iipo_networkContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Iipo_passive_interfaceContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Iipr_ospfContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Il_min_linksContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Inherit_sequence_numberContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Interface_addressContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Interface_bandwidth_kbpsContext;
@@ -543,8 +549,12 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   private static final IntegerSpace HSRP_TRACK_DECREMENT_RANGE =
       IntegerSpace.of(Range.closed(1, 255));
   private static final IntegerSpace HSRP_VERSION_RANGE = IntegerSpace.of(Range.closed(1, 2));
+  private static final IntegerSpace INTERFACE_DELAY_10US_RANGE =
+      IntegerSpace.of(Range.closed(1, 16777215));
   private static final IntegerSpace INTERFACE_DESCRIPTION_LENGTH_RANGE =
       IntegerSpace.of(Range.closed(1, 254));
+  private static final IntegerSpace INTERFACE_OSPF_COST_RANGE =
+      IntegerSpace.of(Range.closed(1, 65535));
   private static final IntegerSpace INTERFACE_SPEED_RANGE_MBPS =
       IntegerSpace.builder()
           .including(100)
@@ -576,6 +586,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
       IntegerSpace.of(Range.closed(1, 63));
   private static final IntegerSpace IP_PREFIX_LIST_PREFIX_LENGTH_RANGE =
       IntegerSpace.of(Range.closed(1, 32));
+  private static final IntegerSpace LACP_MIN_LINKS_RANGE = IntegerSpace.of(Range.closed(1, 32));
   private static final IntegerSpace NUM_AS_PATH_PREPENDS_RANGE =
       IntegerSpace.of(Range.closed(1, 10));
   private static final IntegerSpace OBJECT_GROUP_NAME_LENGTH_RANGE =
@@ -980,7 +991,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   }
 
   @Override
-  public void exitI_speed(I_speedContext ctx) {
+  public void exitI_speed_number(I_speed_numberContext ctx) {
     toIntegerInSpace(ctx, ctx.speed, INTERFACE_SPEED_RANGE_MBPS, "interface speed")
         .ifPresent(speed -> _currentInterfaces.forEach(iface -> iface.setSpeed(speed)));
   }
@@ -1067,6 +1078,14 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   public void exitIhgam_key_chain(Ihgam_key_chainContext ctx) {
     // TODO: support HSRP md5 authentication key-chain
     todo(ctx);
+  }
+
+  @Override
+  public void exitI_delay(I_delayContext ctx) {
+    toIntegerInSpace(
+            ctx, ctx.delay, INTERFACE_DELAY_10US_RANGE, "Interface delay (tens of microseconds)")
+        .ifPresent(
+            delay -> _currentInterfaces.forEach(iface -> iface.setDelayTensOfMicroseconds(delay)));
   }
 
   @Override
@@ -1241,6 +1260,26 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   }
 
   @Override
+  public void exitIl_min_links(Il_min_linksContext ctx) {
+    toIntegerInSpace(ctx, ctx.num, LACP_MIN_LINKS_RANGE, "lacp min-links")
+        .ifPresent(
+            minLinks ->
+                _currentInterfaces.forEach(iface -> iface.getOrCreateLacp().setMinLinks(minLinks)));
+  }
+
+  @Override
+  public void exitIipo_bfd(Iipo_bfdContext ctx) {
+    _currentInterfaces.forEach(iface -> iface.getOrCreateOspf().setBfd(true));
+  }
+
+  @Override
+  public void exitIipo_cost(Iipo_costContext ctx) {
+    toIntegerInSpace(ctx, ctx.cost, INTERFACE_OSPF_COST_RANGE, "OSPF cost")
+        .ifPresent(
+            cost -> _currentInterfaces.forEach(iface -> iface.getOrCreateOspf().setCost(cost)));
+  }
+
+  @Override
   public void exitIipo_dead_interval(Iipo_dead_intervalContext ctx) {
     Optional<Integer> deadIntervalOrErr =
         toIntegerInSpace(ctx, ctx.interval_s, OSPF_DEAD_INTERVAL_S_RANGE, "OSPF dead-interval");
@@ -1273,6 +1312,11 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
       return;
     }
     _currentInterfaces.forEach(iface -> iface.getOrCreateOspf().setNetwork(type));
+  }
+
+  @Override
+  public void exitIipo_passive_interface(Iipo_passive_interfaceContext ctx) {
+    _currentInterfaces.forEach(iface -> iface.getOrCreateOspf().setPassive(true));
   }
 
   @Override
@@ -3616,6 +3660,11 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   @Override
   public void exitI_switchport_mode_trunk(I_switchport_mode_trunkContext ctx) {
     _currentInterfaces.forEach(iface -> iface.setSwitchportMode(SwitchportMode.TRUNK));
+  }
+
+  @Override
+  public void exitI_switchport_monitor(I_switchport_monitorContext ctx) {
+    _currentInterfaces.forEach(iface -> iface.setSwitchportMonitor(true));
   }
 
   @Override

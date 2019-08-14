@@ -103,9 +103,6 @@ final class VpnGateway implements AwsVpcEntity, Serializable {
       Utils.newInterface(
           vpcIfaceName, vpcConfigNode, vpcIfaceAddress, "To VPN gateway " + _vpnGatewayId);
 
-      // associate this gateway with the vpc
-      region.getVpcs().get(vpcId).setVpnGatewayId(_vpnGatewayId);
-
       // add a route on the gateway to the vpc
       Vpc vpc = region.getVpcs().get(vpcId);
       vpc.getCidrBlockAssociations()

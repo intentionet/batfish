@@ -2,6 +2,7 @@ package org.batfish.representation.aws;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.batfish.representation.aws.Utils.checkNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -200,16 +201,15 @@ final class Instance implements AwsVpcEntity, Serializable {
       @Nullable @JsonProperty(JSON_KEY_TAGS) List<Tag> tags,
       @Nullable @JsonProperty(JSON_KEY_STATE) State state) {
 
-    checkArgument(instanceId != null, "InstanceId cannot be null in Instance json");
+    checkNonNull(instanceId, "InstanceId", "Instance");
     checkArgument(
         (vpcId == null && subnetId == null) || (vpcId != null && subnetId != null),
         "Only one of vpcId ('%s') and subnetId ('%s') is null",
         vpcId,
         subnetId);
-    checkArgument(securityGroups != null, "Security groups cannot be null in Instance json");
-    checkArgument(networkInterfaces != null, "Network interfaces cannot be null in Instance json");
-    checkArgument(tags != null, "Tags cannot be null in Instance json");
-    checkArgument(state != null, "State cannot be null in Instance json");
+    checkNonNull(securityGroups, "Security groups", "Instance");
+    checkNonNull(networkInterfaces, "Network interfaces", "Instance");
+    checkNonNull(state, "State", "Instance");
 
     return new Instance(
         instanceId,
@@ -221,7 +221,8 @@ final class Instance implements AwsVpcEntity, Serializable {
         networkInterfaces.stream()
             .map(NetworkInterfaceId::getId)
             .collect(ImmutableList.toImmutableList()),
-        tags.stream().collect(ImmutableMap.toImmutableMap(Tag::getKey, Tag::getValue)),
+        firstNonNull(tags, ImmutableList.<Tag>of()).stream()
+            .collect(ImmutableMap.toImmutableMap(Tag::getKey, Tag::getValue)),
         state.getName());
 
     // check if the public and private ip addresses are associated with an

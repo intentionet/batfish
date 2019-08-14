@@ -215,4 +215,5 @@ interface Ethernet1/14
 interface Ethernet1/15
   no switchport
   switchport
+  switchport monitor
 !

@@ -1176,6 +1176,11 @@ FLASH_OVERRIDE
   'flash-override'
 ;
 
+FLOW
+:
+  'flow'
+;
+
 FORCE
 :
   'force'
@@ -1492,7 +1497,12 @@ INJECT_MAP
 
 INPUT
 :
-  'input' -> pushMode ( M_Word )
+  'input'
+  {
+    if (lastTokenType() == SERVICE_POLICY) {
+      pushMode(M_Word);
+    }
+  }
 ;
 
 INSTALL
@@ -1684,6 +1694,11 @@ LINK_LOCAL_GROUPS_SUPPRESSION
 LINK_STATE
 :
   'link-state'
+;
+
+LINK_STATUS
+:
+  'link-status'
 ;
 
 LISP
@@ -1944,6 +1959,11 @@ MGMT
   [Mm] [Gg] [Mm] [Tt]
 ;
 
+MIN_LINKS
+:
+  'min-links'
+;
+
 MIN_RX
 :
   'min_rx'
@@ -1972,6 +1992,16 @@ MOBILE_REDIRECT
 MODE
 :
   'mode'
+;
+
+MONITOR
+:
+  'monitor'
+  {
+    if (lastTokenType() == FLOW) {
+      pushMode(M_Word);
+    }
+  }
 ;
 
 MROUTER
@@ -2863,6 +2893,11 @@ RULE
   'rule'
 ;
 
+SAMPLER
+:
+  'sampler' -> pushMode(M_Word)
+;
+
 SCHEDULER
 :
   'scheduler'
@@ -3432,6 +3467,11 @@ UNICAST
 UNREACHABLE
 :
   'unreachable'
+;
+
+UNREACHABLES
+:
+  'unreachables'
 ;
 
 UNSUPPRESS_MAP
@@ -4277,9 +4317,15 @@ M_DoubleQuote_DOUBLE_QUOTE
   '"' -> type ( DOUBLE_QUOTE ) , popMode
 ;
 
+M_DoubleQuote_NEWLINE
+:
+// Break out if termination does not occur on same line
+  F_Newline+ -> type ( NEWLINE ) , popMode
+;
+
 M_DoubleQuote_QUOTED_TEXT
 :
-  ~'"'+ -> type ( QUOTED_TEXT )
+  ~["\r\n]+ -> type ( QUOTED_TEXT )
 ;
 
 mode M_Hostname;

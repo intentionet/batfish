@@ -1,0 +1,8 @@
+!RANCID-CONTENT-TYPE: cisco-nx
+!
+hostname nxos_ip_as_path_access_list_invalid
+!
+
+!!! Should fail: quote string cannot contain newline
+ip as-path access-list aspacl_bad permit "^1$
+"

@@ -6,8 +6,6 @@ import static org.batfish.representation.aws.InternetGateway.AWS_BACKBONE_AS;
 import static org.batfish.representation.aws.InternetGateway.AWS_INTERNET_GATEWAY_AS;
 import static org.batfish.representation.aws.InternetGateway.BACKBONE_EXPORT_POLICY_NAME;
 import static org.batfish.representation.aws.InternetGateway.BACKBONE_INTERFACE_NAME;
-import static org.batfish.representation.aws.InternetGateway.createBackboneConnection;
-import static org.batfish.representation.aws.Utils.toStaticRoute;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -58,9 +56,8 @@ public class InternetGatewayTest {
                 new InternetGateway("igw-fac5839d", ImmutableList.of("vpc-925131f4")))));
   }
 
-  /** Test that the right interfaces are created on the Internet gateway */
   @Test
-  public void testToConfigurationNodeInterfaces() {
+  public void testToConfiguration() {
 
     Vpc vpc = new Vpc("vpc", ImmutableSet.of());
     Configuration vpcConfig = Utils.newAwsConfiguration(vpc.getId(), "awstest");
@@ -98,66 +95,35 @@ public class InternetGatewayTest {
         igwConfig.getAllInterfaces().values().stream()
             .map(i -> i.getName())
             .collect(ImmutableList.toImmutableList()),
-        equalTo(ImmutableList.of(BACKBONE_INTERFACE_NAME, vpc.getId())));
+        equalTo(ImmutableList.of(BACKBONE_INTERFACE_NAME)));
 
-    // vpc should have a pointer to the gateway
-    assertThat(
-        vpcConfig.getAllInterfaces().values().stream()
-            .map(i -> i.getName())
-            .collect(ImmutableList.toImmutableList()),
-        equalTo(ImmutableList.of(internetGateway.getId())));
+    Prefix bbInterfacePrefix =
+        igwConfig.getAllInterfaces().get(BACKBONE_INTERFACE_NAME).getConcreteAddress().getPrefix();
 
-    // vpc interface should have the right address
+    assertTrue(igwConfig.getAllInterfaces().containsKey(BACKBONE_INTERFACE_NAME));
     assertThat(
-        igwConfig.getAllInterfaces().get(vpc.getId()).getConcreteAddress().getPrefix(),
+        igwConfig.getDefaultVrf().getBgpProcess().getRouterId(),
+        equalTo(bbInterfacePrefix.getStartIp()));
+
+    assertThat(
+        igwConfig.getRoutingPolicies().get(BACKBONE_EXPORT_POLICY_NAME).getStatements(),
         equalTo(
-            vpcConfig
-                .getAllInterfaces()
-                .get(internetGateway.getId())
-                .getConcreteAddress()
-                .getPrefix()));
-
-    // the gateway should have a static route to the public ip
-    assertThat(
-        igwConfig.getDefaultVrf().getStaticRoutes(),
-        equalTo(
-            ImmutableSet.of(
-                toStaticRoute(
-                    publicIp,
-                    vpcConfig
-                        .getAllInterfaces()
-                        .get(internetGateway.getId())
-                        .getConcreteAddress()
-                        .getIp()))));
-  }
-
-  @Test
-  public void testCreateBackboneConnection() {
-    Configuration cfgNode = Utils.newAwsConfiguration("igw", "awstest");
-    Prefix prefix = Prefix.parse("10.10.10.10/24");
-
-    // dummy value for prefix space
-    PrefixSpace dummySpace = new PrefixSpace(PrefixRange.fromPrefix(Prefix.MULTICAST));
-    createBackboneConnection(cfgNode, prefix, dummySpace);
-
-    assertTrue(cfgNode.getAllInterfaces().containsKey(BACKBONE_INTERFACE_NAME));
-    assertThat(cfgNode.getDefaultVrf().getBgpProcess().getRouterId(), equalTo(prefix.getStartIp()));
-
-    assertThat(
-        cfgNode.getRoutingPolicies().get(BACKBONE_EXPORT_POLICY_NAME).getStatements(),
-        equalTo(
-            Collections.singletonList(IspModelingUtils.getAdvertiseStaticStatement(dummySpace))));
+            Collections.singletonList(
+                IspModelingUtils.getAdvertiseStaticStatement(
+                    new PrefixSpace(
+                        PrefixRange.fromPrefix(
+                            Prefix.create(publicIp, Prefix.MAX_PREFIX_LENGTH)))))));
 
     BgpActivePeerConfig nbr =
-        getOnlyElement(cfgNode.getDefaultVrf().getBgpProcess().getActiveNeighbors().values());
+        getOnlyElement(igwConfig.getDefaultVrf().getBgpProcess().getActiveNeighbors().values());
     assertThat(
         nbr,
         equalTo(
             BgpActivePeerConfig.builder()
-                .setLocalIp(prefix.getStartIp())
+                .setLocalIp(bbInterfacePrefix.getStartIp())
                 .setLocalAs(AWS_INTERNET_GATEWAY_AS)
                 .setRemoteAs(AWS_BACKBONE_AS)
-                .setPeerAddress(prefix.getEndIp())
+                .setPeerAddress(bbInterfacePrefix.getEndIp())
                 .setIpv4UnicastAddressFamily(
                     Ipv4UnicastAddressFamily.builder()
                         .setExportPolicy(BACKBONE_EXPORT_POLICY_NAME)

@@ -54,6 +54,7 @@ rm_set
   SET
   (
     rms_metric
+    | rms_community
     | rms_ip
   )
 ;
@@ -99,4 +100,9 @@ rmsip_next_hop
 rmsipnh_literal
 :
   next_hop = ip_address NEWLINE
+;
+
+rms_community
+:
+  COMMUNITY communities += literal_standard_community+ NEWLINE
 ;

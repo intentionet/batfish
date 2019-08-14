@@ -7,11 +7,13 @@ import static org.batfish.representation.aws.Utils.toStaticRoute;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -25,6 +27,8 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.StaticRoute;
+import org.batfish.representation.aws.Route.State;
 
 /**
  * Representation of an AWS subnet
@@ -43,10 +47,6 @@ public class Subnet implements AwsVpcEntity, Serializable {
   @Nonnull private final Set<Long> _allocatedIps;
 
   private long _lastGeneratedIp;
-
-  private transient String _internetGatewayId;
-
-  private transient String _vpnGatewayId;
 
   @JsonCreator
   private static Subnet create(
@@ -114,59 +114,6 @@ public class Subnet implements AwsVpcEntity, Serializable {
     return matchingAcls.get(0);
   }
 
-  // TODO: implement per-subnet routing
-  @SuppressWarnings("unused")
-  private RouteTable findMyRouteTable(Map<String, RouteTable> routeTables) {
-    // All route tables for this VPC.
-    List<RouteTable> sameVpcTables =
-        routeTables.values().stream()
-            .filter((RouteTable rt) -> rt.getVpcId().equals(_vpcId))
-            .collect(Collectors.toList());
-
-    // First we look for the unique route table with an association for this subnet.
-    List<RouteTable> matchingRouteTables =
-        sameVpcTables.stream()
-            .filter(
-                (RouteTable rt) ->
-                    rt.getAssociations().stream()
-                        .anyMatch(
-                            (RouteTable.Association rtAssoc) ->
-                                _subnetId.equals(rtAssoc.getSubnetId())))
-            .collect(Collectors.toList());
-    if (matchingRouteTables.size() > 1) {
-      List<String> tableIds =
-          matchingRouteTables.stream().map(RouteTable::getId).collect(Collectors.toList());
-      throw new BatfishException(
-          String.format(
-              "Found multiple associated route tables %s for subnet %s", tableIds, _subnetId));
-    }
-
-    if (matchingRouteTables.size() == 1) {
-      return matchingRouteTables.get(0);
-    }
-
-    // If no route table has an association with this subnet, find the unique main routing table.
-    List<RouteTable> mainRouteTables =
-        sameVpcTables.stream()
-            .filter(
-                (RouteTable rt) ->
-                    rt.getAssociations().stream().anyMatch(RouteTable.Association::isMain))
-            .collect(Collectors.toList());
-
-    if (mainRouteTables.isEmpty()) {
-      throw new BatfishException("Could not find a route table for subnet " + _subnetId);
-    }
-
-    if (mainRouteTables.size() > 1) {
-      List<String> tableIds =
-          mainRouteTables.stream().map(RouteTable::getId).collect(Collectors.toList());
-      throw new BatfishException(
-          String.format("Found multiple main route tables %s for subnet %s", tableIds, _subnetId));
-    }
-
-    return mainRouteTables.get(0);
-  }
-
   @Nonnull
   public Prefix getCidrBlock() {
     return _cidrBlock;
@@ -177,16 +124,8 @@ public class Subnet implements AwsVpcEntity, Serializable {
     return _subnetId;
   }
 
-  String getInternetGatewayId() {
-    return _internetGatewayId;
-  }
-
   public String getVpcId() {
     return _vpcId;
-  }
-
-  String getVpnGatewayId() {
-    return _vpnGatewayId;
   }
 
   /**
@@ -208,43 +147,14 @@ public class Subnet implements AwsVpcEntity, Serializable {
         Utils.newInterface(
             instancesIfaceName, cfgNode, instancesIfaceAddress, "To instances " + _subnetId);
 
-    // generate a prefix for the link between the VPC router and the subnet
-    Prefix vpcSubnetLinkPrefix = awsConfiguration.getNextGeneratedLinkSubnet();
-    ConcreteInterfaceAddress subnetIfaceAddress =
-        ConcreteInterfaceAddress.create(
-            vpcSubnetLinkPrefix.getStartIp(), vpcSubnetLinkPrefix.getPrefixLength());
-    ConcreteInterfaceAddress vpcIfaceAddress =
-        ConcreteInterfaceAddress.create(
-            vpcSubnetLinkPrefix.getEndIp(), vpcSubnetLinkPrefix.getPrefixLength());
-
-    // add an interface that faces the VPC router
-    String subnetIfaceName = _vpcId;
-    Interface subnetToVpc =
-        Utils.newInterface(subnetIfaceName, cfgNode, subnetIfaceAddress, "To VPC " + _vpcId);
-
-    // add a corresponding interface on the VPC router facing the subnet
+    // connect to the VPC
     Configuration vpcConfigNode = awsConfiguration.getConfigurationNodes().get(_vpcId);
-    String vpcIfaceName = _subnetId;
-    Utils.newInterface(vpcIfaceName, vpcConfigNode, vpcIfaceAddress, "To subnet " + _subnetId);
+    Utils.connect(awsConfiguration, cfgNode, vpcConfigNode);
 
-    // add a static route on the vpc router for this subnet
-    addStaticRoute(vpcConfigNode, toStaticRoute(_cidrBlock, subnetIfaceAddress.getIp()));
+    // add a static route on the vpc router for this subnet;
+    addStaticRoute(vpcConfigNode, toStaticRoute(_cidrBlock, Utils.getInterfaceIp(cfgNode, _vpcId)));
 
-    // Install a default static route towards the VPC router.
-    addStaticRoute(cfgNode, toStaticRoute(Prefix.ZERO, vpcIfaceAddress.getIp()));
-
-    // for public IPs in the subnet, add static routes on the VPC and Subnet nodes
-    region.getNetworkInterfaces().values().stream()
-        .filter(ni -> ni.getSubnetId().equals(_subnetId))
-        .flatMap(ni -> ni.getPrivateIpAddresses().stream())
-        .map(PrivateIpAddress::getPublicIp)
-        .filter(Objects::nonNull)
-        .forEach(
-            pip -> {
-              addStaticRoute(vpcConfigNode, toStaticRoute(pip, subnetIfaceAddress.getIp()));
-              addStaticRoute(cfgNode, toStaticRoute(pip, subnetToInstances));
-            });
-
+    // add network acls on the subnet node
     NetworkAcl myNetworkAcl = findMyNetworkAcl(region.getNetworkAcls());
 
     IpAccessList inAcl = myNetworkAcl.getIngressAcl();
@@ -252,14 +162,148 @@ public class Subnet implements AwsVpcEntity, Serializable {
     cfgNode.getIpAccessLists().put(inAcl.getName(), inAcl);
     cfgNode.getIpAccessLists().put(outAcl.getName(), outAcl);
 
-    subnetToVpc.setIncomingFilter(inAcl);
-    subnetToVpc.setOutgoingFilter(outAcl);
+    // add ACLs to interface facing the vpc
+    Interface vpcIfaceOnSubnet = cfgNode.getAllInterfaces().get(vpcConfigNode.getHostname());
+    vpcIfaceOnSubnet.setIncomingFilter(inAcl);
+    vpcIfaceOnSubnet.setOutgoingFilter(outAcl);
+
+    // connect the vpn gateway to the subnet if one exists
+    Optional<VpnGateway> optVpnGateway = region.findVpnGateway(_vpcId);
+    if (optVpnGateway.isPresent()) {
+      Configuration vgwConfig =
+          awsConfiguration.getConfigurationNodes().get(optVpnGateway.get().getId());
+      Utils.connect(awsConfiguration, cfgNode, vgwConfig);
+    }
+
+    // connect the internet gateway if one exists
+    Optional<InternetGateway> optInternetGateway = region.findInternetGateway(_vpcId);
+    if (optInternetGateway.isPresent()) {
+      Configuration igwConfig =
+          awsConfiguration.getConfigurationNodes().get(optInternetGateway.get().getId());
+      Utils.connect(awsConfiguration, cfgNode, igwConfig);
+    }
+
+    // for public IPs in the subnet, add static routes to enable inbound traffic
+    //  - on internet gateway toward the subnet
+    //  - on the subnet toward instances
+    List<Ip> publicIps = findMyPublicIps(region);
+    if (!publicIps.isEmpty()) {
+      if (!optInternetGateway.isPresent()) {
+        warnings.redFlag(
+            String.format(
+                "Internet gateway not found for subnet %s in vpc %s with public IPs %s",
+                _subnetId, _vpcId, publicIps));
+      } else {
+        Configuration igwConfig =
+            awsConfiguration.getConfigurationNodes().get(optInternetGateway.get().getId());
+        Ip nhipOnIgw = Utils.getInterfaceIp(cfgNode, igwConfig.getHostname());
+        publicIps.forEach(
+            pip -> {
+              addStaticRoute(igwConfig, toStaticRoute(pip, nhipOnIgw));
+              addStaticRoute(cfgNode, toStaticRoute(pip, subnetToInstances));
+            });
+      }
+    }
+
+    // process route tables to get outbound traffic going
+    Optional<RouteTable> routeTable = region.findRouteTable(_vpcId, _subnetId);
+    if (!routeTable.isPresent()) {
+      warnings.redFlag(
+          String.format("Route table not found for subnet %s in vpc %s", _subnetId, _vpcId));
+    } else {
+      routeTable
+          .get()
+          .getRoutes()
+          .forEach(
+              route -> {
+                StaticRoute sr =
+                    getStaticRoute(
+                        route,
+                        optInternetGateway.orElse(null),
+                        optVpnGateway.orElse(null),
+                        awsConfiguration,
+                        warnings);
+                if (sr != null) {
+                  addStaticRoute(cfgNode, sr);
+                }
+              });
+    }
 
     cfgNode.getVendorFamily().getAws().setVpcId(_vpcId);
     cfgNode.getVendorFamily().getAws().setSubnetId(_subnetId);
     cfgNode.getVendorFamily().getAws().setRegion(region.getName());
 
     return cfgNode;
+  }
+
+  private List<Ip> findMyPublicIps(Region region) {
+    return region.getNetworkInterfaces().values().stream()
+        .filter(ni -> ni.getSubnetId().equals(_subnetId))
+        .flatMap(ni -> ni.getPrivateIpAddresses().stream())
+        .map(PrivateIpAddress::getPublicIp)
+        .filter(Objects::nonNull)
+        .collect(ImmutableList.toImmutableList());
+  }
+
+  /**
+   * Returns a static route corresponding to {@link Route}. Assumes that the node to which the route
+   * is pointed is already connected to subnet node.
+   */
+  @Nullable
+  StaticRoute getStaticRoute(
+      Route route,
+      @Nullable InternetGateway igw,
+      @Nullable VpnGateway vgw,
+      AwsConfiguration awsConfiguration,
+      Warnings warnings) {
+
+    StaticRoute.Builder sr =
+        StaticRoute.builder()
+            .setNetwork(route.getDestinationCidrBlock())
+            .setAdministrativeCost(Route.DEFAULT_STATIC_ROUTE_ADMIN)
+            .setMetric(Route.DEFAULT_STATIC_ROUTE_COST);
+
+    if (route.getState() == State.BLACKHOLE) {
+      return sr.setNextHopInterface(Interface.NULL_INTERFACE_NAME).build();
+    } else {
+      switch (route.getTargetType()) {
+        case Gateway:
+          if (route.getTarget() == null) {
+            warnings.redFlag("Route target is null for target type Gateway");
+            return null;
+          }
+          if (route.getTarget().equals("local")) {
+            // Tp VPC
+            return sr.setNextHopIp(
+                    Utils.getInterfaceIp(
+                        awsConfiguration.getConfigurationNodes().get(_vpcId), _subnetId))
+                .build();
+          } else {
+            if (igw != null && route.getTarget().equals(igw.getId())) {
+              // To IGW
+              return sr.setNextHopIp(
+                      Utils.getInterfaceIp(
+                          awsConfiguration.getConfigurationNodes().get(igw.getId()), _subnetId))
+                  .build();
+            } else if (vgw != null && route.getTarget().equals(vgw.getId())) {
+              // To VGW
+              return sr.setNextHopIp(
+                      Utils.getInterfaceIp(
+                          awsConfiguration.getConfigurationNodes().get(vgw.getId()), _subnetId))
+                  .build();
+            } else {
+              warnings.redFlag(
+                  String.format(
+                      "Unknown target %s specified in this route not accessible from this subnet",
+                      route.getTarget()));
+              return null;
+            }
+          }
+        default:
+          warnings.redFlag("Unsupported target type: " + route.getTargetType());
+          return null;
+      }
+    }
   }
 
   @Override
@@ -275,20 +319,11 @@ public class Subnet implements AwsVpcEntity, Serializable {
         && Objects.equals(_cidrBlock, subnet._cidrBlock)
         && Objects.equals(_subnetId, subnet._subnetId)
         && Objects.equals(_vpcId, subnet._vpcId)
-        && Objects.equals(_allocatedIps, subnet._allocatedIps)
-        && Objects.equals(_internetGatewayId, subnet._internetGatewayId)
-        && Objects.equals(_vpnGatewayId, subnet._vpnGatewayId);
+        && Objects.equals(_allocatedIps, subnet._allocatedIps);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-        _cidrBlock,
-        _subnetId,
-        _vpcId,
-        _allocatedIps,
-        _lastGeneratedIp,
-        _internetGatewayId,
-        _vpnGatewayId);
+    return Objects.hash(_cidrBlock, _subnetId, _vpcId, _allocatedIps, _lastGeneratedIp);
   }
 }

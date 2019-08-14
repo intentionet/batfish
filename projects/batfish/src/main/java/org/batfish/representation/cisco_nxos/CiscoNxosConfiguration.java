@@ -1747,7 +1747,11 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
                 if (ospf.getArea().equals(areaId) && ospf.getProcess().equals(processName)) {
                   interfaces.add(ifaceName);
                   finalizeInterfaceOspfSettings(
-                      ifaceName, areaId, processName, proc.getPassiveInterfaceDefault());
+                      ifaceName,
+                      areaId,
+                      processName,
+                      proc.getPassiveInterfaceDefault(),
+                      iface.getOspf());
                 }
               } else {
                 // Otherwise if OSPF area not explicitly configured on interface, add to this area
@@ -1767,20 +1771,31 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
                 }
                 interfaces.add(ifaceName);
                 finalizeInterfaceOspfSettings(
-                    ifaceName, areaId, processName, proc.getPassiveInterfaceDefault());
+                    ifaceName,
+                    areaId,
+                    processName,
+                    proc.getPassiveInterfaceDefault(),
+                    iface.getOspf());
               }
             });
     return interfaces.build();
   }
 
   private void finalizeInterfaceOspfSettings(
-      String ifaceName, long areaId, String processName, boolean passiveInterfaceDefault) {
+      String ifaceName,
+      long areaId,
+      String processName,
+      boolean passiveInterfaceDefault,
+      OspfInterface ospf) {
     org.batfish.datamodel.Interface newIface = _c.getAllInterfaces().get(ifaceName);
+    newIface.setOspfCost(ospf.getCost());
     newIface.setOspfEnabled(true);
     newIface.setOspfAreaName(areaId);
     newIface.setOspfProcess(processName);
-    // TODO: support exceptions to passive-interface default
-    newIface.setOspfPassive(passiveInterfaceDefault || newIface.getName().startsWith("loopback"));
+    newIface.setOspfPassive(
+        ospf.getPassive() != null
+            ? ospf.getPassive()
+            : passiveInterfaceDefault || newIface.getName().startsWith("loopback"));
   }
 
   private @Nonnull NssaSettings toNssaSettings(OspfAreaNssa ospfAreaNssa) {

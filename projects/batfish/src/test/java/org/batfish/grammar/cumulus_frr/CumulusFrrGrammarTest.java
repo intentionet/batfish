@@ -364,7 +364,6 @@ public class CumulusFrrGrammarTest {
     parse(String.format("route-map %s permit 10\n%s\n", name, clause1));
 
     RouteMapEntry entry = CONFIG.getRouteMaps().get(name).getEntries().get(10);
-    assertThat(
-        entry.getSetIpNextHop().getNextHop(), equalTo(ImmutableList.of(Ip.parse("10.0.0.1"))));
+    assertThat(entry.getSetIpNextHop().getNextHop(), equalTo(Ip.parse("10.0.0.1")));
   }
 }
