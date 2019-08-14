@@ -7184,13 +7184,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     } else {
       CiscoIosDynamicNat dynamicNat = new CiscoIosDynamicNat();
       String acl = ctx.acl.getText();
-      int aclLine = ctx.acl.getStart().getLine();
       dynamicNat.setAclName(acl);
-      _configuration.referenceStructure(IPV4_ACCESS_LIST, acl, IP_NAT_SOURCE_ACCESS_LIST, aclLine);
+      _configuration.referenceStructure(
+          IPV4_ACCESS_LIST, acl, IP_NAT_SOURCE_ACCESS_LIST, ctx.acl.getStart().getLine());
       String pool = ctx.pool.getText();
-      int poolLine = ctx.pool.getStart().getLine();
       dynamicNat.setNatPool(pool);
-      _configuration.referenceStructure(NAT_POOL, pool, IP_NAT_SOURCE_POOL, poolLine);
+      _configuration.referenceStructure(
+          NAT_POOL, pool, IP_NAT_SOURCE_POOL, ctx.pool.getStart().getLine());
+      dynamicNat.setOverload(ctx.OVERLOAD() != null);
       nat = dynamicNat;
     }
     if (ctx.INSIDE() != null) {

@@ -4,7 +4,9 @@ import static org.batfish.datamodel.acl.AclLineMatchExprs.and;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.permittedByAcl;
 import static org.batfish.datamodel.transformation.Transformation.when;
 import static org.batfish.datamodel.transformation.TransformationStep.assignDestinationIp;
+import static org.batfish.datamodel.transformation.TransformationStep.assignDestinationPort;
 import static org.batfish.datamodel.transformation.TransformationStep.assignSourceIp;
+import static org.batfish.datamodel.transformation.TransformationStep.assignSourcePort;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.List;
@@ -20,7 +22,9 @@ import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
+import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpSpace;
+import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.acl.MatchSrcInterface;
@@ -34,6 +38,7 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
 
   private @Nullable String _aclName;
   private @Nullable String _natPool;
+  private boolean _overload;
 
   @VisibleForTesting
   public static String computeDynamicDestinationNatAclName(@Nonnull String natAclName) {
@@ -53,6 +58,10 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
     _natPool = natPool;
   }
 
+  public void setOverload(boolean overload) {
+    _overload = overload;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof CiscoIosDynamicNat)) {
@@ -61,12 +70,13 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
     CiscoIosDynamicNat other = (CiscoIosDynamicNat) o;
     return (getAction() == other.getAction())
         && Objects.equals(_aclName, other._aclName)
-        && Objects.equals(_natPool, other._natPool);
+        && Objects.equals(_natPool, other._natPool)
+        && _overload == other._overload;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(_aclName, getAction(), _natPool);
+    return Objects.hash(_aclName, getAction(), _natPool, _overload);
   }
 
   @Override
@@ -159,6 +169,28 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
   }
 
   /**
+   * Implements Cisco IOS PAT for TCP and UDP. Basically, keeps the post-NAT ports in the same range
+   * as the traffic.
+   *
+   * <p>See comment at the caller for more information.
+   */
+  private Transformation.Builder shiftPortInRange(int start, int end, boolean outgoing) {
+    HeaderSpace.Builder headerSpace =
+        HeaderSpace.builder().setIpProtocols(IpProtocol.TCP, IpProtocol.UDP);
+    if (getAction().whatChanges(outgoing) == IpField.SOURCE) {
+      headerSpace.setSrcPorts(new SubRange(start, end));
+    } else {
+      headerSpace.setDstPorts(new SubRange(start, end));
+    }
+    MatchHeaderSpace match = new MatchHeaderSpace(headerSpace.build());
+    TransformationStep shiftPorts =
+        getAction().whatChanges(outgoing) == IpField.SOURCE
+            ? assignSourcePort(start, end)
+            : assignDestinationPort(start, end);
+    return when(match).apply(shiftPorts);
+  }
+
+  /**
    * Returns the (forward) transformation for this dynamic NAT expression using the given condition
    * on which to NAT, pool to NAT into, and the direction of traffic.
    */
@@ -168,7 +200,21 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
         getAction().whatChanges(outgoing) == IpField.SOURCE
             ? assignSourceIp(pool.getFirst(), pool.getLast())
             : assignDestinationIp(pool.getFirst(), pool.getLast());
-    return when(shouldNat).apply(step);
+    Transformation.Builder natIps = when(shouldNat).apply(step);
+    if (!_overload) {
+      return natIps;
+    }
+
+    // Follow the PAT logic documented here:
+    // https://www.cisco.com/c/en/us/support/docs/ip/network-address-translation-nat/26704-nat-faq-00.html#q18
+    // TODO: implement logic in step 3: recognize applications with fixed ports and don't shift.
+    return natIps.setAndThen(
+        shiftPortInRange(1, 511, outgoing)
+            .setOrElse(
+                shiftPortInRange(512, 1023, outgoing)
+                    .setOrElse(shiftPortInRange(1024, 65535, outgoing).build())
+                    .build())
+            .build());
   }
 
   /**

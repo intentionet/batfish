@@ -12,6 +12,7 @@ public class CiscoIosDynamicNatTest {
     n1.setAction(RuleAction.SOURCE_INSIDE);
     n1.setAclName("acl");
     n1.setNatPool("pool");
+    n1.setOverload(false);
     return new CiscoIosDynamicNat();
   }
 
@@ -28,6 +29,11 @@ public class CiscoIosDynamicNatTest {
       CiscoIosDynamicNat diffName = baseNat();
       diffName.setAclName("diffacl");
       et.addEqualityGroup(diffName);
+    }
+    {
+      CiscoIosDynamicNat diffOverload = baseNat();
+      diffOverload.setOverload(true);
+      et.addEqualityGroup(diffOverload);
     }
     {
       CiscoIosDynamicNat diffPool = baseNat();
