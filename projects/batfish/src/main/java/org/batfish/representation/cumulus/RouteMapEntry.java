@@ -20,8 +20,8 @@ public final class RouteMapEntry implements Serializable {
   private @Nullable String _description;
 
   private @Nullable RouteMapSetMetric _setMetric;
-
   private @Nullable RouteMapSetIpNextHopLiteral _setIpNextHop;
+  private @Nullable RouteMapSetCommunity _setCommunity;
 
   public RouteMapEntry(int number, LineAction action) {
     _number = number;
@@ -59,11 +59,15 @@ public final class RouteMapEntry implements Serializable {
 
   /** Return stream of set statements for this entry. */
   public @Nonnull Stream<RouteMapSet> getSets() {
-    return Stream.of(_setMetric, _setIpNextHop).filter(Objects::nonNull);
+    return Stream.of(_setMetric, _setIpNextHop, _setCommunity).filter(Objects::nonNull);
   }
 
   public @Nullable RouteMapSetMetric getSetMetric() {
     return _setMetric;
+  }
+
+  public @Nullable RouteMapSetIpNextHopLiteral getSetIpNextHop() {
+    return _setIpNextHop;
   }
 
   public void setMatchInterface(@Nullable RouteMapMatchInterface matchInterface) {
@@ -83,15 +87,15 @@ public final class RouteMapEntry implements Serializable {
     _description = description;
   }
 
-  public @Nullable RouteMapSetIpNextHopLiteral getSetIpNextHop() {
-    return _setIpNextHop;
-  }
-
   public void setSetIpNextHop(@Nullable RouteMapSetIpNextHopLiteral setIpNextHop) {
     _setIpNextHop = setIpNextHop;
   }
 
   public void setSetMetric(@Nullable RouteMapSetMetric setMetric) {
     _setMetric = setMetric;
+  }
+
+  public void setSetCommunity(@Nullable RouteMapSetCommunity setCommunity) {
+    _setCommunity = setCommunity;
   }
 }
