@@ -4,10 +4,12 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.batfish.common.BatfishException;
 import org.batfish.common.Warnings;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
+import org.batfish.datamodel.routing_policy.expr.CommunitySetExpr;
+import org.batfish.datamodel.routing_policy.expr.LiteralCommunitySet;
+import org.batfish.datamodel.routing_policy.statement.SetCommunity;
 import org.batfish.datamodel.routing_policy.statement.Statement;
 
 public class RouteMapSetCommunity implements RouteMapSet {
@@ -20,8 +22,8 @@ public class RouteMapSetCommunity implements RouteMapSet {
   @Nonnull
   @Override
   public Stream<Statement> toStatements(Configuration c, CumulusNcluConfiguration vc, Warnings w) {
-    // TODO
-    throw new BatfishException("to be implemented");
+    CommunitySetExpr communities = new LiteralCommunitySet(_communities);
+    return Stream.of(new SetCommunity(communities));
   }
 
   public @Nonnull List<StandardCommunity> getCommunities() {
