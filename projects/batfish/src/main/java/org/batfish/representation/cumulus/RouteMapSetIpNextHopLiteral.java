@@ -15,7 +15,7 @@ public final class RouteMapSetIpNextHopLiteral implements RouteMapSet {
   private final @Nonnull Ip _nextHop;
 
   public RouteMapSetIpNextHopLiteral(Ip nextHop) {
-    _nextHop = Ip.create(nextHop.asLong());
+    _nextHop = nextHop;
   }
 
   public @Nonnull Ip getNextHop() {
