@@ -100,6 +100,8 @@ final class CiscoIosNatUtil {
     // t.andThen == t.orElse
     Transformation previous = andThen;
     for (Transformation.Builder t : Lists.reverse(nonEmptySortedList)) {
+      assert t.build().getAndThen() == null;
+      assert t.build().getOrElse() == null;
       previous = t.setAndThen(andThen).setOrElse(previous).build();
     }
     return previous;
