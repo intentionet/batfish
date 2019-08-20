@@ -1,0 +1,10 @@
+!RANCID-CONTENT-TYPE: cisco-nx
+!
+hostname nxos_ip_sla
+!
+ip sla 30
+  http get http://10.1.1.1/status source-ip 172.62.12.3 version 1.1
+ip sla schedule 30 life forever start-time now
+ip sla reaction-configuration 30 react connectionLoss threshold-type consecutive 3 action-type triggerOnly
+ip sla logging traps
+!

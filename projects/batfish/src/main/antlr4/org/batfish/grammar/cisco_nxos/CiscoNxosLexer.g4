@@ -962,6 +962,11 @@ DISTRIBUTE
   'distribute'
 ;
 
+DNS
+:
+  'dns' -> pushMode(M_Words)
+;
+
 DNSIX
 :
   'dnsix'
@@ -1548,6 +1553,11 @@ HSRP
   'hsrp'
 ;
 
+HTTP
+:
+  'http' -> pushMode(M_Words)
+;
+
 HTTP_METHOD
 :
   'http-method'
@@ -1566,6 +1576,11 @@ IBGP
 ICMP
 :
   'icmp'
+;
+
+ICMP_ECHO
+:
+  'icmp-echo' -> pushMode(M_Words)
 ;
 
 IDENT
@@ -1995,6 +2010,11 @@ LOG_NEIGHBOR_CHANGES
 LOGGING
 :
   'logging'
+  {
+    if (lastTokenType() == SLA) {
+      pushMode(M_Words);
+    }
+  }
 ;
 
 LOGIN
@@ -3067,6 +3087,16 @@ REACHABILITY
   'reachability'
 ;
 
+REACTION_CONFIGURATION
+:
+  'reaction-configuration' -> pushMode(M_Words)
+;
+
+REACTION_TRIGGER
+:
+  'reaction-trigger' -> pushMode(M_Words)
+;
+
 READ
 :
   'read'
@@ -3165,6 +3195,16 @@ REPORT_POLICY
 REPORT_SUPPRESSION
 :
   'report-suppression'
+;
+
+RESET
+:
+  'reset' -> pushMode( M_Words )
+;
+
+RESPONDER
+:
+  'responder' -> pushMode( M_Words )
 ;
 
 RESTART
@@ -3280,6 +3320,11 @@ RULE
 SAMPLER
 :
   'sampler' -> pushMode(M_Word)
+;
+
+SCHEDULE
+:
+  'schedule' -> pushMode(M_Words)
 ;
 
 SCHEDULER
@@ -3716,6 +3761,11 @@ TCP
   'tcp'
 ;
 
+TCP_CONNECT
+:
+  'tcp-connect' -> pushMode(M_Words)
+;
+
 TCP_FLAGS_MASK
 :
   'tcp-flags-mask'
@@ -3928,6 +3978,16 @@ UDLD
 UDP
 :
   'udp'
+;
+
+UDP_ECHO
+:
+  'udp-echo' -> pushMode (M_Words)
+;
+
+UDP_JITTER
+:
+  'udp-jitter' -> pushMode (M_Words)
 ;
 
 UNCHANGED
