@@ -553,7 +553,7 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
 
     // Export RIP routes that should be redistributed.
     BgpRedistributionPolicy ripPolicy =
-        ipv4af == null ? null : ipv4af.getRedistributionPolicy(RoutingProtocol.RIP);
+        ipv4af == null ? null : ipv4af.getRedistributionPolicy(NxosRoutingProtocol.RIP);
     if (ripPolicy != null) {
       String routeMap = ripPolicy.getRouteMap();
       org.batfish.representation.cisco_nxos.RouteMap map = _routeMaps.get(routeMap);
@@ -571,7 +571,7 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
 
     // Export static routes that should be redistributed.
     BgpRedistributionPolicy staticPolicy =
-        ipv4af == null ? null : ipv4af.getRedistributionPolicy(RoutingProtocol.STATIC);
+        ipv4af == null ? null : ipv4af.getRedistributionPolicy(NxosRoutingProtocol.STATIC);
     if (staticPolicy != null) {
       String routeMap = staticPolicy.getRouteMap();
       RouteMap map = _routeMaps.get(routeMap);
@@ -588,7 +588,7 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
 
     // Export connected routes that should be redistributed.
     BgpRedistributionPolicy connectedPolicy =
-        ipv4af == null ? null : ipv4af.getRedistributionPolicy(RoutingProtocol.CONNECTED);
+        ipv4af == null ? null : ipv4af.getRedistributionPolicy(NxosRoutingProtocol.DIRECT);
     if (connectedPolicy != null) {
       String routeMap = connectedPolicy.getRouteMap();
       RouteMap map = _routeMaps.get(routeMap);
@@ -605,7 +605,7 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
 
     // Export OSPF routes that should be redistributed.
     BgpRedistributionPolicy ospfPolicy =
-        ipv4af == null ? null : ipv4af.getRedistributionPolicy(RoutingProtocol.OSPF);
+        ipv4af == null ? null : ipv4af.getRedistributionPolicy(NxosRoutingProtocol.OSPF);
     if (ospfPolicy != null) {
       String routeMap = ospfPolicy.getRouteMap();
       RouteMap map = _routeMaps.get(routeMap);

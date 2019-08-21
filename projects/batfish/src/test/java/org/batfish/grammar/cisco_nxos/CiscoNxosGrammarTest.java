@@ -264,6 +264,7 @@ import org.batfish.representation.cisco_nxos.Nve;
 import org.batfish.representation.cisco_nxos.Nve.HostReachabilityProtocol;
 import org.batfish.representation.cisco_nxos.Nve.IngressReplicationProtocol;
 import org.batfish.representation.cisco_nxos.NveVni;
+import org.batfish.representation.cisco_nxos.NxosRoutingProtocol;
 import org.batfish.representation.cisco_nxos.ObjectGroupIpAddress;
 import org.batfish.representation.cisco_nxos.ObjectGroupIpAddressLine;
 import org.batfish.representation.cisco_nxos.OspfArea;
@@ -511,10 +512,10 @@ public final class CiscoNxosGrammarTest {
       BgpVrfIpv4AddressFamilyConfiguration ipv4u = vrf.getIpv4UnicastAddressFamily();
       assertThat(ipv4u, notNullValue());
       assertThat(
-          ipv4u.getRedistributionPolicy(RoutingProtocol.CONNECTED),
+          ipv4u.getRedistributionPolicy(NxosRoutingProtocol.DIRECT),
           equalTo(new BgpRedistributionPolicy("DIR_MAP", null)));
       assertThat(
-          ipv4u.getRedistributionPolicy(RoutingProtocol.OSPF),
+          ipv4u.getRedistributionPolicy(NxosRoutingProtocol.OSPF),
           equalTo(new BgpRedistributionPolicy("OSPF_MAP", "ospf_proc")));
 
       BgpVrfL2VpnEvpnAddressFamilyConfiguration l2vpn = vrf.getL2VpnEvpnAddressFamily();

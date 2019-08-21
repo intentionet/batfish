@@ -3,7 +3,6 @@ package org.batfish.representation.cisco_nxos;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.batfish.datamodel.RoutingProtocol;
 
 /**
  * Represents the BGP configuration for IPv4 or IPv6 address families at the VRF level.
@@ -92,12 +91,12 @@ public abstract class BgpVrfIpAddressFamilyConfiguration extends BgpVrfAddressFa
   }
 
   @Nullable
-  public final BgpRedistributionPolicy getRedistributionPolicy(RoutingProtocol protocol) {
+  public final BgpRedistributionPolicy getRedistributionPolicy(NxosRoutingProtocol protocol) {
     return _redistributionPolicies.get(protocol);
   }
 
   public final void setRedistributionPolicy(
-      RoutingProtocol protocol, String routeMap, @Nullable String sourceTag) {
+      NxosRoutingProtocol protocol, String routeMap, @Nullable String sourceTag) {
     BgpRedistributionPolicy policy = new BgpRedistributionPolicy(routeMap, sourceTag);
     _redistributionPolicies.put(protocol, policy);
   }
@@ -118,6 +117,6 @@ public abstract class BgpVrfIpAddressFamilyConfiguration extends BgpVrfAddressFa
   private int _distanceLocal;
   private int _maximumPathsEbgp;
   private int _maximumPathsIbgp;
-  private final Map<RoutingProtocol, BgpRedistributionPolicy> _redistributionPolicies;
+  private final Map<NxosRoutingProtocol, BgpRedistributionPolicy> _redistributionPolicies;
   private boolean _suppressInactive;
 }
