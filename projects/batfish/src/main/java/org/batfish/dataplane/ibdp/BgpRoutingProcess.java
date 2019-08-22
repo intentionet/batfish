@@ -419,7 +419,10 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
                 BgpRoutingProcess bgpRoutingProcess =
                     n.getVirtualRouters().get(vniVrf.getName()).getBgpRoutingProcess();
                 checkArgument(
-                    bgpRoutingProcess != null, "Missing bgp process for vrf %s", vniVrf.getName());
+                    bgpRoutingProcess != null,
+                    "Missing bgp process for vrf %s, node %s",
+                    vniVrf.getName(),
+                    _c.getHostname());
                 initializationBuilder.from(
                     bgpRoutingProcess.processCrossVrfEvpnRoute(new RouteAdvertisement<>(route)));
               }
