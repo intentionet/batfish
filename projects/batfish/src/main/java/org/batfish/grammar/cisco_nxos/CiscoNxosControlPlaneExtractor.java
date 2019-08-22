@@ -324,6 +324,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afip_distanceContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afip_inject_mapContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afip_maximum_pathsContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afip_nexthop_route_mapContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afip_no_default_originateContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afip_suppress_inactiveContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afip_table_mapContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Rb_afl2v_retainContext;
@@ -2686,6 +2687,11 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
             name ->
                 _configuration.referenceStructure(
                     ROUTE_MAP, name, BGP_NEXTHOP_ROUTE_MAP, ctx.getStart().getLine()));
+  }
+
+  @Override
+  public void exitRb_afip_no_default_originate(Rb_afip_no_default_originateContext ctx) {
+    _currentBgpVrfIpAddressFamily.setDefaultInformationOriginate(false);
   }
 
   @Override

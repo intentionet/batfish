@@ -528,6 +528,7 @@ public final class CiscoNxosGrammarTest {
       BgpVrfIpv4AddressFamilyConfiguration ipv4u = vrf.getIpv4UnicastAddressFamily();
       assertThat(ipv4u, notNullValue());
       assertThat(ipv4u.getRedistributionPolicies(), hasSize(8));
+      assertFalse(ipv4u.getDefaultInformationOriginate());
       assertThat(
           ipv4u.getRedistributionPolicy(RoutingProtocolInstance.direct()),
           equalTo(new RedistributionPolicy(RoutingProtocolInstance.direct(), "DIR_MAP")));

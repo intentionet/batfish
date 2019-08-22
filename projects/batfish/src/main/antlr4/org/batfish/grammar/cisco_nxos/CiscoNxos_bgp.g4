@@ -257,6 +257,7 @@ rb_afip_common
   | rb_afip_inject_map
   | rb_afip_maximum_paths
   | rb_afip_nexthop
+  | rb_afip_no_default_originate
   | rb_afip_suppress_inactive
   | rb_afip_table_map
   | rb_afip_wait_igp_convergence
@@ -354,6 +355,11 @@ rb_afip_nexthop_route_map
 rb_afip_nexthop_trigger_delay
 :
   TRIGGER_DELAY CRITICAL critical = uint32 NON_CRITICAL noncritical = uint32 NEWLINE
+;
+
+rb_afip_no_default_originate
+:
+  NO DEFAULT_ORIGINATE NEWLINE
 ;
 
 rb_afip_suppress_inactive

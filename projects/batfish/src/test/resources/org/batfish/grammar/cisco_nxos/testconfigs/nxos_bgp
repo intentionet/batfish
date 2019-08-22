@@ -17,6 +17,7 @@ router bgp 1
     redistribute ospf OSPF_PROC2 route-map OSPF_MAP2
     redistribute rip RIP route-map RIP_MAP
     redistribute static route-map STATIC_MAP
+    no default-originate
   address-family ipv6 unicast
     redistribute ospfv3 OSPFv3_PROC route-map OSPFv3_MAP
 
