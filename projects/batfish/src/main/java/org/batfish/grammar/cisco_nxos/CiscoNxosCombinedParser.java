@@ -10,7 +10,10 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Cisco_nxos_configurationCo
 public class CiscoNxosCombinedParser
     extends BatfishCombinedParser<CiscoNxosParser, CiscoNxosLexer> {
 
+  @SuppressWarnings("unused")
   public static final String DEBUG_FLAG_USE_NEW_CISCO_NXOS_PARSER = "newnxos";
+
+  public static final String DEBUG_FLAG_USE_OLD_CISCO_NXOS_PARSER = "oldnxos";
 
   private static final BatfishANTLRErrorStrategyFactory NEWLINE_BASED_RECOVERY =
       new BatfishANTLRErrorStrategy.BatfishANTLRErrorStrategyFactory(CiscoNxosLexer.NEWLINE, "\n");
