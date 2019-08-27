@@ -3730,7 +3730,7 @@
         "File_Name" : "configs/nxos/nxos_bgp",
         "Struct_Type" : "route-map",
         "Ref_Name" : "BLIB",
-        "Context" : "bgp otherwise in/outbound route-map",
+        "Context" : "bgp address-family [IPv6] network route-map",
         "Lines" : {
           "filename" : "configs/nxos/nxos_bgp",
           "lines" : [
@@ -3742,7 +3742,7 @@
         "File_Name" : "configs/nxos/nxos_bgp",
         "Struct_Type" : "route-map",
         "Ref_Name" : "BLIBB",
-        "Context" : "bgp otherwise in/outbound route-map",
+        "Context" : "bgp address-family network route-map",
         "Lines" : {
           "filename" : "configs/nxos/nxos_bgp",
           "lines" : [
@@ -3754,7 +3754,7 @@
         "File_Name" : "configs/nxos/nxos_bgp",
         "Struct_Type" : "route-map",
         "Ref_Name" : "BLOBB",
-        "Context" : "bgp redistribute connected route-map",
+        "Context" : "bgp address-family redistribute route-map",
         "Lines" : {
           "filename" : "configs/nxos/nxos_bgp",
           "lines" : [
@@ -3766,7 +3766,7 @@
         "File_Name" : "configs/nxos/nxos_bgp",
         "Struct_Type" : "route-map",
         "Ref_Name" : "EG_CCC",
-        "Context" : "bgp outbound route-map",
+        "Context" : "bgp neighbor address-family route-map out",
         "Lines" : {
           "filename" : "configs/nxos/nxos_bgp",
           "lines" : [
@@ -3778,7 +3778,7 @@
         "File_Name" : "configs/nxos/nxos_bgp",
         "Struct_Type" : "route-map",
         "Ref_Name" : "IN_BBB",
-        "Context" : "bgp inbound route-map",
+        "Context" : "bgp neighbor address-family route-map in",
         "Lines" : {
           "filename" : "configs/nxos/nxos_bgp",
           "lines" : [
@@ -3790,12 +3790,12 @@
         "File_Name" : "configs/nxos/nxos_ospf",
         "Struct_Type" : "route-map",
         "Ref_Name" : "RM_OSPF_DIRECT",
-        "Context" : "ospf redistribute connected route-map",
+        "Context" : "ospf redistribute route-map",
         "Lines" : {
           "filename" : "configs/nxos/nxos_ospf",
           "lines" : [
-            20,
-            25
+            23,
+            28
           ]
         }
       },
@@ -3803,11 +3803,11 @@
         "File_Name" : "configs/nxos/nxos_ospf",
         "Struct_Type" : "route-map",
         "Ref_Name" : "RM_OSPF_STATIC",
-        "Context" : "ospf redistribute static route-map",
+        "Context" : "ospf redistribute route-map",
         "Lines" : {
           "filename" : "configs/nxos/nxos_ospf",
           "lines" : [
-            21
+            24
           ]
         }
       },
