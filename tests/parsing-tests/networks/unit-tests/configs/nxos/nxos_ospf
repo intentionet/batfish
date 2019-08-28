@@ -6,6 +6,9 @@ interface ethernet0/0
  ip router ospf 1 area 1
  ip address 1.1.1.2/31
 !
+!!! Declare VRFs before they are referenced below
+vrf context OTHER
+vrf context foo
 !!! Interleave process definitions to test correct enter/exit of VRF stanzas under OSPF
 !
 router ospf ignored
