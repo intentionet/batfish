@@ -27751,7 +27751,7 @@
         "interfaces" : {
           "Ethernet0/0" : {
             "name" : "Ethernet0/0",
-            "active" : false,
+            "active" : true,
             "additionalArpIps" : {
               "class" : "org.batfish.datamodel.EmptyIpSpace"
             },
@@ -27784,7 +27784,7 @@
           },
           "Ethernet0/1" : {
             "name" : "Ethernet0/1",
-            "active" : false,
+            "active" : true,
             "additionalArpIps" : {
               "class" : "org.batfish.datamodel.EmptyIpSpace"
             },
