@@ -1,0 +1,8 @@
+!RANCID-CONTENT-TYPE: cisco-nx
+!
+hostname nxos_mac
+!
+mac access-list acl-mac-01
+  permit any any
+  20 permit 00c0.4f00.0000 0000.00ff.ffff any
+  30 permit any any 0x0806
