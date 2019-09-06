@@ -81,8 +81,7 @@ public class InterfacePropertiesAnswererTest {
     // we should have exactly one row1 with two properties; iface2 should have been filtered out
     Row expectedRow =
         Row.builder()
-            .put(
-                InterfacePropertiesAnswerer.COL_INTERFACE, new NodeInterfacePair("node1", "iface1"))
+            .put(InterfacePropertiesAnswerer.COL_INTERFACE, NodeInterfacePair.of("node1", "iface1"))
             .put(property2, false)
             .put(property1, "desc desc desc")
             .build();
@@ -122,7 +121,7 @@ public class InterfacePropertiesAnswererTest {
         propertyRows.iterator().next(),
         hasColumn(
             InterfacePropertiesAnswerer.COL_INTERFACE,
-            equalTo(new NodeInterfacePair("node", "active")),
+            equalTo(NodeInterfacePair.of("node", "active")),
             Schema.INTERFACE));
   }
 

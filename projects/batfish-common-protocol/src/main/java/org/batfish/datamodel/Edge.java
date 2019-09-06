@@ -47,12 +47,12 @@ public class Edge implements Serializable, Comparable<Edge> {
     checkArgument(!Strings.isNullOrEmpty(int1), "Missing %s", PROP_INT1);
     checkArgument(!Strings.isNullOrEmpty(node2), "Missing %s", PROP_NODE2);
     checkArgument(!Strings.isNullOrEmpty(int2), "Missing %s", PROP_INT2);
-    return new Edge(new NodeInterfacePair(node1, int1), new NodeInterfacePair(node2, int2));
+    return new Edge(NodeInterfacePair.of(node1, int1), NodeInterfacePair.of(node2, int2));
   }
 
   /** Create an Edge from {@link Interface}s */
   public Edge(Interface tail, Interface head) {
-    this(new NodeInterfacePair(tail), new NodeInterfacePair(head));
+    this(NodeInterfacePair.of(tail), NodeInterfacePair.of(head));
   }
 
   /** Create an edge from names of nodes and interfaces */

@@ -38,7 +38,7 @@ public class ReferenceInterfaceGroupInterfaceSpecifierTest {
                 ImmutableList.of(
                     new InterfaceGroup(
                         ImmutableSortedSet.of(
-                            new NodeInterfacePair(node1.getHostname(), iface11.getName())),
+                            NodeInterfacePair.of(node1.getHostname(), iface11.getName())),
                         "group")))
             .build();
 
@@ -52,6 +52,6 @@ public class ReferenceInterfaceGroupInterfaceSpecifierTest {
     assertThat(
         new ReferenceInterfaceGroupInterfaceSpecifier("group", "refbook")
             .resolve(ImmutableSet.of(node1.getHostname()), ctxt),
-        contains(new NodeInterfacePair(iface11)));
+        contains(NodeInterfacePair.of(iface11)));
   }
 }

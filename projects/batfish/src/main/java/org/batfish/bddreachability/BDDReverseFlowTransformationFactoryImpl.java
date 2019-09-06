@@ -43,7 +43,7 @@ class BDDReverseFlowTransformationFactoryImpl implements BDDReverseFlowTransform
   @Override
   public @Nonnull Transition reverseFlowIncomingTransformation(String hostname, String iface) {
     return _reverseFlowIncomingTransformations.computeIfAbsent(
-        new NodeInterfacePair(hostname, iface),
+        NodeInterfacePair.of(hostname, iface),
         k ->
             computeReverseFlowTransformation(
                 hostname,
@@ -53,7 +53,7 @@ class BDDReverseFlowTransformationFactoryImpl implements BDDReverseFlowTransform
   @Override
   public @Nonnull Transition reverseFlowOutgoingTransformation(String hostname, String iface) {
     return _reverseFlowOutgoingTransformations.computeIfAbsent(
-        new NodeInterfacePair(hostname, iface),
+        NodeInterfacePair.of(hostname, iface),
         k ->
             computeReverseFlowTransformation(
                 hostname,

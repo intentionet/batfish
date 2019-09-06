@@ -367,20 +367,20 @@ public class EdgesAnswerer extends Answerer {
     RowBuilder row = Row.builder();
     row.put(
             COL_SOURCE_INTERFACE,
-            new NodeInterfacePair(nodeU, ipsecPeerConfigU.getSourceInterface()))
+            NodeInterfacePair.of(nodeU, ipsecPeerConfigU.getSourceInterface()))
         .put(
             COL_TUNNEL_INTERFACE,
             ipsecPeerConfigU.getTunnelInterface() == null
                 ? null
-                : new NodeInterfacePair(nodeU, ipsecPeerConfigU.getTunnelInterface()))
+                : NodeInterfacePair.of(nodeU, ipsecPeerConfigU.getTunnelInterface()))
         .put(
             COL_REMOTE_SOURCE_INTERFACE,
-            new NodeInterfacePair(nodeV, ipsecPeerConfigV.getSourceInterface()))
+            NodeInterfacePair.of(nodeV, ipsecPeerConfigV.getSourceInterface()))
         .put(
             COL_REMOTE_TUNNEL_INTERFACE,
             ipsecPeerConfigV.getTunnelInterface() == null
                 ? null
-                : new NodeInterfacePair(nodeV, ipsecPeerConfigV.getTunnelInterface()));
+                : NodeInterfacePair.of(nodeV, ipsecPeerConfigV.getTunnelInterface()));
     return row.build();
   }
 
@@ -389,11 +389,11 @@ public class EdgesAnswerer extends Answerer {
     RowBuilder row = Row.builder();
     row.put(
             COL_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 eigrpEdge.getNode1().getHostname(), eigrpEdge.getNode1().getInterfaceName()))
         .put(
             COL_REMOTE_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 eigrpEdge.getNode2().getHostname(), eigrpEdge.getNode2().getInterfaceName()));
     return row.build();
   }
@@ -440,11 +440,11 @@ public class EdgesAnswerer extends Answerer {
     RowBuilder row = Row.builder();
     row.put(
             COL_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 isisEdge.getNode1().getNode(), isisEdge.getNode1().getInterfaceName()))
         .put(
             COL_REMOTE_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 isisEdge.getNode2().getNode(), isisEdge.getNode2().getInterfaceName()));
     return row.build();
   }
@@ -454,11 +454,11 @@ public class EdgesAnswerer extends Answerer {
     RowBuilder row = Row.builder();
     row.put(
             COL_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 layer1Edge.getNode1().getHostname(), layer1Edge.getNode1().getInterfaceName()))
         .put(
             COL_REMOTE_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 layer1Edge.getNode2().getHostname(), layer1Edge.getNode2().getInterfaceName()));
 
     return row.build();
@@ -469,12 +469,12 @@ public class EdgesAnswerer extends Answerer {
     RowBuilder row = Row.builder();
     row.put(
             COL_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 layer2Edge.getNode1().getHostname(), layer2Edge.getNode1().getInterfaceName()))
         .put(COL_VLAN, layer2Edge.getNode1().getSwitchportVlanId())
         .put(
             COL_REMOTE_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 layer2Edge.getNode2().getHostname(), layer2Edge.getNode2().getInterfaceName()))
         .put(COL_REMOTE_VLAN, layer2Edge.getNode2().getSwitchportVlanId());
 
@@ -499,9 +499,9 @@ public class EdgesAnswerer extends Answerer {
             .collect(Collectors.toSet());
 
     RowBuilder row = Row.builder();
-    row.put(COL_INTERFACE, new NodeInterfacePair(edge.getNode1(), edge.getInt1()))
+    row.put(COL_INTERFACE, NodeInterfacePair.of(edge.getNode1(), edge.getInt1()))
         .put(COL_IPS, ips1)
-        .put(COL_REMOTE_INTERFACE, new NodeInterfacePair(edge.getNode2(), edge.getInt2()))
+        .put(COL_REMOTE_INTERFACE, NodeInterfacePair.of(edge.getNode2(), edge.getInt2()))
         .put(COL_REMOTE_IPS, ips2);
 
     return row.build();
@@ -510,15 +510,15 @@ public class EdgesAnswerer extends Answerer {
   @VisibleForTesting
   static Row getOspfEdgeRow(String node, String iface, String remoteNode, String remoteIface) {
     RowBuilder row = Row.builder();
-    row.put(COL_INTERFACE, new NodeInterfacePair(node, iface))
-        .put(COL_REMOTE_INTERFACE, new NodeInterfacePair(remoteNode, remoteIface));
+    row.put(COL_INTERFACE, NodeInterfacePair.of(node, iface))
+        .put(COL_REMOTE_INTERFACE, NodeInterfacePair.of(remoteNode, remoteIface));
     return row.build();
   }
 
   static Row getRipEdgeRow(String node, String iface, String remoteNode, String remoteIface) {
     RowBuilder row = Row.builder();
-    row.put(COL_INTERFACE, new NodeInterfacePair(node, iface))
-        .put(COL_REMOTE_INTERFACE, new NodeInterfacePair(remoteNode, remoteIface));
+    row.put(COL_INTERFACE, NodeInterfacePair.of(node, iface))
+        .put(COL_REMOTE_INTERFACE, NodeInterfacePair.of(remoteNode, remoteIface));
     return row.build();
   }
 

@@ -70,7 +70,7 @@ public class PbrWithTracerouteTest {
             allOf(
                 hasDisposition(FlowDisposition.DELIVERED_TO_SUBNET),
                 hasLastHop(
-                    hasOutputInterface(new NodeInterfacePair(c.getHostname(), _pbrOutIface))))));
+                    hasOutputInterface(NodeInterfacePair.of(c.getHostname(), _pbrOutIface))))));
   }
 
   @Test

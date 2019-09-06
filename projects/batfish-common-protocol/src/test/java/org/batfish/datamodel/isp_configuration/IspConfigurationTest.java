@@ -20,21 +20,21 @@ public class IspConfigurationTest {
         .addEqualityGroup(
             new IspConfiguration(
                 ImmutableList.of(
-                    new BorderInterfaceInfo(new NodeInterfacePair("node", "interface"))),
+                    new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface"))),
                 new IspFilter(ImmutableList.of(1234L), ImmutableList.of(Ip.parse("1.1.1.1")))),
             new IspConfiguration(
                 ImmutableList.of(
-                    new BorderInterfaceInfo(new NodeInterfacePair("node", "interface"))),
+                    new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface"))),
                 new IspFilter(ImmutableList.of(1234L), ImmutableList.of(Ip.parse("1.1.1.1")))))
         .addEqualityGroup(
             new IspConfiguration(
                 ImmutableList.of(
-                    new BorderInterfaceInfo(new NodeInterfacePair("node", "interface"))),
+                    new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface"))),
                 new IspFilter(ImmutableList.of(5678L), ImmutableList.of(Ip.parse("2.2.2.2")))))
         .addEqualityGroup(
             new IspConfiguration(
                 ImmutableList.of(
-                    new BorderInterfaceInfo(new NodeInterfacePair("diffNode", "diffInterface"))),
+                    new BorderInterfaceInfo(NodeInterfacePair.of("diffNode", "diffInterface"))),
                 new IspFilter(ImmutableList.of(1234L), ImmutableList.of(Ip.parse("1.1.1.1")))))
         .testEquals();
   }
@@ -43,7 +43,7 @@ public class IspConfigurationTest {
   public void testJsonSerialization() throws IOException {
     IspConfiguration ispConfiguration =
         new IspConfiguration(
-            ImmutableList.of(new BorderInterfaceInfo(new NodeInterfacePair("node", "interface"))),
+            ImmutableList.of(new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface"))),
             new IspFilter(ImmutableList.of(1234L), ImmutableList.of(Ip.parse("1.1.1.1"))));
 
     assertThat(

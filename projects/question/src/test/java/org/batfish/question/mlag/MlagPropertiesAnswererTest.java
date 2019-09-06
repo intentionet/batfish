@@ -84,7 +84,7 @@ public final class MlagPropertiesAnswererTest {
                 .put(COL_NODE, new Node(hostname))
                 .put(COL_MLAG_ID, m.getId())
                 .put(COL_MLAG_PEER_ADDRESS, m.getPeerAddress())
-                .put(COL_MLAG_PEER_INTERFACE, new NodeInterfacePair(hostname, "Port-Channel1"))
+                .put(COL_MLAG_PEER_INTERFACE, NodeInterfacePair.of(hostname, "Port-Channel1"))
                 .put(COL_MLAG_LOCAL_INTERFACE, null)
                 .build()));
   }

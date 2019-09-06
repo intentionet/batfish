@@ -366,7 +366,7 @@ class FlowTracer {
     Hop hop = new Hop(_currentNode, _steps);
     _hops.add(hop);
 
-    NodeInterfacePair exitIface = new NodeInterfacePair(_currentNode.getName(), outgoingInterface);
+    NodeInterfacePair exitIface = NodeInterfacePair.of(_currentNode.getName(), outgoingInterface);
     interfacesThatReplyToArp.forEach(
         enterIface -> forkTracerFollowEdge(exitIface, enterIface).processHop());
   }
@@ -376,7 +376,7 @@ class FlowTracer {
     return ExitOutputIfaceStep.builder()
         .setDetail(
             ExitOutputIfaceStepDetail.builder()
-                .setOutputInterface(new NodeInterfacePair(_currentNode.getName(), outputIface))
+                .setOutputInterface(NodeInterfacePair.of(_currentNode.getName(), outputIface))
                 .setTransformedFlow(TracerouteUtils.hopFlow(_originalFlow, _currentFlow))
                 .build())
         .setAction(action)
@@ -887,7 +887,7 @@ class FlowTracer {
 
                   // Forward to neighbor.
                   forkTracerFollowEdge(
-                          new NodeInterfacePair(currentNodeName, outgoingInterfaceName), nextHop)
+                          NodeInterfacePair.of(currentNodeName, outgoingInterfaceName), nextHop)
                       .processHop();
                   return null;
                 } finally {
@@ -904,8 +904,7 @@ class FlowTracer {
             .setDetail(
                 ExitOutputIfaceStepDetail.builder()
                     .setOutputInterface(
-                        new NodeInterfacePair(
-                            _currentNode.getName(), Interface.NULL_INTERFACE_NAME))
+                        NodeInterfacePair.of(_currentNode.getName(), Interface.NULL_INTERFACE_NAME))
                     .build())
             .setAction(StepAction.NULL_ROUTED)
             .build());

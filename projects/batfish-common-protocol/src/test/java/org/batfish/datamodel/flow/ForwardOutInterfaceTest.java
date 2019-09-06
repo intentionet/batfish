@@ -16,7 +16,7 @@ public final class ForwardOutInterfaceTest {
         .addEqualityGroup(new Object())
         .addEqualityGroup(f, f, new ForwardOutInterface("a", null))
         .addEqualityGroup(new ForwardOutInterface("b", null))
-        .addEqualityGroup(new ForwardOutInterface("a", new NodeInterfacePair("a", "a")))
+        .addEqualityGroup(new ForwardOutInterface("a", NodeInterfacePair.of("a", "a")))
         .testEquals();
   }
 }

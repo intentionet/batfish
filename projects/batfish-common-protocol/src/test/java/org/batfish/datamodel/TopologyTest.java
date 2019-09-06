@@ -20,9 +20,9 @@ public class TopologyTest {
   // Set up two edges with 3 nodes with 1 interface each:
   // n1:i1 -> n2:i2
   // n2:i2 -> n3:i3
-  NodeInterfacePair _nip1 = new NodeInterfacePair("n1", "i1");
-  NodeInterfacePair _nip2 = new NodeInterfacePair("n2", "i2");
-  NodeInterfacePair _nip3 = new NodeInterfacePair("n3", "i3");
+  NodeInterfacePair _nip1 = NodeInterfacePair.of("n1", "i1");
+  NodeInterfacePair _nip2 = NodeInterfacePair.of("n2", "i2");
+  NodeInterfacePair _nip3 = NodeInterfacePair.of("n3", "i3");
   Set<Edge> _edge1to2Set = ImmutableSet.of(new Edge(_nip1, _nip2));
   Set<Edge> _edge2to3Set = ImmutableSet.of(new Edge(_nip2, _nip3));
   SortedSet<Edge> _bothEdges =
@@ -36,13 +36,13 @@ public class TopologyTest {
     assertThat(topo.getEdges(), equalTo(ImmutableSet.of()));
     assertThat(topo.getNodeEdges(), equalTo(ImmutableMap.of()));
     assertThat(
-        topo.getNeighbors(new NodeInterfacePair("node", "iface")), equalTo(ImmutableSet.of()));
+        topo.getNeighbors(NodeInterfacePair.of("node", "iface")), equalTo(ImmutableSet.of()));
   }
 
   @Test
   public void testOneEdge() {
-    NodeInterfacePair nip1 = new NodeInterfacePair("n1", "i1");
-    NodeInterfacePair nip2 = new NodeInterfacePair("n2", "i2");
+    NodeInterfacePair nip1 = NodeInterfacePair.of("n1", "i1");
+    NodeInterfacePair nip2 = NodeInterfacePair.of("n2", "i2");
     Edge edge = new Edge(nip1, nip2);
     SortedSet<Edge> edges = ImmutableSortedSet.of(edge);
     Topology topo = new Topology(edges);
@@ -51,7 +51,7 @@ public class TopologyTest {
     assertThat(topo.getNodeEdges(), equalTo(ImmutableMap.of("n1", edges, "n2", edges)));
     assertThat(topo.getNeighbors(nip1), equalTo(ImmutableSet.of(nip2)));
     assertThat(topo.getNeighbors(nip2), equalTo(ImmutableSet.of()));
-    assertThat(topo.getNeighbors(new NodeInterfacePair("x", "y")), equalTo(ImmutableSet.of()));
+    assertThat(topo.getNeighbors(NodeInterfacePair.of("x", "y")), equalTo(ImmutableSet.of()));
   }
 
   @Test

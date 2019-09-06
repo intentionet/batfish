@@ -39,7 +39,7 @@ public class NodeSpecifierInterfaceSpecifierTest {
     assertThat(
         new NodeSpecifierInterfaceSpecifier(new NameNodeSpecifier("node1"))
             .resolve(ImmutableSet.of("node1", "node2"), ctxt),
-        containsInAnyOrder(new NodeInterfacePair(iface1node1), new NodeInterfacePair(iface2node1)));
+        containsInAnyOrder(NodeInterfacePair.of(iface1node1), NodeInterfacePair.of(iface2node1)));
 
     // no common nodes
     assertThat(

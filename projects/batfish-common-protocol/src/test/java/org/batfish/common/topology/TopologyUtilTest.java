@@ -1009,8 +1009,8 @@ public final class TopologyUtilTest {
     IspConfiguration ispConfiguration =
         new IspConfiguration(
             ImmutableList.of(
-                new BorderInterfaceInfo(new NodeInterfacePair(b1Name, i2Name)),
-                new BorderInterfaceInfo(new NodeInterfacePair(b2Name, i2Name))),
+                new BorderInterfaceInfo(NodeInterfacePair.of(b1Name, i2Name)),
+                new BorderInterfaceInfo(NodeInterfacePair.of(b2Name, i2Name))),
             new IspFilter(ImmutableList.of(), ImmutableList.of()));
     Map<String, Configuration> ispConfigurations =
         IspModelingUtils.getInternetAndIspNodes(
@@ -1047,8 +1047,8 @@ public final class TopologyUtilTest {
                 configurations),
             configurations);
 
-    NodeInterfacePair l3B1 = new NodeInterfacePair(b1Name, i2Name);
-    NodeInterfacePair l3B2 = new NodeInterfacePair(b2Name, i2Name);
+    NodeInterfacePair l3B1 = NodeInterfacePair.of(b1Name, i2Name);
+    NodeInterfacePair l3B2 = NodeInterfacePair.of(b2Name, i2Name);
 
     Set<String> explicitNodes = explicitConfigurations.keySet();
     Set<String> ispNodes = ispConfigurations.keySet();
@@ -1132,10 +1132,10 @@ public final class TopologyUtilTest {
     Layer1Node l1n1 = new Layer1Node(n1Name, i1Name);
     Layer1Node l1n2 = new Layer1Node(n2Name, i1Name);
 
-    NodeInterfacePair l3n2i2 = new NodeInterfacePair(n2Name, i2Name);
-    NodeInterfacePair l3n3i1 = new NodeInterfacePair(n3Name, i1Name);
-    NodeInterfacePair l3n3i2 = new NodeInterfacePair(n3Name, i2Name);
-    NodeInterfacePair l3n4i1 = new NodeInterfacePair(n4Name, i1Name);
+    NodeInterfacePair l3n2i2 = NodeInterfacePair.of(n2Name, i2Name);
+    NodeInterfacePair l3n3i1 = NodeInterfacePair.of(n3Name, i1Name);
+    NodeInterfacePair l3n3i2 = NodeInterfacePair.of(n3Name, i2Name);
+    NodeInterfacePair l3n4i1 = NodeInterfacePair.of(n4Name, i1Name);
 
     _ib.setActive(true);
 
@@ -1375,8 +1375,8 @@ public final class TopologyUtilTest {
             ImmutableMap.of(c1.getHostname(), c1, c2.getHostname(), c2));
     Edge edge =
         new Edge(
-            new NodeInterfacePair(c1.getHostname(), i1.getName()),
-            new NodeInterfacePair(c2.getHostname(), i2.getName()));
+            NodeInterfacePair.of(c1.getHostname(), i1.getName()),
+            NodeInterfacePair.of(c2.getHostname(), i2.getName()));
     assertThat(t.getEdges(), containsInAnyOrder(edge, edge.reverse()));
   }
 

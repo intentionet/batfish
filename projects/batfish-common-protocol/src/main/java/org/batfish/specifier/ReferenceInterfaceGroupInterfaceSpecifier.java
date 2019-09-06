@@ -57,7 +57,7 @@ public final class ReferenceInterfaceGroupInterfaceSpecifier implements Interfac
     return nodes.stream()
         .map(n -> ctxt.getConfigs().get(n).getAllInterfaces().values())
         .flatMap(Collection::stream)
-        .map(NodeInterfacePair::new)
+        .map(NodeInterfacePair::of)
         .filter(interfaceGroup.getInterfaces()::contains)
         .collect(ImmutableSet.toImmutableSet());
   }

@@ -172,7 +172,7 @@ public class PreOutgoingTransformationNodeVisitor implements StateExprVisitor<No
 
   @Override
   public NodeInterfacePair visitPreOutEdge(PreOutEdge preOutEdge) {
-    return new NodeInterfacePair(preOutEdge.getSrcNode(), preOutEdge.getSrcIface());
+    return NodeInterfacePair.of(preOutEdge.getSrcNode(), preOutEdge.getSrcIface());
   }
 
   @Override
@@ -183,24 +183,24 @@ public class PreOutgoingTransformationNodeVisitor implements StateExprVisitor<No
   @Override
   public NodeInterfacePair visitPreOutInterfaceDeliveredToSubnet(
       PreOutInterfaceDeliveredToSubnet state) {
-    return new NodeInterfacePair(state.getHostname(), state.getInterface());
+    return NodeInterfacePair.of(state.getHostname(), state.getInterface());
   }
 
   @Override
   public NodeInterfacePair visitPreOutInterfaceExitsNetwork(PreOutInterfaceExitsNetwork state) {
-    return new NodeInterfacePair(state.getHostname(), state.getInterface());
+    return NodeInterfacePair.of(state.getHostname(), state.getInterface());
   }
 
   @Override
   public NodeInterfacePair visitPreOutInterfaceInsufficientInfo(
       PreOutInterfaceInsufficientInfo state) {
-    return new NodeInterfacePair(state.getHostname(), state.getInterface());
+    return NodeInterfacePair.of(state.getHostname(), state.getInterface());
   }
 
   @Override
   public NodeInterfacePair visitPreOutInterfaceNeighborUnreachable(
       PreOutInterfaceNeighborUnreachable state) {
-    return new NodeInterfacePair(state.getHostname(), state.getInterface());
+    return NodeInterfacePair.of(state.getHostname(), state.getInterface());
   }
 
   @Override

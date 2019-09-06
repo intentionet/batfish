@@ -42,7 +42,7 @@ public final class NameInterfaceSpecifier implements InterfaceSpecifier {
         .map(c -> c.getAllInterfaces().values())
         .flatMap(Collection::stream)
         .filter(iface -> iface.getName().equalsIgnoreCase(_name))
-        .map(NodeInterfacePair::new)
+        .map(NodeInterfacePair::of)
         .collect(ImmutableSet.toImmutableSet());
   }
 }

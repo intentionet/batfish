@@ -45,6 +45,6 @@ public class VrfNameRegexInterfaceSpecifierTest {
     assertThat(
         new VrfNameRegexInterfaceSpecifier(Pattern.compile("vrf1"))
             .resolve(ImmutableSet.of("node1"), ctxt),
-        equalTo(ImmutableSet.of(new NodeInterfacePair(iface11))));
+        equalTo(ImmutableSet.of(NodeInterfacePair.of(iface11))));
   }
 }

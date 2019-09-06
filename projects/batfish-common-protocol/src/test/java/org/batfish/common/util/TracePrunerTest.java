@@ -29,7 +29,7 @@ public class TracePrunerTest {
                   .setAction(StepAction.FORWARDED)
                   .setDetail(
                       ExitOutputIfaceStepDetail.builder()
-                          .setOutputInterface(new NodeInterfacePair("A", "out"))
+                          .setOutputInterface(NodeInterfacePair.of("A", "out"))
                           .build())
                   .build()));
   private static final Hop HOP_B =
@@ -40,7 +40,7 @@ public class TracePrunerTest {
                   .setAction(StepAction.RECEIVED)
                   .setDetail(
                       EnterInputIfaceStepDetail.builder()
-                          .setInputInterface(new NodeInterfacePair("B", "in"))
+                          .setInputInterface(NodeInterfacePair.of("B", "in"))
                           .build())
                   .build()));
   private static final Hop HOP_C = new Hop(new Node("C"), ImmutableList.of());

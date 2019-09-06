@@ -92,7 +92,7 @@ public class ParserInterfaceTest {
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()
             .setNodes(ImmutableSet.of("node1"))
-            .setInterfaces(ImmutableSet.of(new NodeInterfacePair("node1", "iface1")))
+            .setInterfaces(ImmutableSet.of(NodeInterfacePair.of("node1", "iface1")))
             .build();
 
     Set<ParboiledAutoCompleteSuggestion> suggestions =
@@ -142,8 +142,8 @@ public class ParserInterfaceTest {
             .setNodes(ImmutableSet.of("node1"))
             .setInterfaces(
                 ImmutableSet.of(
-                    new NodeInterfacePair("node1", "iface1"),
-                    new NodeInterfacePair("node1", "iface11")))
+                    NodeInterfacePair.of("node1", "iface1"),
+                    NodeInterfacePair.of("node1", "iface11")))
             .build();
 
     Set<ParboiledAutoCompleteSuggestion> suggestions =
@@ -398,9 +398,9 @@ public class ParserInterfaceTest {
         CompletionMetadata.builder()
             .setInterfaces(
                 ImmutableSet.of(
-                    new NodeInterfacePair("n1a", "eth11"),
-                    new NodeInterfacePair("n1a", "eth12"),
-                    new NodeInterfacePair("n2a", "eth21")))
+                    NodeInterfacePair.of("n1a", "eth11"),
+                    NodeInterfacePair.of("n1a", "eth12"),
+                    NodeInterfacePair.of("n2a", "eth21")))
             .build();
 
     String query = "n1a[eth";

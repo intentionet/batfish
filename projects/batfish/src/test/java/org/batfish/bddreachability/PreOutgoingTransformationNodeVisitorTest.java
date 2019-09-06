@@ -20,22 +20,22 @@ public final class PreOutgoingTransformationNodeVisitorTest {
 
     assertEquals(
         new PreOutEdge(node, iface, "", "").accept(PreOutgoingTransformationNodeVisitor.INSTANCE),
-        new NodeInterfacePair(node, iface));
+        NodeInterfacePair.of(node, iface));
     assertEquals(
         new PreOutInterfaceDeliveredToSubnet(node, iface)
             .accept(PreOutgoingTransformationNodeVisitor.INSTANCE),
-        new NodeInterfacePair(node, iface));
+        NodeInterfacePair.of(node, iface));
     assertEquals(
         new PreOutInterfaceExitsNetwork(node, iface)
             .accept(PreOutgoingTransformationNodeVisitor.INSTANCE),
-        new NodeInterfacePair(node, iface));
+        NodeInterfacePair.of(node, iface));
     assertEquals(
         new PreOutInterfaceInsufficientInfo(node, iface)
             .accept(PreOutgoingTransformationNodeVisitor.INSTANCE),
-        new NodeInterfacePair(node, iface));
+        NodeInterfacePair.of(node, iface));
     assertEquals(
         new PreOutInterfaceNeighborUnreachable(node, iface)
             .accept(PreOutgoingTransformationNodeVisitor.INSTANCE),
-        new NodeInterfacePair(node, iface));
+        NodeInterfacePair.of(node, iface));
   }
 }

@@ -147,12 +147,12 @@ public final class EdgesTest {
         answer.getRowsList(),
         containsInAnyOrder(
             Row.builder()
-                .put(COL_INTERFACE, new NodeInterfacePair(c1Name, c1a1Name))
-                .put(COL_REMOTE_INTERFACE, new NodeInterfacePair(c2Name, c2a1Name))
+                .put(COL_INTERFACE, NodeInterfacePair.of(c1Name, c1a1Name))
+                .put(COL_REMOTE_INTERFACE, NodeInterfacePair.of(c2Name, c2a1Name))
                 .build(),
             Row.builder()
-                .put(COL_INTERFACE, new NodeInterfacePair(c2Name, c2a1Name))
-                .put(COL_REMOTE_INTERFACE, new NodeInterfacePair(c1Name, c1a1Name))
+                .put(COL_INTERFACE, NodeInterfacePair.of(c2Name, c2a1Name))
+                .put(COL_REMOTE_INTERFACE, NodeInterfacePair.of(c1Name, c1a1Name))
                 .build()));
   }
 

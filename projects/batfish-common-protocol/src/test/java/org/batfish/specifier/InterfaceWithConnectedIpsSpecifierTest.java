@@ -89,17 +89,17 @@ public class InterfaceWithConnectedIpsSpecifierTest {
     assertThat(
         new InterfaceWithConnectedIpsSpecifier(Ip.parse("1.2.3.4").toIpSpace())
             .resolve(ImmutableSet.of("node1", "node2"), ctxt),
-        equalTo(ImmutableSet.of(new NodeInterfacePair(iface11), new NodeInterfacePair(iface2))));
+        equalTo(ImmutableSet.of(NodeInterfacePair.of(iface11), NodeInterfacePair.of(iface2))));
 
     assertThat(
         new InterfaceWithConnectedIpsSpecifier(Ip.parse("1.2.3.8").toIpSpace())
             .resolve(ImmutableSet.of("node1", "node2"), ctxt),
-        equalTo(ImmutableSet.of(new NodeInterfacePair(iface11))));
+        equalTo(ImmutableSet.of(NodeInterfacePair.of(iface11))));
 
     assertThat(
         new InterfaceWithConnectedIpsSpecifier(Ip.parse("2.3.4.5").toIpSpace())
             .resolve(ImmutableSet.of("node1", "node2"), ctxt),
-        equalTo(ImmutableSet.of(new NodeInterfacePair(iface12))));
+        equalTo(ImmutableSet.of(NodeInterfacePair.of(iface12))));
 
     assertThat(
         new InterfaceWithConnectedIpsSpecifier(Prefix.parse("3.0.0.0/24").toIpSpace())

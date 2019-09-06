@@ -19,19 +19,19 @@ public class Layer3EdgeTest {
     new EqualsTester()
         .addEqualityGroup(
             new Layer3Edge(
-                new NodeInterfacePair("node1", "interface1"),
-                new NodeInterfacePair("node2", "interface2"),
+                NodeInterfacePair.of("node1", "interface1"),
+                NodeInterfacePair.of("node2", "interface2"),
                 ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("1.1.1.1"), 32)),
                 ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("2.2.2.2"), 32))),
             new Layer3Edge(
-                new NodeInterfacePair("node1", "interface1"),
-                new NodeInterfacePair("node2", "interface2"),
+                NodeInterfacePair.of("node1", "interface1"),
+                NodeInterfacePair.of("node2", "interface2"),
                 ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("1.1.1.1"), 32)),
                 ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("2.2.2.2"), 32))))
         .addEqualityGroup(
             new Layer3Edge(
-                new NodeInterfacePair("diffnode1", "diffinterface1"),
-                new NodeInterfacePair("diffnode2", "diffinterface2"),
+                NodeInterfacePair.of("diffnode1", "diffinterface1"),
+                NodeInterfacePair.of("diffnode2", "diffinterface2"),
                 ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("3.3.3.3"), 32)),
                 ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("4.4.4.4"), 32))))
         .testEquals();
@@ -41,8 +41,8 @@ public class Layer3EdgeTest {
   public void testJsonSerialization() throws IOException {
     Layer3Edge layer3Edge =
         new Layer3Edge(
-            new NodeInterfacePair("node1", "interface1"),
-            new NodeInterfacePair("node2", "interface2"),
+            NodeInterfacePair.of("node1", "interface1"),
+            NodeInterfacePair.of("node2", "interface2"),
             ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("1.1.1.1"), 32)),
             ImmutableSortedSet.of(ConcreteInterfaceAddress.create(Ip.parse("2.2.2.2"), 32)));
 

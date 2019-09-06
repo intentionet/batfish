@@ -118,7 +118,7 @@ public class EigrpNeighborConfigId implements Serializable, Comparable<EigrpNeig
   @Nonnull
   @JsonIgnore
   public NodeInterfacePair getNodeInterfacePair() {
-    return new NodeInterfacePair(getHostname(), getInterfaceName());
+    return NodeInterfacePair.of(getHostname(), getInterfaceName());
   }
 
   @Nonnull

@@ -455,17 +455,17 @@ public final class FixedPointTopologyTest {
         equalTo(
             ImmutableSortedSet.of(
                 new Edge(
-                    new NodeInterfacePair("host1", "Interface1"),
-                    new NodeInterfacePair("host2", "Interface2")),
+                    NodeInterfacePair.of("host1", "Interface1"),
+                    NodeInterfacePair.of("host2", "Interface2")),
                 new Edge(
-                    new NodeInterfacePair("host2", "Interface2"),
-                    new NodeInterfacePair("host1", "Interface1")),
+                    NodeInterfacePair.of("host2", "Interface2"),
+                    NodeInterfacePair.of("host1", "Interface1")),
                 new Edge(
-                    new NodeInterfacePair("host1", "Tunnel1"),
-                    new NodeInterfacePair("host2", "Tunnel2")),
+                    NodeInterfacePair.of("host1", "Tunnel1"),
+                    NodeInterfacePair.of("host2", "Tunnel2")),
                 new Edge(
-                    new NodeInterfacePair("host2", "Tunnel2"),
-                    new NodeInterfacePair("host1", "Tunnel1")))));
+                    NodeInterfacePair.of("host2", "Tunnel2"),
+                    NodeInterfacePair.of("host1", "Tunnel1")))));
   }
 
   @Test
@@ -500,16 +500,16 @@ public final class FixedPointTopologyTest {
         equalTo(
             ImmutableSortedSet.of(
                 new Edge(
-                    new NodeInterfacePair("host1", "Interface1"),
-                    new NodeInterfacePair("host2", "Interface2")),
+                    NodeInterfacePair.of("host1", "Interface1"),
+                    NodeInterfacePair.of("host2", "Interface2")),
                 new Edge(
-                    new NodeInterfacePair("host2", "Interface2"),
-                    new NodeInterfacePair("host1", "Interface1")),
+                    NodeInterfacePair.of("host2", "Interface2"),
+                    NodeInterfacePair.of("host1", "Interface1")),
                 new Edge(
-                    new NodeInterfacePair("host1", "Tunnel1"),
-                    new NodeInterfacePair("host2", "Tunnel2")),
+                    NodeInterfacePair.of("host1", "Tunnel1"),
+                    NodeInterfacePair.of("host2", "Tunnel2")),
                 new Edge(
-                    new NodeInterfacePair("host2", "Tunnel2"),
-                    new NodeInterfacePair("host1", "Tunnel1")))));
+                    NodeInterfacePair.of("host2", "Tunnel2"),
+                    NodeInterfacePair.of("host1", "Tunnel1")))));
   }
 }

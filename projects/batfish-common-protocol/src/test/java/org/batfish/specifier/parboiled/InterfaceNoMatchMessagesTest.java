@@ -39,8 +39,7 @@ public class InterfaceNoMatchMessagesTest {
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()
             .setInterfaces(
-                ImmutableSet.of(
-                    new NodeInterfacePair("h1", "i1"), new NodeInterfacePair("h2", "i2")))
+                ImmutableSet.of(NodeInterfacePair.of("h1", "i1"), NodeInterfacePair.of("h2", "i2")))
             .build();
     assertThat(
         getMessages(
@@ -57,8 +56,7 @@ public class InterfaceNoMatchMessagesTest {
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()
             .setInterfaces(
-                ImmutableSet.of(
-                    new NodeInterfacePair("h1", "i1"), new NodeInterfacePair("h2", "i2")))
+                ImmutableSet.of(NodeInterfacePair.of("h1", "i1"), NodeInterfacePair.of("h2", "i2")))
             .build();
     assertThat(
         getMessages(
@@ -132,8 +130,7 @@ public class InterfaceNoMatchMessagesTest {
         CompletionMetadata.builder()
             .setNodes(ImmutableSet.of("h1", "h2"))
             .setInterfaces(
-                ImmutableSet.of(
-                    new NodeInterfacePair("h1", "i1"), new NodeInterfacePair("h2", "i2")))
+                ImmutableSet.of(NodeInterfacePair.of("h1", "i1"), NodeInterfacePair.of("h2", "i2")))
             .build();
     assertThat(
         getMessages(
@@ -167,8 +164,7 @@ public class InterfaceNoMatchMessagesTest {
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()
             .setInterfaces(
-                ImmutableSet.of(
-                    new NodeInterfacePair("h1", "i1"), new NodeInterfacePair("h2", "i2")))
+                ImmutableSet.of(NodeInterfacePair.of("h1", "i1"), NodeInterfacePair.of("h2", "i2")))
             .build();
     List<String> expected =
         ImmutableList.of(
@@ -206,8 +202,7 @@ public class InterfaceNoMatchMessagesTest {
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()
             .setInterfaces(
-                ImmutableSet.of(
-                    new NodeInterfacePair("h1", "i1"), new NodeInterfacePair("h2", "i2")))
+                ImmutableSet.of(NodeInterfacePair.of("h1", "i1"), NodeInterfacePair.of("h2", "i2")))
             .build();
     assertThat(
         getMessages(

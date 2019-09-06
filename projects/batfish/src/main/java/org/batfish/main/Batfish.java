@@ -1851,7 +1851,7 @@ public class Batfish extends PluginConsumer implements IBatfish {
         .map(Optional::get)
         // All interfaces in each config
         .flatMap(c -> c.getAllInterfaces().values().stream())
-        .map(NodeInterfacePair::new)
+        .map(NodeInterfacePair::of)
         .collect(ImmutableSet.toImmutableSet());
   }
 

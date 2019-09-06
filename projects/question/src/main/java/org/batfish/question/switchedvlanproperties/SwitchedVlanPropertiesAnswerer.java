@@ -205,7 +205,7 @@ public final class SwitchedVlanPropertiesAnswerer extends Answerer {
       IntegerSpace vlans,
       Map<Integer, Builder<NodeInterfacePair>> switchedVlanInterfaces,
       Interface iface) {
-    NodeInterfacePair ifacePair = new NodeInterfacePair(iface);
+    NodeInterfacePair ifacePair = NodeInterfacePair.of(iface);
     if (!specifiedInterfaces.contains(ifacePair)
         || (excludeShutInterfaces && !iface.getActive())
         || (iface.getInterfaceType() != InterfaceType.VLAN

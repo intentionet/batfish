@@ -196,7 +196,7 @@ final class BDDReverseTransformationRangesImpl implements BDDReverseTransformati
     BDD srcAndLastHop = sourceAndLastHopConstraint(node, inIface, lastHop);
     BDD reach =
         _outgoingTransformationRangeStates.asMap()
-            .getOrDefault(new NodeInterfacePair(node, outIface), ImmutableSet.of()).stream()
+            .getOrDefault(NodeInterfacePair.of(node, outIface), ImmutableSet.of()).stream()
             .map(_forwardReachableSets::get)
             .reduce(BDD::or)
             .orElse(_zero);

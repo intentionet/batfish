@@ -207,7 +207,7 @@ public class BDDReverseTransformationRangesImplTest {
             _bddPacket,
             _configs,
             ImmutableSet.of(
-                new Edge(new NodeInterfacePair("A", "A"), new NodeInterfacePair(HOSTNAME, iName))));
+                new Edge(NodeInterfacePair.of("A", "A"), NodeInterfacePair.of(HOSTNAME, iName))));
 
     BDD srcBdd = srcManagers.get(HOSTNAME).getSourceInterfaceBDD(iName);
     BDD lastHopBdd = _lastHopManager.getNoLastHopOutgoingInterfaceBdd(HOSTNAME, iName);
@@ -240,15 +240,15 @@ public class BDDReverseTransformationRangesImplTest {
     String neighbor1 = "neighbor1";
     String neighbor2 = "neighbor2";
     String neighborIface = "neighborIface";
-    NodeInterfacePair lastHop1 = new NodeInterfacePair(neighbor1, neighborIface);
-    NodeInterfacePair lastHop2 = new NodeInterfacePair(neighbor2, neighborIface);
+    NodeInterfacePair lastHop1 = NodeInterfacePair.of(neighbor1, neighborIface);
+    NodeInterfacePair lastHop2 = NodeInterfacePair.of(neighbor2, neighborIface);
     _lastHopManager =
         new LastHopOutgoingInterfaceManager(
             _bddPacket,
             _configs,
             ImmutableSet.of(
-                new Edge(lastHop1, new NodeInterfacePair(HOSTNAME, iName)),
-                new Edge(lastHop2, new NodeInterfacePair(HOSTNAME, iName))));
+                new Edge(lastHop1, NodeInterfacePair.of(HOSTNAME, iName)),
+                new Edge(lastHop2, NodeInterfacePair.of(HOSTNAME, iName))));
 
     BDDReverseTransformationRangesImpl ranges =
         new BDDReverseTransformationRangesImpl(
@@ -289,7 +289,7 @@ public class BDDReverseTransformationRangesImplTest {
     String node = "node";
     String iface = "iface";
     String inIface = "inIface";
-    NodeInterfacePair lastHop = new NodeInterfacePair("lastHopNode", "lastHopIface");
+    NodeInterfacePair lastHop = NodeInterfacePair.of("lastHopNode", "lastHopIface");
     new EqualsTester()
         .addEqualityGroup(
             new Key(node, iface, OUTGOING, inIface, null),

@@ -49,17 +49,17 @@ public class VrfNameInterfaceSpecifierTest {
     // vrf1 on node1 should yield one interface
     assertThat(
         new VrfNameInterfaceSpecifier("vrf1").resolve(ImmutableSet.of("node1"), ctxt),
-        contains(new NodeInterfacePair(iface11)));
+        contains(NodeInterfacePair.of(iface11)));
 
     // vrf1 on node1, node2 should yield one interface
     assertThat(
         new VrfNameInterfaceSpecifier("vrf1").resolve(ImmutableSet.of("node1", "node2"), ctxt),
-        containsInAnyOrder(new NodeInterfacePair(iface11), new NodeInterfacePair(iface2)));
+        containsInAnyOrder(NodeInterfacePair.of(iface11), NodeInterfacePair.of(iface2)));
 
     // case insensitivity
     assertThat(
         new VrfNameInterfaceSpecifier("VrF1").resolve(ImmutableSet.of("node1"), ctxt),
-        contains(new NodeInterfacePair(iface11)));
+        contains(NodeInterfacePair.of(iface11)));
 
     // bad names
     assertThat(

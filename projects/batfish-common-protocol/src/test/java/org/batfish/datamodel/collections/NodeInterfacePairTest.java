@@ -16,9 +16,9 @@ public class NodeInterfacePairTest {
   public void testEquals() {
     new EqualsTester()
         .addEqualityGroup(
-            new NodeInterfacePair("host", "iface"), new NodeInterfacePair("host", "iface"))
-        .addEqualityGroup(new NodeInterfacePair("otherHost", "iface"))
-        .addEqualityGroup(new NodeInterfacePair("host", "otherIface"))
+            NodeInterfacePair.of("host", "iface"), NodeInterfacePair.of("host", "iface"))
+        .addEqualityGroup(NodeInterfacePair.of("otherHost", "iface"))
+        .addEqualityGroup(NodeInterfacePair.of("host", "otherIface"))
         .addEqualityGroup(new Object())
         .testEquals();
   }
@@ -27,10 +27,10 @@ public class NodeInterfacePairTest {
   public void testCompareTo() {
     List<NodeInterfacePair> ordered =
         ImmutableList.of(
-            new NodeInterfacePair("a", "a"),
-            new NodeInterfacePair("a", "b"),
-            new NodeInterfacePair("b", "a"),
-            new NodeInterfacePair("b", "b"));
+            NodeInterfacePair.of("a", "a"),
+            NodeInterfacePair.of("a", "b"),
+            NodeInterfacePair.of("b", "a"),
+            NodeInterfacePair.of("b", "b"));
     for (int i = 0; i < ordered.size(); i++) {
       for (int j = 0; j < ordered.size(); j++) {
         assertThat(
@@ -42,13 +42,13 @@ public class NodeInterfacePairTest {
 
   @Test
   public void testJavaSerialization() {
-    NodeInterfacePair nip = new NodeInterfacePair("host", "iface");
+    NodeInterfacePair nip = NodeInterfacePair.of("host", "iface");
     assertThat(SerializationUtils.clone(nip), equalTo(nip));
   }
 
   @Test
   public void testJsonSerialization() throws IOException {
-    NodeInterfacePair nip = new NodeInterfacePair("host", "iface");
+    NodeInterfacePair nip = NodeInterfacePair.of("host", "iface");
     assertThat(BatfishObjectMapper.clone(nip, NodeInterfacePair.class), equalTo(nip));
   }
 }

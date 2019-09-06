@@ -131,14 +131,14 @@ public class OspfSessionCompatibilityAnswererTest {
         allOf(
             hasColumn(
                 COL_INTERFACE,
-                equalTo(new NodeInterfacePair("configuration_u", "int_u")),
+                equalTo(NodeInterfacePair.of("configuration_u", "int_u")),
                 Schema.INTERFACE),
             hasColumn(COL_VRF, equalTo("vrf_u"), Schema.STRING),
             hasColumn(COL_IP, equalTo(Ip.parse("1.1.1.2")), Schema.IP),
             hasColumn(COL_AREA, equalTo(1L), Schema.LONG),
             hasColumn(
                 COL_REMOTE_INTERFACE,
-                equalTo(new NodeInterfacePair("configuration_v", "int_v")),
+                equalTo(NodeInterfacePair.of("configuration_v", "int_v")),
                 Schema.INTERFACE),
             hasColumn(COL_REMOTE_VRF, equalTo("vrf_v"), Schema.STRING),
             hasColumn(COL_REMOTE_IP, equalTo(Ip.parse("1.1.1.3")), Schema.IP),
@@ -153,14 +153,14 @@ public class OspfSessionCompatibilityAnswererTest {
         allOf(
             hasColumn(
                 COL_INTERFACE,
-                equalTo(new NodeInterfacePair("configuration_w", "int_w")),
+                equalTo(NodeInterfacePair.of("configuration_w", "int_w")),
                 Schema.INTERFACE),
             hasColumn(COL_VRF, equalTo("vrf_w"), Schema.STRING),
             hasColumn(COL_IP, equalTo(Ip.parse("1.1.1.4")), Schema.IP),
             hasColumn(COL_AREA, equalTo(1L), Schema.LONG),
             hasColumn(
                 COL_REMOTE_INTERFACE,
-                equalTo(new NodeInterfacePair("configuration_x", "int_x")),
+                equalTo(NodeInterfacePair.of("configuration_x", "int_x")),
                 Schema.INTERFACE),
             hasColumn(COL_REMOTE_VRF, equalTo("vrf_x"), Schema.STRING),
             hasColumn(COL_REMOTE_IP, equalTo(Ip.parse("1.1.1.5")), Schema.IP),

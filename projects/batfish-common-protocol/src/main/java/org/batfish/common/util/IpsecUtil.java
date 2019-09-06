@@ -536,8 +536,8 @@ public class IpsecUtil {
           && peerV.getTunnelInterface() != null) {
         edgesBuilder.add(
             new Edge(
-                new NodeInterfacePair(endPoint.nodeU().getHostName(), peerU.getTunnelInterface()),
-                new NodeInterfacePair(endPoint.nodeV().getHostName(), peerV.getTunnelInterface())));
+                NodeInterfacePair.of(endPoint.nodeU().getHostName(), peerU.getTunnelInterface()),
+                NodeInterfacePair.of(endPoint.nodeV().getHostName(), peerV.getTunnelInterface())));
       }
     }
     return edgesBuilder.build();

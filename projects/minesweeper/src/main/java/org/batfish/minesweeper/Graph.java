@@ -379,7 +379,7 @@ public class Graph {
       for (Entry<String, Interface> entry2 : conf.getAllInterfaces().entrySet()) {
         String name = entry2.getKey();
         Interface iface = entry2.getValue();
-        NodeInterfacePair nip = new NodeInterfacePair(router, name);
+        NodeInterfacePair nip = NodeInterfacePair.of(router, name);
         ifacePairs.add(nip);
         ifaceMap.put(nip, iface);
       }

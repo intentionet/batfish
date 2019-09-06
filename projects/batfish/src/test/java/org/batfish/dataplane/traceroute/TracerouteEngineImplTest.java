@@ -622,7 +622,7 @@ public class TracerouteEngineImplTest {
     assertThat(step0.getDetail().getInputVrf(), equalTo(v1.getName()));
     assertThat(
         step0.getDetail().getInputInterface(),
-        equalTo(new NodeInterfacePair(c1.getHostname(), i1.getName())));
+        equalTo(NodeInterfacePair.of(c1.getHostname(), i1.getName())));
 
     RoutingStep step1 = (RoutingStep) steps.get(1);
     assertThat(step1.getAction(), equalTo(StepAction.FORWARDED));
@@ -639,7 +639,7 @@ public class TracerouteEngineImplTest {
     assertThat(step3.getAction(), equalTo(StepAction.EXITS_NETWORK));
     assertThat(
         step3.getDetail().getOutputInterface(),
-        equalTo(new NodeInterfacePair(c1.getHostname(), i2.getName())));
+        equalTo(NodeInterfacePair.of(c1.getHostname(), i2.getName())));
     assertThat(step3.getDetail().getTransformedFlow(), nullValue());
 
     Flow flow2 =
@@ -1835,7 +1835,7 @@ public class TracerouteEngineImplTest {
                           new FirewallSessionTraceInfo(
                               c2.getHostname(),
                               new ForwardOutInterface(
-                                  c2i1Name, new NodeInterfacePair(c1.getHostname(), c1i1Name)),
+                                  c2i1Name, NodeInterfacePair.of(c1.getHostname(), c1i1Name)),
                               ImmutableSet.of(c2i2Name),
                               match5Tuple(dstIp, dstPort, srcIp, srcPort, ipProtocol),
                               null))))));
@@ -1975,7 +1975,7 @@ public class TracerouteEngineImplTest {
       FirewallSessionTraceInfo session =
           new FirewallSessionTraceInfo(
               c1.getHostname(),
-              new ForwardOutInterface(c1i2Name, new NodeInterfacePair(c2.getHostname(), c2i1Name)),
+              new ForwardOutInterface(c1i2Name, NodeInterfacePair.of(c2.getHostname(), c2i1Name)),
               ImmutableSet.of(c1i1Name),
               TRUE,
               null);
@@ -2000,7 +2000,7 @@ public class TracerouteEngineImplTest {
       FirewallSessionTraceInfo session =
           new FirewallSessionTraceInfo(
               c1.getHostname(),
-              new ForwardOutInterface(c1i2Name, new NodeInterfacePair(c2.getHostname(), c2i1Name)),
+              new ForwardOutInterface(c1i2Name, NodeInterfacePair.of(c2.getHostname(), c2i1Name)),
               ImmutableSet.of(c1i1Name),
               TRUE,
               null);
@@ -2017,7 +2017,7 @@ public class TracerouteEngineImplTest {
       FirewallSessionTraceInfo session =
           new FirewallSessionTraceInfo(
               c1.getHostname(),
-              new ForwardOutInterface(c1i2Name, new NodeInterfacePair(c2.getHostname(), c2i1Name)),
+              new ForwardOutInterface(c1i2Name, NodeInterfacePair.of(c2.getHostname(), c2i1Name)),
               ImmutableSet.of(c1i1Name),
               TRUE,
               null);
@@ -2036,7 +2036,7 @@ public class TracerouteEngineImplTest {
       FirewallSessionTraceInfo session =
           new FirewallSessionTraceInfo(
               c1.getHostname(),
-              new ForwardOutInterface(c1i2Name, new NodeInterfacePair(c2.getHostname(), c2i1Name)),
+              new ForwardOutInterface(c1i2Name, NodeInterfacePair.of(c2.getHostname(), c2i1Name)),
               ImmutableSet.of(c1i1Name),
               TRUE,
               always().apply(assignSourceIp(ip11, ip11)).build());
@@ -2063,7 +2063,7 @@ public class TracerouteEngineImplTest {
       FirewallSessionTraceInfo session =
           new FirewallSessionTraceInfo(
               c1.getHostname(),
-              new ForwardOutInterface(c1i2Name, new NodeInterfacePair(c2.getHostname(), c2i1Name)),
+              new ForwardOutInterface(c1i2Name, NodeInterfacePair.of(c2.getHostname(), c2i1Name)),
               ImmutableSet.of(c1i1Name),
               TRUE,
               always().apply(assignSourceIp(ip11, ip11)).build());
@@ -2079,7 +2079,7 @@ public class TracerouteEngineImplTest {
       FirewallSessionTraceInfo session =
           new FirewallSessionTraceInfo(
               c1.getHostname(),
-              new ForwardOutInterface(c1i2Name, new NodeInterfacePair(c2.getHostname(), c2i1Name)),
+              new ForwardOutInterface(c1i2Name, NodeInterfacePair.of(c2.getHostname(), c2i1Name)),
               ImmutableSet.of(c1i1Name),
               TRUE,
               always().apply(assignSourceIp(ip11, ip11)).build());

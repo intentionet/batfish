@@ -156,7 +156,7 @@ public class TracerouteEngineImplContext {
   }
 
   Collection<FirewallSessionTraceInfo> getSessions(String node, String inputIface) {
-    return _sessionsByIngressInterface.get(new NodeInterfacePair(node, inputIface));
+    return _sessionsByIngressInterface.get(NodeInterfacePair.of(node, inputIface));
   }
 
   /**
@@ -190,6 +190,6 @@ public class TracerouteEngineImplContext {
   @Nonnull
   SortedSet<NodeInterfacePair> getInterfaceNeighbors(
       String currentNodeName, String outgoingIfaceName) {
-    return _topology.getNeighbors(new NodeInterfacePair(currentNodeName, outgoingIfaceName));
+    return _topology.getNeighbors(NodeInterfacePair.of(currentNodeName, outgoingIfaceName));
   }
 }

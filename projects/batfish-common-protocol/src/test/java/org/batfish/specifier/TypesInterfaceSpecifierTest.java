@@ -91,31 +91,30 @@ public class TypesInterfaceSpecifierTest {
   @Test
   public void test() {
     assertThat(
-        specifiedInterfaces("a.*"), equalTo(ImmutableSet.of(new NodeInterfacePair(AGGREGATED))));
+        specifiedInterfaces("a.*"), equalTo(ImmutableSet.of(NodeInterfacePair.of(AGGREGATED))));
     assertThat(
-        specifiedInterfaces("l.*"), equalTo(ImmutableSet.of(new NodeInterfacePair(LOOPBACK))));
-    assertThat(specifiedInterfaces("n.*"), equalTo(ImmutableSet.of(new NodeInterfacePair(NULL))));
+        specifiedInterfaces("l.*"), equalTo(ImmutableSet.of(NodeInterfacePair.of(LOOPBACK))));
+    assertThat(specifiedInterfaces("n.*"), equalTo(ImmutableSet.of(NodeInterfacePair.of(NULL))));
     assertThat(
-        specifiedInterfaces("p.*"), equalTo(ImmutableSet.of(new NodeInterfacePair(PHYSICAL))));
+        specifiedInterfaces("p.*"), equalTo(ImmutableSet.of(NodeInterfacePair.of(PHYSICAL))));
     assertThat(
-        specifiedInterfaces("r.*"), equalTo(ImmutableSet.of(new NodeInterfacePair(REDUNDANT))));
-    assertThat(specifiedInterfaces("t.*"), equalTo(ImmutableSet.of(new NodeInterfacePair(TUNNEL))));
-    assertThat(
-        specifiedInterfaces("u.*"), equalTo(ImmutableSet.of(new NodeInterfacePair(UNKNOWN))));
-    assertThat(specifiedInterfaces("vlan"), equalTo(ImmutableSet.of(new NodeInterfacePair(VLAN))));
-    assertThat(specifiedInterfaces("vpn"), equalTo(ImmutableSet.of(new NodeInterfacePair(VPN))));
+        specifiedInterfaces("r.*"), equalTo(ImmutableSet.of(NodeInterfacePair.of(REDUNDANT))));
+    assertThat(specifiedInterfaces("t.*"), equalTo(ImmutableSet.of(NodeInterfacePair.of(TUNNEL))));
+    assertThat(specifiedInterfaces("u.*"), equalTo(ImmutableSet.of(NodeInterfacePair.of(UNKNOWN))));
+    assertThat(specifiedInterfaces("vlan"), equalTo(ImmutableSet.of(NodeInterfacePair.of(VLAN))));
+    assertThat(specifiedInterfaces("vpn"), equalTo(ImmutableSet.of(NodeInterfacePair.of(VPN))));
     assertThat(
         specifiedInterfaces(".*"),
         equalTo(
             ImmutableSet.of(
-                new NodeInterfacePair(AGGREGATED),
-                new NodeInterfacePair(LOOPBACK),
-                new NodeInterfacePair(NULL),
-                new NodeInterfacePair(PHYSICAL),
-                new NodeInterfacePair(REDUNDANT),
-                new NodeInterfacePair(TUNNEL),
-                new NodeInterfacePair(UNKNOWN),
-                new NodeInterfacePair(VLAN),
-                new NodeInterfacePair(VPN))));
+                NodeInterfacePair.of(AGGREGATED),
+                NodeInterfacePair.of(LOOPBACK),
+                NodeInterfacePair.of(NULL),
+                NodeInterfacePair.of(PHYSICAL),
+                NodeInterfacePair.of(REDUNDANT),
+                NodeInterfacePair.of(TUNNEL),
+                NodeInterfacePair.of(UNKNOWN),
+                NodeInterfacePair.of(VLAN),
+                NodeInterfacePair.of(VPN))));
   }
 }

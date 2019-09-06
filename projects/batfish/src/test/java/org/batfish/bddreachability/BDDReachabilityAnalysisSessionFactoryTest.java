@@ -72,8 +72,8 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
   private static final String FWI3 = "FWI3";
 
   // next hops
-  private static final NodeInterfacePair NEXT_HOP_R1I1 = new NodeInterfacePair(R1, R1I1);
-  private static final NodeInterfacePair NEXT_HOP_R2I1 = new NodeInterfacePair(R2, R2I1);
+  private static final NodeInterfacePair NEXT_HOP_R1I1 = NodeInterfacePair.of(R1, R1I1);
+  private static final NodeInterfacePair NEXT_HOP_R2I1 = NodeInterfacePair.of(R2, R2I1);
 
   // transformation transitions
   private static final Transition FWI1_REVERSE_TRANSFORMATION = new MockTransition(FWI1);
@@ -212,10 +212,12 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
         new MockBDDReverseFlowTransformationFactory(
             // incoming transformations
             ImmutableMap.of(
-                new NodeInterfacePair(FW, FWI1), FWI1_REVERSE_TRANSFORMATION,
-                new NodeInterfacePair(FW, FWI2), FWI2_REVERSE_TRANSFORMATION),
+                NodeInterfacePair.of(FW, FWI1),
+                FWI1_REVERSE_TRANSFORMATION,
+                NodeInterfacePair.of(FW, FWI2),
+                FWI2_REVERSE_TRANSFORMATION),
             // outgoing transformations
-            ImmutableMap.of(new NodeInterfacePair(FW, FWI3), FWI3_REVERSE_TRANSFORMATION));
+            ImmutableMap.of(NodeInterfacePair.of(FW, FWI3), FWI3_REVERSE_TRANSFORMATION));
   }
 
   private Map<String, List<BDDFirewallSessionTraceInfo>> computeInitializedSessions(
@@ -304,8 +306,7 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
 
     assertThat(fwSession, hasHostname(FW));
     assertThat(fwSession, hasIncomingInterfaces(contains(FWI3)));
-    assertThat(
-        fwSession, hasAction(new ForwardOutInterface(FWI1, new NodeInterfacePair(R1, R1I1))));
+    assertThat(fwSession, hasAction(new ForwardOutInterface(FWI1, NodeInterfacePair.of(R1, R1I1))));
     assertThat(fwSession, hasSessionFlows(sessionFlows));
     assertThat(fwSession, hasTransformation(_fwI3ToI1ReverseTransformation));
   }
@@ -398,7 +399,7 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
                 // R2:I1 -> FW:I1
                 hasHostname(FW),
                 hasIncomingInterfaces(contains(FWI3)),
-                hasAction(new ForwardOutInterface(FWI1, new NodeInterfacePair(R2, R2I1))),
+                hasAction(new ForwardOutInterface(FWI1, NodeInterfacePair.of(R2, R2I1))),
                 hasSessionFlows(r2I1SessionFlows),
                 hasTransformation(
                     compose(
@@ -464,14 +465,14 @@ public class BDDReachabilityAnalysisSessionFactoryTest {
                 // R1:I1 -> FW:I1
                 hasHostname(FW),
                 hasIncomingInterfaces(contains(FWI3)),
-                hasAction(new ForwardOutInterface(FWI1, new NodeInterfacePair(R1, R1I1))),
+                hasAction(new ForwardOutInterface(FWI1, NodeInterfacePair.of(R1, R1I1))),
                 hasSessionFlows(r1I1SessionFlows),
                 hasTransformation(_fwI3ToI1ReverseTransformation)),
             allOf(
                 // R3:I1 -> FW:I2
                 hasHostname(FW),
                 hasIncomingInterfaces(contains(FWI3)),
-                hasAction(new ForwardOutInterface(FWI2, new NodeInterfacePair(R3, R3I1))),
+                hasAction(new ForwardOutInterface(FWI2, NodeInterfacePair.of(R3, R3I1))),
                 hasSessionFlows(r3I1SessionFlows),
                 hasTransformation(_fwI3ToI2ReverseTransformation))));
   }

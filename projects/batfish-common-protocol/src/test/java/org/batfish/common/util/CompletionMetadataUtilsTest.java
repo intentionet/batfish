@@ -91,7 +91,7 @@ public final class CompletionMetadataUtilsTest {
         getInterfaces(configs),
         equalTo(
             ImmutableSet.of(
-                new NodeInterfacePair(nodeName, int1), new NodeInterfacePair(nodeName, int2))));
+                NodeInterfacePair.of(nodeName, int1), NodeInterfacePair.of(nodeName, int2))));
   }
 
   @Test

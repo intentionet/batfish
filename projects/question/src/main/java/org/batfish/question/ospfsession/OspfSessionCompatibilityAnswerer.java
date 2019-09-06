@@ -157,13 +157,13 @@ public class OspfSessionCompatibilityAnswerer extends Answerer {
       OspfSessionStatus sessionStatus,
       Map<String, ColumnMetadata> columnMetadataMap) {
     return Row.builder(columnMetadataMap)
-        .put(COL_INTERFACE, new NodeInterfacePair(nodeU.getHostname(), nodeU.getInterfaceName()))
+        .put(COL_INTERFACE, NodeInterfacePair.of(nodeU.getHostname(), nodeU.getInterfaceName()))
         .put(COL_VRF, nodeU.getVrfName())
         .put(COL_IP, nodeU.getIp())
         .put(COL_AREA, nodeU.getArea())
         .put(
             COL_REMOTE_INTERFACE,
-            new NodeInterfacePair(nodeV.getHostname(), nodeV.getInterfaceName()))
+            NodeInterfacePair.of(nodeV.getHostname(), nodeV.getInterfaceName()))
         .put(COL_REMOTE_VRF, nodeV.getVrfName())
         .put(COL_REMOTE_IP, nodeV.getIp())
         .put(COL_REMOTE_AREA, nodeV.getArea())

@@ -148,7 +148,7 @@ public class InterfacePropertiesAnswerer extends Answerer {
         }
         RowBuilder row =
             Row.builder(columns)
-                .put(COL_INTERFACE, new NodeInterfacePair(nodeName, iface.getName()));
+                .put(COL_INTERFACE, NodeInterfacePair.of(nodeName, iface.getName()));
 
         for (String property : propertySpecifier.getMatchingProperties()) {
           PropertyDescriptor<Interface> propertyDescriptor =

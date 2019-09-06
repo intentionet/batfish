@@ -14,7 +14,7 @@ import org.junit.runners.JUnit4;
 public class EdgeTest {
 
   private static Edge EDGE =
-      new Edge(new NodeInterfacePair("tail", "tailInt"), new NodeInterfacePair("head", "headInt"));
+      new Edge(NodeInterfacePair.of("tail", "tailInt"), NodeInterfacePair.of("head", "headInt"));
 
   @Test
   public void testFactory() {
@@ -40,22 +40,21 @@ public class EdgeTest {
         .addEqualityGroup(
             EDGE,
             new Edge(
-                new NodeInterfacePair("tail", "tailInt"), new NodeInterfacePair("head", "headInt")))
+                NodeInterfacePair.of("tail", "tailInt"), NodeInterfacePair.of("head", "headInt")))
         .addEqualityGroup(EDGE.reverse())
         .addEqualityGroup(
             new Edge(
-                new NodeInterfacePair("tail1", "tailInt"),
-                new NodeInterfacePair("head", "headInt")))
+                NodeInterfacePair.of("tail1", "tailInt"), NodeInterfacePair.of("head", "headInt")))
         .addEqualityGroup(
             new Edge(
-                new NodeInterfacePair("tail", "tailint"), new NodeInterfacePair("head", "headInt")))
+                NodeInterfacePair.of("tail", "tailint"), NodeInterfacePair.of("head", "headInt")))
         .addEqualityGroup(
             new Edge(
-                new NodeInterfacePair("tail", "tailInt"), new NodeInterfacePair("hEad", "headInt")))
+                NodeInterfacePair.of("tail", "tailInt"), NodeInterfacePair.of("hEad", "headInt")))
         .addEqualityGroup(
             new Edge(
-                new NodeInterfacePair("tail", "tailInt"),
-                new NodeInterfacePair("head", "headIntOther")))
+                NodeInterfacePair.of("tail", "tailInt"),
+                NodeInterfacePair.of("head", "headIntOther")))
         .testEquals();
   }
 
@@ -65,7 +64,6 @@ public class EdgeTest {
         EDGE.reverse(),
         equalTo(
             new Edge(
-                new NodeInterfacePair("head", "headInt"),
-                new NodeInterfacePair("tail", "tailInt"))));
+                NodeInterfacePair.of("head", "headInt"), NodeInterfacePair.of("tail", "tailInt"))));
   }
 }

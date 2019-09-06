@@ -134,11 +134,11 @@ public final class SessionInstrumentationTest {
                 PKT,
                 LAST_HOP_VAR_NAME,
                 ImmutableMap.of(
-                    new NodeInterfacePair(FW, FW_I1),
+                    NodeInterfacePair.of(FW, FW_I1),
                     ImmutableSet.of(
                         NO_LAST_HOP,
-                        new NodeInterfacePair(SOURCE1, SOURCE1_IFACE),
-                        new NodeInterfacePair(SOURCE2, SOURCE2_IFACE)))));
+                        NodeInterfacePair.of(SOURCE1, SOURCE1_IFACE),
+                        NodeInterfacePair.of(SOURCE2, SOURCE2_IFACE)))));
 
     // Setup source managers
     {
@@ -299,7 +299,7 @@ public final class SessionInstrumentationTest {
         new BDDFirewallSessionTraceInfo(
             FW,
             ImmutableSet.of(FW_I1),
-            new ForwardOutInterface(FW_I1, new NodeInterfacePair(SOURCE1, SOURCE1_IFACE)),
+            new ForwardOutInterface(FW_I1, NodeInterfacePair.of(SOURCE1, SOURCE1_IFACE)),
             sessionHeaders,
             IDENTITY);
 
@@ -370,7 +370,7 @@ public final class SessionInstrumentationTest {
           new BDDFirewallSessionTraceInfo(
               FW,
               ImmutableSet.of(FW_I1),
-              new ForwardOutInterface(FW_I1, new NodeInterfacePair(SOURCE1, SOURCE1_IFACE)),
+              new ForwardOutInterface(FW_I1, NodeInterfacePair.of(SOURCE1, SOURCE1_IFACE)),
               sessionHeaders,
               nat);
       assertThat(

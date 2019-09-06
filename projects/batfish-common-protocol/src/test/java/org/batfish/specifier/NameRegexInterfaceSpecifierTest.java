@@ -40,12 +40,12 @@ public class NameRegexInterfaceSpecifierTest {
     assertThat(
         new NameRegexInterfaceSpecifier(Pattern.compile(".*1"))
             .resolve(ImmutableSet.of("node1"), ctxt),
-        contains(new NodeInterfacePair(iface1node1)));
+        contains(NodeInterfacePair.of(iface1node1)));
 
     assertThat(
         new NameRegexInterfaceSpecifier(Pattern.compile("iface1.*"))
             .resolve(ImmutableSet.of("node1", "node2"), ctxt),
-        containsInAnyOrder(new NodeInterfacePair(iface1node1), new NodeInterfacePair(iface1node2)));
+        containsInAnyOrder(NodeInterfacePair.of(iface1node1), NodeInterfacePair.of(iface1node2)));
 
     // bad regex
     assertThat(

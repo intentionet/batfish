@@ -23,7 +23,7 @@ final class MockBDDReverseFlowTransformationFactory implements BDDReverseFlowTra
   @Override
   public Transition reverseFlowIncomingTransformation(String hostname, String iface) {
     return checkNotNull(
-        _reverseFlowIncomingTransformations.get(new NodeInterfacePair(hostname, iface)),
+        _reverseFlowIncomingTransformations.get(NodeInterfacePair.of(hostname, iface)),
         "Missing reverseFlowIncomingTransformations entry for %s:%s",
         hostname,
         iface);
@@ -33,6 +33,6 @@ final class MockBDDReverseFlowTransformationFactory implements BDDReverseFlowTra
   @Override
   public Transition reverseFlowOutgoingTransformation(String hostname, String iface) {
     return checkNotNull(
-        _reverseFlowOutgoingTransformations.get(new NodeInterfacePair(hostname, iface)));
+        _reverseFlowOutgoingTransformations.get(NodeInterfacePair.of(hostname, iface)));
   }
 }

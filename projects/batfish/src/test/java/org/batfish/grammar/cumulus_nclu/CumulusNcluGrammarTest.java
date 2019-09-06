@@ -825,7 +825,7 @@ public final class CumulusNcluGrammarTest {
 
     // Expect an l3 edge to come up on the peer link interface
     Edge edge =
-        new Edge(new NodeInterfacePair(node1, peerlink), new NodeInterfacePair(node2, peerlink));
+        new Edge(NodeInterfacePair.of(node1, peerlink), NodeInterfacePair.of(node2, peerlink));
     assertThat(
         batfish
             .getTopologyProvider()

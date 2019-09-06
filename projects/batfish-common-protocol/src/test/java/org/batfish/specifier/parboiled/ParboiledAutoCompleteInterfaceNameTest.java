@@ -50,9 +50,9 @@ public class ParboiledAutoCompleteInterfaceNameTest {
       CompletionMetadata.builder()
           .setInterfaces(
               ImmutableSet.of(
-                  new NodeInterfacePair("n1a", "eth11"),
-                  new NodeInterfacePair("n1a", "eth12"),
-                  new NodeInterfacePair("n2a", "eth21")))
+                  NodeInterfacePair.of("n1a", "eth11"),
+                  NodeInterfacePair.of("n1a", "eth12"),
+                  NodeInterfacePair.of("n2a", "eth21")))
           .build();
 
   private static ParboiledAutoComplete getPAC(String query) {

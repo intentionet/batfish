@@ -84,7 +84,7 @@ public class IspModelingUtilsTest {
         ImmutableMap.of("conf", nf.configurationBuilder().setHostname("conf").build()),
         ImmutableList.of(
             new IspConfiguration(
-                ImmutableList.of(new BorderInterfaceInfo(new NodeInterfacePair("conf1", "init1"))),
+                ImmutableList.of(new BorderInterfaceInfo(NodeInterfacePair.of("conf1", "init1"))),
                 IspFilter.ALLOW_ALL)),
         warnings);
 
@@ -388,7 +388,7 @@ public class IspModelingUtilsTest {
             ImmutableList.of(
                 new IspConfiguration(
                     ImmutableList.of(
-                        new BorderInterfaceInfo(new NodeInterfacePair("CoNf", "InTeRfAcE"))),
+                        new BorderInterfaceInfo(NodeInterfacePair.of("CoNf", "InTeRfAcE"))),
                     IspFilter.ALLOW_ALL)),
             new BatfishLogger("output", false),
             new Warnings());
@@ -429,7 +429,7 @@ public class IspModelingUtilsTest {
             ImmutableList.of(
                 new IspConfiguration(
                     ImmutableList.of(
-                        new BorderInterfaceInfo(new NodeInterfacePair("conf", "interface"))),
+                        new BorderInterfaceInfo(NodeInterfacePair.of("conf", "interface"))),
                     IspFilter.ALLOW_ALL)),
             new BatfishLogger("output", false),
             new Warnings());
@@ -627,8 +627,8 @@ public class IspModelingUtilsTest {
             ImmutableList.of(
                 new IspConfiguration(
                     ImmutableList.of(
-                        new BorderInterfaceInfo(new NodeInterfacePair("conf1", "interface1")),
-                        new BorderInterfaceInfo(new NodeInterfacePair("conf2", "interface2"))),
+                        new BorderInterfaceInfo(NodeInterfacePair.of("conf1", "interface1")),
+                        new BorderInterfaceInfo(NodeInterfacePair.of("conf2", "interface2"))),
                     IspFilter.ALLOW_ALL)),
             new BatfishLogger("output", false),
             new Warnings());
@@ -680,8 +680,8 @@ public class IspModelingUtilsTest {
             ImmutableList.of(
                 new IspConfiguration(
                     ImmutableList.of(
-                        new BorderInterfaceInfo(new NodeInterfacePair("conf2", "interface2")),
-                        new BorderInterfaceInfo(new NodeInterfacePair("conf2", "interface2"))),
+                        new BorderInterfaceInfo(NodeInterfacePair.of("conf2", "interface2")),
+                        new BorderInterfaceInfo(NodeInterfacePair.of("conf2", "interface2"))),
                     IspFilter.ALLOW_ALL)),
             new BatfishLogger("output", false),
             new Warnings());
@@ -748,12 +748,12 @@ public class IspModelingUtilsTest {
                 new IspConfiguration(
                     ImmutableList.of(
                         new BorderInterfaceInfo(
-                            new NodeInterfacePair(c1.getHostname(), bgpIfaceName))),
+                            NodeInterfacePair.of(c1.getHostname(), bgpIfaceName))),
                     IspFilter.ALLOW_ALL),
                 new IspConfiguration(
                     ImmutableList.of(
                         new BorderInterfaceInfo(
-                            new NodeInterfacePair(c2.getHostname(), bgpIfaceName))),
+                            NodeInterfacePair.of(c2.getHostname(), bgpIfaceName))),
                     IspFilter.ALLOW_ALL)),
             new Warnings());
 

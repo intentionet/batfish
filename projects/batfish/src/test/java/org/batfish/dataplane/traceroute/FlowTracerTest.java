@@ -125,7 +125,7 @@ public final class FlowTracerTest {
             null,
             new Node(c.getHostname()),
             traces::add,
-            new NodeInterfacePair("node", "iface"),
+            NodeInterfacePair.of("node", "iface"),
             ImmutableSet.of(sessionInfo),
             flow,
             vrf.getName(),

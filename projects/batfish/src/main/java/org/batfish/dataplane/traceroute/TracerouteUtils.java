@@ -94,7 +94,7 @@ public final class TracerouteUtils {
     EnterInputIfaceStepDetail.Builder enterSrcStepDetailBuilder =
         EnterInputIfaceStepDetail.builder();
     enterSrcStepDetailBuilder
-        .setInputInterface(new NodeInterfacePair(node.getHostname(), inputIfaceName))
+        .setInputInterface(NodeInterfacePair.of(node.getHostname(), inputIfaceName))
         .setInputVrf(inputInterface.getVrfName());
 
     // Send in the flow to the next steps
@@ -216,7 +216,7 @@ public final class TracerouteUtils {
                 .forEach(
                     incomingIface ->
                         builder.put(
-                            new NodeInterfacePair(session.getHostname(), incomingIface), session)));
+                            NodeInterfacePair.of(session.getHostname(), incomingIface), session)));
     return builder.build();
   }
 

@@ -180,7 +180,7 @@ class IpsecSessionStatusAnswerer extends Answerer {
     row.put(COL_INITIATOR, new Node(info.getInitiatorHostname()))
         .put(
             COL_INIT_INTERFACE,
-            new NodeInterfacePair(
+            NodeInterfacePair.of(
                 info.getInitiatorHostname(), String.format("%s", info.getInitiatorInterface())))
         .put(COL_INIT_IP, info.getInitiatorIp())
         .put(
@@ -189,7 +189,7 @@ class IpsecSessionStatusAnswerer extends Answerer {
         .put(
             COL_RESPONDER_INTERFACE,
             info.getResponderHostname() != null && info.getResponderInterface() != null
-                ? new NodeInterfacePair(
+                ? NodeInterfacePair.of(
                     info.getResponderHostname(), String.format("%s", info.getResponderInterface()))
                 : null)
         .put(COL_RESPONDER_IP, info.getResponderIp())

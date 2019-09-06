@@ -4,6 +4,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
@@ -15,6 +18,12 @@ import org.batfish.datamodel.Interface;
 /** Combination of node name and interface name */
 @ParametersAreNonnullByDefault
 public final class NodeInterfacePair implements Serializable, Comparable<NodeInterfacePair> {
+  // Soft values: let it be garbage collected in times of pressure.
+  // Maximum size 2^18: Just some upper bound on cache size, well less than GiB.
+  //   (~40 bytes reasonable entry size: 12+12+pointers, would be 10 MiB total).
+  private static final LoadingCache<NodeInterfacePair, NodeInterfacePair> CACHE =
+      CacheBuilder.newBuilder().softValues().maximumSize(1 << 18).build(CacheLoader.from(x -> x));
+
   private static final String PROP_HOSTNAME = "hostname";
   private static final String PROP_INTERFACE = "interface";
 
@@ -22,21 +31,31 @@ public final class NodeInterfacePair implements Serializable, Comparable<NodeInt
   @Nonnull private final String _interfaceName;
 
   @JsonCreator
-  private static NodeInterfacePair create(
+  private static NodeInterfacePair jsonCreator(
       @Nullable @JsonProperty(PROP_HOSTNAME) String node,
       @Nullable @JsonProperty(PROP_INTERFACE) String iface) {
     checkArgument(node != null, "NodeInterfacePair missing %s", PROP_HOSTNAME);
     checkArgument(iface != null, "NodeInterfacePair missing %s", PROP_INTERFACE);
-    return new NodeInterfacePair(node, iface);
+    return of(node, iface);
   }
 
+  public static NodeInterfacePair of(String hostname, String interfaceName) {
+    return CACHE.getUnchecked(new NodeInterfacePair(hostname, interfaceName));
+  }
+
+  public static NodeInterfacePair of(Interface iface) {
+    return of(iface.getOwner().getHostname(), iface.getName());
+  }
+
+  @Deprecated
   public NodeInterfacePair(String hostname, String interfaceName) {
     _hostname = hostname;
     _interfaceName = interfaceName;
   }
 
+  @Deprecated
   public NodeInterfacePair(Interface iface) {
-    this(iface.getOwner().getHostname(), iface.getName());
+    this(iface.getOwner().getNtpSourceInterface(), iface.getName());
   }
 
   /** Return node name */

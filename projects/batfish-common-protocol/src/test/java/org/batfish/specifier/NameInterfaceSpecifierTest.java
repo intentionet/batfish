@@ -38,11 +38,11 @@ public class NameInterfaceSpecifierTest {
 
     assertThat(
         new NameInterfaceSpecifier("iface1").resolve(ImmutableSet.of("node1"), ctxt),
-        contains(new NodeInterfacePair(iface1node1)));
+        contains(NodeInterfacePair.of(iface1node1)));
 
     assertThat(
         new NameInterfaceSpecifier("iface1").resolve(ImmutableSet.of("node1", "node2"), ctxt),
-        containsInAnyOrder(new NodeInterfacePair(iface1node1), new NodeInterfacePair(iface1node2)));
+        containsInAnyOrder(NodeInterfacePair.of(iface1node1), NodeInterfacePair.of(iface1node2)));
 
     // bad name
     assertThat(
@@ -51,6 +51,6 @@ public class NameInterfaceSpecifierTest {
     // case insensitive
     assertThat(
         new NameInterfaceSpecifier("IfACe1").resolve(ImmutableSet.of("node1"), ctxt),
-        contains(new NodeInterfacePair(iface1node1)));
+        contains(NodeInterfacePair.of(iface1node1)));
   }
 }

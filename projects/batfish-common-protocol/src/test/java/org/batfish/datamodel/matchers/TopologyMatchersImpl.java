@@ -65,7 +65,7 @@ class TopologyMatchersImpl {
 
     @Override
     protected boolean matchesSafely(String item, Description mismatchDescription) {
-      NodeInterfacePair pair = new NodeInterfacePair(_node, item);
+      NodeInterfacePair pair = NodeInterfacePair.of(_node, item);
       if (!_subMatcher.matches(pair)) {
         mismatchDescription
             .appendText(String.format("%s as interface of %s did not satisfy: ", item, _node))

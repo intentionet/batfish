@@ -39,7 +39,7 @@ public final class LastHopOutgoingInterfaceManager {
 
   // used for originating at an interface
   public static final NodeInterfacePair NO_LAST_HOP =
-      new NodeInterfacePair(NO_LAST_HOP_NODE, NO_LAST_HOP_INTERFACE);
+      NodeInterfacePair.of(NO_LAST_HOP_NODE, NO_LAST_HOP_INTERFACE);
 
   // (Receiving node, ingress interface) --> [(Sending node, egress interface)]
   private final Map<NodeInterfacePair, BDDFiniteDomain<NodeInterfacePair>> _finiteDomains;
@@ -112,19 +112,19 @@ public final class LastHopOutgoingInterfaceManager {
 
   public BDD getLastHopOutgoingInterfaceBdd(
       String sendingNode, String sendingIface, String receivingNode, String receivingIface) {
-    NodeInterfacePair key = new NodeInterfacePair(receivingNode, receivingIface);
+    NodeInterfacePair key = NodeInterfacePair.of(receivingNode, receivingIface);
     BDDFiniteDomain<NodeInterfacePair> fd = _finiteDomains.get(key);
     if (fd == null) {
       // receivingNode doesn't track last-hop outgoing interfaces.
       return _trueBdd;
     }
-    NodeInterfacePair val = new NodeInterfacePair(sendingNode, sendingIface);
+    NodeInterfacePair val = NodeInterfacePair.of(sendingNode, sendingIface);
     return fd.getConstraintForValue(val);
   }
 
   public Optional<NodeInterfacePair> getLastHopOutgoingInterfaceFromAssignment(
       String receivingNode, String receivingIface, BDD bdd) {
-    NodeInterfacePair key = new NodeInterfacePair(receivingNode, receivingIface);
+    NodeInterfacePair key = NodeInterfacePair.of(receivingNode, receivingIface);
     BDDFiniteDomain<NodeInterfacePair> fd = _finiteDomains.get(key);
     return fd == null ? Optional.empty() : Optional.of(fd.getValueFromAssignment(bdd));
   }

@@ -29,7 +29,7 @@ public final class FirewallSessionTraceInfoTest {
         .addEqualityGroup(
             new FirewallSessionTraceInfo(
                 "A",
-                new ForwardOutInterface("B", new NodeInterfacePair("", "")),
+                new ForwardOutInterface("B", NodeInterfacePair.of("", "")),
                 ImmutableSet.of(),
                 TRUE,
                 null))

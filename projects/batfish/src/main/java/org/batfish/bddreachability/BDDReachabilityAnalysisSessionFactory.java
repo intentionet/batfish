@@ -138,14 +138,14 @@ final class BDDReachabilityAnalysisSessionFactory {
                 Optional.ofNullable(
                         _lastHopManager
                             .getFiniteDomains()
-                            .get(new NodeInterfacePair(hostname, iface)))
+                            .get(NodeInterfacePair.of(hostname, iface)))
                     .map(BDDFiniteDomain::getValueBdds)
                     .orElse(ImmutableMap.of()));
 
     return sessionExitInterfaces.stream()
         .flatMap(
             iface -> {
-              BDD exitIfaceBdd = _sessionBdds.get(new NodeInterfacePair(hostname, iface.getName()));
+              BDD exitIfaceBdd = _sessionBdds.get(NodeInterfacePair.of(hostname, iface.getName()));
               return exitIfaceBdd == null || exitIfaceBdd.isZero()
                   ? Stream.of()
                   : computeInitializedSessions(iface, lastHopOutgoingInterfaceBdds, exitIfaceBdd)

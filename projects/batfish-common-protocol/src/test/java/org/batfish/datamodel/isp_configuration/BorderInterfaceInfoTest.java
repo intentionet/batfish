@@ -15,17 +15,17 @@ public class BorderInterfaceInfoTest {
   public void testEquals() {
     new EqualsTester()
         .addEqualityGroup(
-            new BorderInterfaceInfo(new NodeInterfacePair("node", "interface")),
-            new BorderInterfaceInfo(new NodeInterfacePair("node", "interface")))
+            new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface")),
+            new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface")))
         .addEqualityGroup(
-            new BorderInterfaceInfo(new NodeInterfacePair("diffNode", "diffInterface")))
+            new BorderInterfaceInfo(NodeInterfacePair.of("diffNode", "diffInterface")))
         .testEquals();
   }
 
   @Test
   public void testJsonSerialization() throws IOException {
     BorderInterfaceInfo borderInterfaceInfo =
-        new BorderInterfaceInfo(new NodeInterfacePair("node", "interface"));
+        new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface"));
 
     assertThat(
         BatfishObjectMapper.clone(borderInterfaceInfo, BorderInterfaceInfo.class),

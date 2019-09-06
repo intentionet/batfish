@@ -89,7 +89,7 @@ public class OspfInterfaceConfigAnswererTest {
             hasColumn(COL_PROCESS_ID, equalTo("ospf_1"), Schema.STRING),
             hasColumn(
                 COL_INTERFACE,
-                equalTo(new NodeInterfacePair("test_conf", "int1")),
+                equalTo(NodeInterfacePair.of("test_conf", "int1")),
                 Schema.INTERFACE),
             hasColumn(OSPF_AREA_NAME, equalTo(1), Schema.INTEGER)));
     assertThat(

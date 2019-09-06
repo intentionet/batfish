@@ -166,8 +166,8 @@ public class EigrpTopologyUtilsTest {
   @Test
   public void testInitEigrpTopology() {
     Map<String, Configuration> configurations = configurationsForEigrpTopology();
-    NodeInterfacePair conf1Iface1 = new NodeInterfacePair("conf1", "iface1");
-    NodeInterfacePair conf2Iface1 = new NodeInterfacePair("conf2", "iface1");
+    NodeInterfacePair conf1Iface1 = NodeInterfacePair.of("conf1", "iface1");
+    NodeInterfacePair conf2Iface1 = NodeInterfacePair.of("conf2", "iface1");
     Topology layer3Topology =
         new Topology(
             ImmutableSortedSet.of(

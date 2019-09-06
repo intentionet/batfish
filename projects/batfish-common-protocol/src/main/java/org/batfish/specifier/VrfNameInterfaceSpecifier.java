@@ -43,7 +43,7 @@ public final class VrfNameInterfaceSpecifier implements InterfaceSpecifier {
         .filter(v -> v.getName().equalsIgnoreCase(_name))
         .map(v -> v.getInterfaces().values())
         .flatMap(Collection::stream)
-        .map(NodeInterfacePair::new)
+        .map(NodeInterfacePair::of)
         .collect(ImmutableSet.toImmutableSet());
   }
 }

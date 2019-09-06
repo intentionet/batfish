@@ -97,7 +97,7 @@ public class AwsConfiguration implements Serializable, GenericConfigObject {
   public List<BorderInterfaceInfo> getBorderInterfaces() {
     return _regions.values().stream()
         .flatMap(r -> r.getInternetGateways().values().stream())
-        .map(igw -> new NodeInterfacePair(igw.getId(), BACKBONE_INTERFACE_NAME))
+        .map(igw -> NodeInterfacePair.of(igw.getId(), BACKBONE_INTERFACE_NAME))
         .map(BorderInterfaceInfo::new)
         .collect(ImmutableList.toImmutableList());
   }

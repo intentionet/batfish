@@ -116,12 +116,12 @@ public final class MlagPropertiesAnswerer extends Answerer {
         .put(
             COL_MLAG_PEER_INTERFACE,
             mlag.getPeerInterface() != null
-                ? new NodeInterfacePair(hostname, mlag.getPeerInterface())
+                ? NodeInterfacePair.of(hostname, mlag.getPeerInterface())
                 : null)
         .put(
             COL_MLAG_LOCAL_INTERFACE,
             mlag.getLocalInterface() != null
-                ? new NodeInterfacePair(hostname, mlag.getLocalInterface())
+                ? NodeInterfacePair.of(hostname, mlag.getLocalInterface())
                 : null)
         .build();
   }

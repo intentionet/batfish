@@ -427,9 +427,9 @@ public final class TopologyUtil {
                 edge -> {
                   Edge l3Edge =
                       new Edge(
-                          new NodeInterfacePair(
+                          NodeInterfacePair.of(
                               edge.getNode1().getHostname(), edge.getNode1().getInterfaceName()),
-                          new NodeInterfacePair(
+                          NodeInterfacePair.of(
                               edge.getNode2().getHostname(), edge.getNode2().getInterfaceName()));
                   // Return forward and reverse edges (L1 topology not guaranteed to be symmetric)
                   // In the end it collapses to a set anyway
@@ -440,7 +440,7 @@ public final class TopologyUtil {
         configurations.values().stream()
             .flatMap(c -> c.getActiveInterfaces().values().stream())
             .filter(i -> i.getInterfaceType() == InterfaceType.AGGREGATE_CHILD)
-            .map(i -> new NodeInterfacePair(i.getOwner().getHostname(), i.getName()))
+            .map(i -> NodeInterfacePair.of(i.getOwner().getHostname(), i.getName()))
             .collect(ImmutableSet.toImmutableSet());
 
     Stream<Edge> subInterfaceLLAStream =
@@ -689,7 +689,7 @@ public final class TopologyUtil {
                   .getTunnelConfig()
                   .getDestinationAddress()
                   .equals(iface2.getTunnelConfig().getSourceAddress())) {
-            builder.add(new NodeInterfacePair(iface1), new NodeInterfacePair(iface2));
+            builder.add(NodeInterfacePair.of(iface1), NodeInterfacePair.of(iface2));
           }
         }
       }

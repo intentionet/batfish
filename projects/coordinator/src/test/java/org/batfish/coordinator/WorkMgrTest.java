@@ -165,8 +165,8 @@ public final class WorkMgrTest {
     File serializedList = tmp.newFile();
     Path serializedListPath = serializedList.toPath();
 
-    NodeInterfacePair baseInterface = new NodeInterfacePair("n1", "iface1");
-    NodeInterfacePair additionalInterface = new NodeInterfacePair("n2", "iface2");
+    NodeInterfacePair baseInterface = NodeInterfacePair.of("n1", "iface1");
+    NodeInterfacePair additionalInterface = NodeInterfacePair.of("n2", "iface2");
 
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
@@ -194,7 +194,7 @@ public final class WorkMgrTest {
     File serializedList = tmp.newFile();
     Path serializedListPath = serializedList.toPath();
 
-    NodeInterfacePair baseInterface = new NodeInterfacePair("n1", "iface1");
+    NodeInterfacePair baseInterface = NodeInterfacePair.of("n1", "iface1");
 
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
@@ -220,7 +220,7 @@ public final class WorkMgrTest {
     File serializedList = tmp.newFile();
     Path serializedListPath = serializedList.toPath();
 
-    NodeInterfacePair baseInterface = new NodeInterfacePair("n1", "iface1");
+    NodeInterfacePair baseInterface = NodeInterfacePair.of("n1", "iface1");
 
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
@@ -246,7 +246,7 @@ public final class WorkMgrTest {
     Path serializedListPath = serializedList.toPath();
     serializedList.delete();
 
-    NodeInterfacePair additionalInterface = new NodeInterfacePair("n2", "iface2");
+    NodeInterfacePair additionalInterface = NodeInterfacePair.of("n2", "iface2");
 
     addToSerializedList(
         serializedListPath,
@@ -285,8 +285,8 @@ public final class WorkMgrTest {
     File serializedList = tmp.newFile();
     Path serializedListPath = serializedList.toPath();
 
-    NodeInterfacePair baseInterface1 = new NodeInterfacePair("n1", "iface1");
-    NodeInterfacePair baseInterface2 = new NodeInterfacePair("n2", "iface2");
+    NodeInterfacePair baseInterface1 = NodeInterfacePair.of("n1", "iface1");
+    NodeInterfacePair baseInterface2 = NodeInterfacePair.of("n2", "iface2");
 
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
@@ -315,10 +315,10 @@ public final class WorkMgrTest {
     File serializedList = tmp.newFile();
     Path serializedListPath = serializedList.toPath();
 
-    NodeInterfacePair baseInterface1 = new NodeInterfacePair("n1", "iface1");
-    NodeInterfacePair baseInterface2 = new NodeInterfacePair("n2", "iface2");
-    NodeInterfacePair subtraction1 = new NodeInterfacePair("n2", "iface2");
-    NodeInterfacePair subtraction2 = new NodeInterfacePair("n3", "iface3");
+    NodeInterfacePair baseInterface1 = NodeInterfacePair.of("n1", "iface1");
+    NodeInterfacePair baseInterface2 = NodeInterfacePair.of("n2", "iface2");
+    NodeInterfacePair subtraction1 = NodeInterfacePair.of("n2", "iface2");
+    NodeInterfacePair subtraction2 = NodeInterfacePair.of("n3", "iface3");
 
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
@@ -346,7 +346,7 @@ public final class WorkMgrTest {
     Path serializedListPath = serializedList.toPath();
     Files.delete(serializedListPath);
 
-    NodeInterfacePair subtraction = new NodeInterfacePair("n2", "iface2");
+    NodeInterfacePair subtraction = NodeInterfacePair.of("n2", "iface2");
 
     // Removing non-existent element should throw
     _thrown.expect(IllegalArgumentException.class);
@@ -403,7 +403,7 @@ public final class WorkMgrTest {
     File serializedList = tmp.newFile();
     Path serializedListPath = serializedList.toPath();
 
-    NodeInterfacePair baseInterface1 = new NodeInterfacePair("n1", "iface1");
+    NodeInterfacePair baseInterface1 = NodeInterfacePair.of("n1", "iface1");
 
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
@@ -699,7 +699,7 @@ public final class WorkMgrTest {
     String snapshotNewName1 = "snapshotNew1";
     String snapshotNewName2 = "snapshotNew2";
 
-    List<NodeInterfacePair> interfaces = ImmutableList.of(new NodeInterfacePair("n1", "iface1"));
+    List<NodeInterfacePair> interfaces = ImmutableList.of(NodeInterfacePair.of("n1", "iface1"));
     List<Edge> links = ImmutableList.of(Edge.of("n2", "iface2", "n3", "iface3"));
     List<String> nodes = ImmutableList.of("n4", "n5");
 
@@ -2257,9 +2257,9 @@ public final class WorkMgrTest {
     String col = "col1";
     ColumnMetadata columnMetadata = new ColumnMetadata(col, Schema.INTERFACE, "colDesc");
     Comparator<Row> comparator = _manager.columnComparator(columnMetadata);
-    Row r1 = Row.of(col, new NodeInterfacePair("a", "a"));
-    Row r2 = Row.of(col, new NodeInterfacePair("a", "b"));
-    Row r3 = Row.of(col, new NodeInterfacePair("b", "a"));
+    Row r1 = Row.of(col, NodeInterfacePair.of("a", "a"));
+    Row r2 = Row.of(col, NodeInterfacePair.of("a", "b"));
+    Row r3 = Row.of(col, NodeInterfacePair.of("b", "a"));
 
     assertThat(comparator.compare(r1, r2), lessThan(0));
     assertThat(comparator.compare(r1, r3), lessThan(0));

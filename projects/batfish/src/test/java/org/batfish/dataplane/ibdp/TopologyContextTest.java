@@ -104,7 +104,7 @@ public final class TopologyContextTest {
             builder
                 .setTunnelTopology(
                     TunnelTopology.builder()
-                        .add(new NodeInterfacePair("n1", "i1"), new NodeInterfacePair("n2", "i2"))
+                        .add(NodeInterfacePair.of("n1", "i1"), NodeInterfacePair.of("n2", "i2"))
                         .build())
                 .build())
         .addEqualityGroup(builder.setVxlanTopology(new VxlanTopology(vxlanTopology)).build())
@@ -151,7 +151,7 @@ public final class TopologyContextTest {
             Optional.of(new Layer1Topology(ImmutableList.of(new Layer1Edge("a", "b", "c", "d")))))
         .setTunnelTopology(
             TunnelTopology.builder()
-                .add(new NodeInterfacePair("n1", "i1"), new NodeInterfacePair("n2", "i2"))
+                .add(NodeInterfacePair.of("n1", "i1"), NodeInterfacePair.of("n2", "i2"))
                 .build())
         .setVxlanTopology(new VxlanTopology(vxlanTopology));
 

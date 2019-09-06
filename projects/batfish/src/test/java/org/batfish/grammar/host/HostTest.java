@@ -83,17 +83,17 @@ public class HostTest {
         not(
             hasItems(
                 new Edge(
-                    new NodeInterfacePair("cisco_host", "Tunnel1"),
-                    new NodeInterfacePair("vgw-81fd279f", "vpn1")),
+                    NodeInterfacePair.of("cisco_host", "Tunnel1"),
+                    NodeInterfacePair.of("vgw-81fd279f", "vpn1")),
                 new Edge(
-                    new NodeInterfacePair("cisco_host", "Tunnel2"),
-                    new NodeInterfacePair("vgw-81fd279f", "vpn2")),
+                    NodeInterfacePair.of("cisco_host", "Tunnel2"),
+                    NodeInterfacePair.of("vgw-81fd279f", "vpn2")),
                 new Edge(
-                    new NodeInterfacePair("vgw-81fd279f", "vpn1"),
-                    new NodeInterfacePair("cisco_host", "Tunnel1")),
+                    NodeInterfacePair.of("vgw-81fd279f", "vpn1"),
+                    NodeInterfacePair.of("cisco_host", "Tunnel1")),
                 new Edge(
-                    new NodeInterfacePair("vgw-81fd279f", "vpn2"),
-                    new NodeInterfacePair("cisco_host", "Tunnel2")))));
+                    NodeInterfacePair.of("vgw-81fd279f", "vpn2"),
+                    NodeInterfacePair.of("cisco_host", "Tunnel2")))));
   }
 
   @Test
@@ -110,17 +110,17 @@ public class HostTest {
         fixedPointLayer3Topology.getEdges(),
         hasItems(
             new Edge(
-                new NodeInterfacePair("cisco_host", "Tunnel1"),
-                new NodeInterfacePair("vgw-81fd279f", "vpn1")),
+                NodeInterfacePair.of("cisco_host", "Tunnel1"),
+                NodeInterfacePair.of("vgw-81fd279f", "vpn1")),
             new Edge(
-                new NodeInterfacePair("cisco_host", "Tunnel2"),
-                new NodeInterfacePair("vgw-81fd279f", "vpn2")),
+                NodeInterfacePair.of("cisco_host", "Tunnel2"),
+                NodeInterfacePair.of("vgw-81fd279f", "vpn2")),
             new Edge(
-                new NodeInterfacePair("vgw-81fd279f", "vpn1"),
-                new NodeInterfacePair("cisco_host", "Tunnel1")),
+                NodeInterfacePair.of("vgw-81fd279f", "vpn1"),
+                NodeInterfacePair.of("cisco_host", "Tunnel1")),
             new Edge(
-                new NodeInterfacePair("vgw-81fd279f", "vpn2"),
-                new NodeInterfacePair("cisco_host", "Tunnel2"))));
+                NodeInterfacePair.of("vgw-81fd279f", "vpn2"),
+                NodeInterfacePair.of("cisco_host", "Tunnel2"))));
   }
 
   @Test

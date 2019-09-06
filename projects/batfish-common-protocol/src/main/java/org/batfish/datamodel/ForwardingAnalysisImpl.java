@@ -829,7 +829,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
                           .flatMap(
                               ifaceEntry -> {
                                 NodeInterfacePair out =
-                                    new NodeInterfacePair(nodeEntry.getKey(), ifaceEntry.getKey());
+                                    NodeInterfacePair.of(nodeEntry.getKey(), ifaceEntry.getKey());
                                 Set<AbstractRoute> routes = ifaceEntry.getValue();
                                 return topology.getNeighbors(out).stream()
                                     .map(
@@ -982,7 +982,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
                             ifaceEntry -> {
                               String outInterface = ifaceEntry.getKey();
                               Set<AbstractRoute> candidateRoutes = ifaceEntry.getValue();
-                              NodeInterfacePair out = new NodeInterfacePair(hostname, outInterface);
+                              NodeInterfacePair out = NodeInterfacePair.of(hostname, outInterface);
                               Set<NodeInterfacePair> receivers = topology.getNeighbors(out);
                               return receivers.stream()
                                   .map(

@@ -30,7 +30,7 @@ public final class CompletionMetadataUtils {
         .forEach(
             configuration ->
                 configuration.getAllInterfaces().values().stream()
-                    .map(NodeInterfacePair::new)
+                    .map(NodeInterfacePair::of)
                     .forEach(interfaces::add));
     return interfaces.build();
   }

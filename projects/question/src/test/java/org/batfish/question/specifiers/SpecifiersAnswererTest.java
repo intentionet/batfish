@@ -129,7 +129,7 @@ public class SpecifiersAnswererTest {
         equalTo(
             ImmutableMultiset.of(
                 Row.of(
-                    COL_INTERFACE, new NodeInterfacePair(_c1.getHostname(), _iface1.getName())))));
+                    COL_INTERFACE, NodeInterfacePair.of(_c1.getHostname(), _iface1.getName())))));
 
     // nothing should match since the node specifier does not match anything
     question.setNodeSpecifierInput("foofoo");

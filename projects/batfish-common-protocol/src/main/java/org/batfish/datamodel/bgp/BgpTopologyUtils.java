@@ -228,7 +228,7 @@ public final class BgpTopologyUtils {
 
     Set<BgpPeerConfigId> alreadyEstablished = graph.adjacentNodes(neighborId);
     String hostname = neighborId.getHostname();
-    NodeInterfacePair peerNip = new NodeInterfacePair(hostname, neighborId.getPeerInterface());
+    NodeInterfacePair peerNip = NodeInterfacePair.of(hostname, neighborId.getPeerInterface());
     graph.nodes().stream()
         .filter(
             candidateId ->
@@ -240,7 +240,7 @@ public final class BgpTopologyUtils {
                     // Check layer 2 connectivity
                     && layer2Topology.inSameBroadcastDomain(
                         peerNip,
-                        new NodeInterfacePair(
+                        NodeInterfacePair.of(
                             candidateId.getHostname(), candidateId.getPeerInterface())))
         .forEach(remoteId -> addEdges(neighbor, neighborId, remoteId, graph, nc));
   }

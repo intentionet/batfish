@@ -151,7 +151,7 @@ public final class OspfInterfaceConfigurationAnswerer extends Answerer {
       Map<String, ColumnMetadata> columnMetadataMap) {
     RowBuilder rowBuilder =
         Row.builder(columnMetadataMap)
-            .put(COL_INTERFACE, new NodeInterfacePair(nodeName, iface.getName()))
+            .put(COL_INTERFACE, NodeInterfacePair.of(nodeName, iface.getName()))
             .put(COL_VRF, iface.getVrfName())
             .put(COL_PROCESS_ID, ospfProcessId);
 

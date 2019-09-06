@@ -66,7 +66,7 @@ public final class InterfaceWithConnectedIpsSpecifier implements InterfaceSpecif
         .filter(
             i ->
                 i.getAllConcreteAddresses().stream().anyMatch(this::interfaceAddressMatchesIpSpace))
-        .map(NodeInterfacePair::new)
+        .map(NodeInterfacePair::of)
         .collect(ImmutableSet.toImmutableSet());
   }
 

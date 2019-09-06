@@ -68,7 +68,7 @@ public class OspfStatusQuestionPlugin extends QuestionPlugin {
       }
 
       public OspfInfo(String hostname, String interfaceName, OspfStatus status) {
-        this(new NodeInterfacePair(hostname, interfaceName), status);
+        this(NodeInterfacePair.of(hostname, interfaceName), status);
       }
 
       @JsonProperty(PROP_INTERFACE)
@@ -139,7 +139,7 @@ public class OspfStatusQuestionPlugin extends QuestionPlugin {
           for (Entry<String, Interface> e2 : vrf.getInterfaces().entrySet()) {
             String interfaceName = e2.getKey();
             Interface iface = e2.getValue();
-            if (includeInterfaces.contains(new NodeInterfacePair(iface))) {
+            if (includeInterfaces.contains(NodeInterfacePair.of(iface))) {
               if (iface.getSwitchport()) {
                 // it's a layer2 interface
                 conditionalAdd(

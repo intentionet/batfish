@@ -121,7 +121,7 @@ public final class FileBasedStorageTest {
 
     IspConfiguration ispConfiguration =
         new IspConfiguration(
-            ImmutableList.of(new BorderInterfaceInfo(new NodeInterfacePair("node", "interface"))),
+            ImmutableList.of(new BorderInterfaceInfo(NodeInterfacePair.of("node", "interface"))),
             new IspFilter(
                 ImmutableList.of(1L, 2L),
                 ImmutableList.of(Ip.parse("1.1.1.1"), Ip.parse("2.2.2.2"))));
@@ -451,7 +451,7 @@ public final class FileBasedStorageTest {
     CompletionMetadata completionMetadata =
         new CompletionMetadata(
             ImmutableSet.of("filter1"),
-            ImmutableSet.of(new NodeInterfacePair("node", "iface")),
+            ImmutableSet.of(NodeInterfacePair.of("node", "iface")),
             ImmutableSet.of("1.1.1.1"),
             ImmutableSet.of("mlag"),
             ImmutableSet.of("node"),

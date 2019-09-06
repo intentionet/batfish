@@ -83,7 +83,7 @@ public final class OspfNeighborConfigId implements Serializable {
   @Nonnull
   @JsonIgnore
   public NodeInterfacePair getNodeInterfacePair() {
-    return new NodeInterfacePair(getHostname(), getInterfaceName());
+    return NodeInterfacePair.of(getHostname(), getInterfaceName());
   }
 
   @Override

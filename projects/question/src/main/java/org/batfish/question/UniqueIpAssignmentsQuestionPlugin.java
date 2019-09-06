@@ -104,7 +104,7 @@ public class UniqueIpAssignmentsQuestionPlugin extends QuestionPlugin {
                   iface.getAllConcreteAddresses().stream()
                       .map(
                           ifaceAdrr ->
-                              Maps.immutableEntry(ifaceAdrr.getIp(), new NodeInterfacePair(iface))))
+                              Maps.immutableEntry(ifaceAdrr.getIp(), NodeInterfacePair.of(iface))))
           // group by Ip
           .collect(Multimaps.toMultimap(Entry::getKey, Entry::getValue, TreeMultimap::create))
           // convert to stream of Entry<Ip, Set<NodeInterfacePair>>

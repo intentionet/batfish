@@ -18,7 +18,7 @@ public class CompletionMetadataTest {
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()
             .setFilterNames(ImmutableSet.of("filter"))
-            .setInterfaces(ImmutableSet.of(new NodeInterfacePair("node", "interface")))
+            .setInterfaces(ImmutableSet.of(NodeInterfacePair.of("node", "interface")))
             .setIps(ImmutableSet.of("ip"))
             .setMlagIds(ImmutableSet.of("mlag"))
             .setNodes(ImmutableSet.of("node"))
@@ -36,7 +36,7 @@ public class CompletionMetadataTest {
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()
             .setFilterNames(ImmutableSet.of("filter"))
-            .setInterfaces(ImmutableSet.of(new NodeInterfacePair("node", "interface")))
+            .setInterfaces(ImmutableSet.of(NodeInterfacePair.of("node", "interface")))
             .setIps(ImmutableSet.of("ip"))
             .setMlagIds(ImmutableSet.of("mlag"))
             .setNodes(ImmutableSet.of("node"))
@@ -62,7 +62,7 @@ public class CompletionMetadataTest {
         .addEqualityGroup(builder.setFilterNames(ImmutableSet.of("filter")).build())
         .addEqualityGroup(
             builder
-                .setInterfaces(ImmutableSet.of(new NodeInterfacePair("node", "interface")))
+                .setInterfaces(ImmutableSet.of(NodeInterfacePair.of("node", "interface")))
                 .build())
         .addEqualityGroup(builder.setIps(ImmutableSet.of("ip")).build())
         .addEqualityGroup(builder.setMlagIds(ImmutableSet.of("mlag")).build())

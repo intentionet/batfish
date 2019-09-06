@@ -131,12 +131,12 @@ public final class ReachabilityParametersResolver {
     NodeInterfacePair iface;
     if (l instanceof InterfaceLocation) {
       iface =
-          new NodeInterfacePair(
+          NodeInterfacePair.of(
               ((InterfaceLocation) l).getNodeName(), ((InterfaceLocation) l).getInterfaceName());
     } else {
       assert l instanceof InterfaceLinkLocation;
       iface =
-          new NodeInterfacePair(
+          NodeInterfacePair.of(
               ((InterfaceLinkLocation) l).getNodeName(),
               ((InterfaceLinkLocation) l).getInterfaceName());
     }

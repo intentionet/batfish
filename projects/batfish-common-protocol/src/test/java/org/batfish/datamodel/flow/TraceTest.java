@@ -23,7 +23,7 @@ public class TraceTest {
                   .setAction(StepAction.RECEIVED)
                   .setDetail(
                       EnterInputIfaceStepDetail.builder()
-                          .setInputInterface(new NodeInterfacePair("Enter", "in"))
+                          .setInputInterface(NodeInterfacePair.of("Enter", "in"))
                           .build())
                   .build()));
   private Hop _hopWithOnlyExit =
@@ -34,7 +34,7 @@ public class TraceTest {
                   .setAction(StepAction.RECEIVED)
                   .setDetail(
                       ExitOutputIfaceStepDetail.builder()
-                          .setOutputInterface(new NodeInterfacePair("Exit", "out"))
+                          .setOutputInterface(NodeInterfacePair.of("Exit", "out"))
                           .build())
                   .build()));
 

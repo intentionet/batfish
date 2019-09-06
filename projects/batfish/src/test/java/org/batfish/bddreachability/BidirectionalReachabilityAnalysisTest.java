@@ -334,9 +334,9 @@ public final class BidirectionalReachabilityAnalysisTest {
     Transition i2Transition = new MockTransition(fwI2.getName());
 
     NodeInterfacePair source1Source1Iface =
-        new NodeInterfacePair(source1.getHostname(), source1Iface.getName());
+        NodeInterfacePair.of(source1.getHostname(), source1Iface.getName());
     NodeInterfacePair source2Source2Iface =
-        new NodeInterfacePair(source2.getHostname(), source2Iface.getName());
+        NodeInterfacePair.of(source2.getHostname(), source2Iface.getName());
     BDD source1InRange = PKT.getDstPort().value(1);
     BDD source2InRange = PKT.getDstPort().value(2);
     BDD fwInRange = PKT.getDstPort().value(3);
@@ -399,9 +399,9 @@ public final class BidirectionalReachabilityAnalysisTest {
             forwardReachableBdds,
             new MockBDDReverseFlowTransformationFactory(
                 ImmutableMap.of(
-                    new NodeInterfacePair(fw.getHostname(), fwI1.getName()), i1Transition),
+                    NodeInterfacePair.of(fw.getHostname(), fwI1.getName()), i1Transition),
                 ImmutableMap.of(
-                    new NodeInterfacePair(fw.getHostname(), fwI2.getName()), i2Transition)),
+                    NodeInterfacePair.of(fw.getHostname(), fwI2.getName()), i2Transition)),
             new MockBDDReverseTransformationRanges(PKT.getFactory().zero(), transformationRanges));
 
     BDD source1SessionFlows =
@@ -428,7 +428,7 @@ public final class BidirectionalReachabilityAnalysisTest {
                     hasAction(
                         new ForwardOutInterface(
                             fwI1.getName(),
-                            new NodeInterfacePair(source1.getHostname(), source1Iface.getName()))),
+                            NodeInterfacePair.of(source1.getHostname(), source1Iface.getName()))),
                     hasSessionFlows(source1SessionFlows),
                     hasTransformation(
                         compose(
@@ -442,7 +442,7 @@ public final class BidirectionalReachabilityAnalysisTest {
                     hasAction(
                         new ForwardOutInterface(
                             fwI1.getName(),
-                            new NodeInterfacePair(source2.getHostname(), source2Iface.getName()))),
+                            NodeInterfacePair.of(source2.getHostname(), source2Iface.getName()))),
                     hasSessionFlows(source2SessionFlows),
                     hasTransformation(
                         compose(
@@ -596,7 +596,7 @@ public final class BidirectionalReachabilityAnalysisTest {
     {
       BDDReverseTransformationRanges ranges = analysis.getReverseTransformationRanges();
       NodeInterfacePair source1I1 =
-          new NodeInterfacePair(source1.getHostname(), source1Iface.getName());
+          NodeInterfacePair.of(source1.getHostname(), source1Iface.getName());
       assertEquals(
           ranges.reverseOutgoingTransformationRange(
               fw.getHostname(), fwI2.getName(), fwI1.getName(), source1I1),
@@ -607,7 +607,7 @@ public final class BidirectionalReachabilityAnalysisTest {
           PKT.swapSourceAndDestinationFields(source1LocIpBdd.and(dstIpBdd)));
 
       NodeInterfacePair source2I2 =
-          new NodeInterfacePair(source2.getHostname(), source2Iface2.getName());
+          NodeInterfacePair.of(source2.getHostname(), source2Iface2.getName());
       assertEquals(
           ranges.reverseOutgoingTransformationRange(
               fw.getHostname(), fwI2.getName(), fwI1.getName(), source2I2),

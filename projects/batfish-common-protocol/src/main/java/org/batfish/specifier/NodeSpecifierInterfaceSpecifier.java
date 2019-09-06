@@ -38,7 +38,7 @@ public class NodeSpecifierInterfaceSpecifier implements InterfaceSpecifier {
   public Set<NodeInterfacePair> resolve(Set<String> nodes, SpecifierContext ctxt) {
     return Sets.intersection(_nodeSpecifier.resolve(ctxt), nodes).stream()
         .flatMap(n -> ctxt.getConfigs().get(n).getAllInterfaces().values().stream())
-        .map(NodeInterfacePair::new)
+        .map(NodeInterfacePair::of)
         .collect(ImmutableSet.toImmutableSet());
   }
 }

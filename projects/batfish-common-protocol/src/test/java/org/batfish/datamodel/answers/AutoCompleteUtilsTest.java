@@ -86,15 +86,15 @@ public class AutoCompleteUtilsTest {
                 "host1", "host2", "router1", "spine", "leaf", "\"/foo/leaf\"", "enternet1"))
         .setInterfaces(
             ImmutableSet.of(
-                new NodeInterfacePair("host1", "interface1"),
-                new NodeInterfacePair("host1", "ethernet1"),
-                new NodeInterfacePair("host2", "ethernet1"),
-                new NodeInterfacePair("host2", "gigEthernet1"),
-                new NodeInterfacePair("router1", "eth1"),
-                new NodeInterfacePair("router1", "ge0"),
-                new NodeInterfacePair("spine", "int1"),
-                new NodeInterfacePair("leaf", "leafInterface"),
-                new NodeInterfacePair("\"/foo/leaf\"", "fooInterface")))
+                NodeInterfacePair.of("host1", "interface1"),
+                NodeInterfacePair.of("host1", "ethernet1"),
+                NodeInterfacePair.of("host2", "ethernet1"),
+                NodeInterfacePair.of("host2", "gigEthernet1"),
+                NodeInterfacePair.of("router1", "eth1"),
+                NodeInterfacePair.of("router1", "ge0"),
+                NodeInterfacePair.of("spine", "int1"),
+                NodeInterfacePair.of("leaf", "leafInterface"),
+                NodeInterfacePair.of("\"/foo/leaf\"", "fooInterface")))
         .setIps(ImmutableSet.of("1.1.1.1", "11.2.3.4", "3.1.2.4", "1.2.3.4", "4.4.4.4"))
         .setMlagIds(ImmutableSet.of("mlag1", "mlag2", "other"))
         .setVrfs(ImmutableSet.of("default"))
@@ -270,8 +270,8 @@ public class AutoCompleteUtilsTest {
     String network = "network";
     String snapshot = "snapshot";
 
-    NodeInterfacePair suggested = new NodeInterfacePair("hostname", "interface");
-    NodeInterfacePair notSuggested = new NodeInterfacePair("blah", "blahhh");
+    NodeInterfacePair suggested = NodeInterfacePair.of("hostname", "interface");
+    NodeInterfacePair notSuggested = NodeInterfacePair.of("blah", "blahhh");
 
     CompletionMetadata completionMetadata =
         CompletionMetadata.builder()

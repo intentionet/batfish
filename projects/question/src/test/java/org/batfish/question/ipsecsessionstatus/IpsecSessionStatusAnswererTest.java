@@ -237,7 +237,7 @@ public class IpsecSessionStatusAnswererTest {
             hasColumn(COL_RESPONDER, equalTo(new Node(RESPONDER_HOST_NAME)), Schema.NODE),
             hasColumn(
                 COL_INIT_INTERFACE,
-                equalTo(new NodeInterfacePair(INITIATOR_HOST_NAME, "Test_interface")),
+                equalTo(NodeInterfacePair.of(INITIATOR_HOST_NAME, "Test_interface")),
                 Schema.INTERFACE),
             hasColumn(COL_INIT_IP, equalTo(Ip.parse("1.2.3.4")), Schema.IP)));
 
@@ -248,7 +248,7 @@ public class IpsecSessionStatusAnswererTest {
         allOf(
             hasColumn(
                 COL_RESPONDER_INTERFACE,
-                equalTo(new NodeInterfacePair(RESPONDER_HOST_NAME, "Test_interface")),
+                equalTo(NodeInterfacePair.of(RESPONDER_HOST_NAME, "Test_interface")),
                 Schema.INTERFACE),
             hasColumn(COL_RESPONDER_IP, equalTo(Ip.parse("2.3.4.5")), Schema.IP)));
 

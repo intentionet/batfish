@@ -314,14 +314,14 @@ public class BgpSessionStatusAnswerer extends Answerer {
     NodeInterfacePair remoteInterface = null;
     if (remoteId != null) {
       remoteNode = new Node(remoteId.getHostname());
-      remoteInterface = new NodeInterfacePair(remoteId.getHostname(), remoteId.getPeerInterface());
+      remoteInterface = NodeInterfacePair.of(remoteId.getHostname(), remoteId.getPeerInterface());
     }
 
     return Row.builder(METADATA_MAP)
         .put(COL_ESTABLISHED_STATUS, status)
         .put(
             COL_LOCAL_INTERFACE,
-            new NodeInterfacePair(unnumId.getHostname(), unnumPeer.getPeerInterface()))
+            NodeInterfacePair.of(unnumId.getHostname(), unnumPeer.getPeerInterface()))
         .put(COL_LOCAL_AS, unnumPeer.getLocalAs())
         .put(COL_LOCAL_IP, null)
         .put(COL_NODE, new Node(unnumId.getHostname()))
