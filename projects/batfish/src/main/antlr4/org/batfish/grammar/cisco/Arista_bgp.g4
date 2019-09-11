@@ -10,11 +10,119 @@ eos_router_bgp
 :
   ROUTER BGP asn = bgp_asn NEWLINE
   (
-    eos_rb_inner
+    eos_rb_address_family
+    | eos_rb_inner
     | eos_rb_vlan
     | eos_rb_vlan_aware_bundle
     | eos_rb_vrf
   )*
+;
+
+eos_rb_address_family
+:
+  eos_rb_af_ipv4
+//  | eos_rb_af_ipv4_multicast
+//  | eos_rb_af_ipv4_labeled_multicast
+//  | eos_rb_af_ipv4_sr_te
+//  | eos_rb_af_ipv6
+//  | eos_rb_af_ipv6_labeled_multicast
+//  | eos_rb_af_ipv6_sr_te
+  | eos_rb_af_evpn
+//  | eos_rb_af_vpn_v4
+//  | eos_rb_af_vpn_v6
+;
+
+eos_rb_af_ipv4
+:
+  ADDRESS_FAMILY IPV4 NEWLINE
+  (
+    eos_rbafipv4_bgp
+//    | eos_rbafipv4_graceful_restart
+    | eos_rbafipv4_neighbor
+//    | eos_rbafipv4_network
+//    | eos_rbafipv4_redistribute
+  )*
+;
+
+eos_rbafipv4_bgp
+:
+  BGP
+  null_rest_of_line
+//  (
+//    eos_rbafipv4b_additional_paths
+//    | eos_rbafipv4b_next_hop
+//    | eos_rbafipv4b_redistribute_internal
+//    | eos_rbafipv4b_route
+//  )
+;
+
+eos_rbafipv4_neighbor
+:
+  NEIGHBOR
+  (
+    v4 = IP_ADDRESS
+    | v6 = IPV6_ADDRESS
+    | pg = VARIABLE
+  )
+  eos_rb_af_neighbor_common
+;
+
+eos_rb_af_evpn
+:
+  ADDRESS_FAMILY EVPN NEWLINE
+  (
+    eos_rb_af_evpn_bgp
+//    | eos_rb_af_evpn_graceful_restart
+//    | eos_rb_af_evpn_host_flap
+    | eos_rb_af_evpn_neighbor
+  )*
+;
+
+eos_rb_af_evpn_bgp
+:
+  BGP
+  (
+    eos_rbafeb_additional_paths
+    | eos_rbafeb_next_hop_unchanged
+  )
+;
+
+eos_rb_af_evpn_neighbor
+:
+  NEIGHBOR
+  (
+    v4 = IP_ADDRESS
+    | v6 = IPV6_ADDRESS
+    | pg = VARIABLE
+  )
+  eos_rb_af_neighbor_common
+;
+
+eos_rb_af_neighbor_common
+:
+  (
+    eos_rbafnc_activate
+//    | eos_rbafnc_additional_paths
+//    | eos_rbafnc_graceful_restart
+//    | eos_rbafnc_next_hop_unchanged
+//    | oes_rbafnc_route_map
+//    | oes_rbafnc_weight
+  )
+;
+
+eos_rbafeb_additional_paths
+:
+  ADDITIONAL_PATHS (SEND ANY | RECEIVE) NEWLINE
+;
+
+eos_rbafeb_next_hop_unchanged
+:
+  NEXT_HOP_UNCHANGED NEWLINE
+;
+
+eos_rbafnc_activate
+:
+  ACTIVATE NEWLINE
 ;
 
 eos_rb_inner
@@ -39,7 +147,6 @@ eos_rbi_aggregate_address
   )
 ;
 
-
 eos_rbi_default_metric
 :
   DEFAULT_METRIC metric = DEC NEWLINE
@@ -49,6 +156,7 @@ eos_rbi_distance
 :
   DISTANCE external = DEC (internal = DEC local = DEC)? NEWLINE
 ;
+
 eos_rbi_neighbor
 :
   NEIGHBOR
@@ -214,7 +322,6 @@ eos_rbinc_send_community
     EXTENDED
     | STANDARD
 //    TODO: support for link-bandwidth
-//
 //    | LINK_BANDWIDTH
 //      (
 //        AGGREGATE "0.0-4294967295.0 or nn.nn(K|M|G)  Reference link speed in bits/second"
@@ -230,7 +337,6 @@ eos_rbin_peer_group
   PEER_GROUP name = VARIABLE NEWLINE
 ;
 
-
 // Defining a peer group
 eos_rbi_peer_group
 :
@@ -240,6 +346,7 @@ eos_rbi_peer_group
     | eos_rbi_neighbor_common
   )
 ;
+
 eos_rbi_router_id
 :
   ROUTER_ID id = IP_ADDRESS NEWLINE
@@ -366,6 +473,12 @@ eos_rb_vlan_tail
   | eos_rb_vlan_tail_route_target
 ;
 
+eos_rbv_address_family
+:
+  eos_rb_af_ipv4
+//  | eos_rb_af_ipv4_multicast
+//  | eos_rb_af_ipv6
+;
 
 eos_rbv_local_as
 :
@@ -388,8 +501,8 @@ eos_rb_vrf
 :
   VRF name = VARIABLE NEWLINE
   (
-//    eos_rbv_address_family
-    eos_rb_inner
+    eos_rbv_address_family
+    | eos_rb_inner
     | eos_rbv_local_as
     | eos_rbv_rd
     | eos_rbv_route_target

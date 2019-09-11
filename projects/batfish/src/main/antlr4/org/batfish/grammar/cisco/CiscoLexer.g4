@@ -8574,6 +8574,11 @@ NEXT_HOP_THIRD_PARTY
    'next-hop-third-party'
 ;
 
+NEXT_HOP_UNCHANGED
+:
+   'next-hop-unchanged'
+;
+
 NEXT_SERVER
 :
    'next-server'

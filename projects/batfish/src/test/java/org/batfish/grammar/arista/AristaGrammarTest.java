@@ -28,10 +28,13 @@ import org.batfish.grammar.cisco.CiscoControlPlaneExtractor;
 import org.batfish.main.Batfish;
 import org.batfish.representation.cisco.CiscoConfiguration;
 import org.batfish.representation.cisco.eos.AristaBgpAggregateNetwork;
+import org.batfish.representation.cisco.eos.AristaBgpPeerGroupNeighbor;
 import org.batfish.representation.cisco.eos.AristaBgpV4Neighbor;
 import org.batfish.representation.cisco.eos.AristaBgpVlan;
 import org.batfish.representation.cisco.eos.AristaBgpVlanAwareBundle;
 import org.batfish.representation.cisco.eos.AristaBgpVrf;
+import org.batfish.representation.cisco.eos.AristaBgpVrfEvpnAddressFamily;
+import org.batfish.representation.cisco.eos.AristaBgpVrfIpv4UnicastAddressFamily;
 import org.junit.Test;
 
 @ParametersAreNonnullByDefault
@@ -197,5 +200,36 @@ public class AristaGrammarTest {
     assertThat(vrf.getExportRouteTarget(), equalTo(ExtendedCommunity.target(1L, 1L)));
     assertThat(vrf.getImportRouteTarget(), equalTo(ExtendedCommunity.target(2L, 2L)));
     assertThat(vrf.getLocalAs(), equalTo(65000L));
+  }
+
+  @Test
+  public void testAddressFamilyExtraction() {
+    CiscoConfiguration config = parseVendorConfig("arista_bgp_af");
+    AristaBgpVrfIpv4UnicastAddressFamily ipv4af =
+        config.getAristaBgp().getDefaultVrf().getV4unicastAf();
+    AristaBgpVrfEvpnAddressFamily evpnaf = config.getAristaBgp().getDefaultVrf().getEvpnAf();
+    assertThat(ipv4af, notNullValue());
+    assertThat(evpnaf, notNullValue());
+
+    {
+      AristaBgpV4Neighbor neighbor =
+          config.getAristaBgp().getDefaultVrf().getV4neighbors().get(Ip.parse("1.1.1.1"));
+      assertTrue(neighbor.getV4UnicastAf().getActivate());
+      assertTrue(neighbor.getEvpnAf().getActivate());
+    }
+    {
+      AristaBgpV4Neighbor neighbor =
+          config.getAristaBgp().getDefaultVrf().getV4neighbors().get(Ip.parse("2.2.2.2"));
+      assertThat(neighbor.getV4UnicastAf(), notNullValue());
+      assertThat(neighbor.getV4UnicastAf().getActivate(), nullValue());
+      assertThat(neighbor.getEvpnAf(), nullValue());
+    }
+    {
+      AristaBgpPeerGroupNeighbor pg = config.getAristaBgp().getPeerGroups().get("PG");
+      assertThat(pg.getV4UnicastAf(), notNullValue());
+      assertThat(pg.getV4UnicastAf().getActivate(), nullValue());
+      assertThat(pg.getEvpnAf(), notNullValue());
+      assertTrue(pg.getEvpnAf().getActivate());
+    }
   }
 }

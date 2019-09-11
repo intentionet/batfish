@@ -6,6 +6,7 @@ public final class AristaBgpPeerGroupNeighbor extends AristaBgpNeighbor {
   @Nonnull private final String _name;
 
   public AristaBgpPeerGroupNeighbor(String name) {
+    super();
     _name = name;
   }
 

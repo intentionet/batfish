@@ -10,13 +10,18 @@ public abstract class AristaBgpNeighbor implements Serializable {
   @Nullable private String _description;
   @Nullable private Boolean _dontCapabilityNegotiate;
   @Nullable private Integer _ebgpMultihop;
+  @Nullable private AristaBgpNeighborEvpnAddressFamily _evpnAf;
   @Nullable private Boolean _enforceFirstAs;
   @Nullable private Long _localAs;
   @Nullable private Boolean _nextHopSelf;
   @Nullable private Long _remoteAs;
   @Nullable private Boolean _sendCommunity;
+  @Nullable private AristaBgpNeighborIpv4UnicastAddressFamily _v4UnicastAf;
 
-  public AristaBgpNeighbor() {}
+  protected AristaBgpNeighbor() {
+    // By default, all neighbors have IPv4 unicast as their default address family
+    _v4UnicastAf = new AristaBgpNeighborIpv4UnicastAddressFamily();
+  }
 
   @Nullable
   public Integer getAllowAsIn() {
@@ -73,6 +78,15 @@ public abstract class AristaBgpNeighbor implements Serializable {
   }
 
   @Nullable
+  public AristaBgpNeighborEvpnAddressFamily getEvpnAf() {
+    return _evpnAf;
+  }
+
+  public void setEvpnAf(@Nullable AristaBgpNeighborEvpnAddressFamily evpnAf) {
+    _evpnAf = evpnAf;
+  }
+
+  @Nullable
   public Long getLocalAs() {
     return _localAs;
   }
@@ -106,5 +120,14 @@ public abstract class AristaBgpNeighbor implements Serializable {
 
   public void setSendCommunity(@Nullable Boolean sendCommunity) {
     _sendCommunity = sendCommunity;
+  }
+
+  @Nullable
+  public AristaBgpNeighborIpv4UnicastAddressFamily getV4UnicastAf() {
+    return _v4UnicastAf;
+  }
+
+  public void setV4UnicastAf(@Nullable AristaBgpNeighborIpv4UnicastAddressFamily v4UnicastAf) {
+    _v4UnicastAf = v4UnicastAf;
   }
 }

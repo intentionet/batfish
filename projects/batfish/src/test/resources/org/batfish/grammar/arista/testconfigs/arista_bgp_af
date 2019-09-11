@@ -1,0 +1,15 @@
+!RANCID-CONTENT-TYPE: arista
+!
+hostname arista_bgp_af
+!
+router bgp 65104
+  router-id 192.168.255.8
+  neighbor 1.1.1.1 remote-as 2
+  neighbor 2.2.2.2 remote-as 2
+  neighbor PG peer-group
+  neighbor PG remote-as 1
+  address-family ipv4
+    neighbor 1.1.1.1 activate
+  address-family evpn
+    neighbor 1.1.1.1 activate
+    neighbor PG activate
