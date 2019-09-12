@@ -10,6 +10,7 @@ router bgp 65104
   neighbor PG remote-as 1
   address-family ipv4
     neighbor 1.1.1.1 activate
+    no neighbor 2.2.2.2 activate
   address-family evpn
     neighbor 1.1.1.1 activate
     neighbor PG activate

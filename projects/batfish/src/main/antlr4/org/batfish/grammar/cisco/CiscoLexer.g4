@@ -6354,6 +6354,11 @@ IPV4_L5
    'ipv4-l5'
 ;
 
+IPV4_UNICAST
+:
+    'ipv4-unicast'
+;
+
 IPV6
 :
    [iI] [pP] [vV] '6'

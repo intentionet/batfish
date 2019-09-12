@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 public abstract class AristaBgpNeighborAddressFamily implements Serializable {
   @Nullable protected Boolean _activate;
   @Nullable protected AristaBgpAdditionalPathsConfig _additionalPaths;
+  @Nullable protected boolean _defaultActivate = false;
   @Nullable protected Boolean _nextHopUnchanged;
   @Nullable protected String _routeMapIn;
   @Nullable protected String _routeMapOut;
@@ -28,6 +29,15 @@ public abstract class AristaBgpNeighborAddressFamily implements Serializable {
 
   public void setAdditionalPaths(@Nullable AristaBgpAdditionalPathsConfig additionalPaths) {
     _additionalPaths = additionalPaths;
+  }
+
+  /** Whether the neighbors by default are activated in this address family */
+  public boolean isDefaultActivate() {
+    return _defaultActivate;
+  }
+
+  public void setDefaultActivate(boolean defaultActivate) {
+    _defaultActivate = defaultActivate;
   }
 
   @Nullable

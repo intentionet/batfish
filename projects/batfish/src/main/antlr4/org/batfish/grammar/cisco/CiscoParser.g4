@@ -3677,7 +3677,7 @@ stanza
    | banner_stanza
    | community_set_stanza
    | del_stanza
-   | { _aristaBgp }? eos_router_bgp
+   | eos_router_bgp
    | extended_access_list_stanza
    | extended_ipv6_access_list_stanza
    | ip_as_path_access_list_stanza
@@ -3698,7 +3698,7 @@ stanza
    | protocol_type_code_access_list_stanza
    | route_map_stanza
    | route_policy_stanza
-   | { !_aristaBgp }? router_bgp_stanza
+//   | { !_aristaBgp }? router_bgp_stanza
    | router_hsrp_stanza
    | router_isis_stanza
    | router_multicast_stanza

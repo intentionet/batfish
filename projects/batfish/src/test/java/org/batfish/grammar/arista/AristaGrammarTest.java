@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
@@ -78,10 +79,11 @@ public class AristaGrammarTest {
       assertThat(defaultVrf.getRouterId(), equalTo(Ip.parse("1.2.3.4")));
       assertThat(defaultVrf.getKeepAliveTimer(), equalTo(3));
       assertThat(defaultVrf.getHoldTimer(), equalTo(9));
-      assertThat(defaultVrf.getDefaultEbgpAdminDistance(), equalTo(300));
-      assertThat(defaultVrf.getDefaultIbgpAdminDistance(), nullValue());
-      assertThat(defaultVrf.getDefaultLocalAdminDistance(), nullValue());
+      assertThat(defaultVrf.getEbgpAdminDistance(), equalTo(300));
+      assertThat(defaultVrf.getIbgpAdminDistance(), nullValue());
+      assertThat(defaultVrf.getLocalAdminDistance(), nullValue());
       assertThat(defaultVrf.getDefaultMetric(), equalTo(100L));
+      assertFalse(defaultVrf.getDefaultIpv4Unicast());
     }
     {
       String vrfName = "tenant_vrf";
@@ -90,9 +92,10 @@ public class AristaGrammarTest {
       assertThat(vrf.getRouterId(), equalTo(Ip.parse("5.6.7.8")));
       assertThat(vrf.getKeepAliveTimer(), equalTo(6));
       assertThat(vrf.getHoldTimer(), equalTo(18));
-      assertThat(vrf.getDefaultEbgpAdminDistance(), equalTo(333));
-      assertThat(vrf.getDefaultIbgpAdminDistance(), equalTo(400));
-      assertThat(vrf.getDefaultLocalAdminDistance(), equalTo(500));
+      assertThat(vrf.getEbgpAdminDistance(), equalTo(333));
+      assertThat(vrf.getIbgpAdminDistance(), equalTo(400));
+      assertThat(vrf.getLocalAdminDistance(), equalTo(500));
+      assertTrue(vrf.getDefaultIpv4Unicast());
     }
     {
       String vrfName = "tenant2_vrf";
@@ -227,7 +230,7 @@ public class AristaGrammarTest {
       AristaBgpV4Neighbor neighbor =
           config.getAristaBgp().getDefaultVrf().getV4neighbors().get(Ip.parse("2.2.2.2"));
       assertThat(neighbor.getV4UnicastAf(), notNullValue());
-      assertThat(neighbor.getV4UnicastAf().getActivate(), nullValue());
+      assertFalse(neighbor.getV4UnicastAf().getActivate());
       assertThat(neighbor.getEvpnAf(), nullValue());
     }
     {

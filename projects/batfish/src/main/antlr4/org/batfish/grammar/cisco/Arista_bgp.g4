@@ -48,6 +48,7 @@ eos_rb_af_ipv4_unicast
     eos_rbafipv4u_bgp
 //    | eos_rbafipv4u_graceful_restart
     | eos_rbafipv4u_neighbor
+    | eos_rbafipv4_no
 //    | eos_rbafipv4u_network
 //    | eos_rbafipv4u_redistribute
   )*
@@ -76,6 +77,25 @@ eos_rbafipv4u_neighbor
   eos_rb_af_neighbor_common
 ;
 
+eos_rbafipv4_no
+:
+  NO
+  (
+    eos_rbafipv4_no_neighbor
+  )
+;
+
+eos_rbafipv4_no_neighbor
+:
+  NEIGHBOR
+  (
+    v4 = IP_ADDRESS
+    | v6 = IPV6_ADDRESS
+    | pg = VARIABLE
+  )
+  eos_rb_af_no_neighbor_common
+;
+
 eos_rb_af_evpn
 :
   EVPN NEWLINE
@@ -84,6 +104,7 @@ eos_rb_af_evpn
 //    | eos_rb_af_evpn_graceful_restart
 //    | eos_rb_af_evpn_host_flap
     | eos_rb_af_evpn_neighbor
+    | eos_rb_af_evpn_no
   )*
 ;
 
@@ -105,6 +126,22 @@ eos_rb_af_evpn_neighbor
     | pg = VARIABLE
   )
   eos_rb_af_neighbor_common
+;
+
+eos_rb_af_evpn_no:
+  NO
+  eos_rb_af_evpn_no_neighbor
+;
+
+eos_rb_af_evpn_no_neighbor
+:
+  NEIGHBOR
+  (
+    v4 = IP_ADDRESS
+    | v6 = IPV6_ADDRESS
+    | pg = VARIABLE
+  )
+  eos_rb_af_no_neighbor_common
 ;
 
 eos_rb_af_neighbor_common
@@ -134,6 +171,16 @@ eos_rbafnc_activate
   ACTIVATE NEWLINE
 ;
 
+eos_rb_af_no_neighbor_common
+:
+  eos_rbafnonc_activate
+;
+
+eos_rbafnonc_activate
+:
+  ACTIVATE NEWLINE
+;
+
 eos_rb_inner
 :
   eos_rbi_aggregate_address
@@ -141,6 +188,7 @@ eos_rb_inner
   | eos_rbi_distance
   | eos_rbi_neighbor
   | eos_rbi_network
+  | eos_rbi_no
   | eos_rbi_redistribute
   | eos_rbi_router_id
   | eos_rbi_shutdown
@@ -380,6 +428,29 @@ eos_rbi_network4
 eos_rbi_network6
 :
   IPV6_PREFIX (ROUTE_MAP rm = VARIABLE)? NEWLINE
+;
+
+eos_rbi_no
+:
+  NO
+  eos_rbino_bgp
+;
+
+eos_rbino_bgp
+:
+  BGP
+  eos_rbino_bgp_default
+;
+
+eos_rbino_bgp_default
+:
+  DEFAULT
+  eos_rbino_bgp_default_ipv4_unicast
+;
+
+eos_rbino_bgp_default_ipv4_unicast
+:
+  IPV4_UNICAST NEWLINE
 ;
 
 // Defining a peer group

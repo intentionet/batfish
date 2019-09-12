@@ -18,6 +18,7 @@ router bgp 1
   update wait-for-convergence
   update wait-install
   update wait-install batch-size 20
+  no bgp default ipv4-unicast
   vrf tenant_vrf
     router-id 5.6.7.8
     timers bgp 6 18

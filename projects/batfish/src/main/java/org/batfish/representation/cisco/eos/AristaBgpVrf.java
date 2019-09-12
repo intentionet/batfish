@@ -13,14 +13,15 @@ import org.batfish.datamodel.bgp.community.ExtendedCommunity;
 /** BGP configuration for a single VRF */
 public final class AristaBgpVrf implements Serializable {
 
+  @Nullable private boolean _defaultIpv4Unicast = true;
   @Nullable private Long _defaultMetric;
-  @Nullable private Integer _defaultEbgpAdminDistance;
-  @Nullable private Integer _defaultIbgpAdminDistance;
-  @Nullable private Integer _defaultLocalAdminDistance;
+  @Nullable private Integer _ebgpAdminDistance;
   @Nullable private ExtendedCommunity _exportRouteTarget;
+  @Nullable private Integer _ibgpAdminDistance;
   @Nullable private ExtendedCommunity _importRouteTarget;
   @Nullable private Integer _holdTimer;
   @Nullable private Integer _keepAliveTimer;
+  @Nullable private Integer _localAdminDistance;
   @Nullable private Long _localAs;
   @Nonnull private final String _name;
 
@@ -39,9 +40,15 @@ public final class AristaBgpVrf implements Serializable {
     _name = name;
     _v4aggregates = new HashMap<>(0);
     _v4neighbors = new HashMap<>(0);
-    // V4 unicast is enabled by default
-    _v4UnicastAf = new AristaBgpVrfIpv4UnicastAddressFamily();
     _redistributionPolicies = new HashMap<>(0);
+  }
+
+  public boolean getDefaultIpv4Unicast() {
+    return _defaultIpv4Unicast;
+  }
+
+  public void setDefaultIpv4Unicast(boolean defaultIpv4Unicast) {
+    _defaultIpv4Unicast = defaultIpv4Unicast;
   }
 
   @Nullable
@@ -54,30 +61,30 @@ public final class AristaBgpVrf implements Serializable {
   }
 
   @Nullable
-  public Integer getDefaultEbgpAdminDistance() {
-    return _defaultEbgpAdminDistance;
+  public Integer getEbgpAdminDistance() {
+    return _ebgpAdminDistance;
   }
 
-  public void setDefaultEbgpAdminDistance(@Nullable Integer defaultEbgpAdminDistance) {
-    _defaultEbgpAdminDistance = defaultEbgpAdminDistance;
-  }
-
-  @Nullable
-  public Integer getDefaultIbgpAdminDistance() {
-    return _defaultIbgpAdminDistance;
-  }
-
-  public void setDefaultIbgpAdminDistance(@Nullable Integer defaultIbgpAdminDistance) {
-    _defaultIbgpAdminDistance = defaultIbgpAdminDistance;
+  public void setEbgpAdminDistance(@Nullable Integer ebgpAdminDistance) {
+    _ebgpAdminDistance = ebgpAdminDistance;
   }
 
   @Nullable
-  public Integer getDefaultLocalAdminDistance() {
-    return _defaultLocalAdminDistance;
+  public Integer getIbgpAdminDistance() {
+    return _ibgpAdminDistance;
   }
 
-  public void setDefaultLocalAdminDistance(@Nullable Integer defaultLocalAdminDistance) {
-    _defaultLocalAdminDistance = defaultLocalAdminDistance;
+  public void setIbgpAdminDistance(@Nullable Integer ibgpAdminDistance) {
+    _ibgpAdminDistance = ibgpAdminDistance;
+  }
+
+  @Nullable
+  public Integer getLocalAdminDistance() {
+    return _localAdminDistance;
+  }
+
+  public void setLocalAdminDistance(@Nullable Integer localAdminDistance) {
+    _localAdminDistance = localAdminDistance;
   }
 
   @Nullable

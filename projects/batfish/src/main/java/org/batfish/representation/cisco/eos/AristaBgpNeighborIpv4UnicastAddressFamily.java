@@ -15,6 +15,10 @@ public final class AristaBgpNeighborIpv4UnicastAddressFamily
   // Route Map in/out are inherited
   @Nullable private Integer _weight;
 
+  public AristaBgpNeighborIpv4UnicastAddressFamily() {
+    _defaultActivate = true;
+  }
+
   public void inherit(AristaBgpVrfIpv4UnicastAddressFamily af) {
     if (_additionalPaths != null) {
       _additionalPaths = af.getAdditionalPaths();

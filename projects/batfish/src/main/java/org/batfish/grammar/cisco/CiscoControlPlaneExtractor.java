@@ -633,6 +633,7 @@ import org.batfish.grammar.cisco.CiscoParser.Eos_rb_aa_modifiersContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_aa_v4Context;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_af_evpnContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_af_evpn_neighborContext;
+import org.batfish.grammar.cisco.CiscoParser.Eos_rb_af_evpn_no_neighborContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_af_ipv4Context;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_vab_vlanContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_vlanContext;
@@ -641,8 +642,10 @@ import org.batfish.grammar.cisco.CiscoParser.Eos_rb_vlan_tail_rdContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_vlan_tail_redistributeContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_vlan_tail_route_targetContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rb_vrfContext;
+import org.batfish.grammar.cisco.CiscoParser.Eos_rbafipv4_no_neighborContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbafipv4u_neighborContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbafnc_activateContext;
+import org.batfish.grammar.cisco.CiscoParser.Eos_rbafnonc_activateContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbi_default_metricContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbi_distanceContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbi_neighbor4Context;
@@ -667,6 +670,7 @@ import org.batfish.grammar.cisco.CiscoParser.Eos_rbinc_maximum_routesContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbinc_next_hop_selfContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbinc_remote_asContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbinc_send_communityContext;
+import org.batfish.grammar.cisco.CiscoParser.Eos_rbino_bgp_default_ipv4_unicastContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbir_attached_hostContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbir_connectedContext;
 import org.batfish.grammar.cisco.CiscoParser.Eos_rbir_dynamicContext;
@@ -2575,13 +2579,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void enterEos_rb_af_ipv4(Eos_rb_af_ipv4Context ctx) {
-    _currentAristaBgpVrf.getOrCreateV4UnicastAf();
-  }
-
-  @Override
-  public void enterEos_rbafipv4u_neighbor(Eos_rbafipv4u_neighborContext ctx) {
-    AristaBgpNeighbor neighbor = new AristaBgpPeerGroupNeighbor("dummy");
+  public void enterEos_rb_af_evpn_no_neighbor(Eos_rb_af_evpn_no_neighborContext ctx) {
+    AristaBgpNeighbor neighbor;
     if (ctx.v4 != null) {
       neighbor =
           _currentAristaBgpVrf
@@ -2594,6 +2593,40 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
               .computeIfAbsent(ctx.pg.getText(), AristaBgpPeerGroupNeighbor::new);
     } else if (ctx.v6 != null) {
       todo(ctx);
+      neighbor = new AristaBgpPeerGroupNeighbor("dummy");
+    } else {
+      throw new IllegalStateException(
+          String.format("Unknown neighbor type in %s", getFullText(ctx)));
+    }
+    _currentAristaBgpNeighborAddressFamily = neighbor.getOrCreateV4UnicastAf();
+  }
+
+  @Override
+  public void exitEos_rb_af_evpn_no_neighbor(Eos_rb_af_evpn_no_neighborContext ctx) {
+    _currentAristaBgpNeighborAddressFamily = null;
+  }
+
+  @Override
+  public void enterEos_rb_af_ipv4(Eos_rb_af_ipv4Context ctx) {
+    _currentAristaBgpVrf.getOrCreateV4UnicastAf();
+  }
+
+  @Override
+  public void enterEos_rbafipv4u_neighbor(Eos_rbafipv4u_neighborContext ctx) {
+    AristaBgpNeighbor neighbor;
+    if (ctx.v4 != null) {
+      neighbor =
+          _currentAristaBgpVrf
+              .getV4neighbors()
+              .computeIfAbsent(toIp(ctx.v4), AristaBgpV4Neighbor::new);
+    } else if (ctx.pg != null) {
+      neighbor =
+          _currentAristaBgpProcess
+              .getPeerGroups()
+              .computeIfAbsent(ctx.pg.getText(), AristaBgpPeerGroupNeighbor::new);
+    } else if (ctx.v6 != null) {
+      todo(ctx);
+      neighbor = new AristaBgpPeerGroupNeighbor("dummy");
     } else {
       throw new IllegalStateException(
           String.format("Unknown neighbor type in %s", getFullText(ctx)));
@@ -2607,8 +2640,46 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void enterEos_rbafnonc_activate(Eos_rbafnonc_activateContext ctx) {
+    _currentAristaBgpNeighborAddressFamily.setActivate(false);
+  }
+
+  @Override
   public void exitEos_rbafnc_activate(Eos_rbafnc_activateContext ctx) {
     _currentAristaBgpNeighborAddressFamily.setActivate(true);
+  }
+
+  @Override
+  public void enterEos_rbafipv4_no_neighbor(Eos_rbafipv4_no_neighborContext ctx) {
+    AristaBgpNeighbor neighbor;
+    if (ctx.v4 != null) {
+      neighbor =
+          _currentAristaBgpVrf
+              .getV4neighbors()
+              .computeIfAbsent(toIp(ctx.v4), AristaBgpV4Neighbor::new);
+    } else if (ctx.pg != null) {
+      neighbor =
+          _currentAristaBgpProcess
+              .getPeerGroups()
+              .computeIfAbsent(ctx.pg.getText(), AristaBgpPeerGroupNeighbor::new);
+    } else if (ctx.v6 != null) {
+      todo(ctx);
+      neighbor = new AristaBgpPeerGroupNeighbor("dummy");
+    } else {
+      throw new IllegalStateException(
+          String.format("Unknown neighbor type in %s", getFullText(ctx)));
+    }
+    _currentAristaBgpNeighborAddressFamily = neighbor.getOrCreateV4UnicastAf();
+  }
+
+  @Override
+  public void exitEos_rbafipv4_no_neighbor(Eos_rbafipv4_no_neighborContext ctx) {
+    _currentAristaBgpNeighborAddressFamily = null;
+  }
+
+  @Override
+  public void exitEos_rbafnonc_activate(Eos_rbafnonc_activateContext ctx) {
+    _currentAristaBgpNeighborAddressFamily.setDefaultActivate(false);
   }
 
   @Override
@@ -2618,12 +2689,12 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void exitEos_rbi_distance(Eos_rbi_distanceContext ctx) {
-    _currentAristaBgpVrf.setDefaultEbgpAdminDistance(toInteger(ctx.external));
+    _currentAristaBgpVrf.setEbgpAdminDistance(toInteger(ctx.external));
     if (ctx.internal != null) {
-      _currentAristaBgpVrf.setDefaultIbgpAdminDistance(toInteger(ctx.internal));
+      _currentAristaBgpVrf.setIbgpAdminDistance(toInteger(ctx.internal));
     }
     if (ctx.local != null) {
-      _currentAristaBgpVrf.setDefaultLocalAdminDistance(toInteger(ctx.local));
+      _currentAristaBgpVrf.setLocalAdminDistance(toInteger(ctx.local));
     }
   }
 
@@ -2743,6 +2814,12 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       _configuration.referenceStructure(
           ROUTE_MAP, ctx.rm.getText(), BGP_NETWORK_ORIGINATION_ROUTE_MAP, ctx.getStart().getLine());
     }
+  }
+
+  @Override
+  public void exitEos_rbino_bgp_default_ipv4_unicast(
+      Eos_rbino_bgp_default_ipv4_unicastContext ctx) {
+    _currentAristaBgpVrf.setDefaultIpv4Unicast(false);
   }
 
   @Override
