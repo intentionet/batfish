@@ -84,6 +84,14 @@ public final class AristaBgpVrf implements Serializable {
     _exportRouteTarget = exportRouteTarget;
   }
 
+  @Nonnull
+  public AristaBgpVrfEvpnAddressFamily getOrCreateEvpnAf() {
+    if (_evpnAf == null) {
+      _evpnAf = new AristaBgpVrfEvpnAddressFamily();
+    }
+    return _evpnAf;
+  }
+
   @Nullable
   public AristaBgpVrfEvpnAddressFamily getEvpnAf() {
     return _evpnAf;
@@ -177,6 +185,14 @@ public final class AristaBgpVrf implements Serializable {
 
   @Nullable
   public AristaBgpVrfIpv4UnicastAddressFamily getV4unicastAf() {
+    return _v4unicastAf;
+  }
+
+  @Nonnull
+  public AristaBgpVrfIpv4UnicastAddressFamily getOrCreateV4unicastAf() {
+    if (_v4unicastAf == null) {
+      _v4unicastAf = new AristaBgpVrfIpv4UnicastAddressFamily();
+    }
     return _v4unicastAf;
   }
 

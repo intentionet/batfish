@@ -11,7 +11,6 @@ public final class AristaBgpV4Neighbor extends AristaBgpNeighbor implements Aris
   @Nullable private String _peerGroup;
 
   public AristaBgpV4Neighbor(@Nonnull Ip ip) {
-    super();
     _ip = ip;
   }
 

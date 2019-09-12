@@ -1,6 +1,7 @@
 package org.batfish.representation.cisco.eos;
 
 import java.io.Serializable;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /** Base class for all Arista BGP neighbors */
@@ -82,6 +83,14 @@ public abstract class AristaBgpNeighbor implements Serializable {
     return _evpnAf;
   }
 
+  @Nonnull
+  public AristaBgpNeighborEvpnAddressFamily getOrCreateEvpnAf() {
+    if (_evpnAf == null) {
+      _evpnAf = new AristaBgpNeighborEvpnAddressFamily();
+    }
+    return _evpnAf;
+  }
+
   public void setEvpnAf(@Nullable AristaBgpNeighborEvpnAddressFamily evpnAf) {
     _evpnAf = evpnAf;
   }
@@ -124,6 +133,14 @@ public abstract class AristaBgpNeighbor implements Serializable {
 
   @Nullable
   public AristaBgpNeighborIpv4UnicastAddressFamily getV4UnicastAf() {
+    return _v4UnicastAf;
+  }
+
+  @Nullable
+  public AristaBgpNeighborIpv4UnicastAddressFamily getOrCreateV4UnicastAf() {
+    if (_v4UnicastAf == null) {
+      _v4UnicastAf = new AristaBgpNeighborIpv4UnicastAddressFamily();
+    }
     return _v4UnicastAf;
   }
 

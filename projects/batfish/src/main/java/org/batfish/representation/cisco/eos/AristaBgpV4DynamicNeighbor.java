@@ -11,7 +11,6 @@ public class AristaBgpV4DynamicNeighbor implements AristaBgpHasPeerGroup {
   @Nullable private String _peerGroup;
 
   public AristaBgpV4DynamicNeighbor(@Nonnull Prefix range) {
-    super();
     _range = range;
   }
 

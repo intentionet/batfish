@@ -1429,8 +1429,6 @@ import org.batfish.representation.cisco.eos.AristaBgpAggregateNetwork;
 import org.batfish.representation.cisco.eos.AristaBgpHasPeerGroup;
 import org.batfish.representation.cisco.eos.AristaBgpNeighbor;
 import org.batfish.representation.cisco.eos.AristaBgpNeighborAddressFamily;
-import org.batfish.representation.cisco.eos.AristaBgpNeighborEvpnAddressFamily;
-import org.batfish.representation.cisco.eos.AristaBgpNeighborIpv4UnicastAddressFamily;
 import org.batfish.representation.cisco.eos.AristaBgpPeerGroupNeighbor;
 import org.batfish.representation.cisco.eos.AristaBgpProcess;
 import org.batfish.representation.cisco.eos.AristaBgpV4Neighbor;
@@ -1439,8 +1437,6 @@ import org.batfish.representation.cisco.eos.AristaBgpVlanAwareBundle;
 import org.batfish.representation.cisco.eos.AristaBgpVlanBase;
 import org.batfish.representation.cisco.eos.AristaBgpVrf;
 import org.batfish.representation.cisco.eos.AristaBgpVrfAddressFamily;
-import org.batfish.representation.cisco.eos.AristaBgpVrfEvpnAddressFamily;
-import org.batfish.representation.cisco.eos.AristaBgpVrfIpv4UnicastAddressFamily;
 import org.batfish.representation.cisco.eos.AristaEosVxlan;
 import org.batfish.representation.cisco.nx.CiscoNxBgpVrfAddressFamilyAggregateNetworkConfiguration;
 import org.batfish.representation.cisco.nx.CiscoNxBgpVrfAddressFamilyConfiguration;
@@ -2532,12 +2528,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterEos_rb_af_evpn(Eos_rb_af_evpnContext ctx) {
-    _currentAristaBgpVrfAddressFamily = _currentAristaBgpVrf.getEvpnAf();
-    if (_currentAristaBgpVrfAddressFamily == null) {
-      AristaBgpVrfEvpnAddressFamily af = new AristaBgpVrfEvpnAddressFamily();
-      _currentAristaBgpVrf.setEvpnAf(af);
-      _currentAristaBgpVrfAddressFamily = af;
-    }
+    _currentAristaBgpVrfAddressFamily = _currentAristaBgpVrf.getOrCreateEvpnAf();
   }
 
   @Override
@@ -2547,7 +2538,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterEos_rb_af_evpn_neighbor(Eos_rb_af_evpn_neighborContext ctx) {
-    AristaBgpNeighbor neighbor = new AristaBgpPeerGroupNeighbor("dummy");
+    AristaBgpNeighbor neighbor;
     if (ctx.v4 != null) {
       neighbor =
           _currentAristaBgpVrf
@@ -2560,16 +2551,12 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
               .computeIfAbsent(ctx.pg.getText(), AristaBgpPeerGroupNeighbor::new);
     } else if (ctx.v6 != null) {
       todo(ctx);
+      neighbor = new AristaBgpPeerGroupNeighbor("dummy");
     } else {
       throw new IllegalStateException(
           String.format("Unknown neighbor type in %s", getFullText(ctx)));
     }
-    _currentAristaBgpNeighborAddressFamily = neighbor.getEvpnAf();
-    if (_currentAristaBgpNeighborAddressFamily == null) {
-      AristaBgpNeighborEvpnAddressFamily af = new AristaBgpNeighborEvpnAddressFamily();
-      neighbor.setEvpnAf(af);
-      _currentAristaBgpNeighborAddressFamily = af;
-    }
+    _currentAristaBgpNeighborAddressFamily = neighbor.getOrCreateEvpnAf();
   }
 
   @Override
@@ -2579,12 +2566,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterEos_rb_af_ipv4(Eos_rb_af_ipv4Context ctx) {
-    _currentAristaBgpVrfAddressFamily = _currentAristaBgpVrf.getV4unicastAf();
-    if (_currentAristaBgpVrfAddressFamily == null) {
-      AristaBgpVrfIpv4UnicastAddressFamily af = new AristaBgpVrfIpv4UnicastAddressFamily();
-      _currentAristaBgpVrf.setV4unicastAf(af);
-      _currentAristaBgpVrfAddressFamily = af;
-    }
+    _currentAristaBgpVrfAddressFamily = _currentAristaBgpVrf.getOrCreateV4unicastAf();
   }
 
   @Override
@@ -2611,13 +2593,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       throw new IllegalStateException(
           String.format("Unknown neighbor type in %s", getFullText(ctx)));
     }
-    _currentAristaBgpNeighborAddressFamily = neighbor.getV4UnicastAf();
-    if (_currentAristaBgpNeighborAddressFamily == null) {
-      AristaBgpNeighborIpv4UnicastAddressFamily af =
-          new AristaBgpNeighborIpv4UnicastAddressFamily();
-      neighbor.setV4UnicastAf(af);
-      _currentAristaBgpNeighborAddressFamily = af;
-    }
+    _currentAristaBgpNeighborAddressFamily = neighbor.getOrCreateV4UnicastAf();
   }
 
   @Override
