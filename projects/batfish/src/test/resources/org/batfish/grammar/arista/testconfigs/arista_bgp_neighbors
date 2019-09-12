@@ -29,6 +29,7 @@ router bgp 1
   neighbor PARSE_ONLY maximum-routes 4444 warning-only
   neighbor PARSE_ONLY maximum-accepted-routes 5555
   neighbor PARSE_ONLY maximum-accepted-routes 6666 warning-limit 60000
+  neighbor PARSE_ONLY password YzQ2ZTRlYTNhYzVhZTc0MDE2MTc2ZGEzODhkZmMyMmM=
 !
 !
   vrf tenant
