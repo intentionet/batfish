@@ -286,7 +286,7 @@ eos_rbi_neighbor_common
 //    | eos_rbinc_prefix_list
     | eos_rbinc_remote_as
 //    | eos_rbinc_remove_private_as
-//    | eos_rbinc_route_map
+    | eos_rbinc_route_map
 //    | eos_rbinc_route_reflector_client
 //    | eos_rbinc_route_to_peer
     | eos_rbinc_send_community
@@ -387,6 +387,11 @@ eos_rbinc_password
 eos_rbinc_remote_as
 :
   REMOTE_AS asn = bgp_asn NEWLINE
+;
+
+eos_rbinc_route_map
+:
+  ROUTE_MAP name = VARIABLE NEWLINE
 ;
 
 eos_rbinc_send_community

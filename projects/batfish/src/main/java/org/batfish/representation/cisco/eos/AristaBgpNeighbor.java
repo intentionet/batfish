@@ -16,6 +16,7 @@ public abstract class AristaBgpNeighbor implements Serializable {
   @Nullable private Long _localAs;
   @Nullable private Boolean _nextHopSelf;
   @Nullable private Long _remoteAs;
+  @Nullable private String _routeMap;
   @Nullable private Boolean _sendCommunity;
   @Nullable private AristaBgpNeighborIpv4UnicastAddressFamily _v4UnicastAf;
 
@@ -120,6 +121,15 @@ public abstract class AristaBgpNeighbor implements Serializable {
 
   public void setRemoteAs(@Nullable Long remoteAs) {
     _remoteAs = remoteAs;
+  }
+
+  @Nullable
+  public String getRouteMap() {
+    return _routeMap;
+  }
+
+  public void setRouteMap(@Nullable String routeMap) {
+    _routeMap = routeMap;
   }
 
   @Nullable

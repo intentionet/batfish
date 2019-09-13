@@ -19,6 +19,7 @@ router bgp 1
   neighbor 1.1.1.1 next-hop-self
   neighbor 1.1.1.1 peer-group PEER_G
   neighbor 1.1.1.1 remote-as 35
+  neighbor 1.1.1.1 route-map RM
   neighbor 1.1.1.1 send-community
 !
   neighbor 2.2.2.2 remote-as 36

@@ -191,6 +191,7 @@ public class AristaGrammarTest {
       assertTrue(neighbor.getNextHopSelf());
       assertThat(neighbor.getPeerGroup(), equalTo("PEER_G"));
       assertThat(neighbor.getRemoteAs(), equalTo(35L));
+      assertThat(neighbor.getRouteMap(), equalTo("RM"));
       assertTrue(neighbor.getSendCommunity());
     }
     {
