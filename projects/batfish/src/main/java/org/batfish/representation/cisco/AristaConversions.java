@@ -314,7 +314,7 @@ final class AristaConversions {
           AddressFamilyCapabilities.builder()
               .setAdvertiseInactive(Boolean.FALSE) // todo
               .setAllowLocalAsIn(firstNonNull(neighbor.getAllowAsIn(), 0) > 0)
-              .setAllowRemoteAsOut(Boolean.FALSE) // todo
+              .setAllowRemoteAsOut(true) // this is always true on Arista
               .setSendCommunity(firstNonNull(neighbor.getSendCommunity(), Boolean.FALSE))
               .setSendExtendedCommunity(firstNonNull(neighbor.getSendCommunity(), Boolean.FALSE))
               .build());
