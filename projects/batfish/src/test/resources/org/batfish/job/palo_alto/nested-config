@@ -1,5 +1,14 @@
 deviceconfig {
-    system {
-        hostname nested-config;
+  system {
+    hostname nested-config;
+  }
+  application {
+    harvest {
+      references {
+        Wikipedia {
+          link https://en.wikipedia.org/wiki/Harvest_(software);
+        }
+      }
     }
+  }
 }

@@ -1,2 +1,3 @@
 ####BATFISH FLATTENED PALO ALTO CONFIG####
 set deviceconfig system hostname nested-config
+set deviceconfig application harvest references Wikipedia link https://en.wikipedia.org/wiki/Harvest_(software)
