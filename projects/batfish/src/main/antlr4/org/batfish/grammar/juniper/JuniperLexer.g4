@@ -84,7 +84,7 @@ WORD
 :
    F_QuotedString
    | F_ParenString
-   | F_WordChar+
+   | F_Word
 ;
 
 WS
@@ -123,7 +123,20 @@ F_WhitespaceChar
 ;
 
 fragment
+F_Word
+:
+  F_WordLeadingChar F_WordChar*
+;
+
+fragment
 F_WordChar
 :
-   ~[ \t\u000C\r\n;{}[\]"#()]
+   ~[ \t\u000C\r\n;{}[\]"#]
+;
+
+// F_WordChar with ) additionally excluded
+fragment
+F_WordLeadingChar
+:
+   ~[ \t\u000C\r\n;{}[\]"#)]
 ;
