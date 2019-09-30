@@ -30,7 +30,6 @@ import org.batfish.datamodel.BgpProcess;
 import org.batfish.datamodel.CommunityList;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.Configuration;
-import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.LongSpace;
@@ -1075,7 +1074,7 @@ public class Graph {
       return proto.isBgp();
     }
     // Never use Loopbacks for any protocol except connected
-    if (ge.getStart().isLoopback(conf.getConfigurationFormat())) {
+    if (ge.getStart().isLoopback()) {
       return proto.isConnected();
     }
 
@@ -1114,8 +1113,7 @@ public class Graph {
    */
   public boolean isLoopback(GraphEdge ge) {
     Configuration conf = _configurations.get(ge.getRouter());
-    ConfigurationFormat format = conf.getConfigurationFormat();
-    return ge.getStart().isLoopback(format);
+    return ge.getStart().isLoopback();
   }
 
   /*

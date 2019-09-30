@@ -616,7 +616,7 @@ public final class TopologyUtil {
     configurations.forEach(
         (nodeName, node) -> {
           for (Interface iface : node.getAllInterfaces().values()) {
-            if (iface.isLoopback(node.getConfigurationFormat()) || !iface.getActive()) {
+            if (iface.isLoopback() || !iface.getActive()) {
               continue;
             }
             // Look at all allocated addresses to determine subnet buckets
