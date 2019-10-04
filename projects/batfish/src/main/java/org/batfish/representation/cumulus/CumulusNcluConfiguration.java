@@ -1492,7 +1492,9 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
     return newIface;
   }
 
-  private @Nonnull RoutingPolicy toRouteMap(RouteMap routeMap) {
+  @VisibleForTesting
+  @Nonnull
+  RoutingPolicy toRouteMap(RouteMap routeMap) {
     RoutingPolicy.Builder builder =
         RoutingPolicy.builder().setName(routeMap.getName()).setOwner(_c);
     routeMap.getEntries().values().stream()

@@ -54,9 +54,10 @@ rm_set
 :
   SET
   (
-    rms_metric
     | rms_community
     | rms_ip
+    | rms_local_preference
+    | rms_metric
   )
 ;
 
@@ -111,4 +112,9 @@ rmsipnh_literal
 rms_community
 :
   COMMUNITY communities += literal_standard_community+ NEWLINE
+;
+
+rms_local_preference
+:
+  LOCAL_PREFERENCE pref = uint32 NEWLINE
 ;

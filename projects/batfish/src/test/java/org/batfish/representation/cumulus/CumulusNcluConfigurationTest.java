@@ -38,6 +38,7 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RouteFilterLine;
 import org.batfish.datamodel.RouteFilterList;
 import org.batfish.datamodel.RoutingProtocol;
+import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
@@ -695,5 +696,26 @@ public class CumulusNcluConfigurationTest {
     assertThat(
         loopback.getAddresses(),
         equalTo(ImmutableList.of(ConcreteInterfaceAddress.parse("1.1.1.1/30"))));
+  }
+
+  @Test
+  public void testToRouteMapSetLocalPref() {
+    CumulusNcluConfiguration vendorConfiguration = new CumulusNcluConfiguration();
+    RouteMap rm = new RouteMap("RM");
+    RouteMapEntry rme = new RouteMapEntry(10, LineAction.PERMIT);
+    rme.setSetLocalPreference(new RouteMapSetLocalPreference(200L));
+    rm.getEntries().put(10, rme);
+    RoutingPolicy policy = vendorConfiguration.toRouteMap(rm);
+
+    StaticRoute.Builder routeBuilder =
+        org.batfish.datamodel.StaticRoute.builder()
+            .setNetwork(Prefix.ZERO)
+            .setAdmin(1)
+            .setNextHopInterface("iface");
+    Builder outputBuilder = Bgpv4Route.builder();
+    Environment.Builder env =
+        Environment.builder(new Configuration("h", ConfigurationFormat.CUMULUS_CONCATENATED));
+    policy.call(env.setOutputRoute(outputBuilder).build());
+    assertThat(outputBuilder.getLocalPreference(), equalTo(200L));
   }
 }

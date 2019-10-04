@@ -678,6 +678,17 @@ public class CumulusFrrGrammarTest {
   }
 
   @Test
+  public void testCumulusFrrRouteMapSetLocalPref() {
+    String name = "ROUTE-MAP-NAME";
+
+    parse(String.format("route-map %s permit 10\nset local-preference 200\n", name));
+
+    RouteMapEntry c = CONFIG.getRouteMaps().get(name).getEntries().get(10);
+
+    assertThat(c.getSetLocalPreference().getLocalPreference(), equalTo(200L));
+  }
+
+  @Test
   public void testCumulusFrrVrfRouteMapSetIpNextHop() {
     String name = "ROUTE-MAP-NAME";
     String clause1 = "set ip next-hop 10.0.0.1";

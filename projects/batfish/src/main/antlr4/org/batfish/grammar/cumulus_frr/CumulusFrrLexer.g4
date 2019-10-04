@@ -291,6 +291,11 @@ LE
   'le'
 ;
 
+LOCAL_PREFERENCE
+:
+  'local-preference'
+;
+
 LOG
 :
   'log'
