@@ -24,25 +24,57 @@ statement
   | NO IPV6 FORWARDING NEWLINE
   | s_agentx
   | s_bgp
-  | s_vrf
-  | s_routemap
-  | s_ip
-  | s_service
-  | LINE VTY NEWLINE
-  | s_log
-  | s_interface
-  | s_router_ospf
+  | s_enable
   | s_end
+  | s_interface
+  | s_ip
+  | s_line
+  | s_log
+  | s_password
+  | s_routemap
+  | s_router_ospf
+  | s_service
+  | s_vrf
 ;
 
-s_service
+s_agentx
 :
-  SERVICE
+  AGENTX NEWLINE
+;
+
+si_description
+:
+  DESCRIPTION description = REMARK_TEXT NEWLINE
+;
+
+s_enable
+:
+  ENABLE
+  se_password
+;
+
+s_end
+:
+  END NEWLINE
+;
+
+se_password
+:
+  PASSWORD null_rest_of_line
+;
+
+s_ip
+:
+  IP
   (
-    INTEGRATED_VTYSH_CONFIG
-    | PASSWORD_ENCRYPTION
+    ip_community_list
+    | ip_prefix_list
   )
-  NEWLINE
+;
+
+s_line
+:
+  LINE VTY NEWLINE
 ;
 
 s_log
@@ -55,26 +87,18 @@ s_log
   ) NEWLINE
 ;
 
-s_agentx
+s_password
 :
-  AGENTX NEWLINE
+  PASSWORD null_rest_of_line
 ;
 
-s_ip
+s_service
 :
-  IP
+  SERVICE
   (
-    ip_community_list
-    | ip_prefix_list
+    INTEGRATED_VTYSH_CONFIG
+    | PASSWORD_ENCRYPTION
   )
+  NEWLINE
 ;
 
-si_description
-:
-  DESCRIPTION description = REMARK_TEXT NEWLINE
-;
-
-s_end
-:
-  END NEWLINE
-;

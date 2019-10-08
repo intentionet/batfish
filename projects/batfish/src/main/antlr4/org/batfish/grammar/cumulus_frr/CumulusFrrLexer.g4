@@ -158,6 +158,11 @@ DESCRIPTION
   'description' -> pushMode ( M_Remark )
 ;
 
+ENABLE
+:
+  'enable'
+;
+
 END
 :
   'end'

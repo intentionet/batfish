@@ -1079,6 +1079,11 @@ public class CumulusFrrGrammarTest {
   }
 
   @Test
+  public void testPasswordParsing() {
+    parseLines("password 8 geC4x9Mm5HYDE\n", "enable password 8 <SCRUBBED>\n");
+  }
+
+  @Test
   public void testNextMultipleOfFive() {
     assertThat(nextMultipleOfFive(null), equalTo(5L));
     assertThat(nextMultipleOfFive(0L), equalTo(5L));
