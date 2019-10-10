@@ -1,6 +1,6 @@
 !RANCID-CONTENT-TYPE: cisco-nx
 !
-hostname nxos_bgp_nh_unchanged
+hostname r1
 feature bgp
 !
 interface Ethernet1/1
@@ -19,9 +19,9 @@ router bgp 1
     address-family ipv4 unicast
       route-map NHIP-UNCHANGED out
   neighbor 2.2.2.2
-      remote-as 1
-      address-family ipv4 unicast
-        route-map NHIP-UNCHANGED out
+    remote-as 1
+    address-family ipv4 unicast
+      route-map NHIP-UNCHANGED out
 !
 route-map NHIP-UNCHANGED permit 10
   set ip next-hop unchanged

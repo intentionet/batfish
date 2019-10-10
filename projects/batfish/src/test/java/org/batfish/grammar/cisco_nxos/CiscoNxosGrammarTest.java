@@ -125,11 +125,13 @@ import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
+import com.google.common.graph.ValueGraph;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -152,6 +154,8 @@ import org.batfish.datamodel.AsPathAccessListLine;
 import org.batfish.datamodel.BddTestbed;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPeerConfig;
+import org.batfish.datamodel.BgpPeerConfigId;
+import org.batfish.datamodel.BgpSessionProperties;
 import org.batfish.datamodel.Bgpv4Route;
 import org.batfish.datamodel.BumTransportMethod;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
@@ -593,8 +597,23 @@ public final class CiscoNxosGrammarTest {
 
   @Test
   public void testBgpNextHopUnchanged() throws IOException {
-    Configuration c = parseConfig("nxos_bgp_nh_unchanged");
-    RoutingPolicy nhipUnchangedPolicy = c.getRoutingPolicies().get("NHIP-UNCHANGED");
+    /*
+    Setup: Router r1 has two BGP neighbors, connected to peers on r2 and r3 respectively. Both peers
+    employ an export policy with set ip next-hop unchanged. The session with r2 is EBGP and the
+    session with r3 is IBGP.
+     */
+    Batfish batfish =
+        BatfishTestUtils.getBatfishFromTestrigText(
+            TestrigText.builder()
+                .setConfigurationText(SNAPSHOTS_PREFIX + "bgp_nh_unchanged", "r1", "r2", "r3")
+                .build(),
+            _folder);
+    batfish.computeDataPlane();
+    ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
+        batfish.getTopologyProvider().getBgpTopology(batfish.getNetworkSnapshot()).getGraph();
+
+    Configuration r1 = batfish.loadConfigurations().get("r1");
+    RoutingPolicy nhipUnchangedPolicy = r1.getRoutingPolicies().get("NHIP-UNCHANGED");
 
     // assert on the structure of routing policy
     Statement defaultPermitStatement =
@@ -628,21 +647,40 @@ public final class CiscoNxosGrammarTest {
             .build();
     Bgpv4Route.Builder outputRouteBuilder =
         Bgpv4Route.builder().setNextHopIp(UNSET_ROUTE_NEXT_HOP_IP);
-    Prefix ibgpNeighbor = Prefix.parse("2.2.2.2/32");
-    Prefix ebgpNeighbor = Prefix.parse("1.1.1.1/32");
 
+    // Get BgpSessionProperties for all edges coming into r1
+    Ip ebgpLocalIp = Ip.parse("1.1.1.2");
+    Ip ebgpRemoteIp = Ip.parse("1.1.1.1");
+    Ip ibgpLocalIp = Ip.parse("2.2.2.3");
+    Ip ibgpRemoteIp = Ip.parse("2.2.2.2");
+    Prefix ebgpLocalPrefix = ebgpLocalIp.toPrefix();
+    Prefix ebgpRemotePrefix = ebgpRemoteIp.toPrefix();
+    Prefix ibgpLocalPrefix = ibgpLocalIp.toPrefix();
+    Prefix ibgpRemotePrefix = ibgpRemoteIp.toPrefix();
+    BgpPeerConfigId r1EbgpPeer = new BgpPeerConfigId("r1", "default", ebgpRemotePrefix, false);
+    BgpPeerConfigId r1IbgpPeer = new BgpPeerConfigId("r1", "default", ibgpRemotePrefix, false);
+    BgpPeerConfigId r2peer = new BgpPeerConfigId("r2", "default", ebgpLocalPrefix, false);
+    BgpPeerConfigId r3peer = new BgpPeerConfigId("r3", "default", ibgpLocalPrefix, false);
+    Optional<BgpSessionProperties> props2To1Optional = bgpTopology.edgeValue(r2peer, r1EbgpPeer);
+    Optional<BgpSessionProperties> props3To1Optional = bgpTopology.edgeValue(r3peer, r1IbgpPeer);
+    assertTrue(props2To1Optional.isPresent());
+    assertTrue(props3To1Optional.isPresent());
+    BgpSessionProperties props2To1 = props2To1Optional.get();
+    BgpSessionProperties props3To1 = props3To1Optional.get();
+
+    // next-hop unchanged should not be affect IBGP routes
     boolean shouldExportToIbgp =
-        nhipUnchangedPolicy.process(
-            originalRoute, outputRouteBuilder, null, ibgpNeighbor, "default", Direction.OUT);
+        nhipUnchangedPolicy.processBgpRoute(
+            originalRoute, outputRouteBuilder, props3To1, "default", Direction.OUT);
     assertTrue(shouldExportToIbgp);
     // NHIP was not set for iBGP neighbor
     assertThat(outputRouteBuilder.getNextHopIp(), equalTo(UNSET_ROUTE_NEXT_HOP_IP));
 
+    // For ebgp, next-hop unchanged should set output route's nhip to original route's nhip
     boolean shouldExportToEbgp =
-        nhipUnchangedPolicy.process(
-            originalRoute, outputRouteBuilder, null, ebgpNeighbor, "default", Direction.OUT);
+        nhipUnchangedPolicy.processBgpRoute(
+            originalRoute, outputRouteBuilder, props2To1, "default", Direction.OUT);
     assertTrue(shouldExportToEbgp);
-    // NHIP was set to original route's NHIP for eBGP neighbor
     assertThat(outputRouteBuilder.getNextHopIp(), equalTo(originalNhip));
   }
 
