@@ -1,0 +1,22 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+    hostname r3
+}
+net interface 1.0 { }
+net vlan /Common/vlan1 {
+    interfaces {
+        1.0 { }
+    }
+}
+net self /Common/self1 {
+    address 192.0.2.2/24
+    allow-service all
+    vlan /Common/vlan1
+}
+!
+!!! imish configuration starts here
+!
+router bgp 65501
+ neighbor 192.0.2.254 remote-as 65501
+!

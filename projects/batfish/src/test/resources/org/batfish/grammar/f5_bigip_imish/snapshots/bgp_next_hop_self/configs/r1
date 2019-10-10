@@ -1,0 +1,30 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+    hostname r1
+}
+net interface 1.0 { }
+net vlan /Common/vlan1 {
+    interfaces {
+        1.0 { }
+    }
+}
+net self /Common/self1 {
+    address 192.0.2.254/24
+    allow-service all
+    vlan /Common/vlan1
+}
+!
+!!! imish configuration starts here
+!
+router bgp 65501
+ neighbor 192.0.2.1 remote-as 65501
+ neighbor 192.0.2.1 next-hop-self
+ neighbor pg1 peer-group
+ neighbor pg1 remote-as 65501
+ neighbor pg1 next-hop-self
+ neighbor 192.0.2.2 peer-group pg1
+ neighbor 192.0.2.3 remote-as 65501
+ !invalid since neighbor undeclared
+ neighbor 192.0.2.4 next-hop-self
+!
