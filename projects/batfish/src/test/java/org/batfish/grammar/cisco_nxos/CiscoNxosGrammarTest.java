@@ -152,8 +152,6 @@ import org.batfish.datamodel.AsPathAccessListLine;
 import org.batfish.datamodel.BddTestbed;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPeerConfig;
-import org.batfish.datamodel.BgpSessionProperties;
-import org.batfish.datamodel.BgpSessionProperties.SessionType;
 import org.batfish.datamodel.Bgpv4Route;
 import org.batfish.datamodel.BumTransportMethod;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
@@ -630,30 +628,21 @@ public final class CiscoNxosGrammarTest {
             .build();
     Bgpv4Route.Builder outputRouteBuilder =
         Bgpv4Route.builder().setNextHopIp(UNSET_ROUTE_NEXT_HOP_IP);
+    Prefix ibgpNeighbor = Prefix.parse("2.2.2.2/32");
+    Prefix ebgpNeighbor = Prefix.parse("1.1.1.1/32");
 
-    Ip sessionPropsHeadIp = Ip.parse("1.1.1.1");
-    BgpSessionProperties.Builder sessionProps =
-        BgpSessionProperties.builder()
-            .setHeadAs(1L)
-            .setTailAs(1L)
-            .setHeadIp(sessionPropsHeadIp)
-            .setTailIp(Ip.parse("2.2.2.2"));
-    BgpSessionProperties ibgpSession = sessionProps.setSessionType(SessionType.IBGP).build();
-    BgpSessionProperties ebgpSession =
-        sessionProps.setTailAs(2L).setSessionType(SessionType.EBGP_SINGLEHOP).build();
-
-    // No operation for IBGP
     boolean shouldExportToIbgp =
-        nhipUnchangedPolicy.processBgpRoute(
-            originalRoute, outputRouteBuilder, ibgpSession, "default", Direction.OUT);
+        nhipUnchangedPolicy.process(
+            originalRoute, outputRouteBuilder, null, ibgpNeighbor, "default", Direction.OUT);
     assertTrue(shouldExportToIbgp);
+    // NHIP was not set for iBGP neighbor
     assertThat(outputRouteBuilder.getNextHopIp(), equalTo(UNSET_ROUTE_NEXT_HOP_IP));
 
-    // Preserves original route's next hop IP for EBGP
     boolean shouldExportToEbgp =
-        nhipUnchangedPolicy.processBgpRoute(
-            originalRoute, outputRouteBuilder, ebgpSession, "default", Direction.OUT);
+        nhipUnchangedPolicy.process(
+            originalRoute, outputRouteBuilder, null, ebgpNeighbor, "default", Direction.OUT);
     assertTrue(shouldExportToEbgp);
+    // NHIP was set to original route's NHIP for eBGP neighbor
     assertThat(outputRouteBuilder.getNextHopIp(), equalTo(originalNhip));
   }
 

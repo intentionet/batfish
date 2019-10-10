@@ -1,6 +1,27 @@
 !RANCID-CONTENT-TYPE: cisco-nx
 !
 hostname nxos_bgp_nh_unchanged
+feature bgp
+!
+interface Ethernet1/1
+  no switchport
+  no shutdown
+  ip address 1.1.1.2/24
+!
+interface Ethernet1/2
+  no switchport
+  no shutdown
+  ip address 2.2.2.3/24
+!
+router bgp 1
+  neighbor 1.1.1.1
+    remote-as 2
+    address-family ipv4 unicast
+      route-map NHIP-UNCHANGED out
+  neighbor 2.2.2.2
+      remote-as 1
+      address-family ipv4 unicast
+        route-map NHIP-UNCHANGED out
 !
 route-map NHIP-UNCHANGED permit 10
   set ip next-hop unchanged
