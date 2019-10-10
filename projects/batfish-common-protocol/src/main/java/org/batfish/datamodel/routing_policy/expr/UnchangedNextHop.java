@@ -1,11 +1,10 @@
 package org.batfish.datamodel.routing_policy.expr;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 import javax.annotation.Nullable;
 import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.BgpSessionProperties;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.Route;
 import org.batfish.datamodel.routing_policy.Environment;
 
 /** Implements BGP next-hop unchanged semantics */
@@ -38,7 +37,10 @@ public class UnchangedNextHop extends NextHopExpr {
     }
     // Preserve original NHIP if present
     Ip originalRouteNextHop = environment.getOriginalRoute().getNextHopIp();
-    return firstNonNull(originalRouteNextHop, sessionProperties.getHeadIp());
+    if (originalRouteNextHop != null && originalRouteNextHop != Route.UNSET_ROUTE_NEXT_HOP_IP) {
+      return originalRouteNextHop;
+    }
+    return sessionProperties.getHeadIp();
   }
 
   @Override
