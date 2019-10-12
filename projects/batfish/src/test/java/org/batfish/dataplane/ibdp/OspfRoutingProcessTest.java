@@ -599,7 +599,7 @@ public class OspfRoutingProcessTest {
                     "filter",
                     ImmutableList.of(
                         new RouteFilterLine(
-                            LineAction.DENY, Prefix.parse("1.0.0.0/8"), new SubRange(8, 8)))),
+                            LineAction.DENY, Prefix.parse("1.0.0.0/8"), SubRange.singleton(8)))),
                 nextHopIp,
                 999L)
             .collect(Collectors.toList());
@@ -690,7 +690,7 @@ public class OspfRoutingProcessTest {
                     "filter",
                     ImmutableList.of(
                         new RouteFilterLine(
-                            LineAction.DENY, Prefix.parse("1.0.0.0/8"), new SubRange(8, 8)))),
+                            LineAction.DENY, Prefix.parse("1.0.0.0/8"), SubRange.singleton(8)))),
                 nextHopIp,
                 999L)
             .collect(Collectors.toList());

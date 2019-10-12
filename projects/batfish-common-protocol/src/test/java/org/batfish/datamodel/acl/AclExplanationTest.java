@@ -112,13 +112,13 @@ public class AclExplanationTest {
     MatchHeaderSpace matchDstPrefix = matchDst(Prefix.parse("1.2.3.0/24"));
     MatchHeaderSpace matchDstPort =
         new MatchHeaderSpace(
-            HeaderSpace.builder().setDstPorts(ImmutableList.of(new SubRange(80, 80))).build());
+            HeaderSpace.builder().setDstPorts(ImmutableList.of(SubRange.singleton(80))).build());
     MatchHeaderSpace matchDstPrefixAndPort =
         new MatchHeaderSpace(
             matchDstPrefix
                 .getHeaderspace()
                 .toBuilder()
-                .setDstPorts(ImmutableList.of(new SubRange(80, 80)))
+                .setDstPorts(ImmutableList.of(SubRange.singleton(80)))
                 .build());
 
     _explanation.requireHeaderSpace(matchDstPrefix);

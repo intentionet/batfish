@@ -41,7 +41,7 @@ public class FwFromPrefixListTest {
     _c = new Configuration("test", ConfigurationFormat.FLAT_JUNIPER);
     RouteFilterList rflist = new RouteFilterList(BASE_PREFIX_LIST_NAME);
     RouteFilterLine rfline =
-        new RouteFilterLine(LineAction.PERMIT, Prefix.parse(BASE_IP_PREFIX), new SubRange(0, 0));
+        new RouteFilterLine(LineAction.PERMIT, Prefix.parse(BASE_IP_PREFIX), SubRange.singleton(0));
     rflist.addLine(rfline);
     _c.getRouteFilterLists().put(BASE_PREFIX_LIST_NAME, rflist);
   }

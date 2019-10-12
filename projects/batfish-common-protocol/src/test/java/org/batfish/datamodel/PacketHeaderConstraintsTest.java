@@ -45,7 +45,7 @@ public class PacketHeaderConstraintsTest {
   @Test
   public void testIsValidEcn() {
     assertThat(isValidEcn(IntegerSpace.of(new SubRange(0, 3))), equalTo(true));
-    assertThat(isValidEcn(IntegerSpace.of(new SubRange(1, 1))), equalTo(true));
+    assertThat(isValidEcn(IntegerSpace.of(SubRange.singleton(1))), equalTo(true));
     assertThat(isValidEcn(IntegerSpace.of(new SubRange(-1, 0))), equalTo(false));
     assertThat(isValidEcn(IntegerSpace.of(new SubRange(2, 4))), equalTo(false));
     assertThat(isValidEcn(IntegerSpace.of(new SubRange(2, 1))), equalTo(false));
@@ -55,7 +55,7 @@ public class PacketHeaderConstraintsTest {
   @Test
   public void testIsValidDscp() {
     assertThat(isValidDscp(IntegerSpace.of(new SubRange(0, 63))), equalTo(true));
-    assertThat(isValidDscp(IntegerSpace.of(new SubRange(1, 1))), equalTo(true));
+    assertThat(isValidDscp(IntegerSpace.of(SubRange.singleton(1))), equalTo(true));
     assertThat(isValidDscp(IntegerSpace.of(new SubRange(-1, 0))), equalTo(false));
     assertThat(isValidDscp(IntegerSpace.of(new SubRange(2, 64))), equalTo(false));
     assertThat(isValidDscp(IntegerSpace.of(new SubRange(2, 1))), equalTo(false));
@@ -144,7 +144,11 @@ public class PacketHeaderConstraintsTest {
   public void testResolveIpProtocolsIcmpAndPorts() {
     thrown.expect(IllegalArgumentException.class);
     resolveIpProtocols(
-        ImmutableSet.of(IpProtocol.ICMP), IntegerSpace.of(new SubRange(10, 10)), null, null, null);
+        ImmutableSet.of(IpProtocol.ICMP),
+        IntegerSpace.of(SubRange.singleton(10)),
+        null,
+        null,
+        null);
   }
 
   @Test
@@ -166,7 +170,7 @@ public class PacketHeaderConstraintsTest {
 
   @Test
   public void testResolvePorts() {
-    final IntegerSpace sshSet = IntegerSpace.of(new SubRange(22, 22));
+    final IntegerSpace sshSet = IntegerSpace.of(SubRange.singleton(22));
 
     assertThat(resolvePorts(null, null), nullValue());
 
@@ -237,7 +241,7 @@ public class PacketHeaderConstraintsTest {
     constraints =
         PacketHeaderConstraints.builder().setApplications(ImmutableSet.of(Protocol.SSH)).build();
     assertThat(constraints.resolveIpProtocols(), equalTo(ImmutableSet.of(TCP)));
-    assertThat(constraints.resolveDstPorts(), equalTo(IntegerSpace.of(new SubRange(22, 22))));
+    assertThat(constraints.resolveDstPorts(), equalTo(IntegerSpace.of(SubRange.singleton(22))));
 
     // Headerspace-like resolution
     constraints =
@@ -247,7 +251,7 @@ public class PacketHeaderConstraintsTest {
     assertThat(constraints.resolveIpProtocols(), equalTo(ImmutableSet.of(TCP)));
     assertThat(
         constraints.resolveDstPorts(),
-        equalTo(IntegerSpace.unionOf(new SubRange(22, 22), new SubRange(80, 80))));
+        equalTo(IntegerSpace.unionOf(SubRange.singleton(22), SubRange.singleton(80))));
   }
 
   @Test
@@ -255,7 +259,7 @@ public class PacketHeaderConstraintsTest {
     // Src port incompatibility
     thrown.expect(IllegalArgumentException.class);
     PacketHeaderConstraints.builder()
-        .setSrcPorts(IntegerSpace.of(new SubRange(22, 22)))
+        .setSrcPorts(IntegerSpace.of(SubRange.singleton(22)))
         .setIpProtocols(ImmutableSet.of(IpProtocol.ICMP))
         .build();
   }
@@ -265,7 +269,7 @@ public class PacketHeaderConstraintsTest {
     // Dst port incompatibility
     thrown.expect(IllegalArgumentException.class);
     PacketHeaderConstraints.builder()
-        .setDstPorts(IntegerSpace.of(new SubRange(22, 22)))
+        .setDstPorts(IntegerSpace.of(SubRange.singleton(22)))
         .setIpProtocols(ImmutableSet.of(IpProtocol.ICMP))
         .build();
   }
@@ -276,7 +280,7 @@ public class PacketHeaderConstraintsTest {
     thrown.expect(IllegalArgumentException.class);
     PacketHeaderConstraints.builder()
         .setIpProtocols(ImmutableSet.of(TCP))
-        .setIcmpCodes(IntegerSpace.of(new SubRange(1, 1)))
+        .setIcmpCodes(IntegerSpace.of(SubRange.singleton(1)))
         .build();
   }
 

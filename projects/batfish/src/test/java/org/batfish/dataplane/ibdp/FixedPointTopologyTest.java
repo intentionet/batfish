@@ -316,8 +316,7 @@ public final class FixedPointTopologyTest {
                           AclLineMatchExprs.match(
                               HeaderSpace.builder()
                                   .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-                                  .setDstPorts(
-                                      ImmutableSet.of(new SubRange(IPSEC_UDP_PORT, IPSEC_UDP_PORT)))
+                                  .setDstPorts(ImmutableSet.of(SubRange.singleton(IPSEC_UDP_PORT)))
                                   .build()))))
               .build());
     }

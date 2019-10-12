@@ -97,7 +97,8 @@ rbn_peer_group_assign
 rbn_null
 :
   (
-    CAPABILITY
+    ADVERTISEMENT_INTERVAL
+    | CAPABILITY
     | FALL_OVER
     | MAXIMUM_PREFIX
   ) null_rest_of_line

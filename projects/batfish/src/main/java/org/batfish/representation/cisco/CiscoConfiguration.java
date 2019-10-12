@@ -122,7 +122,6 @@ import org.batfish.datamodel.Names;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
-import org.batfish.datamodel.Prefix6Range;
 import org.batfish.datamodel.Prefix6Space;
 import org.batfish.datamodel.PrefixRange;
 import org.batfish.datamodel.PrefixSpace;
@@ -165,6 +164,7 @@ import org.batfish.datamodel.ospf.OspfInterfaceSettings;
 import org.batfish.datamodel.ospf.OspfMetricType;
 import org.batfish.datamodel.ospf.OspfNetworkType;
 import org.batfish.datamodel.ospf.StubType;
+import org.batfish.datamodel.routing_policy.Common;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.routing_policy.expr.BooleanExpr;
 import org.batfish.datamodel.routing_policy.expr.BooleanExprs;
@@ -209,33 +209,8 @@ import org.batfish.vendor.VendorConfiguration;
 
 public final class CiscoConfiguration extends VendorConfiguration {
 
-  /** Matches the IPv4 default route. */
-  static final MatchPrefixSet MATCH_DEFAULT_ROUTE;
-
-  /** Matches the IPv6 default route. */
-  static final MatchPrefix6Set MATCH_DEFAULT_ROUTE6;
-
   /** Matches anything but the IPv4 default route. */
-  static final Not NOT_DEFAULT_ROUTE;
-
-  static {
-    MATCH_DEFAULT_ROUTE =
-        new MatchPrefixSet(
-            DestinationNetwork.instance(),
-            new ExplicitPrefixSet(
-                new PrefixSpace(new PrefixRange(Prefix.ZERO, new SubRange(0, 0)))));
-    MATCH_DEFAULT_ROUTE.setComment("match default route");
-
-    NOT_DEFAULT_ROUTE = new Not(MATCH_DEFAULT_ROUTE);
-
-    MATCH_DEFAULT_ROUTE6 =
-        new MatchPrefix6Set(
-            new DestinationNetwork6(),
-            new ExplicitPrefix6Set(
-                new Prefix6Space(
-                    Collections.singleton(new Prefix6Range(Prefix6.ZERO, new SubRange(0, 0))))));
-    MATCH_DEFAULT_ROUTE6.setComment("match default route");
-  }
+  static final Not NOT_DEFAULT_ROUTE = new Not(Common.matchDefaultRoute());
 
   private static final IpAccessListLine ACL_LINE_EXISTING_CONNECTION =
       new IpAccessListLine(
@@ -1467,8 +1442,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
               (prefix6, bgpNetwork6) -> {
                 int prefixLen = prefix6.getPrefixLength();
                 Route6FilterLine line =
-                    new Route6FilterLine(
-                        LineAction.PERMIT, prefix6, new SubRange(prefixLen, prefixLen));
+                    new Route6FilterLine(LineAction.PERMIT, prefix6, SubRange.singleton(prefixLen));
                 localFilter6.addLine(line);
                 String mapName = bgpNetwork6.getRouteMapName();
                 if (mapName != null) {
@@ -2392,7 +2366,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     if (_vendor == ConfigurationFormat.ARISTA) {
       ospfExportStatements.add(
           new If(
-              MATCH_DEFAULT_ROUTE,
+              Common.matchDefaultRoute(),
               ImmutableList.of(new SetMetric(new LiteralLong(1L))),
               ImmutableList.of(new SetMetric(new LiteralLong(metric)))));
     } else {
@@ -2604,7 +2578,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
             .setName(defaultRouteGenerationPolicyName)
             .addStatement(
                 new If(
-                    MATCH_DEFAULT_ROUTE,
+                    Common.matchDefaultRoute(),
                     ImmutableList.of(Statements.ReturnTrue.toStaticStatement())))
             .build();
         route.setGenerationPolicy(defaultRouteGenerationPolicyName);
@@ -2613,7 +2587,8 @@ public final class CiscoConfiguration extends VendorConfiguration {
       ospfExportDefaultStatements.add(Statements.ExitAccept.toStaticStatement());
       ospfExportDefault.setGuard(
           new Conjunction(
-              ImmutableList.of(MATCH_DEFAULT_ROUTE, new MatchProtocol(RoutingProtocol.AGGREGATE))));
+              ImmutableList.of(
+                  Common.matchDefaultRoute(), new MatchProtocol(RoutingProtocol.AGGREGATE))));
     }
 
     computeDistributeListPolicies(proc, newProcess, c, vrfName, proc.getName(), oldConfig, _w);
@@ -2735,7 +2710,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
       ripExportDefault.setComment("RIP export default route");
       Conjunction ripExportDefaultConditions = new Conjunction();
       List<Statement> ripExportDefaultStatements = ripExportDefault.getTrueStatements();
-      ripExportDefaultConditions.getConjuncts().add(MATCH_DEFAULT_ROUTE);
+      ripExportDefaultConditions.getConjuncts().add(Common.matchDefaultRoute());
       long metric = proc.getDefaultInformationMetric();
       ripExportDefaultStatements.add(new SetMetric(new LiteralLong(metric)));
       // add default export map with metric

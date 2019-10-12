@@ -3,7 +3,6 @@ package org.batfish.representation.cisco;
 import static org.batfish.datamodel.RoutingProtocol.BGP;
 import static org.batfish.datamodel.RoutingProtocol.STATIC;
 import static org.batfish.datamodel.routing_policy.statement.Statements.ExitAccept;
-import static org.batfish.representation.cisco.CiscoConfiguration.MATCH_DEFAULT_ROUTE;
 import static org.batfish.representation.cisco.CiscoConfiguration.NOT_DEFAULT_ROUTE;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
@@ -13,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.ospf.OspfMetricType;
+import org.batfish.datamodel.routing_policy.Common;
 import org.batfish.datamodel.routing_policy.expr.BooleanExpr;
 import org.batfish.datamodel.routing_policy.expr.CallExpr;
 import org.batfish.datamodel.routing_policy.expr.Conjunction;
@@ -85,7 +85,7 @@ public class CiscoOspfRedistributionTest {
         contains(
             new SetOspfMetricType(OspfMetricType.E2),
             new If(
-                MATCH_DEFAULT_ROUTE,
+                Common.matchDefaultRoute(),
                 ImmutableList.of(new SetMetric(new LiteralLong(1L))),
                 ImmutableList.of(new SetMetric(new LiteralLong(10)))),
             ExitAccept.toStaticStatement()));

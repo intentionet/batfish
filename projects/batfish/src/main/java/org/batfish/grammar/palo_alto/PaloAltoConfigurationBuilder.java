@@ -89,6 +89,10 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Bgp_router_idContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppg_definitionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppg_enableContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppg_peerContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppgp_coi_allowContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppgp_coi_remote_portContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppgp_coo_allowContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppgp_coo_local_portContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppgp_enableContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppgp_la_interfaceContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Bgppgp_la_ipContext;
@@ -563,6 +567,26 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
         toString(ctx, ctx.name)
             .map(_currentBgpPeerGroup::getOrCreatePeerGroup)
             .orElseGet(() -> new BgpPeer("dummy")); // create dummy if the name is invalid.
+  }
+
+  @Override
+  public void exitBgppgp_coi_allow(Bgppgp_coi_allowContext ctx) {
+    _currentBgpPeer.getConnectionOptions().setIncomingAllow(toBoolean(ctx.yn));
+  }
+
+  @Override
+  public void exitBgppgp_coi_remote_port(Bgppgp_coi_remote_portContext ctx) {
+    _currentBgpPeer.getConnectionOptions().setRemotePort(toInteger(ctx.p));
+  }
+
+  @Override
+  public void exitBgppgp_coo_allow(Bgppgp_coo_allowContext ctx) {
+    _currentBgpPeer.getConnectionOptions().setOutgoingAllow(toBoolean(ctx.yn));
+  }
+
+  @Override
+  public void exitBgppgp_coo_local_port(Bgppgp_coo_local_portContext ctx) {
+    _currentBgpPeer.getConnectionOptions().setLocalPort(toInteger(ctx.p));
   }
 
   @Override
@@ -2031,8 +2055,14 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
     return Integer.parseInt(getText(t));
   }
 
+  private static final IntegerSpace PORT_NUMBER_SPACE = IntegerSpace.of(Range.closed(0, 65535));
+
   private static final IntegerSpace PROTOCOL_ADMIN_DISTANCE_SPACE =
       IntegerSpace.of(Range.closed(10, 240));
+
+  private Optional<Integer> toInteger(ParserRuleContext ctx, Port_numberContext pn) {
+    return toIntegerInSpace(ctx, pn, PORT_NUMBER_SPACE, "admin-dist");
+  }
 
   private Optional<Integer> toInteger(ParserRuleContext ctx, Protocol_adContext ad) {
     return toIntegerInSpace(ctx, ad, PROTOCOL_ADMIN_DISTANCE_SPACE, "admin-dist");

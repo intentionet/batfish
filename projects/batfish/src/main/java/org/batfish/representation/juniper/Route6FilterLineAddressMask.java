@@ -26,7 +26,7 @@ public final class Route6FilterLineAddressMask extends Route6FilterLine {
             LineAction.PERMIT,
             new Ip6Wildcard(
                 new Prefix6(_prefix6.getAddress(), prefixLength).getAddress(), _addressMask),
-            new SubRange(prefixLength, prefixLength));
+            SubRange.singleton(prefixLength));
     rfl.addLine(line);
   }
 

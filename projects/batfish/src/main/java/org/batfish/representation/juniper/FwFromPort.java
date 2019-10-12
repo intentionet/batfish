@@ -12,7 +12,7 @@ public final class FwFromPort extends FwFrom {
   private final SubRange _portRange;
 
   public FwFromPort(int port) {
-    _portRange = new SubRange(port, port);
+    _portRange = SubRange.singleton(port);
   }
 
   public FwFromPort(SubRange subrange) {

@@ -1,0 +1,13 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+    hostname f5_bigip_imish_route_map_set_next_hop
+}
+
+!
+!!! imish configuration starts here
+!
+route-map rm1 permit 10
+ set ip next-hop 1.2.3.4 primary
+!
+end

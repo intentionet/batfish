@@ -556,7 +556,7 @@ public final class BDDReachabilityAnalysisFactoryTest {
     HeaderSpace ingressAclHeaderSpace =
         HeaderSpace.builder().setSrcIps(Prefix.parse("2.0.0.0/8").toIpSpace()).build();
     HeaderSpace natMatchHeaderSpace =
-        HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(100, 100))).build();
+        HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(100))).build();
     Interface iface =
         nf.interfaceBuilder()
             .setOwner(config)
@@ -621,7 +621,7 @@ public final class BDDReachabilityAnalysisFactoryTest {
     HeaderSpace ingressAclHeaderSpace =
         HeaderSpace.builder().setSrcIps(Prefix.parse("2.0.0.0/8").toIpSpace()).build();
     HeaderSpace nat1MatchHeaderSpace =
-        HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(105, 105))).build();
+        HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(105))).build();
     HeaderSpace nat2MatchHeaderSpace =
         HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(100, 110))).build();
     Interface iface =
@@ -690,7 +690,7 @@ public final class BDDReachabilityAnalysisFactoryTest {
     HeaderSpace preNatAclHeaderSpace =
         HeaderSpace.builder().setDstIps(Prefix.parse("2.0.0.0/24").toIpSpace()).build();
     HeaderSpace nat1MatchHeaderSpace =
-        HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(105, 105))).build();
+        HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(105))).build();
     HeaderSpace nat2MatchHeaderSpace =
         HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(100, 110))).build();
     Interface iface =
@@ -763,9 +763,9 @@ public final class BDDReachabilityAnalysisFactoryTest {
     Vrf vrf = nf.vrfBuilder().setOwner(config).build();
     Ip poolIp = Ip.parse("5.5.5.5");
     HeaderSpace postNatOutAclHeaderSpace =
-        HeaderSpace.builder().setDstPorts(ImmutableList.of(new SubRange(80, 80))).build();
+        HeaderSpace.builder().setDstPorts(ImmutableList.of(SubRange.singleton(80))).build();
     HeaderSpace natMatchHeaderSpace =
-        HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(100, 100))).build();
+        HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(100))).build();
     HeaderSpace preNatOutAclHeaderSpace =
         HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(50, 150))).build();
     Interface iface =
@@ -903,9 +903,9 @@ public final class BDDReachabilityAnalysisFactoryTest {
     Vrf vrf = nf.vrfBuilder().setOwner(config).build();
     Ip poolIp = Ip.parse("5.5.5.5");
     HeaderSpace postNatOutAclHeaderSpace =
-        HeaderSpace.builder().setDstPorts(ImmutableList.of(new SubRange(80, 80))).build();
+        HeaderSpace.builder().setDstPorts(ImmutableList.of(SubRange.singleton(80))).build();
     HeaderSpace natMatchHeaderSpace =
-        HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(100, 100))).build();
+        HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(100))).build();
     HeaderSpace preNatOutAclHeaderSpace =
         HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(50, 150))).build();
     Interface iface =

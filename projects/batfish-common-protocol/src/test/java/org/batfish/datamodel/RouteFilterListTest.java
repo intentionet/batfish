@@ -24,7 +24,7 @@ public class RouteFilterListTest {
                 new RouteFilterLine(
                     LineAction.PERMIT,
                     IpWildcard.parse("1.2.3.4:0.255.0.255"),
-                    new SubRange(24, 24))));
+                    SubRange.singleton(24))));
     _rfPrefixMoreSpecific =
         new RouteFilterList(
             "test-route-filter-prefix",
@@ -40,7 +40,7 @@ public class RouteFilterListTest {
                 new RouteFilterLine(
                     LineAction.PERMIT,
                     IpWildcard.parse("1.2.3.4:0.0.255.255"),
-                    new SubRange(26, 26))));
+                    SubRange.singleton(26))));
   }
 
   @Test

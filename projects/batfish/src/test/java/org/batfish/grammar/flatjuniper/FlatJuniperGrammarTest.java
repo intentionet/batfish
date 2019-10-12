@@ -446,16 +446,16 @@ public final class FlatJuniperGrammarTest {
                         IpAccessListLine.acceptingHeaderSpace(
                             HeaderSpace.builder()
                                 .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
-                                .setSrcPorts(ImmutableList.of(new SubRange(1, 1)))
+                                .setSrcPorts(ImmutableList.of(SubRange.singleton(1)))
                                 .build()),
                         IpAccessListLine.acceptingHeaderSpace(
                             HeaderSpace.builder()
-                                .setDstPorts(ImmutableList.of(new SubRange(2, 2)))
+                                .setDstPorts(ImmutableList.of(SubRange.singleton(2)))
                                 .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
                                 .build()),
                         IpAccessListLine.acceptingHeaderSpace(
                             HeaderSpace.builder()
-                                .setDstPorts(ImmutableList.of(new SubRange(3, 3)))
+                                .setDstPorts(ImmutableList.of(SubRange.singleton(3)))
                                 .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
                                 .build()))))));
 
@@ -569,15 +569,15 @@ public final class FlatJuniperGrammarTest {
                     ImmutableList.of(
                         IpAccessListLine.acceptingHeaderSpace(
                             HeaderSpace.builder()
-                                .setDstPorts(ImmutableList.of(new SubRange(1, 1)))
+                                .setDstPorts(ImmutableList.of(SubRange.singleton(1)))
                                 .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
-                                .setSrcPorts(ImmutableList.of(new SubRange(2, 2)))
+                                .setSrcPorts(ImmutableList.of(SubRange.singleton(2)))
                                 .build()),
                         IpAccessListLine.acceptingHeaderSpace(
                             HeaderSpace.builder()
-                                .setDstPorts(ImmutableList.of(new SubRange(3, 3)))
+                                .setDstPorts(ImmutableList.of(SubRange.singleton(3)))
                                 .setIpProtocols(ImmutableList.of(IpProtocol.UDP))
-                                .setSrcPorts(ImmutableList.of(new SubRange(4, 4)))
+                                .setSrcPorts(ImmutableList.of(SubRange.singleton(4)))
                                 .build()))))));
   }
 
@@ -3771,7 +3771,8 @@ public final class FlatJuniperGrammarTest {
     Ip pool2End = Ip.parse("10.10.10.20");
 
     Transformation ruleSetRIRule1Transformation =
-        when(match(HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(5, 5))).build()))
+        when(match(
+                HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(5))).build()))
             .apply(NOOP_DEST_NAT)
             .build();
 
@@ -3800,7 +3801,7 @@ public final class FlatJuniperGrammarTest {
                 HeaderSpace.builder()
                     .setDstIps(new IpSpaceReference("global~NAME"))
                     .setDstPorts(ImmutableList.of(new SubRange(100, 200)))
-                    .setSrcPorts(ImmutableList.of(new SubRange(80, 80)))
+                    .setSrcPorts(ImmutableList.of(SubRange.singleton(80)))
                     .setSrcIps(new IpSpaceReference("global~SA-NAME"))
                     .build()))
             .apply(NOOP_DEST_NAT)
@@ -3808,7 +3809,8 @@ public final class FlatJuniperGrammarTest {
             .build();
 
     Transformation ruleSetIfaceRule3Transformation =
-        when(match(HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(6, 6))).build()))
+        when(match(
+                HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(6))).build()))
             .apply(NOOP_DEST_NAT)
             .setOrElse(ruleSetZoneRule1Transformation)
             .build();
@@ -4268,17 +4270,17 @@ public final class FlatJuniperGrammarTest {
         RouteFilterListMatchers.hasLines(
             containsInAnyOrder(
                 new RouteFilterLine(
-                    LineAction.PERMIT, Prefix.parse("1.2.0.0/16"), new SubRange(16, 16)),
+                    LineAction.PERMIT, Prefix.parse("1.2.0.0/16"), SubRange.singleton(16)),
                 new RouteFilterLine(
                     LineAction.PERMIT, Prefix.parse("1.2.0.0/16"), new SubRange(17, 32)),
                 new RouteFilterLine(
-                    LineAction.PERMIT, Prefix.parse("1.7.0.0/16"), new SubRange(16, 16)),
+                    LineAction.PERMIT, Prefix.parse("1.7.0.0/16"), SubRange.singleton(16)),
                 new RouteFilterLine(
-                    LineAction.PERMIT, Prefix.parse("1.7.0.0/17"), new SubRange(17, 17)),
+                    LineAction.PERMIT, Prefix.parse("1.7.0.0/17"), SubRange.singleton(17)),
                 new RouteFilterLine(
                     LineAction.PERMIT,
                     IpWildcard.parse("1.0.0.0:0.255.0.255"),
-                    new SubRange(16, 16)))));
+                    SubRange.singleton(16)))));
   }
 
   @Test

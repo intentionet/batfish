@@ -72,8 +72,7 @@ public enum HostProtocol {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.BGP.number(), NamedPort.BGP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.BGP.number())));
           break;
         }
 
@@ -95,8 +94,7 @@ public enum HostProtocol {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSortedSet.of(IpProtocol.TCP, IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.LDP.number(), NamedPort.LDP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.LDP.number())));
           break;
         }
 
@@ -104,8 +102,7 @@ public enum HostProtocol {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.MSDP.number(), NamedPort.MSDP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.MSDP.number())));
           break;
         }
 
@@ -144,10 +141,7 @@ public enum HostProtocol {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
               .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(
-                          NamedPort.EFStcp_OR_RIPudp.number(),
-                          NamedPort.EFStcp_OR_RIPudp.number())));
+                  ImmutableSet.of(SubRange.singleton(NamedPort.EFStcp_OR_RIPudp.number())));
           break;
         }
 
@@ -177,8 +171,7 @@ public enum HostProtocol {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.SAP.number(), NamedPort.SAP.number())))
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.SAP.number())))
               .setDstIps(ImmutableSet.of(IpWildcard.parse("224.2.127.254/32")));
           break;
         }

@@ -783,7 +783,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
       SubRange rejectedLength =
           !lan
               ? new SubRange(0, Prefix.MAX_PREFIX_LENGTH - 2)
-              : new SubRange(Prefix.MAX_PREFIX_LENGTH - 1, Prefix.MAX_PREFIX_LENGTH - 1);
+              : SubRange.singleton(Prefix.MAX_PREFIX_LENGTH - 1);
       match =
           new Conjunction(
               ImmutableList.of(
@@ -2718,7 +2718,7 @@ public final class JuniperConfiguration extends VendorConfiguration {
         int prefixLength = prefix.getPrefixLength();
         org.batfish.datamodel.RouteFilterLine line =
             new org.batfish.datamodel.RouteFilterLine(
-                LineAction.PERMIT, prefix, new SubRange(prefixLength, prefixLength));
+                LineAction.PERMIT, prefix, SubRange.singleton(prefixLength));
         rfl.addLine(line);
       }
       _c.getRouteFilterLists().put(name, rfl);

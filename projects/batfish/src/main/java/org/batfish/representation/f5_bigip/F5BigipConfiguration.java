@@ -191,9 +191,8 @@ public class F5BigipConfiguration extends VendorConfiguration {
     return Optional.of(
         HeaderSpace.builder()
             .setDstIps(address.toIpSpace())
-            .setIcmpTypes(
-                ImmutableList.of(new SubRange(IcmpType.ECHO_REQUEST, IcmpType.ECHO_REQUEST)))
-            .setIcmpCodes(ImmutableList.of(new SubRange(0, 0)))
+            .setIcmpTypes(ImmutableList.of(SubRange.singleton(IcmpType.ECHO_REQUEST)))
+            .setIcmpCodes(ImmutableList.of(SubRange.singleton(0)))
             .build());
   }
 
@@ -603,7 +602,7 @@ public class F5BigipConfiguration extends VendorConfiguration {
     HeaderSpace.Builder headerSpace =
         HeaderSpace.builder()
             .setDstIps(Prefix.create(destinationIp, destinationMask).toIpSpace())
-            .setDstPorts(ImmutableList.of(new SubRange(destinationPort, destinationPort)))
+            .setDstPorts(ImmutableList.of(SubRange.singleton(destinationPort)))
             .setSrcIps(source.toIpSpace());
     IpProtocol protocol = virtual.getIpProtocol();
     if (protocol != null) {
@@ -683,7 +682,7 @@ public class F5BigipConfiguration extends VendorConfiguration {
     HeaderSpace.Builder headerSpace =
         HeaderSpace.builder()
             .setDstIps(Prefix.create(destinationIp, destinationMask).toIpSpace())
-            .setDstPorts(ImmutableList.of(new SubRange(destinationPort, destinationPort)))
+            .setDstPorts(ImmutableList.of(SubRange.singleton(destinationPort)))
             .setSrcIps(source.toIpSpace());
     IpProtocol protocol = virtual.getIpProtocol();
     if (protocol != null) {

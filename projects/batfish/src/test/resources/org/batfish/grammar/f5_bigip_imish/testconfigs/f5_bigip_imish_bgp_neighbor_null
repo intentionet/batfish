@@ -1,0 +1,12 @@
+#TMSH-VERSION: 13.1.1
+
+sys global-settings {
+    hostname f5_bigip_imish_bgp_neighbor_null
+}
+net vlan /Common/vlan_used { }
+!
+!!! imish configuration starts here
+!
+router bgp 123
+ neighbor N advertisement-interval 5
+!

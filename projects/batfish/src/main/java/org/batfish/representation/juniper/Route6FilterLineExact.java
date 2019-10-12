@@ -16,7 +16,7 @@ public final class Route6FilterLineExact extends Route6FilterLine {
     int prefixLength = _prefix6.getPrefixLength();
     org.batfish.datamodel.Route6FilterLine line =
         new org.batfish.datamodel.Route6FilterLine(
-            LineAction.PERMIT, _prefix6, new SubRange(prefixLength, prefixLength));
+            LineAction.PERMIT, _prefix6, SubRange.singleton(prefixLength));
     rfl.addLine(line);
   }
 

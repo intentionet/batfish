@@ -204,7 +204,7 @@ public class HeaderSpaceMatchesTest {
             .build();
     HeaderSpace withDstPortAsSrcOrDst =
         HeaderSpace.builder()
-            .setSrcOrDstPorts(ImmutableSet.of(new SubRange(newDstPort, newDstPort), nonMatching))
+            .setSrcOrDstPorts(ImmutableSet.of(SubRange.singleton(newDstPort), nonMatching))
             .build();
     HeaderSpace withOtherPortAsSrcOrDst =
         HeaderSpace.builder().setSrcOrDstPorts(ImmutableSet.of(nonMatching, nonMatching)).build();

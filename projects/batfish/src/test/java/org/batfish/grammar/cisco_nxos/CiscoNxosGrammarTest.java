@@ -3912,7 +3912,7 @@ public final class CiscoNxosGrammarTest {
 
       line = lines.next();
       assertThat(line.getAction(), equalTo(LineAction.PERMIT));
-      assertThat(line.getLengthRange(), equalTo(new SubRange(24, 24)));
+      assertThat(line.getLengthRange(), equalTo(SubRange.singleton(24)));
       assertThat(line.getIpWildcard().toPrefix(), equalTo(Prefix.parse("10.10.0.0/16")));
 
       line = lines.next();
@@ -3986,7 +3986,7 @@ public final class CiscoNxosGrammarTest {
 
       line = lines.next();
       assertThat(line.getAction(), equalTo(LineAction.PERMIT));
-      assertThat(line.getLengthRange(), equalTo(new SubRange(24, 24)));
+      assertThat(line.getLengthRange(), equalTo(SubRange.singleton(24)));
       assertThat(line.getLine(), equalTo(10L));
       assertThat(line.getPrefix(), equalTo(Prefix.parse("10.10.0.0/16")));
 
@@ -4077,7 +4077,7 @@ public final class CiscoNxosGrammarTest {
 
       line = lines.next();
       assertThat(line.getAction(), equalTo(LineAction.PERMIT));
-      assertThat(line.getLengthRange(), equalTo(new SubRange(120, 120)));
+      assertThat(line.getLengthRange(), equalTo(SubRange.singleton(120)));
       assertThat(line.getIpWildcard().toPrefix(), equalTo(Prefix6.parse("10:10::/112")));
 
       line = lines.next();
@@ -4151,7 +4151,7 @@ public final class CiscoNxosGrammarTest {
 
       line = lines.next();
       assertThat(line.getAction(), equalTo(LineAction.PERMIT));
-      assertThat(line.getLengthRange(), equalTo(new SubRange(120, 120)));
+      assertThat(line.getLengthRange(), equalTo(SubRange.singleton(120)));
       assertThat(line.getLine(), equalTo(10L));
       assertThat(line.getPrefix6(), equalTo(Prefix6.parse("10:10::/112")));
 

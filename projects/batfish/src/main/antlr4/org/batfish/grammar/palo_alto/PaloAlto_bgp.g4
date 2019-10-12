@@ -85,7 +85,8 @@ bgppg_peer
 :
     PEER name = bgp_peer_name
     (
-        bgppgp_enable
+        bgppgp_connection_options
+        | bgppgp_enable
         | bgppgp_local_address
 //        | bgppgp_max_prefixes
         | bgppgp_peer_address
@@ -93,6 +94,53 @@ bgppg_peer
 //        | bgppgp_peering_type
         | bgppgp_reflector_client
     )?
+;
+
+bgppgp_connection_options
+:
+    CONNECTION_OPTIONS
+    (
+        bgppgp_co_incoming_bgp_connection
+        | bgppgp_co_outgoing_bgp_connection
+    )
+;
+
+bgppgp_co_incoming_bgp_connection
+:
+    INCOMING_BGP_CONNECTION
+    (
+        bgppgp_coi_allow
+        | bgppgp_coi_remote_port
+    )
+;
+
+bgppgp_coi_allow
+:
+    ALLOW yn = yes_or_no
+;
+
+bgppgp_coi_remote_port
+:
+    REMOTE_PORT p = port_number
+;
+
+bgppgp_co_outgoing_bgp_connection
+:
+    OUTGOING_BGP_CONNECTION
+    (
+        bgppgp_coo_allow
+        | bgppgp_coo_local_port
+    )
+;
+
+bgppgp_coo_allow
+:
+    ALLOW yn = yes_or_no
+;
+
+bgppgp_coo_local_port
+:
+    LOCAL_PORT p = port_number
 ;
 
 bgppgp_enable

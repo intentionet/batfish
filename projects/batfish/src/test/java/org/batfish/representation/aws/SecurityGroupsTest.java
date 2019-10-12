@@ -119,7 +119,7 @@ public class SecurityGroupsTest {
                     HeaderSpace.builder()
                         .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
                         .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(22, 22)))
+                        .setDstPorts(Sets.newHashSet(SubRange.singleton(22)))
                         .build()))));
   }
 
@@ -293,14 +293,14 @@ public class SecurityGroupsTest {
                     HeaderSpace.builder()
                         .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
                         .setSrcIps(Sets.newHashSet(IpWildcard.parse("5.6.7.8/32")))
-                        .setSrcPorts(Sets.newHashSet(new SubRange(80, 80)))
+                        .setSrcPorts(Sets.newHashSet(SubRange.singleton(80)))
                         .setTcpFlags(ImmutableSet.of(TcpFlagsMatchConditions.ACK_TCP_FLAG))
                         .build()),
                 IpAccessListLine.acceptingHeaderSpace(
                     HeaderSpace.builder()
                         .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
                         .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(22, 22)))
+                        .setDstPorts(Sets.newHashSet(SubRange.singleton(22)))
                         .build()))));
     assertThat(
         outboundRules,
@@ -311,14 +311,14 @@ public class SecurityGroupsTest {
                     HeaderSpace.builder()
                         .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
                         .setDstIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setSrcPorts(Sets.newHashSet(new SubRange(22, 22)))
+                        .setSrcPorts(Sets.newHashSet(SubRange.singleton(22)))
                         .setTcpFlags(ImmutableSet.of(TcpFlagsMatchConditions.ACK_TCP_FLAG))
                         .build()),
                 IpAccessListLine.acceptingHeaderSpace(
                     HeaderSpace.builder()
                         .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
                         .setDstIps(Sets.newHashSet(IpWildcard.parse("5.6.7.8/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(80, 80)))
+                        .setDstPorts(Sets.newHashSet(SubRange.singleton(80)))
                         .build()))));
   }
 

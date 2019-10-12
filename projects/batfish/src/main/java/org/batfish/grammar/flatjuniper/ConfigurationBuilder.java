@@ -3814,7 +3814,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   public void exitFftf_destination_port(Fftf_destination_portContext ctx) {
     if (ctx.port() != null) {
       int port = getPortNumber(ctx.port());
-      SubRange subrange = new SubRange(port, port);
+      SubRange subrange = SubRange.singleton(port);
       FwFrom from = new FwFromDestinationPort(subrange);
       _currentFwTerm.getFroms().add(from);
     } else if (ctx.range() != null) {
@@ -3842,7 +3842,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitFftf_first_fragment(Fftf_first_fragmentContext ctx) {
-    SubRange subRange = new SubRange(0, 0);
+    SubRange subRange = SubRange.singleton(0);
     FwFrom from = new FwFromFragmentOffset(subRange, false);
     _currentFwTerm.getFroms().add(from);
   }
@@ -3873,7 +3873,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     } else if (ctx.icmp_code() != null) {
       Integer icmpCode = toIcmpCode(ctx.icmp_code(), _w);
       if (icmpCode != null) {
-        icmpCodeRange = new SubRange(icmpCode, icmpCode);
+        icmpCodeRange = SubRange.singleton(icmpCode);
       }
     } else {
       _w.redFlag(String.format("Invalid icmp-code: '%s'", ctx.getText()));
@@ -3896,7 +3896,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
     } else if (ctx.icmp_type() != null) {
       Integer icmpType = toIcmpType(ctx.icmp_type(), _w);
       if (icmpType != null) {
-        SubRange icmpTypeRange = new SubRange(icmpType, icmpType);
+        SubRange icmpTypeRange = SubRange.singleton(icmpType);
         _currentFwTerm.getFroms().add(new FwFromIcmpType(icmpTypeRange));
       }
     } else {
@@ -3924,7 +3924,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitFftf_is_fragment(Fftf_is_fragmentContext ctx) {
-    SubRange subRange = new SubRange(0, 0);
+    SubRange subRange = SubRange.singleton(0);
     FwFrom from = new FwFromFragmentOffset(subRange, true);
     _currentFwTerm.getFroms().add(from);
   }
@@ -3947,7 +3947,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   public void exitFftf_port(Fftf_portContext ctx) {
     if (ctx.port() != null) {
       int port = getPortNumber(ctx.port());
-      SubRange subrange = new SubRange(port, port);
+      SubRange subrange = SubRange.singleton(port);
       FwFrom from = new FwFromPort(subrange);
       _currentFwTerm.getFroms().add(from);
     } else if (ctx.range() != null) {
@@ -3992,7 +3992,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   public void exitFftf_source_port(Fftf_source_portContext ctx) {
     if (ctx.port() != null) {
       int port = getPortNumber(ctx.port());
-      SubRange subrange = new SubRange(port, port);
+      SubRange subrange = SubRange.singleton(port);
       FwFrom from = new FwFromSourcePort(subrange);
       _currentFwTerm.getFroms().add(from);
     } else if (ctx.range() != null) {

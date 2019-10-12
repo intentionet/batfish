@@ -35,6 +35,11 @@ ADDRESS
   'address'
 ;
 
+ADVERTISEMENT_INTERVAL
+:
+  'advertisement-interval'
+;
+
 AGGREGATE_ADDRESS
 :
   'aggregate-address'
@@ -220,6 +225,11 @@ NETWORK
   'network'
 ;
 
+NEXT_HOP
+:
+  'next-hop'
+;
+
 NEXT_HOP_SELF
 :
   'next-hop-self'
@@ -258,6 +268,11 @@ PASSIVE_INTERFACE
 PASSWORD
 :
   'password' -> pushMode ( M_Description )
+;
+
+PRIMARY
+:
+  'primary'
 ;
 
 PEER_GROUP

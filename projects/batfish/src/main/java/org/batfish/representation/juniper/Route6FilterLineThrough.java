@@ -24,7 +24,7 @@ public final class Route6FilterLineThrough extends Route6FilterLine {
       Prefix6 currentPrefix6 = new Prefix6(currentNetworkAddress, i);
       org.batfish.datamodel.Route6FilterLine line =
           new org.batfish.datamodel.Route6FilterLine(
-              LineAction.PERMIT, currentPrefix6, new SubRange(i, i));
+              LineAction.PERMIT, currentPrefix6, SubRange.singleton(i));
       rfl.addLine(line);
     }
   }

@@ -140,7 +140,7 @@ public class HeaderSpaceToBDDTest {
   @Test
   public void test_icmpType() {
     HeaderSpace headerSpace =
-        HeaderSpace.builder().setIcmpTypes(ImmutableList.of(new SubRange(8, 8))).build();
+        HeaderSpace.builder().setIcmpTypes(ImmutableList.of(SubRange.singleton(8))).build();
     BDD matchExprBDD = _toBDD.toBDD(headerSpace);
     BDD icmpTypeBDD = _pkt.getIcmpType().value(8);
     assertThat(matchExprBDD, equalTo(icmpTypeBDD));

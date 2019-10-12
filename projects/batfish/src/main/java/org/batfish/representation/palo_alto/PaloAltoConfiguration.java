@@ -73,6 +73,7 @@ import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.IpSpaceMetadata;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.datamodel.Vrf;
@@ -84,6 +85,7 @@ import org.batfish.datamodel.acl.OrMatchExpr;
 import org.batfish.datamodel.acl.TrueExpr;
 import org.batfish.datamodel.bgp.AddressFamilyCapabilities;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
+import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily.Builder;
 import org.batfish.datamodel.ospf.NssaSettings;
 import org.batfish.datamodel.ospf.OspfArea;
 import org.batfish.datamodel.ospf.OspfDefaultOriginateType;
@@ -91,6 +93,10 @@ import org.batfish.datamodel.ospf.OspfInterfaceSettings;
 import org.batfish.datamodel.ospf.OspfNetworkType;
 import org.batfish.datamodel.ospf.OspfProcess;
 import org.batfish.datamodel.ospf.StubSettings;
+import org.batfish.datamodel.routing_policy.RoutingPolicy;
+import org.batfish.datamodel.routing_policy.expr.MatchProtocol;
+import org.batfish.datamodel.routing_policy.statement.If;
+import org.batfish.datamodel.routing_policy.statement.Statements;
 import org.batfish.representation.palo_alto.OspfAreaNssa.DefaultRouteType;
 import org.batfish.representation.palo_alto.OspfInterface.LinkType;
 import org.batfish.representation.palo_alto.Zone.Type;
@@ -270,6 +276,10 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
   @Override
   public void setVendor(ConfigurationFormat format) {
     _vendor = format;
+  }
+
+  static String computePeerExportPolicyName(Prefix remoteAddress) {
+    return "~PEER_EXPORT_POLICY:" + remoteAddress + "~";
   }
 
   // Visible for testing
@@ -1097,10 +1107,24 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     }
 
     // TODO
-    peerB.setIpv4UnicastAddressFamily(
+    Builder ipv4af =
         Ipv4UnicastAddressFamily.builder()
-            .setAddressFamilyCapabilities(AddressFamilyCapabilities.builder().build())
-            .build());
+            .setAddressFamilyCapabilities(AddressFamilyCapabilities.builder().build());
+
+    // BGP routing process expects an export policy to be attached to Ipv4UnicastAddressFamily
+    // TODO flesh out correct export policy, this is just a placeholder allowing BGP
+    String peerExportPolicyName = computePeerExportPolicyName(peer.getPeerAddress().toPrefix());
+    RoutingPolicy peerExportPolicy = new RoutingPolicy(peerExportPolicyName, _c);
+    peerExportPolicy
+        .getStatements()
+        .add(
+            new If(
+                new MatchProtocol(RoutingProtocol.IBGP, RoutingProtocol.BGP),
+                ImmutableList.of(Statements.ReturnTrue.toStaticStatement())));
+    _c.getRoutingPolicies().put(peerExportPolicyName, peerExportPolicy);
+    ipv4af.setExportPolicy(peerExportPolicyName);
+
+    peerB.setIpv4UnicastAddressFamily(ipv4af.build());
 
     peerB.build(); // automatically adds itself to the process
   }

@@ -16,7 +16,7 @@ public final class Route4FilterLineExact extends Route4FilterLine {
     int prefixLength = _prefix.getPrefixLength();
     org.batfish.datamodel.RouteFilterLine line =
         new org.batfish.datamodel.RouteFilterLine(
-            LineAction.PERMIT, _prefix, new SubRange(prefixLength, prefixLength));
+            LineAction.PERMIT, _prefix, SubRange.singleton(prefixLength));
     rfl.addLine(line);
   }
 

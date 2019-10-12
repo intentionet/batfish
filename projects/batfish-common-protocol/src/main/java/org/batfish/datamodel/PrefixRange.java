@@ -22,7 +22,7 @@ public final class PrefixRange implements Serializable, Comparable<PrefixRange> 
   /** Returns a {@link PrefixRange} that contains exactly the specified {@link Prefix}. */
   public static PrefixRange fromPrefix(Prefix prefix) {
     int prefixLength = prefix.getPrefixLength();
-    return new PrefixRange(prefix, new SubRange(prefixLength, prefixLength));
+    return new PrefixRange(prefix, SubRange.singleton(prefixLength));
   }
 
   @JsonCreator

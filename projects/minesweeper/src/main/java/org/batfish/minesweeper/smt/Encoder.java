@@ -259,7 +259,7 @@ public class Encoder {
 
           // Make sure messages use TCP port 179
           SortedSet<SubRange> dstPorts = new TreeSet<>();
-          dstPorts.add(new SubRange(179, 179));
+          dstPorts.add(SubRange.singleton(179));
           hs.setDstPorts(dstPorts);
 
           // Make sure messages use the TCP protocol

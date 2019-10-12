@@ -137,6 +137,7 @@ import org.batfish.representation.palo_alto.AddressGroup;
 import org.batfish.representation.palo_alto.AddressObject;
 import org.batfish.representation.palo_alto.AdminDistances;
 import org.batfish.representation.palo_alto.Application;
+import org.batfish.representation.palo_alto.BgpConnectionOptions;
 import org.batfish.representation.palo_alto.BgpPeer;
 import org.batfish.representation.palo_alto.BgpPeer.ReflectorClient;
 import org.batfish.representation.palo_alto.BgpPeerGroup;
@@ -615,6 +616,12 @@ public final class PaloAltoGrammarTest {
     assertThat(peer.getPeerAddress(), equalTo(Ip.parse("5.4.3.2")));
     assertThat(peer.getPeerAs(), equalTo(54321L));
     assertThat(peer.getReflectorClient(), equalTo(ReflectorClient.NON_CLIENT));
+
+    BgpConnectionOptions co = peer.getConnectionOptions();
+    assertTrue(co.getIncomingAllow());
+    assertThat(co.getRemotePort(), equalTo(0));
+    assertFalse(co.getOutgoingAllow());
+    assertThat(co.getLocalPort(), equalTo(4321));
   }
 
   @Test
@@ -630,6 +637,10 @@ public final class PaloAltoGrammarTest {
     assertThat(peer.getLocalIp(), equalTo(Ip.parse("1.2.3.6")));
     assertThat(peer.getLocalAs(), equalTo(65001L));
     assertThat(peer.getRemoteAsns(), equalTo(LongSpace.of(65001)));
+    // BgpRoutingProcess requires an export policy be present
+    String exportPolicyName = peer.getIpv4UnicastAddressFamily().getExportPolicy();
+    assertThat(exportPolicyName, not(nullValue()));
+    assertThat(c.getRoutingPolicies().get(exportPolicyName), not(nullValue()));
   }
 
   @Test

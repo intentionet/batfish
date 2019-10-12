@@ -40,10 +40,10 @@ public class AclToAclLineMatchExprTest {
   private static final AclLineMatchExpr EXPR_B = matchSrcIp("2.2.2.2");
   private static final AclLineMatchExpr EXPR_C =
       AclLineMatchExprs.match(
-          HeaderSpace.builder().setDstPorts(ImmutableList.of(new SubRange(1, 1))).build());
+          HeaderSpace.builder().setDstPorts(ImmutableList.of(SubRange.singleton(1))).build());
   private static final AclLineMatchExpr EXPR_D =
       AclLineMatchExprs.match(
-          HeaderSpace.builder().setSrcPorts(ImmutableList.of(new SubRange(2, 2))).build());
+          HeaderSpace.builder().setSrcPorts(ImmutableList.of(SubRange.singleton(2))).build());
   private static final AclLineMatchExpr EXPR_E =
       AclLineMatchExprs.match(
           HeaderSpace.builder().setIpProtocols(ImmutableList.of(IpProtocol.TCP)).build());

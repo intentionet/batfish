@@ -173,7 +173,7 @@ public class PacketHeaderConstraintsUtilTest {
         Flow.builder().setIngressNode("node").setIngressInterface("iface").setTag("tag");
     PacketHeaderConstraints phc =
         PacketHeaderConstraints.builder()
-            .setFragmentOffsets(IntegerSpace.of(new SubRange(2, 2)))
+            .setFragmentOffsets(IntegerSpace.of(SubRange.singleton(2)))
             .build();
     setFragmentOffsets(phc, builder);
     assertThat(builder.build().getFragmentOffset(), equalTo(2));

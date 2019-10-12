@@ -51,7 +51,7 @@ public class SubRangeTest {
   public void testContains() {
     SubRange empty = new SubRange(2, 1);
     SubRange base = new SubRange(0, 10);
-    SubRange singleton = new SubRange(5, 5);
+    SubRange singleton = SubRange.singleton(5);
 
     assertThat(base.contains(empty), equalTo(true));
     assertThat(empty.contains(empty), equalTo(true));
@@ -87,7 +87,7 @@ public class SubRangeTest {
   public void isSingleValue() {
     SubRange empty = new SubRange(2, 1);
     SubRange base = new SubRange(0, 10);
-    SubRange singleton = new SubRange(5, 5);
+    SubRange singleton = SubRange.singleton(5);
 
     assertThat(empty.isSingleValue(), equalTo(false));
     assertThat(base.isSingleValue(), equalTo(false));

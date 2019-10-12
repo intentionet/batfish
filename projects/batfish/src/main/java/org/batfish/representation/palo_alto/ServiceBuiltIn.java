@@ -25,12 +25,12 @@ public enum ServiceBuiltIn {
       case SERVICE_HTTP:
         return HeaderSpace.builder()
             .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
-            .setDstPorts(ImmutableSortedSet.of(new SubRange(80, 80), new SubRange(8080, 8080)))
+            .setDstPorts(ImmutableSortedSet.of(SubRange.singleton(80), new SubRange(8080, 8080)))
             .build();
       case SERVICE_HTTPS:
         return HeaderSpace.builder()
             .setIpProtocols(ImmutableList.of(IpProtocol.TCP))
-            .setDstPorts(ImmutableSortedSet.of(new SubRange(443, 443)))
+            .setDstPorts(ImmutableSortedSet.of(SubRange.singleton(443)))
             .build();
         // any and application-default don't match a specific port
       case ANY:

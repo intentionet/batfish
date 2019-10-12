@@ -26,7 +26,7 @@ public final class Route4FilterLineAddressMask extends Route4FilterLine {
             LineAction.PERMIT,
             IpWildcard.ipWithWildcardMask(
                 Prefix.create(_prefix.getStartIp(), prefixLength).getStartIp(), _addressMask),
-            new SubRange(prefixLength, prefixLength));
+            SubRange.singleton(prefixLength));
     rfl.addLine(line);
   }
 

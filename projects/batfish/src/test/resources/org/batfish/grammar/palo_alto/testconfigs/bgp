@@ -30,6 +30,16 @@ network {
            }
            peer {
              PEER {
+               connection-options {
+                 incoming-bgp-connection {
+                   remote-port 0;
+                   allow yes;
+                 }
+                 outgoing-bgp-connection {
+                   local-port 4321;
+                   allow no;
+                 }
+               }
                enable yes;
                local-address {
                  interface ethernet1/1;

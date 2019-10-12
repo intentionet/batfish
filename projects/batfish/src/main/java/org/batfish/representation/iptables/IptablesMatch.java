@@ -90,7 +90,7 @@ public class IptablesMatch implements Serializable {
         subRanges.add(new SubRange(port + 1, 65535));
       }
     } else {
-      subRanges.add(new SubRange(port, port));
+      subRanges.add(SubRange.singleton(port));
     }
 
     return subRanges;

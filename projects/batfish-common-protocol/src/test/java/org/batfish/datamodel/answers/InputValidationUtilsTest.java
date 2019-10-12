@@ -1,6 +1,8 @@
 package org.batfish.datamodel.answers;
 
 import static org.batfish.datamodel.answers.InputValidationUtils.getErrorMessage;
+import static org.batfish.datamodel.answers.InputValidationUtils.validateIp;
+import static org.batfish.datamodel.answers.InputValidationUtils.validatePrefix;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -8,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.function.Function;
 import org.batfish.common.CompletionMetadata;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.answers.InputValidationNotes.Validity;
 import org.batfish.datamodel.questions.BgpPeerPropertySpecifier;
 import org.batfish.datamodel.questions.BgpProcessPropertySpecifier;
@@ -128,5 +131,40 @@ public class InputValidationUtilsTest {
                 Validity.INVALID,
                 getErrorMessage(Grammar.NODE_PROPERTY_SPECIFIER.getFriendlyName(), 6),
                 6)));
+  }
+
+  @Test
+  public void testValidateIpValid() {
+    InputValidationNotes notes = validateIp("1.1.1.1");
+    assertThat(
+        notes, equalTo(new InputValidationNotes(Validity.VALID, Ip.parse("1.1.1.1").toString())));
+  }
+
+  @Test
+  public void testValidateIpInvalid() {
+    InputValidationNotes notes = validateIp("1.1.1.1111");
+    assertThat(
+        notes,
+        equalTo(
+            new InputValidationNotes(
+                Validity.INVALID, "Invalid IPv4 address: 1.1.1.1111. 1111 is an invalid octet")));
+  }
+
+  @Test
+  public void testValidatePrefixValid() {
+    InputValidationNotes notes = validatePrefix("1.1.1.1/23");
+    assertThat(
+        notes,
+        equalTo(new InputValidationNotes(Validity.VALID, Prefix.parse("1.1.1.1/23").toString())));
+  }
+
+  @Test
+  public void testValidatePrefixInvalid() {
+    InputValidationNotes notes = validatePrefix("1.1.1.1111/23");
+    assertThat(
+        notes,
+        equalTo(
+            new InputValidationNotes(
+                Validity.INVALID, "Invalid IPv4 address: 1.1.1.1111. 1111 is an invalid octet")));
   }
 }

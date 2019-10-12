@@ -17,7 +17,7 @@ public class Prefix6Range implements Serializable, Comparable<Prefix6Range> {
 
   public static Prefix6Range fromPrefix6(Prefix6 prefix6) {
     int prefix6Length = prefix6.getPrefixLength();
-    return new Prefix6Range(prefix6, new SubRange(prefix6Length, prefix6Length));
+    return new Prefix6Range(prefix6, SubRange.singleton(prefix6Length));
   }
 
   private static SubRange lengthRangeFromStr(String str) {
@@ -30,7 +30,7 @@ public class Prefix6Range implements Serializable, Comparable<Prefix6Range> {
       prefix6 = Prefix6.parse(mainParts[0]);
       if (mainParts.length == 1) {
         int prefix6Length = prefix6.getPrefixLength();
-        return new SubRange(prefix6Length, prefix6Length);
+        return SubRange.singleton(prefix6Length);
       } else {
         return new SubRange(mainParts[1]);
       }

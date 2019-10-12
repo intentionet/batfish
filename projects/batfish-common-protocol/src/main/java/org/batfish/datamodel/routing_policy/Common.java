@@ -32,8 +32,6 @@ import org.batfish.datamodel.routing_policy.statement.Statements;
 /** Utility functions for generating {@link RoutingPolicy routing policies}. */
 public final class Common {
 
-  private Common() {} // prevent instantiation of utility class
-
   /**
    * Creates a generation policy for the aggregate network with the given {@link Prefix}. The
    * generation policy matches any route with a destination more specific than {@code prefix}.
@@ -119,5 +117,39 @@ public final class Common {
             DestinationNetwork.instance(), new NamedPrefixSet(matchLonger.getName())),
         ImmutableList.of(Statements.Suppress.toStaticStatement()),
         ImmutableList.of());
+  }
+
+  public static MatchPrefixSet matchDefaultRoute() {
+    return MATCH_DEFAULT_ROUTE;
+  }
+
+  public static MatchPrefix6Set matchDefaultRouteV6() {
+    return MATCH_DEFAULT_ROUTE_V6;
+  }
+
+  // Private implementation details
+  private Common() {} // prevent instantiation of utility class
+
+  private static final MatchPrefixSet MATCH_DEFAULT_ROUTE = makeMatchDefaultRouteV4();
+  private static final MatchPrefix6Set MATCH_DEFAULT_ROUTE_V6 = makeMatchDefaultRouteV6();
+
+  private static MatchPrefixSet makeMatchDefaultRouteV4() {
+    MatchPrefixSet ret =
+        new MatchPrefixSet(
+            DestinationNetwork.instance(),
+            new ExplicitPrefixSet(
+                new PrefixSpace(new PrefixRange(Prefix.ZERO, SubRange.singleton(0)))));
+    ret.setComment("match default route");
+    return ret;
+  }
+
+  private static MatchPrefix6Set makeMatchDefaultRouteV6() {
+    MatchPrefix6Set ret =
+        new MatchPrefix6Set(
+            new DestinationNetwork6(),
+            new ExplicitPrefix6Set(
+                new Prefix6Space(new Prefix6Range(Prefix6.ZERO, SubRange.singleton(0)))));
+    ret.setComment("match default route");
+    return ret;
   }
 }

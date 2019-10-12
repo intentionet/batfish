@@ -280,9 +280,9 @@ public final class AclLineMatchExprs {
     return new MatchHeaderSpace(
         HeaderSpace.builder()
             .setSrcIps(srcIp.toIpSpace())
-            .setSrcPorts(ImmutableList.of(new SubRange(srcPort, srcPort)))
+            .setSrcPorts(ImmutableList.of(SubRange.singleton(srcPort)))
             .setDstIps(dstIp.toIpSpace())
-            .setDstPorts(ImmutableList.of(new SubRange(dstPort, dstPort)))
+            .setDstPorts(ImmutableList.of(SubRange.singleton(dstPort)))
             .setIpProtocols(ImmutableList.of(ipProtocol))
             .build());
   }

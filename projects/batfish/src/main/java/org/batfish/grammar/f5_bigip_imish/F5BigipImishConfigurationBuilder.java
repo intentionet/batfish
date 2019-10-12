@@ -52,6 +52,7 @@ import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Rmm_ip_addressConte
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Rmm_ip_address_prefix_listContext;
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Rms_communityContext;
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Rms_metricContext;
+import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Rms_next_hopContext;
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Rms_originContext;
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Ro_neighborContext;
 import org.batfish.grammar.f5_bigip_imish.F5BigipImishParser.Ro_networkContext;
@@ -88,6 +89,7 @@ import org.batfish.representation.f5_bigip.RouteMap;
 import org.batfish.representation.f5_bigip.RouteMapEntry;
 import org.batfish.representation.f5_bigip.RouteMapMatchPrefixList;
 import org.batfish.representation.f5_bigip.RouteMapSetCommunity;
+import org.batfish.representation.f5_bigip.RouteMapSetIpNextHop;
 import org.batfish.representation.f5_bigip.RouteMapSetMetric;
 import org.batfish.representation.f5_bigip.RouteMapSetOrigin;
 
@@ -612,6 +614,12 @@ public class F5BigipImishConfigurationBuilder extends F5BigipImishParserBaseList
   @Override
   public void exitRms_origin(Rms_originContext ctx) {
     _currentRouteMapEntry.setSetOrigin(new RouteMapSetOrigin(toOriginType(ctx.origin)));
+  }
+
+  @Override
+  public void exitRms_next_hop(Rms_next_hopContext ctx) {
+    Ip ip = Ip.parse(ctx.ip.getText());
+    _currentRouteMapEntry.setSetIpNextHop(new RouteMapSetIpNextHop(ip));
   }
 
   @Override

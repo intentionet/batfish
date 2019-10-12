@@ -25,7 +25,7 @@ public class Route6FilterListTest {
                     LineAction.PERMIT,
                     Ip6Wildcard.parse(
                         "2001:db8:1234:2345:3456:4567:5678:6789;0:ffff:0:0:0:ffff:ffff:ffff"),
-                    new SubRange(64, 64))));
+                    SubRange.singleton(64))));
     _rfPrefixMoreSpecific =
         new Route6FilterList(
             "test-route6-filter-prefix",
@@ -43,7 +43,7 @@ public class Route6FilterListTest {
                     LineAction.PERMIT,
                     Ip6Wildcard.parse(
                         "2001:db8:1234:2345:3456:4567:5678:6789;0:0:0:0:ffff:ffff:ffff:ffff"),
-                    new SubRange(64, 64))));
+                    SubRange.singleton(64))));
   }
 
   @Test

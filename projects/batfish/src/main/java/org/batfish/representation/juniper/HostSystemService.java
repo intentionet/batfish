@@ -88,9 +88,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSortedSet.of(IpProtocol.TCP, IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(NamedPort.DOMAIN.number(), NamedPort.DOMAIN.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.DOMAIN.number())));
           break;
         }
 
@@ -98,9 +96,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(NamedPort.FINGER.number(), NamedPort.FINGER.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.FINGER.number())));
           break;
         }
 
@@ -108,8 +104,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.FTP.number(), NamedPort.FTP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.FTP.number())));
           break;
         }
 
@@ -117,8 +112,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.HTTP.number(), NamedPort.HTTP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.HTTP.number())));
           break;
         }
 
@@ -126,9 +120,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(NamedPort.HTTPS.number(), NamedPort.HTTPS.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.HTTPS.number())));
           break;
         }
 
@@ -144,9 +136,8 @@ public enum HostSystemService {
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
               .setDstPorts(
                   ImmutableSortedSet.of(
-                      new SubRange(NamedPort.ISAKMP.number(), NamedPort.ISAKMP.number()),
-                      new SubRange(
-                          NamedPort.NON500_ISAKMP.number(), NamedPort.NON500_ISAKMP.number())));
+                      SubRange.singleton(NamedPort.ISAKMP.number()),
+                      SubRange.singleton(NamedPort.NON500_ISAKMP.number())));
           break;
         }
 
@@ -161,10 +152,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(
-                          NamedPort.NETCONF_SSH.number(), NamedPort.NETCONF_SSH.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.NETCONF_SSH.number())));
           break;
         }
 
@@ -172,8 +160,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.NTP.number(), NamedPort.NTP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.NTP.number())));
           break;
         }
 
@@ -189,8 +176,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.R2CP.number(), NamedPort.R2CP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.R2CP.number())));
           break;
         }
 
@@ -198,10 +184,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(
-                          NamedPort.REVERSE_SSH.number(), NamedPort.REVERSE_SSH.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.REVERSE_SSH.number())));
           break;
         }
 
@@ -209,10 +192,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(
-                          NamedPort.REVERSE_TELNET.number(), NamedPort.REVERSE_TELNET.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.REVERSE_TELNET.number())));
           break;
         }
 
@@ -221,10 +201,7 @@ public enum HostSystemService {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
               .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(
-                          NamedPort.LOGINtcp_OR_WHOudp.number(),
-                          NamedPort.LOGINtcp_OR_WHOudp.number())));
+                  ImmutableSet.of(SubRange.singleton(NamedPort.LOGINtcp_OR_WHOudp.number())));
           break;
         }
 
@@ -240,10 +217,7 @@ public enum HostSystemService {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
               .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(
-                          NamedPort.CMDtcp_OR_SYSLOGudp.number(),
-                          NamedPort.CMDtcp_OR_SYSLOGudp.number())));
+                  ImmutableSet.of(SubRange.singleton(NamedPort.CMDtcp_OR_SYSLOGudp.number())));
           break;
         }
 
@@ -261,8 +235,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.SNMP.number(), NamedPort.SNMP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.SNMP.number())));
           break;
         }
 
@@ -270,9 +243,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(NamedPort.SNMPTRAP.number(), NamedPort.SNMPTRAP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.SNMPTRAP.number())));
           break;
         }
 
@@ -280,8 +251,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.SSH.number(), NamedPort.SSH.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.SSH.number())));
           break;
         }
 
@@ -289,9 +259,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(NamedPort.TELNET.number(), NamedPort.TELNET.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.TELNET.number())));
           break;
         }
 
@@ -299,8 +267,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(new SubRange(NamedPort.TFTP.number(), NamedPort.TFTP.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.TFTP.number())));
           break;
         }
 
@@ -308,9 +275,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.UDP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(NamedPort.TRACEROUTE.number(), NamedPort.TRACEROUTE.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.TRACEROUTE.number())));
           break;
         }
 
@@ -318,10 +283,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(
-                          NamedPort.XNM_CLEAR_TEXT.number(), NamedPort.XNM_CLEAR_TEXT.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.XNM_CLEAR_TEXT.number())));
           break;
         }
 
@@ -329,9 +291,7 @@ public enum HostSystemService {
         {
           headerSpaceBuilder
               .setIpProtocols(ImmutableSet.of(IpProtocol.TCP))
-              .setDstPorts(
-                  ImmutableSet.of(
-                      new SubRange(NamedPort.XNM_SSL.number(), NamedPort.XNM_SSL.number())));
+              .setDstPorts(ImmutableSet.of(SubRange.singleton(NamedPort.XNM_SSL.number())));
           break;
         }
 

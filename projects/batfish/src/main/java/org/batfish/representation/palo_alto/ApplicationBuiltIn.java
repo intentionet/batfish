@@ -17,11 +17,58 @@ import org.batfish.datamodel.SubRange;
  */
 @ParametersAreNonnullByDefault
 public final class ApplicationBuiltIn {
+  public static final Application AOL_MESSAGEBOARD_POSTING =
+      Application.builder("aol-messageboard-posting")
+          .setDescription("built-in application aol-messageboard-posting")
+          .addService(
+              Service.builder("aol-messageboard-posting")
+                  .setIpProtocol(IpProtocol.TCP)
+                  .addPort(80)
+                  .build())
+          .build();
+  public static final Application AOL_PROXY =
+      Application.builder("aol-proxy")
+          .setDescription("built-in application aol-proxy")
+          .addService(
+              Service.builder("aol-proxy")
+                  .setIpProtocol(IpProtocol.TCP)
+                  .addPorts(80, 5192, 5190)
+                  .build())
+          .build();
+  public static final Application DHCP =
+      Application.builder("dhcp")
+          .setDescription("built-in application dhcp")
+          .addService(
+              Service.builder("dhcp-tcp").setIpProtocol(IpProtocol.UDP).addPorts(67, 68).build())
+          .addService(
+              Service.builder("dhcp-udp").setIpProtocol(IpProtocol.TCP).addPorts(67, 68).build())
+          .build();
+
+  public static final Application FINGER =
+      Application.builder("finger")
+          .setDescription("built-in application finger")
+          .addService(
+              Service.builder("finger-tcp").setIpProtocol(IpProtocol.UDP).addPort(79).build())
+          .addService(
+              Service.builder("finger-udp").setIpProtocol(IpProtocol.TCP).addPorts(79).build())
+          .build();
+
   public static final Application FTP =
       Application.builder("ftp")
           .setDescription("built-in application ftp")
           .addService(Service.builder("ftp").setIpProtocol(IpProtocol.TCP).addPort(21).build())
           .build();
+
+  public static final Application GNUTELLA =
+      // No well-known ports, DPI only
+      Application.builder("gnutella").setDescription("built-in application gnutella").build();
+
+  public static final Application GOPHER =
+      Application.builder("gopher")
+          .setDescription("built-in application gopher")
+          .addService(Service.builder("gopher").setIpProtocol(IpProtocol.TCP).addPort(70).build())
+          .build();
+
   public static final Application ICMP =
       Application.builder("icmp")
           .setDescription("built-in application icmp")
@@ -38,6 +85,14 @@ public final class ApplicationBuiltIn {
           .addService(
               Service.builder("ldap udp").setIpProtocol(IpProtocol.UDP).addPorts(389, 3268).build())
           .build();
+
+  public static final Application MCSQL_MON =
+      Application.builder("mssql-mon")
+          .setDescription("built-in application mssql-mon")
+          .addService(
+              Service.builder("mssql-mon").setIpProtocol(IpProtocol.UDP).addPort(1434).build())
+          .build();
+
   public static final Application MS_DS_SMB =
       Application.builder("ms-ds-smb")
           .setDescription("built-in application ms-ds-smb")
@@ -48,6 +103,22 @@ public final class ApplicationBuiltIn {
                   .build())
           .addService(
               Service.builder("ms-ds-smb udp").setIpProtocol(IpProtocol.UDP).addPorts(445).build())
+          .build();
+  public static final Application MSN =
+      Application.builder("msn")
+          .setDescription("built-in application msn")
+          .addService(
+              Service.builder("msn tcp")
+                  .setIpProtocol(IpProtocol.TCP)
+                  .addPorts(1863, 80, 7001, 443)
+                  .addPorts(new SubRange(1025, 65535))
+                  .build())
+          .addService(
+              Service.builder("msn udp")
+                  .setIpProtocol(IpProtocol.UDP)
+                  .addPorts(new SubRange(1025, 65535))
+                  .addPorts(7001)
+                  .build())
           .build();
   public static final Application MS_NETLOGON =
       Application.builder("ms-netlogon")
@@ -70,6 +141,17 @@ public final class ApplicationBuiltIn {
           .setDescription("built-in application ms-kms")
           .addService(
               Service.builder("ms-kms tcp").setIpProtocol(IpProtocol.TCP).addPorts(1688).build())
+          .build();
+  public static final Application MSRPC =
+      // No well-known ports, DPI only
+      Application.builder("msrpc").setDescription("built-in application msrpc").build();
+  public static final Application MSSQL_DB =
+      Application.builder("mssql-db")
+          .addService(
+              Service.builder("mssql-db tcp").setIpProtocol(IpProtocol.TCP).addPorts(1433).build())
+          .addService(
+              Service.builder("mssql-db udp").setIpProtocol(IpProtocol.UDP).addPorts(1433).build())
+          .setDescription("built-in application mssql-db")
           .build();
   public static final Application NETBIOS_SS =
       Application.builder("netbios-ss")
@@ -99,11 +181,28 @@ public final class ApplicationBuiltIn {
           .setDescription("built-in application ping")
           .addService(Service.builder("ping").setIpProtocol(IpProtocol.ICMP).build())
           .build();
+  public static final Application PC_ANYWHERE =
+      Application.builder("pcanywhere")
+          .setDescription("built-in application pcanywhere")
+          .addService(
+              Service.builder("pcanywhere-tcp")
+                  .setIpProtocol(IpProtocol.TCP)
+                  .addPorts(5631, 65301)
+                  .build())
+          .addService(
+              Service.builder("pcanywhere-udp")
+                  .setIpProtocol(IpProtocol.UDP)
+                  .addPorts(22, 5632)
+                  .build())
+          .build();
   public static final Application POP3 =
       Application.builder("pop3")
           .setDescription("built-in application pop3")
           .addService(Service.builder("pop3").setIpProtocol(IpProtocol.TCP).addPort(110).build())
           .build();
+  public static final Application RPC =
+      // No well-known ports, DPI only
+      Application.builder("rpc").setDescription("built-in application rpc").build();
   public static final Application SMTP =
       Application.builder("smtp")
           .setDescription("built-in application smtp")
@@ -143,17 +242,29 @@ public final class ApplicationBuiltIn {
 
   private static final List<Application> BUILTIN_LIST =
       ImmutableList.of(
+          AOL_MESSAGEBOARD_POSTING,
+          AOL_PROXY,
+          DHCP,
+          FINGER,
           FTP,
+          GNUTELLA,
+          GOPHER,
           ICMP,
           LDAP,
+          MCSQL_MON,
           MS_DS_SMB,
           MS_KMS,
+          MSN,
           MS_NETLOGON,
+          MSSQL_DB,
+          MSRPC,
           NETBIOS_SS,
           NTP,
           PAN_DB_CLOUD,
+          PC_ANYWHERE,
           PING,
           POP3,
+          RPC,
           SMTP,
           SNMP,
           SOAP,

@@ -1535,7 +1535,7 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
       int high = toInteger(ctx.high);
       return new SubRange(low, high);
     } else {
-      return new SubRange(low, low);
+      return SubRange.singleton(low);
     }
   }
 

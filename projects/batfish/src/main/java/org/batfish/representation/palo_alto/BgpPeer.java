@@ -24,6 +24,10 @@ public class BgpPeer implements Serializable {
     _name = name;
   }
 
+  public BgpConnectionOptions getConnectionOptions() {
+    return _connectionOptions;
+  }
+
   public boolean getEnable() {
     return _enable;
   }
@@ -78,6 +82,7 @@ public class BgpPeer implements Serializable {
 
   // private implementation details
 
+  private BgpConnectionOptions _connectionOptions = new BgpConnectionOptions();
   private boolean _enable;
   private @Nullable Ip _localAddress;
   private @Nullable String _localInterface;

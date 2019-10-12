@@ -2,10 +2,13 @@ package org.batfish.datamodel.answers;
 
 import static org.batfish.datamodel.Names.escapeNameIfNeeded;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.CompletionMetadata;
+import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.answers.InputValidationNotes.Validity;
 import org.batfish.datamodel.questions.Variable;
 import org.batfish.referencelibrary.ReferenceLibrary;
@@ -20,8 +23,7 @@ public final class InputValidationUtils {
   /**
    * Validates user-provided input for questions. It is meant to do something interesting only for
    * variable types that are top-level (e.g., nodeSpec), and not sub parts (e.g., address group
-   * names). In addition, the current implementation is only limited to variable types whose parsing
-   * is parboiled-based.
+   * names).
    */
   @Nonnull
   public static InputValidationNotes validate(
@@ -98,6 +100,8 @@ public final class InputValidationUtils {
             completionMetadata,
             nodeRolesData,
             referenceLibrary);
+      case IP:
+        return validateIp(query);
       case IP_PROTOCOL_SPEC:
         return ParboiledInputValidator.validate(
             Grammar.IP_PROTOCOL_SPECIFIER,
@@ -152,6 +156,8 @@ public final class InputValidationUtils {
             completionMetadata,
             nodeRolesData,
             referenceLibrary);
+      case PREFIX:
+        return validatePrefix(query);
       case ROUTING_PROTOCOL_SPEC:
         return ParboiledInputValidator.validate(
             Grammar.ROUTING_PROTOCOL_SPECIFIER,
@@ -219,5 +225,25 @@ public final class InputValidationUtils {
       return nameType.substring(0, 1).toUpperCase() + nameType.substring(1);
     }
     return nameType;
+  }
+
+  @VisibleForTesting
+  static InputValidationNotes validateIp(String query) {
+    try {
+      Ip ip = Ip.parse(query);
+      return new InputValidationNotes(Validity.VALID, ip.toString());
+    } catch (Exception e) {
+      return new InputValidationNotes(Validity.INVALID, e.getMessage());
+    }
+  }
+
+  @VisibleForTesting
+  static InputValidationNotes validatePrefix(String query) {
+    try {
+      Prefix pfx = Prefix.parse(query);
+      return new InputValidationNotes(Validity.VALID, pfx.toString());
+    } catch (Exception e) {
+      return new InputValidationNotes(Validity.INVALID, e.getMessage());
+    }
   }
 }

@@ -503,8 +503,8 @@ public final class SearchFiltersTest {
   @Test
   public void testReachFilter_DENY_ALL_portConstraints() {
     HeaderSpace hs = new HeaderSpace();
-    hs.setSrcPorts(Collections.singletonList(new SubRange(1111, 1111)));
-    hs.setDstPorts(Collections.singletonList(new SubRange(2222, 2222)));
+    hs.setSrcPorts(Collections.singletonList(SubRange.singleton(1111)));
+    hs.setDstPorts(Collections.singletonList(SubRange.singleton(2222)));
     SearchFiltersParameters params =
         _allLocationsParams
             .toBuilder()

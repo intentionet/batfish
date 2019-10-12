@@ -182,13 +182,13 @@ public final class IntegerSpaceTest {
 
   @Test
   public void testRoundTripThroughBuilder() {
-    IntegerSpace space = _b.including(PORTS).excluding(new SubRange(22, 22)).build();
+    IntegerSpace space = _b.including(PORTS).excluding(SubRange.singleton(22)).build();
     assertThat(space.toBuilder().build(), equalTo(space));
   }
 
   @Test
   public void testConversionToBuilder() {
-    IntegerSpace space = _b.including(PORTS).excluding(new SubRange(22, 22)).build();
+    IntegerSpace space = _b.including(PORTS).excluding(SubRange.singleton(22)).build();
     Builder newBuilder = space.toBuilder();
     newBuilder.including(Range.closed(-10, -5));
     newBuilder.excluding(Range.closed(53, 53));
@@ -382,14 +382,14 @@ public final class IntegerSpaceTest {
 
   @Test
   public void testConversionToSubrange() {
-    assertThat(IntegerSpace.of(1).getSubRanges(), equalTo(ImmutableSet.of(new SubRange(1, 1))));
+    assertThat(IntegerSpace.of(1).getSubRanges(), equalTo(ImmutableSet.of(SubRange.singleton(1))));
     assertThat(PORTS.getSubRanges(), equalTo(ImmutableSet.of(new SubRange(0, 65535))));
     assertThat(EMPTY.getSubRanges(), equalTo(ImmutableSet.of()));
   }
 
   @Test
   public void testStaticCreators() {
-    SubRange r1 = new SubRange(1, 1);
+    SubRange r1 = SubRange.singleton(1);
     SubRange r2 = new SubRange(4, 5);
     assertThat(
         IntegerSpace.unionOf(r1, r2),
