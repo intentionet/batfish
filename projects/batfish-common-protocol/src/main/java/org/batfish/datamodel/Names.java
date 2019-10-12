@@ -104,6 +104,10 @@ public final class Names {
     return String.format("~BGP_PEER_EXPORT_POLICY:%s:%s~", vrf, peer);
   }
 
+  public static String generatedBgpPeerImportPolicyName(String vrf, String peer) {
+    return String.format("~BGP_PEER_IMPORT_POLICY:%s:%s~", vrf, peer);
+  }
+
   public static String generatedBgpPeerEvpnExportPolicyName(String vrf, String peer) {
     return String.format("~BGP_PEER_EXPORT_POLICY_EVPN:%s:%s~", vrf, peer);
   }
