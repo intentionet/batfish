@@ -134,6 +134,11 @@ AS_FORMAT
     'as-format'
 ;
 
+AUTH
+:
+    'auth'
+;
+
 AUTH_PROFILE
 :
     'auth-profile'
@@ -394,6 +399,11 @@ EXTERNAL
     'external'
 ;
 
+EXTERNAL_LIST
+:
+    'external-list'
+;
+
 ETHERNET
 :
     'ethernet'
@@ -497,6 +507,11 @@ HIP_PROFILES
 HOSTNAME
 :
     'hostname'
+;
+
+HOURLY
+:
+    'hourly'
 ;
 
 HOURS
@@ -809,6 +824,11 @@ PASSIVE
     'passive'
 ;
 
+PASSWORD
+:
+    'password'
+;
+
 PEER
 :
     'peer'
@@ -887,6 +907,11 @@ PROTOCOL
 QOS
 :
     'qos'
+;
+
+RECURRING
+:
+    'recurring'
 ;
 
 REFLECTOR_CLIENT
@@ -1199,9 +1224,19 @@ UPDATE_SERVER
     'update-server'
 ;
 
+URL
+:
+    'url'
+;
+
 USED_BY_MALWARE
 :
     'used-by-malware'
+;
+
+USERNAME
+:
+    'username'
 ;
 
 VIRTUAL_ROUTER

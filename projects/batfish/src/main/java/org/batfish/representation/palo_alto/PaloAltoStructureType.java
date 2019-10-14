@@ -13,6 +13,7 @@ public enum PaloAltoStructureType implements StructureType {
   APPLICATION_GROUP("application-group"),
   APPLICATION_GROUP_OR_APPLICATION("application-group or application"),
   APPLICATION_GROUP_OR_APPLICATION_OR_NONE("application-group or application or none"),
+  EXTERNAL_LIST("external-list"),
   GLOBAL_PROTECT_APP_CRYPTO_PROFILE("global-protect-app-crypto-profile"),
   IKE_CRYPTO_PROFILE("ike-crypto-profile"),
   IPSEC_CRYPTO_PROFILE("ipsec-crypto-profile"),

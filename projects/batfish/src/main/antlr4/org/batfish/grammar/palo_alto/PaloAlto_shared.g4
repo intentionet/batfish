@@ -23,10 +23,75 @@ ss_common
     | s_application
     | s_application_filter
     | s_application_group
+    | s_external_filter
     | s_service
     | s_service_group
     | s_tag
     | ss_log_settings
+;
+
+s_external_filter
+:
+    EXTERNAL_LIST name = variable
+    (
+      sef_type
+    )
+;
+
+sef_type
+:
+    TYPE
+    (
+      setf_ip
+    )
+;
+
+setf_ip
+:
+    IP
+    (
+      setfip_auth
+      | setfip_certificate_profile
+      | setfip_recurring
+      | setfip_url
+    )
+;
+
+setfip_auth
+:
+    AUTH
+    (
+      setfipa_password
+      | setfipa_username
+    )
+;
+
+setfipa_username
+:
+    USERNAME null_rest_of_line
+;
+
+setfipa_password
+:
+    PASSWORD null_rest_of_line
+;
+
+setfip_certificate_profile
+:
+    CERTIFICATE_PROFILE name = variable
+;
+
+setfip_recurring
+:
+    RECURRING
+    (
+      HOURLY
+    )
+;
+
+setfip_url
+:
+    URL url = null_rest_of_line
 ;
 
 ss_log_settings

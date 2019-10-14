@@ -801,6 +801,12 @@ public final class PaloAltoGrammarTest {
   }
 
   @Test
+  public void testExternalList() {
+    // don't crash
+    parseNestedConfig("external-list");
+  }
+
+  @Test
   public void testFilesystemConfigFormat() {
     String hostname = "config-filesystem-format";
     Configuration c = parseConfig(hostname);
