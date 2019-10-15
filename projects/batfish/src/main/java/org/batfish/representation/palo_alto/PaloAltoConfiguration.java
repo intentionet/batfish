@@ -488,15 +488,16 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     Stream<Map.Entry<SecurityRule, Vsys>> pre =
         _panorama == null
             ? Stream.of()
-            : _panorama.getPreRules().values().stream()
+            : _panorama.getPreRulebase().getSecurityRules().values().stream()
                 .map(r -> new SimpleImmutableEntry<>(r, _panorama));
     Stream<Map.Entry<SecurityRule, Vsys>> post =
         _panorama == null
             ? Stream.of()
-            : _panorama.getPostRules().values().stream()
+            : _panorama.getPostRulebase().getSecurityRules().values().stream()
                 .map(r -> new SimpleImmutableEntry<>(r, _panorama));
     Stream<Map.Entry<SecurityRule, Vsys>> rules =
-        vsys.getRules().values().stream().map(r -> new SimpleImmutableEntry<>(r, vsys));
+        vsys.getRulebase().getSecurityRules().values().stream()
+            .map(r -> new SimpleImmutableEntry<>(r, vsys));
 
     return Stream.concat(Stream.concat(pre, rules), post).collect(ImmutableList.toImmutableList());
   }

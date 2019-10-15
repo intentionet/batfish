@@ -3,8 +3,6 @@ package org.batfish.representation.palo_alto;
 import com.google.common.base.MoreObjects;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -40,12 +38,11 @@ public final class Vsys implements Serializable {
 
   private final String _name;
 
-  // Note: these are all LinkedHashMaps to preserve insertion order.
-  private LinkedHashMap<String, SecurityRule> _rules; // NOPMD
+  @Nonnull private final Rulebase _rulebase;
   // Panorama only: rules to prepend to every rulebase
-  private final LinkedHashMap<String, SecurityRule> _preRules; // NOPMD
+  @Nonnull private final Rulebase _preRulebase;
   // Panorama only: rules to append to every rulebase
-  private final LinkedHashMap<String, SecurityRule> _postRules; // NOPMD
+  @Nonnull private final Rulebase _postRulebase;
 
   private final SortedMap<String, Service> _services;
 
@@ -77,9 +74,9 @@ public final class Vsys implements Serializable {
     _applicationGroups = new TreeMap<>();
     _importedInterfaces = new HashSet<>();
     _importedVsyses = new HashSet<>();
-    _rules = new LinkedHashMap<>();
-    _preRules = new LinkedHashMap<>();
-    _postRules = new LinkedHashMap<>();
+    _rulebase = new Rulebase();
+    _preRulebase = new Rulebase();
+    _postRulebase = new Rulebase();
     _services = new TreeMap<>();
     _serviceGroups = new TreeMap<>();
     _syslogServerGroups = new TreeMap<>();
@@ -127,27 +124,22 @@ public final class Vsys implements Serializable {
     return _name;
   }
 
-  /** Returns a {@code Map} of rule name to rule for the rules in this vsys. */
-  public Map<String, SecurityRule> getRules() {
-    return _rules;
+  /** Returns a {@link Rulebase} of the rules in this vsys. */
+  @Nonnull
+  public Rulebase getRulebase() {
+    return _rulebase;
   }
 
-  /**
-   * Returns a map of rule name to rule for the pre-rulebase rules.
-   *
-   * <p>This should be panorama Vsys.
-   */
-  public Map<String, SecurityRule> getPreRules() {
-    return _preRules;
+  /** Returns a {@link Rulebase} of the pre-rulebase for this vsys. */
+  @Nonnull
+  public Rulebase getPreRulebase() {
+    return _preRulebase;
   }
 
-  /**
-   * Returns a map of rule name to rule for the post-rulebase rules.
-   *
-   * <p>This should be panorama Vsys.
-   */
-  public Map<String, SecurityRule> getPostRules() {
-    return _postRules;
+  /** Returns a {@link Rulebase} of the post-rulebase for this vsys. */
+  @Nonnull
+  public Rulebase getPostRulebase() {
+    return _postRulebase;
   }
 
   /** Returns a map of service name to service for the services in this vsys. */

@@ -17,6 +17,7 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureType.APPLICA
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.APPLICATION_GROUP_OR_APPLICATION_OR_NONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.EXTERNAL_LIST;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.INTERFACE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureType.NAT_RULE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SECURITY_RULE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE_GROUP;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE_OR_SERVICE_GROUP;
@@ -30,6 +31,7 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.BGP_PE
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.IMPORT_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER2_INTERFACE_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER3_INTERFACE_ZONE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_SELF_REF;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULEBASE_SERVICE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_DESTINATION;
@@ -57,7 +59,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -227,6 +228,7 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Snsg_zone_definitionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snsgi_interfaceContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snsgzn_layer3Context;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Src_or_dst_list_itemContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_definitionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_actionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_applicationContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_definitionContext;
@@ -294,6 +296,7 @@ import org.batfish.representation.palo_alto.BgpVrRoutingOptions.AsFormat;
 import org.batfish.representation.palo_alto.CryptoProfile;
 import org.batfish.representation.palo_alto.CryptoProfile.Type;
 import org.batfish.representation.palo_alto.Interface;
+import org.batfish.representation.palo_alto.NatRule;
 import org.batfish.representation.palo_alto.OspfArea;
 import org.batfish.representation.palo_alto.OspfAreaNormal;
 import org.batfish.representation.palo_alto.OspfAreaNssa;
@@ -311,6 +314,7 @@ import org.batfish.representation.palo_alto.PolicyRuleMatchFromPeerSet;
 import org.batfish.representation.palo_alto.PolicyRuleUpdateMetric;
 import org.batfish.representation.palo_alto.PolicyRuleUpdateOrigin;
 import org.batfish.representation.palo_alto.RuleEndpoint;
+import org.batfish.representation.palo_alto.Rulebase;
 import org.batfish.representation.palo_alto.SecurityRule;
 import org.batfish.representation.palo_alto.Service;
 import org.batfish.representation.palo_alto.ServiceBuiltIn;
@@ -353,6 +357,7 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
   private String _currentDeviceName;
   private String _currentExternalListName;
   private Interface _currentInterface;
+  private NatRule _currentNatRule;
   private boolean _currentNtpServerPrimary;
   private Interface _currentParentInterface;
   private PolicyRule _currentPolicyRule;
@@ -1779,18 +1784,45 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
   }
 
   @Override
-  public void enterSrs_definition(Srs_definitionContext ctx) {
+  public void enterSrn_definition(Srn_definitionContext ctx) {
     String name = getText(ctx.name);
-    Map<String, SecurityRule> rulebase;
+    Rulebase rulebase;
     if (_currentRuleScope == RulebaseId.DEFAULT) {
-      rulebase = _currentVsys.getRules();
+      rulebase = _currentVsys.getRulebase();
     } else if (_currentRuleScope == RulebaseId.PRE) {
-      rulebase = _currentVsys.getPreRules();
+      rulebase = _currentVsys.getPreRulebase();
     } else {
       assert _currentRuleScope == RulebaseId.POST;
-      rulebase = _currentVsys.getPostRules();
+      rulebase = _currentVsys.getPostRulebase();
     }
-    _currentSecurityRule = rulebase.computeIfAbsent(name, n -> new SecurityRule(n, _currentVsys));
+    _currentNatRule = rulebase.getNatRules().computeIfAbsent(name, NatRule::new);
+
+    // Use constructed name so same-named defs across vsys are unique
+    String uniqueName = computeObjectName(_currentVsys.getName(), name);
+    _configuration.defineFlattenedStructure(NAT_RULE, uniqueName, ctx, _parser);
+    _configuration.referenceStructure(
+        NAT_RULE, uniqueName, NAT_RULE_SELF_REF, getLine(ctx.name.start));
+  }
+
+  @Override
+  public void exitSrn_definition(Srn_definitionContext ctx) {
+    _currentNatRule = null;
+  }
+
+  @Override
+  public void enterSrs_definition(Srs_definitionContext ctx) {
+    String name = getText(ctx.name);
+    Rulebase rulebase;
+    if (_currentRuleScope == RulebaseId.DEFAULT) {
+      rulebase = _currentVsys.getRulebase();
+    } else if (_currentRuleScope == RulebaseId.PRE) {
+      rulebase = _currentVsys.getPreRulebase();
+    } else {
+      assert _currentRuleScope == RulebaseId.POST;
+      rulebase = _currentVsys.getPostRulebase();
+    }
+    _currentSecurityRule =
+        rulebase.getSecurityRules().computeIfAbsent(name, n -> new SecurityRule(n, _currentVsys));
 
     // Use constructed name so same-named defs across vsys are unique
     String uniqueName = computeObjectName(_currentVsys.getName(), name);

@@ -9,6 +9,7 @@ public enum PaloAltoStructureUsage implements StructureUsage {
   IMPORT_INTERFACE("import network interface"),
   LAYER2_INTERFACE_ZONE("zone network layer2"),
   LAYER3_INTERFACE_ZONE("zone network layer3"),
+  NAT_RULE_SELF_REF("rulebase nat rules"),
   RULE_APPLICATION("rulebase security rules application"),
   RULE_DESTINATION("rulebase security rules destination"),
   RULE_FROM_ZONE("rulebase security rules from"),
