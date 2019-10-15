@@ -41,11 +41,11 @@ public final class Vsys implements Serializable {
   private final String _name;
 
   // Note: these are all LinkedHashMaps to preserve insertion order.
-  private LinkedHashMap<String, Rule> _rules; // NOPMD
+  private LinkedHashMap<String, SecurityRule> _rules; // NOPMD
   // Panorama only: rules to prepend to every rulebase
-  private final LinkedHashMap<String, Rule> _preRules; // NOPMD
+  private final LinkedHashMap<String, SecurityRule> _preRules; // NOPMD
   // Panorama only: rules to append to every rulebase
-  private final LinkedHashMap<String, Rule> _postRules; // NOPMD
+  private final LinkedHashMap<String, SecurityRule> _postRules; // NOPMD
 
   private final SortedMap<String, Service> _services;
 
@@ -128,7 +128,7 @@ public final class Vsys implements Serializable {
   }
 
   /** Returns a {@code Map} of rule name to rule for the rules in this vsys. */
-  public Map<String, Rule> getRules() {
+  public Map<String, SecurityRule> getRules() {
     return _rules;
   }
 
@@ -137,7 +137,7 @@ public final class Vsys implements Serializable {
    *
    * <p>This should be panorama Vsys.
    */
-  public Map<String, Rule> getPreRules() {
+  public Map<String, SecurityRule> getPreRules() {
     return _preRules;
   }
 
@@ -146,7 +146,7 @@ public final class Vsys implements Serializable {
    *
    * <p>This should be panorama Vsys.
    */
-  public Map<String, Rule> getPostRules() {
+  public Map<String, SecurityRule> getPostRules() {
     return _postRules;
   }
 
