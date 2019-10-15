@@ -1505,7 +1505,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
             PaloAltoStructureType.APPLICATION, PaloAltoStructureType.APPLICATION_GROUP),
         true,
         PaloAltoStructureUsage.APPLICATION_GROUP_MEMBERS,
-        PaloAltoStructureUsage.RULE_APPLICATION);
+        PaloAltoStructureUsage.SECURITY_RULE_APPLICATION);
 
     // Handle service objects/groups that may overlap with built-in names
     markAbstractStructureFromUnknownNamespace(
@@ -1513,12 +1513,12 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
         ImmutableList.of(PaloAltoStructureType.SERVICE, PaloAltoStructureType.SERVICE_GROUP),
         true,
         PaloAltoStructureUsage.SERVICE_GROUP_MEMBER,
-        PaloAltoStructureUsage.RULEBASE_SERVICE);
+        PaloAltoStructureUsage.SECURITY_RULE_SERVICE);
     markAbstractStructureFromUnknownNamespace(
         PaloAltoStructureType.SERVICE_OR_SERVICE_GROUP,
         ImmutableList.of(PaloAltoStructureType.SERVICE, PaloAltoStructureType.SERVICE_GROUP),
         PaloAltoStructureUsage.SERVICE_GROUP_MEMBER,
-        PaloAltoStructureUsage.RULEBASE_SERVICE);
+        PaloAltoStructureUsage.SECURITY_RULE_SERVICE);
 
     // Handle marking rule endpoints
     // First, handle those which may or may not be referencing objects (e.g. "1.2.3.4" may be IP
@@ -1530,8 +1530,8 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
             PaloAltoStructureType.ADDRESS_OBJECT,
             PaloAltoStructureType.EXTERNAL_LIST),
         true,
-        PaloAltoStructureUsage.RULE_DESTINATION,
-        PaloAltoStructureUsage.RULE_SOURCE);
+        PaloAltoStructureUsage.SECURITY_RULE_DESTINATION,
+        PaloAltoStructureUsage.SECURITY_RULE_SOURCE);
     // Next, handle address object references which are definitely referencing objects
     markAbstractStructureFromUnknownNamespace(
         PaloAltoStructureType.ADDRESS_LIKE,
@@ -1540,8 +1540,8 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
             PaloAltoStructureType.ADDRESS_OBJECT,
             PaloAltoStructureType.EXTERNAL_LIST),
         PaloAltoStructureUsage.ADDRESS_GROUP_STATIC,
-        PaloAltoStructureUsage.RULE_DESTINATION,
-        PaloAltoStructureUsage.RULE_SOURCE);
+        PaloAltoStructureUsage.SECURITY_RULE_DESTINATION,
+        PaloAltoStructureUsage.SECURITY_RULE_SOURCE);
 
     // Applications or Application-Groups
     markAbstractStructureFromUnknownNamespace(
@@ -1549,7 +1549,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
         ImmutableList.of(
             PaloAltoStructureType.APPLICATION_GROUP, PaloAltoStructureType.APPLICATION),
         PaloAltoStructureUsage.APPLICATION_GROUP_MEMBERS,
-        PaloAltoStructureUsage.RULE_APPLICATION);
+        PaloAltoStructureUsage.SECURITY_RULE_APPLICATION);
 
     return ImmutableList.of(_c);
   }

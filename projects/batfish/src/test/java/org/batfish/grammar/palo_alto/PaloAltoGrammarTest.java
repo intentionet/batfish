@@ -59,7 +59,7 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureType.SERVICE
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.SHARED_GATEWAY;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.IMPORT_INTERFACE;
-import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_APPLICATION;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.STATIC_ROUTE_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.VIRTUAL_ROUTER_INTERFACE;
 import static org.batfish.representation.palo_alto.Zone.Type.EXTERNAL;
@@ -585,7 +585,7 @@ public final class PaloAltoGrammarTest {
     assertThat(
         ccae,
         hasUndefinedReference(
-            filename, APPLICATION_GROUP_OR_APPLICATION, "undefined", RULE_APPLICATION));
+            filename, APPLICATION_GROUP_OR_APPLICATION, "undefined", SECURITY_RULE_APPLICATION));
   }
 
   @Test
@@ -835,7 +835,7 @@ public final class PaloAltoGrammarTest {
         ccae,
         not(
             hasUndefinedReference(
-                filename, APPLICATION_GROUP_OR_APPLICATION, "ssl", RULE_APPLICATION)));
+                filename, APPLICATION_GROUP_OR_APPLICATION, "ssl", SECURITY_RULE_APPLICATION)));
   }
 
   @Test
@@ -1396,14 +1396,14 @@ public final class PaloAltoGrammarTest {
             filename,
             PaloAltoStructureType.SERVICE_OR_SERVICE_GROUP,
             "SERVICE_UNDEF",
-            PaloAltoStructureUsage.RULEBASE_SERVICE));
+            PaloAltoStructureUsage.SECURITY_RULE_SERVICE));
     assertThat(
         ccae,
         hasUndefinedReference(
             filename,
             PaloAltoStructureType.ZONE,
             zoneUndefName,
-            PaloAltoStructureUsage.RULE_FROM_ZONE));
+            PaloAltoStructureUsage.SECURITY_RULE_FROM_ZONE));
 
     // Confirm builtins do not show up as undefined references
     assertThat(
