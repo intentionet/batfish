@@ -30,13 +30,13 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.BGP_PE
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.IMPORT_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER2_INTERFACE_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER3_INTERFACE_ZONE;
-import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULEBASE_SERVICE;
-import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_APPLICATION;
-import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_DESTINATION;
-import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_FROM_ZONE;
-import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_SOURCE;
-import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.RULE_TO_ZONE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_APPLICATION;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_DESTINATION;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_FROM_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_SELF_REF;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_SERVICE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_SOURCE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_TO_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SERVICE_GROUP_MEMBER;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.STATIC_ROUTE_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.STATIC_ROUTE_NEXT_VR;
@@ -1835,7 +1835,7 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
       _currentSecurityRule.getApplications().add(name);
       // Use constructed object name so same-named refs across vsys are unique
       String uniqueName = computeObjectName(_currentVsys.getName(), name);
-      referenceApplicationLike(name, uniqueName, RULE_APPLICATION, var);
+      referenceApplicationLike(name, uniqueName, SECURITY_RULE_APPLICATION, var);
     }
   }
 
@@ -1861,7 +1861,8 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
         // object/group
         type = ADDRESS_LIKE;
       }
-      _configuration.referenceStructure(type, uniqueName, RULE_DESTINATION, getLine(var.start));
+      _configuration.referenceStructure(
+          type, uniqueName, SECURITY_RULE_DESTINATION, getLine(var.start));
     }
   }
 
@@ -1879,7 +1880,8 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
       if (!zoneName.equals(CATCHALL_ZONE_NAME)) {
         // Use constructed object name so same-named refs across vsys are unique
         String uniqueName = computeObjectName(_currentVsys.getName(), zoneName);
-        _configuration.referenceStructure(ZONE, uniqueName, RULE_FROM_ZONE, getLine(var.start));
+        _configuration.referenceStructure(
+            ZONE, uniqueName, SECURITY_RULE_FROM_ZONE, getLine(var.start));
       }
     }
   }
@@ -1899,7 +1901,7 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
     for (Variable_list_itemContext var : variables(ctx.variable_list())) {
       String serviceName = getText(var);
       _currentSecurityRule.getService().add(new ServiceOrServiceGroupReference(serviceName));
-      referenceService(var, RULEBASE_SERVICE);
+      referenceService(var, SECURITY_RULE_SERVICE);
     }
   }
 
@@ -1917,7 +1919,7 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
       if (endpoint.getType() == RuleEndpoint.Type.REFERENCE) {
         type = ADDRESS_LIKE;
       }
-      _configuration.referenceStructure(type, uniqueName, RULE_SOURCE, getLine(var.start));
+      _configuration.referenceStructure(type, uniqueName, SECURITY_RULE_SOURCE, getLine(var.start));
     }
   }
 
@@ -1930,7 +1932,8 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
       if (!zoneName.equals(CATCHALL_ZONE_NAME)) {
         // Use constructed object name so same-named refs across vsys are unique
         String uniqueName = computeObjectName(_currentVsys.getName(), zoneName);
-        _configuration.referenceStructure(ZONE, uniqueName, RULE_TO_ZONE, getLine(var.start));
+        _configuration.referenceStructure(
+            ZONE, uniqueName, SECURITY_RULE_TO_ZONE, getLine(var.start));
       }
     }
   }
