@@ -31,7 +31,11 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.BGP_PE
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.IMPORT_INTERFACE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER2_INTERFACE_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER3_INTERFACE_ZONE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_DESTINATION;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_FROM_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_SELF_REF;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_SOURCE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_TO_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_DESTINATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_FROM_ZONE;
@@ -229,6 +233,10 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Snsgi_interfaceContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Snsgzn_layer3Context;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Src_or_dst_list_itemContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_definitionContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_destinationContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_fromContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_sourceContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_toContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_actionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_applicationContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_definitionContext;
@@ -1807,6 +1815,72 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
   @Override
   public void exitSrn_definition(Srn_definitionContext ctx) {
     _currentNatRule = null;
+  }
+
+  @Override
+  public void exitSrn_destination(Srn_destinationContext ctx) {
+    for (Src_or_dst_list_itemContext var : ctx.src_or_dst_list().src_or_dst_list_item()) {
+      RuleEndpoint endpoint = toRuleEndpoint(var);
+      _currentNatRule.getDestination().add(endpoint);
+
+      // Use constructed object name so same-named refs across vsys are unique
+      String uniqueName = computeObjectName(_currentVsys.getName(), endpoint.getValue());
+
+      // At this time, don't know if something that looks like a constant (e.g. IP address) is a
+      // reference or not.  So mark a reference to a very permissive abstract structure type.
+      PaloAltoStructureType type = ADDRESS_LIKE_OR_NONE;
+      if (endpoint.getType() == RuleEndpoint.Type.REFERENCE) {
+        // We know this reference doesn't look like a valid constant, so it must be pointing to an
+        // object/group
+        type = ADDRESS_LIKE;
+      }
+      _configuration.referenceStructure(type, uniqueName, NAT_RULE_DESTINATION, getLine(var.start));
+    }
+  }
+
+  @Override
+  public void exitSrn_source(Srn_sourceContext ctx) {
+    for (Src_or_dst_list_itemContext var : ctx.src_or_dst_list().src_or_dst_list_item()) {
+      RuleEndpoint endpoint = toRuleEndpoint(var);
+      _currentNatRule.getSource().add(endpoint);
+      // Use constructed object name so same-named refs across vsys are unique
+      String uniqueName = computeObjectName(_currentVsys.getName(), endpoint.getValue());
+
+      // At this time, don't know if something that looks like a constant (e.g. IP address) is a
+      // reference or not.  So mark a reference to a very permissive abstract structure type.
+      PaloAltoStructureType type = ADDRESS_LIKE_OR_NONE;
+      if (endpoint.getType() == RuleEndpoint.Type.REFERENCE) {
+        type = ADDRESS_LIKE;
+      }
+      _configuration.referenceStructure(type, uniqueName, NAT_RULE_SOURCE, getLine(var.start));
+    }
+  }
+
+  @Override
+  public void exitSrn_from(Srn_fromContext ctx) {
+    for (Variable_list_itemContext var : variables(ctx.variable_list())) {
+      String zoneName = getText(var);
+      _currentNatRule.getFrom().add(zoneName);
+
+      if (!zoneName.equals(CATCHALL_ZONE_NAME)) {
+        // Use constructed object name so same-named refs across vsys are unique
+        String uniqueName = computeObjectName(_currentVsys.getName(), zoneName);
+        _configuration.referenceStructure(ZONE, uniqueName, NAT_RULE_FROM_ZONE, getLine(var.start));
+      }
+    }
+  }
+
+  @Override
+  public void exitSrn_to(Srn_toContext ctx) {
+    String zoneName = getText(ctx.zone);
+    _currentNatRule.getTo().add(zoneName);
+
+    if (!zoneName.equals(CATCHALL_ZONE_NAME)) {
+      // Use constructed object name so same-named refs across vsys are unique
+      String uniqueName = computeObjectName(_currentVsys.getName(), zoneName);
+      _configuration.referenceStructure(
+          ZONE, uniqueName, NAT_RULE_TO_ZONE, getLine(ctx.zone.start));
+    }
   }
 
   @Override

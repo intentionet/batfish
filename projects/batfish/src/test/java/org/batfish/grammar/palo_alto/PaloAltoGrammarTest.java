@@ -50,6 +50,7 @@ import static org.batfish.representation.palo_alto.PaloAltoConfiguration.PANORAM
 import static org.batfish.representation.palo_alto.PaloAltoConfiguration.SHARED_VSYS_NAME;
 import static org.batfish.representation.palo_alto.PaloAltoConfiguration.computeObjectName;
 import static org.batfish.representation.palo_alto.PaloAltoConfiguration.computeServiceGroupMemberAclName;
+import static org.batfish.representation.palo_alto.PaloAltoStructureType.ADDRESS_LIKE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.APPLICATION_GROUP_OR_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.EXTERNAL_LIST;
 import static org.batfish.representation.palo_alto.PaloAltoStructureType.INTERFACE;
@@ -86,10 +87,13 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import javax.annotation.Nonnull;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.apache.commons.lang3.SerializationUtils;
@@ -151,6 +155,7 @@ import org.batfish.representation.palo_alto.CryptoProfile;
 import org.batfish.representation.palo_alto.CryptoProfile.Type;
 import org.batfish.representation.palo_alto.IbgpPeerGroupType;
 import org.batfish.representation.palo_alto.Interface;
+import org.batfish.representation.palo_alto.NatRule;
 import org.batfish.representation.palo_alto.OspfArea;
 import org.batfish.representation.palo_alto.OspfAreaNormal;
 import org.batfish.representation.palo_alto.OspfAreaNssa;
@@ -165,6 +170,7 @@ import org.batfish.representation.palo_alto.PaloAltoStructureUsage;
 import org.batfish.representation.palo_alto.PolicyRule;
 import org.batfish.representation.palo_alto.PolicyRule.Action;
 import org.batfish.representation.palo_alto.PolicyRuleUpdateOrigin;
+import org.batfish.representation.palo_alto.RuleEndpoint;
 import org.batfish.representation.palo_alto.ServiceBuiltIn;
 import org.batfish.representation.palo_alto.StaticRoute;
 import org.batfish.representation.palo_alto.Tag;
@@ -1416,6 +1422,107 @@ public final class PaloAltoGrammarTest {
         not(
             hasUndefinedReference(
                 filename, SERVICE_OR_SERVICE_GROUP, ServiceBuiltIn.APPLICATION_DEFAULT.getName())));
+  }
+
+  @Test
+  public void testNatRulesAndReferences() throws IOException {
+    String hostname = "rulebase-nat";
+    String filename = "configs/" + hostname;
+
+    // Check VS model
+    PaloAltoConfiguration vendorConfig = parsePaloAltoConfig(hostname);
+    LinkedHashMap<String, NatRule> natRules =
+        vendorConfig.getVirtualSystems().get(DEFAULT_VSYS_NAME).getRulebase().getNatRules();
+
+    // In order of appearance
+    String rule1Name = "RULE1";
+    String rule2Name = "RULE2";
+    String rule3Name = "3rd_RULE";
+    assertThat(natRules.keySet(), contains(rule1Name, rule2Name, rule3Name));
+
+    NatRule rule1 = natRules.get(rule1Name);
+    assertThat(rule1.getTo(), contains("TO_ZONE"));
+    assertThat(rule1.getFrom(), contains("any"));
+    assertThat(
+        Iterables.getOnlyElement(rule1.getSource()).getType(), equalTo(RuleEndpoint.Type.Any));
+    assertThat(
+        Iterables.getOnlyElement(rule1.getDestination()).getType(), equalTo(RuleEndpoint.Type.Any));
+
+    NatRule rule2 = natRules.get(rule2Name);
+    assertThat(rule2.getFrom(), contains("FROM_1"));
+    assertThat(Iterables.getOnlyElement(rule2.getSource()).getValue(), equalTo("SRC_1"));
+    assertThat(Iterables.getOnlyElement(rule2.getDestination()).getValue(), equalTo("DST_1"));
+
+    NatRule rule3 = natRules.get(rule3Name);
+    assertThat(rule3.getFrom(), contains("FROM_1", "FROM_2", "FROM_3"));
+    assertThat(
+        rule3.getSource().stream()
+            .map(RuleEndpoint::getValue)
+            .collect(ImmutableList.toImmutableList()),
+        contains("SRC_1", "SRC_2", "SRC_3"));
+    assertThat(
+        rule3.getDestination().stream()
+            .map(RuleEndpoint::getValue)
+            .collect(ImmutableList.toImmutableList()),
+        contains("DST_1", "DST_2", "DST_3"));
+
+    // TODO: Test semantics after conversion
+
+    // Check referenced structures
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse();
+
+    String rule1RefName = computeObjectName(DEFAULT_VSYS_NAME, rule1Name);
+    String rule2RefName = computeObjectName(DEFAULT_VSYS_NAME, rule2Name);
+    String rule3RefName = computeObjectName(DEFAULT_VSYS_NAME, rule3Name);
+    String toZone = computeObjectName(DEFAULT_VSYS_NAME, "TO_ZONE");
+    String from1 = computeObjectName(DEFAULT_VSYS_NAME, "FROM_1");
+    String from2 = computeObjectName(DEFAULT_VSYS_NAME, "FROM_2");
+    String from3 = computeObjectName(DEFAULT_VSYS_NAME, "FROM_3");
+    String dst1 = computeObjectName(DEFAULT_VSYS_NAME, "DST_1");
+    String dst2 = computeObjectName(DEFAULT_VSYS_NAME, "DST_2");
+    String dst3 = computeObjectName(DEFAULT_VSYS_NAME, "DST_3");
+    String src1 = computeObjectName(DEFAULT_VSYS_NAME, "SRC_1");
+    String src2 = computeObjectName(DEFAULT_VSYS_NAME, "SRC_2");
+    String src3 = computeObjectName(DEFAULT_VSYS_NAME, "SRC_3");
+
+    SortedMap<String, SortedMap<String, SortedMap<String, SortedSet<Integer>>>> referencedStructs =
+        ccae.getReferencedStructures().get(filename);
+    assertThat(
+        referencedStructs.get(PaloAltoStructureType.ZONE.getDescription()).keySet(),
+        containsInAnyOrder(toZone, from1, from2, from3));
+    assertThat(
+        referencedStructs.get(ADDRESS_LIKE.getDescription()).keySet(),
+        containsInAnyOrder(src1, src2, src3, dst1, dst2, dst3));
+    assertThat(
+        referencedStructs.get(PaloAltoStructureType.NAT_RULE.getDescription()).keySet(),
+        containsInAnyOrder(rule1RefName, rule2RefName, rule3RefName));
+
+    // Zones should be marked as undefined references
+    assertThat(
+        ccae,
+        allOf(
+            hasUndefinedReference(
+                filename,
+                PaloAltoStructureType.ZONE,
+                toZone,
+                PaloAltoStructureUsage.NAT_RULE_TO_ZONE),
+            hasUndefinedReference(
+                filename,
+                PaloAltoStructureType.ZONE,
+                from1,
+                PaloAltoStructureUsage.NAT_RULE_FROM_ZONE),
+            hasUndefinedReference(
+                filename,
+                PaloAltoStructureType.ZONE,
+                from2,
+                PaloAltoStructureUsage.NAT_RULE_FROM_ZONE),
+            hasUndefinedReference(
+                filename,
+                PaloAltoStructureType.ZONE,
+                from3,
+                PaloAltoStructureUsage.NAT_RULE_FROM_ZONE)));
   }
 
   @Test

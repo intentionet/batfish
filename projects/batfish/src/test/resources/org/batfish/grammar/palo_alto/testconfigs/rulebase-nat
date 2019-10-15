@@ -1,0 +1,18 @@
+set deviceconfig system hostname rulebase-nat
+
+set rulebase nat rules RULE1 to TO_ZONE
+set rulebase nat rules RULE1 from any
+set rulebase nat rules RULE1 source any
+set rulebase nat rules RULE1 destination any
+
+set rulebase nat rules RULE2 from FROM_1
+set rulebase nat rules RULE2 source SRC_1
+set rulebase nat rules RULE2 destination DST_1
+
+# This last rule comes before the others alphabetically but should be processed last
+set rulebase nat rules 3rd_RULE from FROM_1
+set rulebase nat rules 3rd_RULE from [ FROM_2 FROM_3]
+set rulebase nat rules 3rd_RULE source SRC_1
+set rulebase nat rules 3rd_RULE source [ SRC_2 SRC_3]
+set rulebase nat rules 3rd_RULE destination DST_1
+set rulebase nat rules 3rd_RULE destination [ DST_2 DST_3]
