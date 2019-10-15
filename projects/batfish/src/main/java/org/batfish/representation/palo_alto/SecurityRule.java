@@ -12,7 +12,7 @@ import org.batfish.datamodel.LineAction;
 
 /** PAN datamodel component containing security rule configuration */
 @ParametersAreNonnullByDefault
-public final class Rule implements Serializable {
+public final class SecurityRule implements Serializable {
 
   // Name of the rule
   @Nonnull private final String _name;
@@ -42,7 +42,7 @@ public final class Rule implements Serializable {
   // Applications
   @Nonnull private final SortedSet<String> _applications;
 
-  public Rule(String name, Vsys vsys) {
+  public SecurityRule(String name, Vsys vsys) {
     _action = LineAction.DENY;
     _applications = new TreeSet<>();
     _destination = new LinkedList<>();

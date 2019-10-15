@@ -339,7 +339,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
       }
 
       // Create cross-zone ACLs for each pair of zones, including self-zone.
-      List<Map.Entry<Rule, Vsys>> rules = getAllRules(vsys);
+      List<Map.Entry<SecurityRule, Vsys>> rules = getAllRules(vsys);
       for (Zone fromZone : vsys.getZones().values()) {
         Type fromType = fromZone.getType();
         for (Zone toZone : vsys.getZones().values()) {
@@ -432,7 +432,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
 
   /** Generates a cross-zone ACL from the two given zones in the same Vsys using the given rules. */
   private IpAccessList generateCrossZoneFilter(
-      Zone fromZone, Zone toZone, List<Map.Entry<Rule, Vsys>> rules) {
+      Zone fromZone, Zone toZone, List<Map.Entry<SecurityRule, Vsys>> rules) {
     assert fromZone.getVsys() == toZone.getVsys();
 
     String crossZoneFilterName =
@@ -456,7 +456,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
         rules.stream()
             .filter(
                 e -> {
-                  Rule rule = e.getKey();
+                  SecurityRule rule = e.getKey();
                   if (rule.getDisabled()) {
                     return false;
                   } else if (Sets.intersection(
@@ -484,18 +484,18 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
   }
 
   /** Collects the rules from this Vsys and merges the common pre-/post-rulebases from Panorama. */
-  private List<Map.Entry<Rule, Vsys>> getAllRules(Vsys vsys) {
-    Stream<Map.Entry<Rule, Vsys>> pre =
+  private List<Map.Entry<SecurityRule, Vsys>> getAllRules(Vsys vsys) {
+    Stream<Map.Entry<SecurityRule, Vsys>> pre =
         _panorama == null
             ? Stream.of()
             : _panorama.getPreRules().values().stream()
                 .map(r -> new SimpleImmutableEntry<>(r, _panorama));
-    Stream<Map.Entry<Rule, Vsys>> post =
+    Stream<Map.Entry<SecurityRule, Vsys>> post =
         _panorama == null
             ? Stream.of()
             : _panorama.getPostRules().values().stream()
                 .map(r -> new SimpleImmutableEntry<>(r, _panorama));
-    Stream<Map.Entry<Rule, Vsys>> rules =
+    Stream<Map.Entry<SecurityRule, Vsys>> rules =
         vsys.getRules().values().stream().map(r -> new SimpleImmutableEntry<>(r, vsys));
 
     return Stream.concat(Stream.concat(pre, rules), post).collect(ImmutableList.toImmutableList());
@@ -783,7 +783,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
   // constraints, and service (aka Protocol + Ports) constraints.
   //   However, services are a bit complicated when `service application-default` is used. In that
   //   case, we extract service definitions from the application that matches.
-  private IpAccessListLine toIpAccessListLine(Rule rule, Vsys vsys) {
+  private IpAccessListLine toIpAccessListLine(SecurityRule rule, Vsys vsys) {
     assert !rule.getDisabled(); // handled by caller.
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -829,7 +829,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
    * Returns an expression describing the protocol/port combinations permitted by this rule, or
    * {@link Optional#empty()} if all are allowed.
    */
-  private Optional<AclLineMatchExpr> getServiceExpr(Rule rule, Vsys vsys) {
+  private Optional<AclLineMatchExpr> getServiceExpr(SecurityRule rule, Vsys vsys) {
     SortedSet<ServiceOrServiceGroupReference> services = rule.getService();
     if (services.isEmpty()) {
       // No filtering.
@@ -867,7 +867,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     return Optional.of(new OrMatchExpr(serviceDisjuncts));
   }
 
-  private List<AclLineMatchExpr> matchApplications(Rule rule, Vsys vsys) {
+  private List<AclLineMatchExpr> matchApplications(SecurityRule rule, Vsys vsys) {
     ImmutableList.Builder<AclLineMatchExpr> ret = ImmutableList.builder();
     Queue<String> applications = new LinkedBlockingQueue<>(rule.getApplications());
     while (!applications.isEmpty()) {
@@ -1492,7 +1492,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     markConcreteStructure(PaloAltoStructureType.IKE_CRYPTO_PROFILE);
     markConcreteStructure(PaloAltoStructureType.IPSEC_CRYPTO_PROFILE);
     markConcreteStructure(PaloAltoStructureType.INTERFACE);
-    markConcreteStructure(PaloAltoStructureType.RULE);
+    markConcreteStructure(PaloAltoStructureType.SECURITY_RULE);
     markConcreteStructure(PaloAltoStructureType.ZONE);
     markConcreteStructure(PaloAltoStructureType.VIRTUAL_ROUTER);
 
