@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
+/** Represents a rulebase within a {@link Vsys} or in panorama policy */
 public class Rulebase implements Serializable {
 
   // Note: these are LinkedHashMaps to preserve insertion order.
