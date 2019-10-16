@@ -90,7 +90,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -1431,7 +1430,7 @@ public final class PaloAltoGrammarTest {
 
     // Check VS model
     PaloAltoConfiguration vendorConfig = parsePaloAltoConfig(hostname);
-    LinkedHashMap<String, NatRule> natRules =
+    Map<String, NatRule> natRules =
         vendorConfig.getVirtualSystems().get(DEFAULT_VSYS_NAME).getRulebase().getNatRules();
 
     // In order of appearance

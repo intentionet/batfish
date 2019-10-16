@@ -2,6 +2,7 @@ package org.batfish.representation.palo_alto;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -9,8 +10,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class Rulebase implements Serializable {
 
   // Note: these are LinkedHashMaps to preserve insertion order.
-  @Nonnull private final LinkedHashMap<String, NatRule> _natRules;
-  @Nonnull private final LinkedHashMap<String, SecurityRule> _securityRules;
+  @Nonnull private final Map<String, NatRule> _natRules;
+  @Nonnull private final Map<String, SecurityRule> _securityRules;
 
   public Rulebase() {
     _natRules = new LinkedHashMap<>();
@@ -18,12 +19,12 @@ public class Rulebase implements Serializable {
   }
 
   @Nonnull
-  public LinkedHashMap<String, NatRule> getNatRules() {
+  public Map<String, NatRule> getNatRules() {
     return _natRules;
   }
 
   @Nonnull
-  public LinkedHashMap<String, SecurityRule> getSecurityRules() {
+  public Map<String, SecurityRule> getSecurityRules() {
     return _securityRules;
   }
 }
