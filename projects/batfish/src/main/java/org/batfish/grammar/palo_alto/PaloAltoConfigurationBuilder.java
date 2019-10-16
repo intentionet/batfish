@@ -32,9 +32,11 @@ import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.IMPORT
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER2_INTERFACE_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.LAYER3_INTERFACE_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_DESTINATION;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_DESTINATION_TRANSLATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_FROM_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_SELF_REF;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_SOURCE;
+import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_SOURCE_TRANSLATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.NAT_RULE_TO_ZONE;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_APPLICATION;
 import static org.batfish.representation.palo_alto.PaloAltoStructureUsage.SECURITY_RULE_DESTINATION;
@@ -234,8 +236,10 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Snsgzn_layer3Context;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Src_or_dst_list_itemContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_definitionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_destinationContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_destination_translationContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_fromContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_sourceContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_source_translationContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srn_toContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_actionContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Srs_applicationContext;
@@ -262,6 +266,7 @@ import org.batfish.grammar.palo_alto.PaloAltoParser.Szn_layer2Context;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Szn_layer3Context;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Szn_tapContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Szn_virtual_wireContext;
+import org.batfish.grammar.palo_alto.PaloAltoParser.Translated_address_list_itemContext;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Uint16Context;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Uint32Context;
 import org.batfish.grammar.palo_alto.PaloAltoParser.Uint8Context;
@@ -303,6 +308,8 @@ import org.batfish.representation.palo_alto.BgpVr;
 import org.batfish.representation.palo_alto.BgpVrRoutingOptions.AsFormat;
 import org.batfish.representation.palo_alto.CryptoProfile;
 import org.batfish.representation.palo_alto.CryptoProfile.Type;
+import org.batfish.representation.palo_alto.DestinationTranslation;
+import org.batfish.representation.palo_alto.DynamicIpAndPort;
 import org.batfish.representation.palo_alto.Interface;
 import org.batfish.representation.palo_alto.NatRule;
 import org.batfish.representation.palo_alto.OspfArea;
@@ -328,6 +335,7 @@ import org.batfish.representation.palo_alto.Service;
 import org.batfish.representation.palo_alto.ServiceBuiltIn;
 import org.batfish.representation.palo_alto.ServiceGroup;
 import org.batfish.representation.palo_alto.ServiceOrServiceGroupReference;
+import org.batfish.representation.palo_alto.SourceTranslation;
 import org.batfish.representation.palo_alto.StaticRoute;
 import org.batfish.representation.palo_alto.SyslogServer;
 import org.batfish.representation.palo_alto.Tag;
@@ -537,6 +545,19 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
     if (ctx.any != null) {
       return new RuleEndpoint(RuleEndpoint.Type.Any, text);
     } else if (ctx.address != null) {
+      return new RuleEndpoint(RuleEndpoint.Type.IP_ADDRESS, text);
+    } else if (ctx.prefix != null) {
+      return new RuleEndpoint(RuleEndpoint.Type.IP_PREFIX, text);
+    } else if (ctx.range != null) {
+      return new RuleEndpoint(RuleEndpoint.Type.IP_RANGE, text);
+    }
+    return new RuleEndpoint(RuleEndpoint.Type.REFERENCE, text);
+  }
+
+  /** Convert translated-address list item into an appropriate IpSpace */
+  private RuleEndpoint toRuleEndpoint(Translated_address_list_itemContext ctx) {
+    String text = getText(ctx);
+    if (ctx.address != null) {
       return new RuleEndpoint(RuleEndpoint.Type.IP_ADDRESS, text);
     } else if (ctx.prefix != null) {
       return new RuleEndpoint(RuleEndpoint.Type.IP_PREFIX, text);
@@ -1815,6 +1836,69 @@ public class PaloAltoConfigurationBuilder extends PaloAltoParserBaseListener {
   @Override
   public void exitSrn_definition(Srn_definitionContext ctx) {
     _currentNatRule = null;
+  }
+
+  @Override
+  public void exitSrn_destination_translation(Srn_destination_translationContext ctx) {
+    if (ctx.srndt_translated_address() == null
+        || ctx.srndt_translated_address().translated_address_list_item() == null) {
+      return;
+    }
+    RuleEndpoint translatedAddress =
+        toRuleEndpoint(ctx.srndt_translated_address().translated_address_list_item());
+    _currentNatRule.setDestinationTranslation(new DestinationTranslation(translatedAddress));
+
+    // Add reference
+    String uniqueName = computeObjectName(_currentVsys.getName(), translatedAddress.getValue());
+    // At this time, don't know if something that looks like a constant (e.g. IP address) is a
+    // reference or not.  So mark a reference to a very permissive abstract structure type.
+    PaloAltoStructureType type = ADDRESS_LIKE_OR_NONE;
+    if (translatedAddress.getType() == RuleEndpoint.Type.REFERENCE) {
+      // We know this reference doesn't look like a valid constant, so it must be pointing to an
+      // object/group
+      type = ADDRESS_LIKE;
+    }
+    _configuration.referenceStructure(
+        type, uniqueName, NAT_RULE_DESTINATION_TRANSLATION, getLine(ctx.start));
+  }
+
+  @Override
+  public void exitSrn_source_translation(Srn_source_translationContext ctx) {
+    if (ctx.srnst_dynamic_ip_and_port() == null
+        || ctx.srnst_dynamic_ip_and_port().srnst_translated_address() == null) {
+      return;
+    }
+    SourceTranslation sourceTranslation = _currentNatRule.getSourceTranslation();
+    if (sourceTranslation == null) {
+      sourceTranslation = new SourceTranslation();
+      _currentNatRule.setSourceTranslation(sourceTranslation);
+    }
+    DynamicIpAndPort dynamicIpAndPort = sourceTranslation.getDynamicIpAndPort();
+    if (dynamicIpAndPort == null) {
+      dynamicIpAndPort = new DynamicIpAndPort();
+      sourceTranslation.setDynamicIpAndPort(dynamicIpAndPort);
+    }
+    for (Translated_address_list_itemContext var :
+        ctx.srnst_dynamic_ip_and_port()
+            .srnst_translated_address()
+            .translated_address_list()
+            .translated_address_list_item()) {
+      RuleEndpoint translatedAddress = toRuleEndpoint(var);
+      dynamicIpAndPort.addTranslatedAddress(translatedAddress);
+
+      // Add reference
+      String uniqueName = computeObjectName(_currentVsys.getName(), translatedAddress.getValue());
+      // At this time, don't know if something that looks like a constant (e.g. IP address) is a
+      // reference or not.  So mark a reference to a very permissive abstract structure type.
+      PaloAltoStructureType type = ADDRESS_LIKE_OR_NONE;
+      if (translatedAddress.getType() == RuleEndpoint.Type.REFERENCE) {
+        // We know this reference doesn't look like a valid constant, so it must be pointing to an
+        // object/group
+        type = ADDRESS_LIKE;
+      }
+      _configuration.referenceStructure(
+          type, uniqueName, NAT_RULE_SOURCE_TRANSLATION, getLine(var.start));
+    }
   }
 
   @Override

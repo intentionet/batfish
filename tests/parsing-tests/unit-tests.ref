@@ -90223,6 +90223,11 @@
         },
         "configs/palo_alto/nat" : {
           "address-like" : {
+            "ADDR1~panorama" : {
+              "rulebase nat rules source-translation" : [
+                40
+              ]
+            },
             "DST_1~panorama" : {
               "rulebase nat rules destination" : [
                 45
@@ -90231,6 +90236,11 @@
             "DST_2~panorama" : {
               "rulebase nat rules destination" : [
                 45
+              ]
+            },
+            "DST_ADDRESS_NAME~panorama" : {
+              "rulebase nat rules destination-translation" : [
+                19
               ]
             },
             "DST_NAME~panorama" : {
@@ -90248,6 +90258,11 @@
                 44
               ]
             },
+            "SRC_ADDRESS_NAME~panorama" : {
+              "rulebase nat rules source-translation" : [
+                24
+              ]
+            },
             "SRC_NAME~panorama" : {
               "rulebase nat rules source" : [
                 34
@@ -90255,6 +90270,21 @@
             }
           },
           "address-like or none" : {
+            "1.1.1.1~panorama" : {
+              "rulebase nat rules source-translation" : [
+                40
+              ]
+            },
+            "2.2.2.0/24~panorama" : {
+              "rulebase nat rules source-translation" : [
+                40
+              ]
+            },
+            "3.3.3.3-4.4.4.4~panorama" : {
+              "rulebase nat rules source-translation" : [
+                40
+              ]
+            },
             "any~panorama" : {
               "rulebase nat rules destination" : [
                 30

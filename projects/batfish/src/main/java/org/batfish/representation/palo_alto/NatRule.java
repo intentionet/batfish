@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /** PAN NAT rule configuration */
 public final class NatRule implements Serializable {
@@ -21,6 +22,10 @@ public final class NatRule implements Serializable {
   @Nonnull private final List<RuleEndpoint> _source;
   @Nonnull private final List<RuleEndpoint> _destination;
 
+  // Translations
+  @Nullable private SourceTranslation _sourceTranslation;
+  @Nullable private DestinationTranslation _destinationTranslation;
+
   public NatRule(String name) {
     _name = name;
     _from = new TreeSet<>();
@@ -32,6 +37,11 @@ public final class NatRule implements Serializable {
   @Nonnull
   public List<RuleEndpoint> getDestination() {
     return _destination;
+  }
+
+  @Nullable
+  public DestinationTranslation getDestinationTranslation() {
+    return _destinationTranslation;
   }
 
   @Nonnull
@@ -49,8 +59,21 @@ public final class NatRule implements Serializable {
     return _source;
   }
 
+  @Nullable
+  public SourceTranslation getSourceTranslation() {
+    return _sourceTranslation;
+  }
+
   @Nonnull
   public SortedSet<String> getTo() {
     return _to;
+  }
+
+  public void setDestinationTranslation(DestinationTranslation destinationTranslation) {
+    _destinationTranslation = destinationTranslation;
+  }
+
+  public void setSourceTranslation(SourceTranslation sourceTranslation) {
+    _sourceTranslation = sourceTranslation;
   }
 }
