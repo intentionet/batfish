@@ -83800,7 +83800,46 @@
             }
           }
         },
-        "configs/palo_alto/nat" : { },
+        "configs/palo_alto/nat" : {
+          "nat rule" : {
+            "RULE_1~panorama" : {
+              "definitionLines" : [
+                18,
+                19,
+                20,
+                22,
+                23,
+                24,
+                27,
+                28,
+                29,
+                30
+              ],
+              "numReferrers" : 0
+            },
+            "RULE_2~panorama" : {
+              "definitionLines" : [
+                32,
+                33,
+                34,
+                35
+              ],
+              "numReferrers" : 0
+            },
+            "RULE_3~panorama" : {
+              "definitionLines" : [
+                37,
+                38,
+                39,
+                40,
+                43,
+                44,
+                45
+              ],
+              "numReferrers" : 0
+            }
+          }
+        },
         "configs/palo_alto/policy" : {
           "address object" : {
             "rfc1918_10~panorama" : {
@@ -90182,6 +90221,89 @@
             }
           }
         },
+        "configs/palo_alto/nat" : {
+          "address-like" : {
+            "DST_1~panorama" : {
+              "rulebase nat rules destination" : [
+                45
+              ]
+            },
+            "DST_2~panorama" : {
+              "rulebase nat rules destination" : [
+                45
+              ]
+            },
+            "DST_NAME~panorama" : {
+              "rulebase nat rules destination" : [
+                35
+              ]
+            },
+            "SRC_1~panorama" : {
+              "rulebase nat rules source" : [
+                44
+              ]
+            },
+            "SRC_2~panorama" : {
+              "rulebase nat rules source" : [
+                44
+              ]
+            },
+            "SRC_NAME~panorama" : {
+              "rulebase nat rules source" : [
+                34
+              ]
+            }
+          },
+          "address-like or none" : {
+            "any~panorama" : {
+              "rulebase nat rules destination" : [
+                30
+              ],
+              "rulebase nat rules source" : [
+                29
+              ]
+            }
+          },
+          "nat rule" : {
+            "RULE_1~panorama" : {
+              "rulebase nat rules" : [
+                18
+              ]
+            },
+            "RULE_2~panorama" : {
+              "rulebase nat rules" : [
+                32
+              ]
+            },
+            "RULE_3~panorama" : {
+              "rulebase nat rules" : [
+                37
+              ]
+            }
+          },
+          "zone" : {
+            "FROM_1~panorama" : {
+              "rulebase nat rules from" : [
+                43
+              ]
+            },
+            "FROM_2~panorama" : {
+              "rulebase nat rules from" : [
+                43
+              ]
+            },
+            "FROM_ZONE~panorama" : {
+              "rulebase nat rules from" : [
+                33
+              ]
+            },
+            "TO_ZONE~panorama" : {
+              "rulebase nat rules to" : [
+                27
+              ]
+            }
+          }
+        },
         "configs/palo_alto/virtual-routers" : {
           "interface" : {
             "dummy" : {
@@ -92446,6 +92568,30 @@
             "jumbo" : {
               "system qos service-policy type network-qos" : [
                 11
+              ]
+            }
+          }
+        },
+        "configs/palo_alto/nat" : {
+          "zone" : {
+            "FROM_1~panorama" : {
+              "rulebase nat rules from" : [
+                43
+              ]
+            },
+            "FROM_2~panorama" : {
+              "rulebase nat rules from" : [
+                43
+              ]
+            },
+            "FROM_ZONE~panorama" : {
+              "rulebase nat rules from" : [
+                33
+              ]
+            },
+            "TO_ZONE~panorama" : {
+              "rulebase nat rules to" : [
+                27
               ]
             }
           }

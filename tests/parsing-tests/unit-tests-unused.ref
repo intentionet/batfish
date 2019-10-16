@@ -3489,6 +3489,54 @@
         }
       },
       {
+        "Structure_Type" : "nat rule",
+        "Structure_Name" : "RULE_1~panorama",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/nat",
+          "lines" : [
+            18,
+            19,
+            20,
+            22,
+            23,
+            24,
+            27,
+            28,
+            29,
+            30
+          ]
+        }
+      },
+      {
+        "Structure_Type" : "nat rule",
+        "Structure_Name" : "RULE_2~panorama",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/nat",
+          "lines" : [
+            32,
+            33,
+            34,
+            35
+          ]
+        }
+      },
+      {
+        "Structure_Type" : "nat rule",
+        "Structure_Name" : "RULE_3~panorama",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/nat",
+          "lines" : [
+            37,
+            38,
+            39,
+            40,
+            43,
+            44,
+            45
+          ]
+        }
+      },
+      {
         "Structure_Type" : "address object",
         "Structure_Name" : "rfc1918_10~panorama",
         "Source_Lines" : {
@@ -3741,10 +3789,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 252 results",
+      "notes" : "Found 255 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 252
+      "numResults" : 255
     }
   }
 ]
