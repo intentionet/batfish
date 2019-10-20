@@ -114,6 +114,7 @@ import org.batfish.datamodel.packet_policy.IngressInterfaceVrf;
 import org.batfish.datamodel.packet_policy.PacketMatchExpr;
 import org.batfish.datamodel.packet_policy.PacketPolicy;
 import org.batfish.datamodel.packet_policy.Return;
+import org.batfish.datamodel.packet_policy.Statement;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.transformation.AssignIpAddressFromPool;
 import org.batfish.datamodel.transformation.IpField;
@@ -430,29 +431,32 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
 
     getAllNatRules(vsys)
         // This method is run once and goes through all NAT rules. File invalid rule warnings here.
-        .filter(r -> checkNatRuleValid(r, true) && r.doesSourceTranslation())
+        .filter(r -> checkNatRuleValid(r, true))
         .forEach(
             r -> {
-              RangeSet<Ip> pool =
-                  ipRangeSetFromRuleEndpoints(
-                      // Already filtered out any rules for which these are null
-                      r.getSourceTranslation().getDynamicIpAndPort().getTranslatedAddresses(),
-                      vsys,
-                      _w);
-              if (pool.isEmpty()) {
-                // Can't have source IP translation rules with empty IP pool
-                _w.redFlag(
-                    String.format(
-                        "NAT rule %s ignored for source translation because its source translation pool is empty",
-                        r.getName()));
-                return;
+              Transformation.Builder t = Transformation.when(getSourceNatRuleMatchExpr(r, vsys));
+              List<RuleEndpoint> translatedAddrs =
+                  Optional.ofNullable(r.getSourceTranslation())
+                      .map(SourceTranslation::getDynamicIpAndPort)
+                      .map(DynamicIpAndPort::getTranslatedAddresses)
+                      .orElse(null);
+              if (translatedAddrs != null) {
+                // This rule applies a source transformation. Collect the translated IP pool.
+                RangeSet<Ip> pool = ipRangeSetFromRuleEndpoints(translatedAddrs, vsys, _w);
+                if (pool.isEmpty()) {
+                  // Can't apply a source IP translation with empty IP pool
+                  // TODO: Check real behavior in this scenario
+                  _w.redFlag(
+                      String.format(
+                          "NAT rule %s ignored for source translation because its source translation pool is empty",
+                          r.getName()));
+                } else {
+                  t.apply(
+                      new AssignIpAddressFromPool(
+                          TransformationType.SOURCE_NAT, IpField.SOURCE, pool),
+                      transformPort);
+                }
               }
-              Transformation.Builder t =
-                  Transformation.when(getSourceNatRuleMatchExpr(r, vsys))
-                      .apply(
-                          new AssignIpAddressFromPool(
-                              TransformationType.SOURCE_NAT, IpField.SOURCE, pool),
-                          transformPort);
               // Note that "to any" is not permitted
               toZoneTransformations.computeIfAbsent(r.getTo(), x -> new ArrayList<>()).add(t);
             });
@@ -1300,7 +1304,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
               .map(DestinationTranslation::getTranslatedAddress)
               .orElse(null);
       Zone toZone = vsys.getZones().get(rule.getTo());
-      if (translatedAddress == null || toZone == null) {
+      if (toZone == null) {
         continue;
       }
 
@@ -1313,25 +1317,34 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
               new FibLookupOutgoingInterfaceIsOneOf(
                   IngressInterfaceVrf.instance(), toZone.getInterfaceNames()));
 
-      // Actual dest NAT transformation
-      Transformation transform =
-          new Transformation(
-              // No need to guard since packet policy already encodes this rule's match conditions
-              TrueExpr.INSTANCE,
-              ImmutableList.of(
-                  new AssignIpAddressFromPool(
-                      TransformationType.DEST_NAT,
-                      IpField.DESTINATION,
-                      ruleEndpointToIpRangeSet(translatedAddress, vsys, _w))),
-              null,
-              null);
+      List<Statement> actionsIfMatched = new ArrayList<>();
+      if (translatedAddress != null) {
+        // Rule applies a destination translation. Add dest NAT transformation to actions if matched
+        RangeSet<Ip> pool = ruleEndpointToIpRangeSet(translatedAddress, vsys, _w);
+        if (pool.isEmpty()) {
+          // Can't apply a dest IP translation with empty IP pool
+          // TODO: Check real behavior in this scenario
+          _w.redFlag(
+              String.format(
+                  "NAT rule %s ignored for destination translation because its destination translation pool is empty",
+                  rule.getName()));
+        } else {
+          Transformation transform =
+              new Transformation(
+                  // No need to guard: packet policy already encodes this rule's match conditions
+                  TrueExpr.INSTANCE,
+                  ImmutableList.of(
+                      new AssignIpAddressFromPool(
+                          TransformationType.DEST_NAT, IpField.DESTINATION, pool)),
+                  null,
+                  null);
+          actionsIfMatched.add(new ApplyTransformation(transform));
+        }
+      }
 
-      lines.add(
-          new org.batfish.datamodel.packet_policy.If(
-              condition,
-              ImmutableList.of(
-                  new ApplyTransformation(transform),
-                  new Return(new FibLookup(IngressInterfaceVrf.instance())))));
+      // Always do a FIB lookup and return if matched
+      actionsIfMatched.add(new Return(new FibLookup(IngressInterfaceVrf.instance())));
+      lines.add(new org.batfish.datamodel.packet_policy.If(condition, actionsIfMatched));
     }
     return new PacketPolicy(
         name, lines.build(), new Return(new FibLookup(IngressInterfaceVrf.instance())));

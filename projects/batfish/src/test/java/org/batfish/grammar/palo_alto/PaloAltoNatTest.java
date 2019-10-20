@@ -399,4 +399,71 @@ public class PaloAltoNatTest {
     // Confirm the dst IP was rewritten by the post-rulebase rule
     assertThat(postRulebaseDetail.getTransformedFlow().getDstIp(), equalTo(Ip.parse("1.1.1.101")));
   }
+
+  @Test
+  public void testNatNoopRules() throws IOException {
+    /*
+    Setup: 4 NAT rules
+    - First rule matches src 1.1.1.2, does nothing
+    - Second rule matches src 1.1.1.2/30, translates source only
+    - Third rule matches src 1.1.1.2/28, translates dest only
+    Only one NAT rule should be applied to each flow.
+     */
+    Configuration c = parseConfig("nat-match-noop-rules");
+    Batfish batfish = getBatfish(ImmutableSortedMap.of(c.getHostname(), c), _folder);
+    batfish.computeDataPlane();
+    String ingressIfaceName = "ethernet1/1.1"; // 1.1.1.3/24
+
+    // Create flows to match each rule
+    Ip dstIp = Ip.parse("1.2.1.2");
+    Ip matchNoopSrcIp = Ip.parse("1.1.1.2");
+    Ip matchSrcTransRuleIp = Ip.parse("1.1.1.3");
+    Ip matchDstTransRuleIp = Ip.parse("1.1.1.6");
+    Flow.Builder flowBuilder =
+        Flow.builder()
+            .setTag("test")
+            .setIngressNode(c.getHostname())
+            .setIngressInterface(ingressIfaceName)
+            .setDstIp(dstIp)
+            .setSrcPort(111)
+            .setDstPort(222)
+            .setIpProtocol(IpProtocol.TCP);
+    Flow matchesNoopRule = flowBuilder.setSrcIp(matchNoopSrcIp).build();
+    Flow matchesSrcTranslationRule = flowBuilder.setSrcIp(matchSrcTransRuleIp).build();
+    Flow matchesDstTranslationRule = flowBuilder.setSrcIp(matchDstTransRuleIp).build();
+
+    SortedMap<Flow, List<Trace>> traces =
+        batfish
+            .getTracerouteEngine()
+            .computeTraces(
+                ImmutableSet.of(
+                    matchesNoopRule,
+                    matchesSrcTranslationRule,
+                    matchesDstTranslationRule),
+                false);
+
+    // All translated IPs will match these translated addresses
+    Ip newSrcIp = Ip.parse("1.1.1.99");
+    Ip newDstIp = Ip.parse("1.2.1.99");
+
+    // First flow should not be NAT'd, should not get past security rules
+    assertFalse( traces.get(matchesNoopRule).get(0).getDisposition().isSuccessful());
+
+    // Second flow should have only its source IP translated
+    Trace matchSrcTranslation = traces.get(matchesSrcTranslationRule).get(0);
+    ExitOutputIfaceStepDetail matchSrcTranslationDetail =
+        (ExitOutputIfaceStepDetail)
+            Iterables.getLast(matchSrcTranslation.getHops().get(0).getSteps()).getDetail();
+    assertThat(matchSrcTranslationDetail.getTransformedFlow().getSrcIp(), equalTo(newSrcIp));
+    assertThat(matchSrcTranslationDetail.getTransformedFlow().getDstIp(), equalTo(dstIp));
+
+    // Third flow should have only its dest IP translated
+    Trace matchDstTranslation = traces.get(matchesDstTranslationRule).get(0);
+    ExitOutputIfaceStepDetail matchDstTranslationDetail =
+        (ExitOutputIfaceStepDetail)
+            Iterables.getLast(matchDstTranslation.getHops().get(0).getSteps()).getDetail();
+    assertThat(
+        matchDstTranslationDetail.getTransformedFlow().getSrcIp(), equalTo(matchDstTransRuleIp));
+    assertThat(matchDstTranslationDetail.getTransformedFlow().getDstIp(), equalTo(newDstIp));
+  }
 }
