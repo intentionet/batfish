@@ -93511,22 +93511,6 @@
           "Red flags" : [
             {
               "tag" : "MISCELLANEOUS",
-              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=SRC_1}"
-            },
-            {
-              "tag" : "MISCELLANEOUS",
-              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=SRC_2}"
-            },
-            {
-              "tag" : "MISCELLANEOUS",
-              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=DST_1}"
-            },
-            {
-              "tag" : "MISCELLANEOUS",
-              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=DST_2}"
-            },
-            {
-              "tag" : "MISCELLANEOUS",
               "text" : "NAT rule MISSING_TO ignored because it has no to zone configured"
             },
             {

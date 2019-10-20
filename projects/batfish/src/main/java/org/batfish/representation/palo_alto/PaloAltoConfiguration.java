@@ -1101,8 +1101,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
             String[] ips = endpointValue.split("-");
             return IpRange.range(Ip.parse(ips[0]), Ip.parse(ips[1]));
           case REFERENCE:
-            // Undefined reference
-            w.redFlag("No matching address group/object found for RuleEndpoint: " + endpoint);
+            // Rely on undefined references to surface this issue (endpoint reference not defined)
             return EmptyIpSpace.INSTANCE;
           default:
             w.redFlag("Could not convert RuleEndpoint to IpSpace: " + endpoint);
