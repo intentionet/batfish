@@ -71803,6 +71803,28 @@
             "                  (srn_definition",
             "                    name = (variable",
             "                      VARIABLE:'RULE_2')",
+            "                    (srn_to",
+            "                      TO:'to'",
+            "                      zone = (variable",
+            "                        VARIABLE:'TO_ZONE'))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'RULE_2')",
             "                    (srn_from",
             "                      FROM:'from'",
             "                      (variable_list",
@@ -71856,6 +71878,28 @@
             "                        (src_or_dst_list_item",
             "                          name = (variable",
             "                            VARIABLE:'DST_NAME'))))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'RULE_3')",
+            "                    (srn_to",
+            "                      TO:'to'",
+            "                      zone = (variable",
+            "                        VARIABLE:'TO_ZONE'))))))))))",
             "    NEWLINE:'\\n')",
             "  (set_line",
             "    SET:'set'",
@@ -72108,6 +72152,160 @@
             "                        (src_or_dst_list_item",
             "                          name = (variable",
             "                            VARIABLE:'DST_2'))))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'MISSING_TO')))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'MISSING_FROM')",
+            "                    (srn_to",
+            "                      TO:'to'",
+            "                      zone = (variable",
+            "                        VARIABLE:'TO_ZONE'))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'MISSING_SOURCE')",
+            "                    (srn_to",
+            "                      TO:'to'",
+            "                      zone = (variable",
+            "                        VARIABLE:'TO_ZONE'))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'MISSING_SOURCE')",
+            "                    (srn_from",
+            "                      FROM:'from'",
+            "                      (variable_list",
+            "                        (variable_list_item",
+            "                          VARIABLE:'FROM_ZONE')))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'MISSING_DESTINATION')",
+            "                    (srn_to",
+            "                      TO:'to'",
+            "                      zone = (variable",
+            "                        VARIABLE:'TO_ZONE'))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'MISSING_DESTINATION')",
+            "                    (srn_from",
+            "                      FROM:'from'",
+            "                      (variable_list",
+            "                        (variable_list_item",
+            "                          VARIABLE:'FROM_ZONE')))))))))))",
+            "    NEWLINE:'\\n')",
+            "  (set_line",
+            "    SET:'set'",
+            "    (set_line_tail",
+            "      (s_policy",
+            "        POLICY:'policy'",
+            "        (s_policy_panorama",
+            "          PANORAMA:'panorama'",
+            "          (panorama_post_rulebase",
+            "            POST_RULEBASE:'post-rulebase'",
+            "            (rulebase_inner",
+            "              (sr_nat",
+            "                NAT:'nat'",
+            "                (sr_nat_rules",
+            "                  RULES:'rules'",
+            "                  (srn_definition",
+            "                    name = (variable",
+            "                      VARIABLE:'MISSING_DESTINATION')",
+            "                    (srn_source",
+            "                      SOURCE:'source'",
+            "                      (src_or_dst_list",
+            "                        (src_or_dst_list_item",
+            "                          name = (variable",
+            "                            VARIABLE:'SRC_NAME'))))))))))))",
             "    NEWLINE:'\\n')",
             "  EOF:<EOF>)"
           ]
@@ -76468,7 +76666,7 @@
         "palo_alto_virtual_routers" : "PASSED",
         "paloalto_applications" : "PASSED",
         "paloalto_interfaces" : "WARNINGS",
-        "paloalto_nat" : "PASSED",
+        "paloalto_nat" : "WARNINGS",
         "paloalto_policy" : "PASSED",
         "paloalto_zones" : "PASSED",
         "pim" : "PASSED",
@@ -83800,6 +83998,36 @@
         },
         "configs/palo_alto/nat" : {
           "nat rule" : {
+            "MISSING_DESTINATION~panorama" : {
+              "definitionLines" : [
+                57,
+                58,
+                59,
+                60
+              ],
+              "numReferrers" : 0
+            },
+            "MISSING_FROM~panorama" : {
+              "definitionLines" : [
+                50,
+                51
+              ],
+              "numReferrers" : 0
+            },
+            "MISSING_SOURCE~panorama" : {
+              "definitionLines" : [
+                53,
+                54,
+                55
+              ],
+              "numReferrers" : 0
+            },
+            "MISSING_TO~panorama" : {
+              "definitionLines" : [
+                49
+              ],
+              "numReferrers" : 0
+            },
             "RULE_1~panorama" : {
               "definitionLines" : [
                 18,
@@ -83820,19 +84048,21 @@
                 32,
                 33,
                 34,
-                35
+                35,
+                36
               ],
               "numReferrers" : 0
             },
             "RULE_3~panorama" : {
               "definitionLines" : [
-                37,
                 38,
                 39,
                 40,
-                43,
-                44,
-                45
+                41,
+                42,
+                45,
+                46,
+                47
               ],
               "numReferrers" : 0
             }
@@ -90223,37 +90453,38 @@
           "address-like" : {
             "ADDR1~panorama" : {
               "rulebase nat rules source-translation" : [
-                40
+                42
               ]
             },
             "DST_1~panorama" : {
               "rulebase nat rules destination" : [
-                45
+                47
               ]
             },
             "DST_2~panorama" : {
               "rulebase nat rules destination" : [
-                45
+                47
               ]
             },
             "DST_NAME~panorama" : {
               "rulebase nat rules destination" : [
-                35
+                36
               ]
             },
             "SRC_1~panorama" : {
               "rulebase nat rules source" : [
-                44
+                46
               ]
             },
             "SRC_2~panorama" : {
               "rulebase nat rules source" : [
-                44
+                46
               ]
             },
             "SRC_NAME~panorama" : {
               "rulebase nat rules source" : [
-                34
+                35,
+                60
               ]
             }
           },
@@ -90265,18 +90496,18 @@
             },
             "1.1.1.1~panorama" : {
               "rulebase nat rules source-translation" : [
-                40
+                42
               ]
             },
             "2.2.2.0/24~panorama" : {
               "rulebase nat rules source-translation" : [
                 24,
-                40
+                42
               ]
             },
             "3.3.3.3-4.4.4.4~panorama" : {
               "rulebase nat rules source-translation" : [
-                40
+                42
               ]
             },
             "any~panorama" : {
@@ -90289,6 +90520,26 @@
             }
           },
           "nat rule" : {
+            "MISSING_DESTINATION~panorama" : {
+              "rulebase nat rules" : [
+                57
+              ]
+            },
+            "MISSING_FROM~panorama" : {
+              "rulebase nat rules" : [
+                50
+              ]
+            },
+            "MISSING_SOURCE~panorama" : {
+              "rulebase nat rules" : [
+                53
+              ]
+            },
+            "MISSING_TO~panorama" : {
+              "rulebase nat rules" : [
+                49
+              ]
+            },
             "RULE_1~panorama" : {
               "rulebase nat rules" : [
                 18
@@ -90301,29 +90552,36 @@
             },
             "RULE_3~panorama" : {
               "rulebase nat rules" : [
-                37
+                38
               ]
             }
           },
           "zone" : {
             "FROM_1~panorama" : {
               "rulebase nat rules from" : [
-                43
+                45
               ]
             },
             "FROM_2~panorama" : {
               "rulebase nat rules from" : [
-                43
+                45
               ]
             },
             "FROM_ZONE~panorama" : {
               "rulebase nat rules from" : [
-                33
+                34,
+                55,
+                59
               ]
             },
             "TO_ZONE~panorama" : {
               "rulebase nat rules to" : [
-                27
+                27,
+                33,
+                39,
+                51,
+                54,
+                58
               ]
             }
           }
@@ -92614,22 +92872,29 @@
           "zone" : {
             "FROM_1~panorama" : {
               "rulebase nat rules from" : [
-                43
+                45
               ]
             },
             "FROM_2~panorama" : {
               "rulebase nat rules from" : [
-                43
+                45
               ]
             },
             "FROM_ZONE~panorama" : {
               "rulebase nat rules from" : [
-                33
+                34,
+                55,
+                59
               ]
             },
             "TO_ZONE~panorama" : {
               "rulebase nat rules to" : [
-                27
+                27,
+                33,
+                39,
+                51,
+                54,
+                58
               ]
             }
           }
@@ -93239,6 +93504,42 @@
             {
               "tag" : "MISCELLANEOUS",
               "text" : "Interface vlan.1 is not in a virtual-router, placing in ~NULL_VRF~ and shutting it down."
+            }
+          ]
+        },
+        "paloalto_nat" : {
+          "Red flags" : [
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=SRC_1}"
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=SRC_2}"
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=DST_1}"
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "No matching address group/object found for RuleEndpoint: RuleEndpoint{type=REFERENCE, value=DST_2}"
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "NAT rule MISSING_TO ignored because it has no to zone configured"
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "NAT rule MISSING_FROM ignored because it has no from zones configured"
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "NAT rule MISSING_SOURCE ignored because it has no source addresses configured"
+            },
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "NAT rule MISSING_DESTINATION ignored because it has no destination addresses configured"
             }
           ]
         }

@@ -30,11 +30,13 @@ policy {
             destination any;
           }
           RULE_2 {
+            to TO_ZONE;
             from FROM_ZONE;
             source SRC_NAME;
             destination DST_NAME;
           }
           RULE_3 {
+            to TO_ZONE;
             source-translation {
               dynamic-ip-and-port {
                 translated-address [ ADDR1 1.1.1.1 2.2.2.0/24 3.3.3.3-4.4.4.4];
@@ -43,6 +45,19 @@ policy {
             from [ FROM_1 FROM_2 ];
             source [ SRC_1 SRC_2];
             destination [ DST_1 DST_2];
+          }
+          MISSING_TO;
+          MISSING_FROM {
+            to TO_ZONE;
+          }
+          MISSING_SOURCE {
+            to TO_ZONE;
+            from FROM_ZONE;
+          }
+          MISSING_DESTINATION {
+            to TO_ZONE;
+            from FROM_ZONE;
+            source SRC_NAME;
           }
         }
       }

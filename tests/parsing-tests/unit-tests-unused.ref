@@ -3490,6 +3490,52 @@
       },
       {
         "Structure_Type" : "nat rule",
+        "Structure_Name" : "MISSING_DESTINATION~panorama",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/nat",
+          "lines" : [
+            57,
+            58,
+            59,
+            60
+          ]
+        }
+      },
+      {
+        "Structure_Type" : "nat rule",
+        "Structure_Name" : "MISSING_FROM~panorama",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/nat",
+          "lines" : [
+            50,
+            51
+          ]
+        }
+      },
+      {
+        "Structure_Type" : "nat rule",
+        "Structure_Name" : "MISSING_SOURCE~panorama",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/nat",
+          "lines" : [
+            53,
+            54,
+            55
+          ]
+        }
+      },
+      {
+        "Structure_Type" : "nat rule",
+        "Structure_Name" : "MISSING_TO~panorama",
+        "Source_Lines" : {
+          "filename" : "configs/palo_alto/nat",
+          "lines" : [
+            49
+          ]
+        }
+      },
+      {
+        "Structure_Type" : "nat rule",
         "Structure_Name" : "RULE_1~panorama",
         "Source_Lines" : {
           "filename" : "configs/palo_alto/nat",
@@ -3516,7 +3562,8 @@
             32,
             33,
             34,
-            35
+            35,
+            36
           ]
         }
       },
@@ -3526,13 +3573,14 @@
         "Source_Lines" : {
           "filename" : "configs/palo_alto/nat",
           "lines" : [
-            37,
             38,
             39,
             40,
-            43,
-            44,
-            45
+            41,
+            42,
+            45,
+            46,
+            47
           ]
         }
       },
@@ -3789,10 +3837,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 255 results",
+      "notes" : "Found 259 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 255
+      "numResults" : 259
     }
   }
 ]

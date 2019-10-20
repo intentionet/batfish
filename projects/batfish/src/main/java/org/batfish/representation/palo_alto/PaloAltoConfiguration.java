@@ -429,7 +429,8 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
             NamedPort.EPHEMERAL_LOWEST.number(), NamedPort.EPHEMERAL_HIGHEST.number());
 
     getAllNatRules(vsys)
-        .filter(r -> checkNatRuleValid(r, false) && r.doesSourceTranslation())
+        // This method is run once and goes through all NAT rules. File invalid rule warnings here.
+        .filter(r -> checkNatRuleValid(r, true) && r.doesSourceTranslation())
         .forEach(
             r -> {
               RangeSet<Ip> pool =
@@ -1274,7 +1275,7 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
       return null;
     }
     Vsys vsys = zone.getVsys();
-    List<NatRule> natRules = getNatPoliciesForIface(iface);
+    List<NatRule> natRules = getNatRulesForIface(iface);
     if (!natRules.isEmpty()) {
       String packetPolicyName = computePacketPolicyName(iface.getName());
       _c.getPacketPolicies()
@@ -1295,13 +1296,12 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
     ImmutableList.Builder<org.batfish.datamodel.packet_policy.Statement> lines =
         ImmutableList.builder();
     for (NatRule rule : natRules) {
-      DestinationTranslation destTranslation = rule.getDestinationTranslation();
+      RuleEndpoint translatedAddress =
+          Optional.ofNullable(rule.getDestinationTranslation())
+              .map(DestinationTranslation::getTranslatedAddress)
+              .orElse(null);
       Zone toZone = vsys.getZones().get(rule.getTo());
-      if (destTranslation == null || !checkNatRuleValid(rule, false)) {
-        continue;
-      }
-      RuleEndpoint translatedAddress = destTranslation.getTranslatedAddress();
-      if (translatedAddress == null) {
+      if (translatedAddress == null || toZone == null) {
         continue;
       }
 
@@ -1317,7 +1317,8 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
       // Actual dest NAT transformation
       Transformation transform =
           new Transformation(
-              matchHeaderSpace,
+              // No need to guard since packet policy already encodes this rule's match conditions
+              TrueExpr.INSTANCE,
               ImmutableList.of(
                   new AssignIpAddressFromPool(
                       TransformationType.DEST_NAT,
@@ -1337,18 +1338,19 @@ public final class PaloAltoConfiguration extends VendorConfiguration {
         name, lines.build(), new Return(new FibLookup(IngressInterfaceVrf.instance())));
   }
 
-  /** Return a list of all NAT rules associated with the specified from-interface. */
-  private List<NatRule> getNatPoliciesForIface(Interface iface) {
+  /** Return a list of all valid NAT rules associated with the specified from-interface. */
+  private List<NatRule> getNatRulesForIface(Interface iface) {
     Zone zone = iface.getZone();
     if (zone == null) {
       return ImmutableList.of();
     }
-    Vsys vsys = iface.getZone().getVsys();
+    Vsys vsys = zone.getVsys();
     return getAllNatRules(vsys)
         .filter(
             rule ->
-                rule.getFrom().contains(zone.getName())
-                    || rule.getFrom().contains(CATCHALL_ZONE_NAME))
+                checkNatRuleValid(rule, false)
+                    && (rule.getFrom().contains(zone.getName())
+                        || rule.getFrom().contains(CATCHALL_ZONE_NAME)))
         .collect(ImmutableList.toImmutableList());
   }
 
