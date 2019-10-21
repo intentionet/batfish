@@ -120,9 +120,10 @@ public final class FilterQuestionUtils {
 
     Set<String> inactiveInterfaces =
         Sets.union(
-            Sets.difference(baseConfig.getAllInterfaces().keySet(), baseConfig.activeInterfaces()),
             Sets.difference(
-                deltaConfig.getAllInterfaces().keySet(), deltaConfig.activeInterfaces()));
+                baseConfig.getAllInterfaces().keySet(), baseConfig.activeInterfaceNames()),
+            Sets.difference(
+                deltaConfig.getAllInterfaces().keySet(), deltaConfig.activeInterfaceNames()));
 
     // effectively active sources are those of interest that are active in both configs.
     Set<String> activeSources = Sets.difference(commonSources, inactiveInterfaces);

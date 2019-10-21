@@ -627,7 +627,7 @@ public class BatfishTest {
 
     // all of the interfaces should still be active
     assertThat(
-        config1.activeInterfaces(),
+        config1.activeInterfaceNames(),
         equalTo(ImmutableSet.of(notIgnored, notIgnored2, notIgnored3, notIgnored4, notIgnored5)));
   }
 
@@ -658,7 +658,7 @@ public class BatfishTest {
     Batfish.processManagementInterfaces(configs);
 
     // none of the interfaces should be active
-    assertThat(config1.activeInterfaces(), equalTo(ImmutableSet.of()));
+    assertThat(config1.activeInterfaceNames(), equalTo(ImmutableSet.of()));
   }
 
   @Test

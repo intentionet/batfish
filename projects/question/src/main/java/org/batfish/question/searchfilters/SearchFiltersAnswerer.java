@@ -388,7 +388,7 @@ public final class SearchFiltersAnswerer extends Answerer {
     SpecifierContext specifierContext = batfish.specifierContext();
 
     Set<String> inactiveIfaces =
-        Sets.difference(node.getAllInterfaces().keySet(), node.activeInterfaces());
+        Sets.difference(node.getAllInterfaces().keySet(), node.activeInterfaceNames());
     Set<String> activeSources =
         Sets.difference(
             resolveSources(

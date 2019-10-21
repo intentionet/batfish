@@ -438,7 +438,7 @@ public final class TopologyUtil {
     // Special-case sub-interfaces of aggregate interfaces
     ImmutableSet<NodeInterfacePair> subInterfaces =
         configurations.values().stream()
-            .flatMap(c -> c.getActiveInterfaces().values().stream())
+            .flatMap(Configuration::activeInterfaces)
             .filter(i -> i.getInterfaceType() == InterfaceType.AGGREGATE_CHILD)
             .map(i -> NodeInterfacePair.of(i.getOwner().getHostname(), i.getName()))
             .collect(ImmutableSet.toImmutableSet());

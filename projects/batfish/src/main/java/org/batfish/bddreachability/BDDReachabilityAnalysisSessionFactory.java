@@ -132,7 +132,7 @@ final class BDDReachabilityAnalysisSessionFactory {
 
     Map<String, Map<NodeInterfacePair, BDD>> lastHopOutgoingInterfaceBdds =
         toImmutableMap(
-            config.activeInterfaces(),
+            config.activeInterfaceNames(),
             Function.identity(),
             iface ->
                 Optional.ofNullable(

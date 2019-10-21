@@ -713,7 +713,7 @@ public final class BDDReachabilityAnalysisFactory {
     return finalNodes.stream()
         .map(_configs::get)
         .filter(Objects::nonNull) // remove finalNodes that don't exist on this network
-        .flatMap(c -> c.getActiveInterfaces().values().stream())
+        .flatMap(Configuration::activeInterfaces)
         .map(
             iface -> {
               String node = iface.getOwner().getHostname();
@@ -917,12 +917,9 @@ public final class BDDReachabilityAnalysisFactory {
               String node2 = edge.getNode2();
               String iface2 = edge.getInt2();
 
-              String preNatAcl =
-                  _configs
-                      .get(node1)
-                      .getActiveInterfaces()
-                      .get(iface1)
-                      .getPreTransformationOutgoingFilterName();
+              Interface i1 = _configs.get(node1).getAllInterfaces().get(iface1);
+              assert i1.getActive();
+              String preNatAcl = i1.getPreTransformationOutgoingFilterName();
 
               BDD denyPreNat = ignorableAclDenyBDD(node1, preNatAcl);
               if (denyPreNat.equals(_zero)) {
@@ -948,12 +945,9 @@ public final class BDDReachabilityAnalysisFactory {
               String node2 = edge.getNode2();
               String iface2 = edge.getInt2();
 
-              String preNatAcl =
-                  _configs
-                      .get(node1)
-                      .getActiveInterfaces()
-                      .get(iface1)
-                      .getPreTransformationOutgoingFilterName();
+              Interface i1 = _configs.get(node1).getAllInterfaces().get(iface1);
+
+              String preNatAcl = i1.getPreTransformationOutgoingFilterName();
 
               BDD aclPermit = ignorableAclPermitBDD(node1, preNatAcl);
               if (aclPermit.equals(_zero)) {
@@ -983,8 +977,9 @@ public final class BDDReachabilityAnalysisFactory {
               String node2 = edge.getNode2();
               String iface2 = edge.getInt2();
 
-              String aclName =
-                  _configs.get(node1).getActiveInterfaces().get(iface1).getOutgoingFilterName();
+              Interface i1 = _configs.get(node1).getAllInterfaces().get(iface1);
+              assert i1.getActive();
+              String aclName = i1.getOutgoingFilterName();
 
               if (aclName == null) {
                 return Stream.of();
@@ -1011,14 +1006,9 @@ public final class BDDReachabilityAnalysisFactory {
               String node2 = edge.getNode2();
               String iface2 = edge.getInt2();
 
-              BDD aclPermitBDD =
-                  ignorableAclPermitBDD(
-                      node1,
-                      _configs
-                          .get(node1)
-                          .getActiveInterfaces()
-                          .get(iface1)
-                          .getOutgoingFilterName());
+              Interface i1 = _configs.get(node1).getAllInterfaces().get(iface1);
+              assert i1.getActive();
+              BDD aclPermitBDD = ignorableAclPermitBDD(node1, i1.getOutgoingFilterName());
               assert aclPermitBDD != null;
 
               return new Edge(
@@ -1547,8 +1537,7 @@ public final class BDDReachabilityAnalysisFactory {
           .forEach(
               configuration ->
                   configuration
-                      .getActiveInterfaces()
-                      .values()
+                      .activeInterfaces()
                       .forEach(
                           iface -> {
                             visitTransformationSteps(
@@ -1752,6 +1741,6 @@ public final class BDDReachabilityAnalysisFactory {
   }
 
   private @Nonnull Stream<Interface> getInterfaces() {
-    return _configs.values().stream().flatMap(c -> c.getActiveInterfaces().values().stream());
+    return _configs.values().stream().flatMap(Configuration::activeInterfaces);
   }
 }

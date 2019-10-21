@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.common.BatfishException;
@@ -340,11 +341,12 @@ public final class Configuration implements Serializable {
     return _authenticationKeyChains;
   }
 
-  public Set<String> activeInterfaces() {
-    return _interfaces.values().stream()
-        .filter(Interface::getActive)
-        .map(Interface::getName)
-        .collect(ImmutableSet.toImmutableSet());
+  public Set<String> activeInterfaceNames() {
+    return activeInterfaces().map(Interface::getName).collect(ImmutableSet.toImmutableSet());
+  }
+
+  public @Nonnull Stream<Interface> activeInterfaces() {
+    return _interfaces.values().stream().filter(Interface::getActive);
   }
 
   /** Dictionary of all community-lists for this node. */

@@ -113,7 +113,7 @@ public final class BDDSourceManager {
       BDDPacket pkt, Configuration config, IpAccessList acl) {
     return forIpAccessList(
         pkt,
-        Sets.union(ImmutableSet.of(SOURCE_ORIGINATING_FROM_DEVICE), config.activeInterfaces()),
+        Sets.union(ImmutableSet.of(SOURCE_ORIGINATING_FROM_DEVICE), config.activeInterfaceNames()),
         config.getIpAccessLists(),
         acl);
   }
@@ -152,7 +152,7 @@ public final class BDDSourceManager {
             entry ->
                 ImmutableSet.<String>builder()
                     .add(SOURCE_ORIGINATING_FROM_DEVICE)
-                    .addAll(entry.getValue().activeInterfaces())
+                    .addAll(entry.getValue().activeInterfaceNames())
                     .build());
 
     Map<String, Set<String>> referencedSources =
