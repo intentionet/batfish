@@ -29,14 +29,19 @@ AUTO
   'auto' -> pushMode (M_Word)
 ;
 
-BOND_SLAVES
-:
-  'bond-slaves' -> pushMode(M_Words)
-;
-
 BOND_LACP_BYPASS_ALLOW
 :
   'bond-lacp-bypass-allow' -> pushMode(M_DropUntilNewline)
+;
+
+BOND_LACP_RATE
+:
+  'bond-lacp-rate' -> pushMode(M_DropUntilNewline)
+;
+
+BOND_SLAVES
+:
+  'bond-slaves' -> pushMode(M_Words)
 ;
 
 BRIDGE_PORTS

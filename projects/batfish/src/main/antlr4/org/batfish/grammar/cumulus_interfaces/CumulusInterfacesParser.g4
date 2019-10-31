@@ -53,6 +53,7 @@ i_property
   | i_address_virtual
   | i_alias
   | i_bond_lacp_bypass_allow
+  | i_bond_lacp_rate
   | i_bond_slaves
   | i_bridge_access
   | i_bridge_arp_nd_suppress
@@ -97,6 +98,12 @@ i_alias
 i_bond_lacp_bypass_allow
 :
   BOND_LACP_BYPASS_ALLOW NEWLINE
+;
+
+
+i_bond_lacp_rate
+:
+  BOND_LACP_RATE NEWLINE
 ;
 
 
