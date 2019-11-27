@@ -15,3 +15,4 @@ interface Vxlan1
   vxlan vrf TENANT vni 10000
   vxlan vlan 1 vni 10001
   vxlan vlan 2 vni 10002
+  vxlan virtual-router encapsulation mac-address mlag-system-id

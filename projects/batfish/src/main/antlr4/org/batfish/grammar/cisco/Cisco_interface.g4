@@ -24,6 +24,7 @@ eos_vxlan_if_inner
          | eos_vxif_vxlan_multicast_group
          | eos_vxif_vxlan_source_interface
          | eos_vxif_vxlan_udp_port
+         | eos_vxif_vxlan_virtual_router
          | eos_vxif_vxlan_vlan
          | eos_vxif_vxlan_vrf
       )
@@ -54,6 +55,13 @@ eos_vxif_vxlan_source_interface
 eos_vxif_vxlan_udp_port
 :
    UDP_PORT num = DEC NEWLINE
+;
+
+eos_vxif_vxlan_virtual_router
+:
+   VIRTUAL_ROUTER
+   // TODO: expand to full completions
+   (ENCAPSULATION MAC_ADDRESS MLAG_SYSTEM_ID) NEWLINE
 ;
 
 eos_vxif_vxlan_vlan

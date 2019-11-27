@@ -7244,7 +7244,7 @@ MAC
 
 MAC_ADDRESS
 :
-   'mac-address' -> pushMode ( M_COMMENT )
+   'mac-address'
 ;
 
 MAC_ADDRESS_TABLE
@@ -7865,6 +7865,12 @@ MISMATCH
 MLAG
 :
    'mlag'
+;
+
+MLAG_SYSTEM_ID
+:
+
+   'mlag-system-id'
 ;
 
 MLD
