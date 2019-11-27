@@ -85,7 +85,7 @@ public class NodeColoredSchedule extends IbdpSchedule {
      */
 
     // Add all nodes first
-    _graph = new DefaultDirectedGraph<>((src, dst) -> new DefaultEdge());
+    _graph = new DefaultDirectedGraph<>(DefaultEdge.class);
     nodes.keySet().forEach(n -> _graph.addVertex(n));
 
     // Process BGP connections
