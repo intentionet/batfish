@@ -1,5 +1,6 @@
 package org.batfish.dataplane.ibdp;
 
+import static com.google.common.collect.ImmutableSortedSet.of;
 import static org.batfish.common.topology.TopologyUtil.computeLayer2Topology;
 import static org.batfish.common.topology.TopologyUtil.computeLayer3Topology;
 import static org.batfish.common.topology.TopologyUtil.computeRawLayer3Topology;
@@ -55,12 +56,12 @@ import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.Topology;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.acl.AclLineMatchExprs;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.ipsec.IpsecTopology;
 import org.batfish.datamodel.ospf.OspfTopology;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.datamodel.vxlan.VxlanNode;
 import org.batfish.datamodel.vxlan.VxlanTopology;
 import org.junit.Rule;
@@ -145,26 +146,20 @@ public final class FixedPointTopologyTest {
     l2Builder.setName(SWP1_NAME).setOwner(_s1).setVrf(s1Vrf).build();
     l2Builder.setName(SWP2_NAME).setOwner(_s2).setVrf(s2Vrf).build();
 
-    VniSettings.Builder vsb =
-        VniSettings.builder()
+    Layer2Vni.Builder vsb =
+        Layer2Vni.builder()
             .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
             .setUdpPort(UDP_PORT)
             .setVlan(VLAN)
             .setVni(VNI);
-    s1Vrf
-        .getVniSettings()
-        .put(
-            VNI,
-            vsb.setBumTransportIps(ImmutableSortedSet.of(S2_ADDRESS.getIp()))
-                .setSourceAddress(S1_ADDRESS.getIp())
-                .build());
-    s2Vrf
-        .getVniSettings()
-        .put(
-            VNI,
-            vsb.setBumTransportIps(ImmutableSortedSet.of(S1_ADDRESS.getIp()))
-                .setSourceAddress(S2_ADDRESS.getIp())
-                .build());
+    s1Vrf.addLayer2Vni(
+        vsb.setBumTransportIps(of(S2_ADDRESS.getIp()))
+            .setSourceAddress(S1_ADDRESS.getIp())
+            .build());
+    s2Vrf.addLayer2Vni(
+        vsb.setBumTransportIps(of(S1_ADDRESS.getIp()))
+            .setSourceAddress(S2_ADDRESS.getIp())
+            .build());
     return ImmutableMap.of(H1_NAME, _h1, H2_NAME, _h2, S1_NAME, _s1, S2_NAME, _s2);
   }
 

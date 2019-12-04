@@ -41,7 +41,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,7 +80,6 @@ import org.batfish.datamodel.RouteFilterLine;
 import org.batfish.datamodel.RouteFilterList;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.SwitchportMode;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.bgp.AddressFamilyCapabilities;
 import org.batfish.datamodel.bgp.BgpConfederation;
 import org.batfish.datamodel.bgp.EvpnAddressFamily;
@@ -113,6 +111,8 @@ import org.batfish.datamodel.routing_policy.statement.SetOrigin;
 import org.batfish.datamodel.routing_policy.statement.Statement;
 import org.batfish.datamodel.routing_policy.statement.Statements;
 import org.batfish.datamodel.vendor_family.cumulus.CumulusFamily;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Vni;
 import org.batfish.vendor.VendorConfiguration;
 
 /** A {@link VendorConfiguration} for the Cumulus NCLU configuration language. */
@@ -533,7 +533,7 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
     Map<Integer, Integer> vniToIndex = vniToIndexBuilder.build();
 
     if (evpnConfig.getAdvertiseAllVni()) {
-      for (VniSettings vxlan : _c.getVrfs().get(bgpVrf.getVrfName()).getVniSettings().values()) {
+      for (Layer2Vni vxlan : _c.getVrfs().get(bgpVrf.getVrfName()).getLayer2Vnis().values()) {
         RouteDistinguisher rd =
             RouteDistinguisher.from(newProc.getRouterId(), vniToIndex.get(vxlan.getVni()));
         ExtendedCommunity rt = toRouteTarget(localAs, vxlan.getVni());
@@ -973,8 +973,8 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
   }
 
   /**
-   * Converts {@link Vxlan} into appropriate {@link VniSettings} for each VRF. Requires VI Vrfs to
-   * already be properly initialized
+   * Converts {@link Vxlan} into appropriate {@link Vni} for each VRF. Requires VI Vrfs to already
+   * be properly initialized
    */
   private void convertVxlans() {
     if (_vxlans.isEmpty()) {
@@ -988,7 +988,7 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
             .collect(ImmutableMap.toImmutableMap(Vrf::getVni, Vrf::getName));
 
     // Put all valid VXLAN VNIs into appropriate VRF
-    Map<String, Set<VniSettings>> vrfToVniSettings = new HashMap<>(0);
+    Map<String, Set<Layer2Vni>> vrfToVniSettings = new HashMap<>(0);
     _vxlans
         .values()
         .forEach(
@@ -999,11 +999,12 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
                 // Not a valid VNI configuration
                 return;
               }
+              // TODO: this logic is wrong, fix it later.
               String vrfName = vniToVrf.getOrDefault(vxlan.getId(), Configuration.DEFAULT_VRF_NAME);
               vrfToVniSettings
                   .computeIfAbsent(vrfName, k -> new HashSet<>())
                   .add(
-                      VniSettings.builder()
+                      Layer2Vni.builder()
                           .setVni(vxlan.getId())
                           .setVlan(vxlan.getBridgeAccessVlan())
                           .setSourceAddress(
@@ -1013,17 +1014,7 @@ public class CumulusNcluConfiguration extends VendorConfiguration {
                           .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
                           .build());
             });
-    vrfToVniSettings.forEach(
-        (vrfName, vnis) ->
-            _c.getVrfs()
-                .get(vrfName)
-                .setVniSettings(
-                    vnis.stream()
-                        .collect(
-                            ImmutableSortedMap.toImmutableSortedMap(
-                                Comparator.naturalOrder(),
-                                VniSettings::getVni,
-                                Function.identity()))));
+    vrfToVniSettings.forEach((vrfName, vnis) -> _c.getVrfs().get(vrfName).setLayer2Vnis(vnis));
   }
 
   public @Nullable BgpProcess getBgpProcess() {

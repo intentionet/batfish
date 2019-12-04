@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 
 public class MockDataPlane implements DataPlane {
 
@@ -22,7 +23,7 @@ public class MockDataPlane implements DataPlane {
     @Nonnull
     private SortedMap<String, SortedMap<String, GenericRib<AnnotatedRoute<AbstractRoute>>>> _ribs;
 
-    @Nonnull private Table<String, String, Set<VniSettings>> _vniSettings;
+    @Nonnull private Table<String, String, Set<Layer2Vni>> _vniSettings;
 
     private Builder() {
       _bgpRoutes = HashBasedTable.create();
@@ -62,7 +63,7 @@ public class MockDataPlane implements DataPlane {
       return this;
     }
 
-    public Builder setVniSettings(@Nonnull Table<String, String, Set<VniSettings>> vniSettings) {
+    public Builder setVniSettings(@Nonnull Table<String, String, Set<Layer2Vni>> vniSettings) {
       _vniSettings = vniSettings;
       return this;
     }
@@ -88,7 +89,7 @@ public class MockDataPlane implements DataPlane {
   private final SortedMap<String, SortedMap<String, GenericRib<AnnotatedRoute<AbstractRoute>>>>
       _ribs;
 
-  @Nonnull private Table<String, String, Set<VniSettings>> _vniSettings;
+  @Nonnull private Table<String, String, Set<Layer2Vni>> _vniSettings;
 
   private MockDataPlane(Builder builder) {
     _bgpRoutes = builder._bgpRoutes;
@@ -145,7 +146,7 @@ public class MockDataPlane implements DataPlane {
 
   @Nonnull
   @Override
-  public Table<String, String, Set<VniSettings>> getVniSettings() {
+  public Table<String, String, Set<Layer2Vni>> getVniSettings() {
     return _vniSettings;
   }
 }

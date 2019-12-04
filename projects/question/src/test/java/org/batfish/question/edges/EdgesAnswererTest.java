@@ -81,7 +81,6 @@ import org.batfish.datamodel.IpsecStaticPeerConfig;
 import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.Topology;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.bgp.BgpTopology;
@@ -102,6 +101,7 @@ import org.batfish.datamodel.ospf.OspfTopologyUtils;
 import org.batfish.datamodel.pojo.Node;
 import org.batfish.datamodel.table.ColumnMetadata;
 import org.batfish.datamodel.table.Row;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.datamodel.vxlan.VxlanNode;
 import org.batfish.datamodel.vxlan.VxlanTopology;
 import org.batfish.datamodel.vxlan.VxlanTopologyUtils;
@@ -132,18 +132,17 @@ public class EdgesAnswererTest {
     Vrf v1 = vb.setOwner(c1).build();
     Vrf v2 = vb.setOwner(c2).build();
     Map<String, Configuration> configurations = ImmutableMap.of(VXLAN_NODE1, c1, VXLAN_NODE2, c2);
-    VniSettings.Builder vniSettingsBuilder =
-        VniSettings.builder()
+    Layer2Vni.Builder vniSettingsBuilder =
+        Layer2Vni.builder()
             .setBumTransportIps(ImmutableSortedSet.of(VXLAN_MULTICAST_GROUP))
             .setBumTransportMethod(BumTransportMethod.MULTICAST_GROUP)
             .setUdpPort(VXLAN_UDP_PORT)
             .setVni(VXLAN_VNI);
-    VniSettings vniSettingsTail =
+    Layer2Vni vniSettingsTail =
         vniSettingsBuilder.setSourceAddress(VXLAN_SRC_IP1).setVlan(VXLAN_VLAN1).build();
-    v1.setVniSettings(ImmutableSortedMap.of(VXLAN_VNI, vniSettingsTail));
-    v2.setVniSettings(
-        ImmutableSortedMap.of(
-            VXLAN_VNI,
+    v1.setLayer2Vnis(ImmutableSet.of(vniSettingsTail));
+    v2.setLayer2Vnis(
+        ImmutableSet.of(
             vniSettingsBuilder.setSourceAddress(VXLAN_SRC_IP2).setVlan(VXLAN_VLAN2).build()));
     return NetworkConfigurations.of(configurations);
   }

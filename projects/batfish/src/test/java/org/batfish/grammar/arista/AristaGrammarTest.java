@@ -48,12 +48,13 @@ import org.batfish.datamodel.LongSpace;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Prefix6;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.Layer2VniConfig;
 import org.batfish.datamodel.bgp.Layer3VniConfig;
 import org.batfish.datamodel.bgp.RouteDistinguisher;
 import org.batfish.datamodel.bgp.community.ExtendedCommunity;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Layer3Vni;
 import org.batfish.grammar.cisco.CiscoCombinedParser;
 import org.batfish.grammar.cisco.CiscoControlPlaneExtractor;
 import org.batfish.main.Batfish;
@@ -549,20 +550,19 @@ public class AristaGrammarTest {
   public void testVxlanConversion() {
     Configuration config = parseConfig("arista_vxlan");
     {
-      VniSettings vniSettings = config.getVrfs().get("TENANT").getVniSettings().get(10000);
-      assertThat(
-          vniSettings.getBumTransportMethod(), equalTo(BumTransportMethod.UNICAST_FLOOD_GROUP));
-      assertThat(vniSettings.getBumTransportIps(), empty());
-      assertThat(vniSettings.getVlan(), nullValue());
-    }
-    {
-      VniSettings vniSettings = config.getVrfs().get("VRF_1").getVniSettings().get(10001);
+      Layer3Vni vniSettings = config.getVrfs().get("TENANT").getLayer3Vnis().get(10000);
       assertThat(
           vniSettings.getBumTransportMethod(), equalTo(BumTransportMethod.UNICAST_FLOOD_GROUP));
       assertThat(vniSettings.getBumTransportIps(), empty());
     }
     {
-      VniSettings vniSettings = config.getVrfs().get("VRF_2").getVniSettings().get(10002);
+      Layer2Vni vniSettings = config.getVrfs().get("VRF_1").getLayer2Vnis().get(10001);
+      assertThat(
+          vniSettings.getBumTransportMethod(), equalTo(BumTransportMethod.UNICAST_FLOOD_GROUP));
+      assertThat(vniSettings.getBumTransportIps(), empty());
+    }
+    {
+      Layer2Vni vniSettings = config.getVrfs().get("VRF_2").getLayer2Vnis().get(10002);
       assertThat(
           vniSettings.getBumTransportMethod(), equalTo(BumTransportMethod.UNICAST_FLOOD_GROUP));
       assertThat(vniSettings.getBumTransportIps(), empty());

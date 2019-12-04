@@ -8,11 +8,11 @@ import org.batfish.datamodel.GeneratedRoute;
 import org.batfish.datamodel.KernelRoute;
 import org.batfish.datamodel.SnmpServer;
 import org.batfish.datamodel.StaticRoute;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.eigrp.EigrpProcess;
 import org.batfish.datamodel.isis.IsisProcess;
 import org.batfish.datamodel.ospf.OspfProcess;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
@@ -128,14 +128,14 @@ final class VrfMatchersImpl {
     }
   }
 
-  static final class HasVniSettings extends FeatureMatcher<Vrf, Map<Integer, VniSettings>> {
-    HasVniSettings(@Nonnull Matcher<? super Map<Integer, VniSettings>> subMatcher) {
+  static final class HasVniSettings extends FeatureMatcher<Vrf, Map<Integer, Layer2Vni>> {
+    HasVniSettings(@Nonnull Matcher<? super Map<Integer, Layer2Vni>> subMatcher) {
       super(subMatcher, "A VRF with VNI settings:", "vniSettings");
     }
 
     @Override
-    protected Map<Integer, VniSettings> featureValueOf(Vrf actual) {
-      return actual.getVniSettings();
+    protected Map<Integer, Layer2Vni> featureValueOf(Vrf actual) {
+      return actual.getLayer2Vnis();
     }
   }
 }

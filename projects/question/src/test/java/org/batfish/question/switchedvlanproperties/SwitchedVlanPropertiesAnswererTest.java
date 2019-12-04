@@ -36,12 +36,12 @@ import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.SwitchportMode;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.pojo.Node;
 import org.batfish.datamodel.table.ColumnMetadata;
 import org.batfish.datamodel.table.Row;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.specifier.AllInterfacesInterfaceSpecifier;
 import org.batfish.specifier.InterfaceSpecifier;
 import org.batfish.specifier.SpecifierContext;
@@ -57,7 +57,7 @@ public final class SwitchedVlanPropertiesAnswererTest {
 
   private Map<String, Configuration> _configurations;
   private Interface.Builder _ib;
-  private VniSettings.Builder _vnb;
+  private Layer2Vni.Builder _vnb;
   private SpecifierContext _specifierContext;
 
   @Before
@@ -71,7 +71,7 @@ public final class SwitchedVlanPropertiesAnswererTest {
     Vrf v = nf.vrfBuilder().setName(Configuration.DEFAULT_VRF_NAME).setOwner(c).build();
     _ib = nf.interfaceBuilder().setOwner(c).setVrf(v).setName(INTERFACE).setActive(true);
     _configurations = ImmutableMap.of(c.getHostname(), c);
-    _vnb = VniSettings.builder().setBumTransportMethod(BumTransportMethod.MULTICAST_GROUP);
+    _vnb = Layer2Vni.builder().setBumTransportMethod(BumTransportMethod.MULTICAST_GROUP);
     _specifierContext =
         new TestSpecifierContext() {
           @Override
@@ -96,7 +96,7 @@ public final class SwitchedVlanPropertiesAnswererTest {
     iface.setAccessVlan(vlan);
     Configuration c = _configurations.values().iterator().next();
     int vni = 10000;
-    c.getDefaultVrf().getVniSettings().put(vni, _vnb.setVlan(vlan).setVni(vni).build());
+    c.getDefaultVrf().addLayer2Vni(_vnb.setVlan(vlan).setVni(vni).build());
 
     computeNodeVlanProperties(
         _specifierContext,
@@ -167,11 +167,7 @@ public final class SwitchedVlanPropertiesAnswererTest {
     iface.setSwitchport(true);
     iface.setSwitchportMode(SwitchportMode.ACCESS);
     iface.setAccessVlan(vlan);
-    _configurations
-        .get(NODE)
-        .getDefaultVrf()
-        .getVniSettings()
-        .put(vni, _vnb.setVni(vni).setVlan(vlan).build());
+    _configurations.get(NODE).getDefaultVrf().addLayer2Vni(_vnb.setVni(vni).setVlan(vlan).build());
 
     assertThat(
         getProperties(
@@ -380,28 +376,13 @@ public final class SwitchedVlanPropertiesAnswererTest {
   }
 
   @Test
-  public void testTryAddVlanVniVlanAbsent() {
-    int vni = 10000;
-    int vlan = 1;
-    IntegerSpace vlans = IntegerSpace.of(vlan);
-    ImmutableMap.Builder<Integer, Integer> vlanVnisBuilder = ImmutableMap.builder();
-    Map<Integer, ImmutableSet.Builder<NodeInterfacePair>> switchedVlanInterfaces = new HashMap<>();
-    VniSettings vniSettings = _vnb.setVni(vni).build();
-
-    tryAddVlanVni(vniSettings, vlans, vlanVnisBuilder, switchedVlanInterfaces);
-
-    assertThat(vlanVnisBuilder.build(), anEmptyMap());
-    assertThat(switchedVlanInterfaces, anEmptyMap());
-  }
-
-  @Test
   public void testTryAddVlanVniVlanPresent() {
     int vni = 10000;
     int vlan = 1;
     IntegerSpace vlans = IntegerSpace.of(vlan);
     ImmutableMap.Builder<Integer, Integer> vlanVnisBuilder = ImmutableMap.builder();
     Map<Integer, ImmutableSet.Builder<NodeInterfacePair>> switchedVlanInterfaces = new HashMap<>();
-    VniSettings vniSettings = _vnb.setVni(vni).setVlan(vlan).build();
+    Layer2Vni vniSettings = _vnb.setVni(vni).setVlan(vlan).build();
 
     tryAddVlanVni(vniSettings, vlans, vlanVnisBuilder, switchedVlanInterfaces);
 

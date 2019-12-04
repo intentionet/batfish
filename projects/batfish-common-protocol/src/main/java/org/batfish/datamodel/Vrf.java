@@ -2,6 +2,7 @@ package org.batfish.datamodel;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.batfish.common.util.CollectionUtil.toImmutableMap;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,8 +12,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -21,6 +22,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,6 +32,8 @@ import org.batfish.datamodel.dataplane.rib.RibGroup;
 import org.batfish.datamodel.eigrp.EigrpProcess;
 import org.batfish.datamodel.isis.IsisProcess;
 import org.batfish.datamodel.ospf.OspfProcess;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Layer3Vni;
 
 /** A virtual routing and forwarding (VRF) instance on a node. */
 public class Vrf extends ComparableStructure<String> {
@@ -105,7 +109,8 @@ public class Vrf extends ComparableStructure<String> {
   private RipProcess _ripProcess;
   private SnmpServer _snmpServer;
   private SortedSet<StaticRoute> _staticRoutes;
-  private Map<Integer, VniSettings> _vniSettings;
+  private Map<Integer, Layer2Vni> _layer2Vnis;
+  private Map<Integer, Layer3Vni> _layer3Vnis;
 
   public Vrf(@Nonnull String name) {
     super(name);
@@ -117,7 +122,8 @@ public class Vrf extends ComparableStructure<String> {
     _kernelRoutes = ImmutableSortedSet.of();
     _ospfProcesses = ImmutableSortedMap.of();
     _staticRoutes = new TreeSet<>();
-    _vniSettings = new HashMap<>();
+    _layer2Vnis = ImmutableMap.of();
+    _layer3Vnis = ImmutableMap.of();
   }
 
   @JsonCreator
@@ -238,8 +244,37 @@ public class Vrf extends ComparableStructure<String> {
   }
 
   @JsonIgnore
-  public Map<Integer, VniSettings> getVniSettings() {
-    return _vniSettings;
+  public Map<Integer, Layer2Vni> getLayer2Vnis() {
+    return _layer2Vnis;
+  }
+
+  public void setLayer2Vnis(Collection<Layer2Vni> layer2Vnis) {
+    _layer2Vnis = toImmutableMap(layer2Vnis, Layer2Vni::getVni, Function.identity());
+  }
+
+  public void addLayer2Vni(Layer2Vni vni) {
+    _layer2Vnis =
+        ImmutableMap.<Integer, Layer2Vni>builder()
+            .putAll(_layer2Vnis)
+            .put(vni.getVni(), vni)
+            .build();
+  }
+
+  @JsonIgnore
+  public Map<Integer, Layer3Vni> getLayer3Vnis() {
+    return _layer3Vnis;
+  }
+
+  public void setLayer3Vnis(Collection<Layer3Vni> layer3Vnis) {
+    _layer3Vnis = toImmutableMap(layer3Vnis, Layer3Vni::getVni, Function.identity());
+  }
+
+  public void addLayer3Vni(Layer3Vni vni) {
+    _layer3Vnis =
+        ImmutableMap.<Integer, Layer3Vni>builder()
+            .putAll(_layer3Vnis)
+            .put(vni.getVni(), vni)
+            .build();
   }
 
   public void resolveReferences(Configuration owner) {
@@ -356,9 +391,5 @@ public class Vrf extends ComparableStructure<String> {
   @JsonProperty(PROP_STATIC_ROUTES)
   public void setStaticRoutes(SortedSet<StaticRoute> staticRoutes) {
     _staticRoutes = staticRoutes;
-  }
-
-  public void setVniSettings(Map<Integer, VniSettings> vniSettings) {
-    _vniSettings = ImmutableMap.copyOf(vniSettings);
   }
 }

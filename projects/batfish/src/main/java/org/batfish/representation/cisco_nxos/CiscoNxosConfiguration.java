@@ -105,7 +105,6 @@ import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.TcpFlags;
 import org.batfish.datamodel.TcpFlagsMatchConditions;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.AclLineMatchExprs;
 import org.batfish.datamodel.acl.PermittedByAcl;
@@ -196,6 +195,8 @@ import org.batfish.datamodel.tracking.DecrementPriority;
 import org.batfish.datamodel.vendor_family.cisco_nxos.CiscoNxosFamily;
 import org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform;
 import org.batfish.datamodel.vendor_family.cisco_nxos.NxosMajorVersion;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Layer3Vni;
 import org.batfish.representation.cisco_nxos.BgpVrfIpv6AddressFamilyConfiguration.Network;
 import org.batfish.representation.cisco_nxos.Nve.IngressReplicationProtocol;
 import org.batfish.vendor.VendorConfiguration;
@@ -1140,34 +1141,45 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
         .noneMatch(iface -> vlan.equals(iface.getVlan()) && iface.getActive())) {
       return;
     }
-    VniSettings vniSettings =
-        VniSettings.builder()
-            .setBumTransportIps(bumTransportIps)
-            .setBumTransportMethod(bumTransportMethod)
-            .setSourceAddress(
-                nve.getSourceInterface() != null
-                    ? getInterfaceIp(_c.getAllInterfaces(), nve.getSourceInterface())
-                    : null)
-            .setUdpPort(VniSettings.DEFAULT_UDP_PORT)
-            .setVni(nveVni.getVni())
-            .setVlan(vlan)
-            .build();
+
     if (nveVni.isAssociateVrf()) {
+      // L3 VNI
+
       Vrf vsTenantVrfForL3Vni = getVrfForL3Vni(_vrfs, nveVni.getVni());
       if (vsTenantVrfForL3Vni == null || _c.getVrfs().get(vsTenantVrfForL3Vni.getName()) == null) {
         return;
       }
-      _c.getVrfs()
-          .get(vsTenantVrfForL3Vni.getName())
-          .getVniSettings()
-          .put(vniSettings.getVni(), vniSettings);
-      return;
+      Layer3Vni vniSettings =
+          Layer3Vni.builder()
+              .setBumTransportIps(bumTransportIps)
+              .setBumTransportMethod(bumTransportMethod)
+              .setSourceAddress(
+                  nve.getSourceInterface() != null
+                      ? getInterfaceIp(_c.getAllInterfaces(), nve.getSourceInterface())
+                      : null)
+              .setUdpPort(Layer2Vni.DEFAULT_UDP_PORT)
+              .setVni(nveVni.getVni())
+              .build();
+      _c.getVrfs().get(vsTenantVrfForL3Vni.getName()).addLayer3Vni(vniSettings);
+    } else {
+      org.batfish.datamodel.Vrf viTenantVrfForL2Vni = getMemberVrfForVlan(vlan);
+      Layer2Vni vniSettings =
+          Layer2Vni.builder()
+              .setBumTransportIps(bumTransportIps)
+              .setBumTransportMethod(bumTransportMethod)
+              .setSourceAddress(
+                  nve.getSourceInterface() != null
+                      ? getInterfaceIp(_c.getAllInterfaces(), nve.getSourceInterface())
+                      : null)
+              .setUdpPort(Layer2Vni.DEFAULT_UDP_PORT)
+              .setVni(nveVni.getVni())
+              .setVlan(vlan)
+              .build();
+      if (viTenantVrfForL2Vni == null) {
+        return;
+      }
+      viTenantVrfForL2Vni.addLayer2Vni(vniSettings);
     }
-    org.batfish.datamodel.Vrf viTenantVrfForL2Vni = getMemberVrfForVlan(vlan);
-    if (viTenantVrfForL2Vni == null) {
-      return;
-    }
-    viTenantVrfForL2Vni.getVniSettings().put(vniSettings.getVni(), vniSettings);
   }
 
   /**

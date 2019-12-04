@@ -41,7 +41,6 @@ import org.batfish.datamodel.LongSpace;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.AddressFamilyCapabilities;
 import org.batfish.datamodel.bgp.EvpnAddressFamily;
@@ -68,6 +67,8 @@ import org.batfish.datamodel.routing_policy.statement.SetOrigin;
 import org.batfish.datamodel.routing_policy.statement.SetTag;
 import org.batfish.datamodel.routing_policy.statement.Statement;
 import org.batfish.datamodel.routing_policy.statement.Statements;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Layer3Vni;
 import org.batfish.representation.cisco_nxos.BgpVrfL2VpnEvpnAddressFamilyConfiguration.RetainRouteType;
 
 /**
@@ -435,10 +436,7 @@ final class Conversions {
     // looping over all VRFs in VI configuration so we can get all VNI settings which were valid and
     // mapped to some VRF (including the default VRF)
     for (Vrf tenantVrf : c.getVrfs().values()) {
-      for (VniSettings vniSettings : tenantVrf.getVniSettings().values()) {
-        if (!isLayer2Vni(vsConfig.getNves(), vniSettings.getVni())) {
-          continue;
-        }
+      for (Layer2Vni vniSettings : tenantVrf.getLayer2Vnis().values()) {
 
         Integer macVrfId = getMacVrfIdForL2Vni(vsConfig, vniSettings.getVni());
         if (macVrfId == null) {
@@ -521,10 +519,7 @@ final class Conversions {
     // looping over all VRFs in VI configuration so we can get all VNI settings which were valid and
     // mapped to some VRF (including the default VRF)
     for (Vrf tenantVrf : c.getVrfs().values()) {
-      for (VniSettings vniSettings : tenantVrf.getVniSettings().values()) {
-        if (!isLayer3Vni(vsConfig.getNves(), vniSettings.getVni())) {
-          continue;
-        }
+      for (Layer3Vni vniSettings : tenantVrf.getLayer3Vnis().values()) {
 
         org.batfish.representation.cisco_nxos.Vrf vsTenantVrfForL3Vni =
             getVrfForL3Vni(vsConfig.getVrfs(), vniSettings.getVni());
@@ -614,26 +609,6 @@ final class Conversions {
     }
 
     return MAC_VRF_OFFSET + vlanNumber;
-  }
-
-  /**
-   * Returns true if the provided vni is a Layer 2 VNI. Checks by seeing if the VNI is not declared
-   * with key-word "associate-vrf" under NVE interface.
-   */
-  private static boolean isLayer2Vni(Map<Integer, Nve> nves, int vni) {
-    return nves.values().stream()
-        .anyMatch(
-            nve -> nve.getMemberVnis().get(vni) != null && !nve.getMemberVni(vni).isAssociateVrf());
-  }
-
-  /**
-   * Returns true if the provided vni is a Layer 3 VNI. Checks by seeing if the VNI is declared with
-   * key-word "associate-vrf" under NVE interface.
-   */
-  private static boolean isLayer3Vni(Map<Integer, Nve> nves, int vni) {
-    return nves.values().stream()
-        .anyMatch(
-            nve -> nve.getMemberVnis().get(vni) != null && nve.getMemberVni(vni).isAssociateVrf());
   }
 
   /** Get the tenant VRF associated with a L3 VNI */

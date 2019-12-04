@@ -130,7 +130,6 @@ import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.SwitchportEncapsulationType;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.TunnelConfiguration;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Zone;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.AndMatchExpr;
@@ -191,6 +190,8 @@ import org.batfish.datamodel.vendor_family.cisco.Aaa;
 import org.batfish.datamodel.vendor_family.cisco.AaaAuthentication;
 import org.batfish.datamodel.vendor_family.cisco.AaaAuthenticationLogin;
 import org.batfish.datamodel.vendor_family.cisco.CiscoFamily;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Layer3Vni;
 import org.batfish.representation.cisco.CiscoAsaNat.Section;
 import org.batfish.representation.cisco.Tunnel.TunnelMode;
 import org.batfish.representation.cisco.eos.AristaBgpAggregateNetwork;
@@ -3577,17 +3578,14 @@ public final class CiscoConfiguration extends VendorConfiguration {
           .forEach(
               (vlan, vni) -> {
                 org.batfish.datamodel.Vrf vrf = getVrfForVlan(c, vlan).orElse(c.getDefaultVrf());
-                vrf.getVniSettings().put(vni, toVniSettings(_eosVxlan, vni, vlan, sourceIface));
+                vrf.addLayer2Vni(toL2Vni(_eosVxlan, vni, vlan, sourceIface));
               });
       _eosVxlan
           .getVrfToVni()
           .forEach(
               (vrfName, vni) ->
                   Optional.ofNullable(c.getVrfs().get(vrfName))
-                      .map(
-                          vrf ->
-                              vrf.getVniSettings()
-                                  .put(vni, toVniSettings(_eosVxlan, vni, null, sourceIface))));
+                      .ifPresent(vrf -> vrf.addLayer3Vni(toL3Vni(_eosVxlan, vni, sourceIface))));
     }
 
     // Define the Null0 interface if it has been referenced. Otherwise, these show as undefined
@@ -3936,10 +3934,10 @@ public final class CiscoConfiguration extends VendorConfiguration {
     return ImmutableList.of(c);
   }
 
-  private static VniSettings toVniSettings(
+  private static Layer2Vni toL2Vni(
       @Nonnull AristaEosVxlan vxlan,
       @Nonnull Integer vni,
-      @Nullable Integer vlan,
+      @Nonnull Integer vlan,
       @Nullable Interface sourceInterface) {
     Ip sourceAddress =
         sourceInterface == null
@@ -3948,9 +3946,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
     // Prefer VLAN-specific or general flood address (in that order) over multicast address
     SortedSet<Ip> bumTransportIps =
-        firstNonNull(
-            vlan != null ? vxlan.getVlanFloodAddresses().get(vlan) : null,
-            vxlan.getFloodAddresses());
+        firstNonNull(vxlan.getVlanFloodAddresses().get(vlan), vxlan.getFloodAddresses());
 
     // default to unicast flooding unless specified otherwise
     BumTransportMethod bumTransportMethod = BumTransportMethod.UNICAST_FLOOD_GROUP;
@@ -3962,12 +3958,40 @@ public final class CiscoConfiguration extends VendorConfiguration {
       bumTransportIps = ImmutableSortedSet.of(multicastAddress);
     }
 
-    return VniSettings.builder()
+    return Layer2Vni.builder()
         .setBumTransportIps(bumTransportIps)
         .setBumTransportMethod(bumTransportMethod)
         .setSourceAddress(sourceAddress)
         .setUdpPort(firstNonNull(vxlan.getUdpPort(), AristaEosVxlan.DEFAULT_UDP_PORT))
         .setVlan(vlan)
+        .setVni(vni)
+        .build();
+  }
+
+  private static Layer3Vni toL3Vni(
+      @Nonnull AristaEosVxlan vxlan, @Nonnull Integer vni, @Nullable Interface sourceInterface) {
+    Ip sourceAddress =
+        sourceInterface == null
+            ? null
+            : sourceInterface.getAddress() == null ? null : sourceInterface.getAddress().getIp();
+
+    SortedSet<Ip> bumTransportIps = vxlan.getFloodAddresses();
+
+    // default to unicast flooding unless specified otherwise
+    BumTransportMethod bumTransportMethod = BumTransportMethod.UNICAST_FLOOD_GROUP;
+
+    // Check if multicast is enabled
+    Ip multicastAddress = vxlan.getMulticastGroup();
+    if (bumTransportIps.isEmpty() && multicastAddress != null) {
+      bumTransportMethod = BumTransportMethod.MULTICAST_GROUP;
+      bumTransportIps = ImmutableSortedSet.of(multicastAddress);
+    }
+
+    return Layer3Vni.builder()
+        .setBumTransportIps(bumTransportIps)
+        .setBumTransportMethod(bumTransportMethod)
+        .setSourceAddress(sourceAddress)
+        .setUdpPort(firstNonNull(vxlan.getUdpPort(), AristaEosVxlan.DEFAULT_UDP_PORT))
         .setVni(vni)
         .build();
   }

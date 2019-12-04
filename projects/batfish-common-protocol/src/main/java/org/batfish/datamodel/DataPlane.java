@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 
 public interface DataPlane extends Serializable {
 
@@ -32,9 +33,9 @@ public interface DataPlane extends Serializable {
       getPrefixTracingInfoSummary();
 
   /**
-   * Return {@link VniSettings} for each node/VRF. Returned settings are based on the vni settings
-   * in a {@link Vrf}, but may include additional information obtained during dataplane computation,
+   * Return {@link Layer2Vni} for each node/VRF. Returned settings are based on the vni settings in
+   * a {@link Vrf}, but may include additional information obtained during dataplane computation,
    * such as updated flood lists due to EVPN route exchange.
    */
-  Table<String, String, Set<VniSettings>> getVniSettings();
+  Table<String, String, Set<Layer2Vni>> getVniSettings();
 }

@@ -7,7 +7,6 @@ import static org.batfish.datamodel.Interface.NULL_INTERFACE_NAME;
 import static org.batfish.datamodel.IpWildcard.ipWithWildcardMask;
 import static org.batfish.datamodel.Route.UNSET_NEXT_HOP_INTERFACE;
 import static org.batfish.datamodel.Route.UNSET_ROUTE_NEXT_HOP_IP;
-import static org.batfish.datamodel.VniSettings.DEFAULT_UDP_PORT;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchDscp;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchDst;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchDstPort;
@@ -33,7 +32,6 @@ import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasDefaultVrf
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasHostname;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterface;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasInterfaces;
-import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasVrf;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasNumReferrers;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasRoute6FilterLists;
 import static org.batfish.datamodel.matchers.DataModelMatchers.hasRouteFilterLists;
@@ -70,7 +68,7 @@ import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasBumTransport
 import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasSourceAddress;
 import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasUdpPort;
 import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasVni;
-import static org.batfish.datamodel.matchers.VrfMatchers.hasVniSettings;
+import static org.batfish.datamodel.matchers.VrfMatchers.hasL2VniSettings;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS_3000;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS_5000;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS_6000;
@@ -78,6 +76,7 @@ import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS_9000;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NxosMajorVersion.NXOS5;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NxosMajorVersion.NXOS6;
+import static org.batfish.datamodel.vxlan.Layer2Vni.DEFAULT_UDP_PORT;
 import static org.batfish.grammar.cisco_nxos.CiscoNxosControlPlaneExtractor.PACKET_LENGTH_RANGE;
 import static org.batfish.grammar.cisco_nxos.CiscoNxosControlPlaneExtractor.TCP_PORT_RANGE;
 import static org.batfish.grammar.cisco_nxos.CiscoNxosControlPlaneExtractor.UDP_PORT_RANGE;
@@ -4490,9 +4489,9 @@ public final class CiscoNxosGrammarTest {
   public void testNveVnisConversion() throws IOException {
     Configuration c = parseConfig("nxos_nve_vnis");
 
-    assertThat(c, hasDefaultVrf(hasVniSettings(hasKey(10001))));
+    assertThat(c, hasDefaultVrf(hasL2VniSettings(hasKey(10001))));
     assertThat(
-        c.getDefaultVrf().getVniSettings().get(10001),
+        c.getDefaultVrf().getLayer2Vnis().get(10001),
         allOf(
             hasBumTransportIps(equalTo(ImmutableSortedSet.of(Ip.parse("235.0.0.0")))),
             hasBumTransportMethod(equalTo(BumTransportMethod.MULTICAST_GROUP)),
@@ -4502,21 +4501,20 @@ public final class CiscoNxosGrammarTest {
             hasVni(10001)));
 
     String tenant1 = "tenant1"; // 20001 is an L3 VNI so it should be mapped to a VRF
-    assertThat(c, hasVrf(tenant1, hasVniSettings(hasKey(20001))));
+    assertThat(c.getVrfs().get(tenant1).getLayer3Vnis().get(20001), notNullValue());
     assertThat(
-        c.getVrfs().get(tenant1).getVniSettings().get(20001),
+        c.getVrfs().get(tenant1).getLayer3Vnis().get(20001),
         allOf(
             // L3 mcast IP
             hasBumTransportIps(equalTo(ImmutableSortedSet.of(Ip.parse("234.0.0.0")))),
             hasBumTransportMethod(equalTo(BumTransportMethod.MULTICAST_GROUP)),
             hasSourceAddress(nullValue()),
             hasUdpPort(equalTo(DEFAULT_UDP_PORT)),
-            VniSettingsMatchers.hasVlan(equalTo(3)),
             hasVni(20001)));
 
-    assertThat(c, hasDefaultVrf(hasVniSettings(hasKey(30001))));
+    assertThat(c, hasDefaultVrf(hasL2VniSettings(hasKey(30001))));
     assertThat(
-        c.getDefaultVrf().getVniSettings().get(30001),
+        c.getDefaultVrf().getLayer2Vnis().get(30001),
         allOf(
             // L2 mcast IP
             hasBumTransportIps(equalTo(ImmutableSortedSet.of(Ip.parse("233.0.0.0")))),
@@ -4526,9 +4524,9 @@ public final class CiscoNxosGrammarTest {
             VniSettingsMatchers.hasVlan(equalTo(4)),
             hasVni(30001)));
 
-    assertThat(c, hasDefaultVrf(hasVniSettings(hasKey(40001))));
+    assertThat(c, hasDefaultVrf(hasL2VniSettings(hasKey(40001))));
     assertThat(
-        c.getDefaultVrf().getVniSettings().get(40001),
+        c.getDefaultVrf().getLayer2Vnis().get(40001),
         allOf(
             hasBumTransportIps(equalTo(ImmutableSortedSet.of(Ip.parse("4.0.0.1")))),
             hasBumTransportMethod(equalTo(BumTransportMethod.UNICAST_FLOOD_GROUP)),
@@ -4538,7 +4536,7 @@ public final class CiscoNxosGrammarTest {
             hasVni(40001)));
 
     // VLAN for VNI 500001 is shutdown
-    assertThat(c, not(hasDefaultVrf(hasVniSettings(hasKey(50001)))));
+    assertThat(c, not(hasDefaultVrf(hasL2VniSettings(hasKey(50001)))));
   }
 
   @Test

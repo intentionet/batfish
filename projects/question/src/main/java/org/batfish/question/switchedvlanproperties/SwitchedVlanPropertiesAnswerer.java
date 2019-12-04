@@ -20,7 +20,6 @@ import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.SwitchportMode;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.pojo.Node;
@@ -30,6 +29,7 @@ import org.batfish.datamodel.table.ColumnMetadata;
 import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.specifier.InterfaceSpecifier;
 import org.batfish.specifier.SpecifierContext;
 
@@ -49,7 +49,7 @@ public final class SwitchedVlanPropertiesAnswerer extends Answerer {
         .values()
         .forEach(
             vrf ->
-                vrf.getVniSettings()
+                vrf.getLayer2Vnis()
                     .values()
                     .forEach(
                         vniSettings ->
@@ -229,11 +229,11 @@ public final class SwitchedVlanPropertiesAnswerer extends Answerer {
 
   @VisibleForTesting
   static void tryAddVlanVni(
-      VniSettings vniSettings,
+      Layer2Vni vniSettings,
       IntegerSpace vlans,
       ImmutableMap.Builder<Integer, Integer> vlanVnisBuilder,
       Map<Integer, ImmutableSet.Builder<NodeInterfacePair>> switchedVlanInterfaces) {
-    if (vniSettings.getVlan() != null && vlans.contains(vniSettings.getVlan())) {
+    if (vlans.contains(vniSettings.getVlan())) {
       int vlan = vniSettings.getVlan();
       vlanVnisBuilder.put(vlan, vniSettings.getVni());
       switchedVlanInterfaces.computeIfAbsent(vlan, v -> ImmutableSet.builder());

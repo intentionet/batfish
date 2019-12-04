@@ -25,7 +25,6 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.NamedPort;
 import org.batfish.datamodel.NetworkConfigurations;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.flow.Hop;
 import org.batfish.datamodel.flow.Trace;
@@ -34,16 +33,16 @@ import org.batfish.datamodel.flow.Trace;
 public final class VxlanTopologyUtils {
 
   /**
-   * Add an edge to the {@code graph} between one pair of {@link VniSettings}, if their
-   * configurations are compatible
+   * Add an edge to the {@code graph} between one pair of {@link Layer2Vni}, if their configurations
+   * are compatible
    */
   @VisibleForTesting
   static void addVniEdge(
       MutableGraph<VxlanNode> graph,
       VrfId vrfTail,
-      VniSettings vniSettingsTail,
+      Layer2Vni vniSettingsTail,
       VrfId vrfHead,
-      VniSettings vniSettingsHead) {
+      Layer2Vni vniSettingsHead) {
     if (compatibleVniSettings(vniSettingsTail, vniSettingsHead)) {
       VxlanNode nodeTail = buildVxlanNode(vrfTail, vniSettingsTail);
       VxlanNode nodeHead = buildVxlanNode(vrfHead, vniSettingsHead);
@@ -58,9 +57,9 @@ public final class VxlanTopologyUtils {
   @VisibleForTesting
   static void addVniEdges(
       MutableGraph<VxlanNode> graph,
-      Table<VrfId, Integer, VniSettings> allVniSettings,
+      Table<VrfId, Integer, Layer2Vni> allVniSettings,
       Integer vni,
-      Map<VrfId, VniSettings> vrfs) {
+      Map<VrfId, Layer2Vni> vrfs) {
     for (VrfId vrfTail : vrfs.keySet()) {
       for (VrfId vrfHead : vrfs.keySet()) {
         // Generate all VRF combinations without repetition
@@ -77,21 +76,19 @@ public final class VxlanTopologyUtils {
     }
   }
 
-  /** Build a {@link VxlanNode} for the given {@link VniSettings} and {@link VrfId}. */
+  /** Build a {@link VxlanNode} for the given {@link Layer2Vni} and {@link VrfId}. */
   @VisibleForTesting
-  static VxlanNode buildVxlanNode(VrfId vrf, VniSettings vniSettings) {
+  static VxlanNode buildVxlanNode(VrfId vrf, Layer2Vni vniSettings) {
     return VxlanNode.builder().setHostname(vrf._hostname).setVni(vniSettings.getVni()).build();
   }
 
-  /** Check if two {@link VniSettings} have compatible configurations */
+  /** Check if two {@link Layer2Vni} have compatible configurations */
   @VisibleForTesting
-  static boolean compatibleVniSettings(VniSettings vniSettingsTail, VniSettings vniSettingsHead) {
+  static boolean compatibleVniSettings(Layer2Vni vniSettingsTail, Layer2Vni vniSettingsHead) {
     return vniSettingsTail.getBumTransportMethod() == vniSettingsHead.getBumTransportMethod()
         && vniSettingsTail.getUdpPort().equals(vniSettingsHead.getUdpPort())
         && vniSettingsTail.getSourceAddress() != null
         && vniSettingsHead.getSourceAddress() != null
-        && vniSettingsTail.getVlan() != null
-        && vniSettingsHead.getVlan() != null
         && !vniSettingsTail.getSourceAddress().equals(vniSettingsHead.getSourceAddress())
         && ((vniSettingsTail.getBumTransportMethod() == BumTransportMethod.MULTICAST_GROUP
                 && vniSettingsTail
@@ -105,16 +102,16 @@ public final class VxlanTopologyUtils {
   }
 
   @VisibleForTesting
-  static @Nonnull String getVniVrf(NetworkConfigurations nc, String host, VniSettings vniSettings) {
+  static @Nonnull String getVniVrf(NetworkConfigurations nc, String host, Layer2Vni vniSettings) {
     return nc.get(host).get().getVrfs().entrySet().stream()
-        .filter(vrfEntry -> vrfEntry.getValue().getVniSettings().containsKey(vniSettings.getVni()))
+        .filter(vrfEntry -> vrfEntry.getValue().getLayer2Vnis().containsKey(vniSettings.getVni()))
         .map(Entry::getKey)
         .findAny()
         .get();
   }
 
   /**
-   * Compute the VXLAN topology based on the {@link VniSettings} extracted from the given
+   * Compute the VXLAN topology based on the {@link Layer2Vni} extracted from the given
    * configurations
    */
   public static @Nonnull VxlanTopology computeVxlanTopology(
@@ -123,24 +120,24 @@ public final class VxlanTopologyUtils {
   }
 
   /**
-   * Compute the VXLAN topology based on the {@link VniSettings} extracted from the given table.
+   * Compute the VXLAN topology based on the {@link Layer2Vni} extracted from the given table.
    *
    * @param allVniSettings table of the VNI settings. Row is hostname, Column is VRF name.
    */
   public static @Nonnull VxlanTopology computeVxlanTopology(
-      Table<String, String, ? extends Collection<VniSettings>> allVniSettings) {
+      Table<String, String, ? extends Collection<Layer2Vni>> allVniSettings) {
     return internalComputeVxlanTopology(computeVniSettingsTable(allVniSettings));
   }
 
   /** Convert configurations into a table format that's easier to work with */
   @VisibleForTesting
   @Nonnull
-  static Table<VrfId, Integer, VniSettings> computeVniSettingsTable(
+  static Table<VrfId, Integer, Layer2Vni> computeVniSettingsTable(
       Map<String, Configuration> configurations) {
-    Table<VrfId, Integer, VniSettings> table = HashBasedTable.create();
+    Table<VrfId, Integer, Layer2Vni> table = HashBasedTable.create();
     for (Configuration c : configurations.values()) {
       for (Vrf vrf : c.getVrfs().values()) {
-        for (VniSettings vniSettings : vrf.getVniSettings().values()) {
+        for (Layer2Vni vniSettings : vrf.getLayer2Vnis().values()) {
           table.put(new VrfId(c.getHostname(), vrf.getName()), vniSettings.getVni(), vniSettings);
         }
       }
@@ -153,14 +150,14 @@ public final class VxlanTopologyUtils {
    * with
    */
   @Nonnull
-  private static Table<VrfId, Integer, VniSettings> computeVniSettingsTable(
-      Table<String, String, ? extends Collection<VniSettings>> allVniSettings) {
-    Table<VrfId, Integer, VniSettings> table = HashBasedTable.create();
-    for (Cell<String, String, ? extends Collection<VniSettings>> cell : allVniSettings.cellSet()) {
+  private static Table<VrfId, Integer, Layer2Vni> computeVniSettingsTable(
+      Table<String, String, ? extends Collection<Layer2Vni>> allVniSettings) {
+    Table<VrfId, Integer, Layer2Vni> table = HashBasedTable.create();
+    for (Cell<String, String, ? extends Collection<Layer2Vni>> cell : allVniSettings.cellSet()) {
       assert cell.getValue() != null;
       assert cell.getRowKey() != null;
       assert cell.getColumnKey() != null;
-      for (VniSettings vni : cell.getValue()) {
+      for (Layer2Vni vni : cell.getValue()) {
         table.put(new VrfId(cell.getRowKey(), cell.getColumnKey()), vni.getVni(), vni);
       }
     }
@@ -169,7 +166,7 @@ public final class VxlanTopologyUtils {
 
   /** Compute the VXLAN topology. Adds edges per VNI. */
   private static @Nonnull VxlanTopology internalComputeVxlanTopology(
-      Table<VrfId, Integer, VniSettings> allVniSettings) {
+      Table<VrfId, Integer, Layer2Vni> allVniSettings) {
     MutableGraph<VxlanNode> graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
     allVniSettings
         .columnMap() // group by vni
@@ -206,13 +203,13 @@ public final class VxlanTopologyUtils {
     String hostV = nodeV.getHostname();
     // nodeU and nodeV must be compatible coming in to this function
     int vni = nodeU.getVni();
-    VniSettings vniSettingsU = nc.getVniSettings(hostU, vni).get();
+    Layer2Vni vniSettingsU = nc.getVniSettings(hostU, vni).get();
     // early exit if unsupported
     if (vniSettingsU.getBumTransportMethod() != BumTransportMethod.UNICAST_FLOOD_GROUP) {
       // TODO: support multicast transport
       return false;
     }
-    VniSettings vniSettingsV = nc.getVniSettings(hostV, vni).get();
+    Layer2Vni vniSettingsV = nc.getVniSettings(hostV, vni).get();
     String vrfU = getVniVrf(nc, hostU, vniSettingsU);
     String vrfV = getVniVrf(nc, hostV, vniSettingsV);
     Ip srcIpU = vniSettingsU.getSourceAddress();

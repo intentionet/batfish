@@ -52,7 +52,6 @@ import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Route;
 import org.batfish.datamodel.RoutingProtocol;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.AddressFamily;
 import org.batfish.datamodel.bgp.AddressFamily.Type;
@@ -64,6 +63,8 @@ import org.batfish.datamodel.bgp.VniConfig;
 import org.batfish.datamodel.bgp.community.ExtendedCommunity;
 import org.batfish.datamodel.routing_policy.Environment.Direction;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Vni;
 import org.batfish.dataplane.protocols.BgpProtocolHelper;
 import org.batfish.dataplane.rib.BgpRib;
 import org.batfish.dataplane.rib.Bgpv4Rib;
@@ -531,12 +532,12 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
             vniConfig -> {
               Vrf vniVrf = _c.getVrfs().get(vniConfig.getVrf());
               assert vniVrf != null; // Invariant guaranteed by proper conversion
-              VniSettings vniSettings = vniVrf.getVniSettings().get(vniConfig.getVni());
-              // HOTFIX: skip missing L3 vnis (caused by arista)
-              //     assert vniSettings != null; // Invariant guaranteed by proper conversion
+              // Layer 3 VNIs take precedence on most vendors
+              Vni vniSettings = vniVrf.getLayer3Vnis().get(vniConfig.getVni());
               if (vniSettings == null) {
-                return;
+                vniSettings = vniVrf.getLayer2Vnis().get(vniConfig.getVni());
               }
+              assert vniSettings != null; // Invariant guaranteed by proper conversion
               if (vniSettings.getSourceAddress() == null) {
                 return;
               }
@@ -572,14 +573,14 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
   }
 
   /**
-   * Create a new {@link EvpnType3Route} based on given {@link VniSettings}. Assumes VniSettings are
+   * Create a new {@link EvpnType3Route} based on given {@link Layer2Vni}. Assumes Layer2Vni are
    * valid (e.g., have properly set source address).
    */
   @Nonnull
   @VisibleForTesting
   static EvpnType3Route initEvpnType3Route(
       int ebgpAdmin,
-      VniSettings vniSettings,
+      Vni vniSettings,
       ExtendedCommunity routeTarget,
       RouteDistinguisher routeDistinguisher,
       Ip routerId) {

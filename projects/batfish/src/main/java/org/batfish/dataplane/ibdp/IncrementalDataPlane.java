@@ -26,7 +26,7 @@ import org.batfish.datamodel.ForwardingAnalysisImpl;
 import org.batfish.datamodel.GenericRib;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Topology;
-import org.batfish.datamodel.VniSettings;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 
 public final class IncrementalDataPlane implements Serializable, DataPlane {
 
@@ -99,7 +99,7 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
 
   @Nonnull private final Table<String, String, Set<Bgpv4Route>> _bgpRoutes;
   @Nonnull private final Table<String, String, Set<EvpnRoute<?, ?>>> _evpnRoutes;
-  @Nonnull private final Table<String, String, Set<VniSettings>> _vniSettings;
+  @Nonnull private final Table<String, String, Set<Layer2Vni>> _vniSettings;
 
   private IncrementalDataPlane(Builder builder) {
     _nodes = builder._nodes;
@@ -181,8 +181,8 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
   }
 
   @Nonnull
-  private Table<String, String, Set<VniSettings>> computeVniSettings() {
-    Table<String, String, Set<VniSettings>> result = HashBasedTable.create();
+  private Table<String, String, Set<Layer2Vni>> computeVniSettings() {
+    Table<String, String, Set<Layer2Vni>> result = HashBasedTable.create();
     for (Node node : _nodes.values()) {
       for (Entry<String, VirtualRouter> vr : node.getVirtualRouters().entrySet()) {
         result.put(
@@ -209,7 +209,7 @@ public final class IncrementalDataPlane implements Serializable, DataPlane {
 
   @Nonnull
   @Override
-  public Table<String, String, Set<VniSettings>> getVniSettings() {
+  public Table<String, String, Set<Layer2Vni>> getVniSettings() {
     return _vniSettings;
   }
 

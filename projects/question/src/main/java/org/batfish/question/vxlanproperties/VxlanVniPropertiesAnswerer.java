@@ -15,7 +15,6 @@ import org.batfish.common.plugin.IBatfish;
 import org.batfish.datamodel.BumTransportMethod;
 import org.batfish.datamodel.DataPlane;
 import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.questions.DisplayHints;
 import org.batfish.datamodel.questions.PropertySpecifier;
@@ -27,6 +26,7 @@ import org.batfish.datamodel.table.Row;
 import org.batfish.datamodel.table.Row.RowBuilder;
 import org.batfish.datamodel.table.TableAnswerElement;
 import org.batfish.datamodel.table.TableMetadata;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.specifier.AllNodesNodeSpecifier;
 import org.batfish.specifier.SpecifierFactories;
 
@@ -119,11 +119,11 @@ public final class VxlanVniPropertiesAnswerer extends Answerer {
       Set<String> nodes,
       Map<String, ColumnMetadata> columns) {
     Multiset<Row> rows = HashMultiset.create();
-    Table<String, String, Set<VniSettings>> allVniSettings = dp.getVniSettings();
+    Table<String, String, Set<Layer2Vni>> allVniSettings = dp.getVniSettings();
 
     for (String nodeName : nodes) {
-      for (Set<VniSettings> vrfVnis : allVniSettings.row(nodeName).values()) {
-        for (VniSettings vniSettings : vrfVnis) {
+      for (Set<Layer2Vni> vrfVnis : allVniSettings.row(nodeName).values()) {
+        for (Layer2Vni vniSettings : vrfVnis) {
           int vni = vniSettings.getVni();
           RowBuilder row = Row.builder(columns).put(COL_NODE, nodeName).put(COL_VNI, vni);
           boolean unicast =

@@ -1,6 +1,8 @@
 package org.batfish.dataplane.ibdp;
 
+import static org.batfish.datamodel.BumTransportMethod.UNICAST_FLOOD_GROUP;
 import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
+import static org.batfish.datamodel.vxlan.Layer2Vni.builder;
 import static org.batfish.dataplane.ibdp.BgpRoutingProcess.initEvpnType3Route;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -33,7 +35,6 @@ import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RoutingProtocol;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.AddressFamily.Type;
 import org.batfish.datamodel.bgp.BgpTopology;
@@ -47,6 +48,7 @@ import org.batfish.datamodel.bgp.VniConfig;
 import org.batfish.datamodel.bgp.community.ExtendedCommunity;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.routing_policy.statement.Statements;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.dataplane.rib.Rib;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,7 +112,7 @@ public class BgpRoutingProcessTest {
     EvpnType3Route route =
         initEvpnType3Route(
             admin,
-            VniSettings.builder()
+            Layer2Vni.builder()
                 .setVlan(1)
                 .setVni(10001)
                 .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
@@ -170,25 +172,20 @@ public class BgpRoutingProcessTest {
                     .build())
             .build();
     _bgpProcess.getActiveNeighbors().put(localIp.toPrefix(), evpnPeer);
-    _vrf.getVniSettings()
-        .put(
-            vni,
-            VniSettings.builder()
-                .setVni(vni)
-                .setVlan(1)
-                .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
-                .setSourceAddress(localIp)
-                .build());
-    _vrf2
-        .getVniSettings()
-        .put(
-            vni2,
-            VniSettings.builder()
-                .setVni(vni)
-                .setVlan(2)
-                .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
-                .setSourceAddress(localIp)
-                .build());
+    _vrf.addLayer2Vni(
+        builder()
+            .setVni(vni)
+            .setVlan(1)
+            .setBumTransportMethod(UNICAST_FLOOD_GROUP)
+            .setSourceAddress(localIp)
+            .build());
+    _vrf2.addLayer2Vni(
+        builder()
+            .setVni(vni2)
+            .setVlan(2)
+            .setBumTransportMethod(UNICAST_FLOOD_GROUP)
+            .setSourceAddress(localIp)
+            .build());
 
     Node node = new Node(_c);
     BgpRoutingProcess defaultProc =
@@ -397,25 +394,20 @@ public class BgpRoutingProcessTest {
         .setStatements(Collections.singletonList(Statements.ExitAccept.toStaticStatement()))
         .build();
     _bgpProcess.getActiveNeighbors().put(peerIp.toPrefix(), evpnPeer);
-    _vrf.getVniSettings()
-        .put(
-            vni,
-            VniSettings.builder()
-                .setVni(vni)
-                .setVlan(1)
-                .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
-                .setSourceAddress(localIp)
-                .build());
-    _vrf2
-        .getVniSettings()
-        .put(
-            vni2,
-            VniSettings.builder()
-                .setVni(vni)
-                .setVlan(2)
-                .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
-                .setSourceAddress(localIp)
-                .build());
+    _vrf.addLayer2Vni(
+        builder()
+            .setVni(vni)
+            .setVlan(1)
+            .setBumTransportMethod(UNICAST_FLOOD_GROUP)
+            .setSourceAddress(localIp)
+            .build());
+    _vrf2.addLayer2Vni(
+        builder()
+            .setVni(vni)
+            .setVlan(2)
+            .setBumTransportMethod(UNICAST_FLOOD_GROUP)
+            .setSourceAddress(localIp)
+            .build());
 
     Node node = new Node(_c);
     BgpRoutingProcess routingProcNode1 =

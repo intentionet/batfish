@@ -48,10 +48,10 @@ import org.batfish.datamodel.NetworkConfigurations;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.Topology;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.flow.TraceAndReverseFlow;
 import org.batfish.datamodel.ipsec.IpsecTopology;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.datamodel.vxlan.VxlanNode;
 import org.batfish.datamodel.vxlan.VxlanTopology;
 
@@ -257,11 +257,10 @@ public final class TopologyUtil {
                 }
               });
         });
-    Map<Integer, VniSettings> vniSettingsByVlan =
+    Map<Integer, Layer2Vni> vniSettingsByVlan =
         config.getVrfs().values().stream()
-            .flatMap(vrf -> vrf.getVniSettings().values().stream())
-            .filter(vniSettings -> vniSettings.getVlan() != null)
-            .collect(ImmutableMap.toImmutableMap(VniSettings::getVlan, Function.identity()));
+            .flatMap(vrf -> vrf.getLayer2Vnis().values().stream())
+            .collect(ImmutableMap.toImmutableMap(Layer2Vni::getVlan, Function.identity()));
     config.getAllInterfaces().values().stream()
         .filter(Interface::getActive)
         .filter(i -> i.getInterfaceType() == InterfaceType.VLAN && i.getVlan() != null)

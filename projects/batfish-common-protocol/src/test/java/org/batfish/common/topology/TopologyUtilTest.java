@@ -1,6 +1,7 @@
 package org.batfish.common.topology;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableSortedSet.of;
 import static org.batfish.common.topology.IpOwners.computeIpInterfaceOwners;
 import static org.batfish.common.topology.TopologyUtil.cleanLayer1PhysicalTopology;
 import static org.batfish.common.topology.TopologyUtil.computeInitialTunnelTopology;
@@ -11,10 +12,13 @@ import static org.batfish.common.topology.TopologyUtil.computeRawLayer3Topology;
 import static org.batfish.common.topology.TopologyUtil.computeVniInterNodeEdges;
 import static org.batfish.common.topology.TopologyUtil.computeVniName;
 import static org.batfish.common.topology.TopologyUtil.unionLayer1PhysicalTopologies;
+import static org.batfish.datamodel.BumTransportMethod.UNICAST_FLOOD_GROUP;
+import static org.batfish.datamodel.Ip.FIRST_CLASS_B_PRIVATE_IP;
 import static org.batfish.datamodel.matchers.EdgeMatchers.hasHead;
 import static org.batfish.datamodel.matchers.EdgeMatchers.hasNode1;
 import static org.batfish.datamodel.matchers.EdgeMatchers.hasNode2;
 import static org.batfish.datamodel.matchers.EdgeMatchers.hasTail;
+import static org.batfish.datamodel.vxlan.Layer2Vni.builder;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -58,12 +62,12 @@ import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.Topology;
 import org.batfish.datamodel.TunnelConfiguration;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.isp_configuration.BorderInterfaceInfo;
 import org.batfish.datamodel.isp_configuration.IspConfiguration;
 import org.batfish.datamodel.isp_configuration.IspFilter;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.datamodel.vxlan.VxlanNode;
 import org.batfish.datamodel.vxlan.VxlanTopology;
 import org.junit.Before;
@@ -235,14 +239,14 @@ public final class TopologyUtilTest {
     // (Assume existence of layer-3 interfaces)
 
     // VNIs
-    VniSettings.Builder vnb =
-        VniSettings.builder()
+    Layer2Vni.Builder vnb =
+        Layer2Vni.builder()
             .setBumTransportIps(ImmutableSortedSet.of(Ip.FIRST_MULTICAST_IP))
             .setBumTransportMethod(BumTransportMethod.MULTICAST_GROUP)
             .setVlan(vlanId)
             .setVni(vni);
-    v1.getVniSettings().put(vni, vnb.build());
-    v2.getVniSettings().put(vni, vnb.build());
+    v1.addLayer2Vni(vnb.build());
+    v2.addLayer2Vni(vnb.build());
 
     MutableGraph<VxlanNode> graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
     graph.putEdge(new VxlanNode(s1Name, vni), new VxlanNode(s2Name, vni));
@@ -268,14 +272,14 @@ public final class TopologyUtilTest {
     Configuration s2 = _cb.setHostname(s2Name).build();
     Vrf v1 = _vb.setOwner(s1).setName(vrfName).build();
     Vrf v2 = _vb.setOwner(s2).setName(vrfName).build();
-    VniSettings.Builder vnb =
-        VniSettings.builder()
+    Layer2Vni.Builder vnb =
+        Layer2Vni.builder()
             .setBumTransportIps(ImmutableSortedSet.of(Ip.FIRST_MULTICAST_IP))
             .setBumTransportMethod(BumTransportMethod.MULTICAST_GROUP)
             .setVlan(vlanId)
             .setVni(vni);
-    v1.getVniSettings().put(vni, vnb.build());
-    v2.getVniSettings().put(vni, vnb.build());
+    v1.addLayer2Vni(vnb.build());
+    v2.addLayer2Vni(vnb.build());
     String vniName = computeVniName(vni);
 
     MutableGraph<VxlanNode> graph = GraphBuilder.undirected().allowsSelfLoops(false).build();
@@ -602,15 +606,13 @@ public final class TopologyUtilTest {
         .build();
 
     String vniName = TopologyUtil.computeVniName(vni);
-    v1.getVniSettings()
-        .put(
-            vni,
-            VniSettings.builder()
-                .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
-                .setBumTransportIps(ImmutableSortedSet.of(Ip.FIRST_CLASS_B_PRIVATE_IP))
-                .setVni(vni)
-                .setVlan(vlanId)
-                .build());
+    v1.addLayer2Vni(
+        builder()
+            .setBumTransportMethod(UNICAST_FLOOD_GROUP)
+            .setBumTransportIps(of(FIRST_CLASS_B_PRIVATE_IP))
+            .setVni(vni)
+            .setVlan(vlanId)
+            .build());
 
     ImmutableSet.Builder<Layer2Edge> builder = ImmutableSet.builder();
     computeLayer2SelfEdges(c1, builder::add);
@@ -644,15 +646,13 @@ public final class TopologyUtilTest {
         .build();
 
     String vniName = TopologyUtil.computeVniName(vni);
-    v1.getVniSettings()
-        .put(
-            vni,
-            VniSettings.builder()
-                .setBumTransportMethod(BumTransportMethod.UNICAST_FLOOD_GROUP)
-                .setBumTransportIps(ImmutableSortedSet.of(Ip.FIRST_CLASS_B_PRIVATE_IP))
-                .setVni(vni)
-                .setVlan(vlanId)
-                .build());
+    v1.addLayer2Vni(
+        builder()
+            .setBumTransportMethod(UNICAST_FLOOD_GROUP)
+            .setBumTransportIps(of(FIRST_CLASS_B_PRIVATE_IP))
+            .setVni(vni)
+            .setVlan(vlanId)
+            .build());
 
     ImmutableSet.Builder<Layer2Edge> builder = ImmutableSet.builder();
     computeLayer2SelfEdges(c1, builder::add);

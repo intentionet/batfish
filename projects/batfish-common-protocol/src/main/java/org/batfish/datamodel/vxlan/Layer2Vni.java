@@ -1,24 +1,23 @@
-package org.batfish.datamodel;
+package org.batfish.datamodel.vxlan;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.batfish.datamodel.BumTransportMethod;
+import org.batfish.datamodel.Ip;
 
-/** Settings for a specific VXLAN segment */
-@ParametersAreNonnullByDefault
-public final class VniSettings implements Serializable {
+/** Settings for a VXLAN segment identified by a L2 VNI */
+public final class Layer2Vni implements Vni {
 
+  /** Builder for {@link Layer2Vni} */
   public static final class Builder {
 
     @Nonnull private Set<Ip> _bumTransportIps = ImmutableSet.of();
@@ -30,13 +29,14 @@ public final class VniSettings implements Serializable {
 
     private Builder() {}
 
-    public @Nonnull VniSettings build() {
+    public @Nonnull Layer2Vni build() {
       checkArgument(_vni != null, "VNI must not be null.");
+      checkArgument(_vlan != null, "VLAN must not be null.");
       checkArgument(_bumTransportMethod != null, "BumTransportMethod must not be null.");
       checkArgument(
           _bumTransportMethod != BumTransportMethod.MULTICAST_GROUP || _bumTransportIps.size() <= 1,
           "Cannot specify more than one multicast group.");
-      return new VniSettings(
+      return new Layer2Vni(
           _bumTransportIps,
           _bumTransportMethod,
           _sourceAddress,
@@ -65,7 +65,7 @@ public final class VniSettings implements Serializable {
       return this;
     }
 
-    public @Nonnull Builder setVlan(@Nullable Integer vlan) {
+    public @Nonnull Builder setVlan(Integer vlan) {
       _vlan = vlan;
       return this;
     }
@@ -76,25 +76,23 @@ public final class VniSettings implements Serializable {
     }
   }
 
-  public static final Integer DEFAULT_UDP_PORT = 4789;
-
   @Nonnull private final Set<Ip> _bumTransportIps;
   @Nonnull private final BumTransportMethod _bumTransportMethod;
   @Nullable private final Ip _sourceAddress;
   @Nonnull private final Integer _udpPort;
-  @Nullable private final Integer _vlan;
+  private final int _vlan;
   private final int _vni;
 
   public static @Nonnull Builder builder() {
     return new Builder();
   }
 
-  private VniSettings(
+  private Layer2Vni(
       Set<Ip> bumTransportIps,
       BumTransportMethod bumTransportMethod,
       @Nullable Ip sourceAddress,
       Integer udpPort,
-      @Nullable Integer vlan,
+      int vlan,
       int vni) {
     _bumTransportIps = bumTransportIps;
     _bumTransportMethod = bumTransportMethod;
@@ -109,10 +107,10 @@ public final class VniSettings implements Serializable {
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof VniSettings)) {
+    if (!(obj instanceof Layer2Vni)) {
       return false;
     }
-    VniSettings rhs = (VniSettings) obj;
+    Layer2Vni rhs = (Layer2Vni) obj;
     return Objects.equals(_bumTransportMethod, rhs._bumTransportMethod)
         && Objects.equals(_bumTransportIps, rhs._bumTransportIps)
         && Objects.equals(_sourceAddress, rhs._sourceAddress)
@@ -127,35 +125,39 @@ public final class VniSettings implements Serializable {
         _bumTransportMethod, _bumTransportIps, _sourceAddress, _udpPort, _vlan, _vni);
   }
 
-  @JsonIgnore
+  @Override
   public @Nullable Ip getMulticastGroup() {
     return _bumTransportMethod == BumTransportMethod.MULTICAST_GROUP
         ? Iterables.getOnlyElement(_bumTransportIps)
         : null;
   }
 
+  @Override
   public @Nonnull Set<Ip> getBumTransportIps() {
     return _bumTransportIps;
   }
 
+  @Override
   public @Nonnull BumTransportMethod getBumTransportMethod() {
     return _bumTransportMethod;
   }
 
+  @Override
   @Nullable
   public Ip getSourceAddress() {
     return _sourceAddress;
   }
 
+  @Override
   public @Nonnull Integer getUdpPort() {
     return _udpPort;
   }
 
-  @Nullable
-  public Integer getVlan() {
+  public int getVlan() {
     return _vlan;
   }
 
+  @Override
   public int getVni() {
     return _vni;
   }
@@ -171,16 +173,15 @@ public final class VniSettings implements Serializable {
         .setBumTransportIps(_bumTransportIps);
   }
 
-  /** Return a new {@link VniSettings} with a flood list that includes a given {@code ip} */
+  /** Return a new {@link Layer2Vni} with a flood list that includes a given {@code ip} */
   @Nonnull
-  public VniSettings addToFloodList(Ip ip) {
+  public Layer2Vni addToFloodList(Ip ip) {
     checkArgument(
         _bumTransportMethod == BumTransportMethod.UNICAST_FLOOD_GROUP,
         "Cannot add new IPs if the transport method is not %s",
         BumTransportMethod.UNICAST_FLOOD_GROUP);
     return toBuilder()
-        .setBumTransportIps(
-            ImmutableSortedSet.<Ip>naturalOrder().addAll(_bumTransportIps).add(ip).build())
+        .setBumTransportIps(ImmutableSet.<Ip>builder().addAll(_bumTransportIps).add(ip).build())
         .build();
   }
 }

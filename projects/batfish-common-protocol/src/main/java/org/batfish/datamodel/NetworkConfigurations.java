@@ -17,6 +17,7 @@ import org.batfish.datamodel.eigrp.EigrpProcess;
 import org.batfish.datamodel.ospf.OspfNeighborConfig;
 import org.batfish.datamodel.ospf.OspfNeighborConfigId;
 import org.batfish.datamodel.ospf.OspfProcess;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 
 /**
  * Represents a set of configurations in a network. Has helper methods to "walk the configuration
@@ -165,16 +166,16 @@ public final class NetworkConfigurations {
         .map(oc -> oc.get(ospfConfigId));
   }
 
-  /** Return {@link VniSettings} identificated by {@code hostname} and {@code vni} number. */
+  /** Return {@link Layer2Vni} identificated by {@code hostname} and {@code vni} number. */
   @Nonnull
-  public Optional<VniSettings> getVniSettings(String hostname, int vni) {
+  public Optional<Layer2Vni> getVniSettings(String hostname, int vni) {
     // implementation assumes a given VNI can be present in at most one VRF.
     return get(hostname)
         .map(Configuration::getVrfs)
         .map(
             vrfs ->
                 vrfs.values().stream()
-                    .map(Vrf::getVniSettings)
+                    .map(Vrf::getLayer2Vnis)
                     .map(vniSettingsMap -> vniSettingsMap.get(vni))
                     .filter(Objects::nonNull)
                     .findAny()

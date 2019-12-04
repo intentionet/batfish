@@ -156,7 +156,7 @@ import static org.batfish.datamodel.matchers.VrfMatchers.hasEigrpProcesses;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasOspfProcess;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasSnmpServer;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasStaticRoutes;
-import static org.batfish.datamodel.matchers.VrfMatchers.hasVniSettings;
+import static org.batfish.datamodel.matchers.VrfMatchers.hasL2VniSettings;
 import static org.batfish.datamodel.transformation.Transformation.when;
 import static org.batfish.datamodel.transformation.TransformationStep.assignDestinationIp;
 import static org.batfish.datamodel.transformation.TransformationStep.assignSourceIp;
@@ -336,7 +336,6 @@ import org.batfish.datamodel.SwitchportEncapsulationType;
 import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.TunnelConfiguration;
 import org.batfish.datamodel.TunnelConfiguration.Builder;
-import org.batfish.datamodel.VniSettings;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.acl.MatchSrcInterface;
@@ -385,6 +384,7 @@ import org.batfish.datamodel.tracking.DecrementPriority;
 import org.batfish.datamodel.tracking.TrackInterface;
 import org.batfish.datamodel.transformation.AssignIpAddressFromPool;
 import org.batfish.datamodel.transformation.Transformation;
+import org.batfish.datamodel.vxlan.Layer2Vni;
 import org.batfish.dataplane.ibdp.IncrementalDataPlane;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
@@ -4229,18 +4229,18 @@ public final class CiscoGrammarTest {
             hostnameBase, hostnameNoSourceIface, hostnameNoLoopbackAddr);
     // Config with proper loopback iface, VLAN-specific unicast, explicit UDP port
     Configuration configBase = batfish.loadConfigurations().get(hostnameBase);
-    assertThat(configBase, hasDefaultVrf(hasVniSettings(hasKey(10002))));
-    VniSettings vnisBase = configBase.getDefaultVrf().getVniSettings().get(10002);
+    assertThat(configBase, hasDefaultVrf(hasL2VniSettings(hasKey(10002))));
+    Layer2Vni vnisBase = configBase.getDefaultVrf().getLayer2Vnis().get(10002);
 
     // Config with no loopback address, using multicast, and default UDP port
     Configuration configNoLoopbackAddr = batfish.loadConfigurations().get(hostnameNoLoopbackAddr);
-    assertThat(configNoLoopbackAddr, hasDefaultVrf(hasVniSettings(hasKey(10002))));
-    VniSettings vnisNoAddr = configNoLoopbackAddr.getDefaultVrf().getVniSettings().get(10002);
+    assertThat(configNoLoopbackAddr, hasDefaultVrf(hasL2VniSettings(hasKey(10002))));
+    Layer2Vni vnisNoAddr = configNoLoopbackAddr.getDefaultVrf().getLayer2Vnis().get(10002);
 
     // Config with no source interface and general VXLAN unicast address
     Configuration configNoSourceIface = batfish.loadConfigurations().get(hostnameNoSourceIface);
-    assertThat(configNoSourceIface, hasDefaultVrf(hasVniSettings(hasKey(10002))));
-    VniSettings vnisNoIface = configNoSourceIface.getDefaultVrf().getVniSettings().get(10002);
+    assertThat(configNoSourceIface, hasDefaultVrf(hasL2VniSettings(hasKey(10002))));
+    Layer2Vni vnisNoIface = configNoSourceIface.getDefaultVrf().getLayer2Vnis().get(10002);
 
     // Confirm VLAN-specific unicast address takes priority over the other addresses
     assertThat(vnisBase, hasBumTransportMethod(equalTo(BumTransportMethod.UNICAST_FLOOD_GROUP)));
@@ -4277,8 +4277,8 @@ public final class CiscoGrammarTest {
     Configuration config = batfish.loadConfigurations().get(hostname);
 
     // Make sure that misconfigured VXLAN is still converted into VI model properly
-    assertThat(config, hasDefaultVrf(hasVniSettings(hasKey(10002))));
-    VniSettings vnisMisconfig = config.getDefaultVrf().getVniSettings().get(10002);
+    assertThat(config, hasDefaultVrf(hasL2VniSettings(hasKey(10002))));
+    Layer2Vni vnisMisconfig = config.getDefaultVrf().getLayer2Vnis().get(10002);
 
     // No BUM IPs specified
     assertThat(vnisMisconfig, hasBumTransportIps(emptyIterable()));

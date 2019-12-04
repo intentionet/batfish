@@ -3,7 +3,8 @@ package org.batfish.datamodel.matchers;
 import javax.annotation.Nonnull;
 import org.batfish.datamodel.BumTransportMethod;
 import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.VniSettings;
+import org.batfish.datamodel.vxlan.Layer2Vni;
+import org.batfish.datamodel.vxlan.Vni;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
@@ -11,68 +12,68 @@ public class VniSettingsMatchersImpl {
 
   private VniSettingsMatchersImpl() {}
 
-  static final class HasBumTransportIps extends FeatureMatcher<VniSettings, Iterable<Ip>> {
+  static final class HasBumTransportIps extends FeatureMatcher<Vni, Iterable<Ip>> {
     HasBumTransportIps(@Nonnull Matcher<? super Iterable<Ip>> subMatcher) {
-      super(subMatcher, "VniSettings with BUM transport IPs:", "bumTransportIps");
+      super(subMatcher, "Layer2Vni with BUM transport IPs:", "bumTransportIps");
     }
 
     @Override
-    protected Iterable<Ip> featureValueOf(VniSettings actual) {
+    protected Iterable<Ip> featureValueOf(Vni actual) {
       return actual.getBumTransportIps();
     }
   }
 
-  static final class HasBumTransportMethod extends FeatureMatcher<VniSettings, BumTransportMethod> {
+  static final class HasBumTransportMethod extends FeatureMatcher<Vni, BumTransportMethod> {
     HasBumTransportMethod(@Nonnull Matcher<? super BumTransportMethod> subMatcher) {
-      super(subMatcher, "VniSettings with BUM transport method:", "bumTransportMethod");
+      super(subMatcher, "Layer2Vni with BUM transport method:", "bumTransportMethod");
     }
 
     @Override
-    protected BumTransportMethod featureValueOf(VniSettings actual) {
+    protected BumTransportMethod featureValueOf(Vni actual) {
       return actual.getBumTransportMethod();
     }
   }
 
-  static final class HasSourceAddress extends FeatureMatcher<VniSettings, Ip> {
+  static final class HasSourceAddress extends FeatureMatcher<Vni, Ip> {
     HasSourceAddress(@Nonnull Matcher<? super Ip> subMatcher) {
-      super(subMatcher, "VniSettings with source IP address:", "sourceAddress");
+      super(subMatcher, "Layer2Vni with source IP address:", "sourceAddress");
     }
 
     @Override
-    protected Ip featureValueOf(VniSettings actual) {
+    protected Ip featureValueOf(Vni actual) {
       return actual.getSourceAddress();
     }
   }
 
-  static final class HasUdpPort extends FeatureMatcher<VniSettings, Integer> {
+  static final class HasUdpPort extends FeatureMatcher<Vni, Integer> {
     HasUdpPort(@Nonnull Matcher<? super Integer> subMatcher) {
-      super(subMatcher, "VniSettings with UDP port:", "udpPort");
+      super(subMatcher, "Layer2Vni with UDP port:", "udpPort");
     }
 
     @Override
-    protected Integer featureValueOf(VniSettings actual) {
+    protected Integer featureValueOf(Vni actual) {
       return actual.getUdpPort();
     }
   }
 
-  static final class HasVlan extends FeatureMatcher<VniSettings, Integer> {
+  static final class HasVlan extends FeatureMatcher<Layer2Vni, Integer> {
     HasVlan(@Nonnull Matcher<? super Integer> subMatcher) {
-      super(subMatcher, "VniSettings with VLAN number:", "vlan");
+      super(subMatcher, "Layer2Vni with VLAN number:", "vlan");
     }
 
     @Override
-    protected Integer featureValueOf(VniSettings actual) {
+    protected Integer featureValueOf(Layer2Vni actual) {
       return actual.getVlan();
     }
   }
 
-  static final class HasVni extends FeatureMatcher<VniSettings, Integer> {
+  static final class HasVni extends FeatureMatcher<Vni, Integer> {
     HasVni(@Nonnull Matcher<? super Integer> subMatcher) {
-      super(subMatcher, "VniSettings with VLAN number:", "vlan");
+      super(subMatcher, "Layer2Vni with VLAN number:", "vlan");
     }
 
     @Override
-    protected Integer featureValueOf(VniSettings actual) {
+    protected Integer featureValueOf(Vni actual) {
       return actual.getVni();
     }
   }
