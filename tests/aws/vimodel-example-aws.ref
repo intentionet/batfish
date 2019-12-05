@@ -94,7 +94,8 @@
                     },
                     "negate" : false
                   }
-                }
+                },
+                "name" : "sg-3dfb3140 - default [egress] 0"
               }
             ]
           },
@@ -114,7 +115,8 @@
                       ]
                     }
                   }
-                }
+                },
+                "name" : "sg-3dfb3140 - default [ingress] 0"
               }
             ]
           }
@@ -4659,7 +4661,8 @@
                     },
                     "negate" : false
                   }
-                }
+                },
+                "name" : "sg-55510831 - default [egress] 0"
               }
             ]
           },
@@ -4689,7 +4692,8 @@
                       ]
                     }
                   }
-                }
+                },
+                "name" : "sg-55510831 - default [ingress] 0"
               }
             ]
           }

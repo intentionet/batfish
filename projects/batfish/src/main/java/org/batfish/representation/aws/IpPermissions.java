@@ -21,18 +21,22 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.HeaderSpace;
+import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SubRange;
+import org.batfish.datamodel.acl.MatchHeaderSpace;
 
 /** IP packet permissions within AWS security groups */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -232,28 +236,41 @@ final class IpPermissions implements Serializable {
     return ipWildcardBuilder.build();
   }
 
-  HeaderSpace toEgressIpAccessListLine(Region region) {
-    return toHeaderSpaceBuilder().setDstIps(collectIpWildCards(region)).build();
-  }
+  /**
+   * Converts this {@link IpPermissions} to an {@link IpAccessListLine}.
+   *
+   * <p>Returns {@link Optional#empty()} if the security group cannot be processed, e.g., uses an
+   * unsupported definition of the affected IP addresses.
+   */
+  Optional<IpAccessListLine> toIpAccessListLine(boolean ingress, Region region, String name) {
+    Collection<IpWildcard> ips = collectIpWildCards(region);
+    if (ips.isEmpty()) {
+      // IPs should have been populated using either SG or IP ranges,  if not then this IpPermission
+      // is incomplete.
+      return Optional.empty();
+    }
 
-  HeaderSpace toIngressIpAccessListLine(Region region) {
-    return toHeaderSpaceBuilder().setSrcIps(collectIpWildCards(region)).build();
-  }
-
-  private HeaderSpace.Builder toHeaderSpaceBuilder() {
-    HeaderSpace.Builder headerSpaceBuilder = HeaderSpace.builder();
-    //    line.setAction(LineAction.PERMIT);
+    HeaderSpace.Builder constraints = HeaderSpace.builder();
     IpProtocol protocol = Utils.toIpProtocol(_ipProtocol);
     if (protocol != null) {
-      headerSpaceBuilder.setIpProtocols(ImmutableSet.of(protocol));
+      constraints.setIpProtocols(protocol);
     }
-
     // if the range isn't all ports, set it in ACL
     if (_fromPort != 0 || _toPort != 65535) {
-      headerSpaceBuilder.setDstPorts(ImmutableSet.of(new SubRange(_fromPort, _toPort)));
+      assert protocol == IpProtocol.TCP || protocol == IpProtocol.UDP;
+      constraints.setDstPorts(ImmutableSet.of(new SubRange(_fromPort, _toPort)));
+    }
+    if (ingress) {
+      constraints.setSrcIps(ips);
+    } else {
+      constraints.setDstIps(ips);
     }
 
-    return headerSpaceBuilder;
+    return Optional.ofNullable(
+        IpAccessListLine.accepting()
+            .setMatchCondition(new MatchHeaderSpace(constraints.build()))
+            .setName(name)
+            .build());
   }
 
   @Override
