@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NamedPort;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SubRange;
+import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,16 +112,16 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(SubRange.singleton(22)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .setDstPorts(Sets.newHashSet(SubRange.singleton(22)))
+                    .build())));
   }
 
   @Test
@@ -131,16 +133,16 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(0, 22)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .setDstPorts(Sets.newHashSet(new SubRange(0, 22)))
+                    .build())));
   }
 
   @Test
@@ -152,16 +154,16 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(65530, 65535)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .setDstPorts(Sets.newHashSet(new SubRange(65530, 65535)))
+                    .build())));
   }
 
   @Test
@@ -173,15 +175,15 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .build())));
   }
 
   @Test
@@ -193,15 +195,15 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("0.0.0.0/0")))
-                        .setDstPorts(Sets.newHashSet())
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("0.0.0.0/0")))
+                    .setDstPorts(Sets.newHashSet())
+                    .build())));
   }
 
   @Test
@@ -213,16 +215,16 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(45, 50)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .setDstPorts(Sets.newHashSet(new SubRange(45, 50)))
+                    .build())));
   }
 
   @Test
@@ -234,16 +236,16 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(0, 50)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .setDstPorts(Sets.newHashSet(new SubRange(0, 50)))
+                    .build())));
   }
 
   @Test
@@ -255,16 +257,16 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(new SubRange(30, 65535)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .setDstPorts(Sets.newHashSet(new SubRange(30, 65535)))
+                    .build())));
   }
 
   @Test
@@ -276,26 +278,26 @@ public class SecurityGroupsTest {
 
     sg.addInOutAccessLines(inboundRules, outboundRules, _region);
 
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
     assertThat(
-        inboundRules,
+        line.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
-                        .setDstPorts(Sets.newHashSet(SubRange.singleton(22)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .setDstPorts(Sets.newHashSet(SubRange.singleton(22)))
+                    .build())));
+    IpAccessListLine outline = Iterables.getOnlyElement(outboundRules);
     assertThat(
-        outboundRules,
+        outline.getMatchCondition(),
         equalTo(
-            ImmutableList.of(
-                IpAccessListLine.acceptingHeaderSpace(
-                    HeaderSpace.builder()
-                        .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                        .setDstIps(Sets.newHashSet(IpWildcard.parse("5.6.7.8/32")))
-                        .setDstPorts(Sets.newHashSet(SubRange.singleton(80)))
-                        .build()))));
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                    .setDstIps(Sets.newHashSet(IpWildcard.parse("5.6.7.8/32")))
+                    .setDstPorts(Sets.newHashSet(SubRange.singleton(80)))
+                    .build())));
   }
 
   @Test

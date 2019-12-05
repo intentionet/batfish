@@ -1,5 +1,6 @@
 package org.batfish.datamodel.matchers;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.List;
@@ -48,6 +49,16 @@ public final class IpAccessListMatchers {
    */
   public static HasLines hasLines(@Nonnull Matcher<? super List<IpAccessListLine>> subMatcher) {
     return new HasLines(subMatcher);
+  }
+
+  /**
+   * Provides a matcher that matches if the provided {@code subMatcher} matches the IpAccessList's
+   * lines.
+   */
+  @SafeVarargs
+  @SuppressWarnings("varargs")
+  public static HasLines hasLines(@Nonnull Matcher<? super IpAccessListLine>... subMatchers) {
+    return new HasLines(contains(subMatchers));
   }
 
   /**

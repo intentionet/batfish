@@ -1,5 +1,6 @@
 package org.batfish.representation.aws;
 
+import static org.batfish.datamodel.matchers.IpAccessListLineMatchers.hasMatchCondition;
 import static org.batfish.datamodel.matchers.IpAccessListMatchers.hasLines;
 import static org.batfish.representation.aws.AwsVpcEntity.JSON_KEY_DB_INSTANCES;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -31,13 +32,13 @@ import org.batfish.datamodel.FirewallSessionInterfaceInfo;
 import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
-import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.Topology;
+import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
@@ -143,27 +144,25 @@ public class RdsInstanceTest {
       assertThat(
           iface.getOutgoingFilter(),
           hasLines(
-              equalTo(
-                  ImmutableList.of(
-                      IpAccessListLine.acceptingHeaderSpace(
-                          HeaderSpace.builder()
-                              .setDstIps(Sets.newHashSet(IpWildcard.parse("0.0.0.0/0")))
-                              .build())))));
+              hasMatchCondition(
+                  new MatchHeaderSpace(
+                      HeaderSpace.builder()
+                          .setDstIps(Sets.newHashSet(IpWildcard.parse("0.0.0.0/0")))
+                          .build()))));
       assertThat(
           iface.getIncomingFilter(),
           hasLines(
-              equalTo(
-                  ImmutableList.of(
-                      IpAccessListLine.acceptingHeaderSpace(
-                          HeaderSpace.builder()
-                              .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
-                              .setSrcIps(
-                                  Sets.newHashSet(
-                                      IpWildcard.parse("1.2.3.4/32"),
-                                      IpWildcard.parse("10.193.16.105/32"),
-                                      IpWildcard.parse("54.191.107.22")))
-                              .setDstPorts(Sets.newHashSet(new SubRange(45, 50)))
-                              .build())))));
+              hasMatchCondition(
+                  new MatchHeaderSpace(
+                      HeaderSpace.builder()
+                          .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
+                          .setSrcIps(
+                              Sets.newHashSet(
+                                  IpWildcard.parse("1.2.3.4/32"),
+                                  IpWildcard.parse("10.193.16.105/32"),
+                                  IpWildcard.parse("54.191.107.22")))
+                          .setDstPorts(Sets.newHashSet(new SubRange(45, 50)))
+                          .build()))));
       assertThat(
           iface.getFirewallSessionInterfaceInfo(),
           equalTo(
