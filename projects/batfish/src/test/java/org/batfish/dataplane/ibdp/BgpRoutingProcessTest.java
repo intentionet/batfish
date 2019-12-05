@@ -363,7 +363,6 @@ public class BgpRoutingProcessTest {
     Ip localIp = Ip.parse("2.2.2.2");
     Ip peerIp = Ip.parse("1.1.1.1");
     int vni = 10001;
-    int vni2 = 10002;
     Builder vniConfigBuilder =
         Layer3VniConfig.builder()
             .setVni(vni)
