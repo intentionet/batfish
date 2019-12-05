@@ -24,6 +24,7 @@ public class IpAccessListLineMatchers {
       @Nonnull Matcher<? super AclLineMatchExpr> subMatcher) {
     return new HasMatchCondition(subMatcher);
   }
+
   /**
    * Provides a matcher that matches if the provided {@code expr} equals the HeaderSpace's match
    * condition.
