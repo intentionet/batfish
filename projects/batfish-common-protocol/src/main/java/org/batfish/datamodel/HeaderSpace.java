@@ -285,8 +285,34 @@ public class HeaderSpace implements Serializable, Comparable<HeaderSpace> {
       return this;
     }
 
+    public Builder setIcmpCodes(SubRange... icmpCodes) {
+      _icmpCodes = ImmutableSortedSet.copyOf(icmpCodes);
+      return this;
+    }
+
+    public Builder setIcmpCodes(int... icmpCodes) {
+      _icmpCodes =
+          Arrays.stream(icmpCodes)
+              .mapToObj(SubRange::singleton)
+              .collect(ImmutableSortedSet.toImmutableSortedSet(Ordering.natural()));
+      return this;
+    }
+
     public Builder setIcmpTypes(Iterable<SubRange> icmpTypes) {
       _icmpTypes = ImmutableSortedSet.copyOf(icmpTypes);
+      return this;
+    }
+
+    public Builder setIcmpTypes(SubRange... icmpTypes) {
+      _icmpTypes = ImmutableSortedSet.copyOf(icmpTypes);
+      return this;
+    }
+
+    public Builder setIcmpTypes(int... icmpTypes) {
+      _icmpTypes =
+          Arrays.stream(icmpTypes)
+              .mapToObj(SubRange::singleton)
+              .collect(ImmutableSortedSet.toImmutableSortedSet(Ordering.natural()));
       return this;
     }
 

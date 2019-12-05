@@ -23,6 +23,7 @@ import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpAccessListLine;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpWildcard;
+import org.batfish.datamodel.IpWildcardSetIpSpace;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NamedPort;
 import org.batfish.datamodel.Prefix;
@@ -81,15 +82,15 @@ public class SecurityGroupsTest {
                     ImmutableList.of(
                         new IpPermissions(
                             "-1",
-                            0,
-                            65535,
+                            null,
+                            null,
                             ImmutableList.of(Prefix.parse("0.0.0.0/0")),
                             ImmutableList.of(),
                             ImmutableList.of()),
                         new IpPermissions(
                             "-1",
-                            0,
-                            65535,
+                            null,
+                            null,
                             ImmutableList.of(),
                             ImmutableList.of("pl-7ba54012"),
                             ImmutableList.of())),
@@ -183,6 +184,27 @@ public class SecurityGroupsTest {
                 HeaderSpace.builder()
                     .setIpProtocols(Sets.newHashSet(IpProtocol.TCP))
                     .setSrcIps(Sets.newHashSet(IpWildcard.parse("1.2.3.4/32")))
+                    .build())));
+  }
+
+  @Test
+  public void testIcmpTypes() {
+    SecurityGroup sg = _securityGroups.get(9);
+
+    List<IpAccessListLine> inboundRules = new LinkedList<>();
+    List<IpAccessListLine> outboundRules = new LinkedList<>();
+
+    sg.addInOutAccessLines(inboundRules, outboundRules, _region);
+
+    IpAccessListLine line = Iterables.getOnlyElement(inboundRules);
+    assertThat(
+        line.getMatchCondition(),
+        equalTo(
+            new MatchHeaderSpace(
+                HeaderSpace.builder()
+                    .setIpProtocols(Sets.newHashSet(IpProtocol.ICMP))
+                    .setIcmpTypes(8)
+                    .setSrcIps(IpWildcardSetIpSpace.ANY)
                     .build())));
   }
 
@@ -361,7 +383,12 @@ public class SecurityGroupsTest {
 
     IpPermissions perms =
         new IpPermissions(
-            "-1", 0, 65535, ImmutableList.of(), ImmutableList.of(prefixListId), ImmutableList.of());
+            "-1",
+            null,
+            null,
+            ImmutableList.of(),
+            ImmutableList.of(prefixListId),
+            ImmutableList.of());
 
     SecurityGroup sg =
         new SecurityGroup("test", "test", ImmutableList.of(perms), ImmutableList.of());
