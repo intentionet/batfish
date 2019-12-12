@@ -94,7 +94,7 @@ public final class IpOwners {
    * Invert a mapping from {@link Ip} to owner interfaces (Ip -&gt; hostname -&gt; interface name)
    * and convert the set of owned Ips into an IpSpace.
    */
-  private static Map<String, Map<String, IpSpace>> computeInterfaceOwnedIpSpaces(
+  public static Map<String, Map<String, IpSpace>> computeInterfaceOwnedIpSpaces(
       Map<Ip, Map<String, Set<String>>> ipInterfaceOwners) {
     return toImmutableMap(
         computeInterfaceOwnedIps(ipInterfaceOwners),
@@ -212,8 +212,7 @@ public final class IpOwners {
    * @param excludeInactive whether to ignore inactive interfaces
    * @return A map from {@link Ip}s to hostname to set of interface names that own that IP.
    */
-  @VisibleForTesting
-  static Map<Ip, Map<String, Set<String>>> computeIpInterfaceOwners(
+  public static Map<Ip, Map<String, Set<String>>> computeIpInterfaceOwners(
       Map<String, Set<Interface>> allInterfaces, boolean excludeInactive) {
     Map<Ip, Map<String, Set<String>>> ipOwners = new HashMap<>();
     Table<ConcreteInterfaceAddress, Integer, Set<Interface>> vrrpGroups = HashBasedTable.create();

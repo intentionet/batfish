@@ -5,7 +5,9 @@ import static org.batfish.datamodel.acl.AclLineMatchExprs.match;
 import static org.batfish.question.specifiers.PathConstraintsUtil.createPathConstraints;
 import static org.batfish.question.traceroute.TracerouteAnswerer.diffFlowTracesToRows;
 import static org.batfish.question.traceroute.TracerouteAnswerer.metadata;
+import static org.batfish.specifier.SpecifierUtils.resolveActiveLocations;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.batfish.common.Answerer;
+import org.batfish.common.BatfishException;
 import org.batfish.common.NetworkSnapshot;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.datamodel.AclIpSpace;
@@ -50,27 +53,55 @@ public class DifferentialReachabilityAnswerer extends Answerer {
         getClass().getSimpleName() + " can only be run in differential mode");
   }
 
-  private DifferentialReachabilityParameters parameters(NetworkSnapshot snapshot) {
+  @VisibleForTesting
+  DifferentialReachabilityParameters parameters(
+      NetworkSnapshot snapshot, NetworkSnapshot reference) {
     DifferentialReachabilityQuestion question = (DifferentialReachabilityQuestion) _question;
     PacketHeaderConstraints headerConstraints = question.getHeaderConstraints();
-    SpecifierContext ctxt = _batfish.specifierContext(snapshot);
+    SpecifierContext snapshotCtxt = _batfish.specifierContext(snapshot);
+    SpecifierContext referenceCtxt = _batfish.specifierContext(reference);
 
     PathConstraints pathConstraints = createPathConstraints(question.getPathConstraints());
-    Set<String> forbiddenTransitNodes = pathConstraints.getForbiddenLocations().resolve(ctxt);
-    Set<String> requiredTransitNodes = pathConstraints.getTransitLocations().resolve(ctxt);
-    Set<Location> startLocations = pathConstraints.getStartLocation().resolve(ctxt);
-    Set<String> finalNodes = pathConstraints.getEndLocation().resolve(ctxt);
 
+    // forbiddenTransitNodes can be different in each snapshot. flow must not transit any
+    Set<String> forbiddenTransitNodes =
+        Sets.union(
+            pathConstraints.getForbiddenLocations().resolve(snapshotCtxt),
+            pathConstraints.getForbiddenLocations().resolve(referenceCtxt));
+
+    // requiredTransitNodes can be different in each snapshot. flow must transit any one
+    Set<String> requiredTransitNodes =
+        Sets.union(
+            pathConstraints.getTransitLocations().resolve(snapshotCtxt),
+            pathConstraints.getTransitLocations().resolve(referenceCtxt));
+
+    // only consider startLocations that are present+active in both snapshots
+    Set<Location> startLocations =
+        Sets.intersection(
+            resolveActiveLocations(pathConstraints.getStartLocation(), snapshotCtxt),
+            resolveActiveLocations(pathConstraints.getStartLocation(), referenceCtxt));
+    if (startLocations.isEmpty()) {
+      throw new BatfishException(
+          "no matching startLocation is present and active in both snapshots");
+    }
+
+    // finalNodes can be different in each snapshot
+    Set<String> finalNodes =
+        Sets.union(
+            pathConstraints.getEndLocation().resolve(snapshotCtxt),
+            pathConstraints.getEndLocation().resolve(referenceCtxt));
+
+    // TODO generate better IpSpaceAssignments for differential context
     IpSpaceAssignment ipSpaceAssignment =
         SpecifierFactories.getIpSpaceSpecifierOrDefault(
                 headerConstraints.getSrcIps(), InferFromLocationIpSpaceSpecifier.INSTANCE)
-            .resolve(startLocations, ctxt);
+            .resolve(startLocations, snapshotCtxt);
     IpSpace dstIps =
         firstNonNull(
             AclIpSpace.union(
                 SpecifierFactories.getIpSpaceSpecifierOrDefault(
                         headerConstraints.getDstIps(), InferFromLocationIpSpaceSpecifier.INSTANCE)
-                    .resolve(ImmutableSet.of(), ctxt).getEntries().stream()
+                    .resolve(ImmutableSet.of(), snapshotCtxt).getEntries().stream()
                     .map(Entry::getIpSpace)
                     .collect(ImmutableList.toImmutableList())),
             UniverseIpSpace.INSTANCE);
@@ -94,7 +125,7 @@ public class DifferentialReachabilityAnswerer extends Answerer {
 
   @Override
   public TableAnswerElement answerDiff(NetworkSnapshot snapshot, NetworkSnapshot reference) {
-    DifferentialReachabilityParameters parameters = parameters(snapshot);
+    DifferentialReachabilityParameters parameters = parameters(snapshot, reference);
     DifferentialReachabilityResult result =
         _batfish.bddDifferentialReachability(snapshot, reference, parameters);
 
