@@ -1031,6 +1031,11 @@ DIRECT
   'direct'
 ;
 
+DIRECTED_BROADCAST
+:
+  'directed-broadcast'
+;
+
 DIRECTED_REQUEST
 :
   'directed-request'
@@ -3863,6 +3868,11 @@ SESSION
   'session'
 ;
 
+SESSION_LIMIT
+:
+  'session-limit'
+;
+
 SET
 :
   'set'
@@ -4197,6 +4207,11 @@ SUPPRESS_INACTIVE
 SUPPRESS_MAP
 :
   'suppress-map'
+;
+
+SUPPRESS_RA
+:
+  'suppress-ra'
 ;
 
 // sic

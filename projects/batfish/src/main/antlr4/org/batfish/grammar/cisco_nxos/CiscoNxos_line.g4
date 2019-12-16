@@ -40,6 +40,8 @@ line_vty
   (
     lv_access_class
     | lv_exec_timeout
+    | lv_ipv6
+    | lv_session_limit
   )*
 ;
 
@@ -51,4 +53,19 @@ lv_access_class
 lv_exec_timeout
 :
   EXEC_TIMEOUT mins = line_timeout NEWLINE
+;
+
+lv_ipv6
+:
+  IPV6 lv6_access_class
+;
+
+lv6_access_class
+:
+  ACCESS_CLASS acl = ip_access_list_name (IN | OUT) NEWLINE
+;
+
+lv_session_limit
+:
+  SESSION_LIMIT limit = uint8 NEWLINE
 ;

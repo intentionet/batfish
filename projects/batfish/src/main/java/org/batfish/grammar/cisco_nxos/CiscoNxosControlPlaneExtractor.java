@@ -401,6 +401,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Line_actionContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Literal_standard_communityContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Logging_serverContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Logging_source_interfaceContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Lv6_access_classContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Lv_access_classContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Mac_access_listContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Mac_access_list_nameContext;
@@ -2307,6 +2308,17 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
     CiscoNxosStructureUsage usage =
         ctx.IN() != null ? LINE_VTY_ACCESS_CLASS_IN : LINE_VTY_ACCESS_CLASS_OUT;
     _c.referenceStructure(IP_ACCESS_LIST, acl.get(), usage, ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitLv6_access_class(Lv6_access_classContext ctx) {
+    Optional<String> acl = toString(ctx, ctx.acl);
+    if (!acl.isPresent()) {
+      return;
+    }
+    CiscoNxosStructureUsage usage =
+        ctx.IN() != null ? LINE_VTY_ACCESS_CLASS_IN : LINE_VTY_ACCESS_CLASS_OUT;
+    _c.referenceStructure(IPV6_ACCESS_LIST, acl.get(), usage, ctx.getStart().getLine());
   }
 
   @Override

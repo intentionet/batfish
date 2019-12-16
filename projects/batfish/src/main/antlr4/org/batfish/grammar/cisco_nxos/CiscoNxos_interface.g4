@@ -466,6 +466,7 @@ i_ip_null
 :
   (
     ARP
+    | DIRECTED_BROADCAST
     | FLOW
     | IGMP
     | REDIRECTS
@@ -786,6 +787,7 @@ iip6_null
     DHCP
     | MLD
     | ND
+    | PIM
     | REDIRECTS
     | VERIFY
   ) null_rest_of_line
@@ -971,6 +973,7 @@ i_no_null
     | LOGGING
     | MANAGEMENT
     | NEGOTIATE
+    | OSPFV3
     | PORT_CHANNEL
     | SNMP
     | SPANNING_TREE

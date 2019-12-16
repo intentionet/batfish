@@ -92,10 +92,13 @@ interface Ethernet100/100
   ip arp timeout 2400
   ip arp gratuitous update
   ip arp gratuitous request
+  ip directed-broadcast
   ip port access-group AG in
   ipv6 mld version 2
   ipv6 mld robustness-variable 2
   ipv6 mld query-interval 125
+  ipv6 nd suppress-ra
+  ipv6 pim sparse-mode
   lacp fast-select-hot-standby
   link debounce time 100
   lldp transmit
@@ -111,6 +114,7 @@ interface Ethernet100/100
   mdix auto
   medium broadcast
   negotiate auto
+  no ospfv3 passive-interface
   no port-channel port load-defer
   priority-flow-control mode auto
   no spanning-tree bpdufilter

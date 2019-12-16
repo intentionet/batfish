@@ -24,6 +24,7 @@ ro_common
   | ro_graceful_restart
   | ro_log_adjacency_changes
   | ro_max_metric
+  | ro_name_lookup
   | ro_network
   | ro_passive_interface
   | ro_redistribute
@@ -170,6 +171,11 @@ max_metric_summary_lsa
 :
 // 1-16777215
   uint32
+;
+
+ro_name_lookup
+:
+  NAME_LOOKUP NEWLINE
 ;
 
 ro_network

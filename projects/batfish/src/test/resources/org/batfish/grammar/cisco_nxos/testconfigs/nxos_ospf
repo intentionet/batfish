@@ -219,6 +219,10 @@ router ospf with_vrf
     area 1 authentication
 
 
+!!!!! For parsing only
+router ospf parse_only
+  name-lookup
+
 !!!!! interface settings
 !!! general settings
 interface Ethernet1/1
