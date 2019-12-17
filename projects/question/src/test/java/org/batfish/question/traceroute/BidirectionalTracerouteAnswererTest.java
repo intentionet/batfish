@@ -7,7 +7,6 @@ import static org.batfish.datamodel.FlowDisposition.DENIED_OUT;
 import static org.batfish.datamodel.FlowDisposition.EXITS_NETWORK;
 import static org.batfish.datamodel.FlowDisposition.NEIGHBOR_UNREACHABLE;
 import static org.batfish.datamodel.FlowDisposition.NO_ROUTE;
-import static org.batfish.datamodel.acl.AclLineMatchExprs.TRUE;
 import static org.batfish.datamodel.matchers.RowMatchers.hasColumn;
 import static org.batfish.question.traceroute.BidirectionalTracerouteAnswerer.COL_FORWARD_FLOW;
 import static org.batfish.question.traceroute.BidirectionalTracerouteAnswerer.COL_FORWARD_TRACES;
@@ -37,10 +36,12 @@ import java.util.Set;
 import org.batfish.common.plugin.TracerouteEngine;
 import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.flow.Accept;
 import org.batfish.datamodel.flow.BidirectionalTrace;
 import org.batfish.datamodel.flow.FirewallSessionTraceInfo;
+import org.batfish.datamodel.flow.SessionMatchExpr;
 import org.batfish.datamodel.flow.Trace;
 import org.batfish.datamodel.flow.TraceAndReverseFlow;
 import org.batfish.datamodel.table.Row;
@@ -63,6 +64,9 @@ public final class BidirectionalTracerouteAnswererTest {
           .setIngressNode("reverseIngressNode")
           .setIngressInterface("reverseIngressInterface")
           .build();
+
+  private static final SessionMatchExpr DUMMY_SESSION_FLOW =
+      new SessionMatchExpr(IpProtocol.HOPOPT, Ip.parse("1.1.1.1"), Ip.parse("2.2.2.2"), null, null);
 
   @Test
   public void testNoReverseFlow() {
@@ -157,7 +161,8 @@ public final class BidirectionalTracerouteAnswererTest {
     Trace forwardTrace = new Trace(ACCEPTED, ImmutableList.of());
     Trace reverseTrace = new Trace(NEIGHBOR_UNREACHABLE, ImmutableList.of());
     FirewallSessionTraceInfo session =
-        new FirewallSessionTraceInfo("session", Accept.INSTANCE, ImmutableSet.of(), TRUE, null);
+        new FirewallSessionTraceInfo(
+            "session", Accept.INSTANCE, ImmutableSet.of(), DUMMY_SESSION_FLOW, null);
     TraceAndReverseFlow forwardTarf =
         new TraceAndReverseFlow(forwardTrace, REVERSE_FLOW, ImmutableList.of(session));
     TraceAndReverseFlow reverseTarf =
@@ -184,7 +189,8 @@ public final class BidirectionalTracerouteAnswererTest {
     Trace sessionForwardTrace = new Trace(ACCEPTED, ImmutableList.of());
     Trace noSessionForwardTrace = new Trace(DELIVERED_TO_SUBNET, ImmutableList.of());
     FirewallSessionTraceInfo session =
-        new FirewallSessionTraceInfo("session", Accept.INSTANCE, ImmutableSet.of(), TRUE, null);
+        new FirewallSessionTraceInfo(
+            "session", Accept.INSTANCE, ImmutableSet.of(), DUMMY_SESSION_FLOW, null);
     TraceAndReverseFlow sessionForwardTarf =
         new TraceAndReverseFlow(sessionForwardTrace, REVERSE_FLOW, ImmutableList.of(session));
     TraceAndReverseFlow noSessionForwardTarf =
@@ -233,9 +239,11 @@ public final class BidirectionalTracerouteAnswererTest {
     Trace t4 = new Trace(DENIED_IN, ImmutableList.of());
 
     FirewallSessionTraceInfo session1 =
-        new FirewallSessionTraceInfo("session1", Accept.INSTANCE, ImmutableSet.of(), TRUE, null);
+        new FirewallSessionTraceInfo(
+            "session1", Accept.INSTANCE, ImmutableSet.of(), DUMMY_SESSION_FLOW, null);
     FirewallSessionTraceInfo session2 =
-        new FirewallSessionTraceInfo("session2", Accept.INSTANCE, ImmutableSet.of(), TRUE, null);
+        new FirewallSessionTraceInfo(
+            "session2", Accept.INSTANCE, ImmutableSet.of(), DUMMY_SESSION_FLOW, null);
 
     {
       // All BidirectionalTraces have the same key, so are in the same group.
@@ -375,9 +383,11 @@ public final class BidirectionalTracerouteAnswererTest {
     {
       // Sessions in the key
       FirewallSessionTraceInfo session1 =
-          new FirewallSessionTraceInfo("session1", Accept.INSTANCE, ImmutableSet.of(), TRUE, null);
+          new FirewallSessionTraceInfo(
+              "session1", Accept.INSTANCE, ImmutableSet.of(), DUMMY_SESSION_FLOW, null);
       FirewallSessionTraceInfo session2 =
-          new FirewallSessionTraceInfo("session2", Accept.INSTANCE, ImmutableSet.of(), TRUE, null);
+          new FirewallSessionTraceInfo(
+              "session2", Accept.INSTANCE, ImmutableSet.of(), DUMMY_SESSION_FLOW, null);
       Set<FirewallSessionTraceInfo> sessions = ImmutableSet.of(session1, session2);
 
       BidirectionalTrace bt = new BidirectionalTrace(FORWARD_FLOW, t1, sessions, REVERSE_FLOW, t1);

@@ -14,14 +14,14 @@ public final class FirewallSessionTraceInfo {
   private final @Nonnull String _hostname;
   private final @Nonnull Set<String> _incomingInterfaces;
   private final @Nonnull SessionAction _action;
-  private final @Nonnull AclLineMatchExpr _sessionFlows;
+  private final @Nonnull SessionMatchExpr _sessionFlows;
   private final @Nullable Transformation _transformation;
 
   public FirewallSessionTraceInfo(
       String hostname,
       SessionAction action,
       Set<String> incomingInterfaces,
-      AclLineMatchExpr sessionFlows,
+      SessionMatchExpr sessionFlows,
       @Nullable Transformation transformation) {
     _hostname = hostname;
     _action = action;
@@ -71,7 +71,7 @@ public final class FirewallSessionTraceInfo {
    * org.batfish.datamodel.acl.PermittedByAcl} or {@link org.batfish.datamodel.IpSpaceReference}.
    */
   public @Nonnull AclLineMatchExpr getSessionFlows() {
-    return _sessionFlows;
+    return _sessionFlows.toAclLineMatchExpr();
   }
 
   /** The (optional) transformation for session traffic. */

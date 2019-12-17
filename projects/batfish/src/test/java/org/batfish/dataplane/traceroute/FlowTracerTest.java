@@ -4,7 +4,6 @@ import static org.batfish.datamodel.FlowDisposition.DELIVERED_TO_SUBNET;
 import static org.batfish.datamodel.FlowDisposition.DENIED_IN;
 import static org.batfish.datamodel.FlowDisposition.LOOP;
 import static org.batfish.datamodel.FlowDisposition.NULL_ROUTED;
-import static org.batfish.datamodel.acl.AclLineMatchExprs.TRUE;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchDst;
 import static org.batfish.datamodel.matchers.TraceAndReverseFlowMatchers.hasNewFirewallSessions;
 import static org.batfish.datamodel.matchers.TraceAndReverseFlowMatchers.hasTrace;
@@ -74,6 +73,7 @@ import org.batfish.datamodel.flow.Hop;
 import org.batfish.datamodel.flow.RouteInfo;
 import org.batfish.datamodel.flow.RoutingStep;
 import org.batfish.datamodel.flow.RoutingStep.RoutingStepDetail;
+import org.batfish.datamodel.flow.SessionMatchExpr;
 import org.batfish.datamodel.flow.Step;
 import org.batfish.datamodel.flow.StepAction;
 import org.batfish.datamodel.flow.TraceAndReverseFlow;
@@ -131,8 +131,11 @@ public final class FlowTracerTest {
             .build();
     List<TraceAndReverseFlow> traces = new ArrayList<>();
 
+    SessionMatchExpr dummySessionFlow =
+        new SessionMatchExpr(IpProtocol.TCP, Ip.parse("1.1.1.1"), Ip.parse("2.2.2.2"), null, null);
     FirewallSessionTraceInfo sessionInfo =
-        new FirewallSessionTraceInfo("hostname", Accept.INSTANCE, ImmutableSet.of(), TRUE, null);
+        new FirewallSessionTraceInfo(
+            "hostname", Accept.INSTANCE, ImmutableSet.of(), dummySessionFlow, null);
     TracerouteEngineImplContext ctxt =
         new TracerouteEngineImplContext(
             MockDataPlane.builder().setConfigs(ImmutableMap.of(c.getHostname(), c)).build(),
@@ -624,7 +627,7 @@ public final class FlowTracerTest {
     // TCP
     {
       Flow flow = fb.setIpProtocol(IpProtocol.TCP).setDstPort(100).setSrcPort(20).build();
-      BDD returnFlowBdd = toBdd.toBdd(matchSessionReturnFlow(flow));
+      BDD returnFlowBdd = toBdd.toBdd(matchSessionReturnFlow(flow).toAclLineMatchExpr());
       assertEquals(
           returnFlowBdd,
           BDDOps.andNull(
@@ -638,7 +641,7 @@ public final class FlowTracerTest {
     // UDP
     {
       Flow flow = fb.setIpProtocol(IpProtocol.UDP).setDstPort(100).setSrcPort(20).build();
-      BDD returnFlowBdd = toBdd.toBdd(matchSessionReturnFlow(flow));
+      BDD returnFlowBdd = toBdd.toBdd(matchSessionReturnFlow(flow).toAclLineMatchExpr());
       assertEquals(
           returnFlowBdd,
           BDDOps.andNull(
@@ -652,7 +655,7 @@ public final class FlowTracerTest {
     // ICMP
     {
       Flow flow = fb.setIpProtocol(IpProtocol.ICMP).setIcmpType(100).setIcmpCode(20).build();
-      BDD returnFlowBdd = toBdd.toBdd(matchSessionReturnFlow(flow));
+      BDD returnFlowBdd = toBdd.toBdd(matchSessionReturnFlow(flow).toAclLineMatchExpr());
       assertEquals(
           returnFlowBdd,
           BDDOps.andNull(

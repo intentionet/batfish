@@ -57,17 +57,13 @@ import org.batfish.datamodel.FibNullRoute;
 import org.batfish.datamodel.FirewallSessionInterfaceInfo;
 import org.batfish.datamodel.Flow;
 import org.batfish.datamodel.FlowDisposition;
-import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.Route;
-import org.batfish.datamodel.SubRange;
-import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.Evaluator;
-import org.batfish.datamodel.acl.MatchHeaderSpace;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.flow.Accept;
 import org.batfish.datamodel.flow.ArpErrorStep;
@@ -93,6 +89,7 @@ import org.batfish.datamodel.flow.RoutingStep;
 import org.batfish.datamodel.flow.RoutingStep.Builder;
 import org.batfish.datamodel.flow.RoutingStep.RoutingStepDetail;
 import org.batfish.datamodel.flow.SessionAction;
+import org.batfish.datamodel.flow.SessionMatchExpr;
 import org.batfish.datamodel.flow.SetupSessionStep;
 import org.batfish.datamodel.flow.Step;
 import org.batfish.datamodel.flow.StepAction;
@@ -1040,24 +1037,18 @@ class FlowTracer {
   }
 
   @VisibleForTesting
-  static AclLineMatchExpr matchSessionReturnFlow(Flow forwardFlow) {
+  static SessionMatchExpr matchSessionReturnFlow(Flow forwardFlow) {
     IpProtocol ipProtocol = forwardFlow.getIpProtocol();
     checkArgument(
         IpProtocol.IP_PROTOCOLS_WITH_SESSIONS.contains(ipProtocol),
         "cannot match session return flow with IP protocol %s",
         ipProtocol);
-    HeaderSpace.Builder hb =
-        HeaderSpace.builder()
-            .setSrcIps(forwardFlow.getDstIp().toIpSpace())
-            .setDstIps(forwardFlow.getSrcIp().toIpSpace())
-            .setIpProtocols(ImmutableList.of(ipProtocol));
-
-    if (forwardFlow.getSrcPort() != null) {
-      hb.setSrcPorts(ImmutableList.of(SubRange.singleton(forwardFlow.getDstPort())))
-          .setDstPorts(ImmutableList.of(SubRange.singleton(forwardFlow.getSrcPort())));
-    }
-
-    return new MatchHeaderSpace(hb.build());
+    return new SessionMatchExpr(
+        ipProtocol,
+        forwardFlow.getDstIp(),
+        forwardFlow.getSrcIp(),
+        forwardFlow.getDstPort(),
+        forwardFlow.getSrcPort());
   }
 
   private void buildAcceptTrace() {
