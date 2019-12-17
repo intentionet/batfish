@@ -769,6 +769,7 @@ class FlowTracer {
             MatchSessionStepDetail.builder()
                 .setIncomingInterfaces(session.getIncomingInterfaces())
                 .setSessionAction(session.getAction())
+                .setMatchCriteria(session.getMatchCriteria())
                 .build()));
 
     Configuration config = _tracerouteContext.getConfigurations().get(currentNodeName);

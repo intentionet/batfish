@@ -21,23 +21,30 @@ public class MatchSessionStep extends Step<MatchSessionStepDetail> {
   public static final class MatchSessionStepDetail {
     private static final String PROP_INCOMING_INTERFACES = "incomingInterfaces";
     private static final String PROP_SESSION_ACTION = "sessionAction";
+    private static final String PROP_MATCH_CRITERIA = "matchCriteria";
 
     @Nonnull private final Set<String> _incomingInterfaces;
     @Nonnull private final SessionAction _sessionAction;
+    @Nonnull private final SessionMatchExpr _matchCriteria;
 
     private MatchSessionStepDetail(
-        @Nonnull Set<String> incomingInterfaces, @Nonnull SessionAction sessionAction) {
+        @Nonnull Set<String> incomingInterfaces,
+        @Nonnull SessionAction sessionAction,
+        @Nonnull SessionMatchExpr matchCriteria) {
       _incomingInterfaces = ImmutableSet.copyOf(incomingInterfaces);
       _sessionAction = sessionAction;
+      _matchCriteria = matchCriteria;
     }
 
     @JsonCreator
     private static MatchSessionStepDetail jsonCreator(
         @JsonProperty(PROP_INCOMING_INTERFACES) Set<String> incomingInterfaces,
-        @JsonProperty(PROP_SESSION_ACTION) SessionAction sessionAction) {
+        @JsonProperty(PROP_SESSION_ACTION) SessionAction sessionAction,
+        @JsonProperty(PROP_MATCH_CRITERIA) SessionMatchExpr matchCriteria) {
       checkArgument(incomingInterfaces != null, "Missing %s", PROP_INCOMING_INTERFACES);
       checkArgument(sessionAction != null, "Missing %s", PROP_SESSION_ACTION);
-      return new MatchSessionStepDetail(incomingInterfaces, sessionAction);
+      checkArgument(matchCriteria != null, "Missing %s", PROP_MATCH_CRITERIA);
+      return new MatchSessionStepDetail(incomingInterfaces, sessionAction, matchCriteria);
     }
 
     @JsonProperty(PROP_INCOMING_INTERFACES)
@@ -52,6 +59,12 @@ public class MatchSessionStep extends Step<MatchSessionStepDetail> {
       return _sessionAction;
     }
 
+    @JsonProperty(PROP_MATCH_CRITERIA)
+    @Nonnull
+    public SessionMatchExpr getMatchCriteria() {
+      return _matchCriteria;
+    }
+
     public static Builder builder() {
       return new Builder();
     }
@@ -60,13 +73,17 @@ public class MatchSessionStep extends Step<MatchSessionStepDetail> {
     public static class Builder {
       private @Nullable Set<String> _incomingInterfaces;
       private @Nullable SessionAction _sessionAction;
+      private @Nullable SessionMatchExpr _matchCriteria;
 
       public MatchSessionStepDetail build() {
         checkNotNull(
             _sessionAction,
             "Cannot build MatchSessionStepDetail without specifying session action");
+        checkNotNull(
+            _matchCriteria,
+            "Cannot build MatchSessionStepDetail without specifying match criteria");
         return new MatchSessionStepDetail(
-            firstNonNull(_incomingInterfaces, ImmutableSet.of()), _sessionAction);
+            firstNonNull(_incomingInterfaces, ImmutableSet.of()), _sessionAction, _matchCriteria);
       }
 
       public Builder setIncomingInterfaces(Set<String> incomingInterfaces) {
@@ -76,6 +93,11 @@ public class MatchSessionStep extends Step<MatchSessionStepDetail> {
 
       public Builder setSessionAction(SessionAction sessionAction) {
         _sessionAction = sessionAction;
+        return this;
+      }
+
+      public Builder setMatchCriteria(SessionMatchExpr matchCriteria) {
+        _matchCriteria = matchCriteria;
         return this;
       }
 
