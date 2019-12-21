@@ -1117,6 +1117,13 @@ public class CumulusFrrGrammarTest {
   }
 
   @Test
+  public void testRouterOspfRouterId() {
+    parse("router ospf\n ospf router-id 1.1.1.3\n");
+    assertThat(
+        _config.getOspfProcess().getDefaultVrf().getRouterId(), equalTo(Ip.parse("1.1.1.3")));
+  }
+
+  @Test
   public void testCreatePhysicalInterfaceInFRR() {
     String name = "eth1";
     parse(String.format("interface %s\n", name));

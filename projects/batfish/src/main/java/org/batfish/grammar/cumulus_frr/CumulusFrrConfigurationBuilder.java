@@ -65,6 +65,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rms_metricContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rms_tagContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmsipnh_literalContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ro_passive_interfaceContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ro_router_idContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_bgpContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_interfaceContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_routemapContext;
@@ -448,6 +449,16 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   }
 
   @Override
+  public void exitRo_router_id(Ro_router_idContext ctx) {
+    if (_c.getOspfProcess() == null) {
+      _w.addWarning(ctx, ctx.getText(), _parser, "does not find router ospf command");
+      return;
+    }
+
+    _c.getOspfProcess().getDefaultVrf().setRouterId(Ip.parse(ctx.ip.getText()));
+  }
+
+  @Override
   public void exitSi_description(Si_descriptionContext ctx) {
     if (_currentInterface == null) {
       return;
@@ -468,8 +479,7 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     } else if (ctx.num != null) {
       _currentInterface.getOrCreateOspf().setOspfArea(Long.parseLong(ctx.num.getText()));
     } else {
-      _w.addWarning(
-          ctx, ctx.getText(), _parser, String.format("only allow IP and number in ospf area"));
+      _w.addWarning(ctx, ctx.getText(), _parser, "only allow IP and number in ospf area");
     }
   }
 
