@@ -972,12 +972,28 @@ class FlowTracer {
           buildFirewallSessionTraceInfo(firewallSessionInterfaceInfo);
       if (session != null) {
         _newSessions.add(session);
+        // compute the transformation that will be applied on the return flow
+        Flow origReturnFlow =
+            returnFlow(
+                _currentFlow,
+                // hostname, ingress vrf and ingress interface here are dummies to fulfill argument
+                // requirements for returnFlow, they don't matter for transformation
+                _currentConfig.getHostname(),
+                _currentFlow.getIngressVrf(),
+                _currentFlow.getIngressInterface());
+        Flow transformedReturnFlow =
+            returnFlow(
+                _originalFlow,
+                _currentConfig.getHostname(),
+                _currentFlow.getIngressVrf(),
+                _currentFlow.getIngressInterface());
         _steps.add(
             new SetupSessionStep(
                 SetupSessionStepDetail.builder()
                     .setIncomingInterfaces(session.getIncomingInterfaces())
                     .setMatchCriteria(session.getMatchCriteria())
                     .setSessionAction(session.getAction())
+                    .setTransformation(flowDiffs(origReturnFlow, transformedReturnFlow))
                     .build()));
       }
     }

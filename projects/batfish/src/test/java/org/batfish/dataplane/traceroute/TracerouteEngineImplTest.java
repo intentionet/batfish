@@ -1675,7 +1675,8 @@ public class TracerouteEngineImplTest {
                           hasProperty(
                               "incomingInterfaces", equalTo(session.getIncomingInterfaces())),
                           hasProperty("sessionAction", equalTo(session.getAction())),
-                          hasProperty("matchCriteria", equalTo(session.getMatchCriteria())))))));
+                          hasProperty("matchCriteria", equalTo(session.getMatchCriteria())),
+                          hasProperty("transformation", hasSize(0)))))));
     }
 
     // When exiting i3, we don't make a new session
@@ -1776,7 +1777,12 @@ public class TracerouteEngineImplTest {
                           hasProperty(
                               "incomingInterfaces", equalTo(session.getIncomingInterfaces())),
                           hasProperty("sessionAction", equalTo(session.getAction())),
-                          hasProperty("matchCriteria", equalTo(session.getMatchCriteria())))))));
+                          hasProperty("matchCriteria", equalTo(session.getMatchCriteria())),
+                          hasProperty(
+                              "transformation",
+                              contains(
+                                  flowDiff(IpField.DESTINATION, poolIp, srcIp),
+                                  flowDiff(PortField.DESTINATION, poolPort, srcPort))))))));
     }
   }
 
@@ -1882,7 +1888,8 @@ public class TracerouteEngineImplTest {
                           hasProperty(
                               "incomingInterfaces", equalTo(session.getIncomingInterfaces())),
                           hasProperty("sessionAction", equalTo(session.getAction())),
-                          hasProperty("matchCriteria", equalTo(session.getMatchCriteria())))))));
+                          hasProperty("matchCriteria", equalTo(session.getMatchCriteria())),
+                          hasProperty("transformation", hasSize(0)))))));
     }
   }
 
