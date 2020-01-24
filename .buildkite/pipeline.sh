@@ -35,18 +35,22 @@ cat <<EOF
       - docker#${BATFISH_DOCKER_PLUGIN_VERSION}:
           image: ${BATFISH_DOCKER_CI_BASE_IMAGE}
           always-pull: true
-  - label: ":mvn: Build"
+  - label: ":bazel: Build allinone.jar"
     key: jar
     command:
+      - "python3 -m virtualenv .venv"
+      - ". .venv/bin/activate"
+      - "bazel build -- //projects/allinone:allinone_main_deploy.jar
       - "mkdir workspace"
-      - "mvn -f projects package"
-      - "cp projects/allinone/target/allinone-bundle-*.jar workspace/allinone.jar"
+      - "cp $$(bazel info bazel-bin)/projects/allinone/allinone_main_deploy.jar workspace/allinone.jar"
     artifact_paths:
       - workspace/allinone.jar
     plugins:
       - docker#${BATFISH_DOCKER_PLUGIN_VERSION}:
           image: ${BATFISH_DOCKER_CI_BASE_IMAGE}
           always-pull: true
+          volumes:
+            - $HOME/.bazelrc:/home/batfish/.bazelrc
 EOF
 
 ###### Build tests and code static analysis
