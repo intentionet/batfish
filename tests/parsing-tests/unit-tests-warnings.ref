@@ -57,6 +57,13 @@
         "Comment" : "This feature is not currently supported"
       },
       {
+        "Filename" : "configs/arista_interface",
+        "Line" : 12,
+        "Text" : "ip 2.3.4.5 secondary",
+        "Parser_Context" : "[ifvrrp_ip if_vrrp if_inner s_interface stanza cisco_configuration]",
+        "Comment" : "This feature is not currently supported"
+      },
+      {
         "Filename" : "configs/arista_nat",
         "Line" : 9,
         "Text" : "ip nat pool pool2 1.1.1.1 1.1.1.2 netmask 255.255.255.255",
@@ -1486,10 +1493,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 206 results",
+      "notes" : "Found 207 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 206
+      "numResults" : 207
     }
   }
 ]

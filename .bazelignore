@@ -1,4 +1,3 @@
-# Ignore BUILD files copied over to target directory by Eclipse
 projects/allinone/target
 projects/coordinator/target
 projects/batfish/target
@@ -9,4 +8,5 @@ projects/build-tools/target
 projects/minesweeper/target
 projects/question/target
 projects/symbolic/target
-
+containers
+.pytest_cache

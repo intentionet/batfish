@@ -1799,7 +1799,7 @@
             "        (if_vrrp",
             "          VRRP:'vrrp'",
             "          groupnum = DEC:'1'",
-            "          (ifvrrp_ip_secondary",
+            "          (ifvrrp_ip",
             "            IP:'ip'",
             "            ip = IP_ADDRESS:'2.3.4.5'",
             "            SECONDARY:'secondary'",
@@ -75980,6 +75980,16 @@
               "Line" : 13,
               "Parser_Context" : "[eos_rbir_ospf3 eos_rbi_redistribute eos_rb_inner eos_router_bgp_tail router_bgp_stanza stanza cisco_configuration]",
               "Text" : "ospf3 match external route-map UNDEFINED_MAP"
+            }
+          ]
+        },
+        "configs/arista_interface" : {
+          "Parse warnings" : [
+            {
+              "Comment" : "This feature is not currently supported",
+              "Line" : 12,
+              "Parser_Context" : "[ifvrrp_ip if_vrrp if_inner s_interface stanza cisco_configuration]",
+              "Text" : "ip 2.3.4.5 secondary"
             }
           ]
         },
