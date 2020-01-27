@@ -1520,7 +1520,7 @@ if_vrrp
       ifvrrp_authentication
       | ifvrrp_description
       | ifvrrp_ip
-      | ifvrrp_ip_secondary
+      | ifvrrp_ipv4
       | ifvrrp_ipv6
       | ifvrrp_preempt
       | ifvrrp_priority
@@ -1724,12 +1724,12 @@ ifvrrp_description
 
 ifvrrp_ip
 :
-   IP ip = IP_ADDRESS NEWLINE
+   IP ip = IP_ADDRESS SECONDARY? NEWLINE
 ;
 
-ifvrrp_ip_secondary
+ifvrrp_ipv4
 :
-   IP ip = IP_ADDRESS SECONDARY NEWLINE
+   IPV4 ip = IP_ADDRESS NEWLINE
 ;
 
 ifvrrp_ipv6
