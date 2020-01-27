@@ -779,7 +779,6 @@ public class AristaGrammarTest {
   public void testVrrpExtraction() {
     CiscoConfiguration c = parseVendorConfig("arista_vrrp");
     assertThat(c.getInterfaces(), hasKey("Vlan20"));
-    org.batfish.representation.cisco.Interface i = c.getInterfaces().get("Vlan20");
     assertThat(c.getVrrpGroups(), hasKey("Vlan20"));
     VrrpInterface vrrpI = c.getVrrpGroups().get("Vlan20");
     assertThat(vrrpI.getVrrpGroups(), hasKey(1));
