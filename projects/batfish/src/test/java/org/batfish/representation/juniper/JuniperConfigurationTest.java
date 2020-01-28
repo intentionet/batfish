@@ -23,6 +23,7 @@ import static org.batfish.representation.juniper.JuniperConfiguration.mergeIpAcc
 import static org.batfish.representation.juniper.JuniperConfiguration.toOspfDeadInterval;
 import static org.batfish.representation.juniper.JuniperConfiguration.toOspfHelloInterval;
 import static org.batfish.representation.juniper.JuniperConfiguration.toRibId;
+import static org.batfish.representation.juniper.JuniperStructureType.FIREWALL_FILTER_TERM;
 import static org.batfish.representation.juniper.NatPacketLocation.interfaceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.routingInstanceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.zoneLocation;
@@ -67,12 +68,14 @@ import org.batfish.datamodel.acl.PermittedByAcl;
 import org.batfish.datamodel.dataplane.rib.RibId;
 import org.batfish.datamodel.isis.IsisLevel;
 import org.batfish.representation.juniper.Interface.OspfInterfaceType;
+import org.batfish.vendor.VendorStructureId;
 import org.junit.Test;
 
 public class JuniperConfigurationTest {
 
   private static JuniperConfiguration createConfig() {
     JuniperConfiguration config = new JuniperConfiguration();
+    config.setFilename("file");
     config._c = new Configuration("host", ConfigurationFormat.JUNIPER);
     return config;
   }
@@ -676,7 +679,16 @@ public class JuniperConfigurationTest {
 
     assertThat(acl.getLines(), hasSize(1));
 
-    assertThat(acl.getLines().get(0).getTraceElement(), equalTo(TraceElement.of("Matched term")));
+    TraceElement expected =
+        TraceElement.builder()
+            .add("Matched ")
+            .add(
+                "term",
+                new VendorStructureId("file", FIREWALL_FILTER_TERM.getDescription(), "acl term"))
+            .build();
+    TraceElement actual = acl.getLines().get(0).getTraceElement();
+    assertThat(actual, equalTo(expected));
+    assertThat(actual.getText(), equalTo("Matched term"));
   }
 
   @Test

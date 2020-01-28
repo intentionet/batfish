@@ -22637,7 +22637,16 @@
                   "fragments" : [
                     {
                       "class" : "org.batfish.datamodel.TraceElement$TextFragment",
-                      "text" : "Matched bar"
+                      "text" : "Matched "
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$LinkFragment",
+                      "text" : "bar",
+                      "vendorStructureId" : {
+                        "filename" : "configs/juniper-tcpflags",
+                        "structureName" : "foo bar",
+                        "structureType" : "firewall filter term"
+                      }
                     }
                   ]
                 }
@@ -24035,7 +24044,16 @@
                   "fragments" : [
                     {
                       "class" : "org.batfish.datamodel.TraceElement$TextFragment",
-                      "text" : "Matched blorp"
+                      "text" : "Matched "
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$LinkFragment",
+                      "text" : "blorp",
+                      "vendorStructureId" : {
+                        "filename" : "configs/juniper_firewall",
+                        "structureName" : "blah blorp",
+                        "structureType" : "firewall filter term"
+                      }
                     }
                   ]
                 }
@@ -24054,7 +24072,16 @@
                   "fragments" : [
                     {
                       "class" : "org.batfish.datamodel.TraceElement$TextFragment",
-                      "text" : "Matched t3"
+                      "text" : "Matched "
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$LinkFragment",
+                      "text" : "t3",
+                      "vendorStructureId" : {
+                        "filename" : "configs/juniper_firewall",
+                        "structureName" : "blah t3",
+                        "structureType" : "firewall filter term"
+                      }
                     }
                   ]
                 }
@@ -27351,7 +27378,16 @@
                   "fragments" : [
                     {
                       "class" : "org.batfish.datamodel.TraceElement$TextFragment",
-                      "text" : "Matched 123-4"
+                      "text" : "Matched "
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$LinkFragment",
+                      "text" : "123-4",
+                      "vendorStructureId" : {
+                        "filename" : "configs/juniper_security",
+                        "structureName" : "zone~A~to~zone~B 123-4",
+                        "structureType" : "firewall filter term"
+                      }
                     }
                   ]
                 }
@@ -27377,7 +27413,16 @@
                   "fragments" : [
                     {
                       "class" : "org.batfish.datamodel.TraceElement$TextFragment",
-                      "text" : "Matched p1"
+                      "text" : "Matched "
+                    },
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$LinkFragment",
+                      "text" : "p1",
+                      "vendorStructureId" : {
+                        "filename" : "configs/juniper_security",
+                        "structureName" : "~GLOBAL_SECURITY_POLICY~ p1",
+                        "structureType" : "firewall filter term"
+                      }
                     }
                   ]
                 }

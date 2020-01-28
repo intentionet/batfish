@@ -125,6 +125,7 @@ import static org.batfish.main.BatfishTestUtils.TEST_SNAPSHOT;
 import static org.batfish.representation.juniper.JuniperConfiguration.ACL_NAME_GLOBAL_POLICY;
 import static org.batfish.representation.juniper.JuniperConfiguration.ACL_NAME_SECURITY_POLICY;
 import static org.batfish.representation.juniper.JuniperConfiguration.DEFAULT_ISIS_COST;
+import static org.batfish.representation.juniper.JuniperConfiguration.computeFirewallFilterTermName;
 import static org.batfish.representation.juniper.JuniperConfiguration.computeOspfExportPolicyName;
 import static org.batfish.representation.juniper.JuniperConfiguration.computePeerExportPolicyName;
 import static org.batfish.representation.juniper.JuniperStructureType.APPLICATION;
@@ -132,6 +133,7 @@ import static org.batfish.representation.juniper.JuniperStructureType.APPLICATIO
 import static org.batfish.representation.juniper.JuniperStructureType.APPLICATION_SET;
 import static org.batfish.representation.juniper.JuniperStructureType.AUTHENTICATION_KEY_CHAIN;
 import static org.batfish.representation.juniper.JuniperStructureType.FIREWALL_FILTER;
+import static org.batfish.representation.juniper.JuniperStructureType.FIREWALL_FILTER_TERM;
 import static org.batfish.representation.juniper.JuniperStructureType.INTERFACE;
 import static org.batfish.representation.juniper.JuniperStructureType.PREFIX_LIST;
 import static org.batfish.representation.juniper.JuniperStructureType.VLAN;
@@ -340,6 +342,7 @@ import org.batfish.representation.juniper.TcpFinNoAck;
 import org.batfish.representation.juniper.TcpNoFlag;
 import org.batfish.representation.juniper.TcpSynFin;
 import org.batfish.representation.juniper.Zone;
+import org.batfish.vendor.VendorStructureId;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -363,6 +366,20 @@ public final class FlatJuniperGrammarTest {
     fb.setSrcIp(Ip.parse(sourceAddress));
     fb.setDstIp(Ip.parse(destinationAddress));
     return fb.build();
+  }
+
+  /** Returns a trace element for a firewall filter term for the given test config. */
+  private static TraceElement matchingFirewallFilterTerm(
+      Configuration c, String aclName, String termName) {
+    return TraceElement.builder()
+        .add("Matched ")
+        .add(
+            termName,
+            new VendorStructureId(
+                "configs/" + c.getHostname(),
+                FIREWALL_FILTER_TERM.getDescription(),
+                computeFirewallFilterTermName(aclName, termName)))
+        .build();
   }
 
   private static Flow createFlow(IpProtocol protocol, int port) {
@@ -1700,7 +1717,7 @@ public final class FlatJuniperGrammarTest {
         c.getAllInterfaces().get(interfaceNameUntrust).getPreTransformationOutgoingFilter();
 
     // Should have a an IpSpace in the config corresponding to the trust zone's ADDR1 address
-    final String ipSpaceName = "trust~ADDR1";
+    String ipSpaceName = "trust~ADDR1";
     assertThat(c.getIpSpaces(), hasKey(equalTo(ipSpaceName)));
 
     // It should be the only IpSpace
@@ -1749,7 +1766,7 @@ public final class FlatJuniperGrammarTest {
         c.getAllInterfaces().get(interfaceNameUntrust).getPreTransformationOutgoingFilter();
 
     // Should have a an IpSpace in the config corresponding to the trust zone's ADDR1 address
-    final String ipSpaceName = "trust-book~ADDR1";
+    String ipSpaceName = "trust-book~ADDR1";
     assertThat(c.getIpSpaces(), hasKey(equalTo(ipSpaceName)));
 
     // It should be the only IpSpace
@@ -1798,7 +1815,7 @@ public final class FlatJuniperGrammarTest {
         c.getAllInterfaces().get(interfaceNameUntrust).getPreTransformationOutgoingFilter();
 
     // Should have a an IpSpace in the config corresponding to the trust zone's ADDR1 address
-    final String ipSpaceName = "global~ADDR1";
+    String ipSpaceName = "global~ADDR1";
     assertThat(c.getIpSpaces(), hasKey(equalTo(ipSpaceName)));
 
     // It should be the only IpSpace
@@ -2744,7 +2761,7 @@ public final class FlatJuniperGrammarTest {
                                                 IpWildcard.parse("2.3.4.5/24").toIpSpace()))
                                         .build()))
                             .setName("TERM")
-                            .setTraceElement(TraceElement.of("Matched TERM"))
+                            .setTraceElement(matchingFirewallFilterTerm(c, filterNameV4, "TERM"))
                             .build())))));
   }
 
@@ -3038,7 +3055,7 @@ public final class FlatJuniperGrammarTest {
                                                 IpWildcard.parse("2.3.4.5/24").toIpSpace()))
                                         .build()))
                             .setName("TERM")
-                            .setTraceElement(TraceElement.of("Matched TERM"))
+                            .setTraceElement(matchingFirewallFilterTerm(c, filterNameV4, "TERM"))
                             .build())))));
   }
 
@@ -4958,7 +4975,7 @@ public final class FlatJuniperGrammarTest {
                                     .setSrcIps(IpWildcard.parse("1.2.3.6").toIpSpace())
                                     .build()),
                             "TERM",
-                            TraceElement.of("Matched TERM"))))
+                            matchingFirewallFilterTerm(config, "FILTER1", "TERM"))))
                 .build()));
 
     assertThat(

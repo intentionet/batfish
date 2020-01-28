@@ -3,6 +3,7 @@ package org.batfish.representation.juniper;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.matchSrcInterface;
 import static org.batfish.representation.juniper.JuniperStructureType.ADDRESS_BOOK;
+import static org.batfish.representation.juniper.JuniperStructureType.FIREWALL_FILTER_TERM;
 import static org.batfish.representation.juniper.NatPacketLocation.interfaceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.routingInstanceLocation;
 import static org.batfish.representation.juniper.NatPacketLocation.zoneLocation;
@@ -162,6 +163,7 @@ import org.batfish.representation.juniper.BgpGroup.BgpGroupType;
 import org.batfish.representation.juniper.Interface.OspfInterfaceType;
 import org.batfish.representation.juniper.Zone.AddressBookType;
 import org.batfish.vendor.VendorConfiguration;
+import org.batfish.vendor.VendorStructureId;
 
 public final class JuniperConfiguration extends VendorConfiguration {
 
@@ -2182,7 +2184,16 @@ public final class JuniperConfiguration extends VendorConfiguration {
               .setAction(action)
               .setMatchCondition(new MatchHeaderSpace(matchCondition.build()))
               .setName(term.getName())
-              .setTraceElement(TraceElement.of(String.format("Matched %s", term.getName())))
+              .setTraceElement(
+                  TraceElement.builder()
+                      .add("Matched ")
+                      .add(
+                          term.getName(),
+                          new VendorStructureId(
+                              _filename,
+                              FIREWALL_FILTER_TERM.getDescription(),
+                              computeFirewallFilterTermName(aclName, term.getName())))
+                      .build())
               .build());
     }
     return lines;
