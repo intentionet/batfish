@@ -4,7 +4,7 @@ load-questions questions/stable
 test -raw tests/questions/stable/aaaAuthenticationLogin.ref validate-template aaaAuthenticationLogin nodes=".*"
 
 # validate definedStructures
-test -raw tests/questions/stable/definedStructures.ref validate-template definedStructures nodes="n1", names="m1", types="t1"
+test -raw tests/questions/stable/definedStructures.ref validate-template definedStructures files="f1", nodes="n1", names="m1", types="t1"
 
 # validate fileParseStatus
 test -raw tests/questions/stable/fileParseStatus.ref validate-template fileParseStatus

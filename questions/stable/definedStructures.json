@@ -6,6 +6,7 @@
         "instanceName": "definedStructures",
         "longDescription": "Lists the structures defined in the network, along with the files and line numbers in which they are defined.",
         "orderedVariableNames": [
+            "files",
             "nodes",
             "names",
             "types"
@@ -14,6 +15,13 @@
             "configuration"
         ],
         "variables": {
+            "files": {
+                "description": "Include structures defined in files whose name matches this string or regex",
+                "type": "javaRegex",
+                "value": ".*",
+                "optional": true,
+                "displayName": "Files"
+            },
             "names": {
                 "description": "Include structures whose name matches this string or regex",
                 "type": "structureName",
@@ -37,6 +45,7 @@
             }
         }
     },
+    "files": "${files}",
     "names": "${names}",
     "nodes": "${nodes}",
     "types": "${types}"

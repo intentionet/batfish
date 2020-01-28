@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.batfish.common.Answerer;
 import org.batfish.common.NetworkSnapshot;
 import org.batfish.common.plugin.IBatfish;
-import org.batfish.datamodel.answers.AnswerElement;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
 import org.batfish.datamodel.answers.Schema;
 import org.batfish.datamodel.collections.FileLines;
@@ -35,7 +34,7 @@ public class DefinedStructuresAnswerer extends Answerer {
   }
 
   @Override
-  public AnswerElement answer(NetworkSnapshot snapshot) {
+  public TableAnswerElement answer(NetworkSnapshot snapshot) {
     DefinedStructuresQuestion question = (DefinedStructuresQuestion) _question;
     Multiset<Row> structures = rawAnswer(snapshot, question);
     TableAnswerElement answer = new TableAnswerElement(createMetadata(question));
@@ -49,10 +48,12 @@ public class DefinedStructuresAnswerer extends Answerer {
         question.getNodeSpecifier().resolve(_batfish.specifierContext(snapshot));
     Multimap<String, String> hostnameFilenameMap =
         _batfish.loadParseVendorConfigurationAnswerElement(snapshot).getFileMap();
+    Pattern includeFileNames = Pattern.compile(question.getFiles(), Pattern.CASE_INSENSITIVE);
     Set<String> includeFiles =
         hostnameFilenameMap.entries().stream()
             .filter(e -> includeNodes.contains(e.getKey()))
             .map(Entry::getValue)
+            .filter(f -> includeFileNames.matcher(f).find())
             .collect(Collectors.toSet());
 
     Pattern includeStructureNames = Pattern.compile(question.getNames(), Pattern.CASE_INSENSITIVE);

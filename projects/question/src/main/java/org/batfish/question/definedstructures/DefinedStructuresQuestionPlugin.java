@@ -17,6 +17,6 @@ public class DefinedStructuresQuestionPlugin extends QuestionPlugin {
 
   @Override
   protected Question createQuestion() {
-    return new DefinedStructuresQuestion(".*", null, ".*");
+    return new DefinedStructuresQuestion(".*", null, ".*", ".*");
   }
 }
