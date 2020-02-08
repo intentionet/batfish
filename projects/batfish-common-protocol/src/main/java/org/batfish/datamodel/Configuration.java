@@ -59,6 +59,7 @@ public final class Configuration implements Serializable {
 
     private ConfigurationFormat _configurationFormat;
     private String _hostname;
+    private String _humanName;
     private Supplier<String> _hostnameGenerator;
     private String _domainName;
     private LineAction _defaultCrossZoneAction;
@@ -74,6 +75,7 @@ public final class Configuration implements Serializable {
           "Must set hostname or supply name generator");
       String name = _hostname != null ? _hostname : _hostnameGenerator.get().toLowerCase();
       Configuration configuration = new Configuration(name, _configurationFormat);
+      configuration.setHumanName(_humanName);
       if (_defaultCrossZoneAction != null) {
         configuration.setDefaultCrossZoneAction(_defaultCrossZoneAction);
       }
@@ -100,6 +102,11 @@ public final class Configuration implements Serializable {
       } else {
         _hostname = null;
       }
+      return this;
+    }
+
+    public Builder setHumanName(@Nullable String humanName) {
+      _humanName = humanName;
       return this;
     }
 
@@ -130,6 +137,7 @@ public final class Configuration implements Serializable {
   private static final String PROP_DNS_SOURCE_INTERFACE = "dnsSourceInterface";
   private static final String PROP_DOMAIN_NAME = "domainName";
   private static final String PROP_GENERATED_REFERENCE_BOOKS = "generatedReferenceBooks";
+  private static final String PROP_HUMAN_NAME = "humanName";
   private static final String PROP_IKE_PHASE1_KEYS = "ikePhase1Keys";
   private static final String PROP_IKE_PHASE1_POLICIES = "ikePhase1Policies";
   private static final String PROP_IKE_PHASE1_PROPOSALS = "ikePhase1Proposals";
@@ -220,6 +228,7 @@ public final class Configuration implements Serializable {
   private NavigableMap<String, Mlag> _mlags;
 
   private final String _name;
+  private @Nullable String _humanName;
 
   /** Normal =&gt; Excluding extended and reserved vlans that should not be modified or deleted. */
   private SubRange _normalVlanRange;
@@ -459,6 +468,12 @@ public final class Configuration implements Serializable {
   @JsonProperty(PROP_NAME)
   public String getHostname() {
     return _name;
+  }
+
+  /** A human-readable name, alternative to {@link #getHostname}, but not guaranteed unique. */
+  @JsonProperty(PROP_HUMAN_NAME)
+  public @Nullable String getHumanName() {
+    return _humanName;
   }
 
   /** Dictionary of all IKE phase1 keys for this node. */
@@ -730,6 +745,11 @@ public final class Configuration implements Serializable {
   @JsonProperty(PROP_DOMAIN_NAME)
   public void setDomainName(String domainName) {
     _domainName = domainName;
+  }
+
+  @JsonProperty(PROP_HUMAN_NAME)
+  public void setHumanName(@Nullable String humanName) {
+    _humanName = humanName;
   }
 
   @JsonProperty(PROP_IKE_PHASE1_KEYS)

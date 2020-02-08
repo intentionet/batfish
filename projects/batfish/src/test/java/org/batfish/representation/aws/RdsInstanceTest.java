@@ -187,7 +187,8 @@ public class RdsInstanceTest {
                                     HeaderSpace.builder()
                                         .setSrcIps(Ip.parse("10.193.16.105").toIpSpace())
                                         .build(),
-                                    traceElementForInstance("test host")))))))));
+                                    traceElementForInstance(
+                                        "Test host (i-066b1b9957b9200e7)")))))))));
     assertThat(
         testRds.getIpAccessLists().get("~SECURITY_GROUP_INGRESS_ACL~").getLines(),
         equalTo(

@@ -3,6 +3,7 @@ package org.batfish.representation.aws;
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static org.batfish.representation.aws.AwsVpcEntity.JSON_KEY_INSTANCES;
 import static org.batfish.representation.aws.AwsVpcEntity.JSON_KEY_RESERVATIONS;
+import static org.batfish.representation.aws.AwsVpcEntity.TAG_NAME;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -96,6 +97,7 @@ public class InstanceTest {
         Instance.builder()
             .setInstanceId("instance")
             .setNetworkInterfaces(ImmutableList.of(networkInterface.getNetworkInterfaceId()))
+            .setTags(ImmutableMap.of("MADEUPTAG", "noval", TAG_NAME, "UserVisibleName!"))
             .build();
 
     Region region =
@@ -114,6 +116,7 @@ public class InstanceTest {
 
     assertTrue(warnings.isEmpty());
     assertThat(configuration.getHostname(), equalTo(instance.getId()));
+    assertThat(configuration.getHumanName(), equalTo("UserVisibleName!"));
     assertThat(configInterface.getDescription(), equalTo("desc"));
     assertThat(
         configInterface.getPrimaryNetwork(), equalTo(Prefix.create(Ip.parse("10.10.10.10"), 24)));

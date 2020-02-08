@@ -524,8 +524,8 @@ final class IpPermissions implements Serializable {
       return false;
     }
     IpPermissions that = (IpPermissions) o;
-    return _fromPort == that._fromPort
-        && _toPort == that._toPort
+    return Objects.equals(_fromPort, that._fromPort)
+        && Objects.equals(_toPort, that._toPort)
         && Objects.equals(_ipProtocol, that._ipProtocol)
         && Objects.equals(_ipRanges, that._ipRanges)
         && Objects.equals(_ipRanges, that._ipRanges)

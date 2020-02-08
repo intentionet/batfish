@@ -151,6 +151,8 @@ public interface AwsVpcEntity {
   String STATUS_ACTIVE = "active";
   String STATUS_DELETED = "deleted";
 
+  String TAG_NAME = "Name";
+
   String XML_KEY_ASN = "asn";
   String XML_KEY_AUTHENTICATION_PROTOCOL = "authentication_protocol";
   String XML_KEY_BGP = "bgp";

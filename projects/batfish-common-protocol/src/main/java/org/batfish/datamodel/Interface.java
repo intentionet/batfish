@@ -58,6 +58,7 @@ public final class Interface extends ComparableStructure<String> {
     @Nullable private Integer _encapsulationVlan;
     private Map<Integer, HsrpGroup> _hsrpGroups;
     private String _hsrpVersion;
+    private @Nullable String _humanName;
     private FirewallSessionInterfaceInfo _firewallSessionInterfaceInfo;
     private IpAccessList _incomingFilter;
     private Transformation _incomingTransformation;
@@ -137,6 +138,7 @@ public final class Interface extends ComparableStructure<String> {
       iface.setEncapsulationVlan(_encapsulationVlan);
       iface.setHsrpGroups(_hsrpGroups);
       iface.setHsrpVersion(_hsrpVersion);
+      iface.setHumanName(_humanName);
       iface.setFirewallSessionInterfaceInfo(_firewallSessionInterfaceInfo);
       iface.setIncomingFilter(_incomingFilter);
       iface.setIncomingTransformation(_incomingTransformation);
@@ -320,6 +322,11 @@ public final class Interface extends ComparableStructure<String> {
 
     public @Nonnull Builder setHsrpVersion(@Nullable String hsrpVersion) {
       _hsrpVersion = hsrpVersion;
+      return this;
+    }
+
+    public @Nonnull Builder setHumanName(@Nullable String humanName) {
+      _humanName = humanName;
       return this;
     }
 
@@ -548,6 +555,7 @@ public final class Interface extends ComparableStructure<String> {
   private static final String PROP_FIREWALL_SESSION_INTERFACE_INFO = "firewallSessionInterfaceInfo";
   private static final String PROP_HSRP_GROUPS = "hsrpGroups";
   private static final String PROP_HSRP_VERSION = "hsrpVersion";
+  private static final String PROP_HUMAN_NAME = "humanName";
   private static final String PROP_INBOUND_FILTER = "inboundFilter";
   private static final String PROP_INCOMING_FILTER = "incomingFilter";
   private static final String PROP_INCOMING_TRANSFORMATION = "incomingTransformation";
@@ -810,6 +818,7 @@ public final class Interface extends ComparableStructure<String> {
   @Nullable private Integer _encapsulationVlan;
   @Nullable private FirewallSessionInterfaceInfo _firewallSessionInterfaceInfo;
   private Map<Integer, HsrpGroup> _hsrpGroups;
+  private @Nullable String _humanName;
   private IpAccessList _inboundFilter;
   private transient String _inboundFilterName;
   private IpAccessList _incomingFilter;
@@ -918,13 +927,13 @@ public final class Interface extends ComparableStructure<String> {
     }
     // we check ACLs for name match only -- full ACL diff can be done
     // elsewhere.
-    if (!IpAccessList.bothNullOrSameName(this.getInboundFilter(), other.getInboundFilter())) {
+    if (!IpAccessList.bothNullOrSameName(getInboundFilter(), other.getInboundFilter())) {
       return false;
     }
-    if (!IpAccessList.bothNullOrSameName(this.getIncomingFilter(), other.getIncomingFilter())) {
+    if (!IpAccessList.bothNullOrSameName(getIncomingFilter(), other.getIncomingFilter())) {
       return false;
     }
-    if (this._interfaceType != other._interfaceType) {
+    if (_interfaceType != other._interfaceType) {
       return false;
     }
     if (!Objects.equals(_key, other._key)) {
@@ -950,7 +959,7 @@ public final class Interface extends ComparableStructure<String> {
       return false;
     }
     // TODO: check OSPF settings for equality.
-    if (!IpAccessList.bothNullOrSameName(this._outgoingFilter, other._outgoingFilter)) {
+    if (!IpAccessList.bothNullOrSameName(_outgoingFilter, other._outgoingFilter)) {
       return false;
     }
     if (!_proxyArp == other._proxyArp) {
@@ -962,18 +971,18 @@ public final class Interface extends ComparableStructure<String> {
     if (!Objects.equals(_speed, other._speed)) {
       return false;
     }
-    if (!Objects.equals(this._switchportMode, other._switchportMode)) {
+    if (!Objects.equals(_switchportMode, other._switchportMode)) {
       return false;
     }
-    if (!Objects.equals(this._zoneName, other._zoneName)) {
-      return false;
-    }
-    if (!IpAccessList.bothNullOrSameName(
-        this._postTransformationIncomingFilter, other._postTransformationIncomingFilter)) {
+    if (!Objects.equals(_zoneName, other._zoneName)) {
       return false;
     }
     if (!IpAccessList.bothNullOrSameName(
-        this._preTransformationOutgoingFilter, other._preTransformationOutgoingFilter)) {
+        _postTransformationIncomingFilter, other._postTransformationIncomingFilter)) {
+      return false;
+    }
+    if (!IpAccessList.bothNullOrSameName(
+        _preTransformationOutgoingFilter, other._preTransformationOutgoingFilter)) {
       return false;
     }
     return true;
@@ -1131,6 +1140,11 @@ public final class Interface extends ComparableStructure<String> {
   @JsonProperty(PROP_HSRP_VERSION)
   public @Nullable String getHsrpVersion() {
     return _hsrpVersion;
+  }
+
+  @JsonProperty(PROP_HUMAN_NAME)
+  public @Nullable String getHumanName() {
+    return _humanName;
   }
 
   @JsonIgnore
@@ -1562,6 +1576,11 @@ public final class Interface extends ComparableStructure<String> {
   @JsonProperty(PROP_HSRP_VERSION)
   public void setHsrpVersion(String hsrpVersion) {
     _hsrpVersion = hsrpVersion;
+  }
+
+  @JsonProperty(PROP_HUMAN_NAME)
+  public void setHumanName(@Nullable String humanName) {
+    _humanName = humanName;
   }
 
   @JsonIgnore

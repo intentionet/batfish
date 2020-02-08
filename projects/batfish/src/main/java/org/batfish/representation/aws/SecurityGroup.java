@@ -112,11 +112,18 @@ final class SecurityGroup implements AwsVpcEntity, Serializable {
     return _referrerIps;
   }
 
+  private static String humanReadableInstanceName(Configuration c) {
+    if (c.getHumanName() == null) {
+      return c.getHostname();
+    }
+    return String.format("%s (%s)", c.getHumanName(), c.getHostname());
+  }
+
   void updateConfigIps(Configuration configuration) {
     configuration.getAllInterfaces().values().stream()
         .flatMap(iface -> iface.getAllConcreteAddresses().stream())
         .map(ConcreteInterfaceAddress::getIp)
-        .forEach(ip -> _referrerIps.put(ip, configuration.getHostname()));
+        .forEach(ip -> _referrerIps.put(ip, humanReadableInstanceName(configuration)));
   }
 
   @Override

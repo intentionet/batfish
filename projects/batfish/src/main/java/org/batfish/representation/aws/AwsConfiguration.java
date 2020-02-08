@@ -32,7 +32,7 @@ import org.batfish.vendor.VendorConfiguration;
 @ParametersAreNonnullByDefault
 public class AwsConfiguration extends VendorConfiguration {
 
-  static Ip LINK_LOCAL_IP = Ip.parse("169.254.0.1");
+  static final Ip LINK_LOCAL_IP = Ip.parse("169.254.0.1");
 
   @Nullable private ConvertedConfiguration _convertedConfiguration;
 

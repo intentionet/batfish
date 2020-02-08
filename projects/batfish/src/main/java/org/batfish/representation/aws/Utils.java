@@ -2,9 +2,12 @@ package org.batfish.representation.aws;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.batfish.representation.aws.AwsConfiguration.LINK_LOCAL_IP;
+import static org.batfish.representation.aws.AwsVpcEntity.TAG_NAME;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -58,6 +61,11 @@ final class Utils {
   }
 
   static Configuration newAwsConfiguration(String name, String domainName) {
+    return newAwsConfiguration(name, domainName, Collections.emptyMap());
+  }
+
+  static Configuration newAwsConfiguration(
+      String name, String domainName, Map<String, String> tags) {
     Configuration c =
         Configuration.builder()
             .setHostname(name)
@@ -65,6 +73,7 @@ final class Utils {
             .setConfigurationFormat(ConfigurationFormat.AWS)
             .setDefaultInboundAction(LineAction.PERMIT)
             .setDefaultCrossZoneAction(LineAction.PERMIT)
+            .setHumanName(tags.get(TAG_NAME))
             .build();
     Vrf.builder().setName(Configuration.DEFAULT_VRF_NAME).setOwner(c).build();
     c.getVendorFamily().setAws(new AwsFamily());
