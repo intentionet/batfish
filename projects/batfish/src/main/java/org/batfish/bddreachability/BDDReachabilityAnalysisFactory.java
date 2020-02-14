@@ -1,6 +1,7 @@
 package org.batfish.bddreachability;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Predicates.alwaysTrue;
 import static org.batfish.bddreachability.BidirectionalReachabilityReturnPassInstrumentation.instrumentReturnPassEdges;
 import static org.batfish.bddreachability.SessionInstrumentation.sessionInstrumentation;
@@ -100,6 +101,7 @@ import org.batfish.symbolic.state.NodeInterfaceDeliveredToSubnet;
 import org.batfish.symbolic.state.NodeInterfaceExitsNetwork;
 import org.batfish.symbolic.state.NodeInterfaceInsufficientInfo;
 import org.batfish.symbolic.state.NodeInterfaceNeighborUnreachable;
+import org.batfish.symbolic.state.OriginateInterface;
 import org.batfish.symbolic.state.OriginateInterfaceLink;
 import org.batfish.symbolic.state.OriginateVrf;
 import org.batfish.symbolic.state.PostInInterface;
@@ -550,7 +552,8 @@ public final class BDDReachabilityAnalysisFactory {
   private Stream<Edge> generateRootEdges(Map<StateExpr, BDD> rootBdds) {
     return Streams.concat(
         generateRootEdges_OriginateInterfaceLink_PreInInterface(rootBdds),
-        generateRootEdges_OriginateVrf_PostInVrf(rootBdds));
+        generateRootEdges_OriginateVrf_OriginateInterface(rootBdds),
+        generateRootEdges_OriginateInterface_PostInVrf(rootBdds));
   }
 
   private static Stream<Edge> generateQueryEdges(Set<FlowDisposition> actions) {
@@ -608,18 +611,52 @@ public final class BDDReachabilityAnalysisFactory {
             });
   }
 
-  private Stream<Edge> generateRootEdges_OriginateVrf_PostInVrf(Map<StateExpr, BDD> rootBdds) {
+  private Stream<Edge> generateRootEdges_OriginateVrf_OriginateInterface(
+      Map<StateExpr, BDD> rootBdds) {
     return rootBdds.entrySet().stream()
         .filter(entry -> entry.getKey() instanceof OriginateVrf)
-        .map(
+        .flatMap(
             entry -> {
               OriginateVrf originateVrf = (OriginateVrf) entry.getKey();
               String hostname = originateVrf.getHostname();
+              Configuration c = _configs.get(hostname);
+              if (c == null) {
+                return Stream.of();
+              }
               String vrf = originateVrf.getVrf();
+              // TODO Need to find interface's owned IPs and constrain edge to those src IPs
+              BDD rootBdd = entry.getValue();
+              return c.getActiveInterfaces().values().stream()
+                  .filter(iface -> iface.getVrfName().equals(vrf))
+                  .map(
+                      iface ->
+                          new Edge(
+                              originateVrf,
+                              new OriginateInterface(hostname, iface.getName()),
+                              rootBdd));
+            });
+  }
+
+  private Stream<Edge> generateRootEdges_OriginateInterface_PostInVrf(
+      Map<StateExpr, BDD> rootBdds) {
+    return rootBdds.entrySet().stream()
+        .filter(entry -> entry.getKey() instanceof OriginateInterface)
+        .map(
+            entry -> {
+              OriginateInterface originateInterface = (OriginateInterface) entry.getKey();
+              String hostname = originateInterface.getHostname();
+              String ifaceName = originateInterface.getInterface();
+              Optional<Interface> iface =
+                  Optional.ofNullable(_configs.get(hostname))
+                      .map(Configuration::getActiveInterfaces)
+                      .map(ifaces -> ifaces.get(ifaceName));
+              checkState(
+                  iface.isPresent(), "No such active interface: %s[%s]", hostname, ifaceName);
+              String vrf = iface.get().getVrfName();
               PostInVrf postInVrf = new PostInVrf(hostname, vrf);
               BDD rootBdd = entry.getValue();
               return new Edge(
-                  originateVrf,
+                  originateInterface,
                   postInVrf,
                   compose(
                       addOriginatingFromDeviceConstraint(_bddSourceManagers.get(hostname)),
