@@ -1783,6 +1783,7 @@ public final class BDDReachabilityAnalysisFactory {
                   ? adaptEdgeSetTransitedBit(edge)
                   : edge;
             } else if (edge.getPreState() instanceof OriginateVrf
+                || edge.getPreState() instanceof OriginateInterface
                 || edge.getPreState() instanceof OriginateInterfaceLink) {
               return andThen(edge, notTransited);
             } else if (edge.getPostState() instanceof Query) {
