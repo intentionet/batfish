@@ -9,7 +9,7 @@ public interface ForwardingAnalysis {
    * Mapping: hostname -&gt; vrfName -&gt; ifaceName -&gt; space of IPs accepted by that interface
    */
   @Nonnull
-  Map<String, Map<String, Map<String, IpSpace>>> getAcceptsIps();
+  Map<String, Map<String, Map<String, IpSpace>>> getOwnedIps();
 
   /** Mapping: hostname -&gt; inInterface -&gt; ipsToArpReplyTo */
   Map<String, Map<String, IpSpace>> getArpReplies();

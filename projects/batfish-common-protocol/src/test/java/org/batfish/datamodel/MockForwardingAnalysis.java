@@ -9,7 +9,7 @@ public class MockForwardingAnalysis implements ForwardingAnalysis {
 
   public static class Builder {
 
-    private Map<String, Map<String, Map<String, IpSpace>>> _acceptedIps;
+    private Map<String, Map<String, Map<String, IpSpace>>> _ownedIps;
     private Map<String, Map<String, IpSpace>> _arpReplies;
     private Map<
             String, Map<String, Map<AbstractRoute, Map<String, Map<ArpIpChoice, Set<IpSpace>>>>>>
@@ -21,7 +21,7 @@ public class MockForwardingAnalysis implements ForwardingAnalysis {
     private Map<String, Map<String, IpSpace>> _routableIps;
 
     private Builder() {
-      _acceptedIps = ImmutableMap.of();
+      _ownedIps = ImmutableMap.of();
       _arpReplies = ImmutableMap.of();
       _arpRequests = ImmutableMap.of();
       _arpTrueEdge = ImmutableMap.of();
@@ -35,8 +35,8 @@ public class MockForwardingAnalysis implements ForwardingAnalysis {
       return new MockForwardingAnalysis(this);
     }
 
-    public Builder setAcceptedIps(Map<String, Map<String, Map<String, IpSpace>>> acceptedIps) {
-      _acceptedIps = acceptedIps;
+    public Builder setOwnedIps(Map<String, Map<String, Map<String, IpSpace>>> ownedIps) {
+      _ownedIps = ownedIps;
       return this;
     }
 
@@ -83,7 +83,7 @@ public class MockForwardingAnalysis implements ForwardingAnalysis {
     return new Builder();
   }
 
-  private final Map<String, Map<String, Map<String, IpSpace>>> _acceptedIps;
+  private final Map<String, Map<String, Map<String, IpSpace>>> _ownedIps;
   private final Map<String, Map<String, IpSpace>> _arpReplies;
   private final Map<
           String, Map<String, Map<AbstractRoute, Map<String, Map<ArpIpChoice, Set<IpSpace>>>>>>
@@ -95,7 +95,7 @@ public class MockForwardingAnalysis implements ForwardingAnalysis {
   private final Map<String, Map<String, IpSpace>> _routableIps;
 
   public MockForwardingAnalysis(Builder builder) {
-    _acceptedIps = ImmutableMap.copyOf(builder._acceptedIps);
+    _ownedIps = ImmutableMap.copyOf(builder._ownedIps);
     _arpReplies = ImmutableMap.copyOf(builder._arpReplies);
     _arpRequests = ImmutableMap.copyOf(builder._arpRequests);
     _arpTrueEdge = ImmutableMap.copyOf(builder._arpTrueEdge);
@@ -107,8 +107,8 @@ public class MockForwardingAnalysis implements ForwardingAnalysis {
 
   @Nonnull
   @Override
-  public Map<String, Map<String, Map<String, IpSpace>>> getAcceptsIps() {
-    return _acceptedIps;
+  public Map<String, Map<String, Map<String, IpSpace>>> getOwnedIps() {
+    return _ownedIps;
   }
 
   @Override
