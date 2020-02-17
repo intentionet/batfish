@@ -222,9 +222,6 @@ public final class BDDReachabilityAnalysisFactory {
   /** node --&gt; vrf --&gt; interface --&gt; set of packets accepted by the interface */
   private final Map<String, Map<String, Map<String, BDD>>> _ifaceAcceptBDDs;
 
-  /** node --&gt; vrf --&gt; interface --&gt; set of packets originated by the interface */
-  private final Map<String, Map<String, Map<String, BDD>>> _ifaceOriginateBDDs;
-
   // node --> vrf --> nextVrf --> set of packets vrf delegates to nextVrf
   private final Map<String, Map<String, Map<String, BDD>>> _nextVrfBDDs;
 
@@ -277,9 +274,7 @@ public final class BDDReachabilityAnalysisFactory {
       _nullRoutedBDDs = computeNullRoutedBDDs(forwardingAnalysis, _dstIpSpaceToBDD);
       _routableBDDs = computeRoutableBDDs(forwardingAnalysis, _dstIpSpaceToBDD);
       _ifaceAcceptBDDs =
-          computeIfaceBDDs(configs, forwardingAnalysis.getOwnedIps(), _dstIpSpaceToBDD);
-      _ifaceOriginateBDDs =
-          computeIfaceBDDs(configs, forwardingAnalysis.getOwnedIps(), _srcIpSpaceToBDD);
+          computeIfaceAcceptBDDs(configs, forwardingAnalysis.getAcceptsIps(), _dstIpSpaceToBDD);
       _nextVrfBDDs = computeNextVrfBDDs(forwardingAnalysis.getNextVrfIps(), _dstIpSpaceToBDD);
 
       _convertedPacketPolicies = convertPacketPolicies(configs, ipsRoutedOutInterfacesFactory);
@@ -636,39 +631,31 @@ public final class BDDReachabilityAnalysisFactory {
 
   private Stream<Edge> generateRootEdges_OriginateInterface_PostInVrf(
       Map<StateExpr, BDD> rootBdds) {
-    if (rootBdds.keySet().stream().noneMatch(state -> state instanceof OriginateInterface)) {
-      // short circuit if there are no OriginateInterface roots
-      return Stream.of();
-    }
-    return _ifaceOriginateBDDs.entrySet().stream()
-        .flatMap(
-            nodeEntry -> {
-              String hostname = nodeEntry.getKey();
-              return nodeEntry.getValue().entrySet().stream()
-                  .flatMap(
-                      vrfEntry -> {
-                        PostInVrf postInVrf = new PostInVrf(hostname, vrfEntry.getKey());
-                        return vrfEntry.getValue().entrySet().stream()
-                            .map(
-                                ifaceEntry -> {
-                                  OriginateInterface originateInterface =
-                                      new OriginateInterface(hostname, ifaceEntry.getKey());
-                                  BDD rootBdd = rootBdds.get(originateInterface);
-                                  return rootBdd == null
-                                      ? null
-                                      : new Edge(
-                                          originateInterface,
-                                          postInVrf,
-                                          compose(
-                                              // To transition this edge, flow must originate from
-                                              // device and have a src IP owned by this interface
-                                              addOriginatingFromDeviceConstraint(
-                                                  _bddSourceManagers.get(hostname)),
-                                              constraint(rootBdd.and(ifaceEntry.getValue()))));
-                                })
-                            .filter(Objects::nonNull);
-                      });
-            });
+    return rootBdds.entrySet().stream()
+        .filter(e -> e.getKey() instanceof OriginateInterface)
+        .map(
+            e -> {
+              OriginateInterface state = (OriginateInterface) e.getKey();
+              String vrf =
+                  Optional.ofNullable(_configs.get(state.getHostname()))
+                      .map(c -> c.getActiveInterfaces().get(state.getInterface()))
+                      .map(Interface::getVrfName)
+                      .orElse(null);
+              if (vrf == null) {
+                return null;
+              }
+              PostInVrf postInVrf = new PostInVrf(state.getHostname(), vrf);
+              return new Edge(
+                  state,
+                  postInVrf,
+                  compose(
+                      // To transition this edge, flow must originate from
+                      // device and have a src IP owned by this interface
+                      addOriginatingFromDeviceConstraint(
+                          _bddSourceManagers.get(state.getHostname())),
+                      constraint(e.getValue())));
+            })
+        .filter(Objects::nonNull);
   }
 
   /** Generate edges to each disposition. Depends on final nodes. */
@@ -1637,13 +1624,13 @@ public final class BDDReachabilityAnalysisFactory {
     }
   }
 
-  private static Map<String, Map<String, Map<String, BDD>>> computeIfaceBDDs(
+  private static Map<String, Map<String, Map<String, BDD>>> computeIfaceAcceptBDDs(
       Map<String, Configuration> configs,
-      Map<String, Map<String, Map<String, IpSpace>>> ownedIps, // hostname -> vrf -> iface -> ips
+      Map<String, Map<String, Map<String, IpSpace>>> acceptIps, // hostname -> vrf -> iface -> ips
       IpSpaceToBDD ipSpaceToBDD) {
     try (ActiveSpan span =
         GlobalTracer.get()
-            .buildSpan("BDDReachabilityAnalysisFactory.computeIfaceBDDs")
+            .buildSpan("BDDReachabilityAnalysisFactory.computeIfaceAcceptBDDs")
             .startActive()) {
       assert span != null; // avoid unused warning
       // Iterate over configs because we want all node/vrf/iface keys to be present in the map
@@ -1653,14 +1640,14 @@ public final class BDDReachabilityAnalysisFactory {
           nodeEntry -> {
             String hostname = nodeEntry.getKey();
             Configuration c = nodeEntry.getValue();
-            Map<String, Map<String, IpSpace>> nodeOwnedIps =
-                ownedIps.getOrDefault(hostname, ImmutableMap.of());
+            Map<String, Map<String, IpSpace>> nodeAcceptIps =
+                acceptIps.getOrDefault(hostname, ImmutableMap.of());
             return toImmutableMap(
                 c.getVrfs().keySet(),
                 Function.identity(), /* vrf */
                 vrf -> {
-                  Map<String, IpSpace> vrfOwnedIps =
-                      nodeOwnedIps.getOrDefault(vrf, ImmutableMap.of());
+                  Map<String, IpSpace> vrfAcceptIps =
+                      nodeAcceptIps.getOrDefault(vrf, ImmutableMap.of());
                   // Create entry for every interface in the current VRF
                   return c.getAllInterfaces().values().stream()
                       .filter(iface -> iface.getVrfName().equals(vrf))
@@ -1669,7 +1656,7 @@ public final class BDDReachabilityAnalysisFactory {
                           ImmutableMap.toImmutableMap(
                               Function.identity(), /* interface */
                               ifaceName ->
-                                  vrfOwnedIps
+                                  vrfAcceptIps
                                       .getOrDefault(ifaceName, EmptyIpSpace.INSTANCE)
                                       .accept(ipSpaceToBDD)));
                 });

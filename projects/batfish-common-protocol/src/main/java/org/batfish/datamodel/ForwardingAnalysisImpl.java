@@ -37,8 +37,8 @@ import org.batfish.specifier.LocationInfo;
 /** Implementation of {@link ForwardingAnalysis}. */
 public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
 
-  /** node -&gt; vrf -&gt; interface -&gt; ips owned by that interface */
-  private Map<String, Map<String, Map<String, IpSpace>>> _ownedIps;
+  /** node -&gt; vrf -&gt; interface -&gt; ips accepted by that interface */
+  private Map<String, Map<String, Map<String, IpSpace>>> _acceptedIps;
 
   // node -> interface -> ips that the interface would reply arp request
   private final Map<String, Map<String, IpSpace>> _arpReplies;
@@ -96,7 +96,7 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
       // Unowned (i.e., external to the network) IPs
       BDD unownedIpsBDD = ipSpaceToBDD.visit(ownedIps).not();
 
-      _ownedIps = computeOwnedIps(ipOwners);
+      _acceptedIps = computeAcceptedIps(ipOwners);
 
       // IpSpaces matched by each prefix
       // -- only will have entries for active interfaces if FIB is correct
@@ -288,11 +288,12 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
   }
 
   /**
-   * Compute the space of IPs owned by an interface<br>
+   * Compute the space of IPs accepted by an interface<br>
    * Mapping: hostname -&gt; vrf name -&gt; interface name -&gt; space of IPs
    */
   // TODO: Account for special case VRF-accepted IPs that are not interface IPs.
-  private static Map<String, Map<String, Map<String, IpSpace>>> computeOwnedIps(IpOwners ipOwners) {
+  private static Map<String, Map<String, Map<String, IpSpace>>> computeAcceptedIps(
+      IpOwners ipOwners) {
     return ipOwners.getVrfIfaceOwnedIpSpaces();
   }
 
@@ -1064,8 +1065,8 @@ public final class ForwardingAnalysisImpl implements ForwardingAnalysis {
 
   @Nonnull
   @Override
-  public Map<String, Map<String, Map<String, IpSpace>>> getOwnedIps() {
-    return _ownedIps;
+  public Map<String, Map<String, Map<String, IpSpace>>> getAcceptsIps() {
+    return _acceptedIps;
   }
 
   @Override

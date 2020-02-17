@@ -170,7 +170,7 @@ public class TracerouteEngineImplContext {
    * ip}
    */
   boolean acceptsIp(String node, String vrf, Ip ip) {
-    return _forwardingAnalysis.getOwnedIps().getOrDefault(node, ImmutableMap.of())
+    return _forwardingAnalysis.getAcceptsIps().getOrDefault(node, ImmutableMap.of())
         .getOrDefault(vrf, ImmutableMap.of()).values().stream()
         .anyMatch(ipSpace -> ipSpace.containsIp(ip, ImmutableMap.of()));
   }
