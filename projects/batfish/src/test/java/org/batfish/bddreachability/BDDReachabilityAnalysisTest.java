@@ -43,6 +43,7 @@ import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
+import org.batfish.specifier.InterfaceLinkLocation;
 import org.batfish.specifier.InterfaceLocation;
 import org.batfish.specifier.IpSpaceAssignment;
 import org.batfish.symbolic.state.Accept;
@@ -56,6 +57,8 @@ import org.batfish.symbolic.state.NodeDropNullRoute;
 import org.batfish.symbolic.state.NodeInterfaceDeliveredToSubnet;
 import org.batfish.symbolic.state.NodeInterfaceExitsNetwork;
 import org.batfish.symbolic.state.NodeInterfaceInsufficientInfo;
+import org.batfish.symbolic.state.OriginateInterface;
+import org.batfish.symbolic.state.OriginateInterfaceLink;
 import org.batfish.symbolic.state.OriginateVrf;
 import org.batfish.symbolic.state.PostInInterface;
 import org.batfish.symbolic.state.PostInVrf;
@@ -64,6 +67,7 @@ import org.batfish.symbolic.state.PreOutEdge;
 import org.batfish.symbolic.state.PreOutEdgePostNat;
 import org.batfish.symbolic.state.PreOutInterfaceNeighborUnreachable;
 import org.batfish.symbolic.state.PreOutVrf;
+import org.batfish.symbolic.state.Query;
 import org.batfish.symbolic.state.StateExpr;
 import org.batfish.symbolic.state.VrfAccept;
 import org.junit.Before;
@@ -559,6 +563,41 @@ public final class BDDReachabilityAnalysisTest {
     assertThat(
         graph.getIngressLocationReachableBDDs(),
         equalTo(ImmutableMap.of(toIngressLocation(originateVrf), pkt.getFactory().zero())));
+  }
+
+  @Test
+  public void testGetSrcLocationBdds() {
+    // Simple reachability graph starting with interface states. Include an intermediate state to
+    // ensure reverseReachableStates are being correctly used (intermediate state is PostInVrf).
+    String hostname = "c";
+    String ifaceName = "iface";
+    OriginateInterface originateInterface = new OriginateInterface(hostname, ifaceName);
+    OriginateInterfaceLink originateInterfaceLink = new OriginateInterfaceLink(hostname, ifaceName);
+    PostInVrf postInVrf = new PostInVrf(hostname, "vrf");
+    BDD ifaceOriginateBdd = PKT.getDstIp().value(1);
+    BDD ifaceLinkBdd = PKT.getDstIp().value(2);
+    BDD postInVrfBdd = PKT.getSrcIp().value(3); // srcIp, so not mutually exclusive w/ other BDDS
+    BDDReachabilityAnalysis analysis =
+        new BDDReachabilityAnalysis(
+            PKT,
+            ImmutableSet.of(originateInterface, originateInterfaceLink),
+            Stream.of(
+                new Edge(originateInterface, Query.INSTANCE, ifaceOriginateBdd),
+                new Edge(originateInterfaceLink, postInVrf, ifaceLinkBdd),
+                new Edge(postInVrf, Query.INSTANCE, postInVrfBdd)),
+            PKT.getFactory().one());
+
+    // The origination states should translate to Locations with the expected success BDDs.
+    InterfaceLocation ifaceLocation = new InterfaceLocation(hostname, ifaceName);
+    InterfaceLinkLocation ifaceLinkLocation = new InterfaceLinkLocation(hostname, ifaceName);
+    assertThat(
+        analysis.getSrcLocationBdds(),
+        equalTo(
+            ImmutableMap.of(
+                ifaceLocation,
+                ifaceOriginateBdd,
+                ifaceLinkLocation,
+                ifaceLinkBdd.and(postInVrfBdd))));
   }
 
   @Test

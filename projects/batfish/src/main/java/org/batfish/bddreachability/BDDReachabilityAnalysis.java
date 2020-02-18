@@ -11,11 +11,14 @@ import io.opentracing.util.GlobalTracer;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import net.sf.javabdd.BDD;
 import org.batfish.bddreachability.transition.Transition;
 import org.batfish.common.bdd.BDDPacket;
+import org.batfish.specifier.Location;
 import org.batfish.symbolic.IngressLocation;
 import org.batfish.symbolic.state.Query;
 import org.batfish.symbolic.state.StateExpr;
@@ -134,6 +137,17 @@ public class BDDReachabilityAnalysis {
   public Map<IngressLocation, BDD> getIngressLocationReachableBDDs() {
     Map<StateExpr, BDD> reverseReachableStates = computeReverseReachableStates();
     return getIngressLocationBDDs(reverseReachableStates);
+  }
+
+  /** Map of all src {@link Location} to {@link BDD} of successful flows from that location */
+  public Map<Location, BDD> getSrcLocationBdds() {
+    Map<StateExpr, BDD> reverseReachableStates = computeReverseReachableStates();
+    ImmutableMap.Builder<Location, BDD> srcLocBdds = ImmutableMap.builder();
+    for (Entry<StateExpr, BDD> e : reverseReachableStates.entrySet()) {
+      Optional<Location> srcLoc = OriginationStateExprToLocation.toLocation(e.getKey());
+      srcLoc.ifPresent(loc -> srcLocBdds.put(loc, e.getValue()));
+    }
+    return srcLocBdds.build();
   }
 
   private Map<IngressLocation, BDD> getIngressLocationBDDs(
