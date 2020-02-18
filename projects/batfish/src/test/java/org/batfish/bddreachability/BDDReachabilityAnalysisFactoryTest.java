@@ -1,5 +1,8 @@
 package org.batfish.bddreachability;
 
+import static org.batfish.bddreachability.transition.Transitions.addOriginatingFromDeviceConstraint;
+import static org.batfish.bddreachability.transition.Transitions.compose;
+import static org.batfish.bddreachability.transition.Transitions.constraint;
 import static org.batfish.datamodel.ExprAclLine.acceptingHeaderSpace;
 import static org.batfish.datamodel.FlowDisposition.ACCEPTED;
 import static org.batfish.datamodel.FlowDisposition.DELIVERED_TO_SUBNET;
@@ -116,6 +119,7 @@ import org.batfish.symbolic.state.NodeInterfaceDeliveredToSubnet;
 import org.batfish.symbolic.state.NodeInterfaceExitsNetwork;
 import org.batfish.symbolic.state.NodeInterfaceInsufficientInfo;
 import org.batfish.symbolic.state.NodeInterfaceNeighborUnreachable;
+import org.batfish.symbolic.state.OriginateInterface;
 import org.batfish.symbolic.state.OriginateInterfaceLink;
 import org.batfish.symbolic.state.OriginateVrf;
 import org.batfish.symbolic.state.PostInInterface;
@@ -1828,5 +1832,52 @@ public final class BDDReachabilityAnalysisFactoryTest {
     // policy drops traffic to i2
     BDD i2SubnetBdd = PKT.getDstIpSpaceToBDD().toBDD(Ip.parse("2.2.2.2"));
     assertFalse(deliveredToSubnetEndToEndBDD.andSat(i2SubnetBdd));
+  }
+
+  @Test
+  public void testGenerateRootEdges_OriginateInterface_PostInVrf() throws IOException {
+    // Create network with two interfaces
+    NetworkFactory nf = new NetworkFactory();
+    Configuration c =
+        nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CISCO_IOS).build();
+    Vrf vrf = nf.vrfBuilder().setOwner(c).build();
+    Interface.Builder ib = nf.interfaceBuilder().setOwner(c).setVrf(vrf).setActive(true);
+    Interface iface1 = ib.setAddress(ConcreteInterfaceAddress.parse("1.1.1.1/24")).build();
+    ib.setAddress(ConcreteInterfaceAddress.parse("2.2.2.2/24")).build();
+
+    SortedMap<String, Configuration> configs = ImmutableSortedMap.of(c.getHostname(), c);
+    Batfish batfish = BatfishTestUtils.getBatfish(configs, temp);
+    batfish.computeDataPlane(batfish.getSnapshot());
+    DataPlane dataPlane = batfish.loadDataPlane(batfish.getSnapshot());
+    BDDReachabilityAnalysisFactory factory =
+        new BDDReachabilityAnalysisFactory(
+            PKT,
+            configs,
+            dataPlane.getForwardingAnalysis(),
+            new IpsRoutedOutInterfacesFactory(dataPlane.getFibs()),
+            false,
+            false);
+
+    // Generate edges for originating at first interface, with an arbitrary dst IP constraint
+    OriginateInterface originateIface1 = new OriginateInterface(c.getHostname(), iface1.getName());
+    BDD rootBdd = PKT.getDstIp().value(Ip.parse("3.3.3.3").asLong());
+    List<Edge> rootEdges =
+        factory
+            .generateRootEdges_OriginateInterface_PostInVrf(
+                ImmutableMap.of(originateIface1, rootBdd))
+            .collect(ImmutableList.toImmutableList());
+
+    // Generated edges should constrain to flows originating from device with the given dst IP.
+    // Should not include any edges starting from second interface since it wasn't a root state.
+    assertThat(
+        rootEdges,
+        contains(
+            new Edge(
+                originateIface1,
+                new PostInVrf(c.getHostname(), vrf.getName()),
+                compose(
+                    addOriginatingFromDeviceConstraint(
+                        factory.getBDDSourceManagers().get(c.getHostname())),
+                    constraint(rootBdd)))));
   }
 }

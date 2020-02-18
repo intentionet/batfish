@@ -633,8 +633,8 @@ public final class BDDReachabilityAnalysisFactory {
             });
   }
 
-  private Stream<Edge> generateRootEdges_OriginateInterface_PostInVrf(
-      Map<StateExpr, BDD> rootBdds) {
+  @VisibleForTesting
+  Stream<Edge> generateRootEdges_OriginateInterface_PostInVrf(Map<StateExpr, BDD> rootBdds) {
     return rootBdds.entrySet().stream()
         .filter(e -> e.getKey() instanceof OriginateInterface)
         .map(
