@@ -197,7 +197,6 @@ public final class BDDReachabilityAnalysisFactoryTest {
 
     assertThat(configs.size(), equalTo(2));
     for (String node : configs.keySet()) {
-      String otherNode = configs.keySet().stream().filter(n -> !n.equals(node)).findFirst().get();
       BDDReachabilityAnalysisFactory factory =
           new BDDReachabilityAnalysisFactory(
               PKT,
