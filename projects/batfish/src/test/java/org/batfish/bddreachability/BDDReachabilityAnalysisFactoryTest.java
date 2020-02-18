@@ -3,6 +3,7 @@ package org.batfish.bddreachability;
 import static org.batfish.bddreachability.transition.Transitions.addOriginatingFromDeviceConstraint;
 import static org.batfish.bddreachability.transition.Transitions.compose;
 import static org.batfish.bddreachability.transition.Transitions.constraint;
+import static org.batfish.common.util.CollectionUtil.toImmutableMap;
 import static org.batfish.datamodel.ExprAclLine.acceptingHeaderSpace;
 import static org.batfish.datamodel.FlowDisposition.ACCEPTED;
 import static org.batfish.datamodel.FlowDisposition.DELIVERED_TO_SUBNET;
@@ -185,6 +186,77 @@ public final class BDDReachabilityAnalysisFactoryTest {
         new IpsRoutedOutInterfacesFactory(dataPlane.getFibs()),
         false,
         false);
+  }
+
+  @Test
+  public void testAnalysisUseInterfaceRootsParam() throws IOException {
+    SortedMap<String, Configuration> configs = TestNetworkSources.twoNodeNetwork();
+    Batfish batfish = BatfishTestUtils.getBatfish(configs, temp);
+    batfish.computeDataPlane(batfish.getSnapshot());
+    DataPlane dataPlane = batfish.loadDataPlane(batfish.getSnapshot());
+
+    assertThat(configs.size(), equalTo(2));
+    for (String node : configs.keySet()) {
+      String otherNode = configs.keySet().stream().filter(n -> !n.equals(node)).findFirst().get();
+      BDDReachabilityAnalysisFactory factory =
+          new BDDReachabilityAnalysisFactory(
+              PKT,
+              configs,
+              dataPlane.getForwardingAnalysis(),
+              new IpsRoutedOutInterfacesFactory(dataPlane.getFibs()),
+              false,
+              false);
+      Map<StateExpr, Map<StateExpr, Transition>> ifaceRootsEdges =
+          factory
+              .bddReachabilityAnalysis(
+                  ipSpaceAssignment(batfish),
+                  matchDst(UniverseIpSpace.INSTANCE),
+                  ImmutableSet.of(),
+                  ImmutableSet.of(),
+                  ImmutableSet.of(node),
+                  ALL_DISPOSITIONS,
+                  true)
+              .getForwardEdgeMap();
+      Map<StateExpr, Map<StateExpr, Transition>> vrfRootsEdges =
+          factory
+              .bddReachabilityAnalysis(
+                  ipSpaceAssignment(batfish),
+                  matchDst(UniverseIpSpace.INSTANCE),
+                  ImmutableSet.of(),
+                  ImmutableSet.of(),
+                  ImmutableSet.of(node),
+                  ALL_DISPOSITIONS,
+                  false)
+              .getForwardEdgeMap();
+
+      // Test that the expected edges show up:
+      // OriginateInterface -> PostInVrf if useInterfaceRoots is set, and no OriginateVrfs
+      // OriginateVrf -> PostInVrf if useInterfaceRoots is not set, and no OriginateInterfaces
+      Map<OriginateInterface, PostInVrf> originateIfaceEdges =
+          toImmutableMap(
+              configs.get(node).getActiveInterfaces(),
+              ifaceEntry -> new OriginateInterface(node, ifaceEntry.getKey()),
+              ifaceEntry -> new PostInVrf(node, ifaceEntry.getValue().getVrfName()));
+      Map<OriginateVrf, PostInVrf> originateVrfEdges =
+          toImmutableMap(
+              configs.get(node).getVrfs().keySet(),
+              vrf -> new OriginateVrf(node, vrf),
+              vrf -> new PostInVrf(node, vrf));
+
+      // sanity check
+      assert !originateIfaceEdges.isEmpty() && !originateVrfEdges.isEmpty();
+
+      originateIfaceEdges.forEach(
+          (originateIface, postInVrf) -> {
+            assertThat(ifaceRootsEdges, hasEntry(equalTo(originateIface), hasKey(postInVrf)));
+            assertThat(vrfRootsEdges, not(hasKey(equalTo(originateIface))));
+          });
+      originateVrfEdges.forEach(
+          (originateVrf, postInVrf) -> {
+            assertThat(vrfRootsEdges, hasEntry(equalTo(originateVrf), hasKey(postInVrf)));
+            assertThat(ifaceRootsEdges, not(hasKey(equalTo(originateVrf))));
+          });
+    }
   }
 
   @Test

@@ -3086,7 +3086,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
       Set<String> requiredTransitNodes,
       Set<String> finalNodes,
       Set<FlowDisposition> actions,
-      boolean ignoreFilters) {
+      boolean ignoreFilters,
+      boolean useInterfaceRoots) {
     BDDReachabilityAnalysisFactory factory =
         getBddReachabilityAnalysisFactory(snapshot, pkt, ignoreFilters);
     return factory.bddReachabilityAnalysis(
@@ -3095,7 +3096,8 @@ public class Batfish extends PluginConsumer implements IBatfish {
         forbiddenTransitNodes,
         requiredTransitNodes,
         finalNodes,
-        actions);
+        actions,
+        useInterfaceRoots);
   }
 
   /**

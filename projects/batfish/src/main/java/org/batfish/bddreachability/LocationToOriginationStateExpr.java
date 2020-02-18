@@ -8,15 +8,26 @@ import org.batfish.datamodel.Interface;
 import org.batfish.specifier.InterfaceLinkLocation;
 import org.batfish.specifier.InterfaceLocation;
 import org.batfish.specifier.LocationVisitor;
+import org.batfish.symbolic.state.OriginateInterface;
 import org.batfish.symbolic.state.OriginateInterfaceLink;
 import org.batfish.symbolic.state.OriginateVrf;
 import org.batfish.symbolic.state.StateExpr;
 
-class LocationToOriginationStateExpr implements LocationVisitor<Optional<StateExpr>> {
+/**
+ * {@link LocationVisitor} that converts locations to corresponding origination {@link StateExpr}.
+ */
+public class LocationToOriginationStateExpr implements LocationVisitor<Optional<StateExpr>> {
   private final Map<String, Configuration> _configs;
+  private final boolean _useOriginateInterface;
 
-  LocationToOriginationStateExpr(Map<String, Configuration> configs) {
+  /**
+   * @param useOriginateInterface Whether visiting {@link InterfaceLocation} should return an {@link
+   *     OriginateInterface}. If false, it will return an {@link OriginateVrf} instead.
+   */
+  LocationToOriginationStateExpr(
+      Map<String, Configuration> configs, boolean useOriginateInterface) {
     _configs = configs;
+    _useOriginateInterface = useOriginateInterface;
   }
 
   @Override
@@ -44,6 +55,11 @@ class LocationToOriginationStateExpr implements LocationVisitor<Optional<StateEx
     Interface iface = config.getAllInterfaces().get(interfaceLocation.getInterfaceName());
     if (iface == null) {
       return Optional.empty();
+    }
+    if (_useOriginateInterface) {
+      return Optional.of(
+          new OriginateInterface(
+              interfaceLocation.getNodeName(), interfaceLocation.getInterfaceName()));
     }
     String vrf = iface.getVrfName();
     return Optional.of(new OriginateVrf(interfaceLocation.getNodeName(), vrf));

@@ -1207,7 +1207,7 @@ public final class BDDReachabilityAnalysisFactory {
   }
 
   public BDDLoopDetectionAnalysis bddLoopDetectionAnalysis(IpSpaceAssignment srcIpSpaceAssignment) {
-    Map<StateExpr, BDD> ingressLocationStates = rootConstraints(srcIpSpaceAssignment, _one);
+    Map<StateExpr, BDD> ingressLocationStates = rootConstraints(srcIpSpaceAssignment, _one, false);
     Stream<Edge> edges = Stream.concat(generateEdges(), generateRootEdges(ingressLocationStates));
     return new BDDLoopDetectionAnalysis(_bddPacket, edges, ingressLocationStates.keySet());
   }
@@ -1277,7 +1277,7 @@ public final class BDDReachabilityAnalysisFactory {
       Set<FlowDisposition> actions) {
     BDD initialHeaderSpaceBdd = computeInitialHeaderSpaceBdd(initialHeaderSpace);
     BDD finalHeaderSpaceBdd = computeFinalHeaderSpaceBdd(initialHeaderSpaceBdd);
-    Map<StateExpr, BDD> roots = rootConstraints(srcIpSpaceAssignment, initialHeaderSpaceBdd);
+    Map<StateExpr, BDD> roots = rootConstraints(srcIpSpaceAssignment, initialHeaderSpaceBdd, false);
 
     List<Edge> sharedEdges =
         Stream.concat(generateEdges(), generateRootEdges(roots)).collect(Collectors.toList());
@@ -1318,6 +1318,38 @@ public final class BDDReachabilityAnalysisFactory {
       Set<String> requiredTransitNodes,
       Set<String> finalNodes,
       Set<FlowDisposition> actions) {
+    return bddReachabilityAnalysis(
+        srcIpSpaceAssignment,
+        initialHeaderSpace,
+        forbiddenTransitNodes,
+        requiredTransitNodes,
+        finalNodes,
+        actions,
+        false);
+  }
+
+  /**
+   * Create a {@link BDDReachabilityAnalysis} with the specified parameters.
+   *
+   * @param srcIpSpaceAssignment An assignment of active source locations to the corresponding
+   *     source {@link IpSpace}.
+   * @param initialHeaderSpace The initial headerspace (i.e. before any packet transformations).
+   * @param forbiddenTransitNodes A set of hostnames that must not be transited.
+   * @param requiredTransitNodes A set of hostnames of which one must be transited.
+   * @param finalNodes Find flows that stop at one of these nodes.
+   * @param actions Find flows for which at least one trace has one of these actions.
+   * @param useInterfaceRoots Whether to perform analysis with {@link OriginateInterface} roots
+   *     rather than {@link OriginateVrf}.
+   */
+  @VisibleForTesting
+  public BDDReachabilityAnalysis bddReachabilityAnalysis(
+      IpSpaceAssignment srcIpSpaceAssignment,
+      AclLineMatchExpr initialHeaderSpace,
+      Set<String> forbiddenTransitNodes,
+      Set<String> requiredTransitNodes,
+      Set<String> finalNodes,
+      Set<FlowDisposition> actions,
+      boolean useInterfaceRoots) {
     checkArgument(!finalNodes.isEmpty(), "final nodes cannot be empty");
     try (ActiveSpan span =
         GlobalTracer.get()
@@ -1327,7 +1359,8 @@ public final class BDDReachabilityAnalysisFactory {
       BDD initialHeaderSpaceBdd = computeInitialHeaderSpaceBdd(initialHeaderSpace);
       BDD finalHeaderSpaceBdd = computeFinalHeaderSpaceBdd(initialHeaderSpaceBdd);
 
-      Map<StateExpr, BDD> roots = rootConstraints(srcIpSpaceAssignment, initialHeaderSpaceBdd);
+      Map<StateExpr, BDD> roots =
+          rootConstraints(srcIpSpaceAssignment, initialHeaderSpaceBdd, useInterfaceRoots);
 
       Stream<Edge> edgeStream =
           Streams.concat(
@@ -1578,14 +1611,16 @@ public final class BDDReachabilityAnalysisFactory {
   }
 
   Map<StateExpr, BDD> rootConstraints(
-      IpSpaceAssignment srcIpSpaceAssignment, BDD initialHeaderSpaceBdd) {
+      IpSpaceAssignment srcIpSpaceAssignment,
+      BDD initialHeaderSpaceBdd,
+      boolean useInterfaceRoots) {
     try (ActiveSpan span =
         GlobalTracer.get()
             .buildSpan("BDDReachabilityAnalysisFactory.rootConstraints")
             .startActive()) {
       assert span != null; // avoid unused warning
       LocationVisitor<Optional<StateExpr>> locationToStateExpr =
-          new LocationToOriginationStateExpr(_configs);
+          new LocationToOriginationStateExpr(_configs, useInterfaceRoots);
       IpSpaceToBDD srcIpSpaceToBDD = _bddPacket.getSrcIpSpaceToBDD();
 
       // convert Locations to StateExprs, and merge srcIp constraints

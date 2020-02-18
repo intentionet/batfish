@@ -105,13 +105,13 @@ public final class BidirectionalReachabilityAnalysis {
                 ImmutableMap.of());
         BDD initialForwardHeaderSpaceBdd = ipAccessListToBdd.toBdd(initialForwardHeaderSpace);
         _forwardPassOriginationConstraints =
-            _factory.rootConstraints(srcIpSpaceAssignment, initialForwardHeaderSpaceBdd);
+            _factory.rootConstraints(srcIpSpaceAssignment, initialForwardHeaderSpaceBdd, false);
       }
 
       // Compute _originateStateToLocation
       {
         LocationVisitor<Optional<StateExpr>> locationToStateExpr =
-            new LocationToOriginationStateExpr(_configs);
+            new LocationToOriginationStateExpr(_configs, false);
         ImmutableMultimap.Builder<StateExpr, Location> builder = ImmutableMultimap.builder();
         srcIpSpaceAssignment.getEntries().stream()
             .flatMap(entry -> entry.getLocations().stream())
