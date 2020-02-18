@@ -646,8 +646,6 @@ public final class BDDReachabilityAnalysisFactory {
                   state,
                   postInVrf,
                   compose(
-                      // To transition this edge, flow must originate from
-                      // device and have a src IP owned by this interface
                       addOriginatingFromDeviceConstraint(
                           _bddSourceManagers.get(state.getHostname())),
                       constraint(e.getValue())));
