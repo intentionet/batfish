@@ -225,6 +225,9 @@ public final class BDDReachabilityAnalysisFactory {
   // node --> vrf --> nextVrf --> set of packets vrf delegates to nextVrf
   private final Map<String, Map<String, Map<String, BDD>>> _nextVrfBDDs;
 
+  // node --> interface --> vrf
+  private final Map<String, Map<String, String>> _interfacesToVrfsMap;
+
   private BDD _zero;
 
   public BDDReachabilityAnalysisFactory(
@@ -276,6 +279,7 @@ public final class BDDReachabilityAnalysisFactory {
       _ifaceAcceptBDDs =
           computeIfaceAcceptBDDs(configs, forwardingAnalysis.getAcceptsIps(), _dstIpSpaceToBDD);
       _nextVrfBDDs = computeNextVrfBDDs(forwardingAnalysis.getNextVrfIps(), _dstIpSpaceToBDD);
+      _interfacesToVrfsMap = computeInterfacesToVrfsMap(configs);
 
       _convertedPacketPolicies = convertPacketPolicies(configs, ipsRoutedOutInterfacesFactory);
 
@@ -636,14 +640,7 @@ public final class BDDReachabilityAnalysisFactory {
         .map(
             e -> {
               OriginateInterface state = (OriginateInterface) e.getKey();
-              String vrf =
-                  Optional.ofNullable(_configs.get(state.getHostname()))
-                      .map(c -> c.getActiveInterfaces().get(state.getInterface()))
-                      .map(Interface::getVrfName)
-                      .orElse(null);
-              if (vrf == null) {
-                return null;
-              }
+              String vrf = _interfacesToVrfsMap.get(state.getHostname()).get(state.getInterface());
               PostInVrf postInVrf = new PostInVrf(state.getHostname(), vrf);
               return new Edge(
                   state,
@@ -654,8 +651,7 @@ public final class BDDReachabilityAnalysisFactory {
                       addOriginatingFromDeviceConstraint(
                           _bddSourceManagers.get(state.getHostname())),
                       constraint(e.getValue())));
-            })
-        .filter(Objects::nonNull);
+            });
   }
 
   /** Generate edges to each disposition. Depends on final nodes. */
@@ -1622,6 +1618,19 @@ public final class BDDReachabilityAnalysisFactory {
 
       return finalRootConstraints;
     }
+  }
+
+  /** Creates mapping of hostname -&gt; interface name -&gt; vrf name for active interfaces */
+  private static Map<String, Map<String, String>> computeInterfacesToVrfsMap(
+      Map<String, Configuration> configs) {
+    return toImmutableMap(
+        configs,
+        Entry::getKey,
+        nodeEntry ->
+            toImmutableMap(
+                nodeEntry.getValue().getActiveInterfaces().values(),
+                Interface::getName,
+                Interface::getVrfName));
   }
 
   private static Map<String, Map<String, Map<String, BDD>>> computeIfaceAcceptBDDs(
