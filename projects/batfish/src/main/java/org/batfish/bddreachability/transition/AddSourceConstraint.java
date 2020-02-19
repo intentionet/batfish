@@ -2,6 +2,7 @@ package org.batfish.bddreachability.transition;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.MoreObjects;
 import net.sf.javabdd.BDD;
 import org.batfish.common.bdd.BDDSourceManager;
 
@@ -45,5 +46,12 @@ public final class AddSourceConstraint implements Transition {
   @Override
   public BDD transitBackward(BDD bdd) {
     return _mgr.existsSource(bdd.and(_sourceBdd));
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(AddSourceConstraint.class)
+        .add("iface", _mgr.getSourceFromAssignment(_sourceBdd).orElse("missing"))
+        .toString();
   }
 }

@@ -2,6 +2,7 @@ package org.batfish.bddreachability.transition;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.base.MoreObjects;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.sf.javabdd.BDD;
@@ -52,5 +53,10 @@ final class RemoveSourceConstraint implements Transition {
   @Override
   public BDD transitBackward(BDD bdd) {
     return bdd.and(_mgr.isValidValue());
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName();
   }
 }
