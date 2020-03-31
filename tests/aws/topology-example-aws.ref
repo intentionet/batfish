@@ -242,6 +242,12 @@
       "type" : "PHYSICAL"
     },
     {
+      "id" : "interface-node-aws-backbone-To Internet",
+      "name" : "To Internet",
+      "nodeId" : "node-aws-backbone",
+      "type" : "UNKNOWN"
+    },
+    {
       "id" : "interface-node-vpc-f8fad69d-subnet-d9cafabc",
       "name" : "subnet-d9cafabc",
       "nodeId" : "node-vpc-f8fad69d",
@@ -414,12 +420,6 @@
       "name" : "subnet-30398256",
       "nodeId" : "node-vpc-b390fad5",
       "type" : "PHYSICAL"
-    },
-    {
-      "id" : "interface-node-aws-backbone-~Interface_4~",
-      "name" : "~Interface_4~",
-      "nodeId" : "node-aws-backbone",
-      "type" : "UNKNOWN"
     },
     {
       "id" : "interface-node-subnet-30398256-vpc-b390fad5-igw-9b93ddfc",
@@ -622,6 +622,12 @@
       "type" : "PHYSICAL"
     },
     {
+      "dstId" : "interface-node-aws-backbone-To Internet",
+      "id" : "link-interface-node-internet-~Interface_3~-interface-node-aws-backbone-To Internet",
+      "srcId" : "interface-node-internet-~Interface_3~",
+      "type" : "UNKNOWN"
+    },
+    {
       "dstId" : "interface-node-subnet-62f14104-vpc-925131f4-igw-fac5839d",
       "id" : "link-interface-node-vpc-925131f4-subnet-62f14104-igw-fac5839d-interface-node-subnet-62f14104-vpc-925131f4-igw-fac5839d",
       "srcId" : "interface-node-vpc-925131f4-subnet-62f14104-igw-fac5839d",
@@ -760,12 +766,6 @@
       "type" : "PHYSICAL"
     },
     {
-      "dstId" : "interface-node-internet-~Interface_3~",
-      "id" : "link-interface-node-aws-backbone-~Interface_4~-interface-node-internet-~Interface_3~",
-      "srcId" : "interface-node-aws-backbone-~Interface_4~",
-      "type" : "UNKNOWN"
-    },
-    {
       "dstId" : "interface-node-subnet-1f315846-vpc-f8fad69d",
       "id" : "link-interface-node-vpc-f8fad69d-subnet-1f315846-interface-node-subnet-1f315846-vpc-f8fad69d",
       "srcId" : "interface-node-vpc-f8fad69d-subnet-1f315846",
@@ -862,6 +862,12 @@
       "type" : "PHYSICAL"
     },
     {
+      "dstId" : "interface-node-internet-~Interface_3~",
+      "id" : "link-interface-node-aws-backbone-To Internet-interface-node-internet-~Interface_3~",
+      "srcId" : "interface-node-aws-backbone-To Internet",
+      "type" : "UNKNOWN"
+    },
+    {
       "dstId" : "interface-node-vpc-925131f4-subnet-62f14104",
       "id" : "link-interface-node-subnet-62f14104-vpc-925131f4-interface-node-vpc-925131f4-subnet-62f14104",
       "srcId" : "interface-node-subnet-62f14104-vpc-925131f4",
@@ -872,12 +878,6 @@
       "id" : "link-interface-node-vpc-b390fad5-subnet-073b8061-igw-9b93ddfc-interface-node-subnet-073b8061-vpc-b390fad5-igw-9b93ddfc",
       "srcId" : "interface-node-vpc-b390fad5-subnet-073b8061-igw-9b93ddfc",
       "type" : "PHYSICAL"
-    },
-    {
-      "dstId" : "interface-node-aws-backbone-~Interface_4~",
-      "id" : "link-interface-node-internet-~Interface_3~-interface-node-aws-backbone-~Interface_4~",
-      "srcId" : "interface-node-internet-~Interface_3~",
-      "type" : "UNKNOWN"
     }
   ],
   "nodes" : [

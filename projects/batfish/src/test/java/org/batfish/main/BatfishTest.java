@@ -53,7 +53,7 @@ import org.batfish.common.topology.Layer1Edge;
 import org.batfish.common.topology.Layer1Node;
 import org.batfish.common.topology.Layer1Topology;
 import org.batfish.common.util.CommonUtil;
-import org.batfish.common.util.IspModelingUtils.ModeledNodes;
+import org.batfish.common.util.isp.IspModelingUtils.ModeledNodes;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
 import org.batfish.datamodel.Edge;

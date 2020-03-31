@@ -1,25 +1,24 @@
-package org.batfish.common.util;
+package org.batfish.common.util.isp;
 
 import com.google.common.testing.EqualsTester;
-import org.batfish.common.util.IspModel.Remote;
+import org.batfish.common.util.isp.IspModel.Remote;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.isp_configuration.traffic_filtering.IspTrafficFiltering;
 import org.junit.Test;
 
 public class IspModelTest {
 
   @Test
   public void testEquals() {
+    IspModel.Builder builder = IspModel.builder().setAsn(1L).setName("name");
     new EqualsTester()
+        .addEqualityGroup(builder.build(), builder.build())
+        .addEqualityGroup(builder.setAsn(2).build())
+        .addEqualityGroup(builder.setName("other").build())
         .addEqualityGroup(
-            IspModel.builder().setAsn(1L).setName("name").build(),
-            IspModel.builder().setAsn(1L).setName("name").build())
-        .addEqualityGroup(IspModel.builder().setAsn(2L).setName("name").build())
-        .addEqualityGroup(
-            IspModel.builder()
-                .setAsn(1L)
-                .setName("name")
+            builder
                 .setRemotes(
                     new Remote(
                         "a",
@@ -27,13 +26,10 @@ public class IspModelTest {
                         ConcreteInterfaceAddress.parse("1.1.1.1/32"),
                         BgpActivePeerConfig.builder().build()))
                 .build())
-        .addEqualityGroup(IspModel.builder().setAsn(1L).setName("other").build())
         .addEqualityGroup(
-            IspModel.builder()
-                .setAsn(1L)
-                .setName("name")
-                .setAdditionalPrefixesToInternet(Prefix.parse("1.1.1.1/32"))
-                .build())
+            builder.setAdditionalPrefixesToInternet(Prefix.parse("1.1.1.1/32")).build())
+        .addEqualityGroup(
+            builder.setTrafficFiltering(IspTrafficFiltering.blockReservedAddressesAtInternet()))
         .testEquals();
   }
 

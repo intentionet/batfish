@@ -41,7 +41,7 @@ import java.util.List;
 import org.batfish.common.Warnings;
 import org.batfish.common.util.BatfishObjectMapper;
 import org.batfish.common.util.CommonUtil;
-import org.batfish.common.util.IspModelingUtils;
+import org.batfish.common.util.isp.IspModelingUtils;
 import org.batfish.datamodel.BgpUnnumberedPeerConfig;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.DeviceModel;

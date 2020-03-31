@@ -1,6 +1,6 @@
 package org.batfish.representation.aws;
 
-import static org.batfish.common.util.IspModelingUtils.INTERNET_HOST_NAME;
+import static org.batfish.common.util.isp.IspModelingUtils.INTERNET_HOST_NAME;
 import static org.batfish.representation.aws.AwsConfigurationTestUtils.getAnyFlow;
 import static org.batfish.representation.aws.AwsConfigurationTestUtils.getTraces;
 import static org.batfish.representation.aws.AwsConfigurationTestUtils.testSetup;
@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.List;
 import org.batfish.common.plugin.IBatfish;
-import org.batfish.common.util.IspModelingUtils;
+import org.batfish.common.util.isp.IspModelingUtils;
 import org.batfish.datamodel.FlowDisposition;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Prefix;
