@@ -1,6 +1,6 @@
 package org.batfish.specifier;
 
-import org.batfish.common.util.IspModelingUtils;
+import org.batfish.common.util.isp.IspModelingUtils;
 
 /** Converts a {@link Location} to its specifier string */
 public final class ToSpecifierString implements LocationVisitor<String> {

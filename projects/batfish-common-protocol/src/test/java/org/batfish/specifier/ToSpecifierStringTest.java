@@ -3,7 +3,7 @@ package org.batfish.specifier;
 import static org.batfish.specifier.ToSpecifierString.toSpecifierString;
 import static org.junit.Assert.assertEquals;
 
-import org.batfish.common.util.IspModelingUtils;
+import org.batfish.common.util.isp.IspModelingUtils;
 import org.batfish.specifier.parboiled.InternetLocationAstNode;
 import org.junit.Test;
 

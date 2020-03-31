@@ -1,4 +1,4 @@
-package org.batfish.common.util;
+package org.batfish.common.util.isp;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -22,14 +22,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.Warnings;
 import org.batfish.common.topology.Layer1Edge;
-import org.batfish.common.util.IspModel.Remote;
+import org.batfish.common.util.isp.IspModel.Remote;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPeerConfig;
 import org.batfish.datamodel.BgpProcess;
@@ -42,6 +44,7 @@ import org.batfish.datamodel.DeviceType;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.InterfaceAddress;
 import org.batfish.datamodel.Ip;
+import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.LinkLocalAddress;
 import org.batfish.datamodel.LongSpace;
 import org.batfish.datamodel.MultipathEquivalentAsPathMatchMode;
@@ -60,6 +63,7 @@ import org.batfish.datamodel.isp_configuration.BorderInterfaceInfo;
 import org.batfish.datamodel.isp_configuration.IspAnnouncement;
 import org.batfish.datamodel.isp_configuration.IspConfiguration;
 import org.batfish.datamodel.isp_configuration.IspNodeInfo;
+import org.batfish.datamodel.isp_configuration.traffic_filtering.IspTrafficFiltering;
 import org.batfish.datamodel.routing_policy.RoutingPolicy;
 import org.batfish.datamodel.routing_policy.expr.Conjunction;
 import org.batfish.datamodel.routing_policy.expr.DestinationNetwork;
@@ -96,6 +100,7 @@ public final class IspModelingUtils {
   public static final String INTERNET_OUT_INTERFACE = "out";
   static final Ip LINK_LOCAL_IP = Ip.parse("169.254.0.1");
   static final LinkLocalAddress LINK_LOCAL_ADDRESS = LinkLocalAddress.of(LINK_LOCAL_IP);
+  static final String ISP_TO_INTERNET_INTERFACE_NAME = "To Internet";
 
   // null routing private address space at the internet prevents "INSUFFICIENT_INFO" for networks
   // that use this space internally
@@ -355,12 +360,7 @@ public final class IspModelingUtils {
               .setVrf(internet.getDefaultVrf())
               .setAddress(LINK_LOCAL_ADDRESS)
               .build();
-      Interface ispIface =
-          nf.interfaceBuilder()
-              .setOwner(ispConfiguration)
-              .setVrf(ispConfiguration.getDefaultVrf())
-              .setAddress(LINK_LOCAL_ADDRESS)
-              .build();
+      Interface ispIface = ispConfiguration.getAllInterfaces().get(ISP_TO_INTERNET_INTERFACE_NAME);
 
       BgpUnnumberedPeerConfig.builder()
           .setPeerInterface(ispIface.getName())
@@ -468,21 +468,21 @@ public final class IspModelingUtils {
         continue;
       }
       for (BgpPeerConfig bgpPeerConfig : validRemoteBgpPeerConfigs) {
-        Long asn = bgpPeerConfig.getRemoteAsns().least();
-        // Pick the first name we find; else, use default
-        String ispName =
-            ispNodeInfos.stream()
-                .filter(i -> i.getAsn() == asn)
-                .map(IspNodeInfo::getName)
-                .findFirst()
-                .orElse(getDefaultIspNodeName(asn));
+        long asn = bgpPeerConfig.getRemoteAsns().least();
+        // Pick the first IspInfo we find.
+        Optional<IspNodeInfo> isp =
+            ispNodeInfos.stream().filter(i -> i.getAsn() == asn).findFirst();
+        String ispName = isp.map(IspNodeInfo::getName).orElse(getDefaultIspNodeName(asn));
         // Merge the sets of additional announcements to internet is merging their prefixes
         Set<Prefix> additionalPrefixes =
-            ispNodeInfos.stream()
-                .filter(i -> i.getAsn() == asn)
-                .flatMap(
-                    i -> i.getAdditionalAnnouncements().stream().map(IspAnnouncement::getPrefix))
+            isp.map(IspNodeInfo::getAdditionalAnnouncements)
+                .map(List::stream)
+                .orElse(Stream.empty())
+                .map(IspAnnouncement::getPrefix)
                 .collect(ImmutableSet.toImmutableSet());
+        IspTrafficFiltering trafficFiltering =
+            isp.map(IspNodeInfo::getIspTrafficFiltering)
+                .orElse(IspTrafficFiltering.blockReservedAddressesAtInternet());
         IspModel ispInfo =
             allIspModels.computeIfAbsent(
                 asn,
@@ -491,6 +491,7 @@ public final class IspModelingUtils {
                         .setAsn(asn)
                         .setName(ispName)
                         .setAdditionalPrefixesToInternet(additionalPrefixes)
+                        .setTrafficFiltering(trafficFiltering)
                         .build());
         InterfaceAddress interfaceAddress =
             bgpPeerConfig instanceof BgpActivePeerConfig
@@ -565,6 +566,36 @@ public final class IspModelingUtils {
             .build();
     bgpProcess.setMultipathEbgp(true);
 
+    // Get the traffic filtering policy for this ISP.
+    IspTrafficFilteringPolicy fp =
+        IspTrafficFilteringPolicy.createFor(ispInfo.getTrafficFiltering());
+    // Get the 4 filters out, add them all to the node.
+    IpAccessList toInternet = fp.filterTrafficToInternet();
+    if (toInternet != null) {
+      ispConfiguration.getIpAccessLists().put(toInternet.getName(), toInternet);
+    }
+    IpAccessList fromInternet = fp.filterTrafficFromInternet();
+    if (fromInternet != null) {
+      ispConfiguration.getIpAccessLists().put(fromInternet.getName(), fromInternet);
+    }
+    IpAccessList toNetwork = fp.filterTrafficToNetwork();
+    if (toNetwork != null) {
+      ispConfiguration.getIpAccessLists().put(toNetwork.getName(), toNetwork);
+    }
+    IpAccessList fromNetwork = fp.filterTrafficFromNetwork();
+    if (fromNetwork != null) {
+      ispConfiguration.getIpAccessLists().put(fromNetwork.getName(), fromNetwork);
+    }
+    // Create Internet-facing interface and apply filters.
+    nf.interfaceBuilder()
+        .setOwner(ispConfiguration)
+        .setVrf(ispConfiguration.getDefaultVrf())
+        .setName(ISP_TO_INTERNET_INTERFACE_NAME)
+        .setAddress(LINK_LOCAL_ADDRESS)
+        .setIncomingFilter(fromInternet)
+        .setOutgoingFilter(toInternet)
+        .build();
+
     ispInfo
         .getRemotes()
         .forEach(
@@ -574,6 +605,8 @@ public final class IspModelingUtils {
                       .setOwner(ispConfiguration)
                       .setVrf(defaultVrf)
                       .setAddress(remote.getIspIfaceAddress())
+                      .setIncomingFilter(fromNetwork)
+                      .setOutgoingFilter(toNetwork)
                       .build();
               modeledNodes.addLayer1Edge(
                   ispConfiguration.getHostname(),

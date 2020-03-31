@@ -77,7 +77,7 @@ import static org.batfish.specifier.parboiled.Anchor.Type.ZONE_NAME;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import org.batfish.common.util.IspModelingUtils;
+import org.batfish.common.util.isp.IspModelingUtils;
 import org.batfish.datamodel.DeviceType;
 import org.batfish.datamodel.InterfaceType;
 import org.parboiled.Parboiled;

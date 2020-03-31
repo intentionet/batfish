@@ -1,6 +1,6 @@
 package org.batfish.specifier.parboiled;
 
-import org.batfish.common.util.IspModelingUtils;
+import org.batfish.common.util.isp.IspModelingUtils;
 import org.batfish.specifier.InterfaceLinkLocation;
 
 public class InternetLocationAstNode implements LocationAstNode {

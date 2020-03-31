@@ -8,6 +8,28 @@
         "deviceModel" : "BATFISH_ISP",
         "deviceType" : "ISP",
         "interfaces" : {
+          "To Internet" : {
+            "name" : "To Internet",
+            "active" : true,
+            "additionalArpIps" : {
+              "class" : "org.batfish.datamodel.EmptyIpSpace"
+            },
+            "allowedVlans" : "",
+            "autostate" : true,
+            "incomingFilter" : "Block incoming traffic using reserved addresses",
+            "mtu" : 1500,
+            "outgoingFilter" : "Block outgoing traffic using reserved addresses",
+            "prefix" : "link-local:169.254.0.1",
+            "proxyArp" : false,
+            "ripEnabled" : false,
+            "ripPassive" : false,
+            "spanningTreePortfast" : false,
+            "switchport" : false,
+            "switchportMode" : "NONE",
+            "switchportTrunkEncapsulation" : "DOT1Q",
+            "type" : "UNKNOWN",
+            "vrf" : "default"
+          },
           "~Interface_0~" : {
             "name" : "~Interface_0~",
             "active" : true,
@@ -67,26 +89,458 @@
             "switchportTrunkEncapsulation" : "DOT1Q",
             "type" : "UNKNOWN",
             "vrf" : "default"
+          }
+        },
+        "ipAccessLists" : {
+          "Block incoming traffic using reserved addresses" : {
+            "lines" : [
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "0.0.0.0/8"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 6890)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "10.0.0.0/8"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 1918 private)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "127.0.0.0/8"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Loopback)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "172.16.0.0/12"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 1918 private)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "192.0.2.0/24"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Documentation)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "192.168.0.0/16"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 1918 private)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "198.51.100.0/24"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Documentation)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "203.0.113.0/24"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Documentation)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "224.0.0.0/4"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Multicast)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "240.0.0.0/4"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Future use)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "name" : "Block incoming traffic using reserved addresses"
           },
-          "~Interface_4~" : {
-            "name" : "~Interface_4~",
-            "active" : true,
-            "additionalArpIps" : {
-              "class" : "org.batfish.datamodel.EmptyIpSpace"
-            },
-            "allowedVlans" : "",
-            "autostate" : true,
-            "mtu" : 1500,
-            "prefix" : "link-local:169.254.0.1",
-            "proxyArp" : false,
-            "ripEnabled" : false,
-            "ripPassive" : false,
-            "spanningTreePortfast" : false,
-            "switchport" : false,
-            "switchportMode" : "NONE",
-            "switchportTrunkEncapsulation" : "DOT1Q",
-            "type" : "UNKNOWN",
-            "vrf" : "default"
+          "Block outgoing traffic using reserved addresses" : {
+            "lines" : [
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "0.0.0.0/8"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 6890)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "10.0.0.0/8"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 1918 private)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "127.0.0.0/8"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Loopback)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "172.16.0.0/12"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 1918 private)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "192.0.2.0/24"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Documentation)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "192.168.0.0/16"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (RFC 1918 private)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "198.51.100.0/24"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Documentation)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "203.0.113.0/24"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Documentation)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "224.0.0.0/4"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Multicast)"
+                    }
+                  ]
+                }
+              },
+              {
+                "class" : "org.batfish.datamodel.ExprAclLine",
+                "action" : "DENY",
+                "matchCondition" : {
+                  "class" : "org.batfish.datamodel.acl.MatchHeaderSpace",
+                  "headerSpace" : {
+                    "negate" : false,
+                    "srcOrDstIps" : {
+                      "class" : "org.batfish.datamodel.PrefixIpSpace",
+                      "prefix" : "240.0.0.0/4"
+                    }
+                  }
+                },
+                "traceElement" : {
+                  "fragments" : [
+                    {
+                      "class" : "org.batfish.datamodel.TraceElement$TextFragment",
+                      "text" : "Matched reserved IP address (Future use)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "name" : "Block outgoing traffic using reserved addresses"
           }
         },
         "routingPolicies" : {
@@ -1519,6 +1973,31 @@
               "ibgpAdminCost" : 200,
               "routerId" : "169.254.0.1",
               "interfaceNeighbors" : {
+                "To Internet" : {
+                  "class" : "org.batfish.datamodel.BgpUnnumberedPeerConfig",
+                  "defaultMetric" : 0,
+                  "ebgpMultihop" : false,
+                  "enforceFirstAs" : false,
+                  "ipv4UnicastAddressFamily" : {
+                    "addressFamilyCapabilities" : {
+                      "additionalPathsReceive" : false,
+                      "additionalPathsSelectAll" : false,
+                      "additionalPathsSend" : false,
+                      "advertiseExternal" : false,
+                      "advertiseInactive" : false,
+                      "allowLocalAsIn" : false,
+                      "allowRemoteAsOut" : false,
+                      "sendCommunity" : false,
+                      "sendExtendedCommunity" : false
+                    },
+                    "exportPolicy" : "exportPolicyOnIspToInternet",
+                    "routeReflectorClient" : false
+                  },
+                  "localAs" : 16509,
+                  "localIp" : "169.254.0.1",
+                  "peerInterface" : "To Internet",
+                  "remoteAsns" : "65537"
+                },
                 "~Interface_0~" : {
                   "class" : "org.batfish.datamodel.BgpUnnumberedPeerConfig",
                   "defaultMetric" : 0,
@@ -1593,31 +2072,6 @@
                   "localIp" : "169.254.0.1",
                   "peerInterface" : "~Interface_2~",
                   "remoteAsns" : "65534"
-                },
-                "~Interface_4~" : {
-                  "class" : "org.batfish.datamodel.BgpUnnumberedPeerConfig",
-                  "defaultMetric" : 0,
-                  "ebgpMultihop" : false,
-                  "enforceFirstAs" : false,
-                  "ipv4UnicastAddressFamily" : {
-                    "addressFamilyCapabilities" : {
-                      "additionalPathsReceive" : false,
-                      "additionalPathsSelectAll" : false,
-                      "additionalPathsSend" : false,
-                      "advertiseExternal" : false,
-                      "advertiseInactive" : false,
-                      "allowLocalAsIn" : false,
-                      "allowRemoteAsOut" : false,
-                      "sendCommunity" : false,
-                      "sendExtendedCommunity" : false
-                    },
-                    "exportPolicy" : "exportPolicyOnIspToInternet",
-                    "routeReflectorClient" : false
-                  },
-                  "localAs" : 16509,
-                  "localIp" : "169.254.0.1",
-                  "peerInterface" : "~Interface_4~",
-                  "remoteAsns" : "65537"
                 }
               },
               "multipathEbgp" : true,

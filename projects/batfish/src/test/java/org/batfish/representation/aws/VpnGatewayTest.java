@@ -1,6 +1,6 @@
 package org.batfish.representation.aws;
 
-import static org.batfish.common.util.IspModelingUtils.getAdvertiseStaticStatement;
+import static org.batfish.common.util.isp.IspModelingUtils.getAdvertiseStaticStatement;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasDeviceModel;
 import static org.batfish.representation.aws.AwsVpcEntity.TAG_NAME;
 import static org.batfish.representation.aws.Utils.ACCEPT_ALL_BGP;
