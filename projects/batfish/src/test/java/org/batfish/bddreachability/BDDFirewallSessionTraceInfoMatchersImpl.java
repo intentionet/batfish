@@ -1,10 +1,14 @@
 package org.batfish.bddreachability;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import net.sf.javabdd.BDD;
 import org.batfish.bddreachability.transition.Transition;
+import org.batfish.datamodel.flow.IncomingSessionScope;
+import org.batfish.datamodel.flow.OriginatingSessionScope;
 import org.batfish.datamodel.flow.SessionAction;
+import org.batfish.datamodel.flow.SessionScopeVisitor;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
@@ -44,7 +48,22 @@ public class BDDFirewallSessionTraceInfoMatchersImpl {
 
     @Override
     protected Set<String> featureValueOf(BDDFirewallSessionTraceInfo bddFirewallSessionTraceInfo) {
-      return bddFirewallSessionTraceInfo.getIncomingInterfaces();
+      return bddFirewallSessionTraceInfo
+          .getSessionScope()
+          .accept(
+              new SessionScopeVisitor<Set<String>>() {
+                @Override
+                public Set<String> visitIncomingSessionScope(
+                    IncomingSessionScope incomingSessionScope) {
+                  return incomingSessionScope.getIncomingInterfaces();
+                }
+
+                @Override
+                public Set<String> visitOriginatingSessionScope(
+                    OriginatingSessionScope originatingSessionScope) {
+                  return ImmutableSet.of();
+                }
+              });
     }
   }
 

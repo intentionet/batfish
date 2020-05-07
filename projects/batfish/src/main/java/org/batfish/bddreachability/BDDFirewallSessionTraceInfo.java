@@ -7,13 +7,15 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.sf.javabdd.BDD;
 import org.batfish.bddreachability.transition.Transition;
+import org.batfish.datamodel.flow.IncomingSessionScope;
 import org.batfish.datamodel.flow.SessionAction;
+import org.batfish.datamodel.flow.SessionScope;
 
 /** BDD version of {@link org.batfish.datamodel.flow.FirewallSessionTraceInfo}. */
 @ParametersAreNonnullByDefault
 final class BDDFirewallSessionTraceInfo {
   private final @Nonnull String _hostname;
-  private final @Nonnull Set<String> _incomingInterfaces;
+  private final @Nonnull SessionScope _sessionScope;
   private final @Nullable SessionAction _action;
   private final @Nonnull BDD _sessionFlows;
   private final @Nonnull Transition _transformation;
@@ -24,8 +26,22 @@ final class BDDFirewallSessionTraceInfo {
       SessionAction action,
       BDD sessionFlows,
       Transition transformation) {
+    this(
+        hostname,
+        new IncomingSessionScope(incomingInterfaces),
+        action,
+        sessionFlows,
+        transformation);
+  }
+
+  BDDFirewallSessionTraceInfo(
+      String hostname,
+      SessionScope sessionScope,
+      SessionAction action,
+      BDD sessionFlows,
+      Transition transformation) {
     _hostname = hostname;
-    _incomingInterfaces = incomingInterfaces;
+    _sessionScope = sessionScope;
     _action = action;
     _sessionFlows = sessionFlows;
     _transformation = transformation;
@@ -37,8 +53,8 @@ final class BDDFirewallSessionTraceInfo {
   }
 
   @Nonnull
-  public Set<String> getIncomingInterfaces() {
-    return _incomingInterfaces;
+  public SessionScope getSessionScope() {
+    return _sessionScope;
   }
 
   /** The action to take on return traffic. */
@@ -62,7 +78,7 @@ final class BDDFirewallSessionTraceInfo {
     return MoreObjects.toStringHelper(BDDFirewallSessionTraceInfo.class)
         .omitNullValues()
         .add("hostname", _hostname)
-        .add("incomingInterfaces", _incomingInterfaces)
+        .add("sessionScope", _sessionScope)
         .add("action", _action)
         // sessionFlows deliberately omitted since it's not readable
         .add("transformation", _transformation)

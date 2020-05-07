@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 import net.sf.javabdd.BDD;
 import org.batfish.bddreachability.transition.Transition;
 import org.batfish.bddreachability.transition.Zero;
+import org.batfish.common.BatfishException;
 import org.batfish.common.bdd.BDDPacket;
 import org.batfish.common.bdd.BDDSourceManager;
 import org.batfish.datamodel.Configuration;
@@ -36,7 +37,10 @@ import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.flow.Accept;
 import org.batfish.datamodel.flow.FibLookup;
 import org.batfish.datamodel.flow.ForwardOutInterface;
+import org.batfish.datamodel.flow.IncomingSessionScope;
+import org.batfish.datamodel.flow.OriginatingSessionScope;
 import org.batfish.datamodel.flow.SessionAction;
+import org.batfish.datamodel.flow.SessionScopeVisitor;
 import org.batfish.datamodel.visitors.SessionActionVisitor;
 import org.batfish.symbolic.state.NodeAccept;
 import org.batfish.symbolic.state.NodeDropAclIn;
@@ -177,12 +181,30 @@ public class SessionInstrumentation {
   private static Stream<Entry<StateExpr, BDD>> computeNonSessionPreInInterfaceOutEdgeConstraints(
       BDDFirewallSessionTraceInfo sessionInfo) {
     BDD nonSessionFlows = sessionInfo.getSessionFlows().not();
-    return sessionInfo.getIncomingInterfaces().stream()
-        .map(
-            incomingIface -> {
-              String hostname = sessionInfo.getHostname();
-              return Maps.immutableEntry(
-                  new PreInInterface(hostname, incomingIface), nonSessionFlows);
+    return sessionInfo
+        .getSessionScope()
+        .accept(
+            new SessionScopeVisitor<Stream<Entry<StateExpr, BDD>>>() {
+              @Override
+              public Stream<Entry<StateExpr, BDD>> visitIncomingSessionScope(
+                  IncomingSessionScope incomingSessionScope) {
+                return incomingSessionScope.getIncomingInterfaces().stream()
+                    .map(
+                        incomingIface -> {
+                          String hostname = sessionInfo.getHostname();
+                          return Maps.immutableEntry(
+                              new PreInInterface(hostname, incomingIface), nonSessionFlows);
+                        });
+              }
+
+              @Override
+              public Stream<Entry<StateExpr, BDD>> visitOriginatingSessionScope(
+                  OriginatingSessionScope originatingSessionScope) {
+                throw new BatfishException(
+                    String.format(
+                        "Unexpected SessionScope: Originating from VRF %s",
+                        originatingSessionScope.getOriginatingVrf()));
+              }
             });
   }
 
@@ -256,14 +278,32 @@ public class SessionInstrumentation {
     String hostname = sessionInfo.getHostname();
     BDD sessionFlows = sessionInfo.getSessionFlows();
     Map<String, Interface> ifaces = _configs.get(hostname).getAllInterfaces();
-    return sessionInfo.getIncomingInterfaces().stream()
-        .map(
-            incomingInterface ->
-                new Edge(
-                    new PreInInterface(hostname, incomingInterface),
-                    new PostInVrfSession(
-                        hostname, ifaces.get(incomingInterface).getVrf().getName()),
-                    sessionFlows));
+    return sessionInfo
+        .getSessionScope()
+        .accept(
+            new SessionScopeVisitor<Stream<Edge>>() {
+              @Override
+              public Stream<Edge> visitIncomingSessionScope(
+                  IncomingSessionScope incomingSessionScope) {
+                return incomingSessionScope.getIncomingInterfaces().stream()
+                    .map(
+                        incomingInterface ->
+                            new Edge(
+                                new PreInInterface(hostname, incomingInterface),
+                                new PostInVrfSession(
+                                    hostname, ifaces.get(incomingInterface).getVrf().getName()),
+                                sessionFlows));
+              }
+
+              @Override
+              public Stream<Edge> visitOriginatingSessionScope(
+                  OriginatingSessionScope originatingSessionScope) {
+                throw new BatfishException(
+                    String.format(
+                        "Unexpected SessionScope: Originating from VRF %s",
+                        originatingSessionScope.getOriginatingVrf()));
+              }
+            });
   }
 
   @Nonnull
@@ -316,28 +356,46 @@ public class SessionInstrumentation {
     Transition addLastHop =
         addLastHopConstraint(
             _lastHopMgr, hostname, outIface, nextHop.getHostname(), nextHop.getInterface());
-    return sessionInfo.getIncomingInterfaces().stream()
-        .map(
-            inIface -> {
-              StateExpr preState = new PreInInterface(hostname, inIface);
-              BDD sessionFlows = sessionInfo.getSessionFlows();
-              BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
+    return sessionInfo
+        .getSessionScope()
+        .accept(
+            new SessionScopeVisitor<Stream<Edge>>() {
+              @Override
+              public Stream<Edge> visitIncomingSessionScope(
+                  IncomingSessionScope incomingSessionScope) {
+                return incomingSessionScope.getIncomingInterfaces().stream()
+                    .map(
+                        inIface -> {
+                          StateExpr preState = new PreInInterface(hostname, inIface);
+                          BDD sessionFlows = sessionInfo.getSessionFlows();
+                          BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
 
-              Transition transition =
-                  compose(
-                      constraint(sessionFlows.and(inAclBdd)),
-                      sessionInfo.getTransformation(),
-                      outAcl,
-                      removeSourceConstraint(srcMgr),
-                      removeLastHopConstraint(_lastHopMgr, hostname),
-                      addSourceIfaceConstraint,
-                      addLastHop);
-              if (transition == Zero.INSTANCE) {
-                return null;
+                          Transition transition =
+                              compose(
+                                  constraint(sessionFlows.and(inAclBdd)),
+                                  sessionInfo.getTransformation(),
+                                  outAcl,
+                                  removeSourceConstraint(srcMgr),
+                                  removeLastHopConstraint(_lastHopMgr, hostname),
+                                  addSourceIfaceConstraint,
+                                  addLastHop);
+                          if (transition == Zero.INSTANCE) {
+                            return null;
+                          }
+                          return new Edge(preState, postState, transition);
+                        })
+                    .filter(Objects::nonNull);
               }
-              return new Edge(preState, postState, transition);
-            })
-        .filter(Objects::nonNull);
+
+              @Override
+              public Stream<Edge> visitOriginatingSessionScope(
+                  OriginatingSessionScope originatingSessionScope) {
+                throw new BatfishException(
+                    String.format(
+                        "Unexpected SessionScope: Originating from VRF %s",
+                        originatingSessionScope.getOriginatingVrf()));
+              }
+            });
   }
 
   @VisibleForTesting
@@ -373,25 +431,43 @@ public class SessionInstrumentation {
                 Transition denyOutAcl =
                     constraint(getOutgoingSessionFilterBdd(hostname, outIface).not());
 
-                return sessionInfo.getIncomingInterfaces().stream()
-                    .map(
-                        inIface -> {
-                          StateExpr preState = new PreInInterface(hostname, inIface);
-                          BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
+                return sessionInfo
+                    .getSessionScope()
+                    .accept(
+                        new SessionScopeVisitor<Stream<Edge>>() {
+                          @Override
+                          public Stream<Edge> visitIncomingSessionScope(
+                              IncomingSessionScope incomingSessionScope) {
+                            return incomingSessionScope.getIncomingInterfaces().stream()
+                                .map(
+                                    inIface -> {
+                                      StateExpr preState = new PreInInterface(hostname, inIface);
+                                      BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
 
-                          Transition transition =
-                              compose(
-                                  constraint(sessionFlows.and(inAclBdd)),
-                                  sessionInfo.getTransformation(),
-                                  denyOutAcl,
-                                  removeSourceConstraint(srcMgr),
-                                  removeLastHopConstraint(_lastHopMgr, hostname));
-                          if (transition == Zero.INSTANCE) {
-                            return null;
+                                      Transition transition =
+                                          compose(
+                                              constraint(sessionFlows.and(inAclBdd)),
+                                              sessionInfo.getTransformation(),
+                                              denyOutAcl,
+                                              removeSourceConstraint(srcMgr),
+                                              removeLastHopConstraint(_lastHopMgr, hostname));
+                                      if (transition == Zero.INSTANCE) {
+                                        return null;
+                                      }
+                                      return new Edge(preState, postState, transition);
+                                    })
+                                .filter(Objects::nonNull);
                           }
-                          return new Edge(preState, postState, transition);
-                        })
-                    .filter(Objects::nonNull);
+
+                          @Override
+                          public Stream<Edge> visitOriginatingSessionScope(
+                              OriginatingSessionScope originatingSessionScope) {
+                            throw new BatfishException(
+                                String.format(
+                                    "Unexpected SessionScope: Originating from VRF %s",
+                                    originatingSessionScope.getOriginatingVrf()));
+                          }
+                        });
               }
             });
   }
@@ -413,27 +489,46 @@ public class SessionInstrumentation {
     String outIface = forwardOutInterface.getOutgoingInterface();
     StateExpr postState = new NodeInterfaceDeliveredToSubnet(hostname, outIface);
     Transition outAcl = constraint(getOutgoingSessionFilterBdd(hostname, outIface));
-    return sessionInfo.getIncomingInterfaces().stream()
-        .map(
-            inIface -> {
-              StateExpr preState = new PreInInterface(hostname, inIface);
-              BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
-              BDD sessionFlows = sessionInfo.getSessionFlows();
+    return sessionInfo
+        .getSessionScope()
+        .accept(
+            new SessionScopeVisitor<Stream<Edge>>() {
+              @Override
+              public Stream<Edge> visitIncomingSessionScope(
+                  IncomingSessionScope incomingSessionScope) {
+                return incomingSessionScope.getIncomingInterfaces().stream()
+                    .map(
+                        inIface -> {
+                          StateExpr preState = new PreInInterface(hostname, inIface);
+                          BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
+                          BDD sessionFlows = sessionInfo.getSessionFlows();
 
-              /* Don't remove the source interface/last hop constraints here. They get removed in
-               * the transition from NodeInterfaceDeliveredToSubnet to DeliveredToSubnet.
-               */
-              Transition transition =
-                  compose(
-                      constraint(sessionFlows.and(inAclBdd)),
-                      sessionInfo.getTransformation(),
-                      outAcl);
-              if (transition == Zero.INSTANCE) {
-                return null;
+                          /* Don't remove the source interface/last hop constraints here. They get
+                           * removed in the transition from NodeInterfaceDeliveredToSubnet to
+                           * DeliveredToSubnet.
+                           */
+                          Transition transition =
+                              compose(
+                                  constraint(sessionFlows.and(inAclBdd)),
+                                  sessionInfo.getTransformation(),
+                                  outAcl);
+                          if (transition == Zero.INSTANCE) {
+                            return null;
+                          }
+                          return new Edge(preState, postState, transition);
+                        })
+                    .filter(Objects::nonNull);
               }
-              return new Edge(preState, postState, transition);
-            })
-        .filter(Objects::nonNull);
+
+              @Override
+              public Stream<Edge> visitOriginatingSessionScope(
+                  OriginatingSessionScope originatingSessionScope) {
+                throw new BatfishException(
+                    String.format(
+                        "Unexpected SessionScope: Originating from VRF %s",
+                        originatingSessionScope.getOriginatingVrf()));
+              }
+            });
   }
 
   @VisibleForTesting
@@ -448,24 +543,42 @@ public class SessionInstrumentation {
     BDDSourceManager srcMgr = _srcMgrs.get(hostname);
 
     StateExpr postState = new NodeAccept(hostname);
-    return sessionInfo.getIncomingInterfaces().stream()
-        .map(
-            inIface -> {
-              StateExpr preState = new PreInInterface(hostname, inIface);
-              BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
+    return sessionInfo
+        .getSessionScope()
+        .accept(
+            new SessionScopeVisitor<Stream<Edge>>() {
+              @Override
+              public Stream<Edge> visitIncomingSessionScope(
+                  IncomingSessionScope incomingSessionScope) {
+                return incomingSessionScope.getIncomingInterfaces().stream()
+                    .map(
+                        inIface -> {
+                          StateExpr preState = new PreInInterface(hostname, inIface);
+                          BDD inAclBdd = getIncomingSessionFilterBdd(hostname, inIface);
 
-              Transition transition =
-                  compose(
-                      constraint(sessionInfo.getSessionFlows().and(inAclBdd)),
-                      sessionInfo.getTransformation(),
-                      removeSourceConstraint(srcMgr),
-                      removeLastHopConstraint(_lastHopMgr, hostname));
-              if (transition == Zero.INSTANCE) {
-                return null;
+                          Transition transition =
+                              compose(
+                                  constraint(sessionInfo.getSessionFlows().and(inAclBdd)),
+                                  sessionInfo.getTransformation(),
+                                  removeSourceConstraint(srcMgr),
+                                  removeLastHopConstraint(_lastHopMgr, hostname));
+                          if (transition == Zero.INSTANCE) {
+                            return null;
+                          }
+                          return new Edge(preState, postState, transition);
+                        })
+                    .filter(Objects::nonNull);
               }
-              return new Edge(preState, postState, transition);
-            })
-        .filter(Objects::nonNull);
+
+              @Override
+              public Stream<Edge> visitOriginatingSessionScope(
+                  OriginatingSessionScope originatingSessionScope) {
+                throw new BatfishException(
+                    String.format(
+                        "Unexpected SessionScope: Originating from VRF %s",
+                        originatingSessionScope.getOriginatingVrf()));
+              }
+            });
   }
 
   @VisibleForTesting
@@ -480,23 +593,41 @@ public class SessionInstrumentation {
 
     StateExpr postState = new NodeDropAclIn(hostname);
     BDD sessionFlows = sessionInfo.getSessionFlows();
-    return sessionInfo.getIncomingInterfaces().stream()
-        .map(
-            inIface -> {
-              StateExpr preState = new PreInInterface(hostname, inIface);
-              BDD inAclPermitBdd = getIncomingSessionFilterBdd(hostname, inIface);
+    return sessionInfo
+        .getSessionScope()
+        .accept(
+            new SessionScopeVisitor<Stream<Edge>>() {
+              @Override
+              public Stream<Edge> visitIncomingSessionScope(
+                  IncomingSessionScope incomingSessionScope) {
+                return incomingSessionScope.getIncomingInterfaces().stream()
+                    .map(
+                        inIface -> {
+                          StateExpr preState = new PreInInterface(hostname, inIface);
+                          BDD inAclPermitBdd = getIncomingSessionFilterBdd(hostname, inIface);
 
-              Transition transition =
-                  compose(
-                      constraint(sessionFlows.diff(inAclPermitBdd)),
-                      removeSourceConstraint(srcMgr),
-                      removeLastHopConstraint(_lastHopMgr, hostname));
-              if (transition == Zero.INSTANCE) {
-                return null;
+                          Transition transition =
+                              compose(
+                                  constraint(sessionFlows.diff(inAclPermitBdd)),
+                                  removeSourceConstraint(srcMgr),
+                                  removeLastHopConstraint(_lastHopMgr, hostname));
+                          if (transition == Zero.INSTANCE) {
+                            return null;
+                          }
+                          return new Edge(preState, postState, transition);
+                        })
+                    .filter(Objects::nonNull);
               }
-              return new Edge(preState, postState, transition);
-            })
-        .filter(Objects::nonNull);
+
+              @Override
+              public Stream<Edge> visitOriginatingSessionScope(
+                  OriginatingSessionScope originatingSessionScope) {
+                throw new BatfishException(
+                    String.format(
+                        "Unexpected SessionScope: Originating from VRF %s",
+                        originatingSessionScope.getOriginatingVrf()));
+              }
+            });
   }
 
   private BDD getIncomingSessionFilterBdd(String hostname, String inIface) {

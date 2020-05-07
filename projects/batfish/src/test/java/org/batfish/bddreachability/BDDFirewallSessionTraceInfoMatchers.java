@@ -34,6 +34,10 @@ public final class BDDFirewallSessionTraceInfoMatchers {
     return new HasHostname(equalTo(hostname));
   }
 
+  /**
+   * Matches {@link BDDFirewallSessionTraceInfo} that can match flows entering a set of interfaces
+   * that match the given matcher
+   */
   public static HasIncomingInterfaces hasIncomingInterfaces(Matcher<? super Set<String>> matcher) {
     return new HasIncomingInterfaces(matcher);
   }
