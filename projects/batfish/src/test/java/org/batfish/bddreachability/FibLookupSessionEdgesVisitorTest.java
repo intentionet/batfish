@@ -20,7 +20,7 @@ import org.batfish.symbolic.state.PostInVrfSession;
 import org.batfish.symbolic.state.PreInInterface;
 import org.junit.Test;
 
-public class EdgesMatchingSessionVisitorTest {
+public class FibLookupSessionEdgesVisitorTest {
   private static final BDD ZERO = new BDDPacket().getFactory().zero();
   private static final String HOSTNAME = "node";
   private static final String VRF_NAME = "vrf";
@@ -29,8 +29,8 @@ public class EdgesMatchingSessionVisitorTest {
       Interface.builder().setName(IFACE_NAME).setVrf(new Vrf(VRF_NAME)).build();
 
   /** Visitor set up with hostname and interface defined above that sets flow constraint to ZERO */
-  private static final EdgesMatchingSessionVisitor VISITOR =
-      new EdgesMatchingSessionVisitor(HOSTNAME, ImmutableMap.of(IFACE_NAME, IFACE), ZERO);
+  private static final FibLookupSessionEdgesVisitor VISITOR =
+      new FibLookupSessionEdgesVisitor(HOSTNAME, ImmutableMap.of(IFACE_NAME, IFACE), ZERO);
 
   @Test
   public void testIncomingSessionScope() {

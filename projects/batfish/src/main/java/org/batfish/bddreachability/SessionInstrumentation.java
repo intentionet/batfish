@@ -206,7 +206,7 @@ public class SessionInstrumentation {
         computeNewSuccessEdges(sessionInfo),
         nodeDropAclInEdges(sessionInfo),
         nodeDropAclOutEdges(sessionInfo),
-        postInVrfSessionEdges(sessionInfo));
+        fibLookupSessionEdges(sessionInfo));
   }
 
   @Nonnull
@@ -224,8 +224,7 @@ public class SessionInstrumentation {
 
               @Override
               public Stream<Edge> visitFibLookup(FibLookup fibLookup) {
-                // Does not necessarily lead to success, so handled separately in
-                // postInVrfSessionEdges
+                // Does not necessarily lead to success; handled separately in fibLookupSessionEdges
                 return Stream.of();
               }
 
@@ -248,14 +247,15 @@ public class SessionInstrumentation {
   }
 
   /**
-   * Produce PreInInterface->PostInVrfSession, OriginateVrf->PostInVrfSession, and
-   * OriginateInterface->PostInVrfSession edges conditioned on sessionFlows BDD
+   * Produce edges representing matching the given {@link FibLookup} session. These edges are
+   * conditioned on the {@code sessionFlows} BDD and include PreInInterface->PostInVrfSession,
+   * OriginateVrf->PostInVrfSession, and OriginateInterface->PostInVrfSession transitions.
    */
-  private Stream<Edge> computePostInVrfSessionEdges(BDDFirewallSessionTraceInfo sessionInfo) {
+  private Stream<Edge> computeFibLookupSessionEdges(BDDFirewallSessionTraceInfo sessionInfo) {
     SessionAction action = sessionInfo.getAction();
     checkArgument(
         action instanceof FibLookup,
-        "Unsupported session action for PreInInterface->PostInVrfSession edge: %s",
+        "Unsupported session action for FibLookup session: %s",
         action);
 
     String hostname = sessionInfo.getHostname();
@@ -263,12 +263,12 @@ public class SessionInstrumentation {
     Map<String, Interface> ifaces = _configs.get(hostname).getAllInterfaces();
     return sessionInfo
         .getSessionScope()
-        .accept(new EdgesMatchingSessionVisitor(hostname, ifaces, sessionFlows));
+        .accept(new FibLookupSessionEdgesVisitor(hostname, ifaces, sessionFlows));
   }
 
   @Nonnull
   @VisibleForTesting
-  Stream<Edge> postInVrfSessionEdges(BDDFirewallSessionTraceInfo sessionInfo) {
+  Stream<Edge> fibLookupSessionEdges(BDDFirewallSessionTraceInfo sessionInfo) {
     return sessionInfo
         .getAction()
         .accept(
@@ -280,7 +280,7 @@ public class SessionInstrumentation {
 
               @Override
               public Stream<Edge> visitFibLookup(FibLookup fibLookup) {
-                return computePostInVrfSessionEdges(sessionInfo);
+                return computeFibLookupSessionEdges(sessionInfo);
               }
 
               @Override

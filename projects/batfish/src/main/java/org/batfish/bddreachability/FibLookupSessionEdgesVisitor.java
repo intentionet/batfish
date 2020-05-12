@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import javax.annotation.ParametersAreNonnullByDefault;
 import net.sf.javabdd.BDD;
 import org.batfish.datamodel.Interface;
+import org.batfish.datamodel.flow.FibLookup;
 import org.batfish.datamodel.flow.IncomingSessionScope;
 import org.batfish.datamodel.flow.OriginatingSessionScope;
 import org.batfish.datamodel.flow.SessionScope;
@@ -17,19 +18,19 @@ import org.batfish.symbolic.state.PreInInterface;
 import org.batfish.symbolic.state.StateExpr;
 
 /**
- * Visitor for a {@link SessionScope} that returns the {@link Edge edges} that flows will traverse
- * when they match the session. These edges all terminate in {@link PostInVrfSession}, and may start
- * with {@link PreInInterface} (for {@link IncomingSessionScope}) or {@link OriginateInterface} or
- * {@link OriginateVrf} (for {@link OriginatingSessionScope}).
+ * Visitor for a {@link SessionScope} that returns the {@link Edge edges} that flows can traverse
+ * when they match a session with action {@link FibLookup}. These edges all terminate in {@link
+ * PostInVrfSession}, and may start with {@link PreInInterface} (for {@link IncomingSessionScope})
+ * or {@link OriginateInterface} or {@link OriginateVrf} (for {@link OriginatingSessionScope}).
  */
 @ParametersAreNonnullByDefault
-public class EdgesMatchingSessionVisitor implements SessionScopeVisitor<Stream<Edge>> {
+public class FibLookupSessionEdgesVisitor implements SessionScopeVisitor<Stream<Edge>> {
   private final String _hostname;
   private final Map<String, Interface> _ifaces;
   private final BDD _sessionFlows;
   private final PrecedingStatesVisitor _precedingStatesVisitor;
 
-  EdgesMatchingSessionVisitor(String hostname, Map<String, Interface> ifaces, BDD sessionFlows) {
+  FibLookupSessionEdgesVisitor(String hostname, Map<String, Interface> ifaces, BDD sessionFlows) {
     _hostname = hostname;
     _ifaces = ImmutableMap.copyOf(ifaces);
     _sessionFlows = sessionFlows;

@@ -189,9 +189,9 @@ public final class SessionInstrumentationTest {
         .collect(ImmutableList.toImmutableList());
   }
 
-  private List<Edge> postInVrfSessionEdges(BDDFirewallSessionTraceInfo sessionInfo) {
+  private List<Edge> fibLookupSessionEdges(BDDFirewallSessionTraceInfo sessionInfo) {
     return new SessionInstrumentation(PKT, configs(), _srcMgrs, _lastHopMgr, _filterBdds)
-        .postInVrfSessionEdges(sessionInfo)
+        .fibLookupSessionEdges(sessionInfo)
         .collect(ImmutableList.toImmutableList());
   }
 
@@ -275,7 +275,7 @@ public final class SessionInstrumentationTest {
             FW, ImmutableSet.of(FW_I1), FibLookup.INSTANCE, sessionHeaders, IDENTITY);
 
     assertThat(
-        postInVrfSessionEdges(sessionInfo),
+        fibLookupSessionEdges(sessionInfo),
         contains(
             allOf(
                 hasPreState(new PreInInterface(FW, FW_I1)),
