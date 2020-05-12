@@ -10,6 +10,7 @@ import static org.batfish.bddreachability.transition.Transitions.IDENTITY;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 
 import com.google.common.collect.ImmutableList;
@@ -36,10 +37,13 @@ import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.flow.Accept;
 import org.batfish.datamodel.flow.FibLookup;
 import org.batfish.datamodel.flow.ForwardOutInterface;
+import org.batfish.datamodel.flow.OriginatingSessionScope;
 import org.batfish.symbolic.state.NodeAccept;
 import org.batfish.symbolic.state.NodeDropAclIn;
 import org.batfish.symbolic.state.NodeDropAclOut;
 import org.batfish.symbolic.state.NodeInterfaceDeliveredToSubnet;
+import org.batfish.symbolic.state.OriginateInterface;
+import org.batfish.symbolic.state.OriginateVrf;
 import org.batfish.symbolic.state.PostInVrfSession;
 import org.batfish.symbolic.state.PreInInterface;
 import org.junit.Before;
@@ -268,7 +272,7 @@ public final class SessionInstrumentationTest {
   }
 
   @Test
-  public void testPostInVrfSessionEdges() {
+  public void testFibLookupSessionEdges() {
     BDD sessionHeaders = PKT.getDstIp().value(10L);
     BDDFirewallSessionTraceInfo sessionInfo =
         new BDDFirewallSessionTraceInfo(
@@ -279,6 +283,28 @@ public final class SessionInstrumentationTest {
         contains(
             allOf(
                 hasPreState(new PreInInterface(FW, FW_I1)),
+                hasPostState(new PostInVrfSession(FW, FW_VRF)),
+                hasTransition(
+                    allOf(mapsForward(ONE, sessionHeaders), mapsBackward(ONE, sessionHeaders))))));
+  }
+
+  @Test
+  public void testFibLookupSessionEdges_inboundSession() {
+    BDD sessionHeaders = PKT.getDstIp().value(10L);
+    BDDFirewallSessionTraceInfo sessionInfo =
+        new BDDFirewallSessionTraceInfo(
+            FW, new OriginatingSessionScope(FW_VRF), FibLookup.INSTANCE, sessionHeaders, IDENTITY);
+
+    assertThat(
+        fibLookupSessionEdges(sessionInfo),
+        containsInAnyOrder(
+            allOf(
+                hasPreState(new OriginateInterface(FW, FW_I1)),
+                hasPostState(new PostInVrfSession(FW, FW_VRF)),
+                hasTransition(
+                    allOf(mapsForward(ONE, sessionHeaders), mapsBackward(ONE, sessionHeaders)))),
+            allOf(
+                hasPreState(new OriginateVrf(FW, FW_VRF)),
                 hasPostState(new PostInVrfSession(FW, FW_VRF)),
                 hasTransition(
                     allOf(mapsForward(ONE, sessionHeaders), mapsBackward(ONE, sessionHeaders))))));
