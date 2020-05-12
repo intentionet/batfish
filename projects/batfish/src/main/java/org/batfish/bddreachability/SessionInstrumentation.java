@@ -49,6 +49,8 @@ import org.batfish.symbolic.state.NodeInterfaceDeliveredToSubnet;
 import org.batfish.symbolic.state.NodeInterfaceExitsNetwork;
 import org.batfish.symbolic.state.NodeInterfaceInsufficientInfo;
 import org.batfish.symbolic.state.NodeInterfaceNeighborUnreachable;
+import org.batfish.symbolic.state.OriginateInterface;
+import org.batfish.symbolic.state.OriginateVrf;
 import org.batfish.symbolic.state.PostInVrfSession;
 import org.batfish.symbolic.state.PreInInterface;
 import org.batfish.symbolic.state.PreOutVrfSession;
@@ -107,7 +109,7 @@ public class SessionInstrumentation {
      */
     Stream<Edge> instrumentedEdges =
         constrainOutEdges(
-            originalEdges, computeNonSessionPreInInterfaceOutEdgeConstraints(initializedSessions));
+            originalEdges, computeNonSessionOutEdgeConstraints(initializedSessions, configs));
     Stream<Edge> sessionFibLookupEdges =
         computeSessionFibLookupSubgraph(initializedSessions, bddFibGenerator);
 
@@ -163,49 +165,27 @@ public class SessionInstrumentation {
   }
 
   /**
-   * For each incoming interface of all sessions, compute the non-session flow constraint that
-   * should be applied to non-session out-edges from {@link PreInInterface}.
+   * For each session, compute the non-session flow constraint that should be applied to non-session
+   * out-edges from states that can match the session. These states include {@link PreInInterface}
+   * (for interface-scoped sessions) and {@link OriginateInterface} and {@link OriginateVrf} (for
+   * VRF-scoped sessions).
    */
-  private static Map<StateExpr, BDD> computeNonSessionPreInInterfaceOutEdgeConstraints(
-      Map<String, List<BDDFirewallSessionTraceInfo>> initializedSessions) {
+  private static Map<StateExpr, BDD> computeNonSessionOutEdgeConstraints(
+      Map<String, List<BDDFirewallSessionTraceInfo>> initializedSessions,
+      Map<String, Configuration> configs) {
     return initializedSessions.values().stream()
         .flatMap(Collection::stream)
-        .flatMap(SessionInstrumentation::computeNonSessionPreInInterfaceOutEdgeConstraints)
+        .flatMap(
+            sessionInfo -> {
+              String hostname = sessionInfo.getHostname();
+              Collection<Interface> ifaces = configs.get(hostname).getAllInterfaces().values();
+              BDD nonSessionFlows = sessionInfo.getSessionFlows().not();
+              return sessionInfo
+                  .getSessionScope()
+                  .accept(new PrecedingStatesVisitor(hostname, ifaces))
+                  .map(state -> Maps.immutableEntry(state, nonSessionFlows));
+            })
         .collect(Collectors.toMap(Entry::getKey, Entry::getValue, BDD::and));
-  }
-
-  /**
-   * For each incoming interface of a session, compute the non-session flow constraint that should
-   * be applied to non-session out-edges from {@link PreInInterface}.
-   */
-  private static Stream<Entry<StateExpr, BDD>> computeNonSessionPreInInterfaceOutEdgeConstraints(
-      BDDFirewallSessionTraceInfo sessionInfo) {
-    BDD nonSessionFlows = sessionInfo.getSessionFlows().not();
-    return sessionInfo
-        .getSessionScope()
-        .accept(
-            new SessionScopeVisitor<Stream<Entry<StateExpr, BDD>>>() {
-              @Override
-              public Stream<Entry<StateExpr, BDD>> visitIncomingSessionScope(
-                  IncomingSessionScope incomingSessionScope) {
-                return incomingSessionScope.getIncomingInterfaces().stream()
-                    .map(
-                        incomingIface -> {
-                          String hostname = sessionInfo.getHostname();
-                          return Maps.immutableEntry(
-                              new PreInInterface(hostname, incomingIface), nonSessionFlows);
-                        });
-              }
-
-              @Override
-              public Stream<Entry<StateExpr, BDD>> visitOriginatingSessionScope(
-                  OriginatingSessionScope originatingSessionScope) {
-                throw new BatfishException(
-                    String.format(
-                        "Unexpected SessionScope: Originating from VRF %s",
-                        originatingSessionScope.getOriginatingVrf()));
-              }
-            });
   }
 
   /**
@@ -267,7 +247,10 @@ public class SessionInstrumentation {
             });
   }
 
-  /** Produce PreInInterface->PostInVrfSession edges conditioned on sessionFlows BDD */
+  /**
+   * Produce PreInInterface->PostInVrfSession, OriginateVrf->PostInVrfSession, and
+   * OriginateInterface->PostInVrfSession edges conditioned on sessionFlows BDD
+   */
   private Stream<Edge> computePostInVrfSessionEdges(BDDFirewallSessionTraceInfo sessionInfo) {
     SessionAction action = sessionInfo.getAction();
     checkArgument(
@@ -280,30 +263,7 @@ public class SessionInstrumentation {
     Map<String, Interface> ifaces = _configs.get(hostname).getAllInterfaces();
     return sessionInfo
         .getSessionScope()
-        .accept(
-            new SessionScopeVisitor<Stream<Edge>>() {
-              @Override
-              public Stream<Edge> visitIncomingSessionScope(
-                  IncomingSessionScope incomingSessionScope) {
-                return incomingSessionScope.getIncomingInterfaces().stream()
-                    .map(
-                        incomingInterface ->
-                            new Edge(
-                                new PreInInterface(hostname, incomingInterface),
-                                new PostInVrfSession(
-                                    hostname, ifaces.get(incomingInterface).getVrf().getName()),
-                                sessionFlows));
-              }
-
-              @Override
-              public Stream<Edge> visitOriginatingSessionScope(
-                  OriginatingSessionScope originatingSessionScope) {
-                throw new BatfishException(
-                    String.format(
-                        "Unexpected SessionScope: Originating from VRF %s",
-                        originatingSessionScope.getOriginatingVrf()));
-              }
-            });
+        .accept(new EdgesMatchingSessionVisitor(hostname, ifaces, sessionFlows));
   }
 
   @Nonnull
@@ -390,6 +350,7 @@ public class SessionInstrumentation {
               @Override
               public Stream<Edge> visitOriginatingSessionScope(
                   OriginatingSessionScope originatingSessionScope) {
+                // VRF-scoped sessions never forward out interface, so shouldn't get here
                 throw new BatfishException(
                     String.format(
                         "Unexpected SessionScope: Originating from VRF %s",
@@ -462,6 +423,7 @@ public class SessionInstrumentation {
                           @Override
                           public Stream<Edge> visitOriginatingSessionScope(
                               OriginatingSessionScope originatingSessionScope) {
+                            // VRF-scoped sessions never forward out interface
                             throw new BatfishException(
                                 String.format(
                                     "Unexpected SessionScope: Originating from VRF %s",
@@ -523,6 +485,7 @@ public class SessionInstrumentation {
               @Override
               public Stream<Edge> visitOriginatingSessionScope(
                   OriginatingSessionScope originatingSessionScope) {
+                // VRF-scoped sessions never forward out interface, so shouldn't get here
                 throw new BatfishException(
                     String.format(
                         "Unexpected SessionScope: Originating from VRF %s",
@@ -573,6 +536,7 @@ public class SessionInstrumentation {
               @Override
               public Stream<Edge> visitOriginatingSessionScope(
                   OriginatingSessionScope originatingSessionScope) {
+                // VRF-scoped sessions never accept (use FibLookup instead), so shouldn't get here
                 throw new BatfishException(
                     String.format(
                         "Unexpected SessionScope: Originating from VRF %s",
@@ -622,10 +586,8 @@ public class SessionInstrumentation {
               @Override
               public Stream<Edge> visitOriginatingSessionScope(
                   OriginatingSessionScope originatingSessionScope) {
-                throw new BatfishException(
-                    String.format(
-                        "Unexpected SessionScope: Originating from VRF %s",
-                        originatingSessionScope.getOriginatingVrf()));
+                // VRF-scoped sessions can't match incoming traffic
+                return Stream.of();
               }
             });
   }
