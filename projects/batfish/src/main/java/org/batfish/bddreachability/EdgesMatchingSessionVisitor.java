@@ -27,11 +27,13 @@ public class EdgesMatchingSessionVisitor implements SessionScopeVisitor<Stream<E
   private final String _hostname;
   private final Map<String, Interface> _ifaces;
   private final BDD _sessionFlows;
+  private final PrecedingStatesVisitor _precedingStatesVisitor;
 
   EdgesMatchingSessionVisitor(String hostname, Map<String, Interface> ifaces, BDD sessionFlows) {
     _hostname = hostname;
     _ifaces = ImmutableMap.copyOf(ifaces);
     _sessionFlows = sessionFlows;
+    _precedingStatesVisitor = new PrecedingStatesVisitor(_hostname, _ifaces.values());
   }
 
   @Override
@@ -53,15 +55,9 @@ public class EdgesMatchingSessionVisitor implements SessionScopeVisitor<Stream<E
     String vrf = originatingSessionScope.getOriginatingVrf();
     StateExpr postState = new PostInVrfSession(_hostname, vrf);
 
-    // Prestates (OriginateVrf and an OriginateInterface for each interface in the VRF)
-    StateExpr originateVrfState = new OriginateVrf(_hostname, vrf);
-    Stream<StateExpr> originateIfaceStates =
-        _ifaces.values().stream()
-            .filter(iface -> iface.getVrfName().equals(vrf))
-            .map(iface -> new OriginateInterface(_hostname, iface.getName()));
-
-    // Convert prestates to edges
-    return Stream.concat(originateIfaceStates, Stream.of(originateVrfState))
+    // Create an edge per preceding state
+    return _precedingStatesVisitor
+        .visitOriginatingSessionScope(originatingSessionScope)
         .map(preState -> new Edge(preState, postState, _sessionFlows));
   }
 }
