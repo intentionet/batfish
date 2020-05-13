@@ -16,6 +16,8 @@ import static org.batfish.datamodel.acl.SourcesReferencedByIpAccessLists.SOURCE_
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,14 +33,18 @@ import org.batfish.common.bdd.BDDOps;
 import org.batfish.common.bdd.BDDPacket;
 import org.batfish.common.bdd.BDDSourceManager;
 import org.batfish.datamodel.Configuration;
+import org.batfish.datamodel.FirewallSessionInterfaceInfo;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpProtocol;
+import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.batfish.datamodel.flow.Accept;
 import org.batfish.datamodel.flow.FibLookup;
 import org.batfish.datamodel.flow.ForwardOutInterface;
+import org.batfish.datamodel.flow.OriginatingSessionScope;
 import org.batfish.datamodel.flow.SessionAction;
 import org.batfish.symbolic.state.StateExpr;
+import org.batfish.symbolic.state.VrfAccept;
 
 /**
  * Factory for creating {@link BDDFirewallSessionTraceInfo} objects for bidirectional reachability
@@ -61,7 +67,8 @@ final class BDDReachabilityAnalysisSessionFactory {
   private final Map<String, Configuration> _configs;
   private final Map<String, BDDSourceManager> _srcManagers;
   private final LastHopOutgoingInterfaceManager _lastHopManager;
-  private final Map<NodeInterfacePair, BDD> _sessionBdds;
+  private final Map<NodeInterfacePair, BDD> _incomingSessionBdds;
+  private final Map<String, Map<String, BDD>> _originatingSessionBdds;
   private final BDDReverseFlowTransformationFactory _reverseFlowTransformationFactory;
   private final BDDReverseTransformationRanges _reverseTransformationRanges;
 
@@ -81,8 +88,12 @@ final class BDDReachabilityAnalysisSessionFactory {
         IpProtocol.IP_PROTOCOLS_WITH_SESSIONS.stream()
             .map(bddPacket.getIpProtocol()::value)
             .reduce(bddPacket.getFactory().one(), BDD::or);
-    _sessionBdds =
-        reachableSessionCreationBdds(configs, forwardReachableBdds, ipProtocolsWithSessionsBdd);
+    _incomingSessionBdds =
+        reachableIncomingSessionCreationBdds(
+            configs, forwardReachableBdds, ipProtocolsWithSessionsBdd);
+    _originatingSessionBdds =
+        reachableOriginatingSessionCreationBdds(
+            configs, forwardReachableBdds, ipProtocolsWithSessionsBdd);
     _reverseFlowTransformationFactory = transformationFactory;
     _reverseTransformationRanges = reverseTransformationRanges;
   }
@@ -130,12 +141,18 @@ final class BDDReachabilityAnalysisSessionFactory {
   private List<BDDFirewallSessionTraceInfo> computeInitializedSessions(Configuration config) {
     String hostname = config.getHostname();
 
+    List<String> sessionOriginateVrfs =
+        config.getVrfs().values().stream()
+            .filter(Vrf::hasOriginatingSessions)
+            .map(Vrf::getName)
+            .collect(ImmutableList.toImmutableList());
+
     List<Interface> sessionExitInterfaces =
         config.getAllInterfaces().values().stream()
             .filter(iface -> iface.getActive() && iface.getFirewallSessionInterfaceInfo() != null)
             .collect(ImmutableList.toImmutableList());
 
-    if (sessionExitInterfaces.isEmpty()) {
+    if (sessionOriginateVrfs.isEmpty() && sessionExitInterfaces.isEmpty()) {
       // No sessions to create (and won't have any entries in _lastHopManager), so return now
       return ImmutableList.of();
     }
@@ -152,28 +169,45 @@ final class BDDReachabilityAnalysisSessionFactory {
                     .map(BDDFiniteDomain::getValueBdds)
                     .orElse(ImmutableMap.of()));
 
-    return sessionExitInterfaces.stream()
-        .flatMap(
-            iface -> {
-              BDD exitIfaceBdd = _sessionBdds.get(NodeInterfacePair.of(hostname, iface.getName()));
-              return exitIfaceBdd == null || exitIfaceBdd.isZero()
-                  ? Stream.of()
-                  : computeInitializedSessions(iface, lastHopOutgoingInterfaceBdds, exitIfaceBdd)
-                      .stream();
-            })
+    Stream<BDDFirewallSessionTraceInfo> originatingSessions =
+        sessionOriginateVrfs.stream()
+            .flatMap(
+                vrf -> {
+                  BDD originateBdd =
+                      _originatingSessionBdds.getOrDefault(hostname, ImmutableMap.of()).get(vrf);
+                  return originateBdd == null || originateBdd.isZero()
+                      ? Stream.of()
+                      : computeInitializedOriginatingSessions(
+                          hostname, vrf, lastHopOutgoingInterfaceBdds, originateBdd)
+                          .stream();
+                });
+    Stream<BDDFirewallSessionTraceInfo> incomingSessions =
+        sessionExitInterfaces.stream()
+            .flatMap(
+                iface -> {
+                  BDD exitIfaceBdd =
+                      _incomingSessionBdds.get(NodeInterfacePair.of(hostname, iface.getName()));
+                  return exitIfaceBdd == null || exitIfaceBdd.isZero()
+                      ? Stream.of()
+                      : computeInitializedIncomingSessions(
+                          iface, lastHopOutgoingInterfaceBdds, exitIfaceBdd)
+                          .stream();
+                });
+
+    return Stream.concat(originatingSessions, incomingSessions)
         .collect(ImmutableList.toImmutableList());
   }
 
   /**
-   * Compute initialized sessions for an outgoing interface (that has a {@link
-   * org.batfish.datamodel.FirewallSessionInterfaceInfo} object).
+   * Compute initialized sessions for flows exiting an outgoing interface that has a {@link
+   * FirewallSessionInterfaceInfo} object.
    *
-   * @param outIface this nodes' egress iface
+   * @param outIface this node's egress iface; a session is set up when a flow leaves this iface
    * @param lastHopOutIfaceBdds this node's ingress iface -> (last hop, out iface) -> constraint
    * @param outIfaceBdd BDD representing the set of packets for which sessions can be initiated
    *     exiting outIface.
    */
-  private List<BDDFirewallSessionTraceInfo> computeInitializedSessions(
+  private List<BDDFirewallSessionTraceInfo> computeInitializedIncomingSessions(
       Interface outIface,
       Map<String, Map<NodeInterfacePair, BDD>> lastHopOutIfaceBdds,
       BDD outIfaceBdd) {
@@ -313,10 +347,110 @@ final class BDDReachabilityAnalysisSessionFactory {
   }
 
   /**
+   * Compute initialized sessions for flows accepted into the VRF specified by {@code hostname} and
+   * {@code vrf}.
+   *
+   * @param lastHopOutIfaceBdds this node's ingress iface -> (last hop, out iface) -> constraint
+   * @param vrfAcceptBdd BDD representing the set of packets for which sessions can be initiated
+   *     upon being accepted into the VRF.
+   */
+  private List<BDDFirewallSessionTraceInfo> computeInitializedOriginatingSessions(
+      String hostname,
+      String vrfName,
+      Map<String, Map<NodeInterfacePair, BDD>> lastHopOutIfaceBdds,
+      BDD vrfAcceptBdd) {
+    BDDSourceManager srcMgr = _srcManagers.get(hostname);
+
+    /* In order to setup sessions correctly, we have to track all possible sources in the firewall.
+     * This means the source manager must distinguish between all sources, and the reachability
+     * graph must impose the source constraints.
+     */
+    checkArgument(srcMgr.allSourcesTracked(), "Each possible source must be tracked.");
+    checkArgument(
+        srcMgr.hasSourceConstraint(vrfAcceptBdd), "Session devices must have source constraints");
+
+    ImmutableList.Builder<BDDFirewallSessionTraceInfo> sessions = ImmutableList.builder();
+    srcMgr
+        .getSourceBDDs()
+        .forEach(
+            (src, srcBdd) -> {
+              if (src.equals(SOURCE_ORIGINATING_FROM_DEVICE)) {
+                // This assumes traffic to self can't create and match a session. See related
+                // comment in FlowTracer#buildAcceptTrace.
+                return;
+              }
+
+              // Flows that entered src (either an interface or this device) and were accepted
+              BDD srcToAcceptBdd = vrfAcceptBdd.and(srcBdd);
+              if (srcToAcceptBdd.isZero()) {
+                return;
+              }
+              Transition incomingTransformation =
+                  _reverseFlowTransformationFactory.reverseFlowIncomingTransformation(
+                      hostname, src);
+              Map<NodeInterfacePair, BDD> nextHops = lastHopOutIfaceBdds.get(src);
+              if (nextHops.isEmpty()) {
+                // The src interface has no neighbors
+                assert !_lastHopManager.hasLastHopConstraint(srcToAcceptBdd);
+
+                BDD incomingTransformationRange =
+                    _reverseTransformationRanges.reverseIncomingTransformationRange(
+                        hostname, src, src, null);
+
+                BDD sessionBdd =
+                    _bddPacket.swapSourceAndDestinationFields(srcMgr.existsSource(srcToAcceptBdd));
+                sessions.add(
+                    new BDDFirewallSessionTraceInfo(
+                        hostname,
+                        new OriginatingSessionScope(vrfName),
+                        // Batfish does not support VRF-originating sessions with other actions
+                        FibLookup.INSTANCE,
+                        sessionBdd,
+                        compose(incomingTransformation, constraint(incomingTransformationRange))));
+                return;
+              }
+
+              nextHops.forEach(
+                  (lastHopOutIface, lastHopOutIfaceBdd) -> {
+                    // Flows that came from lastHopOutIface, entered src and were accepted
+                    BDD lastHopToSrcIfaceToAcceptBdd = srcToAcceptBdd.and(lastHopOutIfaceBdd);
+                    if (lastHopToSrcIfaceToAcceptBdd.isZero()) {
+                      return;
+                    }
+
+                    // Return flows for this session.
+                    BDD sessionBdd =
+                        _bddPacket.swapSourceAndDestinationFields(
+                            srcMgr.existsSource(
+                                _lastHopManager.existsLastHop(lastHopToSrcIfaceToAcceptBdd)));
+
+                    // Next hop for session flows
+                    NodeInterfacePair lastHop =
+                        lastHopOutIface == NO_LAST_HOP ? null : lastHopOutIface;
+
+                    BDD incomingTransformationRange =
+                        _reverseTransformationRanges.reverseIncomingTransformationRange(
+                            hostname, src, src, lastHop);
+
+                    sessions.add(
+                        new BDDFirewallSessionTraceInfo(
+                            hostname,
+                            new OriginatingSessionScope(vrfName),
+                            // Batfish does not support VRF-originating sessions with other actions
+                            FibLookup.INSTANCE,
+                            sessionBdd,
+                            compose(
+                                incomingTransformation, constraint(incomingTransformationRange))));
+                  });
+            });
+    return sessions.build();
+  }
+
+  /**
    * Compute a mapping from (node,iface) to BDD representing the headers that can establish a
    * session exiting that interface.
    */
-  private static Map<NodeInterfacePair, BDD> reachableSessionCreationBdds(
+  private static Map<NodeInterfacePair, BDD> reachableIncomingSessionCreationBdds(
       Map<String, Configuration> configs,
       Map<StateExpr, BDD> reachable,
       BDD ipProtocolsWithSessionsBdd) {
@@ -344,5 +478,48 @@ final class BDDReachabilityAnalysisSessionFactory {
                     Entry::getValue,
                     collectingAndThen(
                         toList(), bdds -> ipProtocolsWithSessionsBdd.and(ops.orAll(bdds))))));
+  }
+
+  /**
+   * Compute a mapping from hostname to VRF to BDD representing the flows that can establish a
+   * session when they are accepted into that VRF.
+   */
+  private static Map<String, Map<String, BDD>> reachableOriginatingSessionCreationBdds(
+      Map<String, Configuration> configs,
+      Map<StateExpr, BDD> reachable,
+      BDD ipProtocolsWithSessionsBdd) {
+    Map<String, Map<String, List<BDD>>> reachableBdds = new HashMap<>();
+    for (Entry<StateExpr, BDD> e : reachable.entrySet()) {
+      StateExpr state = e.getKey();
+      // Not necessary to check InterfaceAccept states because all InterfaceAccept states have an
+      // unconstrained edge to a VrfAccept state.
+      // TODO: Replace with a visitor.
+      if (state instanceof VrfAccept) {
+        String hostname = ((VrfAccept) state).getHostname();
+        String vrf = ((VrfAccept) state).getVrf();
+        Configuration c = configs.get(hostname);
+        if (c.getVrfs().get(vrf).hasOriginatingSessions()) {
+          reachableBdds
+              .computeIfAbsent(hostname, k -> new HashMap<>())
+              .computeIfAbsent(vrf, k -> new ArrayList<>())
+              .add(e.getValue());
+        }
+      }
+    }
+
+    BDDOps ops = new BDDOps(ipProtocolsWithSessionsBdd.getFactory());
+    return reachableBdds.entrySet().stream()
+        .collect(
+            ImmutableMap.toImmutableMap(
+                Entry::getKey, // hostname
+                nodeEntry ->
+                    nodeEntry.getValue().entrySet().stream()
+                        .collect(
+                            ImmutableMap.toImmutableMap(
+                                Entry::getKey, // VRF name
+                                vrfEntry ->
+                                    // BDD of flows that can match originating session on VRF
+                                    ipProtocolsWithSessionsBdd.and(
+                                        ops.orAll(vrfEntry.getValue()))))));
   }
 }
