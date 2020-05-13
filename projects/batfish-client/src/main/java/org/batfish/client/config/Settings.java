@@ -10,7 +10,6 @@ public class Settings extends BaseSettings {
 
   public enum RunMode {
     batch,
-    genquestions,
     interactive
   }
 

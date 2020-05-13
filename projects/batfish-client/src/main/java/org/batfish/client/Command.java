@@ -11,41 +11,23 @@ import org.batfish.common.BatfishException;
 public enum Command {
   ADD_BATFISH_OPTION("add-batfish-option"),
   ANSWER("answer"),
-  AUTOCOMPLETE("autocomplete"),
-  CHECK_API_KEY("checkapikey"),
-  CONFIGURE_TEMPLATE("configure-template"),
   DEBUG_DELETE("debug-delete"),
   DEBUG_GET("debug-get"),
   DEBUG_POST("debug-post"),
   DEBUG_PUT("debug-put"),
   DEL_BATFISH_OPTION("del-batfish-option"),
   DEL_NETWORK("del-network"),
-  DEL_QUESTION("del-question"),
-  DEL_SNAPSHOT("del-snapshot"),
   EXIT("exit"),
   GEN_DP("generate-dataplane"),
   GET("get"),
-  GET_ANSWER("get-answer"),
-  GET_ANSWER_DIFFERENTIAL("get-answer-differential"),
-  GET_ANSWER_REFERENCE("get-answer-reference"),
-  GET_CONFIGURATION("get-configuration"),
-  GET_NETWORK("get-network"),
   GET_POJO_TOPOLOGY("get-pojo-topology"),
-  GET_QUESTION_TEMPLATES("get-question-templates"),
-  GET_WORK_STATUS("get-work-status"),
   HELP("help"),
   INIT_NETWORK("init-network"),
   INIT_REFERENCE_SNAPSHOT("init-reference-snapshot"),
   INIT_SNAPSHOT("init-snapshot"),
-  KILL_WORK("kill-work"),
-  LIST_INCOMPLETE_WORK("list-incomplete-work"),
-  LIST_NETWORKS("list-networks"),
-  LIST_QUESTIONS("list-questions"),
   LOAD_QUESTIONS("load-questions"),
   QUIT("quit"),
-  SET_BACKGROUND_EXECUCTION("set-background-execution"),
   SET_BATFISH_LOGLEVEL("set-batfish-loglevel"),
-  SET_FIXED_WORKITEM_ID("set-fixed-workitem-id"),
   SET_LOGLEVEL("set-loglevel"),
   SET_NETWORK("set-network"),
   SET_REFERENCE_SNAPSHOT("set-reference-snapshot"),
@@ -58,7 +40,6 @@ public enum Command {
   SHOW_NETWORK("show-network"),
   SHOW_REFERENCE_SNAPSHOT("show-reference-snapshot"),
   SHOW_SNAPSHOT("show-snapshot"),
-  SHOW_VERSION("show-version"),
   TEST("test"),
   VALIDATE_TEMPLATE("validate-template");
 
@@ -117,22 +98,9 @@ public enum Command {
             "<template-name> [differential={true,false}] [questionName=name] [param1=value1 [param2=value2] ...]",
             "Answer the template by name for the current snapshot"));
     descs.put(
-        AUTOCOMPLETE,
-        new CommandUsage(
-            "[-maxSuggestions] <completion-type> <query>",
-            "Autocomplete information of question parameters"));
-    descs.put(CHECK_API_KEY, new CommandUsage("", "Check if API Key is valid"));
-    descs.put(
-        CONFIGURE_TEMPLATE,
-        new CommandUsage(
-            "<new-template-name> <old-template-name> [exceptions=[...],] [assertion={..}]",
-            "Create a new template from the old template with provided exceptions and assertion"));
-    descs.put(
         DEL_BATFISH_OPTION,
         new CommandUsage("<option-key>", "Stop passing this option to Batfish"));
     descs.put(DEL_NETWORK, new CommandUsage("<network-name>", "Delete the specified network"));
-    descs.put(DEL_QUESTION, new CommandUsage("<question-name>", "Delete the specified question"));
-    descs.put(DEL_SNAPSHOT, new CommandUsage("<snapshot-name>", "Delete the specified snapshot"));
     descs.put(EXIT, new CommandUsage("", "Terminate interactive client session"));
     descs.put(GEN_DP, new CommandUsage("", "Generate dataplane for the current snapshot"));
     descs.put(
@@ -141,26 +109,7 @@ public enum Command {
             "<question-type>  [param1=value1 [param2=value2] ...]",
             "Answer the question by type for the current snapshot"));
     descs.put(
-        GET_ANSWER,
-        new CommandUsage("<question-name>", "Get the answer for a previously answered question"));
-    descs.put(
-        GET_ANSWER_REFERENCE,
-        new CommandUsage(
-            "<question-name>",
-            "Get the answer for a question previously answered on the reference snapshot"));
-    descs.put(
-        GET_CONFIGURATION,
-        new CommandUsage(
-            "<network-name> <snapshot-name> <configuration-name>",
-            "Get the file content of the configuration file"));
-    descs.put(
-        GET_NETWORK, new CommandUsage("<network-name>", "Get the information of the network"));
-    descs.put(
         GET_POJO_TOPOLOGY, new CommandUsage("", "Get the POJO topology for the current snapshot"));
-    descs.put(
-        GET_QUESTION_TEMPLATES, new CommandUsage("", "Get question templates from coordinator"));
-    descs.put(
-        GET_WORK_STATUS, new CommandUsage("<work-id>", "Get the status of the specified work id"));
     descs.put(HELP, new CommandUsage("[command]", "Print the list of supported commands"));
     descs.put(
         INIT_NETWORK,
@@ -176,14 +125,6 @@ public enum Command {
         new CommandUsage(
             "[-autoanalyze] <snapshot zipfile or directory> [<snapshot-name>]",
             "Initialize the snapshot"));
-    descs.put(KILL_WORK, new CommandUsage("<guid>", "Kill work with the given GUID"));
-    descs.put(
-        LIST_INCOMPLETE_WORK,
-        new CommandUsage("", "List all incomplete works for the active network"));
-    descs.put(LIST_NETWORKS, new CommandUsage("", "List the networks to which you have access"));
-    descs.put(
-        LIST_QUESTIONS,
-        new CommandUsage("", "List the questions under current network and snapshot"));
     descs.put(
         LOAD_QUESTIONS,
         new CommandUsage(
@@ -193,17 +134,9 @@ public enum Command {
                 + "questions"));
     descs.put(QUIT, new CommandUsage("", "Terminate interactive client session"));
     descs.put(
-        SET_BACKGROUND_EXECUCTION,
-        new CommandUsage(
-            "<true|false>", "Whether to wait for commands to finish before returning"));
-    descs.put(
         SET_BATFISH_LOGLEVEL,
         new CommandUsage(
             "<debug|info|output|warn|error>", "Set the batfish loglevel. Default is warn"));
-    descs.put(
-        SET_FIXED_WORKITEM_ID,
-        new CommandUsage(
-            "<uuid>", "Fix the UUID for WorkItems. Useful for testing; use carefully"));
     descs.put(
         SET_LOGLEVEL,
         new CommandUsage(
@@ -222,7 +155,6 @@ public enum Command {
     descs.put(SHOW_NETWORK, new CommandUsage("", "Show active network"));
     descs.put(SHOW_REFERENCE_SNAPSHOT, new CommandUsage("", "Show reference snapshot"));
     descs.put(SHOW_SNAPSHOT, new CommandUsage("", "Show current snapshot"));
-    descs.put(SHOW_VERSION, new CommandUsage("", "Show the version of Client and Service"));
     descs.put(
         TEST,
         new CommandUsage(
