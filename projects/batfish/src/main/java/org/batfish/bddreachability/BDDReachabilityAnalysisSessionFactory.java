@@ -33,7 +33,6 @@ import org.batfish.common.bdd.BDDOps;
 import org.batfish.common.bdd.BDDPacket;
 import org.batfish.common.bdd.BDDSourceManager;
 import org.batfish.datamodel.Configuration;
-import org.batfish.datamodel.FirewallSessionInterfaceInfo;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.IpProtocol;
 import org.batfish.datamodel.Vrf;
@@ -200,7 +199,7 @@ final class BDDReachabilityAnalysisSessionFactory {
 
   /**
    * Compute initialized sessions for flows exiting an outgoing interface that has a {@link
-   * FirewallSessionInterfaceInfo} object.
+   * org.batfish.datamodel.FirewallSessionInterfaceInfo} object.
    *
    * @param outIface this node's egress iface; a session is set up when a flow leaves this iface
    * @param lastHopOutIfaceBdds this node's ingress iface -> (last hop, out iface) -> constraint
