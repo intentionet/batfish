@@ -73,7 +73,6 @@ import org.batfish.common.WorkItem;
 import org.batfish.common.runtime.RuntimeData;
 import org.batfish.common.runtime.SnapshotRuntimeData;
 import org.batfish.common.util.BatfishObjectMapper;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.common.util.WorkItemBuilder;
 import org.batfish.coordinator.AnalysisMetadataMgr.AnalysisType;
 import org.batfish.coordinator.WorkDetails.WorkType;
@@ -190,7 +189,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         containsInAnyOrder(baseInterface, additionalInterface));
   }
@@ -218,7 +217,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         containsInAnyOrder(baseInterface));
   }
@@ -245,7 +244,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         containsInAnyOrder(baseInterface));
   }
@@ -270,7 +269,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         containsInAnyOrder(additionalInterface));
   }
@@ -317,7 +316,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         contains(baseInterface2));
   }
@@ -393,7 +392,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         iterableWithSize(0));
   }
@@ -437,7 +436,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         contains(baseInterface1));
 
@@ -448,7 +447,7 @@ public final class WorkMgrTest {
     assertThat(
         BatfishObjectMapper.mapper()
             .readValue(
-                CommonUtil.readFile(serializedListPath),
+                FileUtils.readFileToString(serializedListPath.toFile(), StandardCharsets.UTF_8),
                 new TypeReference<List<NodeInterfacePair>>() {}),
         contains(baseInterface1));
   }
@@ -525,7 +524,9 @@ public final class WorkMgrTest {
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of());
       assertThat(
           BatfishObjectMapper.mapper()
-              .readValue(CommonUtil.readFile(runtimeDataPath), SnapshotRuntimeData.class),
+              .readValue(
+                  FileUtils.readFileToString(runtimeDataPath.toFile(), StandardCharsets.UTF_8),
+                  SnapshotRuntimeData.class),
           equalTo(SnapshotRuntimeData.builder().setInterfacesLineDown(nip1).build()));
     }
 
@@ -537,7 +538,9 @@ public final class WorkMgrTest {
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of());
       assertThat(
           BatfishObjectMapper.mapper()
-              .readValue(CommonUtil.readFile(runtimeDataPath), SnapshotRuntimeData.class),
+              .readValue(
+                  FileUtils.readFileToString(runtimeDataPath.toFile(), StandardCharsets.UTF_8),
+                  SnapshotRuntimeData.class),
           equalTo(SnapshotRuntimeData.builder().setInterfacesLineDown(nip1).build()));
     }
 
@@ -554,7 +557,9 @@ public final class WorkMgrTest {
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of(nip2));
       assertThat(
           BatfishObjectMapper.mapper()
-              .readValue(CommonUtil.readFile(runtimeDataPath), SnapshotRuntimeData.class),
+              .readValue(
+                  FileUtils.readFileToString(runtimeDataPath.toFile(), StandardCharsets.UTF_8),
+                  SnapshotRuntimeData.class),
           equalTo(
               SnapshotRuntimeData.builder()
                   .setInterfacesLineDown(nip1)
@@ -579,7 +584,9 @@ public final class WorkMgrTest {
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of(nip2));
       assertThat(
           BatfishObjectMapper.mapper()
-              .readValue(CommonUtil.readFile(runtimeDataPath), SnapshotRuntimeData.class),
+              .readValue(
+                  FileUtils.readFileToString(runtimeDataPath.toFile(), StandardCharsets.UTF_8),
+                  SnapshotRuntimeData.class),
           equalTo(
               SnapshotRuntimeData.builder()
                   .setInterfacesLineUp(nip2)
@@ -598,7 +605,9 @@ public final class WorkMgrTest {
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of(nip1));
       assertThat(
           BatfishObjectMapper.mapper()
-              .readValue(CommonUtil.readFile(runtimeDataPath), SnapshotRuntimeData.class),
+              .readValue(
+                  FileUtils.readFileToString(runtimeDataPath.toFile(), StandardCharsets.UTF_8),
+                  SnapshotRuntimeData.class),
           equalTo(SnapshotRuntimeData.builder().setInterfacesLineUp(nip1).build()));
     }
   }

@@ -205,18 +205,6 @@ public class CommonUtil {
     return null;
   }
 
-  @Nonnull
-  public static String readFile(Path file) throws BatfishException {
-    String text;
-    try {
-      byte[] bytes = Files.readAllBytes(file);
-      text = new String(bytes, detectCharset(bytes));
-    } catch (IOException e) {
-      throw new BatfishException("Failed to read file: " + file, e);
-    }
-    return text;
-  }
-
   public static @Nonnull Charset detectCharset(byte[] bytes) {
     CharsetDetector detector = new CharsetDetector();
     detector.setText(bytes);

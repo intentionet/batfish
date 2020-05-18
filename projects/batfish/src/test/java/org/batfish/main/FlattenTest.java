@@ -1,7 +1,6 @@
 package org.batfish.main;
 
 import static com.google.common.io.MoreFiles.createParentDirectories;
-import static org.batfish.common.util.CommonUtil.readFile;
 import static org.batfish.common.util.CommonUtil.readResource;
 import static org.batfish.main.Flatten.main;
 import static org.hamcrest.Matchers.equalTo;
@@ -11,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.apache.commons.io.FileUtils;
 import org.batfish.common.BfConsts;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public final class FlattenTest {
     main(new String[] {inputDir.toString(), outputDir.toString()});
 
     assertThat(
-        readFile(outputFile),
+        FileUtils.readFileToString(outputFile.toFile(), StandardCharsets.UTF_8),
         equalTo(readResource(String.format("%s/%s", TESTCONFIGS_PATH, outputFilename))));
   }
 

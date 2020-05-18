@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.ParametersAreNonnullByDefault;
+import org.apache.commons.io.FileUtils;
 import org.batfish.common.BfConsts;
 import org.batfish.common.util.CommonUtil;
 import org.junit.Rule;
@@ -52,7 +53,7 @@ public final class PreprocessJuniperTest {
     main(new String[] {inputDir.toString(), outputDir.toString()});
 
     assertThat(
-        CommonUtil.readFile(outputFile).trim(),
+        FileUtils.readFileToString(outputFile.toFile(), StandardCharsets.UTF_8).trim(),
         equalTo(CommonUtil.readResource(String.format("%s%s", prefix, after)).trim()));
   }
 
