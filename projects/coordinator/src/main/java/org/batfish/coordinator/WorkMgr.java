@@ -34,6 +34,8 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.util.GlobalTracer;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +46,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -203,6 +206,24 @@ public class WorkMgr extends AbstractCoordinator {
       throw new BatfishException("Error listing directory '" + directory + "'", e);
     }
     return entries;
+  }
+
+  private static Path createTempDirectory(String prefix, FileAttribute<?>... attrs) {
+    try {
+      Path tempDir = Files.createTempDirectory(prefix, attrs);
+      tempDir.toFile().deleteOnExit();
+      return tempDir;
+    } catch (IOException e) {
+      throw new BatfishException("Failed to create temporary directory", e);
+    }
+  }
+
+  private static void deleteDirectory(Path path) {
+    try {
+      FileUtils.deleteDirectory(path.toFile());
+    } catch (IOException | NullPointerException e) {
+      throw new BatfishException("Could not delete directory: " + path, e);
+    }
   }
 
   static final class AssignWorkTask implements Runnable {
@@ -1714,7 +1735,7 @@ public class WorkMgr extends AbstractCoordinator {
 
     // Copy baseSnapshot so initSnapshot will see a properly formatted upload
     Path newSnapshotInputsDir =
-        CommonUtil.createTempDirectory("files_to_add").resolve(Paths.get(BfConsts.RELPATH_INPUT));
+        createTempDirectory("files_to_add").resolve(Paths.get(BfConsts.RELPATH_INPUT));
     if (!newSnapshotInputsDir.toFile().mkdirs()) {
       throw new BatfishException("Failed to create directory: '" + newSnapshotInputsDir + "'");
     }
@@ -1734,7 +1755,7 @@ public class WorkMgr extends AbstractCoordinator {
     }
     // Write user-specified files to the forked snapshot input dir, overwriting existing ones
     if (forkSnapshotBean.zipFile != null) {
-      Path unzipDir = CommonUtil.createTempDirectory("upload");
+      Path unzipDir = createTempDirectory("upload");
       UnzipUtility.unzip(new ByteArrayInputStream(forkSnapshotBean.zipFile), unzipDir);
 
       // Preserve proper snapshot dir formatting (single top-level dir), so copy new files directly
@@ -1829,18 +1850,18 @@ public class WorkMgr extends AbstractCoordinator {
   @VisibleForTesting
   @Nonnull
   static List<NodeInterfacePair> deserializeAndDeleteInterfaceBlacklist(Path blacklistPath) {
-    if (!blacklistPath.toFile().exists()) {
+    File blacklistFile = blacklistPath.toFile();
+    if (!blacklistFile.exists()) {
       return ImmutableList.of();
     }
-    try {
+    try (FileInputStream in = new FileInputStream(blacklistFile)) {
       return BatfishObjectMapper.mapper()
-          .readValue(
-              CommonUtil.readFile(blacklistPath), new TypeReference<List<NodeInterfacePair>>() {});
+          .readValue(in, new TypeReference<List<NodeInterfacePair>>() {});
     } catch (IOException e) {
       // Blacklist could not be deserialized as List<NodeInterfacePair>
       return ImmutableList.of();
     } finally {
-      CommonUtil.delete(blacklistPath);
+      FileUtils.deleteQuietly(blacklistFile);
     }
   }
 
@@ -2297,7 +2318,7 @@ public class WorkMgr extends AbstractCoordinator {
       throw new UncheckedIOException(e);
     }
 
-    Path unzipDir = CommonUtil.createTempDirectory("tr");
+    Path unzipDir = createTempDirectory("tr");
     try (InputStream zipStream = _storage.loadUploadSnapshotZip(uploadZipKey, networkId)) {
       UnzipUtility.unzip(zipStream, unzipDir);
     } catch (IOException e) {
@@ -2310,7 +2331,7 @@ public class WorkMgr extends AbstractCoordinator {
       throw new BatfishException(
           String.format("Error initializing snapshot: %s", e.getMessage()), e);
     } finally {
-      CommonUtil.deleteDirectory(unzipDir);
+      deleteDirectory(unzipDir);
     }
   }
 

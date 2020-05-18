@@ -14,9 +14,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
@@ -34,7 +32,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.ClientBuilder;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BfConsts;
@@ -187,54 +184,6 @@ public class CommonUtil {
       throw new BatfishException("Error creating HTTP client builder", e);
     }
     return clientBuilder;
-  }
-
-  public static Path createTempDirectory(String prefix, FileAttribute<?>... attrs) {
-    try {
-      Path tempDir = Files.createTempDirectory(prefix, attrs);
-      tempDir.toFile().deleteOnExit();
-      return tempDir;
-    } catch (IOException e) {
-      throw new BatfishException("Failed to create temporary directory", e);
-    }
-  }
-
-  public static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attributes) {
-    try {
-      Path tempFile = Files.createTempFile(prefix, suffix, attributes);
-      tempFile.toFile().deleteOnExit();
-      return tempFile;
-    } catch (IOException e) {
-      throw new BatfishException("Failed to create temporary file", e);
-    }
-  }
-
-  public static void delete(Path path) {
-    try {
-      Files.delete(path);
-    } catch (NoSuchFileException e) {
-      throw new BatfishException("Cannot delete non-existent file: '" + path + "'", e);
-    } catch (IOException e) {
-      throw new BatfishException("Failed to delete file: " + path, e);
-    }
-  }
-
-  public static void deleteDirectory(Path path) {
-    try {
-      FileUtils.deleteDirectory(path.toFile());
-    } catch (IOException | NullPointerException e) {
-      throw new BatfishException("Could not delete directory: " + path, e);
-    }
-  }
-
-  public static void deleteIfExists(Path path) {
-    try {
-      Files.delete(path);
-    } catch (NoSuchFileException e) {
-      return;
-    } catch (IOException e) {
-      throw new BatfishException("Failed to delete file: " + path, e);
-    }
   }
 
   public static <T> void forEachWithIndex(Iterable<T> ts, BiConsumer<Integer, T> biConsumer) {

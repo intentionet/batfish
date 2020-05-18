@@ -447,7 +447,7 @@ public final class WorkMgrTest {
     TemporaryFolder tmp = new TemporaryFolder();
     tmp.create();
     Path blacklistPath = tmp.newFile().toPath();
-    CommonUtil.delete(blacklistPath);
+    Files.deleteIfExists(blacklistPath);
     assertThat(deserializeAndDeleteInterfaceBlacklist(blacklistPath), empty());
   }
 
@@ -498,7 +498,7 @@ public final class WorkMgrTest {
     {
       tmp.create();
       Path runtimeDataPath = tmp.newFile().toPath();
-      CommonUtil.delete(runtimeDataPath);
+      Files.deleteIfExists(runtimeDataPath);
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(), ImmutableSet.of());
       assertFalse(runtimeDataPath.toFile().exists());
     }

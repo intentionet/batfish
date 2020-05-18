@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -56,6 +57,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MediaType;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -784,6 +786,16 @@ public class Client extends AbstractClient implements IClient {
     this(new Settings(args));
   }
 
+  private static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attributes) {
+    try {
+      Path tempFile = Files.createTempFile(prefix, suffix, attributes);
+      tempFile.toFile().deleteOnExit();
+      return tempFile;
+    } catch (IOException e) {
+      throw new BatfishException("Failed to create temporary file", e);
+    }
+  }
+
   private boolean addBatfishOption(String[] words, List<String> options, List<String> parameters) {
     if (!isValidArgument(
         options, parameters, 0, 1, Integer.MAX_VALUE, Command.ADD_BATFISH_OPTION)) {
@@ -844,21 +856,19 @@ public class Client extends AbstractClient implements IClient {
       _logger.output(DIFF_NOT_READY_MSG);
       return false;
     }
-    Path questionFile = createTempFile(BfConsts.RELPATH_QUESTION_FILE, modifiedQuestionStr);
+    Path questionFile =
+        createTempFile(BfConsts.RELPATH_QUESTION_FILE, modifiedQuestionStr).toAbsolutePath();
     questionFile.toFile().deleteOnExit();
     // upload the question
     boolean resultUpload =
         _workHelper.uploadQuestion(
-            _currContainerName,
-            _currTestrig,
-            questionName,
-            questionFile.toAbsolutePath().toString());
+            _currContainerName, _currTestrig, questionName, questionFile.toString());
     if (!resultUpload) {
       return false;
     }
     _logger.debug("Uploaded question. Answering now.\n");
     // delete the temporary params file
-    CommonUtil.deleteIfExists(questionFile);
+    FileUtils.deleteQuietly(questionFile.toFile());
     // answer the question
     WorkItem wItemAs =
         WorkItemBuilder.getWorkItemAnswerQuestion(
@@ -963,9 +973,8 @@ public class Client extends AbstractClient implements IClient {
     }
     // if no exception is thrown, then the modifiedQuestionJson is good
     Path questionFile = createTempFile("question", modifiedQuestionJson);
-    questionFile.toFile().deleteOnExit();
     boolean result = answerFile(questionFile, modifiedQuestion.getDifferential(), outWriter);
-    CommonUtil.deleteIfExists(questionFile);
+    FileUtils.deleteQuietly(questionFile.toFile());
     return result;
   }
 
@@ -2169,7 +2178,7 @@ public class Client extends AbstractClient implements IClient {
 
     // Delete any existing testout filename before running this test.
     Path failedTestoutPath = Paths.get(testFileName);
-    CommonUtil.deleteIfExists(failedTestoutPath);
+    Files.deleteIfExists(failedTestoutPath);
 
     File testoutFile = Files.createTempFile("test", "out").toFile();
     testoutFile.deleteOnExit();
@@ -2257,17 +2266,15 @@ public class Client extends AbstractClient implements IClient {
     Path uploadTarget = initialUploadTarget;
     boolean createZip = Files.isDirectory(initialUploadTarget);
     if (createZip) {
-      uploadTarget = CommonUtil.createTempFile("testrig", "zip");
+      uploadTarget = createTempFile("testrig", "zip");
       ZipUtility.zipFiles(initialUploadTarget.toAbsolutePath(), uploadTarget.toAbsolutePath());
     }
     try {
-      boolean result =
-          _workHelper.uploadSnapshot(
-              _currContainerName, testrigName, uploadTarget.toString(), autoAnalyze);
-      return result;
+      return _workHelper.uploadSnapshot(
+          _currContainerName, testrigName, uploadTarget.toString(), autoAnalyze);
     } finally {
       if (createZip) {
-        CommonUtil.delete(uploadTarget);
+        FileUtils.deleteQuietly(uploadTarget.toAbsolutePath().toFile());
       }
     }
   }
