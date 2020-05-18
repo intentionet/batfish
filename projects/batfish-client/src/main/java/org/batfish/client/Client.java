@@ -75,7 +75,6 @@ import org.batfish.common.plugin.AbstractClient;
 import org.batfish.common.plugin.IClient;
 import org.batfish.common.util.Backoff;
 import org.batfish.common.util.BatfishObjectMapper;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.common.util.WorkItemBuilder;
 import org.batfish.common.util.ZipUtility;
 import org.batfish.datamodel.IntegerSpace;
@@ -1388,8 +1387,8 @@ public class Client extends AbstractClient implements IClient {
    * @return question loaded as a {@link JSONObject}
    * @throws BatfishException if question does not have instanceName or question cannot be parsed
    */
-  static JSONObject loadQuestionFromFile(Path questionFile) {
-    String questionText = CommonUtil.readFile(questionFile);
+  static JSONObject loadQuestionFromFile(Path questionFile) throws IOException {
+    String questionText = FileUtils.readFileToString(questionFile.toFile(), UTF_8);
     return loadQuestionFromText(questionText, questionFile.toString());
   }
 
@@ -2187,7 +2186,7 @@ public class Client extends AbstractClient implements IClient {
       testCommandSucceeded = processCommand(testCommand, testoutWriter);
     }
 
-    String testOutput = CommonUtil.readFile(Paths.get(testoutFile.getAbsolutePath()));
+    String testOutput = FileUtils.readFileToString(testoutFile, UTF_8);
 
     boolean testPassed = false;
     String patch = "";
@@ -2222,7 +2221,9 @@ public class Client extends AbstractClient implements IClient {
         }
 
         String referenceOutput =
-            missingReferenceFile ? "" : CommonUtil.readFile(Paths.get(referenceFileName));
+            missingReferenceFile
+                ? ""
+                : FileUtils.readFileToString(new File(referenceFileName), UTF_8);
 
         patch = getPatch(referenceOutput, testOutput, referenceFileName, testFileName);
         if (patch.isEmpty()) {

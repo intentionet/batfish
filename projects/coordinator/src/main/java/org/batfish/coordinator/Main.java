@@ -14,6 +14,7 @@ import io.opentracing.contrib.jaxrs2.server.ServerTracingDynamicFeature;
 import io.opentracing.util.GlobalTracer;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.UriBuilder;
+import org.apache.commons.io.FileUtils;
 import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
@@ -116,7 +118,7 @@ public class Main {
   @VisibleForTesting
   static String readQuestionTemplate(Path file, Map<String, String> templates)
       throws JSONException, IOException {
-    String questionText = CommonUtil.readFile(file);
+    String questionText = FileUtils.readFileToString(file.toFile(), StandardCharsets.UTF_8);
     JSONObject questionObj = new JSONObject(questionText);
     if (questionObj.has(BfConsts.PROP_INSTANCE) && !questionObj.isNull(BfConsts.PROP_INSTANCE)) {
       JSONObject instanceDataObj = questionObj.getJSONObject(BfConsts.PROP_INSTANCE);

@@ -1581,8 +1581,7 @@ public class WorkMgr extends AbstractCoordinator {
           referenceLibraryData = true;
           try {
             ReferenceLibrary testrigData =
-                BatfishObjectMapper.mapper()
-                    .readValue(CommonUtil.readFile(subFile), ReferenceLibrary.class);
+                BatfishObjectMapper.mapper().readValue(subFile.toFile(), ReferenceLibrary.class);
             ReferenceLibrary mergedLibrary =
                 getReferenceLibrary(networkName)
                     .mergeReferenceBooks(testrigData.getReferenceBooks());
@@ -1821,7 +1820,7 @@ public class WorkMgr extends AbstractCoordinator {
         runtimeData =
             firstNonNull(
                 BatfishObjectMapper.mapper()
-                    .readValue(CommonUtil.readFile(runtimeDataPath), SnapshotRuntimeData.class),
+                    .readValue(runtimeDataPath.toFile(), SnapshotRuntimeData.class),
                 SnapshotRuntimeData.EMPTY_SNAPSHOT_RUNTIME_DATA);
       } catch (IOException e) {
         // fine, existing runtime data is unreadable. Don't care, replace it. TODO warn?
@@ -1876,8 +1875,7 @@ public class WorkMgr extends AbstractCoordinator {
 
     List<T> baseList;
     if (serializedObjectPath.toFile().exists()) {
-      baseList =
-          BatfishObjectMapper.mapper().readValue(CommonUtil.readFile(serializedObjectPath), type);
+      baseList = BatfishObjectMapper.mapper().readValue(serializedObjectPath.toFile(), type);
       baseList.addAll(addition);
     } else {
       baseList = ImmutableList.copyOf(addition);
@@ -1899,8 +1897,7 @@ public class WorkMgr extends AbstractCoordinator {
 
     List<T> baseList;
     if (serializedObjectPath.toFile().exists()) {
-      baseList =
-          BatfishObjectMapper.mapper().readValue(CommonUtil.readFile(serializedObjectPath), type);
+      baseList = BatfishObjectMapper.mapper().readValue(serializedObjectPath.toFile(), type);
     } else {
       throw new IllegalArgumentException("Cannot remove element(s) from non-existent blacklist.");
     }

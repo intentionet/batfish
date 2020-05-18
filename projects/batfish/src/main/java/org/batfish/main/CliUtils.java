@@ -1,16 +1,17 @@
 package org.batfish.main;
 
-import static org.batfish.common.util.CommonUtil.readFile;
-
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Ordering;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.SortedMap;
 import java.util.stream.Stream;
+import org.apache.commons.io.FileUtils;
 import org.batfish.common.BatfishLogger;
 
 /** Utility functions for internal CLI tools */
@@ -35,7 +36,14 @@ final class CliUtils {
           .map(
               path -> {
                 logger.debugf("Reading: \"%s\"\n", path);
-                String fileText = readFile(path.toAbsolutePath());
+                String fileText = null;
+                try {
+                  fileText =
+                      FileUtils.readFileToString(
+                          path.toAbsolutePath().toFile(), StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                  throw new UncheckedIOException(e);
+                }
                 if (!fileText.isEmpty()) {
                   // Adding a trailing newline helps EOF in some parsers.
                   fileText += '\n';
