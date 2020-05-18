@@ -2245,7 +2245,7 @@ public class Client extends AbstractClient implements IClient {
         testPassed ? "Pass" : "Fail",
         testPassed ? "" : patch + "\n");
     if (!testPassed) {
-      CommonUtil.writeFile(failedTestoutPath, testOutput);
+      Files.write(failedTestoutPath, testOutput.getBytes(UTF_8));
       _logger.outputf("Copied output to %s\n", failedTestoutPath);
     }
     return testPassed;

@@ -1834,8 +1834,8 @@ public class WorkMgr extends AbstractCoordinator {
             .setInterfacesLineUp(restoreIfaces)
             .build();
     try {
-      CommonUtil.writeFile(runtimeDataPath, BatfishObjectMapper.writeString(updatedRuntimeData));
-    } catch (JsonProcessingException e) {
+      BatfishObjectMapper.writer().writeValue(runtimeDataPath.toFile(), updatedRuntimeData);
+    } catch (IOException e) {
       // TODO Warn here?
     }
   }
@@ -1882,7 +1882,7 @@ public class WorkMgr extends AbstractCoordinator {
     } else {
       baseList = ImmutableList.copyOf(addition);
     }
-    CommonUtil.writeFile(serializedObjectPath, BatfishObjectMapper.writeString(baseList));
+    BatfishObjectMapper.writer().writeValue(serializedObjectPath.toFile(), baseList);
   }
 
   @VisibleForTesting
@@ -1915,7 +1915,7 @@ public class WorkMgr extends AbstractCoordinator {
         missing);
 
     baseList.removeAll(subtraction);
-    CommonUtil.writeFile(serializedObjectPath, BatfishObjectMapper.writeString(baseList));
+    BatfishObjectMapper.writer().writeValue(serializedObjectPath.toFile(), baseList);
   }
 
   List<WorkItem> getAutoWorkQueue(String networkName, String testrigName) {

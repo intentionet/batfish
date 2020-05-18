@@ -1,6 +1,7 @@
 package org.batfish.main;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.batfish.common.Warnings.forLogger;
 import static org.batfish.main.CliUtils.readAllFiles;
 
@@ -16,7 +17,6 @@ import java.util.TreeMap;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
 import org.batfish.common.Warnings;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.config.Settings;
 import org.batfish.datamodel.answers.FlattenVendorConfigurationAnswerElement;
 import org.batfish.job.BatfishJobExecutor;
@@ -77,9 +77,8 @@ public final class Flatten {
     for (Entry<Path, String> e : outputConfigurationData.entrySet()) {
       Path outputFile = e.getKey();
       String flatConfigText = e.getValue();
-      String outputFileAsString = outputFile.toString();
-      logger.debugf("Writing config to \"%s\"...", outputFileAsString);
-      CommonUtil.writeFile(outputFile, flatConfigText);
+      logger.debugf("Writing config to \"%s\"...", outputFile);
+      Files.write(outputFile, flatConfigText.getBytes(UTF_8));
       logger.debug("OK\n");
     }
   }

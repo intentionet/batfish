@@ -6,6 +6,8 @@ import static org.batfish.common.Warnings.forLogger;
 import static org.batfish.main.CliUtils.readAllFiles;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -17,7 +19,6 @@ import javax.annotation.Nonnull;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
 import org.batfish.common.Warnings;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.config.Settings;
 import org.batfish.job.BatfishJobExecutor;
 import org.batfish.job.PreprocessJuniperJob;
@@ -84,7 +85,7 @@ public final class PreprocessJuniper {
       String preprocessedConfigText = e.getValue();
       String outputFileAsString = outputFile.toString();
       logger.debugf("Writing config to \"%s\"...", outputFileAsString);
-      CommonUtil.writeFile(outputFile, preprocessedConfigText);
+      Files.write(outputFile, preprocessedConfigText.getBytes(StandardCharsets.UTF_8));
       logger.debug("OK\n");
     }
   }
