@@ -11,11 +11,12 @@ import static org.junit.Assert.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import org.batfish.common.BatfishLogger;
-import org.batfish.common.util.CommonUtil;
 import org.codehaus.jettison.json.JSONObject;
 import org.hamcrest.collection.IsMapContaining;
 import org.junit.Rule;
@@ -46,7 +47,7 @@ public class MainTest {
             .put("instanceName", DUPLICATE_TEMPLATE_NAME)
             .put("description", "test question description"));
     Path questionJsonPath = _folder.newFile("testquestion.json").toPath();
-    CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
+    Files.write(questionJsonPath, testQuestion.toString().getBytes(StandardCharsets.UTF_8));
 
     readQuestionTemplate(questionJsonPath, questionTemplates);
 
@@ -71,7 +72,7 @@ public class MainTest {
             .put("instanceName", DUPLICATE_TEMPLATE_NAME.toUpperCase())
             .put("description", "test question description"));
     Path questionJsonPath = _folder.newFile("testquestion.json").toPath();
-    CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
+    Files.write(questionJsonPath, testQuestion.toString().getBytes(StandardCharsets.UTF_8));
 
     readQuestionTemplate(questionJsonPath, questionTemplates);
 
@@ -97,7 +98,7 @@ public class MainTest {
             .put("instanceName", NEW_TEMPLATE_NAME)
             .put("description", "test question description"));
     Path questionJsonPath = _folder.newFile("testquestion.json").toPath();
-    CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
+    Files.write(questionJsonPath, testQuestion.toString().getBytes(StandardCharsets.UTF_8));
 
     readQuestionTemplate(questionJsonPath, questionTemplates);
 
@@ -121,7 +122,7 @@ public class MainTest {
             .put("instanceName", "testQuestion1")
             .put("description", "test question one description"));
     Path question1JsonPath = _folder.newFile("testquestion1.json").toPath();
-    CommonUtil.writeFile(question1JsonPath, testQuestion1.toString());
+    Files.write(question1JsonPath, testQuestion1.toString().getBytes(StandardCharsets.UTF_8));
 
     JSONObject testQuestion2 = new JSONObject();
     testQuestion2.put(
@@ -131,7 +132,7 @@ public class MainTest {
             .put("description", "test question two description"));
     File nestedFolder = _folder.newFolder("nestedFolder");
     Path question2JsonPath = nestedFolder.toPath().resolve("testquestions2.json");
-    CommonUtil.writeFile(question2JsonPath, testQuestion2.toString());
+    Files.write(question2JsonPath, testQuestion2.toString().getBytes(StandardCharsets.UTF_8));
 
     Map<String, String> questionTemplates = Maps.newHashMap();
 
@@ -158,7 +159,7 @@ public class MainTest {
             .put("instanceName", "testQuestion")
             .put("description", "test question description"));
     Path questionJsonPath = _folder.newFile("testquestion.json").toPath();
-    CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
+    Files.write(questionJsonPath, testQuestion.toString().getBytes(StandardCharsets.UTF_8));
 
     Main.mainInit(new String[0]);
     Main.setLogger(new BatfishLogger("debug", false));

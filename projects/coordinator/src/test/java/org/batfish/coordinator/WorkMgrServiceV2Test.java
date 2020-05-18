@@ -16,6 +16,9 @@ import static org.junit.Assert.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +31,6 @@ import org.batfish.common.BfConsts;
 import org.batfish.common.Container;
 import org.batfish.common.CoordConsts;
 import org.batfish.common.CoordConstsV2;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.coordinator.authorizer.Authorizer;
 import org.batfish.datamodel.questions.TestQuestion;
 import org.batfish.version.BatfishVersion;
@@ -105,7 +107,7 @@ public class WorkMgrServiceV2Test extends WorkMgrServiceV2TestBase {
   }
 
   @Test
-  public void testGetQuestionTemplatesConfigured() {
+  public void testGetQuestionTemplatesConfigured() throws IOException {
     String templateName = "template1";
     String templateText = writeTemplateFile(templateName);
     try (Response response =
@@ -121,7 +123,7 @@ public class WorkMgrServiceV2Test extends WorkMgrServiceV2TestBase {
     }
   }
 
-  private @Nonnull String writeTemplateFile(String templateName) {
+  private @Nonnull String writeTemplateFile(String templateName) throws IOException {
     Path questionTemplateDir = _folder.getRoot().toPath().resolve("templates");
     String templateText =
         String.format(
@@ -129,13 +131,13 @@ public class WorkMgrServiceV2Test extends WorkMgrServiceV2TestBase {
             TestQuestion.class, BfConsts.PROP_INSTANCE, BfConsts.PROP_INSTANCE_NAME, templateName);
     Path questionTemplateFile = questionTemplateDir.resolve(templateName + ".json");
     questionTemplateDir.toFile().mkdirs();
-    CommonUtil.writeFile(questionTemplateFile, templateText);
+    Files.write(questionTemplateFile, templateText.getBytes(StandardCharsets.UTF_8));
     Main.getSettings().setQuestionTemplateDirs(ImmutableList.of(questionTemplateDir));
     return templateText;
   }
 
   @Test
-  public void testGetQuestionTemplatesConfiguredVerbose() {
+  public void testGetQuestionTemplatesConfiguredVerbose() throws IOException {
     String templateName = "template1";
     String hiddenTemplateName = "__template2";
     String templateText = writeTemplateFile(templateName);

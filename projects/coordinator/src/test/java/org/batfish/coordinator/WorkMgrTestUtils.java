@@ -8,6 +8,8 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
@@ -17,7 +19,6 @@ import javax.annotation.Nullable;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
 import org.batfish.common.util.BatfishObjectMapper;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.common.util.ZipUtility;
 import org.batfish.coordinator.id.IdManager;
 import org.batfish.coordinator.id.StorageBasedIdManager;
@@ -122,7 +123,11 @@ public final class WorkMgrTestUtils {
             .resolve(BfConsts.RELPATH_CONFIGURATIONS_DIR)
             .resolve(fileName);
     tmpSnapshotConfig.getParent().toFile().mkdirs();
-    CommonUtil.writeFile(tmpSnapshotConfig, content);
+    try {
+      Files.write(tmpSnapshotConfig, content.getBytes(StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
     return tmpSnapshotSrcDir;
   }
 

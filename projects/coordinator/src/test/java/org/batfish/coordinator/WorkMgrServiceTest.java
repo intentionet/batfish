@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +35,6 @@ import org.batfish.common.Container;
 import org.batfish.common.CoordConsts;
 import org.batfish.common.WorkItem;
 import org.batfish.common.util.BatfishObjectMapper;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.coordinator.authorizer.Authorizer;
 import org.batfish.coordinator.config.Settings;
 import org.batfish.coordinator.id.IdManager;
@@ -282,8 +282,9 @@ public class WorkMgrServiceTest {
     ObjectMapper mapper = BatfishObjectMapper.mapper();
     // serializing the question in the temp questions folder
     String questionJsonString = mapper.writeValueAsString(testQuestion);
-    CommonUtil.writeFile(
-        _questionsTemplatesFolder.newFile("testQuestion.json").toPath(), questionJsonString);
+    Files.write(
+        _questionsTemplatesFolder.newFile("testQuestion.json").toPath(),
+        questionJsonString.getBytes(StandardCharsets.UTF_8));
     JSONArray questionsResponse = _service.getQuestionTemplates(CoordConsts.DEFAULT_API_KEY);
 
     // testting if the response is valid and contains testquestion

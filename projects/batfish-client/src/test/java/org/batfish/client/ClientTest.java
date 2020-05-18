@@ -81,6 +81,8 @@ import com.google.common.collect.Multimap;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -94,7 +96,6 @@ import org.batfish.common.BatfishException;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.BfConsts;
 import org.batfish.common.util.BatfishObjectMapper;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.Protocol;
 import org.batfish.datamodel.answers.Answer;
@@ -749,7 +750,7 @@ public final class ClientTest {
             .put("instanceName", "testQuestionName")
             .put("description", "test question description"));
     Path questionJsonPath = _folder.newFile("testquestion.json").toPath();
-    CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
+    Files.write(questionJsonPath, testQuestion.toString().getBytes(StandardCharsets.UTF_8));
     JSONObject question = Client.loadQuestionFromFile(questionJsonPath);
 
     // checking if actual and loaded JSONs are same
@@ -822,7 +823,7 @@ public final class ClientTest {
             .put("instanceName", "testQuestionName")
             .put("description", "test question description"));
     Path questionJsonPath = _folder.newFile("testquestion.json").toPath();
-    CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
+    Files.write(questionJsonPath, testQuestion.toString().getBytes(StandardCharsets.UTF_8));
     client._logger = new BatfishLogger("output", false);
     client.processCommand(
         new String[] {LOAD_QUESTIONS.commandName(), questionJsonPath.getParent().toString()}, null);
@@ -847,7 +848,7 @@ public final class ClientTest {
             .put("instanceName", "testQuestionName")
             .put("description", "test question description"));
     Path questionJsonPath = _folder.newFile("testquestion.json").toPath();
-    CommonUtil.writeFile(questionJsonPath, testQuestion.toString());
+    Files.write(questionJsonPath, testQuestion.toString().getBytes(StandardCharsets.UTF_8));
     Multimap<String, String> loadedQuestions =
         Client.loadQuestionsFromDir(questionJsonPath.toString(), null);
     Multimap<String, String> expectedMap = HashMultimap.create();

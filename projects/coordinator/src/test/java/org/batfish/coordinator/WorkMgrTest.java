@@ -1,6 +1,5 @@
 package org.batfish.coordinator;
 
-import static org.batfish.common.util.CommonUtil.writeFile;
 import static org.batfish.coordinator.WorkMgr.addToSerializedList;
 import static org.batfish.coordinator.WorkMgr.deserializeAndDeleteInterfaceBlacklist;
 import static org.batfish.coordinator.WorkMgr.generateFileDateString;
@@ -30,7 +29,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -179,7 +177,9 @@ public final class WorkMgrTest {
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
     interfaces.add(baseInterface);
-    writeFile(serializedListPath, BatfishObjectMapper.writePrettyString(interfaces));
+    Files.write(
+        serializedListPath,
+        BatfishObjectMapper.writePrettyString(interfaces).getBytes(StandardCharsets.UTF_8));
 
     addToSerializedList(
         serializedListPath,
@@ -207,7 +207,9 @@ public final class WorkMgrTest {
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
     interfaces.add(baseInterface);
-    writeFile(serializedListPath, BatfishObjectMapper.writePrettyString(interfaces));
+    Files.write(
+        serializedListPath,
+        BatfishObjectMapper.writePrettyString(interfaces).getBytes(StandardCharsets.UTF_8));
 
     addToSerializedList(
         serializedListPath, ImmutableList.of(), new TypeReference<List<NodeInterfacePair>>() {});
@@ -233,7 +235,9 @@ public final class WorkMgrTest {
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
     interfaces.add(baseInterface);
-    writeFile(serializedListPath, BatfishObjectMapper.writePrettyString(interfaces));
+    Files.write(
+        serializedListPath,
+        BatfishObjectMapper.writePrettyString(interfaces).getBytes(StandardCharsets.UTF_8));
 
     addToSerializedList(serializedListPath, null, new TypeReference<List<NodeInterfacePair>>() {});
 
@@ -300,7 +304,9 @@ public final class WorkMgrTest {
     List<NodeInterfacePair> interfaces = new ArrayList<>();
     interfaces.add(baseInterface1);
     interfaces.add(baseInterface2);
-    writeFile(serializedListPath, BatfishObjectMapper.writePrettyString(interfaces));
+    Files.write(
+        serializedListPath,
+        BatfishObjectMapper.writePrettyString(interfaces).getBytes(StandardCharsets.UTF_8));
 
     removeFromSerializedList(
         serializedListPath,
@@ -332,7 +338,9 @@ public final class WorkMgrTest {
     List<NodeInterfacePair> interfaces = new ArrayList<>();
     interfaces.add(baseInterface1);
     interfaces.add(baseInterface2);
-    writeFile(serializedListPath, BatfishObjectMapper.writePrettyString(interfaces));
+    Files.write(
+        serializedListPath,
+        BatfishObjectMapper.writePrettyString(interfaces).getBytes(StandardCharsets.UTF_8));
 
     // Removing non-existent element should throw
     _thrown.expect(IllegalArgumentException.class);
@@ -374,7 +382,9 @@ public final class WorkMgrTest {
 
     // Write empty base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
-    writeFile(serializedListPath, BatfishObjectMapper.writePrettyString(interfaces));
+    Files.write(
+        serializedListPath,
+        BatfishObjectMapper.writePrettyString(interfaces).getBytes(StandardCharsets.UTF_8));
 
     removeFromSerializedList(
         serializedListPath, ImmutableList.of(), new TypeReference<List<NodeInterfacePair>>() {});
@@ -416,7 +426,9 @@ public final class WorkMgrTest {
     // Write base serialized list
     List<NodeInterfacePair> interfaces = new ArrayList<>();
     interfaces.add(baseInterface1);
-    writeFile(serializedListPath, BatfishObjectMapper.writePrettyString(interfaces));
+    Files.write(
+        serializedListPath,
+        BatfishObjectMapper.writePrettyString(interfaces).getBytes(StandardCharsets.UTF_8));
 
     removeFromSerializedList(
         serializedListPath, ImmutableList.of(), new TypeReference<List<NodeInterfacePair>>() {});
@@ -470,7 +482,10 @@ public final class WorkMgrTest {
     NodeInterfacePair nip = NodeInterfacePair.of("n1", "i1");
     File blacklistFile = tmp.newFile();
     Path blacklistPath = blacklistFile.toPath();
-    writeFile(blacklistPath, BatfishObjectMapper.writePrettyString(ImmutableList.of(nip)));
+    Files.write(
+        blacklistPath,
+        BatfishObjectMapper.writePrettyString(ImmutableList.of(nip))
+            .getBytes(StandardCharsets.UTF_8));
     assertThat(deserializeAndDeleteInterfaceBlacklist(blacklistPath), contains(nip));
     assertFalse(blacklistFile.exists());
   }
@@ -482,7 +497,7 @@ public final class WorkMgrTest {
     tmp.create();
     File blacklistFile = tmp.newFile();
     Path blacklistPath = blacklistFile.toPath();
-    writeFile(blacklistPath, "invalid json");
+    Files.write(blacklistPath, "invalid json".getBytes(StandardCharsets.UTF_8));
     assertThat(deserializeAndDeleteInterfaceBlacklist(blacklistPath), empty());
     assertFalse(blacklistFile.exists());
   }
@@ -518,7 +533,7 @@ public final class WorkMgrTest {
     {
       tmp.create();
       Path runtimeDataPath = tmp.newFile().toPath();
-      CommonUtil.writeFile(runtimeDataPath, "invalid json");
+      Files.write(runtimeDataPath, "invalid json".getBytes(StandardCharsets.UTF_8));
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of());
       assertThat(
           BatfishObjectMapper.mapper()
@@ -530,9 +545,10 @@ public final class WorkMgrTest {
     {
       tmp.create();
       Path runtimeDataPath = tmp.newFile().toPath();
-      CommonUtil.writeFile(
+      Files.write(
           runtimeDataPath,
-          BatfishObjectMapper.writePrettyString(SnapshotRuntimeData.EMPTY_SNAPSHOT_RUNTIME_DATA));
+          BatfishObjectMapper.writePrettyString(SnapshotRuntimeData.EMPTY_SNAPSHOT_RUNTIME_DATA)
+              .getBytes(StandardCharsets.UTF_8));
 
       // nip1 line down, nip2 line up
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of(nip2));
@@ -557,7 +573,9 @@ public final class WorkMgrTest {
               .setInterfacesLineUp(nip1)
               .setInterfacesLineDown(nip2, nip3)
               .build();
-      CommonUtil.writeFile(runtimeDataPath, BatfishObjectMapper.writePrettyString(existingData));
+      Files.write(
+          runtimeDataPath,
+          BatfishObjectMapper.writePrettyString(existingData).getBytes(StandardCharsets.UTF_8));
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of(nip2));
       assertThat(
           BatfishObjectMapper.mapper()
@@ -573,9 +591,10 @@ public final class WorkMgrTest {
     {
       tmp.create();
       Path runtimeDataPath = tmp.newFile().toPath();
-      CommonUtil.writeFile(
+      Files.write(
           runtimeDataPath,
-          BatfishObjectMapper.writePrettyString(SnapshotRuntimeData.EMPTY_SNAPSHOT_RUNTIME_DATA));
+          BatfishObjectMapper.writePrettyString(SnapshotRuntimeData.EMPTY_SNAPSHOT_RUNTIME_DATA)
+              .getBytes(StandardCharsets.UTF_8));
       updateRuntimeData(runtimeDataPath, ImmutableSet.of(nip1), ImmutableSet.of(nip1));
       assertThat(
           BatfishObjectMapper.mapper()
@@ -958,9 +977,9 @@ public final class WorkMgrTest {
     String baseSnapshotName = "snapshotName";
     Path srcDir = createSnapshot(baseSnapshotName, "file.type", "! empty config", _folder);
     Path snapshotDir = srcDir.resolve(baseSnapshotName);
-    CommonUtil.writeFile(
+    Files.write(
         snapshotDir.resolve(BfConsts.RELPATH_RUNTIME_DATA_FILE),
-        BatfishObjectMapper.writePrettyString(runtimeData));
+        BatfishObjectMapper.writePrettyString(runtimeData).getBytes(StandardCharsets.UTF_8));
     _manager.initNetwork(networkName, null);
     _manager.initSnapshot(networkName, baseSnapshotName, srcDir, false);
 
@@ -1038,9 +1057,9 @@ public final class WorkMgrTest {
     String baseSnapshotName = "snapshotName";
     Path srcDir = createSnapshot(baseSnapshotName, "file.type", "! empty config", _folder);
     Path snapshotDir = srcDir.resolve(baseSnapshotName);
-    CommonUtil.writeFile(
+    Files.write(
         snapshotDir.resolve(BfConsts.RELPATH_INTERFACE_BLACKLIST_FILE),
-        BatfishObjectMapper.writePrettyString(baseBlacklist));
+        BatfishObjectMapper.writePrettyString(baseBlacklist).getBytes(StandardCharsets.UTF_8));
     _manager.initNetwork(networkName, null);
     _manager.initSnapshot(networkName, baseSnapshotName, srcDir, false);
 
@@ -1918,7 +1937,7 @@ public final class WorkMgrTest {
   }
 
   @Test
-  public void testInitSnapshot_interfaceBlacklistAndRuntimeData() throws JsonProcessingException {
+  public void testInitSnapshot_interfaceBlacklistAndRuntimeData() throws IOException {
     /*
     Interface runtime data setup for two devices n1 and n2:
     - i1 is down on both
@@ -1959,12 +1978,12 @@ public final class WorkMgrTest {
     String snapshotName = "snapshotName";
     Path srcDir = createSnapshot(snapshotName, "file.type", "! empty config", _folder);
     Path snapshotDir = srcDir.resolve(snapshotName);
-    CommonUtil.writeFile(
+    Files.write(
         snapshotDir.resolve(BfConsts.RELPATH_RUNTIME_DATA_FILE),
-        BatfishObjectMapper.writePrettyString(runtimeData));
-    CommonUtil.writeFile(
+        BatfishObjectMapper.writePrettyString(runtimeData).getBytes(StandardCharsets.UTF_8));
+    Files.write(
         snapshotDir.resolve(BfConsts.RELPATH_INTERFACE_BLACKLIST_FILE),
-        BatfishObjectMapper.writePrettyString(blacklist));
+        BatfishObjectMapper.writePrettyString(blacklist).getBytes(StandardCharsets.UTF_8));
     _manager.initNetwork(networkName, null);
     _manager.initSnapshot(networkName, snapshotName, srcDir, false);
 
@@ -3261,14 +3280,14 @@ public final class WorkMgrTest {
   }
 
   @Test
-  public void testGetSnapshotSubdirInvalid() {
+  public void testGetSnapshotSubdirInvalid() throws IOException {
     Path root = _folder.getRoot().toPath();
     Path s1Path = root.resolve("s1");
     s1Path.toFile().mkdirs();
     Path s2Path = root.resolve("s2");
     s2Path.toFile().mkdirs();
-    CommonUtil.writeFile(s1Path.resolve("file1"), "content");
-    CommonUtil.writeFile(s2Path.resolve("file2"), "content");
+    Files.write(s1Path.resolve("file1"), "content".getBytes(StandardCharsets.UTF_8));
+    Files.write(s2Path.resolve("file2"), "content".getBytes(StandardCharsets.UTF_8));
 
     // invalid because there are two top-level dirs
     _thrown.expect(BatfishException.class);
@@ -3276,14 +3295,14 @@ public final class WorkMgrTest {
   }
 
   @Test
-  public void testGetSnapshotSubdirValid() {
+  public void testGetSnapshotSubdirValid() throws IOException {
     Path root = _folder.getRoot().toPath();
     Path s1Path = root.resolve("s1");
     s1Path.toFile().mkdirs();
     Path s2Path = root.resolve("__MACOSX"); // ignored dir
     s2Path.toFile().mkdirs();
-    CommonUtil.writeFile(s1Path.resolve("file1"), "content");
-    CommonUtil.writeFile(s2Path.resolve("file2"), "content");
+    Files.write(s1Path.resolve("file1"), "content".getBytes(StandardCharsets.UTF_8));
+    Files.write(s2Path.resolve("file2"), "content".getBytes(StandardCharsets.UTF_8));
 
     // extra dir should be ignored, and s1Path should be considered the snapshot subdir
     assertThat(WorkMgr.getSnapshotSubdir(root), equalTo(s1Path));

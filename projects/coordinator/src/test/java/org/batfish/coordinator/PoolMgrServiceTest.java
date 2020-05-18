@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -19,7 +21,6 @@ import org.batfish.common.BfConsts;
 import org.batfish.common.CoordConsts;
 import org.batfish.common.CoordConstsV2;
 import org.batfish.common.util.BatfishObjectMapper;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.datamodel.questions.TestQuestion;
 import org.batfish.version.BatfishVersion;
 import org.glassfish.jersey.client.ClientConfig;
@@ -118,7 +119,7 @@ public final class PoolMgrServiceTest extends JerseyTest {
         .get();
   }
 
-  private @Nonnull String writeTemplateFile(String templateName) {
+  private @Nonnull String writeTemplateFile(String templateName) throws IOException {
     Path questionTemplateDir = _questionsTemplatesFolder.getRoot().toPath().resolve("templates");
     String templateText =
         String.format(
@@ -126,7 +127,7 @@ public final class PoolMgrServiceTest extends JerseyTest {
             TestQuestion.class, BfConsts.PROP_INSTANCE, BfConsts.PROP_INSTANCE_NAME, templateName);
     Path questionTemplateFile = questionTemplateDir.resolve(templateName + ".json");
     questionTemplateDir.toFile().mkdirs();
-    CommonUtil.writeFile(questionTemplateFile, templateText);
+    Files.write(questionTemplateFile, templateText.getBytes(StandardCharsets.UTF_8));
     Main.getSettings().setQuestionTemplateDirs(ImmutableList.of(questionTemplateDir));
     return templateText;
   }

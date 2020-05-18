@@ -5,11 +5,8 @@ import com.ibm.icu.text.CharsetDetector;
 import io.opentracing.contrib.jaxrs2.client.ClientTracingFeature;
 import io.opentracing.util.GlobalTracer;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -292,16 +289,5 @@ public class CommonUtil {
         resourceConfig,
         true,
         new SSLEngineConfigurator(sslCon, false, verifyClient, false));
-  }
-
-  public static void writeFile(Path outputPath, String output) {
-    try (FileOutputStream fs = new FileOutputStream(outputPath.toFile());
-        OutputStreamWriter os = new OutputStreamWriter(fs, StandardCharsets.UTF_8)) {
-      os.write(output);
-    } catch (FileNotFoundException e) {
-      throw new BatfishException("Failed to write file (file not found): " + outputPath, e);
-    } catch (IOException e) {
-      throw new BatfishException("Failed to write file: " + outputPath, e);
-    }
   }
 }

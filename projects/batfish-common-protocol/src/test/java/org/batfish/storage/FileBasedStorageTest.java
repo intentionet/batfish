@@ -47,7 +47,6 @@ import org.batfish.common.autocomplete.NodeCompletionMetadata;
 import org.batfish.common.topology.Layer1Topology;
 import org.batfish.common.topology.Layer2Topology;
 import org.batfish.common.util.BatfishObjectMapper;
-import org.batfish.common.util.CommonUtil;
 import org.batfish.common.util.UnzipUtility;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ConfigurationFormat;
@@ -216,7 +215,7 @@ public final class FileBasedStorageTest {
     Path logFile = getWorkLogPath(_containerDir.getParent(), network, snapshot, workId);
     final boolean mkdirs = logFile.getParent().toFile().mkdirs();
     assertThat(mkdirs, equalTo(true));
-    CommonUtil.writeFile(logFile, "testoutput");
+    Files.write(logFile, "testoutput".getBytes(UTF_8));
 
     // Test: read log using storage API
     assertThat(_storage.loadWorkLog(network, snapshot, workId), equalTo("testoutput"));

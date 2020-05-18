@@ -1,12 +1,13 @@
 package org.batfish.main;
 
 import static com.google.common.io.MoreFiles.createParentDirectories;
-import static org.batfish.common.util.CommonUtil.writeFile;
 import static org.batfish.main.PreprocessJuniper.main;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.BfConsts;
@@ -44,7 +45,10 @@ public final class PreprocessJuniperTest {
     Path inputFile = inputDir.resolve(BfConsts.RELPATH_CONFIGURATIONS_DIR).resolve("conf");
     Path outputFile = outputDir.resolve(BfConsts.RELPATH_CONFIGURATIONS_DIR).resolve("conf");
     createParentDirectories(inputFile);
-    writeFile(inputFile, CommonUtil.readResource(String.format("%s%s", prefix, before)));
+    Files.write(
+        inputFile,
+        CommonUtil.readResource(String.format("%s%s", prefix, before))
+            .getBytes(StandardCharsets.UTF_8));
     main(new String[] {inputDir.toString(), outputDir.toString()});
 
     assertThat(
