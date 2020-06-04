@@ -118,8 +118,12 @@ public class AwsConfiguration extends VendorConfiguration {
     // Vpc peerings can be both cross-region and cross-account, so we handle them here
     processVpcPeerings();
     // Transit gateways can be cross-account so we handle them here
-    TransitGatewayConverter.convertTransitGateways(this, _convertedConfiguration)
-        .forEach(_convertedConfiguration::addNode);
+    try {
+      TransitGatewayConverter.convertTransitGateways(this, _convertedConfiguration)
+          .forEach(_convertedConfiguration::addNode);
+    } catch (Exception e) {
+      getWarnings().redFlag(String.format("Failed to convert transit gateways", e));
+    }
   }
 
   private void processVpcPeerings() {
