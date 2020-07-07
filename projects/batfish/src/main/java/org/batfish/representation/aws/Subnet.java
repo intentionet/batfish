@@ -299,13 +299,13 @@ public class Subnet implements AwsVpcEntity, Serializable {
   @VisibleForTesting
   void addNlbInstanceTargetInterfaces(
       ConvertedConfiguration awsConfiguration, Configuration subnetCfg, Configuration vpcCfg) {
-    Collection<Instance> instanceTargets = awsConfiguration.getSubnetsToInstanceTargets().get(this);
     Collection<LoadBalancer> nlbs = awsConfiguration.getSubnetsToNlbs().get(this);
-    if (instanceTargets.isEmpty() && nlbs.isEmpty()) {
+    if (!awsConfiguration.getSubnetsToInstanceTargets().containsKey(this) && nlbs.isEmpty()) {
       return;
     }
     //  New VRF in subnet and VPC nodes
-    Vrf.builder().setName(NLB_INSTANCE_TARGETS_VRF_NAME).setOwner(subnetCfg).build();
+    Vrf newSubnetVrf =
+        Vrf.builder().setName(NLB_INSTANCE_TARGETS_VRF_NAME).setOwner(subnetCfg).build();
     if (!vpcCfg.getVrfs().containsKey(NLB_INSTANCE_TARGETS_VRF_NAME)) {
       Vrf.builder().setName(NLB_INSTANCE_TARGETS_VRF_NAME).setOwner(vpcCfg).build();
     }
@@ -319,10 +319,11 @@ public class Subnet implements AwsVpcEntity, Serializable {
         NLB_INSTANCE_TARGETS_IFACE_SUFFIX);
 
     // Add firewall session info on new subnet interface to VPC
-    String subnetIfaceName = interfaceNameToRemote(vpcCfg, NLB_INSTANCE_TARGETS_IFACE_SUFFIX);
-    Interface subnetToVpcIface = subnetCfg.getAllInterfaces().get(subnetIfaceName);
+    String subnetToVpcIfaceName = interfaceNameToRemote(vpcCfg, NLB_INSTANCE_TARGETS_IFACE_SUFFIX);
+    Interface subnetToVpcIface = subnetCfg.getAllInterfaces().get(subnetToVpcIfaceName);
     subnetToVpcIface.setFirewallSessionInterfaceInfo(
-        new FirewallSessionInterfaceInfo(false, ImmutableList.of(subnetIfaceName), null, null));
+        new FirewallSessionInterfaceInfo(
+            false, ImmutableList.of(subnetToVpcIfaceName), null, null));
 
     // For each NLB in the subnet: new interface connecting to NLB, no filters
     for (LoadBalancer nlb : nlbs) {
@@ -342,17 +343,44 @@ public class Subnet implements AwsVpcEntity, Serializable {
       nlbIface.setFirewallSessionInterfaceInfo(
           new FirewallSessionInterfaceInfo(false, ImmutableList.of(nlbIfaceName), null, null));
     }
-    // For each instance target in the subnet: New interface connecting to instance, no filters
-    for (Instance instanceTarget : instanceTargets) {
-      Configuration instanceConfig =
-          awsConfiguration.getNode(Instance.instanceHostname(instanceTarget.getId()));
-      Utils.connect(
-          awsConfiguration,
-          subnetCfg,
-          NLB_INSTANCE_TARGETS_VRF_NAME,
-          instanceConfig,
-          instanceConfig.getDefaultVrf().getName(),
-          NLB_INSTANCE_TARGETS_IFACE_SUFFIX);
+
+    // Add static routes in subnet's new VRF and connect subnet to its instance targets
+    for (Entry<Subnet, Instance> e : awsConfiguration.getSubnetsToInstanceTargets().entries()) {
+      Subnet subnet = e.getKey();
+      if (!subnet.getVpcId().equals(_vpcId)) {
+        continue;
+      }
+      Instance instanceTarget = e.getValue();
+      String staticRouteNextHopIface = subnetToVpcIfaceName;
+      if (subnet == this) {
+        // For each instance target in the subnet: New interface connecting to instance, no filters
+        Configuration instanceConfig =
+            awsConfiguration.getNode(Instance.instanceHostname(instanceTarget.getId()));
+        Utils.connect(
+            awsConfiguration,
+            subnetCfg,
+            NLB_INSTANCE_TARGETS_VRF_NAME,
+            instanceConfig,
+            instanceConfig.getDefaultVrf().getName(),
+            NLB_INSTANCE_TARGETS_IFACE_SUFFIX);
+        staticRouteNextHopIface =
+            interfaceNameToRemote(instanceConfig, NLB_INSTANCE_TARGETS_IFACE_SUFFIX);
+      }
+
+      /*
+      Static routes: One per instance target in this subnet's VPC
+         - For instance targets within this subnet, forward out the interface to that instance
+         - For other instance targets, forward out the interface to the VPC
+         - All have next hop IP AwsConfiguration.LINK_LOCAL_IP
+       */
+      // guaranteed during computation of subnets -> instance targets map
+      assert instanceTarget.getPrimaryPrivateIpAddress() != null;
+      Utils.addStaticRoute(
+          newSubnetVrf,
+          toStaticRoute(
+              instanceTarget.getPrimaryPrivateIpAddress().toPrefix(),
+              staticRouteNextHopIface,
+              AwsConfiguration.LINK_LOCAL_IP));
     }
   }
 
