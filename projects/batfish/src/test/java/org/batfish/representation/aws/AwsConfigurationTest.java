@@ -126,12 +126,12 @@ public class AwsConfigurationTest {
 
       c.populatePrecomputedMaps();
       assertThat(
-          c.getSubnetsToInstanceTargets(), equalTo(ImmutableMultimap.of(instanceSubnet, instance)));
+          c.getSubnetsToInstanceTargets(),
+          equalTo(ImmutableMultimap.of(instanceSubnetId, instance)));
       assertThat(
           c.getSubnetsToNlbs(),
-          equalTo(ImmutableMultimap.of(noInstanceSubnet, nlb, instanceSubnet, nlb)));
-      assertThat(c.getNlbsToInstanceTargets(), equalTo(ImmutableMultimap.of(nlb, instance)));
-      assertThat(c.getVpcsWithInstanceTargets(), contains(vpc));
+          equalTo(ImmutableMultimap.of(noInstanceSubnetId, nlb, instanceSubnetId, nlb)));
+      assertThat(c.getNlbsToInstanceTargets(), equalTo(ImmutableMultimap.of(lbArn, instance)));
     }
     {
       // Application load balancer (not supported): Maps should not get populated
@@ -150,7 +150,6 @@ public class AwsConfigurationTest {
       assertTrue(c.getSubnetsToInstanceTargets().isEmpty());
       assertTrue(c.getSubnetsToNlbs().isEmpty());
       assertTrue(c.getNlbsToInstanceTargets().isEmpty());
-      assertTrue(c.getVpcsWithInstanceTargets().isEmpty());
     }
   }
 

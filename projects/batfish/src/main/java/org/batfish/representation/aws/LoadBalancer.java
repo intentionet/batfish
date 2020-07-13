@@ -254,7 +254,7 @@ public final class LoadBalancer implements AwsVpcEntity, Serializable {
 
     // Add static routes to any instance targets
     getInstanceTargetStaticRoutes(
-            awsConfiguration.getNlbsToInstanceTargets().get(this), availabilityZone.getSubnetId())
+            awsConfiguration.getNlbsToInstanceTargets().get(_arn), availabilityZone.getSubnetId())
         .forEach(staticRoute -> Utils.addStaticRoute(cfgNode, staticRoute));
 
     Optional<NetworkInterface> networkInterface =

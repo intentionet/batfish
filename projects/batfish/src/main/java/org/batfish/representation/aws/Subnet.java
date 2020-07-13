@@ -343,8 +343,8 @@ public class Subnet implements AwsVpcEntity, Serializable {
       // These ACLs should be applied to all subnet interfaces that don't face instances
       @Nullable IpAccessList ingressNetworkAcl,
       @Nullable IpAccessList egressNetworkAcl) {
-    Collection<LoadBalancer> nlbs = awsConfiguration.getSubnetsToNlbs().get(this);
-    if (!awsConfiguration.getSubnetsToInstanceTargets().containsKey(this) && nlbs.isEmpty()) {
+    Collection<LoadBalancer> nlbs = awsConfiguration.getSubnetsToNlbs().get(_subnetId);
+    if (!awsConfiguration.getSubnetsToInstanceTargets().containsKey(_subnetId) && nlbs.isEmpty()) {
       return;
     }
     //  New VRF in subnet and VPC nodes
@@ -401,9 +401,9 @@ public class Subnet implements AwsVpcEntity, Serializable {
     }
 
     // Add static routes in subnet's new VRF and connect subnet to its instance targets
-    for (Entry<Subnet, Instance> e : awsConfiguration.getSubnetsToInstanceTargets().entries()) {
-      Subnet subnet = e.getKey();
-      if (!subnet.getVpcId().equals(_vpcId)) {
+    for (Entry<String, Instance> e : awsConfiguration.getSubnetsToInstanceTargets().entries()) {
+      String subnetId = e.getKey();
+      if (!region.getSubnets().get(subnetId).getVpcId().equals(_vpcId)) {
         continue;
       }
       Instance instanceTarget = e.getValue();
@@ -412,7 +412,7 @@ public class Subnet implements AwsVpcEntity, Serializable {
       Prefix instancePrefix = instanceTarget.getPrimaryPrivateIpAddress().toPrefix();
 
       String staticRouteNextHopIface = subnetToVpcIfaceName;
-      if (subnet == this) {
+      if (subnetId.equals(_subnetId)) {
         // For each instance target in the subnet: New interface connecting to instance, no filters
         Configuration instanceConfig =
             awsConfiguration.getNode(Instance.instanceHostname(instanceTarget.getId()));

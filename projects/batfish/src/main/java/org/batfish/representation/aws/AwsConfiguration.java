@@ -99,17 +99,20 @@ public class AwsConfiguration extends VendorConfiguration {
   @Nullable private ConvertedConfiguration _convertedConfiguration;
   @Nonnull private final Map<String, Account> _accounts;
 
-  /** A multimap from Subnet -> Instance targets within subnet */
-  private Multimap<Subnet, Instance> _subnetsToInstanceTargets;
+  /**
+   * Multimap of subnet IDs to {@link Instance} in that subnet used as targets by some {@link
+   * LoadBalancer}
+   */
+  private Multimap<String, Instance> _subnetsToInstanceTargets;
 
-  /** A multimap from Subnet -> NLBs within subnet that have instance targets */
-  private Multimap<Subnet, LoadBalancer> _subnetsToNlbs;
+  /**
+   * Multimap of subnet IDs to {@link LoadBalancer} connected to that subnet that have active
+   * instance targets
+   */
+  private Multimap<String, LoadBalancer> _subnetsToNlbs;
 
-  /** A multimap of NLB -> instance targets */
-  private Multimap<LoadBalancer, Instance> _nlbsToInstanceTargets;
-
-  /** A set of all VPCs that contain load balancers with active instance targets */
-  private Set<Vpc> _vpcsWithInstanceTargets;
+  /** Multimap of load balancer ARNs to {@link Instance} used as targets for that load balancer */
+  private Multimap<String, Instance> _nlbsToInstanceTargets;
 
   public AwsConfiguration() {
     this(new HashMap<>());
@@ -168,19 +171,15 @@ public class AwsConfiguration extends VendorConfiguration {
 
   @VisibleForTesting
   void populatePrecomputedMaps() {
-    // A multimap from Subnet -> Instance targets within subnet
-    ImmutableMultimap.Builder<Subnet, Instance> subnetsToInstanceTargets =
+    // A multimap from subnet ID -> Instance targets within subnet
+    ImmutableMultimap.Builder<String, Instance> subnetsToInstanceTargets =
         ImmutableMultimap.builder();
 
-    // A multimap from Subnet -> NLBs within subnet that have instance targets
-    ImmutableMultimap.Builder<Subnet, LoadBalancer> subnetsToNlbs = ImmutableMultimap.builder();
+    // A multimap from subnet ID -> NLBs within subnet that have instance targets
+    ImmutableMultimap.Builder<String, LoadBalancer> subnetsToNlbs = ImmutableMultimap.builder();
 
-    // A multimap of NLB -> instance targets
-    ImmutableMultimap.Builder<LoadBalancer, Instance> nlbsToInstanceTargets =
-        ImmutableMultimap.builder();
-
-    // A set of VPCs with instance targets
-    ImmutableSet.Builder<Vpc> vpcsWithInstanceTargets = ImmutableSet.builder();
+    // A multimap of load balancer ARN -> instance targets
+    ImmutableMultimap.Builder<String, Instance> nlbsToInstanceTargets = ImmutableMultimap.builder();
 
     for (Account account : getAccounts()) {
       Collection<Region> regions = account.getRegions();
@@ -220,18 +219,16 @@ public class AwsConfiguration extends VendorConfiguration {
                 .map(desc -> region.getInstances().get(desc.getTarget().getId()))
                 .forEach(
                     instance -> {
-                      Subnet subnet = region.getSubnets().get(instance.getSubnetId());
-                      subnetsToInstanceTargets.put(subnet, instance);
-                      nlbsToInstanceTargets.put(lb, instance);
-                      vpcsWithInstanceTargets.add(region.getVpcs().get(instance.getVpcId()));
+                      assert instance.getSubnetId() != null; // guaranteed by getActiveTargets
+                      subnetsToInstanceTargets.put(instance.getSubnetId(), instance);
+                      nlbsToInstanceTargets.put(lbArn, instance);
                       hasInstanceTarget.set(true);
                     });
             if (hasInstanceTarget.get()) {
               lb.getAvailabilityZones().stream()
                   .map(AvailabilityZone::getSubnetId)
-                  .map(region.getSubnets()::get)
-                  .filter(Objects::nonNull)
-                  .forEach(subnet -> subnetsToNlbs.put(subnet, lb));
+                  .filter(region.getSubnets()::containsKey)
+                  .forEach(subnetId -> subnetsToNlbs.put(subnetId, lb));
             }
           }
         }
@@ -240,7 +237,6 @@ public class AwsConfiguration extends VendorConfiguration {
     _subnetsToInstanceTargets = subnetsToInstanceTargets.build();
     _subnetsToNlbs = subnetsToNlbs.build();
     _nlbsToInstanceTargets = nlbsToInstanceTargets.build();
-    _vpcsWithInstanceTargets = vpcsWithInstanceTargets.build();
   }
 
   private void convertConfigurations() {
@@ -414,24 +410,24 @@ public class AwsConfiguration extends VendorConfiguration {
     return BfConsts.RELPATH_AWS_CONFIGS_FILE;
   }
 
+  /** Subnet IDs to {@link Instance} in that subnet used as targets by some {@link LoadBalancer} */
   @VisibleForTesting
-  Multimap<Subnet, Instance> getSubnetsToInstanceTargets() {
+  Multimap<String, Instance> getSubnetsToInstanceTargets() {
     return _subnetsToInstanceTargets;
   }
 
+  /**
+   * Subnet IDs to {@link LoadBalancer} connected to that subnet that have active instance targets
+   */
   @VisibleForTesting
-  Multimap<Subnet, LoadBalancer> getSubnetsToNlbs() {
+  Multimap<String, LoadBalancer> getSubnetsToNlbs() {
     return _subnetsToNlbs;
   }
 
+  /** Load balancer ARNs to {@link Instance} used as targets for that load balancer */
   @VisibleForTesting
-  Multimap<LoadBalancer, Instance> getNlbsToInstanceTargets() {
+  Multimap<String, Instance> getNlbsToInstanceTargets() {
     return _nlbsToInstanceTargets;
-  }
-
-  @VisibleForTesting
-  Set<Vpc> getVpcsWithInstanceTargets() {
-    return _vpcsWithInstanceTargets;
   }
 
   @Override

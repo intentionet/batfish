@@ -978,8 +978,7 @@ public class LoadBalancerTest {
                 new HashSet<>(),
                 ImmutableMultimap.of(),
                 ImmutableMultimap.of(),
-                ImmutableMultimap.of(_loadBalancer, instance),
-                ImmutableSet.of()),
+                ImmutableMultimap.of(_loadBalancerArn, instance)),
             Region.builder("r1").build(),
             new Warnings());
 

@@ -710,15 +710,14 @@ public class SubnetTest {
 
   @Test
   public void testAddNlbInstanceTargetInterfaces_subnetWithLoadBalancer() {
-    // Get subnet and create its VPC
     Subnet subnet = _subnetList.get(0);
-    Vpc vpc = new Vpc(subnet.getVpcId(), ImmutableSet.of(subnet.getCidrBlock()), ImmutableMap.of());
 
     // Create instance target not in subnet
+    String otherSubnetId = "otherSubnetId";
     Subnet otherSubnet =
         new Subnet(
             Prefix.parse("1.1.1.0/24"),
-            "otherSubnetId",
+            otherSubnetId,
             subnet.getVpcId(),
             subnet.getAvailabilityZone(),
             ImmutableMap.of());
@@ -728,7 +727,7 @@ public class SubnetTest {
         new Instance(
             instanceId,
             subnet.getVpcId(),
-            otherSubnet.getId(),
+            otherSubnetId,
             ImmutableList.of(),
             ImmutableList.of(),
             instanceIp,
@@ -770,11 +769,13 @@ public class SubnetTest {
         new ConvertedConfiguration(
             configs,
             new HashSet<>(), // layer 1 edges
-            ImmutableMultimap.of(otherSubnet, instanceInOtherSubnet), // subnets to targets
-            ImmutableMultimap.of(subnet, loadBalancerInSubnet), // subnets to NLBs
-            ImmutableMultimap.of(loadBalancerInSubnet, instanceInOtherSubnet), // NLBs to targets
-            ImmutableSet.of(vpc)); // VPCs with instance targets
-    Region region = new Region("region");
+            ImmutableMultimap.of(otherSubnetId, instanceInOtherSubnet), // subnets to targets
+            ImmutableMultimap.of(subnet.getId(), loadBalancerInSubnet), // subnets to NLBs
+            ImmutableMultimap.of(lbArn, instanceInOtherSubnet)); // NLBs to targets
+    Region region =
+        Region.builder("region")
+            .setSubnets(ImmutableMap.of(subnet.getId(), subnet, otherSubnetId, otherSubnet))
+            .build();
     subnet.addNlbInstanceTargetInterfaces(
         awsConf, region, subnetCfg, vpcCfg, ingressAcl, egressAcl);
 
@@ -856,9 +857,7 @@ public class SubnetTest {
 
   @Test
   public void testAddNlbInstanceTargetInterfaces_subnetWithInstanceTarget() {
-    // Get subnet and create its VPC
     Subnet subnet = _subnetList.get(0);
-    Vpc vpc = new Vpc(subnet.getVpcId(), ImmutableSet.of(subnet.getCidrBlock()), ImmutableMap.of());
 
     // Create instance target in subnet
     String instanceId = "instanceId";
@@ -877,16 +876,6 @@ public class SubnetTest {
     // Create load balancer not in subnet
     String lbArn = "lbArn";
     String lbDnsName = "lbDnsName";
-    AvailabilityZone otherAz = new AvailabilityZone("otherSubnetId", subnet.getAvailabilityZone());
-    LoadBalancer loadBalancerNotInSubnet =
-        new LoadBalancer(
-            lbArn,
-            ImmutableList.of(otherAz),
-            lbDnsName,
-            "name",
-            Scheme.INTERNAL,
-            Type.NETWORK,
-            subnet.getVpcId());
 
     String subnetHostname = Subnet.nodeName(subnet.getId());
     String vpcHostname = Vpc.nodeName(subnet.getVpcId());
@@ -909,11 +898,11 @@ public class SubnetTest {
         new ConvertedConfiguration(
             configs,
             new HashSet<>(), // layer 1 edges
-            ImmutableMultimap.of(subnet, instanceInSubnet), // subnets to targets
+            ImmutableMultimap.of(subnet.getId(), instanceInSubnet), // subnets to targets
             ImmutableMultimap.of(), // subnets to NLBs
-            ImmutableMultimap.of(loadBalancerNotInSubnet, instanceInSubnet), // NLBs to targets
-            ImmutableSet.of(vpc)); // VPCs with instance targets
-    Region region = new Region("region");
+            ImmutableMultimap.of(lbArn, instanceInSubnet)); // NLBs to targets
+    Region region =
+        Region.builder("region").setSubnets(ImmutableMap.of(subnet.getId(), subnet)).build();
     subnet.addNlbInstanceTargetInterfaces(
         awsConf, region, subnetCfg, vpcCfg, ingressAcl, egressAcl);
 
@@ -987,9 +976,7 @@ public class SubnetTest {
 
   @Test
   public void testAddNlbInstanceTargetInterfaces_subnetWithNlbAndInstanceTarget() {
-    // Get subnet and create its VPC
     Subnet subnet = _subnetList.get(0);
-    Vpc vpc = new Vpc(subnet.getVpcId(), ImmutableSet.of(subnet.getCidrBlock()), ImmutableMap.of());
 
     // Create instance target in subnet
     String instanceId = "instanceId";
@@ -1040,11 +1027,11 @@ public class SubnetTest {
         new ConvertedConfiguration(
             configs,
             new HashSet<>(), // layer 1 edges
-            ImmutableMultimap.of(subnet, instanceInSubnet), // subnets to targets
-            ImmutableMultimap.of(subnet, loadBalancerInSubnet), // subnets to NLBs
-            ImmutableMultimap.of(loadBalancerInSubnet, instanceInSubnet), // NLBs to targets
-            ImmutableSet.of(vpc)); // VPCs with instance targets
-    Region region = new Region("region");
+            ImmutableMultimap.of(subnet.getId(), instanceInSubnet), // subnets to targets
+            ImmutableMultimap.of(subnet.getId(), loadBalancerInSubnet), // subnets to NLBs
+            ImmutableMultimap.of(lbArn, instanceInSubnet)); // NLBs to targets
+    Region region =
+        Region.builder("region").setSubnets(ImmutableMap.of(subnet.getId(), subnet)).build();
     subnet.addNlbInstanceTargetInterfaces(
         awsConf, region, subnetCfg, vpcCfg, ingressAcl, egressAcl);
 
@@ -1138,7 +1125,6 @@ public class SubnetTest {
   public void testAddNlbInstanceTargetInterfaces_appliesInstanceSecurityGroups() {
     // addNlbInstanceTargetInterfaces should apply security groups to instance's new interface
     Subnet subnet = _subnetList.get(0);
-    Vpc vpc = new Vpc(subnet.getVpcId(), ImmutableSet.of(subnet.getCidrBlock()), ImmutableMap.of());
 
     // Create instance target in subnet
     String instanceId = "instanceId";
@@ -1157,16 +1143,6 @@ public class SubnetTest {
     // Create load balancer not in subnet
     String lbArn = "lbArn";
     String lbDnsName = "lbDnsName";
-    AvailabilityZone otherAz = new AvailabilityZone("otherSubnetId", subnet.getAvailabilityZone());
-    LoadBalancer loadBalancerNotInSubnet =
-        new LoadBalancer(
-            lbArn,
-            ImmutableList.of(otherAz),
-            lbDnsName,
-            "name",
-            Scheme.INTERNAL,
-            Type.NETWORK,
-            subnet.getVpcId());
 
     String niSecurityGroupName = "niSecurityGroup";
     Ip ipPermittedIn = Ip.parse("1.1.1.1");
@@ -1223,12 +1199,12 @@ public class SubnetTest {
         new ConvertedConfiguration(
             configs,
             new HashSet<>(), // layer 1 edges
-            ImmutableMultimap.of(subnet, instanceInSubnet), // subnets to targets
+            ImmutableMultimap.of(subnet.getId(), instanceInSubnet), // subnets to targets
             ImmutableMultimap.of(), // subnets to NLBs
-            ImmutableMultimap.of(loadBalancerNotInSubnet, instanceInSubnet), // NLBs to targets
-            ImmutableSet.of(vpc)); // VPCs with instance targets
+            ImmutableMultimap.of(lbArn, instanceInSubnet)); // NLBs to targets
     Region region =
         Region.builder("region")
+            .setSubnets(ImmutableMap.of(subnet.getId(), subnet))
             .setSecurityGroups(ImmutableMap.of(niSecurityGroupName, niSecurityGroup))
             .setNetworkInterfaces(ImmutableMap.of(networkInterfaceId, networkInterface))
             .build();
