@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -31,19 +32,19 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
   // Soft values: let it be garbage collected in times of pressure.
   // Maximum size 2^16: Just some upper bound on cache size, well less than GiB.
   //   (8 bytes seems smallest possible entry (set(long)), would be 1 MiB total).
-  private static final LoadingCache<SortedSet<Community>, SortedSet<Community>> COMMUNITY_CACHE =
+  private static final LoadingCache<Set<Community>, Set<Community>> COMMUNITY_CACHE =
       CacheBuilder.newBuilder()
           .softValues()
           .maximumSize(1 << 16)
-          .build(CacheLoader.from(ImmutableSortedSet::copyOf));
+          .build(CacheLoader.from(ImmutableSet::copyOf));
   // Soft values: let it be garbage collected in times of pressure.
   // Maximum size 2^16: Just some upper bound on cache size, well less than GiB.
   //   (8 bytes seems smallest possible entry (set(long)), would be 1 MiB total).
-  private static final LoadingCache<SortedSet<Long>, SortedSet<Long>> CLUSTER_CACHE =
+  private static final LoadingCache<Set<Long>, Set<Long>> CLUSTER_CACHE =
       CacheBuilder.newBuilder()
           .softValues()
           .maximumSize(1 << 16)
-          .build(CacheLoader.from(ImmutableSortedSet::copyOf));
+          .build(CacheLoader.from(ImmutableSet::copyOf));
 
   /** Builder for {@link BgpRoute} */
   @ParametersAreNonnullByDefault
@@ -52,9 +53,9 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
     @Nonnull protected AsPath _asPath;
     // Invariant: either immutable or a local copy shielded from external mutations.
-    @Nonnull protected SortedSet<Long> _clusterList;
+    @Nonnull protected Set<Long> _clusterList;
     // Invariant: either immutable or a local copy shielded from external mutations.
-    @Nonnull protected SortedSet<Community> _communities;
+    @Nonnull protected Set<Community> _communities;
     protected boolean _discard;
     protected long _localPreference;
     @Nullable protected String _nextHopInterface;
@@ -68,8 +69,8 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
     public Builder() {
       _asPath = AsPath.empty();
-      _communities = ImmutableSortedSet.of();
-      _clusterList = ImmutableSortedSet.of();
+      _communities = ImmutableSet.of();
+      _clusterList = ImmutableSet.of();
     }
 
     /**
@@ -97,17 +98,17 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
     }
 
     @Nonnull
-    public SortedSet<Long> getClusterList() {
-      return _clusterList instanceof ImmutableSortedSet
+    public Set<Long> getClusterList() {
+      return _clusterList instanceof ImmutableSet
           ? _clusterList
-          : Collections.unmodifiableSortedSet(_clusterList);
+          : Collections.unmodifiableSet(_clusterList);
     }
 
     @Nonnull
-    public SortedSet<Community> getCommunities() {
-      return _communities instanceof ImmutableSortedSet
+    public Set<Community> getCommunities() {
+      return _communities instanceof ImmutableSet
           ? _communities
-          : Collections.unmodifiableSortedSet(_communities);
+          : Collections.unmodifiableSet(_communities);
     }
 
     public long getLocalPreference() {
@@ -149,17 +150,14 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
     /** Overwrite the clusterList attribute */
     public B setClusterList(Set<Long> clusterList) {
-      _clusterList =
-          clusterList instanceof ImmutableSortedSet
-              ? (ImmutableSortedSet<Long>) clusterList
-              : new TreeSet<>(clusterList);
+      _clusterList = clusterList instanceof ImmutableSet ? clusterList : new HashSet<>(clusterList);
       return getThis();
     }
 
     /** Add to the cluster list attribute */
     public B addClusterList(Set<Long> clusterList) {
-      if (_clusterList instanceof ImmutableSortedSet) {
-        _clusterList = new TreeSet<>(_clusterList);
+      if (_clusterList instanceof ImmutableSet) {
+        _clusterList = new HashSet<>(_clusterList);
       }
       _clusterList.addAll(clusterList);
       return getThis();
@@ -167,8 +165,8 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
     /** Add to the cluster list attribute */
     public B addToClusterList(Long cluster) {
-      if (_clusterList instanceof ImmutableSortedSet) {
-        _clusterList = new TreeSet<>(_clusterList);
+      if (_clusterList instanceof ImmutableSet) {
+        _clusterList = new HashSet<>(_clusterList);
       }
       _clusterList.add(cluster);
       return getThis();
@@ -176,17 +174,14 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
     /** Overwrite communities */
     public B setCommunities(Set<Community> communities) {
-      _communities =
-          communities instanceof ImmutableSortedSet
-              ? (ImmutableSortedSet<Community>) communities
-              : new TreeSet<>(communities);
+      _communities = communities instanceof ImmutableSet ? communities : new HashSet<>(communities);
       return getThis();
     }
 
     /** Add communities */
     public B addCommunities(Collection<? extends Community> communities) {
-      if (_communities instanceof ImmutableSortedSet) {
-        _communities = new TreeSet<>(_communities);
+      if (_communities instanceof ImmutableSet) {
+        _communities = new HashSet<>(_communities);
       }
       _communities.addAll(communities);
       return getThis();
@@ -194,8 +189,8 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
     /** Add a single community */
     public B addCommunity(Community community) {
-      if (_communities instanceof ImmutableSortedSet) {
-        _communities = new TreeSet<>(_communities);
+      if (_communities instanceof ImmutableSet) {
+        _communities = new HashSet<>(_communities);
       }
       _communities.add(community);
       return getThis();
@@ -203,7 +198,7 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
     /** Add communities */
     public B removeCommunities(Set<Community> communities) {
-      if (_communities instanceof ImmutableSortedSet) {
+      if (_communities instanceof ImmutableSet) {
         _communities = new TreeSet<>(_communities);
       }
       _communities.removeAll(communities);
@@ -278,8 +273,8 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
   static final String PROP_WEIGHT = "weight";
 
   @Nonnull protected final AsPath _asPath;
-  @Nonnull protected final SortedSet<Long> _clusterList;
-  @Nonnull protected final SortedSet<Community> _communities;
+  @Nonnull protected final Set<Long> _clusterList;
+  @Nonnull protected final Set<Community> _communities;
   protected final boolean _discard;
   protected final long _localPreference;
   protected final long _med;
@@ -303,13 +298,13 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
       @Nullable Ip nextHopIp,
       int admin,
       @Nullable AsPath asPath,
-      @Nullable SortedSet<Community> communities,
+      @Nullable Set<Community> communities,
       boolean discard,
       long localPreference,
       long med,
       String nextHopInterface,
       Ip originatorIp,
-      @Nullable SortedSet<Long> clusterList,
+      @Nullable Set<Long> clusterList,
       boolean receivedFromRouteReflectorClient,
       OriginType originType,
       RoutingProtocol protocol,
@@ -327,9 +322,9 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
         "Invalid BgpRoute protocol");
     _asPath = firstNonNull(asPath, AsPath.empty());
     _clusterList =
-        clusterList == null ? ImmutableSortedSet.of() : CLUSTER_CACHE.getUnchecked(clusterList);
+        clusterList == null ? ImmutableSet.of() : CLUSTER_CACHE.getUnchecked(clusterList);
     _communities =
-        communities == null ? ImmutableSortedSet.of() : COMMUNITY_CACHE.getUnchecked(communities);
+        communities == null ? ImmutableSet.of() : COMMUNITY_CACHE.getUnchecked(communities);
     _discard = discard;
     _localPreference = localPreference;
     _med = med;
@@ -362,16 +357,12 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
     return _asPath;
   }
 
-  @Nonnull
-  @JsonProperty(PROP_CLUSTER_LIST)
-  public SortedSet<Long> getClusterList() {
+  public @Nonnull Set<Long> getClusterList() {
     return _clusterList;
   }
 
   /** Return the set of all community attributes */
-  @Nonnull
-  @JsonProperty(PROP_COMMUNITIES)
-  public SortedSet<Community> getCommunities() {
+  public @Nonnull Set<Community> getCommunities() {
     return _communities;
   }
 
@@ -466,4 +457,14 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
 
   @Override
   public abstract B toBuilder();
+
+  @JsonProperty(PROP_CLUSTER_LIST)
+  private @Nonnull SortedSet<Long> getJsonClusterList() {
+    return ImmutableSortedSet.copyOf(_clusterList);
+  }
+
+  @JsonProperty(PROP_COMMUNITIES)
+  private @Nonnull SortedSet<Community> getJsonCommunities() {
+    return ImmutableSortedSet.copyOf(_communities);
+  }
 }

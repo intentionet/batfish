@@ -6,6 +6,7 @@ import static org.batfish.common.WellKnownCommunity.NO_EXPORT;
 import static org.batfish.common.WellKnownCommunity.NO_EXPORT_SUBCONFED;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.Warnings;
@@ -57,5 +58,5 @@ public final class XrRoutePolicyDeleteAllStatement extends RoutePolicySetStateme
                                               NO_EXPORT_SUBCONFED)
                                           .stream()
                                           .map(StandardCommunity::of)
-                                          .collect(ImmutableList.toImmutableList())))))))));
+                                          .collect(ImmutableSet.toImmutableSet())))))))));
 }

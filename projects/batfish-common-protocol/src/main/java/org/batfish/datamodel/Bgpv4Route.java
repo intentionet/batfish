@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
-import java.util.SortedSet;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -76,13 +76,13 @@ public final class Bgpv4Route extends BgpRoute<Bgpv4Route.Builder, Bgpv4Route> {
       @Nullable @JsonProperty(PROP_NEXT_HOP_IP) Ip nextHopIp,
       @JsonProperty(PROP_ADMINISTRATIVE_COST) int admin,
       @Nullable @JsonProperty(PROP_AS_PATH) AsPath asPath,
-      @Nullable @JsonProperty(PROP_COMMUNITIES) SortedSet<Community> communities,
+      @Nullable @JsonProperty(PROP_COMMUNITIES) Set<Community> communities,
       @JsonProperty(PROP_DISCARD) boolean discard,
       @JsonProperty(PROP_LOCAL_PREFERENCE) long localPreference,
       @JsonProperty(PROP_METRIC) long med,
       @Nullable @JsonProperty(PROP_NEXT_HOP_INTERFACE) String nextHopInterface,
       @Nullable @JsonProperty(PROP_ORIGINATOR_IP) Ip originatorIp,
-      @Nullable @JsonProperty(PROP_CLUSTER_LIST) SortedSet<Long> clusterList,
+      @Nullable @JsonProperty(PROP_CLUSTER_LIST) Set<Long> clusterList,
       @JsonProperty(PROP_RECEIVED_FROM_ROUTE_REFLECTOR_CLIENT)
           boolean receivedFromRouteReflectorClient,
       @Nullable @JsonProperty(PROP_ORIGIN_TYPE) OriginType originType,
@@ -122,13 +122,13 @@ public final class Bgpv4Route extends BgpRoute<Bgpv4Route.Builder, Bgpv4Route> {
       @Nullable Ip nextHopIp,
       int admin,
       @Nullable AsPath asPath,
-      @Nullable SortedSet<Community> communities,
+      @Nullable Set<Community> communities,
       boolean discard,
       long localPreference,
       long med,
       String nextHopInterface,
       Ip originatorIp,
-      @Nullable SortedSet<Long> clusterList,
+      @Nullable Set<Long> clusterList,
       boolean receivedFromRouteReflectorClient,
       OriginType originType,
       RoutingProtocol protocol,

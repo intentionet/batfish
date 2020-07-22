@@ -10,7 +10,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.SortedSet;
 import javax.annotation.Nonnull;
@@ -25,7 +24,7 @@ public final class CommunitySet implements Serializable {
   }
 
   public static @Nonnull CommunitySet of(Community... communities) {
-    return of(Arrays.asList(communities));
+    return of(ImmutableSet.copyOf(communities));
   }
 
   public static @Nonnull CommunitySet of(Iterable<? extends Community> communities) {
@@ -36,8 +35,9 @@ public final class CommunitySet implements Serializable {
     if (communities.isEmpty()) {
       return empty();
     }
-    ImmutableSet<Community> immutableValue = ImmutableSet.copyOf(communities);
-    return CACHE.getUnchecked(immutableValue);
+    @SuppressWarnings("unchecked")
+    Set<Community> genericCommunities = (Set<Community>) communities;
+    return CACHE.getUnchecked(genericCommunities);
   }
 
   public @Nonnull Set<Community> getCommunities() {
@@ -73,7 +73,7 @@ public final class CommunitySet implements Serializable {
   private static final CommunitySet EMPTY = new CommunitySet(ImmutableSet.of());
 
   @JsonCreator
-  private static @Nonnull CommunitySet create(@Nullable Iterable<Community> communities) {
+  private static @Nonnull CommunitySet create(@Nullable Set<Community> communities) {
     return communities != null ? of(communities) : empty();
   }
 
@@ -91,11 +91,11 @@ public final class CommunitySet implements Serializable {
 
   // Soft values: let it be garbage collected in times of pressure.
   // Maximum size 2^16: Just some upper bound on cache size, well less than GiB.
-  private static final LoadingCache<ImmutableSet<Community>, CommunitySet> CACHE =
+  private static final LoadingCache<Set<Community>, CommunitySet> CACHE =
       CacheBuilder.newBuilder()
           .softValues()
           .maximumSize(1 << 16)
-          .build(CacheLoader.from(CommunitySet::new));
+          .build(CacheLoader.from(set -> new CommunitySet(ImmutableSet.copyOf(set))));
 
   /* Cache the hashcode */
   private transient int _hashCode = 0;

@@ -5,9 +5,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
-import java.util.SortedSet;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -92,8 +92,8 @@ public final class EvpnType3Route extends EvpnRoute<EvpnType3Route.Builder, Evpn
   private static EvpnType3Route jsonCreator(
       @JsonProperty(PROP_ADMINISTRATIVE_COST) int admin,
       @Nullable @JsonProperty(PROP_AS_PATH) AsPath asPath,
-      @Nullable @JsonProperty(PROP_CLUSTER_LIST) SortedSet<Long> clusterList,
-      @Nullable @JsonProperty(PROP_COMMUNITIES) SortedSet<Community> communities,
+      @Nullable @JsonProperty(PROP_CLUSTER_LIST) Set<Long> clusterList,
+      @Nullable @JsonProperty(PROP_COMMUNITIES) Set<Community> communities,
       @JsonProperty(PROP_DISCARD) boolean discard,
       @JsonProperty(PROP_LOCAL_PREFERENCE) long localPreference,
       @JsonProperty(PROP_METRIC) long med,
@@ -118,8 +118,8 @@ public final class EvpnType3Route extends EvpnRoute<EvpnType3Route.Builder, Evpn
     return new EvpnType3Route(
         admin,
         firstNonNull(asPath, AsPath.empty()),
-        firstNonNull(clusterList, ImmutableSortedSet.of()),
-        firstNonNull(communities, ImmutableSortedSet.of()),
+        firstNonNull(clusterList, ImmutableSet.of()),
+        firstNonNull(communities, ImmutableSet.of()),
         discard,
         localPreference,
         med,
@@ -142,8 +142,8 @@ public final class EvpnType3Route extends EvpnRoute<EvpnType3Route.Builder, Evpn
   private EvpnType3Route(
       int admin,
       AsPath asPath,
-      SortedSet<Long> clusterList,
-      SortedSet<Community> communities,
+      Set<Long> clusterList,
+      Set<Community> communities,
       boolean discard,
       long localPreference,
       long med,

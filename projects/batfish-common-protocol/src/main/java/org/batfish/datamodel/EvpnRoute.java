@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
-import java.util.SortedSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -50,13 +49,13 @@ public abstract class EvpnRoute<B extends Builder<B, R>, R extends BgpRoute<B, R
       Ip nextHopIp,
       int admin,
       AsPath asPath,
-      SortedSet<Community> communities,
+      Set<Community> communities,
       boolean discard,
       long localPreference,
       long med,
       String nextHopInterface,
       Ip originatorIp,
-      SortedSet<Long> clusterList,
+      Set<Long> clusterList,
       boolean receivedFromRouteReflectorClient,
       OriginType originType,
       RoutingProtocol protocol,
