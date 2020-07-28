@@ -16,6 +16,7 @@ s_bgp
   | sb_neighbor
   | sb_network
   | sb_no
+  | sb_redistribute
   | sbafi_neighbor
   )*
 ;
@@ -79,6 +80,11 @@ sbb_log_neighbor_changes
 sbbb_aspath_multipath_relax
 :
   AS_PATH MULTIPATH_RELAX NEWLINE
+;
+
+sb_redistribute
+:
+  REDISTRIBUTE redist_type = (STATIC | CONNECTED | OSPF) (ROUTE_MAP route_map_name)? NEWLINE
 ;
 
 sbb_router_id
@@ -159,9 +165,8 @@ sbafi_network
 
 sbafi_redistribute
 :
-  REDISTRIBUTE (STATIC | CONNECTED) (ROUTE_MAP route_map_name)? NEWLINE
+  REDISTRIBUTE redist_type = (STATIC | CONNECTED | OSPF) (ROUTE_MAP route_map_name)? NEWLINE
 ;
-
 
 sbafl_advertise_all_vni
 :

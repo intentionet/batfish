@@ -937,8 +937,11 @@ public final class CumulusConversions {
         firstNonNull(bgpVrf.getIpv4Unicast(), new BgpIpv4UnicastAddressFamily());
 
     // Add conditions to redistribute other protocols
-    for (BgpRedistributionPolicy redistributeProtocolPolicy :
-        bgpIpv4UnicastAddressFamily.getRedistributionPolicies().values()) {
+    Stream.concat(bgpVrf.getRedistributionPolicies().values().stream(),
+        bgpIpv4UnicastAddressFamily.getRedistributionPolicies().values().stream()).forEach(
+        redistributeProtocolPolicy -> {
+//    for (BgpRedistributionPolicy redistributeProtocolPolicy :
+//        bgpIpv4UnicastAddressFamily.getRedistributionPolicies().values()) {
 
       // Get a match expression for the protocol to be redistributed
       CumulusRoutingProtocol protocol = redistributeProtocolPolicy.getProtocol();
@@ -957,7 +960,7 @@ public final class CumulusConversions {
       exportProtocolConditions.setComment(
           String.format("Redistribute %s routes into BGP", protocol));
       exportConditions.add(exportProtocolConditions);
-    }
+    });
 
     // create origination prefilter from listed advertised networks
     Sets.union(bgpVrf.getNetworks().keySet(), bgpIpv4UnicastAddressFamily.getNetworks().keySet())

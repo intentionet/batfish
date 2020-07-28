@@ -5,6 +5,8 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.batfish.common.Warnings.TAG_RED_FLAG;
 import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
 import static org.batfish.datamodel.InterfaceType.PHYSICAL;
+import static org.batfish.datamodel.RoutingProtocol.BGP;
+import static org.batfish.datamodel.routing_policy.statement.Statements.ExitAccept;
 import static org.batfish.representation.cumulus.CumulusConversions.GENERATED_DEFAULT_ROUTE;
 import static org.batfish.representation.cumulus.CumulusConversions.REJECT_DEFAULT_ROUTE;
 import static org.batfish.representation.cumulus.CumulusConversions.addBgpNeighbor;
@@ -78,6 +80,9 @@ import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.OriginType;
+import org.batfish.datamodel.OspfExternalRoute;
+import org.batfish.datamodel.OspfExternalType1Route;
+import org.batfish.datamodel.OspfRoute;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RouteFilterLine;
 import org.batfish.datamodel.RouteFilterList;
@@ -90,6 +95,7 @@ import org.batfish.datamodel.bgp.Layer2VniConfig;
 import org.batfish.datamodel.bgp.RouteDistinguisher;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
 import org.batfish.datamodel.ospf.OspfArea;
+import org.batfish.datamodel.ospf.OspfMetricType;
 import org.batfish.datamodel.routing_policy.Common;
 import org.batfish.datamodel.routing_policy.Environment;
 import org.batfish.datamodel.routing_policy.Environment.Direction;
@@ -1297,6 +1303,86 @@ public final class CumulusConversionsTest {
 
     addOspfInterfaces(ncluConfiguration, ifaceMap, "1", new Warnings());
     assertNull(viIface.getOspfNetworkType());
+  }
+
+  /**
+   * Test that networks statements at BGP VRF level (outside of ipv4 address family stanza) are
+   * accounted for when the address family is active
+   */
+  @Test
+  public void testToBgpProcess_OspfToBgpRedistribution() {
+    // setup VI model
+    NetworkFactory nf = new NetworkFactory();
+    Configuration viConfig =
+        nf.configurationBuilder().setConfigurationFormat(ConfigurationFormat.CUMULUS_NCLU).build();
+    nf.vrfBuilder().setOwner(viConfig).setName(DEFAULT_VRF_NAME).build();
+
+    // setup VS model
+    CumulusNcluConfiguration vsConfig = new CumulusNcluConfiguration();
+    BgpProcess bgpProcess = new BgpProcess();
+    OspfProcess ospfProcess = new OspfProcess();
+    vsConfig.setOspfProcess(ospfProcess);
+    vsConfig.setBgpProcess(bgpProcess);
+    vsConfig.setConfiguration(viConfig);
+    vsConfig.getRouteMaps().put("redist_policy", new RouteMap("redist_policy"));
+
+    // setup routing policy - block default and allow all else.
+    RoutingPolicy routemapPolicy =
+        RoutingPolicy.builder()
+            .setOwner(viConfig)
+            .setName("redist_policy")
+            .addStatement(REJECT_DEFAULT_ROUTE)
+            .addStatement(
+                // accept non-default
+                new If(
+                    new Not(Common.matchDefaultRoute()),
+                    ImmutableList.of(Statements.ReturnTrue.toStaticStatement())))
+            .build();
+
+    // setup BgpVrf
+    BgpVrf vrf = bgpProcess.getDefaultVrf();
+    vrf.setRouterId(Ip.parse("1.1.1.1"));
+    vrf.getRedistributionPolicies().put(CumulusRoutingProtocol.OSPF, new BgpRedistributionPolicy(CumulusRoutingProtocol.OSPF, "redist_policy"));
+
+    // setup OspfVrf
+    OspfVrf ospf = ospfProcess.getDefaultVrf();
+    ospf.setRouterId(Ip.parse("1.1.1.1"));
+
+    // the method under test
+    org.batfish.datamodel.BgpProcess viBgp =
+        toBgpProcess(viConfig, vsConfig, DEFAULT_VRF_NAME, vrf);
+
+    //Spawn test prefixes
+    Prefix prefix = Prefix.parse("1.1.1.1/32");
+
+    OspfExternalRoute.Builder ospfExternalRouteBuilder = OspfExternalRoute.builder()
+        .setNetwork(Prefix.ZERO)
+        .setOspfMetricType(OspfMetricType.E1)
+        .setLsaMetric(1L)
+        .setArea(0L)
+        .setCostToAdvertiser(1L)
+        .setAdvertiser("advertiser");
+
+    OspfExternalRoute.Builder ospfExternalRouteBuilder2 = OspfExternalRoute.builder()
+        .setNetwork(prefix)
+        .setOspfMetricType(OspfMetricType.E2)
+        .setLsaMetric(1L)
+        .setArea(0L)
+        .setCostToAdvertiser(1L)
+        .setAdvertiser("advertiser");
+
+    // Based on OSPF type and Routing Policy, 0.0.0.0/0 should be denied and 1.1.1.1/32 should be allowed
+    assertFalse(
+        viConfig
+            .getRoutingPolicies()
+            .get(computeBgpCommonExportPolicyName(DEFAULT_VRF_NAME))
+            .process(ospfExternalRouteBuilder.build(), Bgpv4Route.builder().setNetwork(Prefix.ZERO), Direction.OUT));
+
+    assertTrue(
+        viConfig
+            .getRoutingPolicies()
+            .get(computeBgpCommonExportPolicyName(DEFAULT_VRF_NAME))
+            .process(ospfExternalRouteBuilder2.build(), Bgpv4Route.builder().setNetwork(prefix), Direction.OUT));
   }
 
   @Test

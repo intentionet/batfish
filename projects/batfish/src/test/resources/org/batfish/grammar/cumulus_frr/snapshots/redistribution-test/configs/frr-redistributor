@@ -1,0 +1,34 @@
+frr-redistributor
+# This file describes the network interfaces
+auto lo
+iface lo inet loopback
+
+auto swp1
+iface swp1
+
+# ports.conf --
+frr version
+frr defaults datacenter
+!
+interface lo
+ ip address 1.1.1.1/32
+ ip ospf area 0
+!
+interface swp1
+ ip address 10.1.1.1/24
+ ip ospf area 0
+!
+router bgp 1
+ bgp router-id 1.1.1.1
+ redistribute ospf route-map OSPF-TO-BGP
+ neighbor 10.1.1.4 remote-as 4
+!
+router ospf
+ ospf router-id 1.1.1.1
+!
+ip prefix-list TEST_PREFIX_LIST seq 10 permit 2.2.2.2/32
+!
+route-map OSPF-TO-BGP permit 10
+ match ip address prefix-list TEST_PREFIX_LIST_PERMIT
+!
+end

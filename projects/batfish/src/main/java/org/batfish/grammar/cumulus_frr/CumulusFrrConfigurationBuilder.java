@@ -5,6 +5,7 @@ import static java.lang.Long.parseLong;
 import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
 import static org.batfish.grammar.cumulus_frr.CumulusFrrParser.Int_exprContext;
 import static org.batfish.representation.cumulus.CumulusRoutingProtocol.CONNECTED;
+import static org.batfish.representation.cumulus.CumulusRoutingProtocol.OSPF;
 import static org.batfish.representation.cumulus.CumulusRoutingProtocol.STATIC;
 import static org.batfish.representation.cumulus.CumulusStructureType.ABSTRACT_INTERFACE;
 import static org.batfish.representation.cumulus.CumulusStructureType.IP_AS_PATH_ACCESS_LIST;
@@ -15,6 +16,7 @@ import static org.batfish.representation.cumulus.CumulusStructureType.IP_PREFIX_
 import static org.batfish.representation.cumulus.CumulusStructureType.ROUTE_MAP;
 import static org.batfish.representation.cumulus.CumulusStructureType.VRF;
 import static org.batfish.representation.cumulus.CumulusStructureUsage.BGP_IPV4_UNICAST_REDISTRIBUTE_CONNECTED_ROUTE_MAP;
+import static org.batfish.representation.cumulus.CumulusStructureUsage.BGP_IPV4_UNICAST_REDISTRIBUTE_OSPF_ROUTE_MAP;
 import static org.batfish.representation.cumulus.CumulusStructureUsage.BGP_IPV4_UNICAST_REDISTRIBUTE_STATIC_ROUTE_MAP;
 import static org.batfish.representation.cumulus.CumulusStructureUsage.ROUTE_MAP_CALL;
 import static org.batfish.representation.cumulus.CumulusStructureUsage.ROUTE_MAP_MATCH_COMMUNITY_LIST;
@@ -92,6 +94,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_router_ospfContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_vrfContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sb_neighborContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sb_networkContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sb_redistributeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbaf_ipv4_unicastContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbaf_l2vpn_evpnContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sbafi_aggregate_addressContext;
@@ -367,32 +370,53 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   }
 
   @Override
+  public void exitSb_redistribute(Sb_redistributeContext ctx) {
+    String redistType = ctx.redist_type.getText();
+    String routeMap = ctx.route_map_name() == null ? null : ctx.route_map_name().getText();
+    handle_redistribute(ctx, redistType, routeMap);
+  }
+
+  @Override
   public void exitSbafi_redistribute(Sbafi_redistributeContext ctx) {
+    String redistType = ctx.redist_type.getText();
+    String routeMap = ctx.route_map_name() == null ? null : ctx.route_map_name().getText();
+    handle_redistribute(ctx, redistType, routeMap);
+  }
+
+  public void handle_redistribute(ParserRuleContext ctx, String redistType, @Nullable String routeMap) {
     CumulusRoutingProtocol protocol;
     CumulusStructureUsage usage;
-    if (ctx.STATIC() != null) {
+    //TODO: Extend CumulusRoutingProtocol to allow lookups by string
+
+    if (redistType.equals("static")) {
       protocol = STATIC;
       usage = BGP_IPV4_UNICAST_REDISTRIBUTE_STATIC_ROUTE_MAP;
-    } else if (ctx.CONNECTED() != null) {
+    } else if (redistType.equals("connected")) {
       protocol = CONNECTED;
       usage = BGP_IPV4_UNICAST_REDISTRIBUTE_CONNECTED_ROUTE_MAP;
-    } else {
+    } else if (redistType.equals("ospf")) {
+      protocol = OSPF;
+      usage = BGP_IPV4_UNICAST_REDISTRIBUTE_OSPF_ROUTE_MAP;
+    }
+    else {
       throw new BatfishException("Unexpected redistribution protocol");
     }
 
-    String routeMap;
-    if (ctx.route_map_name() != null) {
-      routeMap = ctx.route_map_name().getText();
+    if (routeMap != null) {
       _c.referenceStructure(ROUTE_MAP, routeMap, usage, ctx.getStart().getLine());
-    } else {
-      routeMap = null;
     }
 
-    BgpRedistributionPolicy oldRedistributionPolicy =
-        _currentBgpVrf
-            .getIpv4Unicast()
-            .getRedistributionPolicies()
-            .put(protocol, new BgpRedistributionPolicy(protocol, routeMap));
+    BgpRedistributionPolicy oldRedistributionPolicy;
+
+    if (_currentBgpVrf.getIpv4Unicast() == null) {
+      oldRedistributionPolicy = _currentBgpVrf.getRedistributionPolicies().put(protocol, new BgpRedistributionPolicy(protocol, routeMap));
+    } else {
+      oldRedistributionPolicy =
+          _currentBgpVrf
+              .getIpv4Unicast()
+              .getRedistributionPolicies()
+              .put(protocol, new BgpRedistributionPolicy(protocol, routeMap));
+    }
 
     if (oldRedistributionPolicy != null) {
       _w.addWarning(

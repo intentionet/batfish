@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.Ip;
@@ -23,6 +24,8 @@ public class BgpVrf implements Serializable {
   private @Nullable Ip _clusterId;
   private final @Nonnull String _vrfName;
   private @Nullable Long _confederationId;
+  private final @Nonnull Map<CumulusRoutingProtocol, BgpRedistributionPolicy>
+      _redistributionPolicies;
 
   public BgpVrf(String vrfName) {
     // the default is true unless explicitly disabled (via "no bgp default ipv4-unicast")
@@ -30,6 +33,7 @@ public class BgpVrf implements Serializable {
     _vrfName = vrfName;
     _neighbors = new HashMap<>();
     _networks = ImmutableMap.of();
+    _redistributionPolicies = new TreeMap<>();
   }
 
   public boolean isIpv4UnicastActive() {
@@ -121,5 +125,9 @@ public class BgpVrf implements Serializable {
             .putAll(_networks)
             .put(network, new BgpNetwork(network))
             .build();
+  }
+
+  public @Nonnull Map<CumulusRoutingProtocol, BgpRedistributionPolicy> getRedistributionPolicies() {
+    return _redistributionPolicies;
   }
 }

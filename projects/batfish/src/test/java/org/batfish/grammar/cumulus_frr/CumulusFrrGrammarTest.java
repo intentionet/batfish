@@ -4,6 +4,7 @@ import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
 import static org.batfish.datamodel.routing_policy.Environment.Direction.OUT;
 import static org.batfish.grammar.cumulus_frr.CumulusFrrConfigurationBuilder.nextMultipleOfFive;
 import static org.batfish.representation.cumulus.CumulusRoutingProtocol.CONNECTED;
+import static org.batfish.representation.cumulus.CumulusRoutingProtocol.OSPF;
 import static org.batfish.representation.cumulus.CumulusRoutingProtocol.STATIC;
 import static org.batfish.representation.cumulus.CumulusStructureType.IP_AS_PATH_ACCESS_LIST;
 import static org.batfish.representation.cumulus.CumulusStructureType.IP_COMMUNITY_LIST;
@@ -242,6 +243,68 @@ public class CumulusFrrGrammarTest {
             .get(CONNECTED);
     assertNotNull(policy);
     assertThat(policy.getRouteMap(), equalTo("foo"));
+  }
+
+  @Test
+  public void testBgpRedistributeOspfRouteMap() {
+    parseLines(
+        "router bgp 1",
+        "redistribute ospf route-map foo");
+    BgpRedistributionPolicy policy =
+        _frr.getBgpProcess()
+            .getDefaultVrf()
+            .getRedistributionPolicies()
+            .get(OSPF);
+    assertNotNull(policy);
+    assertThat(policy.getRouteMap(), equalTo("foo"));
+  }
+
+  @Test
+  public void testBgpRedistributeOspf() {
+    parseLines(
+        "router bgp 1",
+        "redistribute ospf");
+    BgpRedistributionPolicy policy =
+        _frr.getBgpProcess()
+            .getDefaultVrf()
+            .getRedistributionPolicies()
+            .get(OSPF);
+    assertNotNull(policy);
+    assertNull(policy.getRouteMap());
+  }
+
+  @Test
+  public void testBgpAddressFamilyIpv4UnicastRedistributeOspfRouteMap() {
+    parseLines(
+        "router bgp 1",
+        "address-family ipv4 unicast",
+        "redistribute ospf route-map foo",
+        "exit-address-family");
+    BgpRedistributionPolicy policy =
+        _frr.getBgpProcess()
+            .getDefaultVrf()
+            .getIpv4Unicast()
+            .getRedistributionPolicies()
+            .get(OSPF);
+    assertNotNull(policy);
+    assertThat(policy.getRouteMap(), equalTo("foo"));
+  }
+
+  @Test
+  public void testBgpAddressFamilyIpv4UnicastRedistributeOspf() {
+    parseLines(
+        "router bgp 1",
+        "address-family ipv4 unicast",
+        "redistribute ospf",
+        "exit-address-family");
+    BgpRedistributionPolicy policy =
+        _frr.getBgpProcess()
+            .getDefaultVrf()
+            .getIpv4Unicast()
+            .getRedistributionPolicies()
+            .get(OSPF);
+    assertNotNull(policy);
+    assertNull(policy.getRouteMap());
   }
 
   @Test
@@ -1706,5 +1769,49 @@ public class CumulusFrrGrammarTest {
     assertThat(
         _frr.getVrfs().get("VRF").getStaticRoutes(),
         contains(new StaticRoute(Prefix.parse("1.2.3.0/24"), null, "eth0", null)));
+  }
+
+  @Test
+  public void testBgpRedistribution_behavior() throws IOException {
+    /*
+     There are four nodes in the topology arranged in a line.
+       - frr-ospf-originator -- frr-redistributor -- frr-listener
+
+    frr-ospf-originator spawns routes into ospf and is ospf adjacent with frr-redistributor
+
+    frr-redistributor will redist a single OSPF route into BGP and advertise to frr-listener
+    */
+
+    String snapshotName = "redistribution-test";
+    List<String> configurationNames =
+        ImmutableList.of("frr-ospf-originator", "frr-redistributor", "frr-listener");
+    Batfish batfish =
+        BatfishTestUtils.getBatfishFromTestrigText(
+            TestrigText.builder()
+                .setConfigurationFiles(SNAPSHOTS_PREFIX + snapshotName, configurationNames)
+                .build(),
+            _folder);
+
+    NetworkSnapshot snapshot = batfish.getSnapshot();
+    batfish.computeDataPlane(snapshot);
+    DataPlane dp = batfish.loadDataPlane(snapshot);
+
+    // frr-reoriginator should get a default route from frr-originator
+    assertThat(
+        dp.getRibs().get("frr-listener").get(DEFAULT_VRF_NAME).getRoutes(),
+        hasItem(
+            equalTo(
+                Bgpv4Route.builder()
+                    .setNetwork(Prefix.parse("2.2.2.2/32"))
+                    .setNextHopIp(Ip.parse("10.1.1.1"))
+                    .setReceivedFromIp(Ip.parse("10.1.1.1"))
+                    .setOriginatorIp(Ip.parse("1.1.1.1"))
+                    .setOriginType(OriginType.INCOMPLETE)
+                    .setProtocol(RoutingProtocol.BGP)
+                    .setSrcProtocol(RoutingProtocol.BGP)
+                    .setAsPath(AsPath.ofSingletonAsSets(1L))
+                    .setAdmin(20)
+                    .setLocalPreference(100)
+                    .build())));
   }
 }

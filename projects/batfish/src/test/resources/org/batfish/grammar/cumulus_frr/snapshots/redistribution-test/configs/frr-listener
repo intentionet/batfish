@@ -1,0 +1,23 @@
+frr-listener
+# This file describes the network interfaces
+auto lo
+iface lo inet loopback
+
+auto swp1
+iface swp1
+
+# ports.conf --
+frr version
+frr defaults datacenter
+!
+interface lo
+ ip address 4.4.4.4/32
+!
+interface swp1
+ ip address 10.1.1.4/24
+!
+router bgp 4
+ bgp router-id 4.4.4.4
+ neighbor 10.1.1.1 remote-as 1
+!
+end
