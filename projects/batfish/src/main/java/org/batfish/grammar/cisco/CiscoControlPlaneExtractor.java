@@ -119,6 +119,7 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.CRYPTO_MAP_IP
 import static org.batfish.representation.cisco.CiscoStructureUsage.CRYPTO_MAP_IPSEC_ISAKMP_CRYPTO_DYNAMIC_MAP_SET;
 import static org.batfish.representation.cisco.CiscoStructureUsage.CRYPTO_MAP_IPSEC_ISAKMP_ISAKMP_PROFILE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.CRYPTO_MAP_IPSEC_ISAKMP_TRANSFORM_SET;
+import static org.batfish.representation.cisco.CiscoStructureUsage.CRYPTO_MAP_MATCH_ADDRESS;
 import static org.batfish.representation.cisco.CiscoStructureUsage.DEPI_TUNNEL_DEPI_CLASS;
 import static org.batfish.representation.cisco.CiscoStructureUsage.DEPI_TUNNEL_L2TP_CLASS;
 import static org.batfish.representation.cisco.CiscoStructureUsage.DEPI_TUNNEL_PROTECT_TUNNEL;
@@ -507,6 +508,7 @@ import org.batfish.grammar.cisco.CiscoParser.Crypto_map_t_ii_set_peerContext;
 import org.batfish.grammar.cisco.CiscoParser.Crypto_map_t_ii_set_pfsContext;
 import org.batfish.grammar.cisco.CiscoParser.Crypto_map_t_ii_set_transform_setContext;
 import org.batfish.grammar.cisco.CiscoParser.Crypto_map_t_ipsec_isakmpContext;
+import org.batfish.grammar.cisco.CiscoParser.Crypto_map_t_match_addressContext;
 import org.batfish.grammar.cisco.CiscoParser.Cs_classContext;
 import org.batfish.grammar.cisco.CiscoParser.Csc_nameContext;
 import org.batfish.grammar.cisco.CiscoParser.Default_information_originate_rb_stanzaContext;
@@ -4347,6 +4349,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   public void exitCrypto_map_t_ipsec_isakmp(Crypto_map_t_ipsec_isakmpContext ctx) {
     _currentCryptoMapName = null;
     _currentCryptoMapSequenceNum = null;
+  }
+
+  @Override
+  public void exitCrypto_map_t_match_address(Crypto_map_t_match_addressContext ctx) {
+    todo(ctx);
+    String name = ctx.name.getText();
+    int line = ctx.name.getStart().getLine();
+    _configuration.referenceStructure(IP_ACCESS_LIST, name, CRYPTO_MAP_MATCH_ADDRESS, line);
   }
 
   @Override

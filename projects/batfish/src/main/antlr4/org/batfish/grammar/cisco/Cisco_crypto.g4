@@ -754,6 +754,7 @@ crypto_map_tail
    (
       crypto_map_t_gdoi
       | crypto_map_t_ipsec_isakmp
+      | crypto_map_t_match
       | crypto_map_t_null
    )
 ;
@@ -844,11 +845,20 @@ crypto_map_t_ipsec_isakmp
    )*
 ;
 
+crypto_map_t_match
+:
+   MATCH crypto_map_t_match_address
+;
+
+crypto_map_t_match_address
+:
+   ADDRESS name = variable NEWLINE
+;
+
 crypto_map_t_null
 :
    (
       IPSEC_MANUAL
-      | MATCH
       | SET
    ) null_rest_of_line
 ;

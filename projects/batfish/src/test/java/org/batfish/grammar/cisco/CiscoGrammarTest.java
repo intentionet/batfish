@@ -1066,6 +1066,16 @@ public final class CiscoGrammarTest {
   }
 
   @Test
+  public void testAsaGh6042() throws IOException {
+    String hostname = "asa-gh-6042";
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+    assertThat(
+        ccae, hasNumReferrers("configs/" + hostname, IPV4_ACCESS_LIST_EXTENDED, "acl_name", 1));
+  }
+
+  @Test
   public void testAsaServiceObject() throws IOException {
     String hostname = "asa-service-object";
     String filename = "configs/" + hostname;

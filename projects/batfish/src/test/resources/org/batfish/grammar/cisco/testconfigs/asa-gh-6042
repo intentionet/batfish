@@ -1,0 +1,8 @@
+!
+hostname asa-gh-6042
+! test for https://github.com/batfish/batfish/issues/6042
+!
+access-list acl_name extended permit ip object X object Y
+!
+crypto map outside_map 1 match address acl_name
+!

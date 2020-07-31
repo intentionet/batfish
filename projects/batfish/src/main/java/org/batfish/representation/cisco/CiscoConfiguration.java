@@ -3489,6 +3489,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
         CiscoStructureUsage.ACCESS_GROUP_GLOBAL_FILTER,
         CiscoStructureUsage.COPS_LISTENER_ACCESS_LIST,
         CiscoStructureUsage.CRYPTO_MAP_IPSEC_ISAKMP_ACL,
+        CiscoStructureUsage.CRYPTO_MAP_MATCH_ADDRESS,
         CiscoStructureUsage.INSPECT_CLASS_MAP_MATCH_ACCESS_GROUP,
         CiscoStructureUsage.INTERFACE_IGMP_ACCESS_GROUP_ACL,
         CiscoStructureUsage.INTERFACE_IGMP_HOST_PROXY_ACCESS_LIST,
