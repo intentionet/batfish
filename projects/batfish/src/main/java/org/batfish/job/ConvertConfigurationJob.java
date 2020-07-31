@@ -129,6 +129,7 @@ public class ConvertConfigurationJob extends BatfishJob<ConvertConfigurationResu
     c.setCommunitySets(toImmutableMap(c.getCommunitySets()));
     c.setInterfaces(verifyAndToImmutableMap(c.getAllInterfaces(), Interface::getName, w));
     c.setIpAccessLists(verifyAndToImmutableMap(c.getIpAccessLists(), IpAccessList::getName, w));
+    c.setIpSpaces(toImmutableMap(c.getIpSpaces()));
     c.setIp6AccessLists(verifyAndToImmutableMap(c.getIp6AccessLists(), Ip6AccessList::getName, w));
     c.setRouteFilterLists(
         verifyAndToImmutableMap(c.getRouteFilterLists(), RouteFilterList::getName, w));

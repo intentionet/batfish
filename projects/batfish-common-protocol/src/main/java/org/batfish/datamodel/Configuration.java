@@ -222,7 +222,7 @@ public final class Configuration implements Serializable {
 
   private Map<String, IpAccessList> _ipAccessLists;
 
-  private NavigableMap<String, IpSpace> _ipSpaces;
+  private Map<String, IpSpace> _ipSpaces;
 
   private NavigableMap<String, IpSpaceMetadata> _ipSpaceMetadata;
 
@@ -302,7 +302,7 @@ public final class Configuration implements Serializable {
     _interfaces = new TreeMap<>();
     _ipAccessLists = new TreeMap<>();
     _ip6AccessLists = new TreeMap<>();
-    _ipSpaces = new TreeMap<>();
+    _ipSpaces = new HashMap<>();
     _ipSpaceMetadata = new TreeMap<>();
     _ipsecPeerConfigs = ImmutableSortedMap.of();
     _ipsecPhase2Policies = ImmutableSortedMap.of();
@@ -566,9 +566,13 @@ public final class Configuration implements Serializable {
     return _ipsecPeerConfigs;
   }
 
-  @JsonProperty(PROP_IP_SPACES)
-  public NavigableMap<String, IpSpace> getIpSpaces() {
+  public Map<String, IpSpace> getIpSpaces() {
     return _ipSpaces;
+  }
+
+  @JsonProperty(PROP_IP_SPACES)
+  private NavigableMap<String, IpSpace> getIpSpacesJson() {
+    return ImmutableSortedMap.copyOf(_ipSpaces);
   }
 
   @JsonProperty(PROP_IP_SPACE_METADATA)
@@ -811,7 +815,7 @@ public final class Configuration implements Serializable {
   }
 
   @JsonProperty(PROP_IP_SPACES)
-  public void setIpSpaces(NavigableMap<String, IpSpace> ipSpaces) {
+  public void setIpSpaces(Map<String, IpSpace> ipSpaces) {
     _ipSpaces = ipSpaces;
   }
 
