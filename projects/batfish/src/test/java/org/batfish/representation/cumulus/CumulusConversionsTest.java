@@ -5,8 +5,6 @@ import static junit.framework.TestCase.assertNotNull;
 import static org.batfish.common.Warnings.TAG_RED_FLAG;
 import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
 import static org.batfish.datamodel.InterfaceType.PHYSICAL;
-import static org.batfish.datamodel.RoutingProtocol.BGP;
-import static org.batfish.datamodel.routing_policy.statement.Statements.ExitAccept;
 import static org.batfish.representation.cumulus.CumulusConversions.GENERATED_DEFAULT_ROUTE;
 import static org.batfish.representation.cumulus.CumulusConversions.REJECT_DEFAULT_ROUTE;
 import static org.batfish.representation.cumulus.CumulusConversions.addBgpNeighbor;
@@ -81,8 +79,6 @@ import org.batfish.datamodel.LineAction;
 import org.batfish.datamodel.NetworkFactory;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.OspfExternalRoute;
-import org.batfish.datamodel.OspfExternalType1Route;
-import org.batfish.datamodel.OspfRoute;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.RouteFilterLine;
 import org.batfish.datamodel.RouteFilterList;
@@ -1342,7 +1338,10 @@ public final class CumulusConversionsTest {
     // setup BgpVrf
     BgpVrf vrf = bgpProcess.getDefaultVrf();
     vrf.setRouterId(Ip.parse("1.1.1.1"));
-    vrf.getRedistributionPolicies().put(CumulusRoutingProtocol.OSPF, new BgpRedistributionPolicy(CumulusRoutingProtocol.OSPF, "redist_policy"));
+    vrf.getRedistributionPolicies()
+        .put(
+            CumulusRoutingProtocol.OSPF,
+            new BgpRedistributionPolicy(CumulusRoutingProtocol.OSPF, "redist_policy"));
 
     // setup OspfVrf
     OspfVrf ospf = ospfProcess.getDefaultVrf();
@@ -1352,37 +1351,46 @@ public final class CumulusConversionsTest {
     org.batfish.datamodel.BgpProcess viBgp =
         toBgpProcess(viConfig, vsConfig, DEFAULT_VRF_NAME, vrf);
 
-    //Spawn test prefixes
+    // Spawn test prefixes
     Prefix prefix = Prefix.parse("1.1.1.1/32");
 
-    OspfExternalRoute.Builder ospfExternalRouteBuilder = OspfExternalRoute.builder()
-        .setNetwork(Prefix.ZERO)
-        .setOspfMetricType(OspfMetricType.E1)
-        .setLsaMetric(1L)
-        .setArea(0L)
-        .setCostToAdvertiser(1L)
-        .setAdvertiser("advertiser");
+    OspfExternalRoute.Builder ospfExternalRouteBuilder =
+        OspfExternalRoute.builder()
+            .setNetwork(Prefix.ZERO)
+            .setOspfMetricType(OspfMetricType.E1)
+            .setLsaMetric(1L)
+            .setArea(0L)
+            .setCostToAdvertiser(1L)
+            .setAdvertiser("advertiser");
 
-    OspfExternalRoute.Builder ospfExternalRouteBuilder2 = OspfExternalRoute.builder()
-        .setNetwork(prefix)
-        .setOspfMetricType(OspfMetricType.E2)
-        .setLsaMetric(1L)
-        .setArea(0L)
-        .setCostToAdvertiser(1L)
-        .setAdvertiser("advertiser");
+    OspfExternalRoute.Builder ospfExternalRouteBuilder2 =
+        OspfExternalRoute.builder()
+            .setNetwork(prefix)
+            .setOspfMetricType(OspfMetricType.E2)
+            .setLsaMetric(1L)
+            .setArea(0L)
+            .setCostToAdvertiser(1L)
+            .setAdvertiser("advertiser");
 
-    // Based on OSPF type and Routing Policy, 0.0.0.0/0 should be denied and 1.1.1.1/32 should be allowed
+    // Based on OSPF type and Routing Policy, 0.0.0.0/0 should be denied and 1.1.1.1/32 should be
+    // allowed
     assertFalse(
         viConfig
             .getRoutingPolicies()
             .get(computeBgpCommonExportPolicyName(DEFAULT_VRF_NAME))
-            .process(ospfExternalRouteBuilder.build(), Bgpv4Route.builder().setNetwork(Prefix.ZERO), Direction.OUT));
+            .process(
+                ospfExternalRouteBuilder.build(),
+                Bgpv4Route.builder().setNetwork(Prefix.ZERO),
+                Direction.OUT));
 
     assertTrue(
         viConfig
             .getRoutingPolicies()
             .get(computeBgpCommonExportPolicyName(DEFAULT_VRF_NAME))
-            .process(ospfExternalRouteBuilder2.build(), Bgpv4Route.builder().setNetwork(prefix), Direction.OUT));
+            .process(
+                ospfExternalRouteBuilder2.build(),
+                Bgpv4Route.builder().setNetwork(prefix),
+                Direction.OUT));
   }
 
   @Test

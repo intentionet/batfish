@@ -247,28 +247,18 @@ public class CumulusFrrGrammarTest {
 
   @Test
   public void testBgpRedistributeOspfRouteMap() {
-    parseLines(
-        "router bgp 1",
-        "redistribute ospf route-map foo");
+    parseLines("router bgp 1", "redistribute ospf route-map foo");
     BgpRedistributionPolicy policy =
-        _frr.getBgpProcess()
-            .getDefaultVrf()
-            .getRedistributionPolicies()
-            .get(OSPF);
+        _frr.getBgpProcess().getDefaultVrf().getRedistributionPolicies().get(OSPF);
     assertNotNull(policy);
     assertThat(policy.getRouteMap(), equalTo("foo"));
   }
 
   @Test
   public void testBgpRedistributeOspf() {
-    parseLines(
-        "router bgp 1",
-        "redistribute ospf");
+    parseLines("router bgp 1", "redistribute ospf");
     BgpRedistributionPolicy policy =
-        _frr.getBgpProcess()
-            .getDefaultVrf()
-            .getRedistributionPolicies()
-            .get(OSPF);
+        _frr.getBgpProcess().getDefaultVrf().getRedistributionPolicies().get(OSPF);
     assertNotNull(policy);
     assertNull(policy.getRouteMap());
   }
@@ -281,11 +271,7 @@ public class CumulusFrrGrammarTest {
         "redistribute ospf route-map foo",
         "exit-address-family");
     BgpRedistributionPolicy policy =
-        _frr.getBgpProcess()
-            .getDefaultVrf()
-            .getIpv4Unicast()
-            .getRedistributionPolicies()
-            .get(OSPF);
+        _frr.getBgpProcess().getDefaultVrf().getIpv4Unicast().getRedistributionPolicies().get(OSPF);
     assertNotNull(policy);
     assertThat(policy.getRouteMap(), equalTo("foo"));
   }
@@ -293,16 +279,9 @@ public class CumulusFrrGrammarTest {
   @Test
   public void testBgpAddressFamilyIpv4UnicastRedistributeOspf() {
     parseLines(
-        "router bgp 1",
-        "address-family ipv4 unicast",
-        "redistribute ospf",
-        "exit-address-family");
+        "router bgp 1", "address-family ipv4 unicast", "redistribute ospf", "exit-address-family");
     BgpRedistributionPolicy policy =
-        _frr.getBgpProcess()
-            .getDefaultVrf()
-            .getIpv4Unicast()
-            .getRedistributionPolicies()
-            .get(OSPF);
+        _frr.getBgpProcess().getDefaultVrf().getIpv4Unicast().getRedistributionPolicies().get(OSPF);
     assertNotNull(policy);
     assertNull(policy.getRouteMap());
   }

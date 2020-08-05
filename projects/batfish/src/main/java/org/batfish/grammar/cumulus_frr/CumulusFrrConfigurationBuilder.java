@@ -383,10 +383,11 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     handle_redistribute(ctx, redistType, routeMap);
   }
 
-  public void handle_redistribute(ParserRuleContext ctx, String redistType, @Nullable String routeMap) {
+  public void handle_redistribute(
+      ParserRuleContext ctx, String redistType, @Nullable String routeMap) {
     CumulusRoutingProtocol protocol;
     CumulusStructureUsage usage;
-    //TODO: Extend CumulusRoutingProtocol to allow lookups by string
+    // TODO: Extend CumulusRoutingProtocol to allow lookups by string
 
     if (redistType.equals("static")) {
       protocol = STATIC;
@@ -397,8 +398,7 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     } else if (redistType.equals("ospf")) {
       protocol = OSPF;
       usage = BGP_IPV4_UNICAST_REDISTRIBUTE_OSPF_ROUTE_MAP;
-    }
-    else {
+    } else {
       throw new BatfishException("Unexpected redistribution protocol");
     }
 
@@ -409,7 +409,10 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     BgpRedistributionPolicy oldRedistributionPolicy;
 
     if (_currentBgpVrf.getIpv4Unicast() == null) {
-      oldRedistributionPolicy = _currentBgpVrf.getRedistributionPolicies().put(protocol, new BgpRedistributionPolicy(protocol, routeMap));
+      oldRedistributionPolicy =
+          _currentBgpVrf
+              .getRedistributionPolicies()
+              .put(protocol, new BgpRedistributionPolicy(protocol, routeMap));
     } else {
       oldRedistributionPolicy =
           _currentBgpVrf
