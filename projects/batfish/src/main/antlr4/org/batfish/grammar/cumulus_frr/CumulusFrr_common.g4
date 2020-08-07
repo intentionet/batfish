@@ -77,6 +77,11 @@ route_map_name
   WORD
 ;
 
+bgp_redist_type
+:
+   STATIC | CONNECTED | OSPF
+;
+
 standard_community
 :
   literal = literal_standard_community

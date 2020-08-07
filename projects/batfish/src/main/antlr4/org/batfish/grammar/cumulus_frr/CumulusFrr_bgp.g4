@@ -84,7 +84,7 @@ sbbb_aspath_multipath_relax
 
 sb_redistribute
 :
-  REDISTRIBUTE redist_type = (STATIC | CONNECTED | OSPF) (ROUTE_MAP route_map_name)? NEWLINE
+  REDISTRIBUTE bgp_redist_type (ROUTE_MAP route_map_name)? NEWLINE
 ;
 
 sbb_router_id
@@ -165,7 +165,7 @@ sbafi_network
 
 sbafi_redistribute
 :
-  REDISTRIBUTE redist_type = (STATIC | CONNECTED | OSPF) (ROUTE_MAP route_map_name)? NEWLINE
+  REDISTRIBUTE bgp_redist_type (ROUTE_MAP route_map_name)? NEWLINE
 ;
 
 sbafl_advertise_all_vni

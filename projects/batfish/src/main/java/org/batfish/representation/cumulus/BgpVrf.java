@@ -69,6 +69,12 @@ public class BgpVrf implements Serializable {
     return _ipv4Unicast;
   }
 
+  public BgpIpv4UnicastAddressFamily getOrCreateIpv4Unicast() {
+    if (_ipv4Unicast != null) return _ipv4Unicast;
+    _ipv4Unicast = new BgpIpv4UnicastAddressFamily();
+    return _ipv4Unicast;
+  }
+
   public @Nullable BgpL2vpnEvpnAddressFamily getL2VpnEvpn() {
     return _l2VpnEvpn;
   }

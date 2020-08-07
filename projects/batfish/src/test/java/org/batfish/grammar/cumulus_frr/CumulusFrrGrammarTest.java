@@ -249,7 +249,7 @@ public class CumulusFrrGrammarTest {
   public void testBgpRedistributeOspfRouteMap() {
     parseLines("router bgp 1", "redistribute ospf route-map foo");
     BgpRedistributionPolicy policy =
-        _frr.getBgpProcess().getDefaultVrf().getRedistributionPolicies().get(OSPF);
+        _frr.getBgpProcess().getDefaultVrf().getIpv4Unicast().getRedistributionPolicies().get(OSPF);
     assertNotNull(policy);
     assertThat(policy.getRouteMap(), equalTo("foo"));
   }
@@ -258,7 +258,7 @@ public class CumulusFrrGrammarTest {
   public void testBgpRedistributeOspf() {
     parseLines("router bgp 1", "redistribute ospf");
     BgpRedistributionPolicy policy =
-        _frr.getBgpProcess().getDefaultVrf().getRedistributionPolicies().get(OSPF);
+        _frr.getBgpProcess().getDefaultVrf().getIpv4Unicast().getRedistributionPolicies().get(OSPF);
     assertNotNull(policy);
     assertNull(policy.getRouteMap());
   }
