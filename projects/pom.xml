@@ -82,6 +82,7 @@
     <jsonassert.version>1.5.0</jsonassert.version>
     <jsr305.version>3.0.2</jsr305.version>
     <junit.version>4.12</junit.version>
+    <log4j.version>2.13.3</log4j.version>
     <lz4.version>1.6.0</lz4.version>
     <mockito.version>3.3.3</mockito.version>
     <opentracing-jaxrs2.version>1.0.0</opentracing-jaxrs2.version>
@@ -942,6 +943,18 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
         <version>${httpcore.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j.version}</version>
       </dependency>
 
       <dependency>

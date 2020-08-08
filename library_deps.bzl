@@ -39,6 +39,8 @@ BATFISH_MAVEN_ARTIFACTS = [
     "org.apache.commons:commons-lang3:3.9",
     "org.apache.commons:commons-text:1.8",
     "org.apache.httpcomponents:httpclient:4.3.6",
+    "org.apache.logging.log4j:log4j-api:2.13.3",
+    "org.apache.logging.log4j:log4j-core:2.13.3",
     "org.codehaus.jettison:jettison:1.4.0",
     "io.github.java-diff-utils:java-diff-utils:4.0",
     "org.glassfish.grizzly:grizzly-http-server:2.4.3",
