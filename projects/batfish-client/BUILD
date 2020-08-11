@@ -10,7 +10,7 @@ java_binary(
     runtime_deps = [
         ":client",
         "@maven//:io_jaegertracing_jaeger_thrift",
-        "@maven//:org_slf4j_slf4j_jdk14",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
     ],
 )
 

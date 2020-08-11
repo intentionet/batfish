@@ -41,6 +41,7 @@ BATFISH_MAVEN_ARTIFACTS = [
     "org.apache.httpcomponents:httpclient:4.3.6",
     "org.apache.logging.log4j:log4j-api:2.13.3",
     "org.apache.logging.log4j:log4j-core:2.13.3",
+    "org.apache.logging.log4j:log4j-slf4j-impl:2.13.3",
     "org.codehaus.jettison:jettison:1.4.0",
     "io.github.java-diff-utils:java-diff-utils:4.0",
     "org.glassfish.grizzly:grizzly-http-server:2.4.3",
@@ -64,7 +65,5 @@ BATFISH_MAVEN_ARTIFACTS = [
     "org.parboiled:parboiled-core:1.3.1",
     "org.parboiled:parboiled-java:1.3.1",
     "org.skyscreamer:jsonassert:1.5.0",
-    "org.slf4j:slf4j-api:1.7.25",
-    "org.slf4j:slf4j-jdk14:1.7.25",
     "org.xerial:sqlite-jdbc:3.25.2",
 ]

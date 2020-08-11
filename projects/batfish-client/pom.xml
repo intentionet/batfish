@@ -32,7 +32,7 @@
                   </ignoredUnusedDeclaredDependency>
                   <ignoredUnusedDeclaredDependency>org.lastnpe.eea:jdk-eea
                   </ignoredUnusedDeclaredDependency>
-                  <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-jdk14
+                  <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-slf4j-impl
                   </ignoredUnusedDeclaredDependency>
                 </ignoredUnusedDeclaredDependencies>
               </configuration>
@@ -148,8 +148,8 @@
 
     <!-- Runtime dependencies to add logging. -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
       <scope>runtime</scope>
     </dependency>
 

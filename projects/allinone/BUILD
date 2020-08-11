@@ -11,8 +11,8 @@ java_binary(
         ":allinone",
         "//projects/question",
         "@maven//:io_jaegertracing_jaeger_thrift",
-        "@maven//:org_slf4j_slf4j_jdk14",
         "@maven//:org_apache_logging_log4j_log4j_core",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
     ],
 )
 
@@ -23,7 +23,7 @@ java_binary(
         ":allinone",
         "//projects/minesweeper",
         "//projects/question",
-        "@maven//:org_slf4j_slf4j_jdk14",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
     ],
 )
 

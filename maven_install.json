@@ -2,8 +2,7 @@
     "dependency_tree": {
         "conflict_resolution": {
             "com.google.errorprone:error_prone_annotations:2.3.1": "com.google.errorprone:error_prone_annotations:2.3.2",
-            "com.squareup.okhttp3:okhttp:3.14.8": "com.squareup.okhttp3:okhttp:4.2.2",
-            "org.slf4j:slf4j-api:1.7.25": "org.slf4j:slf4j-api:1.7.28"
+            "com.squareup.okhttp3:okhttp:3.14.8": "com.squareup.okhttp3:okhttp:4.2.2"
         },
         "dependencies": [
             {
@@ -2380,6 +2379,50 @@
                 "sha256": "3b73d905be337e5d914f76cd69a50e7028b60fb0a98a28527295a2b54e8cdcdc"
             },
             {
+                "coord": "org.apache.logging.log4j:log4j-slf4j-impl:2.13.3",
+                "file": "v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.13.3/log4j-slf4j-impl-2.13.3.jar",
+                "directDependencies": [
+                    "org.apache.logging.log4j:log4j-api:2.13.3",
+                    "org.apache.logging.log4j:log4j-core:2.13.3",
+                    "org.slf4j:slf4j-api:1.7.28"
+                ],
+                "dependencies": [
+                    "org.apache.logging.log4j:log4j-core:2.13.3",
+                    "org.apache.logging.log4j:log4j-api:2.13.3",
+                    "org.slf4j:slf4j-api:1.7.28"
+                ],
+                "exclusions": [
+                    "org.hamcrest:hamcrest-core"
+                ],
+                "url": "https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.13.3/log4j-slf4j-impl-2.13.3.jar",
+                "mirror_urls": [
+                    "https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.13.3/log4j-slf4j-impl-2.13.3.jar"
+                ],
+                "sha256": "9010069ee8ec2a1fbd0e5f14810f01c0c162a9aa21b41909fd1d851bf02257d6"
+            },
+            {
+                "coord": "org.apache.logging.log4j:log4j-slf4j-impl:jar:sources:2.13.3",
+                "file": "v1/https/repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.13.3/log4j-slf4j-impl-2.13.3-sources.jar",
+                "directDependencies": [
+                    "org.apache.logging.log4j:log4j-api:jar:sources:2.13.3",
+                    "org.apache.logging.log4j:log4j-core:jar:sources:2.13.3",
+                    "org.slf4j:slf4j-api:jar:sources:1.7.28"
+                ],
+                "dependencies": [
+                    "org.apache.logging.log4j:log4j-core:jar:sources:2.13.3",
+                    "org.apache.logging.log4j:log4j-api:jar:sources:2.13.3",
+                    "org.slf4j:slf4j-api:jar:sources:1.7.28"
+                ],
+                "exclusions": [
+                    "org.hamcrest:hamcrest-core"
+                ],
+                "url": "https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.13.3/log4j-slf4j-impl-2.13.3-sources.jar",
+                "mirror_urls": [
+                    "https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-slf4j-impl/2.13.3/log4j-slf4j-impl-2.13.3-sources.jar"
+                ],
+                "sha256": "ebb1b0ad851f8b60ca60feba17b0072ea17c56fa87236c676eaa06b7ffad3e22"
+            },
+            {
                 "coord": "org.apache.thrift:libthrift:0.13.0",
                 "file": "v1/https/repo1.maven.org/maven2/org/apache/thrift/libthrift/0.13.0/libthrift-0.13.0.jar",
                 "directDependencies": [
@@ -4559,42 +4602,6 @@
                 "sha256": "b1b8bfa4f2709684606001685d09ef905adc1b72ec53444ade90f44bfbcebcff"
             },
             {
-                "coord": "org.slf4j:slf4j-jdk14:1.7.25",
-                "file": "v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-jdk14/1.7.25/slf4j-jdk14-1.7.25.jar",
-                "directDependencies": [
-                    "org.slf4j:slf4j-api:1.7.28"
-                ],
-                "dependencies": [
-                    "org.slf4j:slf4j-api:1.7.28"
-                ],
-                "exclusions": [
-                    "org.hamcrest:hamcrest-core"
-                ],
-                "url": "https://repo1.maven.org/maven2/org/slf4j/slf4j-jdk14/1.7.25/slf4j-jdk14-1.7.25.jar",
-                "mirror_urls": [
-                    "https://repo1.maven.org/maven2/org/slf4j/slf4j-jdk14/1.7.25/slf4j-jdk14-1.7.25.jar"
-                ],
-                "sha256": "9b8b9b8279959b17e71432d40b8cf4175c761c3bc6ebc2c7ec0f2ae8ff223feb"
-            },
-            {
-                "coord": "org.slf4j:slf4j-jdk14:jar:sources:1.7.25",
-                "file": "v1/https/repo1.maven.org/maven2/org/slf4j/slf4j-jdk14/1.7.25/slf4j-jdk14-1.7.25-sources.jar",
-                "directDependencies": [
-                    "org.slf4j:slf4j-api:jar:sources:1.7.28"
-                ],
-                "dependencies": [
-                    "org.slf4j:slf4j-api:jar:sources:1.7.28"
-                ],
-                "exclusions": [
-                    "org.hamcrest:hamcrest-core"
-                ],
-                "url": "https://repo1.maven.org/maven2/org/slf4j/slf4j-jdk14/1.7.25/slf4j-jdk14-1.7.25-sources.jar",
-                "mirror_urls": [
-                    "https://repo1.maven.org/maven2/org/slf4j/slf4j-jdk14/1.7.25/slf4j-jdk14-1.7.25-sources.jar"
-                ],
-                "sha256": "a47604a65ecdc62b366253988c61f9c1fec2d24cdadf8099a2cd38f6875c6758"
-            },
-            {
                 "coord": "org.xerial:sqlite-jdbc:3.25.2",
                 "file": "v1/https/repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.25.2/sqlite-jdbc-3.25.2.jar",
                 "directDependencies": [],
@@ -4624,6 +4631,6 @@
             }
         ],
         "version": "0.1.0",
-        "__AUTOGENERATED_FILE_DO_NOT_MODIFY_THIS_FILE_MANUALLY": 384410956
+        "__AUTOGENERATED_FILE_DO_NOT_MODIFY_THIS_FILE_MANUALLY": -608552887
     }
 }

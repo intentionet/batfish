@@ -36,6 +36,9 @@
                     javax.xml.bind:jaxb-api
                   </ignoredUnusedDeclaredDependency>
                   <ignoredUnusedDeclaredDependency>
+                    org.apache.logging.log4j:log4j-slf4j-impl
+                  </ignoredUnusedDeclaredDependency>
+                  <ignoredUnusedDeclaredDependency>
                     org.glassfish.jersey.inject:jersey-hk2
                   </ignoredUnusedDeclaredDependency>
                   <ignoredUnusedDeclaredDependency>
@@ -46,9 +49,6 @@
                   </ignoredUnusedDeclaredDependency>
                   <ignoredUnusedDeclaredDependency>
                     org.lastnpe.eea:jdk-eea
-                  </ignoredUnusedDeclaredDependency>
-                  <ignoredUnusedDeclaredDependency>
-                    org.slf4j:slf4j-jdk14
                   </ignoredUnusedDeclaredDependency>
                   <ignoredUnusedDeclaredDependency>
                     org.xerial:sqlite-jdbc
@@ -220,8 +220,8 @@
 
     <!-- Runtime dependencies to add logging. -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
       <scope>runtime</scope>
     </dependency>
 

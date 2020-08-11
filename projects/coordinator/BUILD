@@ -9,7 +9,7 @@ java_binary(
     main_class = "org.batfish.coordinator.Main",
     runtime_deps = [
         ":coordinator",
-        "@maven//:org_slf4j_slf4j_jdk14",
+        "@maven//:org_apache_logging_log4j_log4j_slf4j_impl",
     ],
 )
 
