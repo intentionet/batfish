@@ -219,7 +219,7 @@ public final class BatfishLogger {
   }
 
   public void debug(String msg) {
-    _logger.debug(msg);
+    LOGGER.debug(msg);
     write(LEVEL_DEBUG, msg);
   }
 
@@ -228,7 +228,7 @@ public final class BatfishLogger {
   }
 
   public void error(String msg) {
-    _logger.error(msg);
+    LOGGER.error(msg);
     write(LEVEL_ERROR, msg);
   }
 
@@ -237,7 +237,7 @@ public final class BatfishLogger {
   }
 
   public void fatal(String msg) {
-    _logger.fatal(msg);
+    LOGGER.fatal(msg);
     write(LEVEL_FATAL, msg);
   }
 
@@ -264,7 +264,7 @@ public final class BatfishLogger {
   }
 
   public void info(String msg) {
-    _logger.info(msg);
+    LOGGER.info(msg);
     write(LEVEL_INFO, msg);
   }
 
@@ -277,7 +277,7 @@ public final class BatfishLogger {
   }
 
   public void output(String msg) {
-    _logger.info(msg);
+    LOGGER.info(msg);
     write(LEVEL_OUTPUT, msg);
   }
 
@@ -286,7 +286,7 @@ public final class BatfishLogger {
   }
 
   public void pedantic(String msg) {
-    _logger.debug(msg);
+    LOGGER.debug(msg);
     write(LEVEL_PEDANTIC, msg);
   }
 
@@ -296,7 +296,7 @@ public final class BatfishLogger {
   }
 
   public void redflag(String msg) {
-    _logger.warn(msg);
+    LOGGER.warn(msg);
     write(LEVEL_REDFLAG, msg);
   }
 
@@ -313,7 +313,7 @@ public final class BatfishLogger {
   }
 
   public void warn(String msg) {
-    _logger.warn(msg);
+    LOGGER.warn(msg);
     write(LEVEL_WARN, msg);
   }
 
@@ -340,5 +340,5 @@ public final class BatfishLogger {
   }
 
   // transitional: before phasing out of BatfishLogger, tee to a static logger
-  private static final Logger _logger = LogManager.getLogger(BatfishLogger.class);
+  private static final Logger LOGGER = LogManager.getLogger(BatfishLogger.class);
 }
