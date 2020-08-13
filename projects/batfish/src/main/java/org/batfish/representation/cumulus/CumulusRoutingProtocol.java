@@ -8,6 +8,7 @@ import org.batfish.datamodel.RoutingProtocol;
 
 public enum CumulusRoutingProtocol {
   OSPF,
+  BGP,
   CONNECTED,
   STATIC;
 
@@ -16,6 +17,7 @@ public enum CumulusRoutingProtocol {
    */
   public static final Map<CumulusRoutingProtocol, Set<RoutingProtocol>> VI_PROTOCOLS_MAP =
       ImmutableMap.of(
+          BGP, ImmutableSet.of(RoutingProtocol.BGP),
           OSPF,
               ImmutableSet.of(
                   RoutingProtocol.OSPF,

@@ -372,35 +372,42 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   @Override
   public void exitSb_redistribute(Sb_redistributeContext ctx) {
     String routeMap = ctx.route_map_name() == null ? null : ctx.route_map_name().getText();
-    handle_redistribute(ctx, getCumulusRoutingProtocol(ctx.bgp_redist_type().getText()), routeMap);
+    handleBgpRedistribution(
+        ctx, getCumulusRoutingProtocol(ctx.bgp_redist_type().getText()), routeMap);
   }
 
   @Override
   public void exitSbafi_redistribute(Sbafi_redistributeContext ctx) {
     String routeMap = ctx.route_map_name() == null ? null : ctx.route_map_name().getText();
-    handle_redistribute(ctx, getCumulusRoutingProtocol(ctx.bgp_redist_type().getText()), routeMap);
+    handleBgpRedistribution(
+        ctx, getCumulusRoutingProtocol(ctx.bgp_redist_type().getText()), routeMap);
   }
 
   private CumulusRoutingProtocol getCumulusRoutingProtocol(String redist_type) {
     return CumulusRoutingProtocol.valueOf(redist_type.toUpperCase());
   }
 
-  private CumulusStructureUsage getRedistributionCumulusStructureUsage(CumulusRoutingProtocol protocol) {
-    switch(protocol) {
-      case STATIC :
-        return BGP_IPV4_UNICAST_REDISTRIBUTE_STATIC_ROUTE_MAP;
-    case CONNECTED :
-      return BGP_IPV4_UNICAST_REDISTRIBUTE_CONNECTED_ROUTE_MAP;
-    case OSPF :
-      return BGP_IPV4_UNICAST_REDISTRIBUTE_OSPF_ROUTE_MAP;
-    default :
-      throw new BatfishException("Unexpected Redistribution Protocol");
+  private CumulusStructureUsage getRedistributionCumulusStructureUsage(
+      CumulusRoutingProtocol srcProtocol, CumulusRoutingProtocol dstProtocol) {
+    if (dstProtocol == CumulusRoutingProtocol.BGP) {
+      switch (srcProtocol) {
+        case STATIC:
+          return BGP_IPV4_UNICAST_REDISTRIBUTE_STATIC_ROUTE_MAP;
+        case CONNECTED:
+          return BGP_IPV4_UNICAST_REDISTRIBUTE_CONNECTED_ROUTE_MAP;
+        case OSPF:
+          return BGP_IPV4_UNICAST_REDISTRIBUTE_OSPF_ROUTE_MAP;
+        default:
+          throw new BatfishException("Unexpected Redistribution Protocol");
       }
+    }
+    throw new BatfishException("Unhandled Redistribution Protocol");
   }
 
-  public void handle_redistribute(
-      ParserRuleContext ctx, CumulusRoutingProtocol protocol, @Nullable String routeMap) {
-    CumulusStructureUsage usage = getRedistributionCumulusStructureUsage(protocol);
+  public void handleBgpRedistribution(
+      ParserRuleContext ctx, CumulusRoutingProtocol srcProtocol, @Nullable String routeMap) {
+    CumulusStructureUsage usage =
+        getRedistributionCumulusStructureUsage(srcProtocol, CumulusRoutingProtocol.BGP);
 
     if (routeMap != null) {
       _c.referenceStructure(ROUTE_MAP, routeMap, usage, ctx.getStart().getLine());
@@ -414,7 +421,7 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
         _currentBgpVrf
             .getIpv4Unicast()
             .getRedistributionPolicies()
-            .put(protocol, new BgpRedistributionPolicy(protocol, routeMap));
+            .put(srcProtocol, new BgpRedistributionPolicy(srcProtocol, routeMap));
 
     if (oldRedistributionPolicy != null) {
       _w.addWarning(
@@ -423,7 +430,7 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
           _parser,
           String.format(
               "overwriting BgpRedistributionPolicy for vrf %s, protocol %s",
-              _currentBgpVrf.getVrfName(), protocol));
+              _currentBgpVrf.getVrfName(), srcProtocol));
     }
   }
 
