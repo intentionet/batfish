@@ -384,18 +384,18 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
       ParserRuleContext ctx,
       Bgp_redist_typeContext bgpRedistTypeContext,
       @Nullable String routeMap) {
-    RoutingProtocol srcProtocol;
+    CumulusRoutingProtocol srcProtocol;
     CumulusStructureUsage usage;
 
     if (bgpRedistTypeContext.STATIC() != null) {
       usage = BGP_IPV4_UNICAST_REDISTRIBUTE_STATIC_ROUTE_MAP;
-      srcProtocol = RoutingProtocol.STATIC;
+      srcProtocol = CumulusRoutingProtocol.STATIC;
     } else if (bgpRedistTypeContext.CONNECTED() != null) {
       usage = BGP_IPV4_UNICAST_REDISTRIBUTE_CONNECTED_ROUTE_MAP;
-      srcProtocol = RoutingProtocol.CONNECTED;
+      srcProtocol = CumulusRoutingProtocol.CONNECTED;
     } else if (bgpRedistTypeContext.OSPF() != null) {
       usage = BGP_IPV4_UNICAST_REDISTRIBUTE_OSPF_ROUTE_MAP;
-      srcProtocol = RoutingProtocol.OSPF;
+      srcProtocol = CumulusRoutingProtocol.OSPF;
     } else {
       throw new BatfishException("Unexpected redistribution protocol");
     }
@@ -405,8 +405,6 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     }
 
     BgpRedistributionPolicy oldRedistributionPolicy;
-    CumulusRoutingProtocol cumulusRoutingProtocol =
-        CumulusRoutingProtocol.valueOf(srcProtocol.name());
 
     _currentBgpVrf.getOrCreateIpv4Unicast();
 
@@ -415,8 +413,8 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
             .getIpv4Unicast()
             .getRedistributionPolicies()
             .put(
-                cumulusRoutingProtocol,
-                new BgpRedistributionPolicy(cumulusRoutingProtocol, routeMap));
+                srcProtocol,
+                new BgpRedistributionPolicy(srcProtocol, routeMap));
 
     if (oldRedistributionPolicy != null) {
       _w.addWarning(

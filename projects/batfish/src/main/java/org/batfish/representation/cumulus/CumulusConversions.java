@@ -1,6 +1,7 @@
 package org.batfish.representation.cumulus;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static java.lang.Enum.valueOf;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
