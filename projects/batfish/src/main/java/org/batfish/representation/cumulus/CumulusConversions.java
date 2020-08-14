@@ -942,8 +942,6 @@ public final class CumulusConversions {
             bgpIpv4UnicastAddressFamily.getRedistributionPolicies().values().stream())
         .forEach(
             redistributeProtocolPolicy -> {
-              //    for (BgpRedistributionPolicy redistributeProtocolPolicy :
-              //        bgpIpv4UnicastAddressFamily.getRedistributionPolicies().values()) {
 
               // Get a match expression for the protocol to be redistributed
               CumulusRoutingProtocol protocol = redistributeProtocolPolicy.getProtocol();
