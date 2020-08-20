@@ -1742,6 +1742,18 @@ public class AristaGrammarTest {
   }
 
   @Test
+  public void testNatParse() {
+    parseVendorConfig("arista_nat");
+    // don't crash.
+  }
+
+  @Test
+  public void testNatConvert() {
+    parseConfig("arista_nat");
+    // don't crash.
+  }
+
+  @Test
   public void testParseAclShowRunAll() {
     Configuration c = parseConfig("arista_acl_show_run_all");
     // Tests that the ACL parses.

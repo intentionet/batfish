@@ -1,0 +1,14 @@
+!RANCID-CONTENT-TYPE: arista
+!
+hostname arista_nat
+!
+ip access-list PERMIT_ALL
+  10 permit ip any any
+!
+ip nat pool POOL prefix-length 27
+   range 1.2.3.4 1.2.3.4
+!
+interface Ethernet1
+   ip nat source dynamic access-list PERMIT_ALL pool POOL
+   ! has no IP address on purpose
+!

@@ -1271,7 +1271,12 @@ public final class AristaConfiguration extends VendorConfiguration {
   private void generateAristaDynamicSourceNats(
       org.batfish.datamodel.Interface newIface,
       List<AristaDynamicSourceNat> aristaDynamicSourceNats) {
-    Ip interfaceIp = newIface.getConcreteAddress().getIp();
+    ConcreteInterfaceAddress address = newIface.getConcreteAddress();
+    if (address == null) {
+      // nothing to do.
+      return;
+    }
+    Ip interfaceIp = address.getIp();
     Transformation next = null;
     for (AristaDynamicSourceNat nat : Lists.reverse(aristaDynamicSourceNats)) {
       next = nat.toTransformation(interfaceIp, _natPools, next).orElse(next);
