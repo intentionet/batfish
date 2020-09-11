@@ -35,6 +35,7 @@ public class IncrementalDataPlanePlugin extends DataPlanePlugin {
             .setLayer3Topology(topologyProvider.getInitialLayer3Topology(snapshot))
             .setOspfTopology(topologyProvider.getInitialOspfTopology(snapshot))
             .setRawLayer1PhysicalTopology(topologyProvider.getRawLayer1PhysicalTopology(snapshot))
+            .setTunnelTopology(topologyProvider.getInitialTunnelTopology(snapshot))
             .build();
 
     ComputeDataPlaneResult answer =

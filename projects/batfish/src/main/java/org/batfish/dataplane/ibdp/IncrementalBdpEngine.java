@@ -35,7 +35,6 @@ import org.batfish.common.plugin.DataPlanePlugin.ComputeDataPlaneResult;
 import org.batfish.common.plugin.TracerouteEngine;
 import org.batfish.common.topology.IpOwners;
 import org.batfish.common.topology.Layer2Topology;
-import org.batfish.common.topology.TopologyUtil;
 import org.batfish.common.topology.TunnelTopology;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AnnotatedRoute;
@@ -54,7 +53,6 @@ import org.batfish.datamodel.ipsec.IpsecTopology;
 import org.batfish.datamodel.isis.IsisTopology;
 import org.batfish.datamodel.ospf.OspfTopology;
 import org.batfish.datamodel.vxlan.VxlanTopology;
-import org.batfish.datamodel.vxlan.VxlanTopologyUtils;
 import org.batfish.dataplane.TracerouteEngineImpl;
 import org.batfish.dataplane.ibdp.schedule.IbdpSchedule;
 import org.batfish.dataplane.ibdp.schedule.IbdpSchedule.Schedule;
@@ -76,33 +74,128 @@ class IncrementalBdpEngine {
     _bfLogger = logger;
   }
 
+  /**
+   * Performs the iterative step in dataplane computations as topology changes.
+   *
+   * <p>The {@code currentTopologyContext} contains the connectivity learned so far in the network,
+   * specifically for things like VXLAN, BGP, and others, and {@code nodes} contains the current
+   * routing and forwarding tables.
+   *
+   * <p>Given these inputs, primarily the current Layer3 topology, the possible edges for each other
+   * topology (obtained from {@code initialTopologyContext}) are pruned down based on which sessions
+   * can be established given the current L3 topology and dataplane state. The resulting {@code
+   * TopologyContext} for the next iteration of dataplane is returned.
+   */
+  private TopologyContext nextTopologyContext(
+      TopologyContext currentTopologyContext,
+      SortedMap<String, Node> nodes,
+      TopologyContext initialTopologyContext,
+      NetworkConfigurations networkConfigurations,
+      Map<Ip, Map<String, Set<String>>> ipVrfOwners) {
+    // Force re-init of partial dataplane. Re-inits forwarding analysis, etc.
+    computeFibs(nodes);
+    IncrementalDataPlane partialDataplane =
+        IncrementalDataPlane.builder()
+            .setNodes(nodes)
+            .setLayer3Topology(currentTopologyContext.getLayer3Topology())
+            .build();
+
+    TracerouteEngine trEngCurrentL3Topology =
+        new TracerouteEngineImpl(partialDataplane, currentTopologyContext.getLayer3Topology());
+
+    Map<String, Configuration> configurations = networkConfigurations.getMap();
+
+    // Update topologies
+    LOGGER.info("Updating dynamic topologies");
+
+    // IPsec
+    LOGGER.info("Updating IPsec topology");
+    // Note: this uses the initial context since it is pruning down the potential edges initially
+    // established.
+    IpsecTopology newIpsecTopology =
+        retainReachableIpsecEdges(
+            initialTopologyContext.getIpsecTopology(), configurations, trEngCurrentL3Topology);
+
+    // VXLAN
+    LOGGER.info("Updating VXLAN topology");
+    VxlanTopology newVxlanTopology =
+        prunedVxlanTopology(
+            computeVxlanTopology(partialDataplane.getLayer2Vnis()),
+            configurations,
+            trEngCurrentL3Topology);
+    // Layer-2
+    LOGGER.info("Updating Layer 2 topology");
+    Optional<Layer2Topology> newLayer2Topology =
+        initialTopologyContext // not updated across rounds
+            .getLayer1LogicalTopology()
+            .map(l1 -> computeLayer2Topology(l1, newVxlanTopology, configurations));
+
+    // Tunnel topology
+    LOGGER.info("Updating Tunnel topology");
+    TunnelTopology newTunnelTopology =
+        pruneUnreachableTunnelEdges(
+            initialTopologyContext.getTunnelTopology(), // like IPsec, pruning initial tunnels
+            networkConfigurations,
+            trEngCurrentL3Topology);
+
+    // Layer-3
+    LOGGER.info("Updating Layer 3 topology");
+    Topology newLayer3Topology =
+        computeLayer3Topology(
+            computeRawLayer3Topology(
+                initialTopologyContext.getRawLayer1PhysicalTopology(), // not updated across rounds
+                initialTopologyContext.getLayer1LogicalTopology(), // not updated across rounds
+                newLayer2Topology,
+                configurations),
+            // Overlay edges consist of "plain" tunnels and IPSec tunnels
+            Sets.union(toEdgeSet(newIpsecTopology, configurations), newTunnelTopology.asEdgeSet()));
+
+    // EIGRP topology
+    LOGGER.info("Updating EIGRP topology");
+    EigrpTopology newEigrpTopology =
+        EigrpTopologyUtils.initEigrpTopology(configurations, newLayer3Topology);
+
+    // IS-IS topology
+    LOGGER.info("Updating IS-IS topology");
+    IsisTopology newIsisTopology =
+        IsisTopology.initIsisTopology(configurations, currentTopologyContext.getLayer3Topology());
+
+    // Initialize BGP topology
+    LOGGER.info("Updating BGP topology");
+    BgpTopology newBgpTopology =
+        initBgpTopology(
+            configurations,
+            ipVrfOwners,
+            false,
+            true,
+            new TracerouteEngineImpl(partialDataplane, newLayer3Topology),
+            newLayer2Topology.orElse(null));
+    return currentTopologyContext
+        .toBuilder()
+        .setBgpTopology(newBgpTopology)
+        .setLayer2Topology(newLayer2Topology)
+        .setLayer3Topology(newLayer3Topology)
+        .setVxlanTopology(newVxlanTopology)
+        .setIpsecTopology(newIpsecTopology)
+        .setIsisTopology(newIsisTopology)
+        .setTunnelTopology(newTunnelTopology)
+        .setEigrpTopology(newEigrpTopology)
+        .build();
+  }
+
   ComputeDataPlaneResult computeDataPlane(
       Map<String, Configuration> configurations,
-      TopologyContext callerTopologyContext,
+      TopologyContext initialTopologyContext,
       Set<BgpAdvertisement> externalAdverts) {
     Span span = GlobalTracer.get().buildSpan("Compute Data Plane").start();
     try (Scope scope = GlobalTracer.get().scopeManager().activate(span)) {
       assert scope != null; // avoid unused warning
 
       _bfLogger.resetTimer();
-      IncrementalDataPlane.Builder dpBuilder = IncrementalDataPlane.builder();
       _bfLogger.info("\nComputing Data Plane using iBDP\n");
 
       // TODO: switch to topologies and owners from TopologyProvider
       Map<Ip, Map<String, Set<String>>> ipVrfOwners = new IpOwners(configurations).getIpVrfOwners();
-
-      TopologyContext initialTopologyContext =
-          callerTopologyContext
-              .toBuilder()
-              .setEigrpTopology(
-                  EigrpTopologyUtils.initEigrpTopology(
-                      configurations, callerTopologyContext.getLayer3Topology()))
-              .setIsisTopology(
-                  IsisTopology.initIsisTopology(
-                      configurations, callerTopologyContext.getLayer3Topology()))
-              .setVxlanTopology(VxlanTopologyUtils.computeVxlanTopology(configurations))
-              .setTunnelTopology(TopologyUtil.computeInitialTunnelTopology(configurations))
-              .build();
 
       // Generate our nodes, keyed by name, sorted for determinism
       SortedMap<String, Node> nodes =
@@ -121,10 +214,17 @@ class IncrementalBdpEngine {
       computeIgpDataPlane(nodes, initialTopologyContext, answerElement);
 
       /*
-       * Perform a fixed-point computation.
+       * Perform a fixed-point computation, in which every round the topology is updated based
+       * on what we have learned in the previous round.
        */
+      TopologyContext currentTopologyContext =
+          nextTopologyContext(
+              initialTopologyContext /* current is just initial */,
+              nodes,
+              initialTopologyContext,
+              networkConfigurations,
+              ipVrfOwners);
       int topologyIterations = 0;
-      TopologyContext currentTopologyContext = initialTopologyContext;
       boolean converged = false;
       while (!converged && topologyIterations++ < MAX_TOPOLOGY_ITERATIONS) {
         Span iterSpan =
@@ -133,93 +233,12 @@ class IncrementalBdpEngine {
         try (Scope iterScope = GlobalTracer.get().scopeManager().activate(iterSpan)) {
           assert iterScope != null; // avoid unused warning
 
-          // Force re-init of partial dataplane. Re-inits forwarding analysis, etc.
-          computeFibs(nodes);
-          IncrementalDataPlane partialDataplane =
-              dpBuilder
-                  .setNodes(nodes)
-                  .setLayer3Topology(currentTopologyContext.getLayer3Topology())
-                  .build();
-
-          TracerouteEngine trEngCurrentL3Topogy =
-              new TracerouteEngineImpl(
-                  partialDataplane, currentTopologyContext.getLayer3Topology());
-
-          // Update topologies
-          LOGGER.info("Updating dynamic topologies");
-          // IPsec
-          LOGGER.info("Updating IPsec topology");
-          IpsecTopology newIpsecTopology =
-              retainReachableIpsecEdges(
-                  initialTopologyContext.getIpsecTopology(), configurations, trEngCurrentL3Topogy);
-          // VXLAN
-          LOGGER.info("Updating VXLAN topology");
-          VxlanTopology newVxlanTopology =
-              prunedVxlanTopology(
-                  computeVxlanTopology(partialDataplane.getLayer2Vnis()),
-                  configurations,
-                  trEngCurrentL3Topogy);
-          // Layer-2
-          LOGGER.info("Updating Layer 2 topology");
-          Optional<Layer2Topology> newLayer2Topology =
-              currentTopologyContext
-                  .getLayer1LogicalTopology()
-                  .map(l1 -> computeLayer2Topology(l1, newVxlanTopology, configurations));
-
-          // Tunnel topology
-          LOGGER.info("Updating Tunnel topology");
-          TunnelTopology newTunnelTopology =
-              pruneUnreachableTunnelEdges(
-                  initialTopologyContext.getTunnelTopology(),
-                  networkConfigurations,
-                  trEngCurrentL3Topogy);
-
-          // Layer-3
-          LOGGER.info("Updating Layer 3 topology");
-          Topology newLayer3Topology =
-              computeLayer3Topology(
-                  computeRawLayer3Topology(
-                      initialTopologyContext.getRawLayer1PhysicalTopology(),
-                      initialTopologyContext.getLayer1LogicalTopology(),
-                      newLayer2Topology,
-                      configurations),
-                  // Overlay edges consist of "plain" tunnels and IPSec tunnels
-                  Sets.union(
-                      toEdgeSet(newIpsecTopology, configurations), newTunnelTopology.asEdgeSet()));
-
-          // EIGRP topology
-          LOGGER.info("Updating EIGRP topology");
-          EigrpTopology newEigrpTopology =
-              EigrpTopologyUtils.initEigrpTopology(configurations, newLayer3Topology);
-
-          // Initialize BGP topology
-          LOGGER.info("Updating BGP topology");
-          BgpTopology newBgpTopology =
-              initBgpTopology(
-                  configurations,
-                  ipVrfOwners,
-                  false,
-                  true,
-                  new TracerouteEngineImpl(partialDataplane, newLayer3Topology),
-                  initialTopologyContext.getLayer2Topology().orElse(null));
-          TopologyContext newTopologyContext =
-              currentTopologyContext
-                  .toBuilder()
-                  .setBgpTopology(newBgpTopology)
-                  .setLayer2Topology(newLayer2Topology)
-                  .setLayer3Topology(newLayer3Topology)
-                  .setVxlanTopology(newVxlanTopology)
-                  .setIpsecTopology(newIpsecTopology)
-                  .setTunnelTopology(newTunnelTopology)
-                  .setEigrpTopology(newEigrpTopology)
-                  .build();
-
           boolean isOscillating =
               computeNonMonotonicPortionOfDataPlane(
                   nodes,
                   externalAdverts,
                   answerElement,
-                  newTopologyContext,
+                  currentTopologyContext,
                   networkConfigurations,
                   ipVrfOwners);
           if (isOscillating) {
@@ -228,8 +247,15 @@ class IncrementalBdpEngine {
             throw new BdpOscillationException("Network has no stable solution");
           }
 
-          converged = currentTopologyContext.equals(newTopologyContext);
-          currentTopologyContext = newTopologyContext;
+          TopologyContext nextTopologyContext =
+              nextTopologyContext(
+                  currentTopologyContext,
+                  nodes,
+                  initialTopologyContext,
+                  networkConfigurations,
+                  ipVrfOwners);
+          converged = currentTopologyContext.equals(nextTopologyContext);
+          currentTopologyContext = nextTopologyContext;
         } finally {
           iterSpan.finish();
         }
