@@ -122,6 +122,7 @@ import org.batfish.datamodel.acl.TrueExpr;
 import org.batfish.datamodel.bgp.AddressFamilyCapabilities;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily.Builder;
+import org.batfish.datamodel.collections.InsertOrderedMap;
 import org.batfish.datamodel.flow.TransformationStep.TransformationType;
 import org.batfish.datamodel.ospf.NssaSettings;
 import org.batfish.datamodel.ospf.OspfArea;
@@ -2426,9 +2427,9 @@ public class PaloAltoConfiguration extends VendorConfiguration {
     targetPostNat.clear();
     targetPostNat.putAll(postRulebaseNat);
     // Security post
-    // Note: using LinkedHashMaps to preserve insertion order
+    // Note: using InsertOrderedMap to preserve insertion order
     Map<String, SecurityRule> postRulebaseSecurity =
-        new LinkedHashMap<>(source.getPostRulebase().getSecurityRules());
+        new InsertOrderedMap<>(source.getPostRulebase().getSecurityRules());
     Map<String, SecurityRule> targetPostSecurity = target.getPostRulebase().getSecurityRules();
     postRulebaseSecurity.putAll(targetPostSecurity);
     targetPostSecurity.clear();

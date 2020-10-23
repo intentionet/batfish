@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import org.batfish.datamodel.collections.InsertOrderedMap;
 
 /** Represents a rulebase within a {@link Vsys} or in panorama policy */
 public class Rulebase implements Serializable {
@@ -14,7 +15,7 @@ public class Rulebase implements Serializable {
 
   public Rulebase() {
     _natRules = new LinkedHashMap<>();
-    _securityRules = new LinkedHashMap<>();
+    _securityRules = new InsertOrderedMap<>();
   }
 
   /** Get map of {@code NatRule} name to {@code NatRule}; preserves insertion order. */
