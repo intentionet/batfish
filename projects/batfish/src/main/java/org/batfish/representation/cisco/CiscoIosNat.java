@@ -106,4 +106,10 @@ public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializab
       }
     }
   }
+
+  // Direction of NAT
+  public enum Direction {
+    INSIDE,
+    OUTSIDE
+  }
 }

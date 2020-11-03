@@ -2675,15 +2675,6 @@ s_ip_name_server
    )? NEWLINE
 ;
 
-s_ip_nat
-:
-   ip_nat_destination
-   | ip_nat_null
-   | ip_nat_pool
-   | ip_nat_pool_range
-   | ip_nat_source
-;
-
 s_ip_nbar
 :
    IP NBAR CUSTOM null_rest_of_line

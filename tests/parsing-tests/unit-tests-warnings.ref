@@ -402,15 +402,15 @@
       {
         "Filename" : "configs/cisco_ip_nat",
         "Line" : 4,
-        "Text" : "ip nat pool abc prefix-length 32  \n range 10.1.2.3 10.1.2.4",
-        "Parser_Context" : "[ip_nat_pool_range s_ip_nat stanza cisco_configuration]",
+        "Text" : "prefix-length 32  \n range 10.1.2.3 10.1.2.4",
+        "Parser_Context" : "[ipn_pool_range ipn_pool s_ip_nat stanza cisco_configuration]",
         "Comment" : "Subnet of NAT pool abc does not contain last pool IP"
       },
       {
         "Filename" : "configs/cisco_ip_nat",
         "Line" : 13,
-        "Text" : "ip nat outside source static 6.6.6.6 7.7.7.7 add-route no-alias",
-        "Parser_Context" : "[ip_nat_source s_ip_nat stanza cisco_configuration]",
+        "Text" : "add-route",
+        "Parser_Context" : "[ipniosm_add_route ipnios_modifiers ipnios_static_addr ipnios_static ipnio_source ipn_outside s_ip_nat stanza cisco_configuration]",
         "Comment" : "This feature is not currently supported"
       },
       {

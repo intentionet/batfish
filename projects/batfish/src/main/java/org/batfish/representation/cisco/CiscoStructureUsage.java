@@ -127,6 +127,7 @@ public enum CiscoStructureUsage implements StructureUsage {
   IP_DOMAIN_LOOKUP_INTERFACE("ip domain lookup interface"),
   IP_ROUTE_NHINT("ip route next-hop interface"),
   IP_NAT_DESTINATION_ACCESS_LIST("ip nat destination acl"),
+  IP_NAT_DESTINATION_POOL("ip nat destination pool"),
   IP_NAT_SOURCE_ACCESS_LIST("ip nat source dynamic access-list"),
   IP_NAT_SOURCE_POOL("ip nat source pool"),
   IP_LOCAL_POLICY_ROUTE_MAP("ip local policy route-map"),
