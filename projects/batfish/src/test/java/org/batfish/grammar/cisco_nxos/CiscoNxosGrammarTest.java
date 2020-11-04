@@ -7412,7 +7412,7 @@ public final class CiscoNxosGrammarTest {
     String hostname = "nxos_vrf";
     Configuration c = parseConfig(hostname);
 
-    assertThat(c.getVrfs(), hasKeys(DEFAULT_VRF_NAME, MANAGEMENT_VRF_NAME, "Vrf1", "vrf3"));
+    assertThat(c.getVrfs(), hasKeys(DEFAULT_VRF_NAME, MANAGEMENT_VRF_NAME, "Vrf1", "vrf3", "vrf4"));
     {
       Map<String, org.batfish.datamodel.Interface> vrfIfaces = c.getAllInterfaces(DEFAULT_VRF_NAME);
       assertThat(vrfIfaces, hasKey("Ethernet1/2"));
@@ -7452,6 +7452,9 @@ public final class CiscoNxosGrammarTest {
       assertThat(iface, isActive(false));
       assertThat(iface, hasAddress("10.0.5.1/24"));
     }
+    {
+      assertThat(c.getDnsServers(), containsInAnyOrder("1.1.1.1", "2001:0000:3238:DFE1:63::FEFB"));
+    }
   }
 
   @Test
@@ -7461,7 +7464,8 @@ public final class CiscoNxosGrammarTest {
 
     assertThat(vc.getDefaultVrf(), not(nullValue()));
     assertThat(vc.getDefaultVrf().getId(), equalTo(DEFAULT_VRF_ID));
-    assertThat(vc.getVrfs(), hasKeys(DEFAULT_VRF_NAME, MANAGEMENT_VRF_NAME, "Vrf1", "vrf3"));
+    assertThat(
+        vc.getVrfs(), hasKeys(DEFAULT_VRF_NAME, MANAGEMENT_VRF_NAME, "Vrf1", "vrf3", "vrf4"));
     {
       Vrf vrf = vc.getDefaultVrf();
       assertFalse(vrf.getShutdown());
@@ -7495,6 +7499,12 @@ public final class CiscoNxosGrammarTest {
       assertThat(vrf.getId(), equalTo(4));
       assertTrue(vrf.getShutdown());
       assertThat(vrf.getRd(), equalTo(RouteDistinguisherOrAuto.auto()));
+    }
+    {
+      Vrf vrf = vc.getVrfs().get("vrf4");
+      assertThat(
+          vc.getIpNameServersByUseVrf().get(vrf.getName()),
+          containsInAnyOrder("1.1.1.1", "2001:0000:3238:DFE1:63::FEFB"));
     }
 
     assertThat(

@@ -189,6 +189,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Ints;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -674,6 +675,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Uint32Context;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Uint8Context;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Unreserved_vlan_idContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Unreserved_vlan_id_rangeContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_ip_name_serverContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_no_shutdownContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_rdContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_shutdownContext;
@@ -6108,6 +6110,21 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   @Override
   public void exitSnmps_host(Snmps_hostContext ctx) {
     _currentSnmpServer = null;
+  }
+
+  @Override
+  public void exitVc_ip_name_server(Vc_ip_name_serverContext ctx) {
+    List<String> servers =
+        _c.getIpNameServersByUseVrf()
+            .computeIfAbsent(
+                _currentVrf.getName(),
+                k -> new ArrayList<>(ctx.ip_address().size() + ctx.ipv6_address().size()));
+    for (Ip_addressContext ip_address : ctx.ip_address()) {
+      servers.add(getFullText(ip_address));
+    }
+    for (Ipv6_addressContext ip_address : ctx.ipv6_address()) {
+      servers.add(getFullText(ip_address));
+    }
   }
 
   @Override

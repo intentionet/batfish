@@ -73,8 +73,14 @@ vc_ip
   IP
   (
     ip_route
+    | vc_ip_name_server
     | vc_ip_null
   )
+;
+
+vc_ip_name_server
+:
+  NAME_SERVER (ip_address | ipv6_address)+ NEWLINE
 ;
 
 vc_ip_null

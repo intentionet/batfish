@@ -75,6 +75,10 @@ vrf context vrf3
   rd auto
   shutdown
 
+!! Has nameservers
+vrf context vrf4
+  ip name-server 1.1.1.1 2001:0000:3238:DFE1:63::FEFB
+
 vrf context management
   ip domain-name test.example.com
   ip domain-list exmaple.com
