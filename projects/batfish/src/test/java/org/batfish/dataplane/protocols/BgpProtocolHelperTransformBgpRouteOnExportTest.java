@@ -432,6 +432,26 @@ public final class BgpProtocolHelperTransformBgpRouteOnExportTest {
   }
 
   @Test
+  public void testNonBgpToBgpKeepMetric() {
+    setUpPeers(false);
+    long metric = 333;
+    assertThat(
+        convertNonBgpRouteToBgpRoute(
+                StaticRoute.builder()
+                    .setNetwork(Prefix.ZERO)
+                    .setNextHopInterface("foo")
+                    .setAdministrativeCost(1)
+                    .setMetric(metric)
+                    .build(),
+                _fromBgpProcess.getRouterId(),
+                _sessionProperties.getTailIp(),
+                170,
+                RoutingProtocol.BGP)
+            .getMetric(),
+        equalTo(metric));
+  }
+
+  @Test
   public void testAggregateProtocolIsCleared() {
     Builder routeBuilder = Bgpv4Route.builder().setProtocol(RoutingProtocol.AGGREGATE);
     transformBgpRoutePostExport(

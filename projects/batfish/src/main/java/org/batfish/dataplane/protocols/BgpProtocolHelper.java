@@ -306,6 +306,7 @@ public final class BgpProtocolHelper {
         .setLocalPreference(BgpRoute.DEFAULT_LOCAL_PREFERENCE)
         .setReceivedFromIp(protocol == RoutingProtocol.BGP ? nextHopIp : Ip.ZERO)
         .setNextHopIp(nextHopIp)
+        .setMetric(route.getMetric())
         .setTag(routeDecorator.getAbstractRoute().getTag());
     // Let everything else default to unset/empty/etc.
   }
