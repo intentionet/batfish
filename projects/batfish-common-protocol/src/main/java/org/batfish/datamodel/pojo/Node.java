@@ -7,12 +7,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.DeviceModel;
 import org.batfish.datamodel.DeviceType;
 
-public class Node extends BfObject {
+public final class Node extends BfObject {
   private static final String PROP_NAME = "name";
   private static final String PROP_MODEL = "model";
   private static final String PROP_TYPE = "type";
@@ -71,9 +72,29 @@ public class Node extends BfObject {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    } else if (!(o instanceof Node)) {
+      return false;
+    }
+    Node node = (Node) o;
+    return _name.equals(node._name)
+        && _model == node._model
+        && _type == node._type
+        && Objects.equals(getId(), node.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_name, getId(), _model, _type);
+  }
+
+  @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
         .omitNullValues()
+        .add("id", getId())
         .add("name", _name)
         .add("model", _model)
         .add("type", _type)

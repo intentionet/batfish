@@ -4,10 +4,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.testing.EqualsTester;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.batfish.common.util.BatfishObjectMapper;
+import org.batfish.datamodel.DeviceModel;
 import org.batfish.datamodel.DeviceType;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,5 +58,17 @@ public class NodeTest {
     assertThat(jsonNode.get("name").asText(), equalTo("testnode"));
     assertThat(jsonNode.get("type").asText(), equalTo("HOST"));
     assertThat(jsonNode.get("properties").get("key").asText(), equalTo("value"));
+  }
+
+  @Test
+  public void testEquals() {
+    new EqualsTester()
+        .addEqualityGroup(new Object())
+        .addEqualityGroup(new Node("foo", null, null, null), new Node("foo", null, null, null))
+        .addEqualityGroup(new Node("bar", null, null, null))
+        .addEqualityGroup(new Node("bar", "id", null, null))
+        .addEqualityGroup(new Node("bar", "id", DeviceModel.ARISTA_UNSPECIFIED, null))
+        .addEqualityGroup(new Node("bar", "id", DeviceModel.ARISTA_UNSPECIFIED, DeviceType.ROUTER))
+        .testEquals();
   }
 }
