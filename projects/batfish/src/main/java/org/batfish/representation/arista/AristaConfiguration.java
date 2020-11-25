@@ -39,6 +39,7 @@ import static org.batfish.representation.arista.eos.AristaRedistributeType.OSPF_
 import static org.batfish.representation.arista.eos.AristaRedistributeType.OSPF_NSSA_EXTERNAL_TYPE_2;
 import static org.batfish.representation.arista.eos.AristaRedistributeType.STATIC;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -50,12 +51,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -157,7 +160,6 @@ import org.batfish.datamodel.routing_policy.expr.MatchPrefixSet;
 import org.batfish.datamodel.routing_policy.expr.MatchProtocol;
 import org.batfish.datamodel.routing_policy.expr.Not;
 import org.batfish.datamodel.routing_policy.expr.WithEnvironmentExpr;
-import org.batfish.datamodel.routing_policy.statement.CallStatement;
 import org.batfish.datamodel.routing_policy.statement.If;
 import org.batfish.datamodel.routing_policy.statement.SetMetric;
 import org.batfish.datamodel.routing_policy.statement.SetOrigin;
@@ -1764,163 +1766,211 @@ public final class AristaConfiguration extends VendorConfiguration {
     return newProcess;
   }
 
-  private RoutingPolicy toRoutingPolicy(Configuration c, RouteMap map) {
-    boolean hasContinue =
-        map.getClauses().values().stream().anyMatch(clause -> clause.getContinueLine() != null);
-    if (hasContinue) {
-      return toRoutingPolicies(c, map);
-    }
-    RoutingPolicy output = new RoutingPolicy(map.getName(), c);
-    List<Statement> statements = output.getStatements();
-    Map<Integer, If> clauses = new HashMap<>();
-    // descend map so continue targets are available
-    If followingClause = null;
-    for (Entry<Integer, RouteMapClause> e : map.getClauses().descendingMap().entrySet()) {
-      int clauseNumber = e.getKey();
-      RouteMapClause rmClause = e.getValue();
-      String clausePolicyName = getRouteMapClausePolicyName(map, clauseNumber);
-      Conjunction conj = new Conjunction();
-      // match ipv4s must be disjoined with match ipv6
-      Disjunction matchIpOrPrefix = new Disjunction();
-      for (RouteMapMatchLine rmMatch : rmClause.getMatchList()) {
-        BooleanExpr matchExpr = rmMatch.toBooleanExpr(c, this, _w);
-        if (rmMatch instanceof RouteMapMatchIpAccessListLine
-            || rmMatch instanceof RouteMapMatchIpPrefixListLine
-            || rmMatch instanceof RouteMapMatchIpv6AccessListLine
-            || rmMatch instanceof RouteMapMatchIpv6PrefixListLine) {
-          matchIpOrPrefix.getDisjuncts().add(matchExpr);
-        } else {
-          conj.getConjuncts().add(matchExpr);
-        }
-      }
-      if (!matchIpOrPrefix.getDisjuncts().isEmpty()) {
-        conj.getConjuncts().add(matchIpOrPrefix);
-      }
-      If ifExpr = new If();
-      clauses.put(clauseNumber, ifExpr);
-      ifExpr.setComment(clausePolicyName);
-      ifExpr.setGuard(conj);
-      List<Statement> matchStatements = ifExpr.getTrueStatements();
-      for (RouteMapSetLine rmSet : rmClause.getSetList()) {
-        rmSet.applyTo(matchStatements, this, c, _w);
-      }
-      switch (rmClause.getAction()) {
-        case PERMIT:
-          matchStatements.add(Statements.ReturnTrue.toStaticStatement());
-          break;
+  private static final Statement ROUTE_MAP_PERMIT_STATEMENT =
+      new If(
+          BooleanExprs.CALL_EXPR_CONTEXT,
+          ImmutableList.of(Statements.ReturnTrue.toStaticStatement()),
+          ImmutableList.of(Statements.ExitAccept.toStaticStatement()));
+  private static final Statement ROUTE_MAP_DENY_STATEMENT =
+      new If(
+          BooleanExprs.CALL_EXPR_CONTEXT,
+          ImmutableList.of(Statements.ReturnFalse.toStaticStatement()),
+          ImmutableList.of(Statements.ExitReject.toStaticStatement()));
 
-        case DENY:
-          matchStatements.add(Statements.ReturnFalse.toStaticStatement());
-          break;
+  private void convertRouteMap(Configuration c, RouteMap routeMap) {
+    /*
+     * High-level overview:
+     * - Group route-map entries into disjoint intervals, where each entry that is the target of a
+     *   continue statement is the start of an interval.
+     * - Generate a RoutingPolicy for each interval.
+     * - Convert each entry into an If statement:
+     *   - True branch of an entry with a continue statement calls the RoutingPolicy for the
+     *     interval started by its target.
+     *   - False branch of an entry at the end of an interval calls the RoutingPolicy for the next
+     *     interval.
+     * - The top-level RoutingPolicy that corresponds to the route-map just calls the first
+     *   interval and does a context-appropriate return based on that result.
+     */
+    String routeMapName = routeMap.getName();
 
-        default:
-          throw new BatfishException("Invalid action");
+    // sequence -> next sequence if no match, or null if last sequence
+    ImmutableMap.Builder<Integer, Integer> noMatchNextBySeqBuilder = ImmutableMap.builder();
+    RouteMapClause lastEntry = null;
+    for (RouteMapClause currentEntry : routeMap.getClauses().values()) {
+      if (lastEntry != null) {
+        int lastSequence = lastEntry.getSeqNum();
+        noMatchNextBySeqBuilder.put(lastSequence, currentEntry.getSeqNum());
       }
-      if (followingClause != null) {
-        ifExpr.getFalseStatements().add(followingClause);
-      } else {
-        ifExpr.getFalseStatements().add(Statements.ReturnLocalDefaultAction.toStaticStatement());
-      }
-      followingClause = ifExpr;
+      lastEntry = currentEntry;
     }
-    statements.add(followingClause);
-    return output;
+
+    // sequences that are valid targets of a continue statement
+    Set<Integer> continueTargets =
+        routeMap.getClauses().values().stream()
+            .map(
+                clause ->
+                    clause.getContinueLine() == null ? null : clause.getContinueLine().getTarget())
+            .filter(Objects::nonNull)
+            .filter(routeMap.getClauses().keySet()::contains)
+            .collect(ImmutableSet.toImmutableSet());
+
+    // sequence -> next sequence if no match, or null if last sequence
+    Map<Integer, Integer> noMatchNextBySeq = noMatchNextBySeqBuilder.build();
+
+    // Build the top-level RoutingPolicy that corresponds to the route-map. All it does is call
+    // the first interval and return its result in a context-appropriate way.
+    int firstSequence = routeMap.getClauses().firstEntry().getKey();
+    String firstSequenceRoutingPolicyName = computeRoutingPolicyName(routeMapName, firstSequence);
+    RoutingPolicy.builder()
+        .setName(routeMapName)
+        .setOwner(c)
+        .setStatements(ImmutableList.of(callInContext(firstSequenceRoutingPolicyName)))
+        .build();
+
+    /*
+     * Initially:
+     * - initialize the statement queue to default deny for the very first statement
+     * For each entry in the route-map:
+     * - If the current entry is the start of a new interval:
+     *   - Build the RoutingPolicy for the previous interval.
+     *   - Set the name of the new generated routing policy.
+     *   - Clear the statement queue.
+     * - After all entries have been processed:
+     *   - Build the RoutingPolicy for the final interval.
+     *     - If there were no continue statements, the final interval is the single policy for the
+     *       whole route-map.
+     */
+    String currentRoutingPolicyName = firstSequenceRoutingPolicyName;
+    ImmutableList.Builder<Statement> currentRoutingPolicyStatements =
+        ImmutableList.<Statement>builder()
+            .add(Statements.SetLocalDefaultActionReject.toStaticStatement());
+    for (RouteMapClause currentEntry : routeMap.getClauses().values()) {
+      int currentSequence = currentEntry.getSeqNum();
+      if (continueTargets.contains(currentSequence)) {
+        // finalize the routing policy consisting of queued statements up to this point. The last
+        // statement includes a call to the next statement if not matched.
+        RoutingPolicy.builder()
+            .setName(currentRoutingPolicyName)
+            .setOwner(c)
+            .setStatements(currentRoutingPolicyStatements.build())
+            .build();
+        // reset statement queue
+        currentRoutingPolicyStatements = ImmutableList.builder();
+        // generate name for policy that will contain subsequent statements
+        currentRoutingPolicyName = computeRoutingPolicyName(routeMapName, currentSequence);
+      } // or else undefined reference
+      currentRoutingPolicyStatements.add(
+          toStatement(c, routeMapName, currentEntry, noMatchNextBySeq, continueTargets));
+    }
+
+    // finalize last routing policy
+    currentRoutingPolicyStatements.add(Statements.ReturnLocalDefaultAction.toStaticStatement());
+    RoutingPolicy.builder()
+        .setName(currentRoutingPolicyName)
+        .setOwner(c)
+        .setStatements(currentRoutingPolicyStatements.build())
+        .build();
   }
 
-  private RoutingPolicy toRoutingPolicies(Configuration c, RouteMap map) {
-    RoutingPolicy output = new RoutingPolicy(map.getName(), c);
-    List<Statement> statements = output.getStatements();
-    Map<Integer, RoutingPolicy> clauses = new HashMap<>();
-    // descend map so continue targets are available
-    RoutingPolicy followingClause = null;
-    Integer followingClauseNumber = null;
-    for (Entry<Integer, RouteMapClause> e : map.getClauses().descendingMap().entrySet()) {
-      int clauseNumber = e.getKey();
-      RouteMapClause rmClause = e.getValue();
-      String clausePolicyName = getRouteMapClausePolicyName(map, clauseNumber);
-      Conjunction conj = new Conjunction();
-      // match ipv4s must be disjoined with match ipv6
-      Disjunction matchIpOrPrefix = new Disjunction();
-      for (RouteMapMatchLine rmMatch : rmClause.getMatchList()) {
-        BooleanExpr matchExpr = rmMatch.toBooleanExpr(c, this, _w);
-        if (rmMatch instanceof RouteMapMatchIpAccessListLine
-            || rmMatch instanceof RouteMapMatchIpPrefixListLine
-            || rmMatch instanceof RouteMapMatchIpv6AccessListLine
-            || rmMatch instanceof RouteMapMatchIpv6PrefixListLine) {
-          matchIpOrPrefix.getDisjuncts().add(matchExpr);
-        } else {
-          conj.getConjuncts().add(matchExpr);
-        }
-      }
-      if (!matchIpOrPrefix.getDisjuncts().isEmpty()) {
-        conj.getConjuncts().add(matchIpOrPrefix);
-      }
-      RoutingPolicy clausePolicy = new RoutingPolicy(clausePolicyName, c);
-      c.getRoutingPolicies().put(clausePolicyName, clausePolicy);
-      If ifStatement = new If();
-      clausePolicy.getStatements().add(ifStatement);
-      clauses.put(clauseNumber, clausePolicy);
-      ifStatement.setComment(clausePolicyName);
-      ifStatement.setGuard(conj);
-      List<Statement> onMatchStatements = ifStatement.getTrueStatements();
-      for (RouteMapSetLine rmSet : rmClause.getSetList()) {
-        rmSet.applyTo(onMatchStatements, this, c, _w);
-      }
-      RouteMapContinue continueStatement = rmClause.getContinueLine();
-      Integer continueTarget = null;
-      RoutingPolicy continueTargetPolicy = null;
-      if (continueStatement != null) {
-        continueTarget = continueStatement.getTarget();
-        if (continueTarget == null) {
-          continueTarget = followingClauseNumber;
-        }
-        if (continueTarget != null) {
-          if (continueTarget <= clauseNumber) {
-            throw new BatfishException("Can only continue to later clause");
-          }
-          continueTargetPolicy = clauses.get(continueTarget);
-          if (continueTargetPolicy == null) {
-            String name = "clause: '" + continueTarget + "' in route-map: '" + map.getName() + "'";
-            undefined(
-                AristaStructureType.ROUTE_MAP_CLAUSE,
-                name,
-                AristaStructureUsage.ROUTE_MAP_CONTINUE,
-                continueStatement.getStatementLine());
-            continueStatement = null;
-          }
-        } else {
-          continueStatement = null;
-        }
-      }
-      switch (rmClause.getAction()) {
-        case PERMIT:
-          if (continueStatement == null) {
-            onMatchStatements.add(Statements.ExitAccept.toStaticStatement());
-          } else {
-            onMatchStatements.add(Statements.SetDefaultActionAccept.toStaticStatement());
-            onMatchStatements.add(new CallStatement(continueTargetPolicy.getName()));
-          }
-          break;
+  private @Nonnull Statement toStatement(
+      Configuration c,
+      String routeMapName,
+      RouteMapClause entry,
+      Map<Integer, Integer> noMatchNextBySeq,
+      Set<Integer> continueTargets) {
+    BooleanExpr guard = toMatchBooleanExpr(c, entry);
 
-        case DENY:
-          onMatchStatements.add(Statements.ExitReject.toStaticStatement());
-          break;
-
-        default:
-          throw new BatfishException("Invalid action");
-      }
-      if (followingClause != null) {
-        ifStatement.getFalseStatements().add(new CallStatement(followingClause.getName()));
-      } else {
-        ifStatement
-            .getFalseStatements()
-            .add(Statements.ReturnLocalDefaultAction.toStaticStatement());
-      }
-      followingClause = clausePolicy;
-      followingClauseNumber = clauseNumber;
+    // sets
+    List<Statement> trueStatements = new LinkedList<>();
+    for (RouteMapSetLine rmSet : entry.getSetList()) {
+      rmSet.applyTo(trueStatements, this, c, _w);
     }
-    statements.add(new CallStatement(followingClause.getName()));
-    return output;
+
+    RouteMapContinue cont = entry.getContinueLine();
+    LineAction action = entry.getAction();
+
+    if (cont == null) {
+      // No continue: on match, return the action.
+      if (action == LineAction.PERMIT) {
+        trueStatements.add(Statements.ReturnTrue.toStaticStatement());
+      } else {
+        assert action == LineAction.DENY;
+        trueStatements.add(Statements.ReturnFalse.toStaticStatement());
+      }
+    } else {
+      // Continue: on match, change the default.
+      if (action == LineAction.PERMIT) {
+        trueStatements.add(Statements.SetLocalDefaultActionAccept.toStaticStatement());
+      } else {
+        assert action == LineAction.DENY;
+        trueStatements.add(Statements.SetLocalDefaultActionReject.toStaticStatement());
+      }
+      int target = cont.getTarget();
+      if (continueTargets.contains(target)) {
+        // TODO: verify correct semantics: possibly, should add two statements in this case; first
+        // should set default action to permit/deny if this is a permit/deny entry, and second
+        // should call policy for next entry.
+        trueStatements.add(call(computeRoutingPolicyName(routeMapName, target)));
+      } else {
+        String targetName = String.format("clause: '%s' in route-map: '%s'", target, routeMapName);
+        undefined(
+            AristaStructureType.ROUTE_MAP_CLAUSE,
+            targetName,
+            AristaStructureUsage.ROUTE_MAP_CONTINUE,
+            cont.getStatementLine());
+        // invalid continue target, so just deny
+        // TODO: verify actual behavior
+        trueStatements.add(Statements.ReturnFalse.toStaticStatement());
+      }
+    }
+
+    // final action if not matched
+    Integer noMatchNext = noMatchNextBySeq.get(entry.getSeqNum());
+    List<Statement> noMatchStatements =
+        noMatchNext != null && continueTargets.contains(noMatchNext)
+            ? ImmutableList.of(call(computeRoutingPolicyName(routeMapName, noMatchNext)))
+            : ImmutableList.of();
+    return new If(guard, trueStatements, noMatchStatements);
+  }
+
+  private static @Nonnull Statement callInContext(String routingPolicyName) {
+    return new If(
+        new CallExpr(routingPolicyName),
+        ImmutableList.of(ROUTE_MAP_PERMIT_STATEMENT),
+        ImmutableList.of(ROUTE_MAP_DENY_STATEMENT));
+  }
+
+  private static @Nonnull Statement call(String routingPolicyName) {
+    return new If(
+        new CallExpr(routingPolicyName),
+        ImmutableList.of(Statements.ReturnTrue.toStaticStatement()),
+        ImmutableList.of(Statements.ReturnFalse.toStaticStatement()));
+  }
+
+  private @Nonnull BooleanExpr toMatchBooleanExpr(Configuration c, RouteMapClause rmClause) {
+    Conjunction conj = new Conjunction();
+    // match ipv4s must be disjoined with match ipv6
+    Disjunction matchIpOrPrefix = new Disjunction();
+    for (RouteMapMatchLine rmMatch : rmClause.getMatchList()) {
+      BooleanExpr matchExpr = rmMatch.toBooleanExpr(c, this, _w);
+      if (rmMatch instanceof RouteMapMatchIpAccessListLine
+          || rmMatch instanceof RouteMapMatchIpPrefixListLine
+          || rmMatch instanceof RouteMapMatchIpv6AccessListLine
+          || rmMatch instanceof RouteMapMatchIpv6PrefixListLine) {
+        matchIpOrPrefix.getDisjuncts().add(matchExpr);
+      } else {
+        conj.getConjuncts().add(matchExpr);
+      }
+    }
+    if (!matchIpOrPrefix.getDisjuncts().isEmpty()) {
+      conj.getConjuncts().add(matchIpOrPrefix);
+    }
+    return conj;
+  }
+
+  @VisibleForTesting
+  public static @Nonnull String computeRoutingPolicyName(String routeMapName, int sequence) {
+    return String.format("~%s~SEQ:%d~", routeMapName, sequence);
   }
 
   @Override
@@ -2108,11 +2158,8 @@ public final class AristaConfiguration extends VendorConfiguration {
 
     // TODO: convert route maps that are used for PBR to PacketPolicies
 
-    for (RouteMap map : _routeMaps.values()) {
-      // convert route maps to RoutingPolicy objects
-      RoutingPolicy newPolicy = toRoutingPolicy(c, map);
-      c.getRoutingPolicies().put(newPolicy.getName(), newPolicy);
-    }
+    // convert route maps to RoutingPolicy objects, and install them in the Configuration.
+    _routeMaps.values().forEach(map -> convertRouteMap(c, map));
 
     createInspectClassMapAcls(c);
 

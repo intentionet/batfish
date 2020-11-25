@@ -18642,8 +18642,53 @@
             "name" : "ROUTE_MAP",
             "statements" : [
               {
-                "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
-                "type" : "ReturnFalse"
+                "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                "falseStatements" : [
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                    "falseStatements" : [
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                        "type" : "ExitReject"
+                      }
+                    ],
+                    "guard" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.BooleanExprs$StaticBooleanExpr",
+                      "type" : "CallExprContext"
+                    },
+                    "trueStatements" : [
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                        "type" : "ReturnFalse"
+                      }
+                    ]
+                  }
+                ],
+                "guard" : {
+                  "class" : "org.batfish.datamodel.routing_policy.expr.CallExpr",
+                  "calledPolicyName" : "~ROUTE_MAP~SEQ:10~"
+                },
+                "trueStatements" : [
+                  {
+                    "class" : "org.batfish.datamodel.routing_policy.statement.If",
+                    "falseStatements" : [
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                        "type" : "ExitAccept"
+                      }
+                    ],
+                    "guard" : {
+                      "class" : "org.batfish.datamodel.routing_policy.expr.BooleanExprs$StaticBooleanExpr",
+                      "type" : "CallExprContext"
+                    },
+                    "trueStatements" : [
+                      {
+                        "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                        "type" : "ReturnTrue"
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -18669,6 +18714,23 @@
               {
                 "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
                 "type" : "ReturnFalse"
+              }
+            ]
+          },
+          "~ROUTE_MAP~SEQ:10~" : {
+            "name" : "~ROUTE_MAP~SEQ:10~",
+            "statements" : [
+              {
+                "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                "type" : "SetLocalDefaultActionReject"
+              },
+              {
+                "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                "type" : "ReturnFalse"
+              },
+              {
+                "class" : "org.batfish.datamodel.routing_policy.statement.Statements$StaticStatement",
+                "type" : "ReturnLocalDefaultAction"
               }
             ]
           }
