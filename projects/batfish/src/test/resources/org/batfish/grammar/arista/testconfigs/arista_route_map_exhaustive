@@ -1,0 +1,23 @@
+!RANCID-CONTENT-TYPE: arista
+!
+hostname arista_route_map_exhaustive
+!
+ip community-list cl20 permit 0:2
+!
+ip prefix-list pl30 permit 1.2.3.4/32
+!
+route-map RM deny 10
+ match tag 1
+ set tag 10
+ continue 20
+route-map RM permit 20
+ match community cl20
+ set community 0:20
+ continue 30
+route-map RM deny 30
+ match ip address pl30
+ set metric 10
+route-map RM permit 40
+ set local-preference 40
+ description Done
+!

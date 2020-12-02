@@ -864,6 +864,7 @@ import org.batfish.grammar.arista.AristaParser.Set_metric_type_rm_stanzaContext;
 import org.batfish.grammar.arista.AristaParser.Set_next_hop_peer_address_stanzaContext;
 import org.batfish.grammar.arista.AristaParser.Set_next_hop_rm_stanzaContext;
 import org.batfish.grammar.arista.AristaParser.Set_origin_rm_stanzaContext;
+import org.batfish.grammar.arista.AristaParser.Set_tag_rm_stanzaContext;
 import org.batfish.grammar.arista.AristaParser.Set_weight_rm_stanzaContext;
 import org.batfish.grammar.arista.AristaParser.Sntp_serverContext;
 import org.batfish.grammar.arista.AristaParser.Spanning_tree_portfastContext;
@@ -986,6 +987,7 @@ import org.batfish.representation.arista.RouteMapSetMetricLine;
 import org.batfish.representation.arista.RouteMapSetNextHopLine;
 import org.batfish.representation.arista.RouteMapSetNextHopPeerAddress;
 import org.batfish.representation.arista.RouteMapSetOriginTypeLine;
+import org.batfish.representation.arista.RouteMapSetTagLine;
 import org.batfish.representation.arista.RouteMapSetWeightLine;
 import org.batfish.representation.arista.SimpleExtendedAccessListServiceSpecifier;
 import org.batfish.representation.arista.StandardAccessList;
@@ -7472,6 +7474,12 @@ public class AristaControlPlaneExtractor extends AristaParserBaseListener
     OriginExpr originExpr = toOriginExpr(ctx.origin_expr_literal());
     RouteMapSetLine line = new RouteMapSetOriginTypeLine(originExpr);
     _currentRouteMapClause.addSetLine(line);
+  }
+
+  @Override
+  public void exitSet_tag_rm_stanza(Set_tag_rm_stanzaContext ctx) {
+    long tag = toLong(ctx.tag);
+    _currentRouteMapClause.addSetLine(new RouteMapSetTagLine(tag));
   }
 
   @Override
