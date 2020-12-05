@@ -38,6 +38,7 @@ import static org.batfish.datamodel.matchers.BgpNeighborMatchers.hasRemoteAs;
 import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasActiveNeighbor;
 import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasMultipathEbgp;
 import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasMultipathEquivalentAsPathMatchMode;
+import static org.batfish.datamodel.matchers.BgpProcessMatchers.hasRouterId;
 import static org.batfish.datamodel.matchers.BgpRouteMatchers.hasWeight;
 import static org.batfish.datamodel.matchers.BgpRouteMatchers.isBgpv4RouteThat;
 import static org.batfish.datamodel.matchers.ConfigurationMatchers.hasConfigurationFormat;
@@ -5436,6 +5437,16 @@ public final class CiscoGrammarTest {
     assertThat(ccae, hasNumReferrers(filename, INTERFACE, "GigabitEthernet0/0", 5));
     assertThat(ccae, hasNumReferrers(filename, ROUTE_MAP, "ipnosr", 4));
     assertThat(ccae, hasNumReferrers(filename, NAT_POOL, "p1", 4));
+  }
+
+  @Test
+  public void testIosBgpShowRunAll() throws IOException {
+    Configuration c = parseConfig("ios_bgp_show_run_all");
+    assertThat(c.getVrfs(), hasKeys("default", "VRF2", "VRF3", "VRF4"));
+    assertThat(c.getDefaultVrf().getBgpProcess(), hasRouterId(Ip.parse("1.1.1.1")));
+    assertThat(c.getVrfs().get("VRF2").getBgpProcess(), hasRouterId(Ip.parse("1.1.1.2")));
+    assertThat(c.getVrfs().get("VRF3").getBgpProcess(), hasRouterId(Ip.parse("1.1.1.3")));
+    assertThat(c.getVrfs().get("VRF4").getBgpProcess(), hasRouterId(Ip.parse("1.1.1.4")));
   }
 
   @Test

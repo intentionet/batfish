@@ -1,0 +1,97 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+hostname ios_bgp_show_run_all
+!
+version 15.5
+!
+vrf definition VRF2
+vrf definition VRF3
+vrf definition VRF4
+!
+router bgp 65000
+ no synchronization
+ bgp router-id 1.1.1.1
+ bgp fast-external-fallover
+ bgp route-map-cache
+ no bgp asnotation dot
+ no bgp consistency-checker
+ bgp client-to-client reflection
+ bgp client-to-client reflection intra-cluster cluster-id any
+ bgp transport path-mtu-discovery
+ bgp enforce-first-as
+ bgp log-neighbor-changes
+ bgp dynamic-med-interval 600
+ bgp listen limit 100
+ bgp update-delay 120
+ bgp refresh stalepath-time 0
+ bgp refresh max-eor-time 0
+ bgp regexp deterministic
+ bgp default ipv4-unicast
+ bgp default ipv6-nexthop
+ bgp default local-preference 100
+ bgp default route-target filter
+ bgp aggregate-timer 30
+ bgp update-group split as-override
+ bgp nexthop trigger enable
+ bgp nexthop trigger delay 5
+ bgp scan-time 60
+ timers bgp 60 180 0
+ distance bgp 20 200 200
+ distance mbgp 20 200 200
+ no auto-summary
+ !
+ address-family ipv4 vrf VRF2
+  no synchronization
+  bgp aggregate-timer 30
+  redistribute static metric 10000 route-map STATIC_TO_BGP
+  distance bgp 20 200 200
+  ! Keep router-id last so we make sure we don't exit the vrf by accident
+  bgp router-id 1.1.1.2
+ exit-address-family
+ !
+ address-family ipv4 vrf VRF3
+  no synchronization
+  bgp aggregate-timer 30
+  network 10.0.0.0 mask 255.255.255.0
+  redistribute static metric 1000 route-map STATIC_TO_BGP
+  neighbor PG3 peer-group
+  neighbor PG3 remote-as 65003
+  neighbor PG3 local-as 65100 no-prepend replace-as
+  neighbor PG3 log-neighbor-changes
+  neighbor PG3 weight 0
+  neighbor PG3 soft-reconfiguration inbound
+  neighbor PG3 route-map PG3_IN in
+  neighbor PG3 route-map PG3_OUT out
+  neighbor 3.3.3.3 peer-group PG3
+  neighbor 3.3.3.3 activate
+  distance bgp 20 200 200
+  ! Keep router-id last so we make sure we don't exit the vrf by accident
+  bgp router-id 1.1.1.3
+ exit-address-family
+ !
+ address-family ipv4 vrf VRF4
+  no synchronization
+  bgp aggregate-timer 30
+  redistribute connected metric 0 route-map CONNECTED_TO_BGP
+  redistribute static metric 10 route-map STATIC_TO_BGP
+  redistribute eigrp 44 metric 0 route-map EIGRP_TO_BGP
+  redistribute ospf 1 metric 10000 match internal external 1 external 2 route-map OSPF_TO_BGP
+  neighbor PG4 peer-group
+  neighbor PG4 remote-as 65004
+  neighbor PG4 log-neighbor-changes
+  neighbor PG4 fall-over bfd
+  neighbor PG4 send-community both
+  neighbor PG4 weight 0
+  neighbor PG4 soft-reconfiguration inbound
+  neighbor PG4 route-map PG4_IN in
+  neighbor PG4 route-map PG4_OUT out
+  neighbor 4.4.4.4 peer-group PG4
+  neighbor 4.4.4.4 activate
+  neighbor 4.4.4.4 weight 0
+  neighbor 4.4.4.4 route-map PG4_IN in
+  maximum-paths 2
+  distance bgp 20 200 200
+  ! Keep router-id last so we make sure we don't exit the vrf by accident
+  bgp router-id 1.1.1.4
+ exit-address-family
+!
