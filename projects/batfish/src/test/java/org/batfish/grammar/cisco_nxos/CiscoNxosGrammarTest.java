@@ -7957,6 +7957,7 @@ public final class CiscoNxosGrammarTest {
     {
       // Interface with custom EIGRP BW, delay, passive-interface
       Interface iface = vc.getInterfaces().get("Ethernet1/1");
+      assertThat(iface.getEigrp(), equalTo("1"));
       assertThat(iface.getEigrpBandwidth(), equalTo(300));
       assertThat(iface.getEigrpDelay(), equalTo(400));
       assertTrue(iface.getEigrpPassive());
@@ -7964,6 +7965,7 @@ public final class CiscoNxosGrammarTest {
     {
       // Interface with no custom EIGRP configurations
       Interface iface = vc.getInterfaces().get("Ethernet1/2");
+      assertThat(iface.getEigrp(), equalTo("EIGRP2"));
       assertNull(iface.getEigrpBandwidth());
       assertNull(iface.getEigrpDelay());
       assertFalse(iface.getEigrpPassive());
@@ -7999,10 +8001,11 @@ public final class CiscoNxosGrammarTest {
     }
     {
       /*
+      router eigrp EIGRP2
+        autonomous-system 2
       interface Ethernet1/2
-        vrf member VRF
         ip address 192.0.3.2/24
-        ip router eigrp 1
+        ip router eigrp EIGRP2
        */
       String ifaceName = "Ethernet1/2";
       org.batfish.datamodel.Interface iface = c.getAllInterfaces().get(ifaceName);
@@ -8010,6 +8013,7 @@ public final class CiscoNxosGrammarTest {
       assertThat(iface.getBandwidth(), equalTo(defaultBw));
       EigrpInterfaceSettings eigrp = iface.getEigrp();
       assertNotNull(eigrp);
+      assertThat(eigrp.getAsn(), equalTo(2L));
       // EIGRP metric values have bandwidth in kb/s; VI config has it in bits/s
       assertThat(
           eigrp.getMetric().getValues().getBandwidth(), equalTo(defaultBw.longValue() / 1000));

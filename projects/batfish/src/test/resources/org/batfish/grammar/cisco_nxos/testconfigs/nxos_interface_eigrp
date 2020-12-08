@@ -10,6 +10,9 @@ vrf context VRF
 router eigrp 1
   ! defined so it will be converted
 !
+router eigrp EIGRP2
+  autonomous-system 2
+!
 interface Ethernet1/1
   vrf member VRF
   ip address 192.0.2.2/24
@@ -21,6 +24,5 @@ interface Ethernet1/1
   ip passive-interface eigrp 1
 !
 interface Ethernet1/2
-  vrf member VRF
   ip address 192.0.3.2/24
-  ip router eigrp 1
+  ip router eigrp EIGRP2
