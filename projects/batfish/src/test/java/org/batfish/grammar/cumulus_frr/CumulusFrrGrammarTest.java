@@ -1,6 +1,8 @@
 package org.batfish.grammar.cumulus_frr;
 
 import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
+import static org.batfish.datamodel.matchers.AbstractRouteDecoratorMatchers.hasPrefix;
+import static org.batfish.datamodel.matchers.BgpRouteMatchers.isBgpv4RouteThat;
 import static org.batfish.datamodel.routing_policy.Environment.Direction.OUT;
 import static org.batfish.grammar.cumulus_frr.CumulusFrrConfigurationBuilder.nextMultipleOfFive;
 import static org.batfish.representation.cumulus.CumulusRoutingProtocol.CONNECTED;
@@ -2010,5 +2012,40 @@ public class CumulusFrrGrammarTest {
                     .setLocalPreference(100)
                     .setMetric(22)
                     .build())));
+  }
+
+  @Test
+  public void testStaticRouteNetworkStatementInteraction_behavior() throws IOException {
+    String snapshotName = "static-route-network-statement";
+    List<String> configurationNames =
+        ImmutableList.of("frr-t1-r1", "frr-t1-r2", "frr-t2-r1", "frr-t2-r2");
+    Batfish batfish =
+        BatfishTestUtils.getBatfishFromTestrigText(
+            TestrigText.builder()
+                .setConfigurationFiles(SNAPSHOTS_PREFIX + snapshotName, configurationNames)
+                .build(),
+            _folder);
+
+    NetworkSnapshot snapshot = batfish.getSnapshot();
+    batfish.computeDataPlane(snapshot);
+    DataPlane dp = batfish.loadDataPlane(snapshot);
+    assertThat(
+        batfish.getTopologyProvider().getBgpTopology(snapshot).getGraph().edges(), hasSize(8));
+
+    assertThat(
+        dp.getRibs().get("frr-t2-r1").get(DEFAULT_VRF_NAME).getRoutes(),
+        hasItem(isBgpv4RouteThat(hasPrefix(Prefix.parse("99.13.80.0/21")))));
+
+    assertThat(
+        dp.getRibs().get("frr-t2-r2").get(DEFAULT_VRF_NAME).getRoutes(),
+        hasItem(isBgpv4RouteThat(hasPrefix(Prefix.parse("99.13.80.0/21")))));
+
+    assertThat(
+        dp.getRibs().get("frr-t2-r1").get(DEFAULT_VRF_NAME).getRoutes(),
+        hasItem(isBgpv4RouteThat(hasPrefix(Prefix.parse("99.8.0.0/20")))));
+
+    assertThat(
+        dp.getRibs().get("frr-t2-r2").get(DEFAULT_VRF_NAME).getRoutes(),
+        hasItem(isBgpv4RouteThat(hasPrefix(Prefix.parse("99.8.0.0/20")))));
   }
 }

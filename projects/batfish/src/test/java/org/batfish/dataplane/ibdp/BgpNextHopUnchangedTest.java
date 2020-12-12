@@ -174,6 +174,7 @@ public class BgpNextHopUnchangedTest {
                         .setOwner(r2)
                         .build()
                         .getName())
+                .setRouteReflectorClient(!ebgp)
                 .build())
         .build();
 

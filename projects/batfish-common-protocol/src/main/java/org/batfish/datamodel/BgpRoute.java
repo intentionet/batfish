@@ -287,7 +287,15 @@ public abstract class BgpRoute<B extends Builder<B, R>, R extends BgpRoute<B, R>
   @Nonnull protected final Ip _originatorIp;
   @Nonnull protected final OriginType _originType;
   @Nonnull protected final RoutingProtocol _protocol;
+
+  /**
+   * The {@link Ip} address of the (I)BGP peer from which the route was learned, or {@link Ip#ZERO}
+   * if the BGP route was originated locally.
+   *
+   * <p>Set on origination and on import.
+   */
   @Nullable protected final Ip _receivedFromIp;
+
   protected final boolean _receivedFromRouteReflectorClient;
   @Nullable protected final RoutingProtocol _srcProtocol;
   /* NOTE: Cisco-only attribute */

@@ -664,6 +664,7 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
                   .getAllowLocalAsIn(),
               sessionProperties.isEbgp(),
               _process,
+              sessionProperties.getTailIp(),
               ourConfigId.getPeerInterface());
       if (transformedIncomingRouteBuilder == null) {
         // Route could not be imported for core protocol reasons
@@ -1049,6 +1050,7 @@ final class BgpRoutingProcess implements RoutingProcess<BgpTopology, BgpRoute<?,
                   .getAllowLocalAsIn(),
               sessionProperties.isEbgp(),
               _process,
+              sessionProperties.getTailIp(),
               ourConfigId.getPeerInterface());
       if (transformedBuilder == null) {
         continue;

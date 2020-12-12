@@ -69,6 +69,7 @@ public class BgpProtocolHelperTest {
             false,
             true,
             _process,
+            Ip.ZERO,
             null),
         nullValue());
   }
@@ -83,6 +84,7 @@ public class BgpProtocolHelperTest {
             true,
             true,
             _process,
+            Ip.ZERO,
             null),
         notNullValue());
   }
@@ -97,6 +99,7 @@ public class BgpProtocolHelperTest {
                 false,
                 true,
                 _process,
+                Ip.ZERO,
                 null)
             .getProtocol(),
         equalTo(RoutingProtocol.BGP));
@@ -115,6 +118,7 @@ public class BgpProtocolHelperTest {
                 false,
                 true,
                 _process,
+                Ip.ZERO,
                 null)
             .getNextHopInterface(),
         equalTo(UNSET_NEXT_HOP_INTERFACE));
@@ -133,6 +137,7 @@ public class BgpProtocolHelperTest {
                 false,
                 true,
                 _process,
+                Ip.ZERO,
                 "baz")
             .getNextHopInterface(),
         equalTo("baz"));
@@ -142,9 +147,20 @@ public class BgpProtocolHelperTest {
   public void testTransformOnImportIbgp() {
     assertThat(
         "No AS path loop, iBGP",
-        transformBgpRouteOnImport(_baseBgpRouteBuilder.build(), 1L, false, false, _process, null)
+        transformBgpRouteOnImport(
+                _baseBgpRouteBuilder.build(), 1L, false, false, _process, Ip.ZERO, null)
             .getProtocol(),
         equalTo(RoutingProtocol.IBGP));
+  }
+
+  @Test
+  public void testTransformOnImportReceivedFromIp() {
+    assertThat(
+        transformBgpRouteOnImport(
+                _baseBgpRouteBuilder.build(), 1L, false, false, _process, Ip.parse("1.2.3.4"), null)
+            .build()
+            .getReceivedFromIp(),
+        equalTo(Ip.parse("1.2.3.4")));
   }
 
   @Test
@@ -156,6 +172,7 @@ public class BgpProtocolHelperTest {
             false,
             true,
             _process,
+            Ip.ZERO,
             "eth0");
     assertThat("PeerInterface is set", builder.getNextHopInterface(), equalTo("eth0"));
     assertThat(
