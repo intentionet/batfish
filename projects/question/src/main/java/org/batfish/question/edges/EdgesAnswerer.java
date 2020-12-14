@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Range;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.ValueGraph;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import org.batfish.datamodel.BgpSessionProperties;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.Edge;
+import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpsecPeerConfig;
@@ -458,16 +460,19 @@ public class EdgesAnswerer extends Answerer {
   @VisibleForTesting
   static Row layer2EdgeToRow(Layer2Edge layer2Edge) {
     RowBuilder row = Row.builder();
+    Range<Integer> vlan1 = layer2Edge.getNode1().getSwitchportVlanRange();
+    Range<Integer> vlan2 = layer2Edge.getNode2().getSwitchportVlanRange();
     row.put(
             COL_INTERFACE,
             NodeInterfacePair.of(
                 layer2Edge.getNode1().getHostname(), layer2Edge.getNode1().getInterfaceName()))
-        .put(COL_VLAN, layer2Edge.getNode1().getSwitchportVlanId())
+        // Use integer space to pretty-stringify the range
+        .put(COL_VLAN, vlan1 == null ? null : IntegerSpace.of(vlan1).toString())
         .put(
             COL_REMOTE_INTERFACE,
             NodeInterfacePair.of(
                 layer2Edge.getNode2().getHostname(), layer2Edge.getNode2().getInterfaceName()))
-        .put(COL_REMOTE_VLAN, layer2Edge.getNode2().getSwitchportVlanId());
+        .put(COL_REMOTE_VLAN, vlan2 == null ? null : IntegerSpace.of(vlan2).toString());
 
     return row.build();
   }

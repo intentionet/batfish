@@ -238,7 +238,7 @@ public class BgpTopologyUtilsTest {
     assertThat(bgpTopology.edges(), empty());
 
     // Should see session if they're connected
-    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null, null);
+    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null);
     Layer2Topology connectedLayer2Topology = Layer2Topology.builder().addEdge(edge).build();
     bgpTopology =
         initBgpTopology(_configs, ImmutableMap.of(), true, false, null, connectedLayer2Topology)
@@ -252,8 +252,8 @@ public class BgpTopologyUtilsTest {
             EndpointPair.ordered(peer1Id, peer2To1Id), EndpointPair.ordered(peer2To1Id, peer1Id)));
 
     // Node 1 and 2 both have layer 2 edges but are not connected to any common node
-    Layer2Edge edge1To3 = new Layer2Edge(NODE2, iface2, null, "node3", "iface3", null, null);
-    Layer2Edge edge2To4 = new Layer2Edge(NODE2, iface2, null, "node4", "iface4", null, null);
+    Layer2Edge edge1To3 = new Layer2Edge(NODE2, iface2, null, "node3", "iface3", null);
+    Layer2Edge edge2To4 = new Layer2Edge(NODE2, iface2, null, "node4", "iface4", null);
     Layer2Topology disconnected =
         Layer2Topology.builder().addEdge(edge1To3).addEdge(edge2To4).build();
     bgpTopology =
@@ -292,7 +292,7 @@ public class BgpTopologyUtilsTest {
     _node1BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface1, peer1));
     _node2BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface2, peer2));
 
-    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null, null);
+    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null);
     Layer2Topology connectedLayer2Topology = Layer2Topology.builder().addEdge(edge).build();
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
         initBgpTopology(_configs, ImmutableMap.of(), true, false, null, connectedLayer2Topology)
@@ -336,7 +336,7 @@ public class BgpTopologyUtilsTest {
     _node1BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface1, peer1));
     _node2BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface2, peer2));
 
-    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null, null);
+    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null);
     Layer2Topology connectedLayer2Topology = Layer2Topology.builder().addEdge(edge).build();
 
     // Shouldn't see session come up because of incompatible remote AS

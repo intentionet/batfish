@@ -695,7 +695,7 @@ public class EdgesAnswererTest {
 
   @Test
   public void testLayer2ToRow() {
-    Row row = layer2EdgeToRow(new Layer2Edge("host1", "int1", 1, "host2", "int2", 2, 12));
+    Row row = layer2EdgeToRow(new Layer2Edge("host1", "int1", 1, "host2", "int2", 2));
     assertThat(
         row,
         allOf(

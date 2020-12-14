@@ -1,18 +1,16 @@
 package org.batfish.common.topology;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
-import static java.util.Comparator.naturalOrder;
-import static java.util.Comparator.nullsFirst;
 import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Comparator;
+import com.google.common.collect.Range;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class Layer2Edge implements Comparable<Layer2Edge> {
+public final class Layer2Edge {
   private static final String PROP_ENCAPSULATED_VLAN_ID = "encapsulatedVlanId";
   private static final String PROP_NODE1 = "node1";
   private static final String PROP_NODE2 = "node2";
@@ -21,33 +19,26 @@ public final class Layer2Edge implements Comparable<Layer2Edge> {
   private static @Nonnull Layer2Edge create(
       @JsonProperty(PROP_NODE1) Layer2Node node1,
       @JsonProperty(PROP_NODE2) Layer2Node node2,
-      @JsonProperty(PROP_ENCAPSULATED_VLAN_ID) Integer encapsulatedVlanId) {
-    return new Layer2Edge(requireNonNull(node1), requireNonNull(node2), encapsulatedVlanId);
+      // PROP_ENCAPSULATED_VLAN_ID for backwards compatibility
+      @Nullable @JsonProperty(PROP_ENCAPSULATED_VLAN_ID) Integer encapsulatedVlanId) {
+    return new Layer2Edge(requireNonNull(node1), requireNonNull(node2));
   }
 
-  private final Integer _encapsulatedVlanId;
-
   private final Layer2Node _node1;
-
   private final Layer2Node _node2;
 
   public Layer2Edge(
       @Nonnull Layer1Node node1,
-      @Nullable Integer node1SwitchportVlanId,
+      @Nullable Range<Integer> node1SwitchportVlanId,
       @Nonnull Layer1Node node2,
-      @Nullable Integer node2SwitchportVlanId,
-      @Nullable Integer encapsulatedVlanId) {
+      @Nullable Range<Integer> node2SwitchportVlanId) {
     this(
-        new Layer2Node(node1, node1SwitchportVlanId),
-        new Layer2Node(node2, node2SwitchportVlanId),
-        encapsulatedVlanId);
+        new Layer2Node(node1, node1SwitchportVlanId), new Layer2Node(node2, node2SwitchportVlanId));
   }
 
-  public Layer2Edge(
-      @Nonnull Layer2Node node1, @Nonnull Layer2Node node2, @Nullable Integer encapsulatedVlanId) {
+  public Layer2Edge(@Nonnull Layer2Node node1, @Nonnull Layer2Node node2) {
     _node1 = node1;
     _node2 = node2;
-    _encapsulatedVlanId = encapsulatedVlanId;
   }
 
   public Layer2Edge(
@@ -56,20 +47,16 @@ public final class Layer2Edge implements Comparable<Layer2Edge> {
       @Nullable Integer node1SwitchportVlanId,
       @Nonnull String node2Hostname,
       @Nonnull String node2InterfaceName,
-      @Nullable Integer node2SwitchportVlanId,
-      @Nullable Integer encapsulatedVlanId) {
+      @Nullable Integer node2SwitchportVlanId) {
     this(
-        new Layer2Node(node1Hostname, node1InterfaceName, node1SwitchportVlanId),
-        new Layer2Node(node2Hostname, node2InterfaceName, node2SwitchportVlanId),
-        encapsulatedVlanId);
-  }
-
-  @Override
-  public int compareTo(@Nonnull Layer2Edge o) {
-    return Comparator.comparing(Layer2Edge::getNode1)
-        .thenComparing(Layer2Edge::getNode2)
-        .thenComparing(Layer2Edge::getEncapsulatedVlanId, nullsFirst(naturalOrder()))
-        .compare(this, o);
+        new Layer2Node(
+            node1Hostname,
+            node1InterfaceName,
+            node1SwitchportVlanId == null ? null : Range.singleton(node1SwitchportVlanId)),
+        new Layer2Node(
+            node2Hostname,
+            node2InterfaceName,
+            node2SwitchportVlanId == null ? null : Range.singleton(node2SwitchportVlanId)));
   }
 
   @Override
@@ -83,13 +70,7 @@ public final class Layer2Edge implements Comparable<Layer2Edge> {
     Layer2Edge rhs = (Layer2Edge) obj;
     return (_hashCode == rhs._hashCode || _hashCode == 0 || rhs._hashCode == 0)
         && _node1.equals(rhs._node1)
-        && _node2.equals(rhs._node2)
-        && Objects.equals(_encapsulatedVlanId, rhs._encapsulatedVlanId);
-  }
-
-  @JsonProperty(PROP_ENCAPSULATED_VLAN_ID)
-  public @Nullable Integer getEncapsulatedVlanId() {
-    return _encapsulatedVlanId;
+        && _node2.equals(rhs._node2);
   }
 
   @JsonProperty(PROP_NODE1)
@@ -106,7 +87,7 @@ public final class Layer2Edge implements Comparable<Layer2Edge> {
   public int hashCode() {
     int ret = _hashCode;
     if (ret == 0) {
-      ret = Objects.hash(_node1, _node2, _encapsulatedVlanId);
+      ret = Objects.hash(_node1, _node2);
       _hashCode = ret;
     }
     return ret;
@@ -118,7 +99,6 @@ public final class Layer2Edge implements Comparable<Layer2Edge> {
         .omitNullValues()
         .add(PROP_NODE1, _node1)
         .add(PROP_NODE2, _node2)
-        .add(PROP_ENCAPSULATED_VLAN_ID, _encapsulatedVlanId)
         .toString();
   }
 

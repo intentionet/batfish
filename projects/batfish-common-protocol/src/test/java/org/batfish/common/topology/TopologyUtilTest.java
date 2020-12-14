@@ -294,17 +294,19 @@ public final class TopologyUtilTest {
 
     assertThat(
         computeVniInterNodeEdges(vxlanTopology).collect(ImmutableList.toImmutableList()),
-        containsInAnyOrder(new Layer2Edge(n1, n2, null), new Layer2Edge(n2, n1, null)));
+        containsInAnyOrder(new Layer2Edge(n1, n2), new Layer2Edge(n2, n1)));
   }
 
   @Test
   public void testComputeLayer2Topology_self_edge_optimization() {
     String c1Name = "c1";
     String c2Name = "c2";
+    String c3Name = "c3";
 
     String c1i1Name = "c1i1";
     String c2i1Name = "c2i1";
     String c2i2Name = "c2i2";
+    String c3i1Name = "c3i1";
     Configuration c1 = _cb.setHostname(c1Name).build();
     Vrf v1 = _vb.setOwner(c1).build();
     _ib.setOwner(c1).setVrf(v1).setActive(true);
@@ -320,7 +322,8 @@ public final class TopologyUtilTest {
     c2i2.setSwitchport(true);
     c2i2.setSwitchportMode(SwitchportMode.ACCESS);
     c2i2.setAccessVlan(1);
-    Map<String, Configuration> configs = ImmutableMap.of(c1Name, c1, c2Name, c2);
+    Configuration c3 = _cb.setHostname(c3Name).build();
+    Map<String, Configuration> configs = ImmutableMap.of(c1Name, c1, c2Name, c2, c3Name, c3);
     {
       // c1i1 and c2i1 are connected in layer1.
       Layer1Topology layer1Topology = layer1Topology(c1Name, c1i1Name, c2Name, c2i1Name);
@@ -334,9 +337,7 @@ public final class TopologyUtilTest {
     }
     {
       // c1i1 is only connected to c3i1, leaving c2 without layer1 edges
-      String c3Name = "c3";
-      String c3i1Name = "c3i1";
-      Configuration c3 = _cb.setHostname(c3Name).build();
+
       Vrf v3 = _vb.setOwner(c3).build();
       _ib.setOwner(c3).setVrf(v3).setActive(true);
       _ib.setName(c3i1Name).build();
@@ -636,12 +637,15 @@ public final class TopologyUtilTest {
     i2.setSwitchportMode(SwitchportMode.ACCESS);
     i2.setAccessVlan(2);
 
+    InterfacesByVlanRange ifacesByVlan = InterfacesByVlanRange.create();
+    ifacesByVlan.add(2, i1.getName());
+    ifacesByVlan.add(2, i2.getName());
     ImmutableSet.Builder<Layer2Edge> builder = ImmutableSet.builder();
-    computeLayer2SelfEdges(c1, builder::add);
+    computeLayer2SelfEdges(c1, ifacesByVlan, builder::add);
 
     assertThat(
         builder.build(),
-        equalTo(ImmutableSet.of(new Layer2Edge(c1Name, i1Name, 2, c1Name, i2Name, 2, null))));
+        equalTo(ImmutableSet.of(new Layer2Edge(c1Name, i1Name, 2, c1Name, i2Name, 2))));
   }
 
   @Test
@@ -671,13 +675,13 @@ public final class TopologyUtilTest {
             .setVlan(vlanId)
             .build());
 
+    InterfacesByVlanRange ifacesByVlan = InterfacesByVlanRange.create();
     ImmutableSet.Builder<Layer2Edge> builder = ImmutableSet.builder();
-    computeLayer2SelfEdges(c1, builder::add);
+    computeLayer2SelfEdges(c1, ifacesByVlan, builder::add);
 
     assertThat(
         builder.build(),
-        equalTo(
-            ImmutableSet.of(new Layer2Edge(c1Name, irbName, null, c1Name, vniName, null, null))));
+        equalTo(ImmutableSet.of(new Layer2Edge(c1Name, irbName, null, c1Name, vniName, null))));
   }
 
   @Test
@@ -709,14 +713,17 @@ public final class TopologyUtilTest {
             .setVlan(vlanId)
             .build());
 
+    InterfacesByVlanRange ifacesByVlan = InterfacesByVlanRange.create();
+    ifacesByVlan.add(vlanId, switchportName);
+
     ImmutableSet.Builder<Layer2Edge> builder = ImmutableSet.builder();
-    computeLayer2SelfEdges(c1, builder::add);
+    computeLayer2SelfEdges(c1, ifacesByVlan, builder::add);
 
     assertThat(
         builder.build(),
         equalTo(
             ImmutableSet.of(
-                new Layer2Edge(c1Name, vniName, null, c1Name, switchportName, vlanId, null))));
+                new Layer2Edge(c1Name, vniName, null, c1Name, switchportName, vlanId))));
   }
 
   @Test
