@@ -1,10 +1,20 @@
 !
 hostname ios-nat-static
 !
+ip vrf vrf1
+!
 interface Ethernet1
  ip nat inside
 !
 interface Ethernet2
+ ip nat outside
+!
+interface Ethernet3
+ ip vrf forwarding vrf1
+ ip nat inside
+!
+interface Ethernet4
+ ip vrf forwarding vrf1
  ip nat outside
 !
 
@@ -14,3 +24,6 @@ ip nat inside source static network 1.1.2.0 2.2.2.0 /14
 ip nat inside source static network 1.1.3.0 2.2.3.0 255.255.255.0
 
 ip nat outside source static 6.6.6.6 7.7.7.7
+
+ip nat inside source static 3.3.3.3 4.4.4.4 vrf vrf1
+ip nat outside source static 8.8.8.8 9.9.9.9 vrf vrf1

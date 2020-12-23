@@ -91,6 +91,8 @@ ipnis_list
 :
    // Delegate to common ACL NAT specification
    acl_pool = ipnc_list
+   // order matters
+   ipnios_vrf?
    OVERLOAD?
    NEWLINE
 ;
@@ -112,7 +114,7 @@ ipnis_static
       | ipnios_static_network
    )
    //order of these options matters
-   ( VRF vrfname = variable )?
+   ipnios_vrf?
    ( ROUTE_MAP mapname = variable )?
    ipnioss_modifiers*
    NEWLINE
@@ -122,6 +124,8 @@ ipnos_list
 :
    // Delegate to common ACL NAT specification
    acl_pool = ipnc_list
+   // order matters
+   ipnios_vrf?
    ipnosm_add_route?
    NEWLINE
 ;
@@ -142,12 +146,17 @@ ipnos_static
       ipnios_static_addr
       | ipnios_static_network
    )
-   ( VRF vrfname = variable )?
+   ipnios_vrf?
    (
       ipnosm_add_route
       | ipnioss_modifiers
    )*
    NEWLINE
+;
+
+ipnios_vrf
+:
+  VRF vrfname = variable
 ;
 
 // common modifiers for inside and outside source static NAT

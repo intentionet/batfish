@@ -48,7 +48,6 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Multimaps;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -1885,7 +1884,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
     } else if (!ciscoAsaNats.isEmpty()) {
       generateCiscoAsaNatTransformations(ifaceName, newIface, ciscoAsaNats);
     } else if (!ciscoIosNats.isEmpty()) {
-      generateCiscoIosNatTransformations(ifaceName, newIface, ipAccessLists, c);
+      generateCiscoIosNatTransformations(ifaceName, vrfName, newIface, ipAccessLists, c);
     }
 
     String routingPolicyName = iface.getRoutingPolicy();
@@ -1980,43 +1979,34 @@ public final class CiscoConfiguration extends VendorConfiguration {
 
   private void generateCiscoIosNatTransformations(
       String ifaceName,
+      String vrfName,
       org.batfish.datamodel.Interface newIface,
       Map<String, IpAccessList> ipAccessLists,
       Configuration c) {
-    List<CiscoIosNat> incomingNats = new ArrayList<>();
-    List<CiscoIosNat> outgoingNats = new ArrayList<>();
-
-    // Check if this is an outside interface
-    if (getNatOutside().contains(ifaceName)) {
-      incomingNats.addAll(getCiscoIosNats());
-      outgoingNats.addAll(getCiscoIosNats());
+    if (!getNatOutside().contains(ifaceName)) {
+      return;
     }
 
     // Convert the IOS NATs to a mapping of transformations. Each field (source or destination)
     // can be modified independently but not jointly. A single CiscoIosNat can represent an incoming
     // NAT, an outgoing NAT, or both.
+    Map<CiscoIosNat, Transformation.Builder> convertedIncomingNats = new HashMap<>();
+    Map<CiscoIosNat, Transformation.Builder> convertedOutgoingNats = new HashMap<>();
+    for (CiscoIosNat nat : getCiscoIosNats()) {
+      // Filter to NAT rules in this interface's VRF
+      if (!firstNonNull(nat.getVrf(), Configuration.DEFAULT_VRF_NAME).equals(vrfName)) {
+        continue;
+      }
+      nat.toIncomingTransformation(ipAccessLists, _natPools)
+          .ifPresent(incoming -> convertedIncomingNats.put(nat, incoming));
+      nat.toOutgoingTransformation(ipAccessLists, _natPools, getNatInside(), c)
+          .ifPresent(outgoing -> convertedOutgoingNats.put(nat, outgoing));
+    }
 
-    Map<CiscoIosNat, Transformation.Builder> convertedIncomingNats =
-        incomingNats.stream()
-            .map(
-                nat ->
-                    new SimpleEntry<>(nat, nat.toIncomingTransformation(ipAccessLists, _natPools)))
-            .filter(entry -> entry.getValue().isPresent())
-            .collect(Collectors.toMap(SimpleEntry::getKey, entry -> entry.getValue().get()));
     if (!convertedIncomingNats.isEmpty()) {
       newIface.setIncomingTransformation(
           CiscoIosNatUtil.toIncomingTransformationChain(convertedIncomingNats));
     }
-
-    Map<CiscoIosNat, Transformation.Builder> convertedOutgoingNats =
-        outgoingNats.stream()
-            .map(
-                nat ->
-                    new SimpleEntry<>(
-                        nat,
-                        nat.toOutgoingTransformation(ipAccessLists, _natPools, getNatInside(), c)))
-            .filter(entry -> entry.getValue().isPresent())
-            .collect(Collectors.toMap(SimpleEntry::getKey, entry -> entry.getValue().get()));
     if (!convertedOutgoingNats.isEmpty()) {
       newIface.setOutgoingTransformation(
           CiscoIosNatUtil.toOutgoingTransformationChain(convertedOutgoingNats));

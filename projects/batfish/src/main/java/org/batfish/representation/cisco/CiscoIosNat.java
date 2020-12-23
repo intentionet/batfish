@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.BatfishException;
 import org.batfish.datamodel.Configuration;
@@ -20,6 +21,7 @@ import org.batfish.datamodel.transformation.Transformation;
 public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializable {
 
   private RuleAction _action;
+  @Nullable private String _vrf;
 
   /**
    * All IOS NATs have a particular action which defines where and when to modify source and
@@ -31,6 +33,16 @@ public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializab
 
   public final void setAction(RuleAction action) {
     _action = action;
+  }
+
+  /** Which VRF this NAT is in */
+  @Nullable
+  public String getVrf() {
+    return _vrf;
+  }
+
+  public void setVrf(@Nullable String vrf) {
+    _vrf = vrf;
   }
 
   /**

@@ -35,13 +35,14 @@ public class CiscoIosStaticNat extends CiscoIosNat {
     }
     CiscoIosStaticNat other = (CiscoIosStaticNat) o;
     return (getAction() == other.getAction())
+        && Objects.equals(getVrf(), other.getVrf())
         && Objects.equals(_localNetwork, other._localNetwork)
         && Objects.equals(_globalNetwork, other._globalNetwork);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getAction(), _localNetwork, _globalNetwork);
+    return Objects.hash(getAction(), _localNetwork, _globalNetwork, getVrf());
   }
 
   public Prefix getLocalNetwork() {

@@ -675,6 +675,7 @@ import org.batfish.grammar.cisco.CiscoParser.Ipnc_listContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipni_destinationContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipnios_static_addrContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipnios_static_networkContext;
+import org.batfish.grammar.cisco.CiscoParser.Ipnios_vrfContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipnioss_local_globalContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipniossm_extendableContext;
 import org.batfish.grammar.cisco.CiscoParser.Ipnis_listContext;
@@ -6243,28 +6244,19 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void enterIpnios_static_addr(Ipnios_static_addrContext ctx) {
-    CiscoIosStaticNat staticNat = new CiscoIosStaticNat();
-    _currentIosSourceNat = staticNat;
+  public void exitIpnios_static_addr(Ipnios_static_addrContext ctx) {
+    assert _currentIosSourceNat instanceof CiscoIosStaticNat;
+    CiscoIosStaticNat staticNat = (CiscoIosStaticNat) _currentIosSourceNat;
     Entry<Ip, Ip> e = toIosNatLocalGlobalIps(ctx.ips);
     staticNat.setLocalNetwork(Prefix.create(e.getKey(), Prefix.MAX_PREFIX_LENGTH));
     staticNat.setGlobalNetwork(Prefix.create(e.getValue(), Prefix.MAX_PREFIX_LENGTH));
-    staticNat.setAction(
-        _currentIosNatDirection == Direction.INSIDE
-            ? RuleAction.SOURCE_INSIDE
-            : RuleAction.SOURCE_OUTSIDE);
-    _configuration.getCiscoIosNats().add(staticNat);
+    _configuration.getCiscoIosNats().add(_currentIosSourceNat);
   }
 
   @Override
-  public void exitIpnios_static_addr(Ipnios_static_addrContext ctx) {
-    _currentIosSourceNat = null;
-  }
-
-  @Override
-  public void enterIpnios_static_network(Ipnios_static_networkContext ctx) {
-    CiscoIosStaticNat staticNat = new CiscoIosStaticNat();
-    _currentIosSourceNat = staticNat;
+  public void exitIpnios_static_network(Ipnios_static_networkContext ctx) {
+    assert _currentIosSourceNat instanceof CiscoIosStaticNat;
+    CiscoIosStaticNat staticNat = (CiscoIosStaticNat) _currentIosSourceNat;
     int prefixLength;
     if (ctx.mask != null) {
       Ip mask = toIp(ctx.mask);
@@ -6275,11 +6267,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     Entry<Ip, Ip> e = toIosNatLocalGlobalIps(ctx.ips);
     staticNat.setLocalNetwork(Prefix.create(e.getKey(), prefixLength));
     staticNat.setGlobalNetwork(Prefix.create(e.getValue(), prefixLength));
-    staticNat.setAction(
-        _currentIosNatDirection == Direction.INSIDE
-            ? RuleAction.SOURCE_INSIDE
-            : RuleAction.SOURCE_OUTSIDE);
     _configuration.getCiscoIosNats().add(_currentIosSourceNat);
+  }
+
+  @Override
+  public void exitIpnios_vrf(Ipnios_vrfContext ctx) {
+    assert _currentIosSourceNat != null;
+    _currentIosSourceNat.setVrf(ctx.vrfname.getText());
+    super.exitIpnios_vrf(ctx);
   }
 
   @Override
@@ -6306,15 +6301,20 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void enterIpnis_static(Ipnis_staticContext ctx) {
+    // Note that this NAT is not added to the configuration until its local & global IPs are set
+    _currentIosSourceNat = new CiscoIosStaticNat();
+    _currentIosSourceNat.setAction(RuleAction.SOURCE_INSIDE);
+  }
+
+  @Override
   public void exitIpnis_static(Ipnis_staticContext ctx) {
-    if (ctx.VRF() != null) {
-      warn(ctx, "vrf specification in 'ip nat inside source static' is not supported");
-    }
     if (ctx.ROUTE_MAP() != null) {
       _configuration.referenceStructure(
           ROUTE_MAP, ctx.mapname.getText(), IP_NAT_INSIDE_SOURCE_STATIC, ctx.getStart().getLine());
       warn(ctx, "route-map specification in 'ip nat inside source static' is not supported");
     }
+    _currentIosSourceNat = null;
   }
 
   @Override
@@ -6327,10 +6327,15 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void enterIpnos_static(Ipnos_staticContext ctx) {
+    // Note that this NAT is not added to the configuration until its local & global IPs are set
+    _currentIosSourceNat = new CiscoIosStaticNat();
+    _currentIosSourceNat.setAction(RuleAction.SOURCE_OUTSIDE);
+  }
+
+  @Override
   public void exitIpnos_static(Ipnos_staticContext ctx) {
-    if (ctx.VRF() != null) {
-      warn(ctx, "vrf specification in 'ip nat outside source static' is not supported");
-    }
+    _currentIosSourceNat = null;
   }
 
   @Override

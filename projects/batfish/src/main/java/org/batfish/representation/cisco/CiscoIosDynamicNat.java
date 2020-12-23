@@ -61,13 +61,14 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
     }
     CiscoIosDynamicNat other = (CiscoIosDynamicNat) o;
     return (getAction() == other.getAction())
+        && Objects.equals(getVrf(), other.getVrf())
         && Objects.equals(_aclName, other._aclName)
         && Objects.equals(_natPool, other._natPool);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(_aclName, getAction(), _natPool);
+    return Objects.hash(_aclName, getAction(), _natPool, getVrf());
   }
 
   @Override
