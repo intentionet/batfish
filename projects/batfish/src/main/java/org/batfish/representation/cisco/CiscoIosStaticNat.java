@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.Prefix;
@@ -14,6 +15,7 @@ import org.batfish.datamodel.acl.MatchSrcInterface;
 import org.batfish.datamodel.transformation.Transformation;
 import org.batfish.datamodel.transformation.TransformationStep;
 
+@ParametersAreNonnullByDefault
 public class CiscoIosStaticNat extends CiscoIosNat {
 
   private Prefix _localNetwork;
@@ -29,7 +31,7 @@ public class CiscoIosStaticNat extends CiscoIosNat {
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (!(o instanceof CiscoIosStaticNat)) {
       return false;
     }
@@ -65,7 +67,8 @@ public class CiscoIosStaticNat extends CiscoIosNat {
   public Optional<Transformation.Builder> toOutgoingTransformation(
       Map<String, IpAccessList> ipAccessLists,
       Map<String, NatPool> natPools,
-      @Nullable Set<String> insideInterfaces,
+      Set<String> insideInterfaces,
+      Map<String, Interface> interfaces,
       Configuration c) {
 
     /*
@@ -87,16 +90,15 @@ public class CiscoIosStaticNat extends CiscoIosNat {
         return Optional.empty();
     }
 
-    if (insideInterfaces != null) {
-      matchExpr = AclLineMatchExprs.and(matchExpr, new MatchSrcInterface(insideInterfaces));
-    }
-
+    matchExpr = AclLineMatchExprs.and(matchExpr, new MatchSrcInterface(insideInterfaces));
     return Optional.of(Transformation.when(matchExpr).apply(step));
   }
 
   @Override
   public Optional<Transformation.Builder> toIncomingTransformation(
-      Map<String, IpAccessList> ipAccessLists, Map<String, NatPool> natPools) {
+      Map<String, IpAccessList> ipAccessLists,
+      Map<String, NatPool> natPools,
+      Map<String, Interface> interfaces) {
     /*
      * No named ACL in rule, but need to match src/dest to global/local according
      * to direction and rule type

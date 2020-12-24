@@ -6210,7 +6210,24 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
 
   @Override
   public void enterIpnis_list(Ipnis_listContext ctx) {
-    _currentIosSourceNat = toIosDynamicNat(ctx.acl_pool, RuleAction.SOURCE_INSIDE);
+    CiscoIosDynamicNat nat = new CiscoIosDynamicNat();
+    nat.setAction(RuleAction.SOURCE_INSIDE);
+    String acl = ctx.acl.getText();
+    _configuration.referenceStructure(
+        IPV4_ACCESS_LIST, acl, IP_NAT_SOURCE_ACCESS_LIST, ctx.getStart().getLine());
+    nat.setAclName(ctx.acl.getText());
+    if (ctx.iname != null) {
+      String iname = getCanonicalInterfaceName(ctx.iname.getText());
+      _configuration.referenceStructure(
+          INTERFACE, iname, IP_NAT_INSIDE_SOURCE, ctx.getStart().getLine());
+      nat.setInterface(iname);
+    } else {
+      String pool = ctx.pool.getText();
+      _configuration.referenceStructure(
+          NAT_POOL, ctx.pool.getText(), IP_NAT_INSIDE_SOURCE, ctx.getStart().getLine());
+      nat.setNatPool(pool);
+    }
+    _currentIosSourceNat = nat;
     _configuration.getCiscoIosNats().add(_currentIosSourceNat);
   }
 
@@ -6296,8 +6313,14 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     warn(ctx, "ip nat inside source route-map is not supported");
     _configuration.referenceStructure(
         ROUTE_MAP, ctx.mapname.getText(), IP_NAT_INSIDE_SOURCE, ctx.getStart().getLine());
-    _configuration.referenceStructure(
-        INTERFACE, ctx.iname.getText(), IP_NAT_INSIDE_SOURCE, ctx.getStart().getLine());
+    if (ctx.iname != null) {
+      String iname = getCanonicalInterfaceName(ctx.iname.getText());
+      _configuration.referenceStructure(
+          INTERFACE, iname, IP_NAT_INSIDE_SOURCE, ctx.getStart().getLine());
+    } else {
+      _configuration.referenceStructure(
+          NAT_POOL, ctx.pool.getText(), IP_NAT_INSIDE_SOURCE, ctx.getStart().getLine());
+    }
   }
 
   @Override

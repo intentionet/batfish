@@ -1997,9 +1997,9 @@ public final class CiscoConfiguration extends VendorConfiguration {
       if (!firstNonNull(nat.getVrf(), Configuration.DEFAULT_VRF_NAME).equals(vrfName)) {
         continue;
       }
-      nat.toIncomingTransformation(ipAccessLists, _natPools)
+      nat.toIncomingTransformation(ipAccessLists, _natPools, _interfaces)
           .ifPresent(incoming -> convertedIncomingNats.put(nat, incoming));
-      nat.toOutgoingTransformation(ipAccessLists, _natPools, getNatInside(), c)
+      nat.toOutgoingTransformation(ipAccessLists, _natPools, getNatInside(), _interfaces, c)
           .ifPresent(outgoing -> convertedOutgoingNats.put(nat, outgoing));
     }
 
@@ -3689,7 +3689,7 @@ public final class CiscoConfiguration extends VendorConfiguration {
         CiscoStructureUsage.ZONE_PAIR_DESTINATION_ZONE,
         CiscoStructureUsage.ZONE_PAIR_SOURCE_ZONE);
 
-    markConcreteStructure(CiscoStructureType.NAT_POOL, CiscoStructureUsage.IP_NAT_SOURCE_POOL);
+    markConcreteStructure(CiscoStructureType.NAT_POOL);
     markConcreteStructure(
         CiscoStructureType.AS_PATH_ACCESS_LIST,
         CiscoStructureUsage.BGP_NEIGHBOR_FILTER_AS_PATH_ACCESS_LIST,

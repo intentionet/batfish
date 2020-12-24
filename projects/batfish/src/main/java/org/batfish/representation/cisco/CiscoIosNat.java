@@ -59,6 +59,7 @@ public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializab
       Map<String, IpAccessList> ipAccessLists,
       Map<String, NatPool> natPools,
       Set<String> insideInterfaces,
+      Map<String, Interface> interfaces,
       Configuration c);
 
   /**
@@ -70,10 +71,12 @@ public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializab
    *     Transformation} could not be built
    */
   public abstract Optional<Transformation.Builder> toIncomingTransformation(
-      Map<String, IpAccessList> ipAccessLists, Map<String, NatPool> natPools);
+      Map<String, IpAccessList> ipAccessLists,
+      Map<String, NatPool> natPools,
+      Map<String, Interface> interfaces);
 
   @Override
-  public abstract boolean equals(Object o);
+  public abstract boolean equals(@Nullable Object o);
 
   @Override
   public abstract int hashCode();

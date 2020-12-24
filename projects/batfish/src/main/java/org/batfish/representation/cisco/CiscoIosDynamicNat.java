@@ -20,6 +20,7 @@ import org.batfish.datamodel.AclLine;
 import org.batfish.datamodel.Configuration;
 import org.batfish.datamodel.ExprAclLine;
 import org.batfish.datamodel.HeaderSpace;
+import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.IpAccessList;
 import org.batfish.datamodel.IpSpace;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
@@ -34,6 +35,8 @@ import org.batfish.datamodel.transformation.TransformationStep;
 public final class CiscoIosDynamicNat extends CiscoIosNat {
 
   private @Nullable String _aclName;
+  /* Interface whose address to use as pool (this and _natPool are mutually exclusive) */
+  private @Nullable String _interface;
   private @Nullable String _natPool;
 
   @VisibleForTesting
@@ -50,12 +53,16 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
     _aclName = aclName;
   }
 
+  public void setInterface(@Nullable String iface) {
+    _interface = iface;
+  }
+
   public void setNatPool(@Nullable String natPool) {
     _natPool = natPool;
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (!(o instanceof CiscoIosDynamicNat)) {
       return false;
     }
@@ -63,12 +70,13 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
     return (getAction() == other.getAction())
         && Objects.equals(getVrf(), other.getVrf())
         && Objects.equals(_aclName, other._aclName)
+        && Objects.equals(_interface, other._interface)
         && Objects.equals(_natPool, other._natPool);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(_aclName, getAction(), _natPool, getVrf());
+    return Objects.hash(_aclName, getAction(), _interface, _natPool, getVrf());
   }
 
   @Override
@@ -108,7 +116,9 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
 
   @Override
   public Optional<Transformation.Builder> toIncomingTransformation(
-      Map<String, IpAccessList> ipAccessLists, Map<String, NatPool> natPools) {
+      Map<String, IpAccessList> ipAccessLists,
+      Map<String, NatPool> natPools,
+      Map<String, Interface> interfaces) {
     // SOURCE_OUTSIDE matches and dynamically translates source addresses on ingress.
     if (getAction() != RuleAction.SOURCE_OUTSIDE) {
       // INSIDE rules require reverse translation on ingress, which is not
@@ -116,11 +126,11 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
       return Optional.empty();
     }
 
-    if (isMalformed(natPools, ipAccessLists)) {
+    if (isMalformed(natPools, ipAccessLists, interfaces)) {
       return Optional.empty();
     }
 
-    return Optional.of(makeTransformation(permittedByAcl(_aclName), natPools.get(_natPool), false));
+    return Optional.of(makeTransformation(permittedByAcl(_aclName), false, natPools, interfaces));
   }
 
   @Override
@@ -128,6 +138,7 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
       Map<String, IpAccessList> ipAccessLists,
       Map<String, NatPool> natPools,
       Set<String> insideInterfaces,
+      Map<String, Interface> interfaces,
       Configuration c) {
     /*
      * SOURCE_INSIDE matches and dynamically translates source addresses on egress
@@ -140,7 +151,7 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
       return Optional.empty();
     }
 
-    if (isMalformed(natPools, ipAccessLists)) {
+    if (isMalformed(natPools, ipAccessLists, interfaces)) {
       return Optional.empty();
     }
     assert _aclName != null; // invariant of isMalformed being false, to help compiler.
@@ -190,19 +201,38 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
 
     AclLineMatchExpr natAclExpr =
         and(permittedByAcl(natAcl.getName()), new MatchSrcInterface(insideInterfaces));
-    return Optional.of(makeTransformation(natAclExpr, natPools.get(_natPool), true));
+    return Optional.of(makeTransformation(natAclExpr, true, natPools, interfaces));
   }
 
   /**
    * Returns the (forward) transformation for this dynamic NAT expression using the given condition
-   * on which to NAT, pool to NAT into, and the direction of traffic.
+   * on which to NAT, the direction of traffic, and the available NatPools and Interfaces. Assumes
+   * {@link #isMalformed(Map, Map, Map)} has passed.
    */
   private Transformation.Builder makeTransformation(
-      AclLineMatchExpr shouldNat, NatPool pool, boolean outgoing) {
+      AclLineMatchExpr shouldNat,
+      boolean outgoing,
+      Map<String, NatPool> natPools,
+      Map<String, Interface> interfaces) {
+    if (_natPool != null) {
+      NatPool pool = natPools.get(_natPool);
+      return makeTransformation(shouldNat, pool.getFirst(), pool.getLast(), outgoing);
+    } else {
+      Ip ifaceAddress = interfaces.get(_interface).getAddress().getIp();
+      return makeTransformation(shouldNat, ifaceAddress, ifaceAddress, outgoing);
+    }
+  }
+
+  /**
+   * Returns the (forward) transformation for this dynamic NAT expression using the given condition
+   * on which to NAT, endpoint IPs for the pool, and the direction of traffic.
+   */
+  private Transformation.Builder makeTransformation(
+      AclLineMatchExpr shouldNat, Ip first, Ip last, boolean outgoing) {
     TransformationStep step =
         getAction().whatChanges(outgoing) == IpField.SOURCE
-            ? assignSourceIp(pool.getFirst(), pool.getLast())
-            : assignDestinationIp(pool.getFirst(), pool.getLast());
+            ? assignSourceIp(first, last)
+            : assignDestinationIp(first, last);
     return when(shouldNat).apply(step);
   }
 
@@ -211,7 +241,9 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
    * NAT pools and access lists.
    */
   private boolean isMalformed(
-      Map<String, NatPool> natPools, Map<String, IpAccessList> ipAccessLists) {
+      Map<String, NatPool> natPools,
+      Map<String, IpAccessList> ipAccessLists,
+      Map<String, Interface> interfaces) {
     // Validate that ACL is configured, present, and is a standard ACL.
     if (_aclName == null) {
       // Not configured (should be rejected by parser, but confirm).
@@ -228,12 +260,22 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
       return true;
     }
 
-    // Validate that NAT pool is configured and present.
-    if (_natPool == null) {
-      // Parser allows this for Arista NAT (nat overload), but it is not supported
+    // Validate that NAT pool xor interface is configured and valid.
+    // Parser allows unconfigured NAT pool for Arista NAT (nat overload), but it is not supported.
+    if ((_natPool == null) == (_interface == null)) {
+      // this shouldn't be possible from extraction, but check anyway
       return true;
     }
-    if (!natPools.containsKey(_natPool)) {
+    if (_natPool == null) {
+      // Interface can only be used for inside source NAT (at least on IOS).
+      if (getAction() != RuleAction.SOURCE_INSIDE) {
+        return true;
+      }
+      Interface iface = interfaces.get(_interface);
+      if (iface == null || iface.getAddress() == null) {
+        return true;
+      }
+    } else if (!natPools.containsKey(_natPool)) {
       // Configuration has an invalid reference
       return true;
     }

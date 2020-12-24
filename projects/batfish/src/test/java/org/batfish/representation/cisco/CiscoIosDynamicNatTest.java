@@ -41,6 +41,18 @@ public class CiscoIosDynamicNatTest {
       diffPool.setNatPool("diffpool");
       et.addEqualityGroup(diffPool);
     }
+    {
+      CiscoIosDynamicNat ifaceNat = baseNat();
+      ifaceNat.setNatPool(null);
+      ifaceNat.setInterface("iface");
+      et.addEqualityGroup(ifaceNat);
+    }
+    {
+      CiscoIosDynamicNat diffIface = baseNat();
+      diffIface.setNatPool(null);
+      diffIface.setInterface("diffIface");
+      et.addEqualityGroup(diffIface);
+    }
     et.testEquals();
   }
 

@@ -89,8 +89,11 @@ ipnosm_add_route
 
 ipnis_list
 :
-   // Delegate to common ACL NAT specification
-   acl_pool = ipnc_list
+   LIST acl = variable
+   (
+     POOL pool = variable
+     | INTERFACE iname = interface_name
+   )
    // order matters
    ipnios_vrf?
    OVERLOAD?
@@ -100,7 +103,10 @@ ipnis_list
 ipnis_route_map
 :
    ROUTE_MAP mapname = variable
-   INTERFACE iname = interface_name
+   (
+     POOL pool = variable
+     | INTERFACE iname = interface_name
+   )
    ( VRF variable )?
    OVERLOAD?
    NEWLINE

@@ -53,6 +53,11 @@ ip nat inside source route-map ipnisr interface GigabitEthernet0/0 vrf v1
 ip nat inside source route-map ipnisr interface GigabitEthernet0/0 vrf v1 overload
 ip nat inside source route-map ipnisr interface GigabitEthernet0/0 overload
 !
+ip nat inside source route-map ipnisr pool p1
+ip nat inside source route-map ipnisr pool p1 vrf v1
+ip nat inside source route-map ipnisr pool p1 vrf v1 overload
+ip nat inside source route-map ipnisr pool p1 overload
+!
 ! outside source route-map
 !
 route-map ipnosr permit 10
@@ -67,10 +72,15 @@ ip nat outside source route-map ipnosr pool p1 add-route
 !
 ! inside list
 !
-ip nat inside source list acl1 pool p1
-ip nat inside source list acl1 pool p1 overload
+access-list 10 permit any
+!
+ip nat inside source list 10 pool p1
+ip nat inside source list 10 pool p1 overload
+!
+ip nat inside source list 10 interface GigabitEthernet0/0
+ip nat inside source list 10 interface GigabitEthernet0/0 overload
 !
 ! outside list
 !
-ip nat outside source list acl1 pool p1
-ip nat outside source list acl1 pool p1 add-route
+ip nat outside source list 10 pool p1
+ip nat outside source list 10 pool p1 add-route

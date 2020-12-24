@@ -5599,10 +5599,11 @@ public final class CiscoGrammarTest {
         batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
 
     assertThat(ccae, hasNumReferrers(filename, ROUTE_MAP, "ipniss", 4));
-    assertThat(ccae, hasNumReferrers(filename, ROUTE_MAP, "ipnisr", 4));
-    assertThat(ccae, hasNumReferrers(filename, INTERFACE, "GigabitEthernet0/0", 5));
+    assertThat(ccae, hasNumReferrers(filename, ROUTE_MAP, "ipnisr", 8));
+    assertThat(ccae, hasNumReferrers(filename, INTERFACE, "GigabitEthernet0/0", 7));
     assertThat(ccae, hasNumReferrers(filename, ROUTE_MAP, "ipnosr", 4));
-    assertThat(ccae, hasNumReferrers(filename, NAT_POOL, "p1", 4));
+    assertThat(ccae, hasNumReferrers(filename, NAT_POOL, "p1", 12));
+    assertThat(ccae, hasNumReferrers(filename, IPV4_ACCESS_LIST_STANDARD, "10", 6));
   }
 
   @Test
