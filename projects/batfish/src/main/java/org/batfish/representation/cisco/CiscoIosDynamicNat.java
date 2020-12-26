@@ -72,8 +72,38 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
   }
 
   @Override
-  protected int natCompare(CiscoIosNat other) {
-    return 0;
+  protected int natCompare(CiscoIosNat o) {
+    if (!(o instanceof CiscoIosDynamicNat)) {
+      return 0;
+    }
+    // Based on GNS3 testing, dynamic NAT rules are applied in order of ACL name.
+    // Deprioritize NATs with null ACLs, as they can't be converted at all.
+    CiscoIosDynamicNat other = (CiscoIosDynamicNat) o;
+    if (_aclName == null) {
+      return other._aclName == null ? 0 : -1;
+    } else if (other._aclName == null) {
+      return 1;
+    }
+    // ACLs with numeric names come first in numerical order, followed by others in lexicographical
+    // order. It is not possible to configure two rules with the same ACL.
+    int thisAcl = 0; // not a configurable ACL id
+    int otherAcl = 0;
+    try {
+      thisAcl = Integer.parseInt(_aclName);
+    } catch (NumberFormatException ignored) {
+      // expected
+    }
+    try {
+      otherAcl = Integer.parseInt(other._aclName);
+    } catch (NumberFormatException ignored) {
+      // expected
+    }
+    if (thisAcl != 0 && otherAcl != 0) {
+      return Integer.compare(otherAcl, thisAcl);
+    }
+    // Don't need to special-case exactly one ACL being numeric, because numbers come first
+    // lexicographically anyway. Non-numeric ACL names must begin with a letter.
+    return other._aclName.compareTo(_aclName);
   }
 
   @Override
