@@ -474,6 +474,11 @@ MAX_MED
   'max-med'
 ;
 
+MAX_METRIC
+:
+  'max-metric'
+;
+
 MESSAGE_DIGEST
 :
   'message-digest'
@@ -727,6 +732,11 @@ NEWLINE
 NEXT_HOP
 :
   'next-hop'
+;
+
+ROUTER_LSA
+:
+  'router-lsa'
 ;
 
 ROUTE_REFLECTOR_CLIENT

@@ -15,6 +15,7 @@ s_router_ospf
     | ro_passive_interface
     | ro_router_id
     | ro_redistribute
+    | ro_max_metric_router_lsa_administrative
   )*
 ;
 
@@ -78,4 +79,9 @@ ro_router_id
 :
   // router-id without OSPF is accepted by FRR (even though its not documented)
   OSPF? ROUTER_ID ip = IP_ADDRESS NEWLINE
+;
+
+ro_max_metric_router_lsa_administrative
+:
+  MAX_METRIC ROUTER_LSA ADMINISTRATIVE NEWLINE
 ;

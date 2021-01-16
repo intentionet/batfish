@@ -18,6 +18,7 @@ public class OspfProcess implements Serializable {
   public static String DEFAULT_OSPF_PROCESS_NAME = "default";
 
   private Map<CumulusRoutingProtocol, RedistributionPolicy> _redistributionPolicies;
+  private boolean _maxMetricRouterLsa;
 
   public OspfProcess() {
     _defaultVrf = new OspfVrf(Configuration.DEFAULT_VRF_NAME);
@@ -45,5 +46,13 @@ public class OspfProcess implements Serializable {
 
   public Map<CumulusRoutingProtocol, RedistributionPolicy> getRedistributionPolicies() {
     return _redistributionPolicies;
+  }
+
+  public boolean getMaxMetricRouterLsa() {
+    return _maxMetricRouterLsa;
+  }
+
+  public void setMaxMetricRouterLsa(boolean maxMetricRouterLsa) {
+    _maxMetricRouterLsa = maxMetricRouterLsa;
   }
 }
