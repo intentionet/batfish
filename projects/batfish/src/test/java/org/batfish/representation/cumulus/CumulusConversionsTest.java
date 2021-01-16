@@ -1239,6 +1239,26 @@ public final class CumulusConversionsTest {
   }
 
   @Test
+  public void testToOspfProcess_MaxMetricRouterLsa() {
+    OspfVrf ospfVrf = new OspfVrf(DEFAULT_VRF_NAME);
+    CumulusNcluConfiguration vsConfig = new CumulusNcluConfiguration();
+    OspfProcess vsOspf = new OspfProcess();
+    vsOspf.setMaxMetricRouterLsa(true);
+    vsConfig.setOspfProcess(vsOspf);
+
+    org.batfish.datamodel.ospf.OspfProcess ospfProcess =
+        toOspfProcess(
+            new Configuration("dummy", ConfigurationFormat.CUMULUS_NCLU),
+            vsConfig,
+            ospfVrf,
+            ImmutableMap.of(),
+            new Warnings());
+    assertThat(
+        ospfProcess.getMaxMetricTransitLinks(),
+        equalTo(CumulusConversions.DEFAULT_OSPF_MAX_METRIC));
+  }
+
+  @Test
   public void testConvertOspfRedistributionPolicy() {
     // setup VI model
     NetworkFactory nf = new NetworkFactory();

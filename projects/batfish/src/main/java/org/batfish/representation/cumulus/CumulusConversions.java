@@ -144,6 +144,7 @@ public final class CumulusConversions {
   public static final Ip CLAG_LINK_LOCAL_IP = Ip.parse("169.254.40.94");
 
   public static final long DEFAULT_MAX_MED = 4294967294L;
+  public static final long DEFAULT_OSPF_MAX_METRIC = 0xFFFF;
 
   @VisibleForTesting
   static GeneratedRoute GENERATED_DEFAULT_ROUTE =
@@ -1244,6 +1245,11 @@ public final class CumulusConversions {
 
     addOspfInterfaces(vsConfig, vrfInterfaces, proc.getProcessId(), w);
     proc.setAreas(computeOspfAreas(vsConfig, vrfInterfaces.keySet()));
+
+    // Handle Max Metric Router LSA
+    if (firstNonNull(vsConfig.getOspfProcess().getMaxMetricRouterLsa(), Boolean.FALSE)) {
+      proc.setMaxMetricTransitLinks(DEFAULT_OSPF_MAX_METRIC);
+    }
 
     // Handle Redistribution
     String ospfExportPolicyName = computeOspfExportPolicyName(ospfVrf.getVrfName());

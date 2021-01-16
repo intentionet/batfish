@@ -11,6 +11,7 @@ s_router_ospf
   ROUTER OSPF NEWLINE
   (
     ro_log_adj_changes
+    | ro_max_metric_router_lsa_administrative
     | ro_no
     | ro_passive_interface
     | ro_router_id
@@ -21,6 +22,11 @@ s_router_ospf
 ro_log_adj_changes
 :
   LOG_ADJACENCY_CHANGES DETAIL? NEWLINE
+;
+
+ro_max_metric_router_lsa_administrative
+:
+  MAX_METRIC ROUTER_LSA ADMINISTRATIVE NEWLINE
 ;
 
 ro_no
@@ -39,6 +45,8 @@ rono_passive_interface
     | ronopi_interface_name
   )
 ;
+
+
 
 ro_redistribute
 :

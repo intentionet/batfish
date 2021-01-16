@@ -86,6 +86,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rms_metricContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rms_tagContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rms_weightContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmsipnh_literalContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ro_max_metric_router_lsa_administrativeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ro_redistributeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ro_router_idContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ronopi_defaultContext;
@@ -675,6 +676,12 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     if (_frr.getOspfProcess() == null) {
       _frr.setOspfProcess(new OspfProcess());
     }
+  }
+
+  @Override
+  public void exitRo_max_metric_router_lsa_administrative(
+      Ro_max_metric_router_lsa_administrativeContext ctx) {
+    _frr.getOspfProcess().setMaxMetricRouterLsa(true);
   }
 
   @Override

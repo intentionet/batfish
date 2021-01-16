@@ -474,6 +474,11 @@ MAX_MED
   'max-med'
 ;
 
+MAX_METRIC
+:
+  'max-metric'
+;
+
 MESSAGE_DIGEST
 :
   'message-digest'
@@ -732,6 +737,11 @@ NEXT_HOP
 ROUTE_REFLECTOR_CLIENT
 :
   'route-reflector-client'
+;
+
+ROUTER_LSA
+:
+  'router-lsa'
 ;
 
 SUBNET_MASK

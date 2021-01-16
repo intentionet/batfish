@@ -1683,6 +1683,20 @@ public class CumulusFrrGrammarTest {
   }
 
   @Test
+  public void testOspfMaxMetricRouterLsaAdministrativeDefault() {
+    parseLines("router ospf");
+    boolean maxMetricRouterLsa = _frr.getOspfProcess().getMaxMetricRouterLsa();
+    assertThat(maxMetricRouterLsa, equalTo(false));
+  }
+
+  @Test
+  public void testOspfMaxMetricRouterLsaAdministrative() {
+    parseLines("router ospf", "max-metric router-lsa administrative");
+    boolean maxMetricRouterLsa = _frr.getOspfProcess().getMaxMetricRouterLsa();
+    assertThat(maxMetricRouterLsa, equalTo(true));
+  }
+
+  @Test
   public void testOspfRedistributeBgpSetMetric_behavior() throws IOException {
     /*
       Three nodes in a line - frr-originator spawns a route into BGP, redistributor redistributes this route into OSPF and sets metric of 10k
