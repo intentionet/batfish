@@ -179,6 +179,8 @@ final class CiscoIosNatUtil {
     } else if (line instanceof RouteMapMatchInterfaceLine) {
       // Clause only matches traffic fwded to certain outside ifaces; see last paragraph here:
       // https://www.cisco.com/c/en/us/support/docs/ip/network-address-translation-nat/13739-nat-routemap.html
+      // TODO Should a match interface line be ignored if it includes undefined interfaces?
+      //  For now, we just check if the line mentions the interface this expr is being created for.
       if (((RouteMapMatchInterfaceLine) line).getInterfaceNames().contains(ifaceName)) {
         return Optional.of(toExpr(ifaceName));
       } else {

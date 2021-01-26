@@ -5688,11 +5688,13 @@ public final class CiscoGrammarTest {
   public void testIosDynamicNatRouteMapsConversion() throws IOException {
     Configuration c = parseConfig("ios-nat-dynamic-route-maps");
     String insideIntf = "Ethernet1";
-    String outsideIntf = "Ethernet2";
+    String outsideIntf0 = "Ethernet2/0";
+    String outsideIntf1 = "Ethernet2/1";
     String vrfInsideIntf = "Ethernet3";
     String vrfOutsideIntf = "Ethernet4";
     assertThat(c, hasInterface(insideIntf, notNullValue()));
-    assertThat(c, hasInterface(outsideIntf, notNullValue()));
+    assertThat(c, hasInterface(outsideIntf0, notNullValue()));
+    assertThat(c, hasInterface(outsideIntf1, notNullValue()));
     assertThat(c, hasInterface(vrfInsideIntf, notNullValue()));
     assertThat(c, hasInterface(vrfOutsideIntf, notNullValue()));
     MatchSrcInterface matchSrcInside = matchSrcInterface(insideIntf, vrfInsideIntf);
@@ -5715,14 +5717,20 @@ public final class CiscoGrammarTest {
       assertThat(inside.getIncomingTransformation(), nullValue());
       assertThat(inside.getOutgoingTransformation(), nullValue());
 
-      Interface outside = c.getAllInterfaces().get(outsideIntf);
+      Interface outside0 = c.getAllInterfaces().get(outsideIntf0);
+      Interface outside1 = c.getAllInterfaces().get(outsideIntf1);
 
       Transformation inTransformation =
           when(permittedByAcl(outsideSrcPoolAcl))
               .apply(assignSourceIp(outsideSrcPoolFirst, outsideSrcPoolLast))
               .build();
 
-      assertThat(outside.getIncomingTransformation(), equalTo(inTransformation));
+      assertThat(outside0.getIncomingTransformation(), equalTo(inTransformation));
+
+      // The route-map used for the outside source rule specifies "match interface Ethernet2/0",
+      // i.e. outside0. Since it will never match traffic forwarded out outside1, that interface
+      // should have no incoming transformation.
+      assertNull(outside1.getIncomingTransformation());
 
       Transformation destTransformation =
           when(and(permittedByAcl(insideDstPoolAcl), matchSrcInside))
@@ -5740,8 +5748,10 @@ public final class CiscoGrammarTest {
                       .setOrElse(destTransformation)
                       .build())
               .build();
-
-      assertThat(outside.getOutgoingTransformation(), equalTo(outTransformation));
+      // both interfaces should have the same outgoing transformation since the route-maps used for
+      // inside source rules don't specify match interfaces
+      assertThat(outside0.getOutgoingTransformation(), equalTo(outTransformation));
+      assertThat(outside1.getOutgoingTransformation(), equalTo(outTransformation));
     }
     {
       // NAT in vrf1

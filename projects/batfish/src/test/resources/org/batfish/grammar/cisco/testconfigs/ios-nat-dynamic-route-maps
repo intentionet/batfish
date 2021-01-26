@@ -11,14 +11,13 @@ access-list 23 permit host 23.23.23.23
 !
 route-map 10 permit 10
  match ip address 10
-route-map 11 permit 10
- match ip address 11
 route-map 12 permit 10
  match ip address 12
 route-map 13 permit 10
  match ip address 13
 route-map 22 permit 10
  match ip address 22
+ match interface Ethernet2/0
 route-map 23 permit 10
  match ip address 23
 !
@@ -27,7 +26,10 @@ ip vrf vrf1
 interface Ethernet1
  ip nat inside
 !
-interface Ethernet2
+interface Ethernet2/0
+ ip nat outside
+!
+interface Ethernet2/1
  ip nat outside
 !
 interface Ethernet3
