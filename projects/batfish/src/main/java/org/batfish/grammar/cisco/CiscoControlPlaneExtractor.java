@@ -249,6 +249,7 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_ADD
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_DELETE_COMMUNITY;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_COMMUNITY_LIST;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_INTERFACE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_PREFIX_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_ACCESS_LIST;
@@ -711,6 +712,7 @@ import org.batfish.grammar.cisco.CiscoParser.Management_ssh_ip_access_groupConte
 import org.batfish.grammar.cisco.CiscoParser.Management_telnet_ip_access_groupContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_as_path_access_list_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_community_list_rm_stanzaContext;
+import org.batfish.grammar.cisco.CiscoParser.Match_interface_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_ip_access_list_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_ip_prefix_list_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_ipv6_access_list_rm_stanzaContext;
@@ -1127,6 +1129,7 @@ import org.batfish.representation.cisco.RouteMapClause;
 import org.batfish.representation.cisco.RouteMapContinue;
 import org.batfish.representation.cisco.RouteMapMatchAsPathAccessListLine;
 import org.batfish.representation.cisco.RouteMapMatchCommunityListLine;
+import org.batfish.representation.cisco.RouteMapMatchInterfaceLine;
 import org.batfish.representation.cisco.RouteMapMatchIpAccessListLine;
 import org.batfish.representation.cisco.RouteMapMatchIpPrefixListLine;
 import org.batfish.representation.cisco.RouteMapMatchIpv6AccessListLine;
@@ -6783,6 +6786,19 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
           name.getStart().getLine());
     }
     RouteMapMatchCommunityListLine line = new RouteMapMatchCommunityListLine(names);
+    _currentRouteMapClause.addMatchLine(line);
+  }
+
+  @Override
+  public void exitMatch_interface_rm_stanza(Match_interface_rm_stanzaContext ctx) {
+    Set<String> names = new TreeSet<>();
+    for (Interface_nameContext name : ctx.interface_name()) {
+      String ifaceName = getCanonicalInterfaceName(name.getText());
+      names.add(ifaceName);
+      _configuration.referenceStructure(
+          INTERFACE, ifaceName, ROUTE_MAP_MATCH_INTERFACE, name.getStart().getLine());
+    }
+    RouteMapMatchInterfaceLine line = new RouteMapMatchInterfaceLine(names);
     _currentRouteMapClause.addMatchLine(line);
   }
 
