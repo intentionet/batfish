@@ -465,6 +465,33 @@ ip_community_list_standard_tail
    )+ NEWLINE
 ;
 
+ip_extcommunity_list
+:
+  EXTCOMMUNITY_LIST
+  (
+    ip_extcommunity_list_expanded
+    | ip_extcommunity_list_standard
+  )
+;
+
+ip_extcommunity_list_expanded
+:
+  (
+    EXPANDED name = variable
+    | num = COMMUNITY_LIST_NUM_EXPANDED
+  )
+  null_rest_of_line
+;
+
+ip_extcommunity_list_standard
+:
+  (
+    STANDARD name = variable
+    | num = COMMUNITY_LIST_NUM_STANDARD
+  )
+  null_rest_of_line
+;
+
 ip_prefix_list_stanza
 :
    (

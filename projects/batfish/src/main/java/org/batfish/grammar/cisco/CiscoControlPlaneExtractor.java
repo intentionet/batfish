@@ -30,6 +30,9 @@ import static org.batfish.representation.cisco.CiscoStructureType.DEPI_CLASS;
 import static org.batfish.representation.cisco.CiscoStructureType.DEPI_TUNNEL;
 import static org.batfish.representation.cisco.CiscoStructureType.DOCSIS_POLICY;
 import static org.batfish.representation.cisco.CiscoStructureType.DOCSIS_POLICY_RULE;
+import static org.batfish.representation.cisco.CiscoStructureType.EXTCOMMUNITY_LIST;
+import static org.batfish.representation.cisco.CiscoStructureType.EXTCOMMUNITY_LIST_EXPANDED;
+import static org.batfish.representation.cisco.CiscoStructureType.EXTCOMMUNITY_LIST_STANDARD;
 import static org.batfish.representation.cisco.CiscoStructureType.ICMP_TYPE_OBJECT_GROUP;
 import static org.batfish.representation.cisco.CiscoStructureType.INSPECT_CLASS_MAP;
 import static org.batfish.representation.cisco.CiscoStructureType.INSPECT_POLICY_MAP;
@@ -249,6 +252,7 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_ADD
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_DELETE_COMMUNITY;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_COMMUNITY_LIST;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_EXTCOMMUNITY;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_PREFIX_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_ACCESS_LIST;
@@ -660,6 +664,8 @@ import org.batfish.grammar.cisco.CiscoParser.Ip_community_list_standard_tailCont
 import org.batfish.grammar.cisco.CiscoParser.Ip_dhcp_relay_serverContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_domain_lookupContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_domain_nameContext;
+import org.batfish.grammar.cisco.CiscoParser.Ip_extcommunity_list_expandedContext;
+import org.batfish.grammar.cisco.CiscoParser.Ip_extcommunity_list_standardContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_hostnameContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_prefix_list_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Ip_prefix_list_tailContext;
@@ -711,6 +717,7 @@ import org.batfish.grammar.cisco.CiscoParser.Management_ssh_ip_access_groupConte
 import org.batfish.grammar.cisco.CiscoParser.Management_telnet_ip_access_groupContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_as_path_access_list_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_community_list_rm_stanzaContext;
+import org.batfish.grammar.cisco.CiscoParser.Match_extcommunity_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_ip_access_list_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_ip_prefix_list_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Match_ipv6_access_list_rm_stanzaContext;
@@ -956,6 +963,7 @@ import org.batfish.grammar.cisco.CiscoParser.Set_community_list_additive_rm_stan
 import org.batfish.grammar.cisco.CiscoParser.Set_community_list_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_community_none_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_community_rm_stanzaContext;
+import org.batfish.grammar.cisco.CiscoParser.Set_extcommunity_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_local_preference_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_metric_eigrp_rm_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Set_metric_rm_stanzaContext;
@@ -1133,6 +1141,7 @@ import org.batfish.representation.cisco.RouteMapMatchIpv6AccessListLine;
 import org.batfish.representation.cisco.RouteMapMatchIpv6PrefixListLine;
 import org.batfish.representation.cisco.RouteMapMatchSourceProtocolLine;
 import org.batfish.representation.cisco.RouteMapMatchTagLine;
+import org.batfish.representation.cisco.RouteMapMatchUnimplementedLine;
 import org.batfish.representation.cisco.RouteMapSetAdditiveCommunityLine;
 import org.batfish.representation.cisco.RouteMapSetAdditiveCommunityListLine;
 import org.batfish.representation.cisco.RouteMapSetAsPathPrependLine;
@@ -6098,6 +6107,20 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
+  public void enterIp_extcommunity_list_expanded(Ip_extcommunity_list_expandedContext ctx) {
+    todo(ctx);
+    String name = ctx.name != null ? ctx.name.getText() : Integer.toString(toInteger(ctx.num));
+    _configuration.defineStructure(EXTCOMMUNITY_LIST_EXPANDED, name, ctx);
+  }
+
+  @Override
+  public void enterIp_extcommunity_list_standard(Ip_extcommunity_list_standardContext ctx) {
+    todo(ctx);
+    String name = ctx.name != null ? ctx.name.getText() : Integer.toString(toInteger(ctx.num));
+    _configuration.defineStructure(EXTCOMMUNITY_LIST_STANDARD, name, ctx);
+  }
+
+  @Override
   public void exitIpl_policy(Ipl_policyContext ctx) {
     todo(ctx);
     String name = ctx.name.getText();
@@ -6784,6 +6807,16 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     }
     RouteMapMatchCommunityListLine line = new RouteMapMatchCommunityListLine(names);
     _currentRouteMapClause.addMatchLine(line);
+  }
+
+  @Override
+  public void exitMatch_extcommunity_rm_stanza(Match_extcommunity_rm_stanzaContext ctx) {
+    for (VariableContext v : ctx.name_list) {
+      _configuration.referenceStructure(
+          EXTCOMMUNITY_LIST, v.getText(), ROUTE_MAP_MATCH_EXTCOMMUNITY, v.getStart().getLine());
+    }
+    _currentRouteMapClause.addMatchLine(new RouteMapMatchUnimplementedLine());
+    todo(ctx);
   }
 
   @Override
@@ -9175,6 +9208,11 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
     }
     RouteMapSetCommunityLine line = new RouteMapSetCommunityLine(commList);
     _currentRouteMapClause.addSetLine(line);
+  }
+
+  @Override
+  public void exitSet_extcommunity_rm_stanza(Set_extcommunity_rm_stanzaContext ctx) {
+    todo(ctx);
   }
 
   @Override

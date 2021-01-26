@@ -1,0 +1,25 @@
+hostname ios-bgp-extcommunity
+! parsing tests of extended communities on IOS
+! using quasi-realistic config
+router bgp 65005
+ bgp router-id 192.168.1.55
+ bgp log-neighbor-changes
+ neighbor d44 peer-group
+ neighbor d44 remote-as 65004
+ neighbor 10.45.21.1 peer-group d44
+ !
+ address-family ipv4
+  network 192.168.123.55 mask 255.255.255.255
+  neighbor d44 send-community both
+  neighbor 10.45.21.1 activate
+  neighbor 10.45.21.1 route-map COM_IN in
+ exit-address-family
+!
+ip extcommunity-list standard COM_WITH_RT permit rt 65001:11
+ip bgp-community new-format
+!
+route-map COM_IN permit 10
+ match extcommunity COM_WITH_RT
+ set local-preference 110
+ set extcommunity rt 1:1
+!

@@ -2625,7 +2625,10 @@ s_interface_line
 s_ip
 :
   IP
-  ip_local
+  (
+    ip_extcommunity_list
+    | ip_local
+  )
 ;
 
 s_ip_default_gateway

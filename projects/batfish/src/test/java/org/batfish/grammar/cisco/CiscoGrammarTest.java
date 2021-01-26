@@ -191,6 +191,8 @@ import static org.batfish.representation.cisco.CiscoConfiguration.eigrpNeighborI
 import static org.batfish.representation.cisco.CiscoIosDynamicNat.computeDynamicDestinationNatAclName;
 import static org.batfish.representation.cisco.CiscoStructureType.ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureType.BFD_TEMPLATE;
+import static org.batfish.representation.cisco.CiscoStructureType.EXTCOMMUNITY_LIST;
+import static org.batfish.representation.cisco.CiscoStructureType.EXTCOMMUNITY_LIST_STANDARD;
 import static org.batfish.representation.cisco.CiscoStructureType.ICMP_TYPE_OBJECT_GROUP;
 import static org.batfish.representation.cisco.CiscoStructureType.INSPECT_CLASS_MAP;
 import static org.batfish.representation.cisco.CiscoStructureType.INSPECT_POLICY_MAP;
@@ -226,6 +228,7 @@ import static org.batfish.representation.cisco.CiscoStructureUsage.EXTENDED_ACCE
 import static org.batfish.representation.cisco.CiscoStructureUsage.INSPECT_POLICY_MAP_INSPECT_CLASS;
 import static org.batfish.representation.cisco.CiscoStructureUsage.INTERFACE_BFD_TEMPLATE;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ISAKMP_PROFILE_KEYRING;
+import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_EXTCOMMUNITY;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV4_ACCESS_LIST;
 import static org.batfish.representation.cisco.CiscoStructureUsage.ROUTE_MAP_MATCH_IPV6_ACCESS_LIST;
 import static org.batfish.representation.cisco.OspfProcess.getReferenceOspfBandwidth;
@@ -1345,6 +1348,24 @@ public final class CiscoGrammarTest {
     assertThat(
         c.getVendorFamily().getCisco().getBanners().get("login"),
         equalTo("Some text\nSome more text\n"));
+  }
+
+  @Test
+  public void testIosBgpExtcommunityParsing() throws IOException {
+    CiscoConfiguration c = parseCiscoConfig("ios-bgp-extcommunity", ConfigurationFormat.CISCO_IOS);
+    ConvertConfigurationAnswerElement ccae = new ConvertConfigurationAnswerElement();
+    c.setAnswerElement(ccae);
+    c.setWarnings(new Warnings(true, true, true));
+    assertThat(
+        ccae, hasDefinedStructure(c.getFilename(), EXTCOMMUNITY_LIST_STANDARD, "COM_WITH_RT"));
+    assertThat(
+        ccae,
+        hasReferencedStructure(
+            c.getFilename(), EXTCOMMUNITY_LIST, "COM_WITH_RT", ROUTE_MAP_MATCH_EXTCOMMUNITY));
+    // convert to mark structures.
+    c.toVendorIndependentConfigurations();
+    assertThat(
+        ccae, hasNumReferrers(c.getFilename(), EXTCOMMUNITY_LIST_STANDARD, "COM_WITH_RT", 1));
   }
 
   @Test

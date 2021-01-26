@@ -661,7 +661,6 @@ null_single
                NO? DOMAIN_LOOKUP
             )
             | DVMRP
-            | EXTCOMMUNITY_LIST
             | FINGER
             | FLOW_CACHE
             | FLOW_EXPORT

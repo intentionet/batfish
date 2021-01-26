@@ -203,6 +203,7 @@ public enum CiscoStructureUsage implements StructureUsage {
   ROUTE_MAP_DELETE_COMMUNITY("route-map delete community"),
   ROUTE_MAP_MATCH_AS_PATH_ACCESS_LIST("route-map match as-path access-list"),
   ROUTE_MAP_MATCH_COMMUNITY_LIST("route-map match community-list"),
+  ROUTE_MAP_MATCH_EXTCOMMUNITY("route-map match extcommunity"),
   ROUTE_MAP_MATCH_IPV4_ACCESS_LIST("route-map match ipv4 access-list"),
   ROUTE_MAP_MATCH_IPV4_PREFIX_LIST("route-map match ipv4 prefix-list"),
   ROUTE_MAP_MATCH_IPV6_ACCESS_LIST("route-map match ipv6 access-list"),

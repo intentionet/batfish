@@ -11,8 +11,6 @@ public class RouteMapClause implements Serializable {
 
   private RouteMapContinue _continueLine;
 
-  private boolean _ignore;
-
   private String _mapName;
 
   private List<RouteMapMatchLine> _matchList;
@@ -45,10 +43,6 @@ public class RouteMapClause implements Serializable {
     return _continueLine;
   }
 
-  public boolean getIgnore() {
-    return _ignore;
-  }
-
   public String getMapName() {
     return _mapName;
   }
@@ -67,9 +61,5 @@ public class RouteMapClause implements Serializable {
 
   public void setContinueLine(RouteMapContinue continueLine) {
     _continueLine = continueLine;
-  }
-
-  public void setIgnore(boolean b) {
-    _ignore = b;
   }
 }
