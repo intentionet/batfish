@@ -7245,6 +7245,29 @@ public final class CiscoGrammarTest {
   }
 
   @Test
+  public void testRouteMapMatchInterface() throws IOException {
+    String hostname = "ios-route-map-match-interface";
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+
+    // Ensure warning was filed regarding lack of match interface support
+    ConvertConfigurationAnswerElement ccae =
+        batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+    assertThat(
+        ccae,
+        hasRedFlagWarning(
+            hostname,
+            containsString(
+                "Route-map match interface is not fully supported. Batfish will ignore clauses"
+                    + " using match interface for route filtering.")));
+
+    // Ensure the converted route-map ignores the match-interface clause
+    Configuration c = batfish.loadConfigurations(batfish.getSnapshot()).get(hostname);
+    RoutingPolicy rm = c.getRoutingPolicies().get("rm");
+    assertThat(
+        rm.getStatements(), contains(Statements.ReturnLocalDefaultAction.toStaticStatement()));
+  }
+
+  @Test
   public void testSetMetricEigrp() throws IOException {
     Configuration c = parseConfig("ios-route-map-set-metric-eigrp");
 
