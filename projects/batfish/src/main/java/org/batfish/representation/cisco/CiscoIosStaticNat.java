@@ -79,6 +79,7 @@ public class CiscoIosStaticNat extends CiscoIosNat {
 
   @Override
   public Optional<Transformation.Builder> toOutgoingTransformation(
+      String ifaceName,
       Map<String, RouteMap> routeMaps,
       Map<String, NatPool> natPools,
       Set<String> insideInterfaces,
@@ -105,7 +106,7 @@ public class CiscoIosStaticNat extends CiscoIosNat {
     // Create match expr for route-map if one is configured
     if (getRouteMap() != null) {
       Optional<AclLineMatchExpr> matchRouteMap =
-          getRouteMapMatchExpr(routeMaps, c.getIpAccessLists(), w);
+          getRouteMapMatchExpr(ifaceName, routeMaps, c.getIpAccessLists(), w);
       if (!matchRouteMap.isPresent()) {
         return Optional.empty();
       } else {
@@ -119,6 +120,7 @@ public class CiscoIosStaticNat extends CiscoIosNat {
 
   @Override
   public Optional<Transformation.Builder> toIncomingTransformation(
+      String ifaceName,
       Map<String, IpAccessList> ipAccessLists,
       Map<String, RouteMap> routeMaps,
       Map<String, NatPool> natPools,
@@ -143,7 +145,8 @@ public class CiscoIosStaticNat extends CiscoIosNat {
 
     // Create match expr for route-map if one is configured
     if (getRouteMap() != null) {
-      Optional<AclLineMatchExpr> matchRouteMap = getRouteMapMatchExpr(routeMaps, ipAccessLists, w);
+      Optional<AclLineMatchExpr> matchRouteMap =
+          getRouteMapMatchExpr(ifaceName, routeMaps, ipAccessLists, w);
       if (!matchRouteMap.isPresent()) {
         return Optional.empty();
       } else {
@@ -160,7 +163,10 @@ public class CiscoIosStaticNat extends CiscoIosNat {
    * wrong -- the route-map doesn't exist or can't be converted.
    */
   private Optional<AclLineMatchExpr> getRouteMapMatchExpr(
-      Map<String, RouteMap> routeMaps, Map<String, IpAccessList> ipAccessLists, Warnings w) {
+      String ifaceName,
+      Map<String, RouteMap> routeMaps,
+      Map<String, IpAccessList> ipAccessLists,
+      Warnings w) {
     // route-map can't be configured for outside NAT; static rules can't be used for destination nat
     assert getAction() == RuleAction.SOURCE_INSIDE;
     String routeMap = getRouteMap();
@@ -170,7 +176,7 @@ public class CiscoIosStaticNat extends CiscoIosNat {
       w.redFlag(String.format("Ignoring NAT rule with undefined route-map %s", routeMap));
       return Optional.empty();
     }
-    return toMatchExpr(rm, ipAccessLists.keySet(), w);
+    return toMatchExpr(rm, ipAccessLists.keySet(), ifaceName, w);
   }
 
   @Override

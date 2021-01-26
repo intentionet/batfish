@@ -1,10 +1,15 @@
 package org.batfish.representation.cisco;
 
+import static org.batfish.datamodel.acl.AclLineMatchExprs.or;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.permittedByAcl;
+import static org.batfish.representation.cisco.CiscoIosNatUtil.clauseToMatchExpr;
+import static org.batfish.representation.cisco.CiscoIosNatUtil.lineToMatchExpr;
+import static org.batfish.representation.cisco.CiscoIosNatUtil.toExpr;
 import static org.batfish.representation.cisco.CiscoIosNatUtil.toMatchExpr;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -12,142 +17,203 @@ import static org.junit.Assert.assertTrue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.util.Optional;
 import java.util.Set;
 import org.batfish.common.Warnings;
 import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.acl.AclLineMatchExprs;
 import org.batfish.datamodel.acl.OrMatchExpr;
 import org.junit.Test;
 
 public class CiscoIosNatUtilTest {
+  private static final String ACL = "acl";
+  private static final String IFACE = "iface";
+  private static final RouteMapMatchLine MATCH_ACL =
+      new RouteMapMatchIpAccessListLine(ImmutableSet.of(ACL));
+  private static final RouteMapMatchLine MATCH_IFACE =
+      new RouteMapMatchInterfaceLine(ImmutableSet.of(IFACE));
 
   @Test
-  public void testToMatchExpr_inconvertibleRouteMaps() {
+  public void testToMatchExpr_emptyRouteMap() {
     // Empty route-map should not convert
-    {
-      Warnings w = new Warnings(true, true, true);
-      assertFalse(toMatchExpr(new RouteMap("rm"), ImmutableSet.of(), w).isPresent());
-      assertThat(
-          Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
-          containsString("empty route-map"));
-    }
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(toMatchExpr(new RouteMap("rm"), ImmutableSet.of(), IFACE, w).isPresent());
+    assertThat(
+        Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
+        containsString("empty route-map"));
+  }
 
-    // We will assume there is one ACL defined, called acl1
-    Set<String> definedAcls = ImmutableSet.of("acl1");
-    RouteMapMatchLine acl1MatchLine = new RouteMapMatchIpAccessListLine(ImmutableSet.of("acl1"));
-    RouteMapClause acl1Clause = new RouteMapClause(LineAction.PERMIT, "acl1", 5);
-    acl1Clause.addMatchLine(acl1MatchLine);
+  @Test
+  public void testToMatchExpr_inconvertibleClause() {
+    RouteMapMatchLine acl2MatchLine =
+        new RouteMapMatchIpAccessListLine(ImmutableSet.of("otherAcl"));
+    RouteMapClause clause1 = rmc(10, MATCH_ACL);
+    RouteMapClause clause2 = rmc(20, acl2MatchLine);
+    RouteMapClause clause3 = rmc(30, MATCH_ACL);
 
-    // Sanity check: make sure a route-map with only acl1Clause does convert successfully
+    // Sanity check: make sure a route-map with only clause1 and clause3 does convert successfully
     assertTrue(
-        toMatchExpr(rmWithClauses(acl1Clause), definedAcls, new Warnings(true, true, true))
+        toMatchExpr(
+                rmWithClauses(clause1, clause3),
+                ImmutableSet.of(ACL),
+                IFACE,
+                new Warnings(true, true, true))
             .isPresent());
 
-    // In these tests, acl1Clause is included in all route maps to confirm that conversion will fail
-    // if *any* clauses are unsupported rather than *all*.
-    // Similarly, clauses that aren't supported because they contain an unsupported match line will
-    // also contain a supported match line.
-    {
-      // Clause is empty
-      Warnings w = new Warnings(true, true, true);
-      assertFalse(
-          toMatchExpr(rmWithClauses(acl1Clause, rmcWithMatchLines()), definedAcls, w).isPresent());
-      assertThat(
-          Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
-          containsString("clauses without match lines"));
-    }
-    {
-      // Clause denies
-      RouteMapClause rmc = new RouteMapClause(LineAction.DENY, "rmc", 10);
-      rmc.addMatchLine(acl1MatchLine); // inconvertible bc it denies, not bc no match lines
-      Warnings w = new Warnings(true, true, true);
-      assertFalse(toMatchExpr(rmWithClauses(acl1Clause, rmc), definedAcls, w).isPresent());
-      assertThat(
-          Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
-          containsString("deny clause"));
-    }
-    {
-      // Clause includes a set line
-      RouteMapClause rmc = rmcWithMatchLines(acl1MatchLine);
-      rmc.addSetLine(new RouteMapSetCommunityLine(ImmutableList.of(1L)));
-      Warnings w = new Warnings(true, true, true);
-      assertFalse(toMatchExpr(rmWithClauses(acl1Clause, rmc), definedAcls, w).isPresent());
-      assertThat(
-          Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(), containsString("set line"));
-    }
-    {
-      // Clause references undefined ACL acl2
-      RouteMapClause rmc = rmcWithMatchLines(acl1MatchLine);
-      rmc.addMatchLine(new RouteMapMatchIpAccessListLine(ImmutableSet.of("acl2")));
-      Warnings w = new Warnings(true, true, true);
-      assertFalse(toMatchExpr(rmWithClauses(acl1Clause, rmc), definedAcls, w).isPresent());
-      assertThat(
-          Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
-          containsString("undefined ACL"));
-    }
-    {
-      // Clause references defined ACL acl1 but also undefined ACL acl2
-      RouteMapClause rmc = rmcWithMatchLines(acl1MatchLine);
-      rmc.addMatchLine(new RouteMapMatchIpAccessListLine(ImmutableSet.of("acl1", "acl2")));
-      Warnings w = new Warnings(true, true, true);
-      assertFalse(toMatchExpr(rmWithClauses(acl1Clause, rmc), definedAcls, w).isPresent());
-      assertThat(
-          Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
-          containsString("undefined ACL"));
-    }
-    {
-      // Clause uses an unsupported type of match line
-      RouteMapClause rmc = rmcWithMatchLines(acl1MatchLine);
-      rmc.addMatchLine(new RouteMapMatchIpPrefixListLine(ImmutableSet.of("pl")));
-      Warnings w = new Warnings(true, true, true);
-      assertFalse(toMatchExpr(rmWithClauses(acl1Clause, rmc), definedAcls, w).isPresent());
-      assertThat(
-          Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
-          containsString(RouteMapMatchIpPrefixListLine.class.getCanonicalName()));
-    }
+    // Cannot convert route-map with an inconvertible clause, even if other clauses are convertible
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(
+        toMatchExpr(rmWithClauses(clause1, clause2, clause3), ImmutableSet.of(ACL), IFACE, w)
+            .isPresent());
   }
 
   @Test
-  public void testToMatchExpr() {
-    Set<String> definedAcls = ImmutableSet.of("acl1", "acl2");
-    RouteMapMatchLine acl1MatchLine = new RouteMapMatchIpAccessListLine(ImmutableSet.of("acl1"));
-    RouteMapMatchLine acl2MatchLine = new RouteMapMatchIpAccessListLine(ImmutableSet.of("acl2"));
-    RouteMapMatchLine acl1And2MatchLine =
-        new RouteMapMatchIpAccessListLine(ImmutableSet.of("acl1", "acl2"));
+  public void testToMatchExpr_unmatchableClause() {
+    // Unmatchable clause should be ignored and other clauses should be converted normally
+    RouteMapClause clause1 = rmc(10, MATCH_ACL);
+    RouteMapClause clause2 = rmc(20, MATCH_IFACE);
+    RouteMapClause clause3 = rmc(30, MATCH_ACL);
 
-    {
-      RouteMap rm = rmWithClauses(rmcWithMatchLines(acl1MatchLine));
-      assertThat(
-          toMatchExpr(rm, definedAcls, new Warnings(true, true, true)).get(),
-          equalTo(permittedByAcl("acl1")));
-    }
-    {
-      // need to create second clause manually so it has a different sequence number
-      RouteMapClause matchAcl2 = new RouteMapClause(LineAction.PERMIT, "rmc2", 20);
-      matchAcl2.addMatchLine(acl2MatchLine);
-      RouteMap rm = rmWithClauses(rmcWithMatchLines(acl1MatchLine), matchAcl2);
-      OrMatchExpr matchExpr =
-          (OrMatchExpr) toMatchExpr(rm, definedAcls, new Warnings(true, true, true)).get();
-      assertThat(
-          matchExpr.getDisjuncts(),
-          containsInAnyOrder(permittedByAcl("acl1"), permittedByAcl("acl2")));
-    }
-    {
-      RouteMap rm = rmWithClauses(rmcWithMatchLines(acl1And2MatchLine));
-      OrMatchExpr matchExpr =
-          (OrMatchExpr) toMatchExpr(rm, definedAcls, new Warnings(true, true, true)).get();
-      assertThat(
-          matchExpr.getDisjuncts(),
-          containsInAnyOrder(permittedByAcl("acl1"), permittedByAcl("acl2")));
-    }
+    Warnings w = new Warnings(true, true, true);
+    assertThat(
+        toMatchExpr(
+            rmWithClauses(clause1, clause2, clause3), ImmutableSet.of(ACL), "otherIface", w),
+        equalTo(Optional.of(or(permittedByAcl(ACL), permittedByAcl(ACL)))));
+    assertThat(w.getRedFlagWarnings(), empty());
   }
 
-  /** Creates a permitting {@link RouteMapClause} with the given match lines and seq number 10. */
-  private static RouteMapClause rmcWithMatchLines(RouteMapMatchLine... lines) {
-    RouteMapClause rmc = new RouteMapClause(LineAction.PERMIT, "rmc", 10);
+  @Test
+  public void testToMatchExpr_singleClause() {
+    Warnings w = new Warnings(true, true, true);
+    assertThat(
+        toMatchExpr(rmWithClauses(rmc(MATCH_ACL)), ImmutableSet.of(ACL), IFACE, w),
+        equalTo(Optional.of(permittedByAcl(ACL))));
+    assertThat(w.getRedFlagWarnings(), empty());
+  }
+
+  @Test
+  public void testClauseToMatchExpr_emptyClause() {
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(clauseToMatchExpr(rmc(), "rm", ImmutableSet.of(), IFACE, w).isPresent());
+    assertThat(
+        Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
+        containsString("clauses without match lines"));
+  }
+
+  @Test
+  public void testClauseToMatchExpr_denyClause() {
+    RouteMapClause rmc = new RouteMapClause(LineAction.DENY, "rmc", 10);
+    rmc.addMatchLine(MATCH_ACL); // inconvertible bc it denies, not bc no match lines
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(clauseToMatchExpr(rmc, "rm", ImmutableSet.of(ACL), IFACE, w).isPresent());
+    assertThat(
+        Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(), containsString("deny clause"));
+  }
+
+  @Test
+  public void testClauseToMatchExpr_setClause() {
+    RouteMapClause rmc = rmc(MATCH_ACL);
+    rmc.addSetLine(new RouteMapSetCommunityLine(ImmutableList.of(1L)));
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(clauseToMatchExpr(rmc, "rm", ImmutableSet.of(ACL), IFACE, w).isPresent());
+    assertThat(
+        Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(), containsString("set line"));
+  }
+
+  @Test
+  public void testClauseToMatchExpr_inconvertibleLine() {
+    RouteMapMatchLine inconvertibleLine =
+        new RouteMapMatchIpAccessListLine(ImmutableSet.of("otherAcl"));
+    RouteMapClause rmc = rmc(MATCH_ACL, inconvertibleLine, MATCH_ACL);
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(clauseToMatchExpr(rmc, "rm", ImmutableSet.of(ACL), IFACE, w).isPresent());
+    assertThat(
+        Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
+        containsString("undefined ACL"));
+  }
+
+  @Test
+  public void testClauseToMatchExpr_unmatchableLine() {
+    // Clause matches a different interface. Should successfully convert to false expr (no warnings)
+    RouteMapClause rmc = rmc(MATCH_ACL, MATCH_IFACE, MATCH_ACL);
+    Warnings w = new Warnings(true, true, true);
+    assertThat(
+        clauseToMatchExpr(rmc, "rm", ImmutableSet.of(ACL), "otherIface", w),
+        equalTo(Optional.of(AclLineMatchExprs.FALSE)));
+    assertThat(w.getRedFlagWarnings(), empty());
+  }
+
+  @Test
+  public void testClauseToMatchExpr_singleLine() {
+    RouteMapClause rmc = rmc(MATCH_ACL);
+    Warnings w = new Warnings(true, true, true);
+    assertThat(
+        clauseToMatchExpr(rmc, "rm", ImmutableSet.of(ACL), IFACE, w),
+        equalTo(Optional.of(permittedByAcl(ACL))));
+    assertThat(w.getRedFlagWarnings(), empty());
+  }
+
+  @Test
+  public void testLineToMatchExpr_undefinedAcl() {
+    RouteMapMatchLine line = new RouteMapMatchIpAccessListLine(ImmutableSet.of(ACL, "otherAcl"));
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(lineToMatchExpr(line, "rm", ImmutableSet.of(ACL), IFACE, w).isPresent());
+    assertThat(
+        Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
+        containsString("undefined ACL"));
+  }
+
+  @Test
+  public void testLineToMatchExpr_unsupportedLineType() {
+    RouteMapMatchLine unsupportedLine = new RouteMapMatchIpPrefixListLine(ImmutableSet.of("pl"));
+    Warnings w = new Warnings(true, true, true);
+    assertFalse(lineToMatchExpr(unsupportedLine, "rm", ImmutableSet.of(ACL), IFACE, w).isPresent());
+    assertThat(
+        Iterables.getOnlyElement(w.getRedFlagWarnings()).getText(),
+        containsString(RouteMapMatchIpPrefixListLine.class.getCanonicalName()));
+  }
+
+  @Test
+  public void testLineToMatchExpr_definedAcls() {
+    String acl2 = "acl2";
+    Set<String> definedAcls = ImmutableSet.of(ACL, acl2);
+    RouteMapMatchLine line = new RouteMapMatchIpAccessListLine(definedAcls);
+    RouteMap rm = rmWithClauses(rmc(line));
+    OrMatchExpr matchExpr =
+        (OrMatchExpr) toMatchExpr(rm, definedAcls, IFACE, new Warnings(true, true, true)).get();
+    assertThat(
+        matchExpr.getDisjuncts(), containsInAnyOrder(permittedByAcl(ACL), permittedByAcl(acl2)));
+  }
+
+  @Test
+  public void testLineToMatchExpr_matchedIface() {
+    Warnings w = new Warnings(true, true, true);
+    assertThat(
+        lineToMatchExpr(MATCH_IFACE, "rm", ImmutableSet.of(ACL), IFACE, w),
+        equalTo(Optional.of(toExpr(IFACE))));
+  }
+
+  @Test
+  public void testLineToMatchExpr_unmatchedIface() {
+    Warnings w = new Warnings(true, true, true);
+    assertThat(
+        lineToMatchExpr(MATCH_IFACE, "rm", ImmutableSet.of(ACL), "otherIface", w),
+        equalTo(Optional.of(AclLineMatchExprs.FALSE)));
+    assertThat(w.getRedFlagWarnings(), empty());
+  }
+
+  /** Creates a permitting {@link RouteMapClause} with the given match lines and sequence number. */
+  private static RouteMapClause rmc(int seqNum, RouteMapMatchLine... lines) {
+    RouteMapClause rmc = new RouteMapClause(LineAction.PERMIT, "rmc", seqNum);
     for (RouteMapMatchLine line : lines) {
       rmc.addMatchLine(line);
     }
     return rmc;
+  }
+
+  /** Creates a permitting {@link RouteMapClause} with the given match lines and seq number 10. */
+  private static RouteMapClause rmc(RouteMapMatchLine... lines) {
+    return rmc(10, lines);
   }
 
   /** Creates a {@link RouteMap} with the given clauses. */

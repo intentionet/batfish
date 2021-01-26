@@ -2027,9 +2027,11 @@ public final class CiscoConfiguration extends VendorConfiguration {
       if (!firstNonNull(nat.getVrf(), Configuration.DEFAULT_VRF_NAME).equals(vrfName)) {
         continue;
       }
-      nat.toIncomingTransformation(c.getIpAccessLists(), _routeMaps, _natPools, _interfaces, _w)
+      nat.toIncomingTransformation(
+              ifaceName, c.getIpAccessLists(), _routeMaps, _natPools, _interfaces, _w)
           .ifPresent(incoming -> convertedIncomingNats.put(nat, incoming));
-      nat.toOutgoingTransformation(_routeMaps, _natPools, getNatInside(), _interfaces, c, _w)
+      nat.toOutgoingTransformation(
+              ifaceName, _routeMaps, _natPools, getNatInside(), _interfaces, c, _w)
           .ifPresent(outgoing -> convertedOutgoingNats.put(nat, outgoing));
     }
 

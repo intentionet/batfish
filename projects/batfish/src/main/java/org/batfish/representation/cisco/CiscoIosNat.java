@@ -73,6 +73,8 @@ public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializab
   /**
    * Converts a single NAT from the configuration into a {@link Transformation}.
    *
+   * @param ifaceName Name of the (outside) interface for which we're creating the transformation
+   * @param routeMaps Route-maps which may be referenced by static or dynamic NATs
    * @param natPools NAT pools from the configuration
    * @param insideInterfaces Names of interfaces which are defined as 'inside'
    * @param c Configuration
@@ -80,6 +82,7 @@ public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializab
    *     Transformation} could not be built
    */
   public abstract Optional<Transformation.Builder> toOutgoingTransformation(
+      String ifaceName,
       Map<String, RouteMap> routeMaps,
       Map<String, NatPool> natPools,
       Set<String> insideInterfaces,
@@ -90,12 +93,15 @@ public abstract class CiscoIosNat implements Comparable<CiscoIosNat>, Serializab
   /**
    * Converts a single NAT from the configuration into a {@link Transformation}.
    *
+   * @param ifaceName Name of the (outside) interface for which we're creating the transformation
    * @param ipAccessLists Named access lists which may be referenced by dynamic NATs
+   * @param routeMaps Route-maps which may be referenced by static or dynamic NATs
    * @param natPools NAT pools from the configuration
    * @return A single {@link Transformation} for inside-to-outside, or nothing if the {@link
    *     Transformation} could not be built
    */
   public abstract Optional<Transformation.Builder> toIncomingTransformation(
+      String ifaceName,
       Map<String, IpAccessList> ipAccessLists,
       Map<String, RouteMap> routeMaps,
       Map<String, NatPool> natPools,

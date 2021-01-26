@@ -160,6 +160,7 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
 
   @Override
   public Optional<Transformation.Builder> toIncomingTransformation(
+      String ifaceName,
       Map<String, IpAccessList> ipAccessLists,
       Map<String, RouteMap> routeMaps,
       Map<String, NatPool> natPools,
@@ -176,12 +177,13 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
       return Optional.empty();
     }
 
-    return makeFilterMatchExpr(routeMaps, ipAccessLists.keySet(), null, w)
+    return makeFilterMatchExpr(ifaceName, routeMaps, ipAccessLists.keySet(), null, w)
         .map(matchExpr -> makeTransformation(matchExpr, false, natPools, interfaces));
   }
 
   @Override
   public Optional<Transformation.Builder> toOutgoingTransformation(
+      String ifaceName,
       Map<String, RouteMap> routeMaps,
       Map<String, NatPool> natPools,
       Set<String> insideInterfaces,
@@ -203,7 +205,7 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
       return Optional.empty();
     }
 
-    return makeFilterMatchExpr(routeMaps, c.getIpAccessLists().keySet(), c, w)
+    return makeFilterMatchExpr(ifaceName, routeMaps, c.getIpAccessLists().keySet(), c, w)
         .map(filterMatchExpr -> and(filterMatchExpr, new MatchSrcInterface(insideInterfaces)))
         .map(matchExpr -> makeTransformation(matchExpr, true, natPools, interfaces));
   }
@@ -216,6 +218,7 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
    * AclLineMatchExpr}.
    */
   private Optional<AclLineMatchExpr> makeFilterMatchExpr(
+      String ifaceName,
       Map<String, RouteMap> routeMaps,
       Set<String> aclNames,
       @Nullable Configuration c,
@@ -243,7 +246,7 @@ public final class CiscoIosDynamicNat extends CiscoIosNat {
     // isMalformed guarantees that _routeMap is nonnull when (iff) _aclName is null, and that it
     // references a real RouteMap
     assert getRouteMap() != null;
-    return toMatchExpr(routeMaps.get(getRouteMap()), aclNames, w);
+    return toMatchExpr(routeMaps.get(getRouteMap()), aclNames, ifaceName, w);
   }
 
   private Optional<IpAccessList> getOrCreateReverseAcl(Configuration c) {
