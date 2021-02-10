@@ -32,6 +32,12 @@ ip_prefix_list_name
   WORD
 ;
 
+ip_prefix_length
+:
+// 0-32
+  UINT8
+;
+
 line_action
 :
   deny = DENY

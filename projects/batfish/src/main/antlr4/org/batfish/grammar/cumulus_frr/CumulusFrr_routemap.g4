@@ -49,9 +49,20 @@ rm_match
   (
     rmm_as_path
     | rmm_community
+    // | rmm_evpn
+    // | rmm_extcommunity
     | rmm_interface
     | rmm_ip
     | rmm_ipv6
+    // | rmm_large_community
+    // | rmm_local_preference
+    // | rmm_mac
+    // | rmm_metric
+    // | rmm_origin
+    // | rmm_peer
+    // | rmm_probability
+    // | rmm_source_protocol
+    // | rmm_source_vrf
     | rmm_tag
   )
 ;
@@ -99,7 +110,12 @@ rms_metric
 
 rmm_ip
 :
-  IP rmmip_address
+  IP
+  (
+    rmmip_address
+    // | rmmip_next_hop
+    // | rmmip_route_source
+  )
 ;
 
 rmm_ipv6
@@ -114,7 +130,20 @@ rmm_tag
 
 rmmip_address
 :
-  ADDRESS rmmipa_prefix_list
+  ADDRESS
+  (
+    // rmmipa_access_list_standard
+    // rmmipa_access_list_extended
+    // rmmipa_access_list_name
+    rmmipa_prefix_len
+    | rmmipa_prefix_list
+  )
+;
+
+rmmipa_prefix_len
+:
+// len; 0-32
+  PREFIX_LEN len = ip_prefix_length NEWLINE
 ;
 
 rmmipa_prefix_list

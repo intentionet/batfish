@@ -21,15 +21,15 @@ pl_action
     SEQ num = ip_prefix_list_line_number
   )? action = line_action prefix = ip_prefix
   (
-    EQ eq = ip_prefix_list_line_prefix_length
-    | (GE ge = ip_prefix_list_line_prefix_length)? (LE le = ip_prefix_list_line_prefix_length)?
+    EQ eq = ip_prefix_length
+    | (GE ge = ip_prefix_length)? (LE le = ip_prefix_length)?
   )
   (
     MASK mask = ip_address
   )? NEWLINE
 ;
 
-ip_prefix_list_line_prefix_length
+ip_prefix_length
 :
 // 1-32
   UINT8

@@ -26,8 +26,8 @@ pl_line_action
     |
     (
       ip_prefix = prefix
-      (GE ge = ip_prefix_list_line_prefix_length)?
-      (LE le = ip_prefix_list_line_prefix_length)?
+      (GE ge = ip_prefix_length)?
+      (LE le = ip_prefix_length)?
       NEWLINE
     )
   )
@@ -36,10 +36,4 @@ pl_line_action
 pl_line_description
 :
   DESCRIPTION REMARK_TEXT NEWLINE
-;
-
-ip_prefix_list_line_prefix_length
-:
-// 1-32
-  UINT8
 ;

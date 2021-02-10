@@ -609,6 +609,11 @@ POINT_TO_POINT
   'point-to-point'
 ;
 
+PREFIX_LEN
+:
+  'prefix-len'
+;
+
 PREFIX_LIST
 :
   'prefix-list' -> pushMode ( M_Word )

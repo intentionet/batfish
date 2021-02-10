@@ -18,6 +18,7 @@ public final class RouteMapEntry implements Serializable {
   private @Nullable RouteMapMatchAsPath _matchAsPath;
   private @Nullable RouteMapMatchCommunity _matchCommunity;
   private @Nullable RouteMapMatchInterface _matchInterface;
+  private @Nullable RouteMapMatchIpAddressPrefixLen _matchIpAddressPrefixLen;
   private @Nullable RouteMapMatchIpAddressPrefixList _matchIpAddressPrefixList;
   private @Nullable RouteMapMatchTag _matchTag;
   private final int _number;
@@ -67,6 +68,15 @@ public final class RouteMapEntry implements Serializable {
 
   public @Nullable RouteMapMatchCommunity getMatchCommunity() {
     return _matchCommunity;
+  }
+
+  public @Nullable RouteMapMatchIpAddressPrefixLen getMatchIpAddressPrefixLen() {
+    return _matchIpAddressPrefixLen;
+  }
+
+  public void setMatchIpAddressPrefixLen(
+      @Nullable RouteMapMatchIpAddressPrefixLen matchIpAddressPrefixLen) {
+    _matchIpAddressPrefixLen = matchIpAddressPrefixLen;
   }
 
   public @Nullable RouteMapMatchIpAddressPrefixList getMatchIpAddressPrefixList() {

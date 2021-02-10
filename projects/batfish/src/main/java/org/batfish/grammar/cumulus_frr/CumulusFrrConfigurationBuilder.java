@@ -32,6 +32,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Range;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import org.batfish.common.BatfishException;
 import org.batfish.common.Warnings;
 import org.batfish.common.Warnings.ParseWarning;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
+import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.LineAction;
@@ -66,6 +68,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Interface_ospf_costConte
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_addressContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_as_pathContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_community_list_nameContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_prefix_lengthContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_prefix_listContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_routeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Line_actionContext;
@@ -80,6 +83,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmm_as_pathContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmm_communityContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmm_interfaceContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmm_tagContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmmipa_prefix_lenContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmmipa_prefix_listContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmom_gotoContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Rmom_nextContext;
@@ -203,6 +207,7 @@ import org.batfish.representation.cumulus.RouteMapEntry;
 import org.batfish.representation.cumulus.RouteMapMatchAsPath;
 import org.batfish.representation.cumulus.RouteMapMatchCommunity;
 import org.batfish.representation.cumulus.RouteMapMatchInterface;
+import org.batfish.representation.cumulus.RouteMapMatchIpAddressPrefixLen;
 import org.batfish.representation.cumulus.RouteMapMatchIpAddressPrefixList;
 import org.batfish.representation.cumulus.RouteMapMatchTag;
 import org.batfish.representation.cumulus.RouteMapSetAsPath;
@@ -217,6 +222,9 @@ import org.batfish.representation.cumulus.StaticRoute;
 import org.batfish.representation.cumulus.Vrf;
 
 public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener {
+  private static final IntegerSpace PREFIX_LENGTH_SPACE =
+      IntegerSpace.of(Range.closed(0, Prefix.MAX_PREFIX_LENGTH));
+
   private final CumulusConcatenatedConfiguration _c;
   private final CumulusFrrConfiguration _frr;
   private final CumulusFrrCombinedParser _parser;
@@ -224,7 +232,7 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   private final String _text;
 
   private @Nullable Vrf _currentVrf;
-  private @Nullable RouteMapEntry _currentRouteMapEntry;
+  private RouteMapEntry _currentRouteMapEntry;
   private @Nullable BgpVrf _currentBgpVrf;
   private @Nullable BgpNeighbor _currentBgpNeighbor;
   private @Nullable IpPrefixList _currentIpPrefixList;
@@ -351,6 +359,33 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
 
   private @Nonnull String toString(Ip_community_list_nameContext ctx) {
     return ctx.getText();
+  }
+
+  /**
+   * Convert a {@link ParserRuleContext} whose text is guaranteed to represent a valid signed 32-bit
+   * decimal integer to an {@link Integer} if it is contained in the provided {@code space}, or else
+   * {@link Optional#empty}.
+   */
+  private @Nonnull Optional<Integer> toIntegerInSpace(
+      ParserRuleContext messageCtx, ParserRuleContext ctx, IntegerSpace space, String name) {
+    int num = Integer.parseInt(ctx.getText());
+    if (!space.contains(num)) {
+      _w.addWarning(
+          messageCtx,
+          getFullText(messageCtx),
+          _parser,
+          String.format("Expected %s in range %s, but got '%d'", name, space, num));
+      return Optional.empty();
+    }
+    return Optional.of(num);
+  }
+
+  private Integer toInteger(Interface_ospf_costContext ctx) {
+    return Integer.parseInt(ctx.getText());
+  }
+
+  private Optional<Integer> toInteger(ParserRuleContext ctx, Ip_prefix_lengthContext len) {
+    return toIntegerInSpace(ctx, len, PREFIX_LENGTH_SPACE, "prefix length");
   }
 
   private void clearOspfPassiveInterface() {
@@ -941,10 +976,6 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
     _currentInterface.getOrCreateOspf().setCost(toInteger(ctx.interface_ospf_cost()));
   }
 
-  private Integer toInteger(Interface_ospf_costContext ctx) {
-    return Integer.parseInt(ctx.getText());
-  }
-
   @Override
   public void exitSbbb_aspath_multipath_relax(Sbbb_aspath_multipath_relaxContext ctx) {
     _currentBgpVrf.setAsPathMultipathRelax(true);
@@ -1237,6 +1268,15 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
         name,
         CumulusStructureUsage.ROUTE_MAP_MATCH_AS_PATH,
         ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitRmmipa_prefix_len(Rmmipa_prefix_lenContext ctx) {
+    Optional<Integer> maybeLen = toInteger(ctx, ctx.len);
+    maybeLen.ifPresent(
+        len ->
+            _currentRouteMapEntry.setMatchIpAddressPrefixLen(
+                new RouteMapMatchIpAddressPrefixLen(len)));
   }
 
   @Override
