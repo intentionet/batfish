@@ -264,6 +264,10 @@ public final class BgpTopologyUtils {
     Set<BgpPeerConfigId> alreadyEstablished = graph.adjacentNodes(neighborId);
     for (Entry<String, Set<String>> entry : possibleVrfs.entrySet()) {
       String node = entry.getKey();
+      if (neighborId.getHostname().equals(node)) {
+        // Skip self-loops. This can happen if a node has the same IP locally as on the remote.
+        continue;
+      }
       Set<String> vrfs = entry.getValue();
       Multimap<String, BgpPeerConfigId> receiversByVrf = receivers.get(node);
       if (receiversByVrf == null) {

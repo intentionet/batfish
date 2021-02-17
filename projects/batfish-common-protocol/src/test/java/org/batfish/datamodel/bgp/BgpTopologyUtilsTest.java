@@ -146,6 +146,35 @@ public class BgpTopologyUtilsTest {
   }
 
   @Test
+  public void testInitTopologyNoSelfLoop() {
+    // Peer 1 on node1 with IP 1.1.1.1 is active, set up to peer with 1.1.1.1
+    // Should see no sessions, and should also not crash.
+
+    Ip ip = Ip.parse("1.1.1.1");
+
+    Prefix peer1PeerPrefix = ip.toPrefix();
+    BgpActivePeerConfig peer1 =
+        BgpActivePeerConfig.builder()
+            .setLocalIp(ip)
+            .setLocalAs(1L)
+            .setPeerAddress(ip)
+            .setRemoteAs(1L)
+            .setIpv4UnicastAddressFamily(
+                Ipv4UnicastAddressFamily.builder()
+                    .setAddressFamilyCapabilities(AddressFamilyCapabilities.builder().build())
+                    .build())
+            .build();
+    _node1BgpProcess.setNeighbors(ImmutableSortedMap.of(peer1PeerPrefix, peer1));
+
+    Map<Ip, Map<String, Set<String>>> ipOwners =
+        ImmutableMap.of(ip, ImmutableMap.of(NODE1, ImmutableSet.of(DEFAULT_VRF_NAME)));
+
+    ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
+        initBgpTopology(_configs, ipOwners, true, false, null, null).getGraph();
+    assertThat(bgpTopology.edges(), empty());
+  }
+
+  @Test
   public void testInitTopologyPeerAddressNotMatchingRemoteHost() {
     // Peer 1 on node1 with IP 1.1.1.1 is active, set up to peer with 1.1.1.2
     // Peer 2 on node2 with IP 1.1.1.2 is passive, able to peer with peer 1
