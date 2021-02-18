@@ -105,6 +105,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Range;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -131,6 +132,7 @@ import org.batfish.datamodel.AsPath;
 import org.batfish.datamodel.AsSet;
 import org.batfish.datamodel.AuthenticationMethod;
 import org.batfish.datamodel.BgpAuthenticationAlgorithm;
+import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.ConcreteInterfaceAddress;
 import org.batfish.datamodel.DiffieHellmanGroup;
 import org.batfish.datamodel.EncryptionAlgorithm;
@@ -149,6 +151,7 @@ import org.batfish.datamodel.IpsecProtocol;
 import org.batfish.datamodel.IsoAddress;
 import org.batfish.datamodel.Line;
 import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.LongSpace;
 import org.batfish.datamodel.NamedPort;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
@@ -805,6 +808,9 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
   private static final BgpGroup DUMMY_BGP_GROUP = new BgpGroup();
 
   private static final StaticRoute DUMMY_STATIC_ROUTE = new StaticRoute(Prefix.ZERO);
+
+  private static final LongSpace LOCAL_PREFERENCE_VALUES =
+      LongSpace.of(Range.closed(0L, BgpRoute.MAX_LOCAL_PREFERENCE));
 
   private String convErrorMessage(Class<?> type, ParserRuleContext ctx) {
     return String.format("Could not convert to %s: %s", type.getSimpleName(), getFullText(ctx));
@@ -1771,6 +1777,21 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   private static long toLong(Token token) {
     return Long.parseLong(token.getText());
+  }
+
+  /**
+   * Convert a {@link ParserRuleContext} whose text is guaranteed to represent a valid signed 64-bit
+   * decimal integer to a {@link Long} if it is contained in the provided {@code space}, or else
+   * {@link Optional#empty}.
+   */
+  private @Nonnull Optional<Long> toLongInSpace(
+      ParserRuleContext messageCtx, ParserRuleContext ctx, LongSpace space, String name) {
+    long num = Long.parseLong(ctx.getText());
+    if (!space.contains(num)) {
+      todo(messageCtx, String.format("Expected %s in range %s, but got '%d'", name, space, num));
+      return Optional.empty();
+    }
+    return Optional.of(num);
   }
 
   private static IpProtocol toIpProtocol(Ip_protocolContext ctx) {
@@ -4860,8 +4881,12 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitPopsf_local_preference(Popsf_local_preferenceContext ctx) {
-    int localPreference = toInt(ctx.localpref);
-    _currentPsTerm.getFroms().setFromLocalPreference(new PsFromLocalPreference(localPreference));
+    toLongInSpace(ctx, ctx.localpref, LOCAL_PREFERENCE_VALUES, "local-preference")
+        .ifPresent(
+            localPreference ->
+                _currentPsTerm
+                    .getFroms()
+                    .setFromLocalPreference(new PsFromLocalPreference(localPreference)));
   }
 
   @Override
@@ -5026,15 +5051,15 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitPopst_local_preference(Popst_local_preferenceContext ctx) {
-    int localPreference = toInt(ctx.localpref);
     PsThenLocalPreference.Operator op =
         ctx.ADD() != null
             ? PsThenLocalPreference.Operator.ADD
             : (ctx.SUBTRACT() != null
                 ? PsThenLocalPreference.Operator.SUBTRACT
                 : PsThenLocalPreference.Operator.SET);
-    PsThenLocalPreference then = new PsThenLocalPreference(localPreference, op);
-    _currentPsThens.add(then);
+    toLongInSpace(ctx, ctx.localpref, LOCAL_PREFERENCE_VALUES, "local-preference")
+        .ifPresent(
+            localPreference -> _currentPsThens.add(new PsThenLocalPreference(localPreference, op)));
   }
 
   @Override

@@ -8726,7 +8726,7 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
 
   private RoutePolicyBoolean toRoutePolicyBoolean(Boolean_local_preference_rp_stanzaContext ctx) {
     IntComparator cmp = toIntComparator(ctx.int_comp());
-    IntExpr rhs = toCommonIntExpr(ctx.rhs);
+    LongExpr rhs = toCommonLongExpr(ctx.rhs);
     return new RoutePolicyBooleanLocalPreference(cmp, rhs);
   }
 

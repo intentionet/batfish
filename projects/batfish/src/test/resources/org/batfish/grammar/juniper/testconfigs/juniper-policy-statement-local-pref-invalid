@@ -1,0 +1,11 @@
+#
+set system host-name juniper-policy-statement-local-pref-invalid
+#
+set policy-options policy-statement LOCAL_PREFERENCE_POLICY term MIN from local-preference 0
+set policy-options policy-statement LOCAL_PREFERENCE_POLICY term MIN then local-preference 0
+set policy-options policy-statement LOCAL_PREFERENCE_POLICY term MAX from local-preference 4294967295
+set policy-options policy-statement LOCAL_PREFERENCE_POLICY term MAX then local-preference 4294967295
+# No need to test negative numbers, since they won't even parse
+set policy-options policy-statement LOCAL_PREFERENCE_POLICY term TOOBIG from local-preference 5000000001
+set policy-options policy-statement LOCAL_PREFERENCE_POLICY term TOOBIG then local-preference 5000000002
+#

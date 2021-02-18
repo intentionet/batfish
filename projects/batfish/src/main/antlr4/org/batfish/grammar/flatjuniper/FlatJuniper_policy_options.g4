@@ -229,7 +229,7 @@ popsf_local_preference
 :
    LOCAL_PREFERENCE
    (
-      localpref = DEC
+      localpref = bgp_local_preference
       | apply_groups
    )
 ;
@@ -526,7 +526,7 @@ popst_local_preference
 :
    LOCAL_PREFERENCE
    (
-      (ADD | SUBTRACT)? localpref = DEC
+      (ADD | SUBTRACT)? localpref = bgp_local_preference
       | apply_groups
    )
 ;

@@ -1,10 +1,12 @@
 package org.batfish.grammar.flatjuniper;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.batfish.common.matchers.ParseWarningMatchers.hasText;
 import static org.batfish.common.util.Resources.readResource;
 import static org.batfish.datamodel.AuthenticationMethod.GROUP_RADIUS;
 import static org.batfish.datamodel.AuthenticationMethod.GROUP_TACACS;
 import static org.batfish.datamodel.AuthenticationMethod.PASSWORD;
+import static org.batfish.datamodel.BgpRoute.MAX_LOCAL_PREFERENCE;
 import static org.batfish.datamodel.Configuration.DEFAULT_VRF_NAME;
 import static org.batfish.datamodel.Flow.builder;
 import static org.batfish.datamodel.Ip.ZERO;
@@ -352,6 +354,7 @@ import org.batfish.representation.juniper.NatRuleThenPrefixName;
 import org.batfish.representation.juniper.NoPortTranslation;
 import org.batfish.representation.juniper.PatPool;
 import org.batfish.representation.juniper.PolicyStatement;
+import org.batfish.representation.juniper.PsFromLocalPreference;
 import org.batfish.representation.juniper.PsThenLocalPreference;
 import org.batfish.representation.juniper.PsThenLocalPreference.Operator;
 import org.batfish.representation.juniper.RoutingInstance;
@@ -426,13 +429,17 @@ public final class FlatJuniperGrammarTest {
     BatfishTestUtils.configureBatfishTestSettings(settings);
     FlatJuniperCombinedParser flatJuniperParser =
         new FlatJuniperCombinedParser(src, settings, null);
+    Warnings w = new Warnings();
     FlatJuniperControlPlaneExtractor extractor =
-        new FlatJuniperControlPlaneExtractor(src, flatJuniperParser, new Warnings());
+        new FlatJuniperControlPlaneExtractor(src, flatJuniperParser, w);
     ParserRuleContext tree =
         Batfish.parse(
             flatJuniperParser, new BatfishLogger(BatfishLogger.LEVELSTR_FATAL, false), settings);
     extractor.processParseTree(TEST_SNAPSHOT, tree);
-    return SerializationUtils.clone((JuniperConfiguration) extractor.getVendorConfiguration());
+    JuniperConfiguration ret =
+        SerializationUtils.clone((JuniperConfiguration) extractor.getVendorConfiguration());
+    ret.setWarnings(w);
+    return ret;
   }
 
   private Map<String, Configuration> parseTextConfigs(String... configurationNames)
@@ -3527,6 +3534,31 @@ public final class FlatJuniperGrammarTest {
                     .setOriginalRoute(new ConnectedRoute(Prefix.parse("3.3.3.0/24"), "nextHop"))
                     .build());
     assertThat(result.getBooleanValue(), equalTo(false));
+  }
+
+  @Test
+  public void testJuniperPolicyStatementLocalPrefStress() {
+    JuniperConfiguration c = parseJuniperConfig("juniper-policy-statement-local-pref-invalid");
+    PolicyStatement policy =
+        c.getMasterLogicalSystem().getPolicyStatements().get("LOCAL_PREFERENCE_POLICY");
+    assertThat(policy.getTerms(), hasKeys("MIN", "MAX", "TOOBIG"));
+    assertThat(
+        policy.getTerms().get("MIN").getFroms().getFromLocalPreference(),
+        equalTo(new PsFromLocalPreference(0)));
+    assertThat(
+        policy.getTerms().get("MIN").getThens(),
+        contains(new PsThenLocalPreference(0, Operator.SET)));
+    assertThat(
+        policy.getTerms().get("MAX").getFroms().getFromLocalPreference(),
+        equalTo(new PsFromLocalPreference(MAX_LOCAL_PREFERENCE)));
+    assertThat(
+        policy.getTerms().get("MAX").getThens(),
+        contains(new PsThenLocalPreference(MAX_LOCAL_PREFERENCE, Operator.SET)));
+    assertThat(policy.getTerms().get("TOOBIG").getFroms().getFromLocalPreference(), nullValue());
+    assertThat(policy.getTerms().get("TOOBIG").getThens(), empty());
+    assertThat(
+        c.getWarnings().getParseWarnings(),
+        contains(hasText("local-preference 5000000001"), hasText("local-preference 5000000002")));
   }
 
   @Test

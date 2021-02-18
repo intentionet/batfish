@@ -69,6 +69,11 @@ bgp_asn
     | asn4hi = DEC PERIOD asn4lo = DEC
 ;
 
+bgp_local_preference
+:
+    DEC
+;
+
 description
 :
   DESCRIPTION text = M_Description_DESCRIPTION?

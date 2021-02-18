@@ -1,5 +1,6 @@
 package org.batfish.representation.juniper;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -130,8 +131,8 @@ public final class PsFroms implements Serializable {
     return _fromInterfaces;
   }
 
-  @Nullable
-  PsFromLocalPreference getFromLocalPreference() {
+  @VisibleForTesting
+  public @Nullable PsFromLocalPreference getFromLocalPreference() {
     return _fromLocalPreference;
   }
 
