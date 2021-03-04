@@ -3,6 +3,7 @@ package org.batfish.bddreachability;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -57,6 +58,9 @@ public final class BDDFibGenerator {
   // node --> vrf --> interface --> set of packets accepted by the interface
   private final Map<String, Map<String, Map<String, BDD>>> _ifaceAcceptBDDs;
 
+  /** Returns a constraint BDD indicating flows that apply to the given outgoing interface. */
+  private final BiFunction<String, String, BDD> _interfaceOutConstraint;
+
   // node --> vrf --> set of packets accepted by the vrf
   private final Map<String, Map<String, BDD>> _vrfAcceptBDDs;
 
@@ -70,7 +74,8 @@ public final class BDDFibGenerator {
       Map<String, Map<String, BDD>> vrfAcceptBDDs,
       Map<String, Map<String, BDD>> routableBDDs,
       Map<String, Map<String, Map<String, BDD>>> nextVrfBDDs,
-      Map<String, Map<String, BDD>> nullRoutedBDDs) {
+      Map<String, Map<String, BDD>> nullRoutedBDDs,
+      BiFunction<String, String, BDD> interfaceOutConstraint) {
     _arpTrueEdgeBDDs = arpTrueEdgeBDDs;
     _neighborUnreachableBDDs = neighborUnreachableBDDs;
     _deliveredToSubnetBDDs = deliveredToSubnetBDDs;
@@ -82,6 +87,7 @@ public final class BDDFibGenerator {
     _nullRoutedBDDs = nullRoutedBDDs;
     // fully determined by ifaceAcceptBdds, but already computed in BDDReachabilityAnalysisFactory
     _vrfAcceptBDDs = vrfAcceptBDDs;
+    _interfaceOutConstraint = interfaceOutConstraint;
   }
 
   /**
@@ -227,12 +233,17 @@ public final class BDDFibGenerator {
                         vrfEntry -> {
                           String node = nodeEntry.getKey();
                           String vrf = vrfEntry.getKey();
-                          BDD acceptBDD = vrfEntry.getValue();
                           BDD routableBDD = _routableBDDs.get(node).get(vrf);
+                          BDD acceptBDD = vrfEntry.getValue();
+                          BDD[] routableDispatched =
+                              Stream.concat(
+                                      Stream.of(acceptBDD),
+                                      _nextVrfBDDs.get(node).get(vrf).values().stream())
+                                  .toArray(BDD[]::new);
                           return new Edge(
                               postInVrf.apply(node, vrf),
                               preOutVrf.apply(node, vrf),
-                              routableBDD.diff(acceptBDD));
+                              routableBDD.diff(routableBDD.getFactory().orAll(routableDispatched)));
                         }));
   }
 
@@ -282,10 +293,13 @@ public final class BDDFibGenerator {
                                       String node2 = edge.getNode2();
                                       String iface2 = edge.getInt2();
 
+                                      BDD leavingIface1 =
+                                          _interfaceOutConstraint.apply(node1, iface1);
+
                                       return new Edge(
                                           preOutVrf.apply(node1, vrf1),
                                           preOutEdge.apply(node1, iface1, node2, iface2),
-                                          arpTrue);
+                                          leavingIface1.and(arpTrue));
                                     })));
   }
 
@@ -300,13 +314,29 @@ public final class BDDFibGenerator {
       StateExprConstructor2 preOutInterfaceNeighborUnreachable) {
     return Streams.concat(
         generateRules_PreOutVrf_PreOutInterfaceDisposition(
-            includedNode, _deliveredToSubnetBDDs, preOutVrf, preOutInterfaceDeliveredToSubnet),
+            includedNode,
+            _deliveredToSubnetBDDs,
+            preOutVrf,
+            preOutInterfaceDeliveredToSubnet,
+            _interfaceOutConstraint),
         generateRules_PreOutVrf_PreOutInterfaceDisposition(
-            includedNode, _exitsNetworkBDDs, preOutVrf, preOutInterfaceExitsNetwork),
+            includedNode,
+            _exitsNetworkBDDs,
+            preOutVrf,
+            preOutInterfaceExitsNetwork,
+            _interfaceOutConstraint),
         generateRules_PreOutVrf_PreOutInterfaceDisposition(
-            includedNode, _insufficientInfoBDDs, preOutVrf, preOutInterfaceInsufficientInfo),
+            includedNode,
+            _insufficientInfoBDDs,
+            preOutVrf,
+            preOutInterfaceInsufficientInfo,
+            _interfaceOutConstraint),
         generateRules_PreOutVrf_PreOutInterfaceDisposition(
-            includedNode, _neighborUnreachableBDDs, preOutVrf, preOutInterfaceNeighborUnreachable));
+            includedNode,
+            _neighborUnreachableBDDs,
+            preOutVrf,
+            preOutInterfaceNeighborUnreachable,
+            _interfaceOutConstraint));
   }
 
   @Nonnull
@@ -315,7 +345,8 @@ public final class BDDFibGenerator {
       Predicate<String> includedNode,
       Map<String, Map<String, Map<String, BDD>>> dispositionBddMap,
       StateExprConstructor2 preOutVrfConstructor,
-      StateExprConstructor2 preOutInterfaceDispositionConstructor) {
+      StateExprConstructor2 preOutInterfaceDispositionConstructor,
+      BiFunction<String, String, BDD> interfaceOutConstraint) {
     return dispositionBddMap.entrySet().stream()
         .filter(byNodeEntry -> includedNode.test(byNodeEntry.getKey()))
         .flatMap(
@@ -332,11 +363,12 @@ public final class BDDFibGenerator {
                                 ifaceEntry -> {
                                   String ifaceName = ifaceEntry.getKey();
                                   BDD bdd = ifaceEntry.getValue();
+                                  BDD forIface = interfaceOutConstraint.apply(hostname, ifaceName);
                                   return new Edge(
                                       preState,
                                       preOutInterfaceDispositionConstructor.apply(
                                           hostname, ifaceName),
-                                      bdd);
+                                      forIface.and(bdd));
                                 });
                       });
             });

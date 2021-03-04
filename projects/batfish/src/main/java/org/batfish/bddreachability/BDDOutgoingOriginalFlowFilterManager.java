@@ -5,6 +5,7 @@ import static com.google.common.collect.Maps.immutableEntry;
 import static org.batfish.common.bdd.IpAccessListToBdd.toBdds;
 import static org.batfish.common.util.CollectionUtil.toImmutableMap;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -200,9 +201,30 @@ public final class BDDOutgoingOriginalFlowFilterManager {
    * Interface#getOutgoingOriginalFlowFilter() outgoingOriginalFlowFilters}. (Does not include entry
    * for {@code _activeButNoOriginalFlowFilterRepresentative} even if present in finite domain.)
    */
+  @VisibleForTesting
   @Nonnull
   Map<String, BDD> getInterfaceBDDs() {
     return _interfaceBdds;
+  }
+
+  /**
+   * Returns the BDD representing the constraint indicating the set of flows to be evaluated against
+   * the outgoing filter on the given interface.
+   *
+   * <p>If there is no outging filter on the given interface, returns the constraint corresponding
+   * to the set of flows that were not evaluated against any interface's outgoing filter.
+   */
+  public @Nonnull BDD outgoingInterfaceBDD(String iface) {
+    if (isTrivial()) {
+      return _trueBdd;
+    }
+    if (_activeButNoOriginalFlowFilterRepresentative == null) {
+      BDD ret = _interfaceBdds.get(iface);
+      assert ret != null;
+      return ret;
+    }
+    return _interfaceBdds.getOrDefault(
+        iface, _interfaceBdds.get(_activeButNoOriginalFlowFilterRepresentative));
   }
 
   /**
