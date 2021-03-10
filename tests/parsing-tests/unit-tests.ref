@@ -80254,7 +80254,7 @@
         "variables" : "PASSED",
         "variables_dos" : "PASSED",
         "vlan_access_map4" : "PASSED",
-        "vmx4" : "PASSED"
+        "vmx4" : "WARNINGS"
       },
       "definedStructures" : {
         "aws_configs" : { },
@@ -93916,6 +93916,14 @@
             {
               "tag" : "MISCELLANEOUS",
               "text" : "NAT rule MISSING_TO ignored because it has no to zone configured"
+            }
+          ]
+        },
+        "vmx4" : {
+          "Red flags" : [
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "Unimplemented: prepending both local-as and global-as for BGP routes"
             }
           ]
         }

@@ -632,6 +632,14 @@ public final class JuniperConfiguration extends VendorConfiguration {
         continue;
       }
 
+      // Warn if configured to prepend global-as, plus global-as and local-as both exist
+      boolean prependGlobalAs = !firstNonNull(ig.getNoPrependGlobalAs(), Boolean.FALSE);
+      if (prependGlobalAs
+          && mg.getLocalAs() != null
+          && mg.getLocalAs().longValue() != ig.getLocalAs().longValue()) {
+        _w.redFlag("Unimplemented: prepending both local-as and global-as for BGP routes");
+      }
+
       /* Inherit multipath */
       if (ig.getType() == BgpGroupType.INTERNAL || ig.getType() == null) {
         boolean currentGroupMultipathIbgp = ig.getMultipath();

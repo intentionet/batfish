@@ -1,6 +1,8 @@
 package org.batfish.grammar.flatjuniper;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.batfish.common.matchers.ParseWarningMatchers.hasComment;
+import static org.batfish.common.matchers.ParseWarningMatchers.hasText;
 import static org.batfish.common.util.Resources.readResource;
 import static org.batfish.datamodel.AbstractRoute.MAX_TAG;
 import static org.batfish.datamodel.AuthenticationMethod.GROUP_RADIUS;
@@ -161,6 +163,7 @@ import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.equalTo;
@@ -203,6 +206,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.apache.commons.lang3.SerializationUtils;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.Warnings;
+import org.batfish.common.Warnings.ParseWarning;
+import org.batfish.common.matchers.WarningMatchers;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.topology.Layer1Edge;
 import org.batfish.common.topology.Layer1Topology;
@@ -965,8 +970,11 @@ public final class FlatJuniperGrammarTest {
 
   /** For https://github.com/batfish/batfish/issues/6710 */
   @Test
-  public void testBgpRoutingOptionsAutonomousSystemGH6710() {
-    Configuration c = parseConfig("bgp-routing-options-as-gh-6710");
+  public void testBgpRoutingOptionsAutonomousSystemGH6710() throws IOException {
+    String hostname = "bgp-routing-options-as-gh-6710";
+    String filename = "configs/" + hostname;
+    IBatfish batfish = getBatfishForConfigurationNames(hostname);
+    Configuration c = batfish.loadConfigurations(batfish.getSnapshot()).get(hostname);
     Vrf def = c.getDefaultVrf();
     assertThat(def.getBgpProcess(), notNullValue());
     // Peer in group_a should pick up local-as
@@ -977,6 +985,27 @@ public final class FlatJuniperGrammarTest {
     assertThat(
         def.getBgpProcess().getActiveNeighbors(),
         hasEntry(equalTo(Prefix.parse("10.255.42.23/32")), hasLocalAs(1111L)));
+
+    List<ParseWarning> parseWarnings =
+        batfish
+            .loadParseVendorConfigurationAnswerElement(batfish.getSnapshot())
+            .getWarnings()
+            .get(filename)
+            .getParseWarnings();
+    assertThat(
+        parseWarnings,
+        hasItem(allOf(hasComment("This feature is not currently supported"), hasText("private"))));
+    Warnings convertWarnings =
+        batfish
+            .loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot())
+            .getWarnings()
+            .get(hostname);
+    assertThat(
+        convertWarnings.getRedFlagWarnings(),
+        not(
+            hasItem(
+                WarningMatchers.hasText(
+                    containsString("prepending both local-as and global-as")))));
   }
 
   @Test

@@ -3839,7 +3839,7 @@ public class ConfigurationBuilder extends FlatJuniperParserBaseListener {
 
   @Override
   public void exitBl_no_prepend_global_as(Bl_no_prepend_global_asContext ctx) {
-    todo(ctx);
+    _currentBgpGroup.setNoPrependGlobalAs(true);
   }
 
   @Override
