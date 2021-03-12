@@ -909,10 +909,11 @@ public class OspfTest {
     assertRoute(routesByNode, OSPF_IA, C1_NAME, C3_E3_4_ADDRESS, 3L);
     assertRoute(routesByNode, OSPF, C2_NAME, C1_L0_ADDRESS, 2L);
     // summary discard route
-    assertRoute(routesByNode, OSPF_IS, C2_NAME, C1_L0_SUMMARY_PREFIX, 0L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_L0_ADDRESS, 2L);
     assertRoute(routesByNode, OSPF, C2_NAME, C4_L0_ADDRESS, 3L);
     assertRoute(routesByNode, OSPF, C2_NAME, C3_E3_4_ADDRESS, 2L);
+    // summary discard route not installed for no-advertise
+    assertNoRoute(routesByNode, C2_NAME, C1_L0_SUMMARY_PREFIX);
     // summary prefix not advertised
     assertNoRoute(routesByNode, C3_NAME, C1_L0_SUMMARY_PREFIX);
     // suppressed by summary

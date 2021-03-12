@@ -740,12 +740,14 @@ final class OspfRoutingProcess implements RoutingProcess<OspfTopology, OspfRoute
   private RibDelta<OspfInternalSummaryRoute> computeInternalSummariesForArea(OspfArea area) {
     RibDelta.Builder<OspfInternalSummaryRoute> deltaBuilder = RibDelta.builder();
     area.getSummaries()
-        .keySet()
         .forEach(
-            prefix ->
+            (prefix, summary) -> {
+              if (summary.getAdvertised()) {
                 computeInternalSummaryRoute(prefix, area.getAreaNumber())
                     // TODO: support withdrawals
-                    .ifPresent(r -> deltaBuilder.from(_internalSummaryRib.mergeRouteGetDelta(r))));
+                    .ifPresent(r -> deltaBuilder.from(_internalSummaryRib.mergeRouteGetDelta(r)));
+              }
+            });
     return deltaBuilder.build();
   }
 
