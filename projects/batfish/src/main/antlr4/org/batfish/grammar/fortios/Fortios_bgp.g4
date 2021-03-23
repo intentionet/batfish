@@ -30,7 +30,7 @@ crb_config
     ) END NEWLINE
 ;
 
-crbc_neighbor: NEIGHBOR newline crbcn_edit;
+crbc_neighbor: NEIGHBOR newline crbcn_edit*;
 
 crbcn_edit: EDIT bgp_neighbor_id newline crbcne* NEXT newline;
 

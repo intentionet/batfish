@@ -8,9 +8,10 @@ config router bgp
     set router-id 1.1.1.1
     config neighbor
         edit "2.2.2.2"
-            # Test max and min remote-as
-            set remote-as 4294967295
             set remote-as 1
+        next
+        edit "3.3.3.3"
+            set remote-as 4294967295
         next
     end
     config redistribute "connected"

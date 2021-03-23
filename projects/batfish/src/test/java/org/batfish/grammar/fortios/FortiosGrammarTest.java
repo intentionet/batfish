@@ -85,6 +85,7 @@ import org.batfish.datamodel.route.nh.NextHopInterface;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.representation.fortios.Address;
+import org.batfish.representation.fortios.BgpNeighbor;
 import org.batfish.representation.fortios.BgpProcess;
 import org.batfish.representation.fortios.FortiosConfiguration;
 import org.batfish.representation.fortios.FortiosStructureType;
@@ -517,6 +518,17 @@ public final class FortiosGrammarTest {
 
     assertThat(bgpProcess.getAs(), equalTo(0L));
     assertThat(bgpProcess.getRouterId(), equalTo(Ip.parse("1.1.1.1")));
+
+    Map<Ip, BgpNeighbor> neighbors = bgpProcess.getNeighbors();
+    Ip ip2222 = Ip.parse("2.2.2.2");
+    Ip ip3333 = Ip.parse("3.3.3.3");
+    assertThat(neighbors.keySet(), containsInAnyOrder(ip2222, ip3333));
+    BgpNeighbor neighbor2222 = neighbors.get(ip2222);
+    BgpNeighbor neighbor3333 = neighbors.get(ip3333);
+    assertThat(neighbor2222.getIp(), equalTo(ip2222));
+    assertThat(neighbor3333.getIp(), equalTo(ip3333));
+    assertThat(neighbor2222.getRemoteAs(), equalTo(1L));
+    assertThat(neighbor3333.getRemoteAs(), equalTo(4294967295L));
   }
 
   @Test
