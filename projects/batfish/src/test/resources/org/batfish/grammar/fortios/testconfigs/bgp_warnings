@@ -1,0 +1,21 @@
+config system global
+    set hostname "bgp_warnings"
+end
+config router bgp
+    set as 4294967296
+    set router-id 0.0.0.0
+    config neighbor
+        # Invalid neighbor ip
+        edit "0.0.0.0"
+            set remote-as 1
+        next
+        # Invalid remote ASes, resulting in neighbor block missing AS
+        edit "1.1.1.1"
+            set remote-as 0
+            set remote-as 4294967296
+        next
+    end
+    config redistribute "connected"
+        set status enable
+    end
+end

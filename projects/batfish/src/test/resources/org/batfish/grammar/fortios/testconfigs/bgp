@@ -14,16 +14,4 @@ config router bgp
             set remote-as 4294967295
         next
     end
-    config redistribute "connected"
-        set status enable
-    end
-    config redistribute "isis"
-        set status disable
-    end
-    config redistribute "ospf"
-    end
-    config redistribute "rip"
-    end
-    config redistribute "static"
-    end
 end

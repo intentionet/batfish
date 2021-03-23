@@ -532,6 +532,29 @@ public final class FortiosGrammarTest {
   }
 
   @Test
+  public void testBgpWarnings() throws IOException {
+    String hostname = "bgp_warnings";
+    FortiosConfiguration vc = parseVendorConfig(hostname);
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    Warnings parseWarnings =
+        getOnlyElement(
+            batfish
+                .loadParseVendorConfigurationAnswerElement(batfish.getSnapshot())
+                .getWarnings()
+                .values());
+    assertThat(
+        parseWarnings.getParseWarnings(),
+        containsInAnyOrder(
+            hasComment("Expected BGP AS in range 0-4294967295, but got '4294967296'"),
+            hasComment("Cannot use 0.0.0.0 as BGP router-id"),
+            hasComment("BGP neighbor edit block ignored: neighbor ID is invalid"),
+            hasComment("Expected BGP remote AS in range 1-4294967295, but got '0'"),
+            hasComment("Expected BGP remote AS in range 1-4294967295, but got '4294967296'"),
+            hasComment("BGP neighbor edit block ignored: remote-as must be set"),
+            hasComment("Redistribution into BGP is not yet supported")));
+  }
+
+  @Test
   public void testInterfaceExtraction() {
     String hostname = "iface";
     FortiosConfiguration vc = parseVendorConfig(hostname);

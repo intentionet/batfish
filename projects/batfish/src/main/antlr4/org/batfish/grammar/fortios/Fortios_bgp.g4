@@ -36,12 +36,7 @@ crbcn_edit: EDIT bgp_neighbor_id newline crbcne* NEXT newline;
 
 crbcne
 :
-    SET crbcne_set_singletons
-;
-
-crbcne_set_singletons
-:
-    crbcne_set_remote_as
+    SET crbcne_set_remote_as
 ;
 
 crbcne_set_remote_as: REMOTE_AS bgp_remote_as newline;
@@ -50,12 +45,7 @@ crbc_redistribute: REDISTRIBUTE protocol = str newline crbcr*;
 
 crbcr
 :
-    SET crbcr_set_singletons
-;
-
-crbcr_set_singletons
-:
-    crbcr_set_status
+    SET crbcr_set_status
 ;
 
 crbcr_set_status: STATUS enable_or_disable newline;
