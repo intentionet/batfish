@@ -534,7 +534,6 @@ public final class FortiosGrammarTest {
   @Test
   public void testBgpWarnings() throws IOException {
     String hostname = "bgp_warnings";
-    FortiosConfiguration vc = parseVendorConfig(hostname);
     Batfish batfish = getBatfishForConfigurationNames(hostname);
     Warnings parseWarnings =
         getOnlyElement(
