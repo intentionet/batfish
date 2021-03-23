@@ -1,0 +1,28 @@
+config system global
+    set hostname "bgp"
+end
+config router bgp
+    # Test max and min AS
+    set as 4294967295
+    set as 0
+    set router-id 1.1.1.1
+    config neighbor
+        edit "2.2.2.2"
+            # Test max and min remote-as
+            set remote-as 4294967295
+            set remote-as 1
+        next
+    end
+    config redistribute "connected"
+        set status enable
+    end
+    config redistribute "isis"
+        set status disable
+    end
+    config redistribute "ospf"
+    end
+    config redistribute "rip"
+    end
+    config redistribute "static"
+    end
+end

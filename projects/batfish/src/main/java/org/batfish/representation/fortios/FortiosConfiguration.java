@@ -38,6 +38,7 @@ public class FortiosConfiguration extends VendorConfiguration {
 
   public FortiosConfiguration() {
     _addresses = new HashMap<>();
+    _bgpProcess = new BgpProcess();
     _interfaces = new HashMap<>();
     _policies = new LinkedHashMap<>();
     _renameableObjects = new HashMap<>();
@@ -67,6 +68,10 @@ public class FortiosConfiguration extends VendorConfiguration {
 
   public @Nonnull Map<String, Address> getAddresses() {
     return _addresses;
+  }
+
+  public @Nonnull BgpProcess getBgpProcess() {
+    return _bgpProcess;
   }
 
   public @Nonnull Map<String, Interface> getInterfaces() {
@@ -113,6 +118,9 @@ public class FortiosConfiguration extends VendorConfiguration {
   private final @Nonnull Map<String, Service> _services;
   private final @Nonnull Map<String, StaticRoute> _staticRoutes;
   private final @Nonnull Map<String, Zone> _zones;
+
+  // Nonnull, but may be empty (no neighbors)
+  private final @Nonnull BgpProcess _bgpProcess;
 
   private @Nonnull Configuration toVendorIndependentConfiguration() {
     Configuration c = new Configuration(_hostname, ConfigurationFormat.FORTIOS);

@@ -85,6 +85,7 @@ import org.batfish.datamodel.route.nh.NextHopInterface;
 import org.batfish.main.Batfish;
 import org.batfish.main.BatfishTestUtils;
 import org.batfish.representation.fortios.Address;
+import org.batfish.representation.fortios.BgpProcess;
 import org.batfish.representation.fortios.FortiosConfiguration;
 import org.batfish.representation.fortios.FortiosStructureType;
 import org.batfish.representation.fortios.FortiosStructureUsage;
@@ -506,6 +507,16 @@ public final class FortiosGrammarTest {
     assertThat(
         wildcardToRange.accept(_srcIpBdd),
         equalTo(IpRange.range(Ip.parse("1.1.0.0"), Ip.parse("255.255.0.0")).accept(_srcIpBdd)));
+  }
+
+  @Test
+  public void testBgpExtraction() {
+    String hostname = "bgp";
+    FortiosConfiguration vc = parseVendorConfig(hostname);
+    BgpProcess bgpProcess = vc.getBgpProcess();
+
+    assertThat(bgpProcess.getAs(), equalTo(0L));
+    assertThat(bgpProcess.getRouterId(), equalTo(Ip.parse("1.1.1.1")));
   }
 
   @Test

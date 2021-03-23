@@ -38,6 +38,8 @@ import org.batfish.grammar.fortios.FortiosParser.Address_nameContext;
 import org.batfish.grammar.fortios.FortiosParser.Address_namesContext;
 import org.batfish.grammar.fortios.FortiosParser.Address_typeContext;
 import org.batfish.grammar.fortios.FortiosParser.Allow_or_denyContext;
+import org.batfish.grammar.fortios.FortiosParser.Bgp_asContext;
+import org.batfish.grammar.fortios.FortiosParser.Bgp_remote_asContext;
 import org.batfish.grammar.fortios.FortiosParser.Cfa_editContext;
 import org.batfish.grammar.fortios.FortiosParser.Cfa_renameContext;
 import org.batfish.grammar.fortios.FortiosParser.Cfa_set_allow_routingContext;
@@ -507,6 +509,21 @@ public final class FortiosConfigurationBuilder extends FortiosParserBaseListener
   @Override
   public void exitCsi_set_vrf(Csi_set_vrfContext ctx) {
     toInteger(ctx, ctx.value).ifPresent(v -> _currentInterface.setVrf(v));
+  }
+
+  @Override
+  public void exitCrb_set_as(FortiosParser.Crb_set_asContext ctx) {
+    toLong(ctx, ctx.bgp_as()).ifPresent(_c.getBgpProcess()::setAs);
+  }
+
+  @Override
+  public void exitCrb_set_router_id(FortiosParser.Crb_set_router_idContext ctx) {
+    Ip routerId = toIp(ctx.router_id);
+    if (routerId.equals(Ip.ZERO)) {
+      warn(ctx, "Cannot use 0.0.0.0 as BGP router-id");
+    } else {
+      _c.getBgpProcess().setRouterId(routerId);
+    }
   }
 
   @Override
@@ -1459,6 +1476,14 @@ public final class FortiosConfigurationBuilder extends FortiosParserBaseListener
     return ctx.text != null ? ctx.text.getText() : "";
   }
 
+  private @Nonnull Optional<Long> toLong(ParserRuleContext messageCtx, Bgp_asContext ctx) {
+    return toLongInSpace(messageCtx, ctx.str(), BGP_AS_SPACE, "BGP AS");
+  }
+
+  private @Nonnull Optional<Long> toLong(ParserRuleContext messageCtx, Bgp_remote_asContext ctx) {
+    return toLongInSpace(messageCtx, ctx.str(), BGP_REMOTE_AS_SPACE, "BGP remote AS");
+  }
+
   private @Nonnull Optional<Long> toLong(ParserRuleContext messageCtx, Policy_numberContext ctx) {
     return toLongInSpace(messageCtx, ctx.str(), POLICY_NUMBER_SPACE, "policy number");
   }
@@ -1736,6 +1761,8 @@ public final class FortiosConfigurationBuilder extends FortiosParserBaseListener
   private static final Pattern WORD_PATTERN = Pattern.compile("^[^ \t\r\n]+$");
   private static final Pattern ZONE_NAME_PATTERN = Pattern.compile("^[^\r\n]{1,35}$");
 
+  private static final LongSpace BGP_AS_SPACE = LongSpace.of(Range.closed(0L, 4294967295L));
+  private static final LongSpace BGP_REMOTE_AS_SPACE = LongSpace.of(Range.closed(1L, 4294967295L));
   private static final IntegerSpace IP_PROTOCOL_NUMBER_SPACE =
       IntegerSpace.of(Range.closed(0, 254));
   private static final IntegerSpace MTU_SPACE = IntegerSpace.of(Range.closed(68, 65535));
