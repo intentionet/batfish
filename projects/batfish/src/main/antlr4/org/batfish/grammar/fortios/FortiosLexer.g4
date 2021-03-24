@@ -148,9 +148,7 @@ ZONE: 'zone';
 
 BLANK_LINE
 :
-  F_Whitespace* F_Newline
-  {lastTokenType() == NEWLINE || lastTokenType() == -1}?
-  F_Newline* -> channel(HIDDEN)
+  F_Whitespace+ F_Newline+ {lastTokenType() == NEWLINE}? -> channel ( HIDDEN )
 ;
 
 COLON: ':';

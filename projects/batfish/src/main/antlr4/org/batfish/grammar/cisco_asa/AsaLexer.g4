@@ -6623,12 +6623,7 @@ BACKSLASH
 
 BLANK_LINE
 :
-   (
-      F_Whitespace
-   )* F_Newline
-   {lastTokenType() == NEWLINE}?
-
-   F_Newline* -> channel ( HIDDEN )
+   F_Whitespace+ F_Newline+ {lastTokenType() == NEWLINE}? -> channel ( HIDDEN )
 ;
 
 BRACE_LEFT
