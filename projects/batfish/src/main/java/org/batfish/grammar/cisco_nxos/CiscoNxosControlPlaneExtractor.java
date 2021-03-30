@@ -396,6 +396,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Inherit_sequence_numberCon
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Inoip_forwardContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Inoip_proxy_arpContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Inoipo_passive_interfaceContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Inos_accessContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Inos_switchportContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.InoshutContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Interface_addressContext;
@@ -5489,6 +5490,12 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   @Override
   public void exitInoshut(InoshutContext ctx) {
     _currentInterfaces.forEach(iface -> iface.setShutdown(false));
+  }
+
+  @Override
+  public void exitInos_access(Inos_accessContext ctx) {
+    // Note: NX-OS does not care what vlan id you put, it clears access vlan regardless.
+    _currentInterfaces.forEach(iface -> iface.setAccessVlan(null));
   }
 
   @Override

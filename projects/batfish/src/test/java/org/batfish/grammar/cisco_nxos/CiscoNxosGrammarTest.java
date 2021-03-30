@@ -2762,6 +2762,7 @@ public final class CiscoNxosGrammarTest {
       assertThat(iface.getEigrp(), nullValue());
       assertThat(iface.getIpForward(), equalTo(Boolean.FALSE));
       assertThat(iface.getIpProxyArp(), equalTo(Boolean.FALSE));
+      assertThat(iface.getAccessVlan(), nullValue());
     }
     {
       Interface iface = vc.getInterfaces().get("Ethernet1/3");

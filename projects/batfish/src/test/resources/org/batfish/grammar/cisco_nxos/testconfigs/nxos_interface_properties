@@ -66,6 +66,9 @@ interface Ethernet1/2
   no snmp trap link-status
   udld disable
   no ip forward
+  switchport
+  switchport access vlan 5
+  no switchport access vlan 7
 
 interface Ethernet1/3
   autostate

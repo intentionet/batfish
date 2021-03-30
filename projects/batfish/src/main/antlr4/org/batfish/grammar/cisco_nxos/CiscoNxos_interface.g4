@@ -1126,7 +1126,7 @@ i_no_switchport
 
 inos_access
 :
-  ACCESS VLAN NEWLINE
+  ACCESS VLAN (vlan = unreserved_vlan_id)? NEWLINE
 ;
 
 inos_block
