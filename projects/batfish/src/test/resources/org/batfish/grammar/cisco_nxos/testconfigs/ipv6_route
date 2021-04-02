@@ -1,0 +1,14 @@
+!RANCID-CONTENT-TYPE: cisco-nx
+!
+hostname ipv6_route
+!
+ipv6 route ::1/128 Null0
+ipv6 route ::2/128 Ethernet1/2
+ipv6 route ::3/128 Ethernet1/2 ::100
+ipv6 route ::4/128 Ethernet1/2 ::101 vrf NHVRF track 3 name name tag 17 11
+!
+vrf context VRF
+  ipv6 route ::1/128 ::2
+  ! Keep description last so we confirm we stay in vrf
+  description VRF
+!

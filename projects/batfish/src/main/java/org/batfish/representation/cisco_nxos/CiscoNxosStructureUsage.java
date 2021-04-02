@@ -92,6 +92,8 @@ public enum CiscoNxosStructureUsage implements StructureUsage {
   IP_PIM_RP_CANDIDATE_ROUTE_MAP("ip pim rp-candidate route-map"),
   IP_ROUTE_NEXT_HOP_INTERFACE("ip route next-hop-interface"),
   IP_ROUTE_NEXT_HOP_VRF("ip route vrf"),
+  IPV6_ROUTE_NEXT_HOP_INTERFACE("ipv6 route next-hop-interface"),
+  IPV6_ROUTE_NEXT_HOP_VRF("ipv6 route vrf"),
   LINE_VTY_ACCESS_CLASS_IN("line vty access-class in"),
   LINE_VTY_ACCESS_CLASS_OUT("line vty access-class out"),
   LOGGING_SOURCE_INTERFACE("logging source-interface"),

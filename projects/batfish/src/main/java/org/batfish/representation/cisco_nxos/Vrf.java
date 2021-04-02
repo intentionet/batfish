@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.datamodel.Prefix;
+import org.batfish.datamodel.Prefix6;
 
 /** A virtual routing and forwarding instance. */
 public final class Vrf implements Serializable {
@@ -26,6 +27,7 @@ public final class Vrf implements Serializable {
     _addressFamilies = new HashMap<>();
     _nameServers = new ArrayList<>(1);
     _staticRoutes = HashMultimap.create();
+    _staticRoutesV6 = HashMultimap.create();
   }
 
   public @Nonnull Map<AddressFamily, VrfAddressFamily> getAddressFamilies() {
@@ -34,6 +36,14 @@ public final class Vrf implements Serializable {
 
   public @Nonnull VrfAddressFamily getAddressFamily(AddressFamily type) {
     return _addressFamilies.computeIfAbsent(type, VrfAddressFamily::new);
+  }
+
+  public @Nullable String getDescription() {
+    return _description;
+  }
+
+  public void setDescription(@Nullable String description) {
+    _description = description;
   }
 
   public @Nonnull String getName() {
@@ -81,6 +91,10 @@ public final class Vrf implements Serializable {
     return _staticRoutes;
   }
 
+  public @Nonnull Multimap<Prefix6, StaticRouteV6> getStaticRoutesV6() {
+    return _staticRoutesV6;
+  }
+
   public @Nullable Integer getVni() {
     return _vni;
   }
@@ -94,11 +108,13 @@ public final class Vrf implements Serializable {
   //////////////////////////////////////////
 
   private final Map<AddressFamily, VrfAddressFamily> _addressFamilies;
+  private @Nullable String _description;
   private final @Nonnull String _name;
   private final int _id;
   @Nonnull private final List<NameServer> _nameServers;
   private @Nullable RouteDistinguisherOrAuto _rd;
   private boolean _shutdown;
   private final Multimap<Prefix, StaticRoute> _staticRoutes;
+  private final Multimap<Prefix6, StaticRouteV6> _staticRoutesV6;
   private @Nullable Integer _vni;
 }

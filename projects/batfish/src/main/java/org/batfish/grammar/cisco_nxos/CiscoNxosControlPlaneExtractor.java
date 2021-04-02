@@ -122,6 +122,8 @@ import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.INTE
 import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.INTERFACE_SERVICE_POLICY_QUEUING;
 import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.INTERFACE_VLAN;
 import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.INTERFACE_VRF_MEMBER;
+import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.IPV6_ROUTE_NEXT_HOP_INTERFACE;
+import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.IPV6_ROUTE_NEXT_HOP_VRF;
 import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.IP_ACCESS_LIST_DESTINATION_ADDRGROUP;
 import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.IP_ACCESS_LIST_DESTINATION_PORTGROUP;
 import static org.batfish.representation.cisco_nxos.CiscoNxosStructureUsage.IP_ACCESS_LIST_SOURCE_ADDRGROUP;
@@ -434,6 +436,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ipv6_addressContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ipv6_prefixContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ipv6_prefix_listContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ipv6_prefix_list_line_prefix_lengthContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ipv6_routeContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Isis_instanceContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ispt_qosContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Ispt_queuingContext;
@@ -698,6 +701,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Uint32Context;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Uint8Context;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Unreserved_vlan_idContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Unreserved_vlan_id_rangeContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_descriptionContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_no_shutdownContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_rdContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vc_shutdownContext;
@@ -709,6 +713,7 @@ import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vlan_idContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vlan_id_rangeContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vlan_vlanContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vni_numberContext;
+import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vrf_descriptionContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vrf_nameContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vrf_non_default_nameContext;
 import org.batfish.grammar.cisco_nxos.CiscoNxosParser.Vv_vn_segmentContext;
@@ -830,6 +835,7 @@ import org.batfish.representation.cisco_nxos.RoutingProtocolInstance;
 import org.batfish.representation.cisco_nxos.SnmpCommunity;
 import org.batfish.representation.cisco_nxos.SnmpServer;
 import org.batfish.representation.cisco_nxos.StaticRoute;
+import org.batfish.representation.cisco_nxos.StaticRouteV6;
 import org.batfish.representation.cisco_nxos.SwitchportMode;
 import org.batfish.representation.cisco_nxos.TacacsServer;
 import org.batfish.representation.cisco_nxos.TcpOptions;
@@ -1013,6 +1019,8 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
 
   private static final IntegerSpace VDC_ID_RANGE = IntegerSpace.of(Range.closed(1, 4));
   private static final IntegerSpace VNI_RANGE = IntegerSpace.of(Range.closed(0, 16777214));
+  private static final IntegerSpace VRF_DESCRIPTION_LENGTH_RANGE =
+      IntegerSpace.of(Range.closed(1, 255));
   private static final IntegerSpace VRF_NAME_LENGTH_RANGE = IntegerSpace.of(Range.closed(1, 32));
 
   private static @Nonnull IpAddressSpec toAddressSpec(Acllal3_address_specContext ctx) {
@@ -2414,6 +2422,62 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   @Override
   public void exitIpv6_prefix_list(Ipv6_prefix_listContext ctx) {
     _currentIpv6PrefixList = null;
+  }
+
+  @Override
+  public void exitIpv6_route(Ipv6_routeContext ctx) {
+    int line = ctx.getStart().getLine();
+    StaticRouteV6.Builder builder = StaticRouteV6.builder(toPrefix6(ctx.network));
+    if (ctx.name != null) {
+      String name = toString(ctx, ctx.name);
+      if (name == null) {
+        return;
+      }
+      builder.setName(name);
+    }
+    if (ctx.nhint != null) {
+      // TODO: if ctx.nhip is null and this version of NX-OS does not allow next-hop-int-only static
+      // route, do something smart
+      String nhint = _c.canonicalizeInterfaceName(ctx.nhint.getText());
+      builder.setNextHopInterface(nhint);
+      _c.referenceStructure(INTERFACE, nhint, IPV6_ROUTE_NEXT_HOP_INTERFACE, line);
+    }
+    if (ctx.nhip != null) {
+      builder.setNextHopIp(toIp6(ctx.nhip));
+    }
+    if (ctx.nhvrf != null) {
+      Optional<String> vrfOrErr = toString(ctx, ctx.nhvrf);
+      if (!vrfOrErr.isPresent()) {
+        return;
+      }
+      String vrf = vrfOrErr.get();
+      _c.referenceStructure(VRF, vrf, IPV6_ROUTE_NEXT_HOP_VRF, line);
+      builder.setNextHopVrf(vrf);
+    }
+    if (ctx.null0 != null) {
+      builder.setDiscard(true);
+    }
+    if (ctx.pref != null) {
+      Optional<Integer> pref = toInteger(ctx, ctx.pref);
+      if (!pref.isPresent()) {
+        return;
+      }
+      builder.setPreference(pref.get());
+    }
+    if (ctx.tag != null) {
+      builder.setTag(toLong(ctx.tag));
+    }
+    if (ctx.track != null) {
+      Short track = toShort(ctx, ctx.track);
+      if (track == null) {
+        return;
+      }
+      builder.setTrack(track);
+      // TODO: support track object number
+      todo(ctx);
+    }
+    StaticRouteV6 route = builder.build();
+    _currentVrf.getStaticRoutesV6().put(route.getPrefix(), route);
   }
 
   @Override
@@ -5689,9 +5753,6 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
       String vrf = vrfOrErr.get();
       _c.referenceStructure(VRF, vrf, IP_ROUTE_NEXT_HOP_VRF, line);
       builder.setNextHopVrf(vrf);
-
-      // TODO: support looking up next-hop-ip in a different VRF
-      todo(ctx);
     }
     if (ctx.null0 != null) {
       builder.setDiscard(true);
@@ -6397,6 +6458,11 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   @Override
   public void exitSnmps_host(Snmps_hostContext ctx) {
     _currentSnmpServer = null;
+  }
+
+  @Override
+  public void exitVc_description(Vc_descriptionContext ctx) {
+    toString(ctx, ctx.desc).ifPresent(_currentVrf::setDescription);
   }
 
   @Override
@@ -7426,6 +7492,12 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
       ParserRuleContext messageCtx, Template_nameContext ctx) {
     return toStringWithLengthInSpace(
         messageCtx, ctx, BGP_TEMPLATE_NAME_LENGTH_RANGE, "bgp template name");
+  }
+
+  private @Nonnull Optional<String> toString(
+      ParserRuleContext messageCtx, Vrf_descriptionContext ctx) {
+    return toStringWithLengthInSpace(
+        messageCtx, ctx, VRF_DESCRIPTION_LENGTH_RANGE, "VRF description");
   }
 
   private @Nonnull Optional<String> toString(ParserRuleContext messageCtx, Vrf_nameContext ctx) {

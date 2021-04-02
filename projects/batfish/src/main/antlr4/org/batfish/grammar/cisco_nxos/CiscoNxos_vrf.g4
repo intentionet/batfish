@@ -11,7 +11,9 @@ s_vrf_context
   VRF CONTEXT name = vrf_name NEWLINE
   (
     vc_address_family
+    | vc_description
     | vc_ip
+    | vc_ipv6
     | vc_no
     | vc_null
     | vc_rd
@@ -68,6 +70,17 @@ vcaf6u_route_target
   ROUTE_TARGET both_export_import rt = route_target_or_auto EVPN? NEWLINE
 ;
 
+vc_description
+ :
+   DESCRIPTION desc = vrf_description NEWLINE
+;
+
+vrf_description
+:
+// 1-255
+  desc = REMARK_TEXT
+;
+
 vc_ip
 :
   IP
@@ -88,6 +101,14 @@ vc_ip_null
   null_rest_of_line
 ;
 
+vc_ipv6
+:
+  IPV6
+  (
+    ipv6_route
+  )
+;
+
 vc_no
 :
   NO vc_no_shutdown
@@ -101,8 +122,7 @@ vc_no_shutdown
 vc_null
 :
   (
-    DESCRIPTION
-    | MDT
+    MDT
     | PIM
   ) null_rest_of_line
 ;

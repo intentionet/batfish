@@ -280,6 +280,7 @@ s_ipv6
   (
     ipv6_access_list
     | ipv6_prefix_list
+    | ipv6_route
   )
 ;
 

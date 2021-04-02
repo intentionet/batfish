@@ -140,6 +140,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -371,6 +372,7 @@ import org.batfish.representation.cisco_nxos.RouteMapSetWeight;
 import org.batfish.representation.cisco_nxos.RoutingProtocolInstance;
 import org.batfish.representation.cisco_nxos.SnmpCommunity;
 import org.batfish.representation.cisco_nxos.StaticRoute;
+import org.batfish.representation.cisco_nxos.StaticRouteV6;
 import org.batfish.representation.cisco_nxos.SwitchportMode;
 import org.batfish.representation.cisco_nxos.TcpOptions;
 import org.batfish.representation.cisco_nxos.UdpOptions;
@@ -4429,6 +4431,56 @@ public final class CiscoNxosGrammarTest {
 
     assertThat(vc.getIpv6AccessLists(), hasKeys("v6acl1"));
     // TODO: extract lines
+  }
+
+  @Test
+  public void testIpv6RouteExtraction() {
+    CiscoNxosConfiguration c = parseVendorConfig("ipv6_route");
+    Map<Prefix6, Collection<StaticRouteV6>> defaultRoutes =
+        c.getDefaultVrf().getStaticRoutesV6().asMap();
+    Prefix6 p1 = Prefix6.parse("::1/128");
+    Prefix6 p2 = Prefix6.parse("::2/128");
+    Prefix6 p3 = Prefix6.parse("::3/128");
+    Prefix6 p4 = Prefix6.parse("::4/128");
+    assertThat(defaultRoutes, hasKeys(p1, p2, p3, p4));
+    assertThat(defaultRoutes.get(p1), contains(StaticRouteV6.builder(p1).setDiscard(true).build()));
+    assertThat(
+        defaultRoutes.get(p2),
+        contains(StaticRouteV6.builder(p2).setNextHopInterface("Ethernet1/2").build()));
+    assertThat(
+        defaultRoutes.get(p3),
+        contains(
+            StaticRouteV6.builder(p3)
+                .setNextHopInterface("Ethernet1/2")
+                .setNextHopIp(Ip6.parse("::100"))
+                .build()));
+    assertThat(
+        defaultRoutes.get(p4),
+        contains(
+            StaticRouteV6.builder(p4)
+                .setNextHopInterface("Ethernet1/2")
+                .setNextHopIp(Ip6.parse("::101"))
+                .setNextHopVrf("NHVRF")
+                .setName("name")
+                .setPreference(11)
+                .setTag(17)
+                .setTrack((short) 3)
+                .build()));
+
+    Vrf vrf = c.getVrfs().get("VRF");
+    assertThat(vrf, notNullValue());
+    assertThat(vrf.getDescription(), equalTo("VRF"));
+    Map<Prefix6, Collection<StaticRouteV6>> vrfRoutes = vrf.getStaticRoutesV6().asMap();
+    assertThat(vrfRoutes, hasKeys(p1));
+    assertThat(
+        vrfRoutes.get(p1),
+        contains(StaticRouteV6.builder(p1).setNextHopIp(Ip6.parse("::2")).build()));
+  }
+
+  @Test
+  public void testIpv6RouteConversion() throws IOException {
+    parseConfig("ipv6_route");
+    // TODO: convert lines
   }
 
   @Test
