@@ -11,12 +11,14 @@ config firewall service custom
         set tcp-portrange 1
     next
     edit "explicit_tcp"
+        set visibility disable
         set protocol TCP/UDP/SCTP
         set tcp-portrange 1-2:3-4 10-11 13:6-7
         set udp-portrange 100
         set sctp-portrange 200 201:300
     next
     edit "src_port_defaults"
+        set visibility enable
         set protocol TCP/UDP/SCTP
         set tcp-portrange 1
         set udp-portrange 1

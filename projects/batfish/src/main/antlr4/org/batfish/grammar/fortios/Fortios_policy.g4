@@ -28,6 +28,7 @@ cfp_set_singletons
     | cfp_set_comments
     | cfp_set_name
     | cfp_set_status
+    | cfp_set_uuid
 ;
 
 cfp_set_action: ACTION action = policy_action newline;
@@ -37,6 +38,8 @@ cfp_set_comments: COMMENTS comments = str newline;
 cfp_set_name: NAME name = policy_name newline;
 
 cfp_set_status: STATUS status = policy_status newline;
+
+cfp_set_uuid: UUID id = str newline;
 
 cfp_set_lists
 :

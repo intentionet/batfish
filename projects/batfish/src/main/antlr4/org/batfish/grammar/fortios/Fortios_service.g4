@@ -24,7 +24,8 @@ cfsce
 cfsc_set: SET cfsc_set_singletons;
 
 cfsc_set_singletons:
-    cfsc_set_comment
+    cfsc_set_category
+    | cfsc_set_comment
     | cfsc_set_icmpcode
     | cfsc_set_icmptype
     | cfsc_set_protocol
@@ -32,7 +33,10 @@ cfsc_set_singletons:
     | cfsc_set_sctp_portrange
     | cfsc_set_tcp_portrange
     | cfsc_set_udp_portrange
+    | cfsc_set_visibility
 ;
+
+cfsc_set_category: CATEGORY category = str newline;
 
 cfsc_set_comment: COMMENT comment = str newline;
 
@@ -49,6 +53,8 @@ cfsc_set_sctp_portrange: SCTP_PORTRANGE value = service_port_ranges newline;
 cfsc_set_tcp_portrange: TCP_PORTRANGE value = service_port_ranges newline;
 
 cfsc_set_udp_portrange: UDP_PORTRANGE value = service_port_ranges newline;
+
+cfsc_set_visibility: VISIBILITY enable_or_disable newline;
 
 // Service group
 cfs_group: GROUP newline cfsg*;

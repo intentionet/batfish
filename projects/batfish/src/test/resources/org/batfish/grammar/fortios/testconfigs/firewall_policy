@@ -41,12 +41,15 @@ config system zone
 end
 config firewall service custom
     edit "custom_tcp_11"
+        set category "Network Services"
         set tcp-portrange 11
     next
     edit "custom_tcp_12_from_11"
+        set category "Web Access"
         set tcp-portrange 12:11
     next
     edit ALL
+        set category "General"
         set protocol IP
     next
 end
@@ -63,6 +66,7 @@ end
 config firewall policy
     # Disabled rule should be ignored
     edit 0
+        set uuid aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
         set action deny
         set srcintf port1
         set dstintf port2
@@ -73,6 +77,7 @@ config firewall policy
     next
     edit 4294967294
         set name "longest allowed firewall policy nam"
+        set uuid aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
         set srcintf port1
         set dstintf port1 port2
         set srcaddr addr1

@@ -100,6 +100,8 @@ CATEGORY: 'category' {
   if (lastTokenType() == SERVICE && secondToLastTokenType() == FIREWALL) {
     setType(IGNORED_CONFIG_BLOCK);
     pushMode(M_IgnoredConfigBlock);
+  } else if (lastTokenType() == SET && secondToLastTokenType() == NEWLINE) {
+    pushMode(M_Str);
   }
 };
 CLEAR: 'clear';
@@ -336,6 +338,7 @@ UTM: 'utm' {
 };
 UUID: 'uuid' -> pushMode(M_Str);
 VDOM: 'vdom' -> pushMode(M_Str);
+VISIBILITY: 'visibility';
 VLAN: 'vlan';
 VLANID: 'vlanid';
 VRF: 'vrf';
