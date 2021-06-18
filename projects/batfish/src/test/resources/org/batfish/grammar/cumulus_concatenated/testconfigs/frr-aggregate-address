@@ -1,0 +1,52 @@
+frr-aggregate-address
+# This file describes the network interfaces
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+auto lo
+iface lo
+
+# ports.conf --
+# ports.conf --
+#
+#   configure port speed, aggregation, and subdivision.
+#
+#   The ports in Cumulus VX are not configurable from here.
+#frr version
+frr version 4.0+cl3u8
+frr defaults datacenter
+hostname frr-aggregate-address
+!
+route-map rm1 permit 100
+ set metric 50
+!
+route-map rm2 permit 100
+ set community 1:1
+!
+route-map sm1 permit 100
+ match tag 5
+!
+route-map sm2 permit 100
+ match tag 5
+!
+router bgp 1
+ address-family ipv4 unicast
+   ! no suppression, everything more specific contributes, no inheritance
+   aggregate-address 1.1.0.0/16
+   ! route-map should transform aggregate
+   aggregate-address 1.2.0.0/16 route-map rm1
+   ! inheritance
+   aggregate-address 2.1.0.0/16 as-set
+   ! route-map applies after inheritance
+   aggregate-address 2.2.0.0/16 as-set route-map rm2
+   ! suppression everything more specific
+   aggregate-address 3.1.0.0/16 summary-only
+   ! suppress only routes passing suppress-map
+   aggregate-address 3.2.0.0/16 suppress-map sm1
+   ! suppress only routes passing suppress-map, completely ignoring summary-only
+   aggregate-address 3.3.0.0/16 summary-only suppress-map sm2
+   ! undefined route-maps
+   aggregate-address 4.0.0.0/16 route-map undefined suppress-map undefined
+   ! unimplemented features
+   aggregate-address 5.0.0.0/16 matching-med-only origin incomplete
+!

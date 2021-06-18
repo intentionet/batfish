@@ -79,6 +79,13 @@ ospf_redist_type
   STATIC | CONNECTED | BGP
 ;
 
+origin_type
+:
+  EGP
+  | IGP
+  | INCOMPLETE
+;
+
 prefix
 :
   IP_PREFIX

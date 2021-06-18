@@ -55,6 +55,7 @@ import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.LineAction;
+import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.SubRange;
 import org.batfish.datamodel.bgp.community.StandardCommunity;
@@ -65,6 +66,12 @@ import org.batfish.datamodel.routing_policy.expr.LongExpr;
 import org.batfish.grammar.BatfishCombinedParser;
 import org.batfish.grammar.SilentSyntaxListener;
 import org.batfish.grammar.UnrecognizedLineToken;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Agg_feature_as_setContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Agg_feature_matching_med_onlyContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Agg_feature_originContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Agg_feature_route_mapContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Agg_feature_summary_onlyContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Agg_feature_suppress_mapContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Bgp_redist_typeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Cumulus_frr_configurationContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Icl_expandedContext;
@@ -78,6 +85,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_prefix_listContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_routeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Line_actionContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Literal_standard_communityContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Origin_typeContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ospf_areaContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ospf_area_range_costContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ospf_redist_typeContext;
@@ -114,6 +122,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ronopi_defaultContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ronopi_interface_nameContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ropi_defaultContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ropi_interface_nameContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Route_map_nameContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_bgpContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_interfaceContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.S_routemapContext;
@@ -196,6 +205,7 @@ import org.batfish.representation.cumulus.BgpVrfAddressFamilyAggregateNetworkCon
 import org.batfish.representation.cumulus.CumulusConcatenatedConfiguration;
 import org.batfish.representation.cumulus.CumulusFrrConfiguration;
 import org.batfish.representation.cumulus.CumulusRoutingProtocol;
+import org.batfish.representation.cumulus.CumulusStructureType;
 import org.batfish.representation.cumulus.CumulusStructureUsage;
 import org.batfish.representation.cumulus.FrrInterface;
 import org.batfish.representation.cumulus.InterfacesInterface;
@@ -264,6 +274,7 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   private @Nullable FrrInterface _currentInterface;
   private OspfArea _currentOspfArea;
   private OspfVrf _currentOspfVrf;
+  private BgpVrfAddressFamilyAggregateNetworkConfiguration _currentAggregate;
   // Interfaces in the frr file are initialized from bottom to top, where bottommost occurrence of a
   // given interface is the only one that matters for determining order.
   private Set<String> _reverseInterfaceInitOrder;
@@ -624,17 +635,82 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   }
 
   @Override
+  public void enterSbafi_aggregate_address(Sbafi_aggregate_addressContext ctx) {
+    _currentAggregate = new BgpVrfAddressFamilyAggregateNetworkConfiguration();
+  }
+
+  @Override
   public void exitSbafi_aggregate_address(Sbafi_aggregate_addressContext ctx) {
     Map<Prefix, BgpVrfAddressFamilyAggregateNetworkConfiguration> aggregateNetworks =
         _currentBgpVrf.getIpv4Unicast().getAggregateNetworks();
     Prefix prefix = Prefix.parse(ctx.IP_PREFIX().getText());
-    BgpVrfAddressFamilyAggregateNetworkConfiguration agg =
-        new BgpVrfAddressFamilyAggregateNetworkConfiguration();
-    agg.setSummaryOnly(ctx.SUMMARY_ONLY() != null);
-    if (aggregateNetworks.put(prefix, agg) != null) {
+    if (aggregateNetworks.put(prefix, _currentAggregate) != null) {
       _w.addWarning(
           ctx, getFullText(ctx), _parser, "Overwriting aggregate-address for " + prefix.toString());
     }
+    _currentAggregate = null;
+  }
+
+  @Override
+  public void exitAgg_feature_as_set(Agg_feature_as_setContext ctx) {
+    todo(ctx);
+    _currentAggregate.setAsSet(true);
+  }
+
+  @Override
+  public void exitAgg_feature_matching_med_only(Agg_feature_matching_med_onlyContext ctx) {
+    todo(ctx);
+    _currentAggregate.setMatchingMedOnly(true);
+  }
+
+  @Override
+  public void exitAgg_feature_origin(Agg_feature_originContext ctx) {
+    todo(ctx);
+    _currentAggregate.setOrigin(toOriginType(ctx.origin_type()));
+  }
+
+  private static @Nonnull OriginType toOriginType(Origin_typeContext ctx) {
+    if (ctx.EGP() != null) {
+      return OriginType.EGP;
+    } else if (ctx.IGP() != null) {
+      return OriginType.IGP;
+    } else {
+      assert ctx.INCOMPLETE() != null;
+      return OriginType.INCOMPLETE;
+    }
+  }
+
+  @Override
+  public void exitAgg_feature_route_map(Agg_feature_route_mapContext ctx) {
+    String routeMapName = toString(ctx.route_map_name());
+    _currentAggregate.setRouteMap(routeMapName);
+    _c.referenceStructure(
+        CumulusStructureType.ROUTE_MAP,
+        routeMapName,
+        CumulusStructureUsage.BGP_AGGREGATE_ADDRESS_ROUTE_MAP,
+        ctx.getStart().getLine());
+  }
+
+  @Override
+  public void exitAgg_feature_summary_only(Agg_feature_summary_onlyContext ctx) {
+    _currentAggregate.setSummaryOnly(true);
+  }
+
+  @Override
+  public void exitAgg_feature_suppress_map(Agg_feature_suppress_mapContext ctx) {
+    todo(ctx);
+    String routeMapName = toString(ctx.route_map_name());
+    _currentAggregate.setSuppressMap(routeMapName);
+    _c.referenceStructure(
+        CumulusStructureType.ROUTE_MAP,
+        routeMapName,
+        CumulusStructureUsage.BGP_AGGREGATE_ADDRESS_SUPPRESS_MAP,
+        ctx.getStart().getLine());
+  }
+
+  private static @Nonnull String toString(Route_map_nameContext ctx) {
+    // TODO: validation and return optional
+    return ctx.getText();
   }
 
   @Override

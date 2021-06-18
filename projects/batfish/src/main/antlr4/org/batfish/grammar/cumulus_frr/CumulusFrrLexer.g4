@@ -57,6 +57,8 @@ AS_PATH
   }
 ;
 
+AS_SET: 'as-set';
+
 AUTHENTICATION: 'authentication';
 
 
@@ -152,6 +154,8 @@ DOUBLE_QUOTE
   '"' -> pushMode ( M_DoubleQuote )
 ;
 
+EGP: 'egp';
+
 EIGRP: 'eigrp';
 
 EMERGENCIES: 'emergencies';
@@ -201,12 +205,16 @@ HOSTNAME
 
 IDENTIFIER: 'identifier';
 
+IGP: 'igp';
+
 IMPORT
 :
    'import' -> pushMode(M_Import)
 ;
 
 IN: 'in';
+
+INCOMPLETE: 'incomplete';
 
 INFORMATIONAL: 'informational';
 
@@ -412,6 +420,8 @@ STATIC: 'static';
 
 SUMMARY_ONLY: 'summary-only';
 
+SUPPRESS_MAP: 'suppress-map' -> pushMode(M_Word);
+
 SUPPRESS_RA: 'suppress-ra';
 
 SYSLOG: 'syslog';
@@ -427,6 +437,8 @@ WARNINGS: 'warnings';
 
 MATCH: 'match';
 
+MATCHING_MED_ONLY: 'matching-' [Mm][Ee][Dd] '-only';
+
 METRIC: 'metric';
 
 METRIC_TYPE: 'metric-type';
@@ -437,6 +449,8 @@ NEWLINE
 ;
 
 NEXT_HOP: 'next-hop';
+
+ORIGIN: 'origin';
 
 ROUTE_REFLECTOR_CLIENT: 'route-reflector-client';
 

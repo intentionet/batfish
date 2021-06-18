@@ -10,6 +10,7 @@ import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.EXACT_PAT
 import static org.batfish.datamodel.MultipathEquivalentAsPathMatchMode.PATH_LENGTH;
 import static org.batfish.datamodel.bgp.AllowRemoteAsOutMode.ALWAYS;
 import static org.batfish.datamodel.bgp.VniConfig.importRtPatternForAnyAs;
+import static org.batfish.datamodel.routing_policy.Common.generateSuppressionPolicy;
 import static org.batfish.representation.cumulus.BgpProcess.BGP_UNNUMBERED_IP;
 import static org.batfish.representation.cumulus.CumulusConcatenatedConfiguration.CUMULUS_CLAG_DOMAIN_ID;
 import static org.batfish.representation.cumulus.CumulusConcatenatedConfiguration.LOOPBACK_INTERFACE_NAME;
@@ -74,6 +75,7 @@ import org.batfish.datamodel.RouteFilterLine;
 import org.batfish.datamodel.RouteFilterList;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.bgp.AddressFamilyCapabilities;
+import org.batfish.datamodel.bgp.BgpAggregate;
 import org.batfish.datamodel.bgp.BgpConfederation;
 import org.batfish.datamodel.bgp.EvpnAddressFamily;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
@@ -300,29 +302,34 @@ public final class CumulusConversions {
             .collect(ImmutableList.toImmutableList()));
   }
 
-  /**
-   * Creates generated routes and route generation policies for aggregate routes for the input vrf.
-   */
-  static void generateGeneratedRoutes(
+  /** Creates BGP aggregates aggregate routes for the input vrf. */
+  static void generateBgpAggregates(
       Configuration c,
-      org.batfish.datamodel.Vrf vrf,
+      org.batfish.datamodel.BgpProcess proc,
       Map<Prefix, BgpVrfAddressFamilyAggregateNetworkConfiguration> aggregateNetworks) {
-    aggregateNetworks.forEach(
-        (prefix, agg) -> {
-          generateGenerationPolicy(c, vrf.getName(), prefix);
+    aggregateNetworks.entrySet().stream()
+        .map(
+            aggregateByPrefixEntry ->
+                toBgpAggregate(
+                    aggregateByPrefixEntry.getKey(), aggregateByPrefixEntry.getValue(), c))
+        .forEach(proc::addAggregate);
+  }
 
-          // TODO generate attribute policy
-          GeneratedRoute gr =
-              GeneratedRoute.builder()
-                  .setNetwork(prefix)
-                  .setAdmin(AGGREGATE_ROUTE_ADMIN_COST)
-                  .setGenerationPolicy(
-                      computeBgpGenerationPolicyName(true, vrf.getName(), prefix.toString()))
-                  .setDiscard(true)
-                  .build();
-
-          vrf.getGeneratedRoutes().add(gr);
-        });
+  private static @Nonnull BgpAggregate toBgpAggregate(
+      Prefix prefix,
+      BgpVrfAddressFamilyAggregateNetworkConfiguration vsAggregate,
+      Configuration c) {
+    // TODO: handle as-set
+    // TODO: handle matching-MED-only
+    // TODO: handle origin
+    // TODO: handle suppress-map
+    // TODO: verify undefined route-map can be treated as omitted
+    String routeMap =
+        Optional.ofNullable(vsAggregate.getRouteMap())
+            .filter(c.getRoutingPolicies()::containsKey)
+            .orElse(null);
+    return BgpAggregate.of(
+        prefix, generateSuppressionPolicy(vsAggregate.isSummaryOnly(), c), null, routeMap);
   }
 
   /**
@@ -476,7 +483,7 @@ public final class CumulusConversions {
           .forEach(newProc::addToOriginationSpace);
 
       // Generate aggregate routes
-      generateGeneratedRoutes(c, c.getVrfs().get(vrfName), ipv4Unicast.getAggregateNetworks());
+      generateBgpAggregates(c, newProc, ipv4Unicast.getAggregateNetworks());
     }
 
     generateBgpCommonExportPolicy(c, vrfName, bgpVrf, vsConfig.getRouteMaps());

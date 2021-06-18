@@ -185,8 +185,30 @@ sbafl_neighbor
 
 sbafi_aggregate_address
 :
-  AGGREGATE_ADDRESS IP_PREFIX SUMMARY_ONLY? NEWLINE
+  AGGREGATE_ADDRESS IP_PREFIX agg_feature* NEWLINE
 ;
+
+agg_feature
+:
+  agg_feature_as_set
+  | agg_feature_matching_med_only
+  | agg_feature_origin
+  | agg_feature_route_map
+  | agg_feature_summary_only
+  | agg_feature_suppress_map
+;
+
+agg_feature_as_set: AS_SET;
+
+agg_feature_matching_med_only: MATCHING_MED_ONLY;
+
+agg_feature_origin: ORIGIN origin_type;
+
+agg_feature_route_map: ROUTE_MAP mapname = route_map_name;
+
+agg_feature_summary_only: SUMMARY_ONLY;
+
+agg_feature_suppress_map: SUPPRESS_MAP mapname = route_map_name;
 
 sbafi_import
 :
