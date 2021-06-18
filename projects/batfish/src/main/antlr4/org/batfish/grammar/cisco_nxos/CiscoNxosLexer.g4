@@ -110,7 +110,7 @@ ADMINISTRATIVELY_PROHIBITED: 'administratively-prohibited';
 
 ADVERTISE: 'advertise';
 
-ADVERTISE_MAP: 'advertise-map';
+ADVERTISE_MAP: 'advertise-map' -> pushMode(M_Word);
 
 ADVERTISEMENT_INTERVAL: 'advertisement-interval';
 
@@ -2171,7 +2171,7 @@ SUPPRESS_FIB_PENDING: 'suppress-fib-pending';
 
 SUPPRESS_INACTIVE: 'suppress-inactive';
 
-SUPPRESS_MAP: 'suppress-map';
+SUPPRESS_MAP: 'suppress-map' -> pushMode(M_Word);
 
 SUPPRESS_RA: 'suppress-ra';
 
@@ -2404,7 +2404,7 @@ UNREACHABLE: 'unreachable';
 
 UNREACHABLES: 'unreachables';
 
-UNSUPPRESS_MAP: 'unsuppress-map';
+UNSUPPRESS_MAP: 'unsuppress-map' -> pushMode(M_Word);
 
 UPDATE: 'update';
 

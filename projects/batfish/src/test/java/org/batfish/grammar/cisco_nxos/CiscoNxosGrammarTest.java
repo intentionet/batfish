@@ -79,6 +79,7 @@ import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasSourceAddres
 import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasUdpPort;
 import static org.batfish.datamodel.matchers.VniSettingsMatchers.hasVni;
 import static org.batfish.datamodel.matchers.VrfMatchers.hasL2VniSettings;
+import static org.batfish.datamodel.routing_policy.Common.SUMMARY_ONLY_SUPPRESSION_POLICY_NAME;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS_3000;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS_5000;
 import static org.batfish.datamodel.vendor_family.cisco_nxos.NexusPlatform.NEXUS_6000;
@@ -114,6 +115,7 @@ import static org.batfish.representation.cisco_nxos.OspfProcess.DEFAULT_TIMERS_L
 import static org.batfish.representation.cisco_nxos.OspfProcess.DEFAULT_TIMERS_THROTTLE_LSA_HOLD_INTERVAL_MS;
 import static org.batfish.representation.cisco_nxos.OspfProcess.DEFAULT_TIMERS_THROTTLE_LSA_MAX_INTERVAL_MS;
 import static org.batfish.representation.cisco_nxos.OspfProcess.DEFAULT_TIMERS_THROTTLE_LSA_START_INTERVAL_MS;
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.any;
@@ -224,6 +226,7 @@ import org.batfish.datamodel.UniverseIpSpace;
 import org.batfish.datamodel.acl.AclLineMatchExpr;
 import org.batfish.datamodel.acl.AclLineMatchExprs;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
+import org.batfish.datamodel.bgp.BgpAggregate;
 import org.batfish.datamodel.bgp.EvpnAddressFamily;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.Layer2VniConfig;
@@ -284,6 +287,7 @@ import org.batfish.representation.cisco_nxos.ActionIpAccessListLine;
 import org.batfish.representation.cisco_nxos.AddrGroupIpAddressSpec;
 import org.batfish.representation.cisco_nxos.AddressFamily;
 import org.batfish.representation.cisco_nxos.BgpGlobalConfiguration;
+import org.batfish.representation.cisco_nxos.BgpVrfAddressFamilyAggregateNetworkConfiguration;
 import org.batfish.representation.cisco_nxos.BgpVrfConfiguration;
 import org.batfish.representation.cisco_nxos.BgpVrfIpv4AddressFamilyConfiguration;
 import org.batfish.representation.cisco_nxos.BgpVrfIpv6AddressFamilyConfiguration;
@@ -8781,5 +8785,177 @@ public final class CiscoNxosGrammarTest {
             CiscoNxosStructureType.TRACK,
             "499",
             CiscoNxosStructureUsage.INTERFACE_HSRP_GROUP_TRACK));
+  }
+
+  @Test
+  public void testAggregateAddressExtraction() {
+    String hostname = "nxos-aggregate-address";
+    CiscoNxosConfiguration vc = parseVendorConfig(hostname);
+    Map<Prefix, BgpVrfAddressFamilyAggregateNetworkConfiguration> aggs =
+        vc.getBgpGlobalConfiguration()
+            .getVrfs()
+            .get(DEFAULT_VRF_NAME)
+            .getIpv4UnicastAddressFamily()
+            .getAggregateNetworks();
+    assertThat(aggs, aMapWithSize(9));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("1.1.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    null, false, null, false, null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("1.2.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    null, false, "atm1", false, null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("2.1.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    null, true, null, false, null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("2.2.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    "adm", true, null, false, null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("2.3.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    null, true, "atm2", false, null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("3.1.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    null, false, null, true, null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("3.2.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    null, false, null, false, "sm1"))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("3.3.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    null, false, null, true, "sm2"))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("4.0.0.0/16")),
+            equalTo(
+                new BgpVrfAddressFamilyAggregateNetworkConfiguration(
+                    "undefined", false, "undefined", false, "undefined"))));
+  }
+
+  @Test
+  public void testAggregateAddressConversion() throws IOException {
+    String hostname = "nxos-aggregate-address";
+    Configuration c = parseConfig(hostname);
+
+    Map<Prefix, BgpAggregate> aggs = c.getDefaultVrf().getBgpProcess().getAggregates();
+    assertThat(aggs, aMapWithSize(9));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("1.1.0.0/16")),
+            equalTo(BgpAggregate.of(Prefix.parse("1.1.0.0/16"), null, null, null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("1.2.0.0/16")),
+            equalTo(BgpAggregate.of(Prefix.parse("1.2.0.0/16"), null, null, "atm1"))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("2.1.0.0/16")),
+            equalTo(
+                BgpAggregate.of(
+                    Prefix.parse("2.1.0.0/16"),
+                    null,
+                    // TODO: generation policy should incorporate as-set
+                    null,
+                    null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("2.2.0.0/16")),
+            equalTo(
+                BgpAggregate.of(
+                    Prefix.parse("2.2.0.0/16"),
+                    null,
+                    // TODO: generation policy should incorporate as-set and advertise-map
+                    null,
+                    null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("2.3.0.0/16")),
+            equalTo(
+                BgpAggregate.of(
+                    Prefix.parse("2.3.0.0/16"),
+                    null,
+                    // TODO: generation policy should incorporate as-set
+                    null,
+                    "atm2"))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("3.1.0.0/16")),
+            equalTo(
+                BgpAggregate.of(
+                    Prefix.parse("3.1.0.0/16"),
+                    SUMMARY_ONLY_SUPPRESSION_POLICY_NAME,
+                    null,
+                    null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("3.2.0.0/16")),
+            equalTo(
+                BgpAggregate.of(
+                    Prefix.parse("3.2.0.0/16"),
+                    // TODO: suppression policy should incorporate suppress-map
+                    null,
+                    null,
+                    null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("3.3.0.0/16")),
+            equalTo(
+                BgpAggregate.of(
+                    Prefix.parse("3.3.0.0/16"),
+                    // TODO: suppression policy should incorporate suppress-map and ignore
+                    //       summary-only.
+                    SUMMARY_ONLY_SUPPRESSION_POLICY_NAME,
+                    null,
+                    null))));
+    assertThat(
+        aggs,
+        hasEntry(
+            equalTo(Prefix.parse("4.0.0.0/16")),
+            equalTo(
+                BgpAggregate.of(
+                    Prefix.parse("4.0.0.0/16"),
+                    // TODO: verify undefined route-map treated as omitted
+                    null,
+                    null,
+                    null))));
   }
 }

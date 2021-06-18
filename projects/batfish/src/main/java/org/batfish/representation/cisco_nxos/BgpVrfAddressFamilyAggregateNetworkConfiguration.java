@@ -1,6 +1,9 @@
 package org.batfish.representation.cisco_nxos;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 import java.io.Serializable;
+import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
@@ -15,6 +18,53 @@ public class BgpVrfAddressFamilyAggregateNetworkConfiguration implements Seriali
   public BgpVrfAddressFamilyAggregateNetworkConfiguration() {
     _asSet = false;
     _summaryOnly = false;
+  }
+
+  public BgpVrfAddressFamilyAggregateNetworkConfiguration(
+      @Nullable String advertiseMap,
+      boolean asSet,
+      @Nullable String attributeMap,
+      boolean summaryOnly,
+      @Nullable String suppressMap) {
+    _advertiseMap = advertiseMap;
+    _asSet = asSet;
+    _attributeMap = attributeMap;
+    _summaryOnly = summaryOnly;
+    _suppressMap = suppressMap;
+  }
+
+  @Override
+  public boolean equals(@Nullable Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof BgpVrfAddressFamilyAggregateNetworkConfiguration)) {
+      return false;
+    }
+    BgpVrfAddressFamilyAggregateNetworkConfiguration that =
+        (BgpVrfAddressFamilyAggregateNetworkConfiguration) o;
+    return Objects.equals(_advertiseMap, that._advertiseMap)
+        && _asSet == that._asSet
+        && Objects.equals(_attributeMap, that._attributeMap)
+        && _summaryOnly == that._summaryOnly
+        && Objects.equals(_suppressMap, that._suppressMap);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_advertiseMap, _asSet, _attributeMap, _summaryOnly, _suppressMap);
+  }
+
+  @Override
+  public String toString() {
+    return toStringHelper(this)
+        .omitNullValues()
+        .add("_asSet", _asSet)
+        .add("_advertiseMap", _advertiseMap)
+        .add("_attributeMap", _attributeMap)
+        .add("_summaryOnly", _summaryOnly)
+        .add("_suppressMap", _suppressMap)
+        .toString();
   }
 
   @Nullable

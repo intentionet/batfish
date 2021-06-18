@@ -9,6 +9,7 @@ import static org.batfish.datamodel.Names.generatedBgpPeerEvpnExportPolicyName;
 import static org.batfish.datamodel.Names.generatedBgpPeerEvpnImportPolicyName;
 import static org.batfish.datamodel.Names.generatedBgpPeerExportPolicyName;
 import static org.batfish.datamodel.Names.generatedBgpPeerImportPolicyName;
+import static org.batfish.datamodel.routing_policy.Common.generateSuppressionPolicy;
 import static org.batfish.datamodel.routing_policy.statement.Statements.RemovePrivateAs;
 import static org.batfish.representation.cisco_nxos.Vrf.MAC_VRF_OFFSET;
 
@@ -47,6 +48,7 @@ import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.AddressFamilyCapabilities;
 import org.batfish.datamodel.bgp.AllowRemoteAsOutMode;
+import org.batfish.datamodel.bgp.BgpAggregate;
 import org.batfish.datamodel.bgp.EvpnAddressFamily;
 import org.batfish.datamodel.bgp.Ipv4UnicastAddressFamily;
 import org.batfish.datamodel.bgp.Layer2VniConfig;
@@ -187,6 +189,25 @@ final class Conversions {
     }
 
     return true;
+  }
+
+  static @Nonnull BgpAggregate toBgpAggregate(
+      Prefix prefix,
+      BgpVrfAddressFamilyAggregateNetworkConfiguration vsAggregate,
+      Configuration c) {
+    // TODO: handle as-set
+    // TODO: handle suppress-map
+    // TODO: verify undefined route-map can be treated as omitted
+    String attributeMap =
+        Optional.ofNullable(vsAggregate.getAttributeMap())
+            .filter(c.getRoutingPolicies()::containsKey)
+            .orElse(null);
+    return BgpAggregate.of(
+        prefix,
+        generateSuppressionPolicy(vsAggregate.getSummaryOnly(), c),
+        // TODO: put advertise-map here
+        null,
+        attributeMap);
   }
 
   @Nonnull

@@ -3730,6 +3730,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
   public void exitRb_afip_aa_tail(Rb_afip_aa_tailContext ctx) {
     int line = ctx.getStart().getLine();
     if (ctx.ADVERTISE_MAP() != null) {
+      todo(ctx);
       Optional<String> nameOrError = toString(ctx, ctx.mapname);
       if (!nameOrError.isPresent()) {
         return;
@@ -3738,6 +3739,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
       _c.referenceStructure(ROUTE_MAP, name, BGP_ADVERTISE_MAP, line);
       _currentBgpVrfAddressFamilyAggregateNetwork.setAdvertiseMap(name);
     } else if (ctx.AS_SET() != null) {
+      todo(ctx);
       _currentBgpVrfAddressFamilyAggregateNetwork.setAsSet(true);
     } else if (ctx.ATTRIBUTE_MAP() != null) {
       Optional<String> nameOrError = toString(ctx, ctx.mapname);
@@ -3750,6 +3752,7 @@ public final class CiscoNxosControlPlaneExtractor extends CiscoNxosParserBaseLis
     } else if (ctx.SUMMARY_ONLY() != null) {
       _currentBgpVrfAddressFamilyAggregateNetwork.setSummaryOnly(true);
     } else if (ctx.SUPPRESS_MAP() != null) {
+      todo(ctx);
       Optional<String> nameOrError = toString(ctx, ctx.mapname);
       if (!nameOrError.isPresent()) {
         return;

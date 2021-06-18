@@ -11,11 +11,11 @@ import static org.batfish.datamodel.Names.generatedBgpCommonExportPolicyName;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.and;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.match;
 import static org.batfish.datamodel.acl.AclLineMatchExprs.or;
-import static org.batfish.datamodel.routing_policy.Common.generateGenerationPolicy;
 import static org.batfish.datamodel.routing_policy.Common.matchDefaultRoute;
 import static org.batfish.datamodel.routing_policy.Common.suppressSummarizedPrefixes;
 import static org.batfish.representation.cisco_nxos.Conversions.getVrfForL3Vni;
 import static org.batfish.representation.cisco_nxos.Conversions.inferRouterId;
+import static org.batfish.representation.cisco_nxos.Conversions.toBgpAggregate;
 import static org.batfish.representation.cisco_nxos.Interface.BANDWIDTH_CONVERSION_FACTOR;
 import static org.batfish.representation.cisco_nxos.Interface.defaultDelayTensOfMicroseconds;
 import static org.batfish.representation.cisco_nxos.Interface.getDefaultBandwidth;
@@ -41,7 +41,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import com.google.common.collect.Streams;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -313,8 +312,6 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
   private static final double OSPF_REFERENCE_BANDWIDTH_CONVERSION_FACTOR = 1E6D; // bps per Mbps
 
   /** Routing-related constants. */
-  private static final int AGGREGATE_ROUTE_ADMIN_COST = 200;
-
   private static final int OSPF_ADMIN_COST = 110;
 
   private static final double SPEED_CONVERSION_FACTOR = 1E6D;
@@ -606,45 +603,12 @@ public final class CiscoNxosConfiguration extends VendorConfiguration {
 
     // Generate and distribute aggregate routes.
     if (ipv4af != null) {
-      for (Entry<Prefix, BgpVrfAddressFamilyAggregateNetworkConfiguration> e :
-          ipv4af.getAggregateNetworks().entrySet()) {
-        Prefix prefix = e.getKey();
-        BgpVrfAddressFamilyAggregateNetworkConfiguration agg = e.getValue();
-        RoutingPolicy genPolicy = generateGenerationPolicy(c, vrfName, prefix);
-
-        GeneratedRoute.Builder gr =
-            GeneratedRoute.builder()
-                .setNetwork(prefix)
-                .setAdmin(AGGREGATE_ROUTE_ADMIN_COST)
-                .setGenerationPolicy(genPolicy.getName())
-                .setDiscard(true);
-
-        // Conditions to generate this route
-        List<BooleanExpr> exportAggregateConditions = new ArrayList<>();
-        exportAggregateConditions.add(
-            new MatchPrefixSet(
-                DestinationNetwork.instance(),
-                new ExplicitPrefixSet(new PrefixSpace(PrefixRange.fromPrefix(prefix)))));
-        exportAggregateConditions.add(new MatchProtocol(RoutingProtocol.AGGREGATE));
-
-        // If defined, set attribute map for aggregate network
-        BooleanExpr weInterior = BooleanExprs.TRUE;
-        String attributeMapName = agg.getAttributeMap();
-        if (attributeMapName != null) {
-          RouteMap attributeMap = _routeMaps.get(attributeMapName);
-          if (attributeMap != null) {
-            // need to apply attribute changes if this specific route is matched
-            weInterior = new CallExpr(attributeMapName);
-            gr.setAttributePolicy(attributeMapName);
-          }
-        }
-        exportAggregateConditions.add(
-            bgpRedistributeWithEnvironmentExpr(weInterior, OriginType.IGP));
-
-        v.getGeneratedRoutes().add(gr.build());
-        // Do export a generated aggregate.
-        exportConditions.add(new Conjunction(exportAggregateConditions));
-      }
+      ipv4af.getAggregateNetworks().entrySet().stream()
+          .map(
+              aggregateByPrefixEntry ->
+                  toBgpAggregate(
+                      aggregateByPrefixEntry.getKey(), aggregateByPrefixEntry.getValue(), c))
+          .forEach(newBgpProcess::addAggregate);
     }
 
     // Only redistribute default route if `default-information originate` is set.
