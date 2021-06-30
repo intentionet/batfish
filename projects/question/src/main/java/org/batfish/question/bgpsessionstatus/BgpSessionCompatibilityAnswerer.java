@@ -34,8 +34,9 @@ import org.batfish.common.Answerer;
 import org.batfish.common.BatfishException;
 import org.batfish.common.NetworkSnapshot;
 import org.batfish.common.plugin.IBatfish;
+import org.batfish.common.topology.GlobalBroadcastNoPointToPoint;
 import org.batfish.common.topology.IpOwners;
-import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.L3Adjacencies;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPassivePeerConfig;
 import org.batfish.datamodel.BgpPeerConfigId;
@@ -135,11 +136,15 @@ public class BgpSessionCompatibilityAnswerer extends Answerer {
     SpecifierContext specifierContext = _batfish.specifierContext(snapshot);
     Set<String> nodes = question.getNodeSpecifier().resolve(specifierContext);
     Set<String> remoteNodes = question.getRemoteNodeSpecifier().resolve(specifierContext);
-    Layer2Topology layer2Topology =
-        _batfish.getTopologyProvider().getInitialLayer2Topology(snapshot).orElse(null);
+    L3Adjacencies l3Adjacencies =
+        _batfish
+            .getTopologyProvider()
+            .getInitialLayer2Topology(snapshot)
+            .map(L3Adjacencies.class::cast)
+            .orElse(GlobalBroadcastNoPointToPoint.instance());
     Map<Ip, Map<String, Set<String>>> ipVrfOwners = new IpOwners(configurations).getIpVrfOwners();
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> configuredTopology =
-        BgpTopologyUtils.initBgpTopology(configurations, ipVrfOwners, true, layer2Topology)
+        BgpTopologyUtils.initBgpTopology(configurations, ipVrfOwners, true, l3Adjacencies)
             .getGraph();
 
     // Generate answer row for each BGP peer (or rows, for dynamic peers with multiple remotes)

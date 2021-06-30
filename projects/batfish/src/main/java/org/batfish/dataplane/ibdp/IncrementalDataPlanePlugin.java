@@ -2,12 +2,16 @@ package org.batfish.dataplane.ibdp;
 
 import com.google.auto.service.AutoService;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.batfish.common.NetworkSnapshot;
 import org.batfish.common.plugin.DataPlanePlugin;
 import org.batfish.common.plugin.Plugin;
+import org.batfish.common.topology.Layer1Topology;
+import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.LegacyL3Adjacencies;
 import org.batfish.common.topology.TopologyProvider;
 import org.batfish.datamodel.BgpAdvertisement;
 import org.batfish.datamodel.Configuration;
@@ -34,17 +38,26 @@ public final class IncrementalDataPlanePlugin extends DataPlanePlugin {
 
     LOGGER.info("Building topology for data-plane");
     TopologyProvider topologyProvider = _batfish.getTopologyProvider();
+    Optional<Layer1Topology> rawL1 = topologyProvider.getRawLayer1PhysicalTopology(snapshot);
+    Optional<Layer1Topology> l1 = topologyProvider.getLayer1LogicalTopology(snapshot);
+    Optional<Layer2Topology> l2 = topologyProvider.getInitialLayer2Topology(snapshot);
     TopologyContext topologyContext =
         TopologyContext.builder()
             .setIpsecTopology(topologyProvider.getInitialIpsecTopology(snapshot))
             .setIsisTopology(
                 IsisTopology.initIsisTopology(
                     configurations, topologyProvider.getInitialLayer3Topology(snapshot)))
-            .setLayer1LogicalTopology(topologyProvider.getLayer1LogicalTopology(snapshot))
-            .setLayer2Topology(topologyProvider.getInitialLayer2Topology(snapshot))
+            .setLayer1LogicalTopology(l1)
+            .setLayer2Topology(l2)
             .setLayer3Topology(topologyProvider.getInitialLayer3Topology(snapshot))
+            .setL3Adjacencies(
+                new LegacyL3Adjacencies(
+                    rawL1.orElse(Layer1Topology.EMPTY),
+                    l1.orElse(Layer1Topology.EMPTY),
+                    l2.orElse(Layer2Topology.EMPTY),
+                    configurations))
             .setOspfTopology(topologyProvider.getInitialOspfTopology(snapshot))
-            .setRawLayer1PhysicalTopology(topologyProvider.getRawLayer1PhysicalTopology(snapshot))
+            .setRawLayer1PhysicalTopology(rawL1)
             .setTunnelTopology(topologyProvider.getInitialTunnelTopology(snapshot))
             .build();
 
