@@ -20,11 +20,12 @@ import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.ValueGraph;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.batfish.common.topology.Layer2Edge;
-import org.batfish.common.topology.Layer2Topology;
+import javax.annotation.ParametersAreNonnullByDefault;
+import org.batfish.common.topology.L3Adjacencies;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPassivePeerConfig;
 import org.batfish.datamodel.BgpPeerConfigId;
@@ -40,6 +41,7 @@ import org.batfish.datamodel.Prefix;
 import org.batfish.datamodel.Vrf;
 import org.batfish.datamodel.bgp.BgpTopologyUtils.AsPair;
 import org.batfish.datamodel.bgp.BgpTopologyUtils.ConfedSessionType;
+import org.batfish.datamodel.collections.NodeInterfacePair;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -264,16 +266,16 @@ public class BgpTopologyUtilsTest {
 
     // Shouldn't see session come up if nodes are not connected in layer 2
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
-        initBgpTopology(_configs, ImmutableMap.of(), true, false, null, Layer2Topology.EMPTY)
+        initBgpTopology(
+                _configs, ImmutableMap.of(), true, false, null, new FixedL3Adjacencies(false))
             .getGraph();
     assertThat(bgpTopology.nodes(), hasSize(2));
     assertThat(bgpTopology.edges(), empty());
 
     // Should see session if they're connected
-    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null);
-    Layer2Topology connectedLayer2Topology = Layer2Topology.builder().addEdge(edge).build();
     bgpTopology =
-        initBgpTopology(_configs, ImmutableMap.of(), true, false, null, connectedLayer2Topology)
+        initBgpTopology(
+                _configs, ImmutableMap.of(), true, false, null, new FixedL3Adjacencies(true))
             .getGraph();
     BgpPeerConfigId peer1Id = new BgpPeerConfigId(NODE1, DEFAULT_VRF_NAME, iface1);
     BgpPeerConfigId peer2To1Id = new BgpPeerConfigId(NODE2, DEFAULT_VRF_NAME, iface2);
@@ -282,16 +284,35 @@ public class BgpTopologyUtilsTest {
         bgpTopology.edges(),
         containsInAnyOrder(
             EndpointPair.ordered(peer1Id, peer2To1Id), EndpointPair.ordered(peer2To1Id, peer1Id)));
+  }
 
-    // Node 1 and 2 both have layer 2 edges but are not connected to any common node
-    Layer2Edge edge1To3 = new Layer2Edge(NODE2, iface2, null, "node3", "iface3", null);
-    Layer2Edge edge2To4 = new Layer2Edge(NODE2, iface2, null, "node4", "iface4", null);
-    Layer2Topology disconnected =
-        Layer2Topology.builder().addEdge(edge1To3).addEdge(edge2To4).build();
-    bgpTopology =
-        initBgpTopology(_configs, ImmutableMap.of(), true, false, null, disconnected).getGraph();
-    assertThat(bgpTopology.nodes(), hasSize(2));
-    assertThat(bgpTopology.edges(), empty());
+  /**
+   * For testing unnumbered links, make an L3 adjacencies that always returns the same value for
+   * checking interfaces are point to point and in the same domain.
+   */
+  @ParametersAreNonnullByDefault
+  private static class FixedL3Adjacencies implements L3Adjacencies {
+    public FixedL3Adjacencies(boolean answer) {
+      _answer = answer;
+    }
+
+    @Override
+    public boolean inSamePointToPointDomain(NodeInterfacePair i1, NodeInterfacePair i2) {
+      return _answer;
+    }
+
+    @Override
+    public boolean inSameBroadcastDomain(NodeInterfacePair i1, NodeInterfacePair i2) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Nonnull
+    @Override
+    public Optional<NodeInterfacePair> pairedPointToPointL3Interface(NodeInterfacePair iface) {
+      throw new UnsupportedOperationException();
+    }
+
+    private final boolean _answer;
   }
 
   @Test
@@ -324,10 +345,9 @@ public class BgpTopologyUtilsTest {
     _node1BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface1, peer1));
     _node2BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface2, peer2));
 
-    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null);
-    Layer2Topology connectedLayer2Topology = Layer2Topology.builder().addEdge(edge).build();
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
-        initBgpTopology(_configs, ImmutableMap.of(), true, false, null, connectedLayer2Topology)
+        initBgpTopology(
+                _configs, ImmutableMap.of(), true, false, null, new FixedL3Adjacencies(true))
             .getGraph();
     BgpPeerConfigId peer1Id = new BgpPeerConfigId(NODE1, DEFAULT_VRF_NAME, iface1);
     BgpPeerConfigId peer2To1Id = new BgpPeerConfigId(NODE2, DEFAULT_VRF_NAME, iface2);
@@ -368,12 +388,10 @@ public class BgpTopologyUtilsTest {
     _node1BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface1, peer1));
     _node2BgpProcess.setInterfaceNeighbors(ImmutableSortedMap.of(iface2, peer2));
 
-    Layer2Edge edge = new Layer2Edge(NODE1, iface1, null, NODE2, iface2, null);
-    Layer2Topology connectedLayer2Topology = Layer2Topology.builder().addEdge(edge).build();
-
     // Shouldn't see session come up because of incompatible remote AS
     ValueGraph<BgpPeerConfigId, BgpSessionProperties> bgpTopology =
-        initBgpTopology(_configs, ImmutableMap.of(), true, false, null, connectedLayer2Topology)
+        initBgpTopology(
+                _configs, ImmutableMap.of(), true, false, null, new FixedL3Adjacencies(true))
             .getGraph();
     assertThat(bgpTopology.nodes(), hasSize(2));
     assertThat(bgpTopology.edges(), empty());

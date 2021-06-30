@@ -107,6 +107,10 @@ public interface TopologyProvider {
   @Nonnull
   Topology getLayer3Topology(NetworkSnapshot snapshot);
 
+  /** Returns the {@link L3Adjacencies} for the given snapshot. */
+  @Nonnull
+  L3Adjacencies getL3Adjacencies(NetworkSnapshot snapshot);
+
   @Nonnull
   OspfTopology getOspfTopology(NetworkSnapshot networkSnapshot);
 

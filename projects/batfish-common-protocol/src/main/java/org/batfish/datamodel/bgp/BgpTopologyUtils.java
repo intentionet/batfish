@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.batfish.common.plugin.TracerouteEngine;
 import org.batfish.common.topology.IpOwners;
-import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.L3Adjacencies;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPassivePeerConfig;
 import org.batfish.datamodel.BgpPeerConfig;
@@ -97,7 +97,7 @@ public final class BgpTopologyUtils {
   /**
    * Compute the BGP topology -- a network of {@link BgpPeerConfig}s connected by {@link
    * BgpSessionProperties}. See {@link #initBgpTopology(Map, Map, boolean, boolean,
-   * TracerouteEngine, Layer2Topology)} for more details.
+   * TracerouteEngine, L3Adjacencies)} for more details.
    *
    * @param configurations configuration keyed by hostname
    * @param ipOwners Ip owners (see {@link IpOwners#computeIpNodeOwners(Map, boolean)}
@@ -110,8 +110,8 @@ public final class BgpTopologyUtils {
       Map<String, Configuration> configurations,
       Map<Ip, Map<String, Set<String>>> ipOwners,
       boolean keepInvalid,
-      @Nullable Layer2Topology layer2Topology) {
-    return initBgpTopology(configurations, ipOwners, keepInvalid, false, null, layer2Topology);
+      L3Adjacencies l3Adjacencies) {
+    return initBgpTopology(configurations, ipOwners, keepInvalid, false, null, l3Adjacencies);
   }
 
   /**
@@ -129,7 +129,7 @@ public final class BgpTopologyUtils {
    *     {@code keepInvalid=false}, which only does filters invalid neighbors at the control-plane
    *     level
    * @param tracerouteEngine an instance of {@link TracerouteEngine} for doing reachability checks.
-   * @param layer2Topology {@link Layer2Topology} of the network, for checking BGP unnumbered
+   * @param l3Adjacencies {@link L3Adjacencies} of the network, for checking BGP unnumbered
    *     reachability.
    * @return A graph ({@link Network}) representing all BGP peerings.
    */
@@ -139,7 +139,7 @@ public final class BgpTopologyUtils {
       boolean keepInvalid,
       boolean checkReachability,
       @Nullable TracerouteEngine tracerouteEngine,
-      @Nullable Layer2Topology layer2Topology) {
+      L3Adjacencies l3Adjacencies) {
     checkArgument(
         !checkReachability || !keepInvalid,
         "Cannot check reachability while keeping invalid peers");
@@ -226,10 +226,7 @@ public final class BgpTopologyUtils {
                 tracerouteEngine);
             break;
           case UNNUMBERED:
-            // Can't infer BGP unnumbered connectivity without layer 2 topology
-            if (layer2Topology != null) {
-              addUnnumberedPeerEdges(neighborId, graph, networkConfigurations, layer2Topology);
-            }
+            addUnnumberedPeerEdges(neighborId, graph, networkConfigurations, l3Adjacencies);
             break;
           default:
             throw new IllegalArgumentException(
@@ -298,7 +295,7 @@ public final class BgpTopologyUtils {
       BgpPeerConfigId neighborId,
       MutableValueGraph<BgpPeerConfigId, BgpSessionProperties> graph,
       NetworkConfigurations nc,
-      @Nonnull Layer2Topology layer2Topology) {
+      L3Adjacencies l3Adjacencies) {
     // neighbor will be null if neighborId has no peer interface defined
     BgpUnnumberedPeerConfig neighbor = nc.getBgpUnnumberedPeerConfig(neighborId);
     if (neighbor == null || neighbor.getLocalAs() == null || neighbor.getRemoteAsns().isEmpty()) {
@@ -317,7 +314,7 @@ public final class BgpTopologyUtils {
                     //  Ensure candidate is unnumbered and has compatible local/remote AS
                     && bgpCandidatePassesSanityChecks(neighborId, neighbor, candidateId, nc)
                     // Check layer 2 connectivity
-                    && layer2Topology.inSameBroadcastDomain(
+                    && l3Adjacencies.inSamePointToPointDomain(
                         peerNip,
                         NodeInterfacePair.of(
                             candidateId.getHostname(), candidateId.getPeerInterface())))

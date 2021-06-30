@@ -505,105 +505,48 @@ public final class TopologyUtil {
    * information contained in the configurations.
    */
   @VisibleForTesting
-  static @Nonnull Topology computeRawLayer3Topology(
-      @Nonnull Layer1Topology rawLayer1Topology,
-      @Nonnull Layer1Topology layer1LogicalTopology,
-      @Nonnull Layer2Topology layer2Topology,
-      @Nonnull Map<String, Configuration> configurations) {
-    Set<String> layer1TailNodes =
-        Stream.concat(
-                rawLayer1Topology.getGraph().edges().stream(),
-                layer1LogicalTopology.getGraph().edges().stream())
-            .filter(
-                // Ignore border-to-ISP edges when computing the set of nodes for which users
-                // provided L1 topology. Batfish adds these edges during ISP modeling, and not
-                // excluding them impact L3 edge inference for border.
-                l1Edge -> !isBorderToIspEdge(l1Edge, configurations))
-            .map(l1Edge -> l1Edge.getNode1().getHostname())
-            .collect(ImmutableSet.toImmutableSet());
+  public static @Nonnull Topology computeRawLayer3Topology(
+      @Nonnull L3Adjacencies adjacencies, @Nonnull Map<String, Configuration> configurations) {
     Stream<Edge> filteredEdgeStream =
         synthesizeL3Topology(configurations).getEdges().stream()
             .filter(
                 edge ->
-                    // keep if either node is not in tail of edge in layer-1, or if vertices are in
-                    // same broadcast domain
-                    !layer1TailNodes.contains(edge.getNode1())
-                        || !layer1TailNodes.contains(edge.getNode2())
-                        || layer2Topology.inSameBroadcastDomain(edge.getHead(), edge.getTail())
+                    adjacencies.inSameBroadcastDomain(edge.getHead(), edge.getTail())
                         // Keep if virtual wire
                         || isVirtualWireSameDevice(edge));
     NetworkConfigurations nc = NetworkConfigurations.of(configurations);
-
-    // Look over all L1 logical edges and see if they both have link-local addresses. If they do,
-    // include those in L3 topology
-    Stream<Edge> layer1LLAEdgeStream =
-        layer1LogicalTopology.getGraph().edges().stream()
-            .filter(
-                edge ->
-                    // at least one link-local address exists on both edge endpoints
-                    !nc.getInterface(
-                                edge.getNode1().getHostname(), edge.getNode1().getInterfaceName())
-                            .map(Interface::getAllLinkLocalAddresses)
-                            .map(Set::isEmpty)
-                            .orElse(true)
-                        && !nc.getInterface(
-                                edge.getNode2().getHostname(), edge.getNode2().getInterfaceName())
-                            .map(Interface::getAllLinkLocalAddresses)
-                            .map(Set::isEmpty)
-                            .orElse(true))
-            .flatMap(
-                edge -> {
-                  Edge l3Edge =
-                      new Edge(
-                          NodeInterfacePair.of(
-                              edge.getNode1().getHostname(), edge.getNode1().getInterfaceName()),
-                          NodeInterfacePair.of(
-                              edge.getNode2().getHostname(), edge.getNode2().getInterfaceName()));
-                  // Return forward and reverse edges (L1 topology not guaranteed to be symmetric)
-                  // In the end it collapses to a set anyway
-                  return Stream.of(l3Edge, l3Edge.reverse());
-                });
-
-    // Special-case sub-interfaces of aggregate interfaces that have link-local addresses.
-    // Since these interfaces will not appear in the L1 topology, we fall back to n^2 candidates and
-    // filter to only keep the ones that are in the same broadcast domain.
-    ImmutableSet<NodeInterfacePair> aggSubInterfacesWithLLAs =
+    // For link-layer edges, we see if there is a unique point-to-point interface in the same
+    // broadcast domain that is unnumbered. If so, we create an edge, otherwise there is no
+    // neighbor.
+    Stream<Edge> linkLocalEdges =
         configurations.values().stream()
             .flatMap(Configuration::activeInterfaces)
-            .filter(
-                i ->
-                    i.getInterfaceType() == InterfaceType.AGGREGATE_CHILD
-                        && !i.getAllLinkLocalAddresses().isEmpty())
+            .filter(i -> !i.getAllLinkLocalAddresses().isEmpty())
             .map(i -> NodeInterfacePair.of(i.getOwner().getHostname(), i.getName()))
-            .collect(ImmutableSet.toImmutableSet());
-    Stream<Edge> subInterfaceLLAStream =
-        aggSubInterfacesWithLLAs.stream()
             .flatMap(
-                i1 ->
-                    aggSubInterfacesWithLLAs.stream()
-                        .filter(
-                            i2 -> !i1.equals(i2) && layer2Topology.inSameBroadcastDomain(i1, i2))
-                        .map(i2 -> new Edge(i1, i2)));
-    return new Topology(
-        Streams.concat(filteredEdgeStream, layer1LLAEdgeStream, subInterfaceLLAStream)
-            .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder())));
-  }
+                nip -> {
+                  @Nullable
+                  NodeInterfacePair paired =
+                      adjacencies
+                          .pairedPointToPointL3Interface(nip)
+                          .filter(
+                              other ->
+                                  nc.getInterface(other.getHostname(), other.getInterface())
+                                      .map(
+                                          i ->
+                                              i.getActive()
+                                                  && !i.getAllLinkLocalAddresses().isEmpty())
+                                      .orElse(false))
+                          .orElse(null);
+                  if (paired == null) {
+                    return Stream.of();
+                  }
+                  return Stream.of(new Edge(nip, paired), new Edge(paired, nip));
+                });
 
-  /**
-   * Compute the raw layer 3 topology from information contained in the configurations, and also the
-   * layer-1 and layer-2 topologies if present. It also removes the overlay edges from the computed
-   * layer 3 edges.
-   */
-  public static @Nonnull Topology computeRawLayer3Topology(
-      @Nonnull Optional<Layer1Topology> rawLayer1PhysicalTopology,
-      @Nonnull Optional<Layer1Topology> layer1LogicalTopology,
-      @Nonnull Optional<Layer2Topology> layer2Topology,
-      @Nonnull Map<String, Configuration> configurations) {
-    return computeRawLayer3Topology(
-        rawLayer1PhysicalTopology.orElse(Layer1Topology.EMPTY),
-        layer1LogicalTopology.orElse(Layer1Topology.EMPTY),
-        layer2Topology.orElse(Layer2Topology.EMPTY),
-        configurations);
+    return new Topology(
+        Streams.concat(filteredEdgeStream, linkLocalEdges)
+            .collect(ImmutableSortedSet.toImmutableSortedSet(Comparator.naturalOrder())));
   }
 
   /**

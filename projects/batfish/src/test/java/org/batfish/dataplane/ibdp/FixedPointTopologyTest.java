@@ -32,6 +32,7 @@ import org.batfish.common.topology.Layer1Edge;
 import org.batfish.common.topology.Layer1Topology;
 import org.batfish.common.topology.Layer2Node;
 import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.LegacyL3Adjacencies;
 import org.batfish.common.topology.TopologyContainer;
 import org.batfish.common.topology.TopologyUtil;
 import org.batfish.datamodel.BumTransportMethod;
@@ -172,8 +173,7 @@ public final class FixedPointTopologyTest {
         .setLayer2Topology(Optional.of(l2))
         .setLayer3Topology(
             computeLayer3Topology(
-                computeRawLayer3Topology(
-                    Optional.of(l1), Optional.of(l1), Optional.of(l2), configs),
+                computeRawLayer3Topology(new LegacyL3Adjacencies(l1, l1, l2, configs), configs),
                 ImmutableSet.of()))
         .setOspfTopology(OspfTopology.EMPTY)
         .setRawLayer1PhysicalTopology(Optional.of(l1))

@@ -5,5 +5,8 @@ package(
 
 filegroup(
     name = "layer2ntc",
-    srcs = glob(["**"], exclude=["BUILD"]),
+    srcs = glob(
+        ["**"],
+        exclude = ["BUILD"],
+    ),
 )

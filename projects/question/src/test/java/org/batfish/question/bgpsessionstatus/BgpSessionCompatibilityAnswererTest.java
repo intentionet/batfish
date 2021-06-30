@@ -33,15 +33,16 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javax.annotation.Nonnull;
 import org.batfish.common.BatfishException;
 import org.batfish.common.NetworkSnapshot;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.plugin.IBatfishTestAdapter;
-import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.GlobalBroadcastNoPointToPoint;
+import org.batfish.common.topology.L3Adjacencies;
 import org.batfish.common.topology.TopologyProvider;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPassivePeerConfig;
@@ -601,18 +602,19 @@ public class BgpSessionCompatibilityAnswererTest {
 
     @Override
     public TopologyProvider getTopologyProvider() {
-      return new MockLayer2TopologyProvider(this);
+      return new NoL1InfoTopologyProvider(this);
     }
 
-    /** Mock topology provider that provides empty initial layer 2 topology */
-    static class MockLayer2TopologyProvider extends TopologyProviderTestAdapter {
-      MockLayer2TopologyProvider(IBatfish bf) {
+    /** Mock topology provider that provides the no-L1-info-provided topology */
+    static class NoL1InfoTopologyProvider extends TopologyProviderTestAdapter {
+      NoL1InfoTopologyProvider(IBatfish bf) {
         super(bf);
       }
 
+      @Nonnull
       @Override
-      public Optional<Layer2Topology> getInitialLayer2Topology(NetworkSnapshot networkSnapshot) {
-        return Optional.empty();
+      public L3Adjacencies getL3Adjacencies(NetworkSnapshot snapshot) {
+        return GlobalBroadcastNoPointToPoint.instance();
       }
     }
   }

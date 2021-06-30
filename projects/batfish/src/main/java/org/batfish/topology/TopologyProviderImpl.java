@@ -15,9 +15,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import org.batfish.common.BatfishException;
 import org.batfish.common.NetworkSnapshot;
 import org.batfish.common.plugin.IBatfish;
+import org.batfish.common.topology.GlobalBroadcastNoPointToPoint;
 import org.batfish.common.topology.IpOwners;
+import org.batfish.common.topology.L3Adjacencies;
 import org.batfish.common.topology.Layer1Topology;
 import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.LegacyL3Adjacencies;
 import org.batfish.common.topology.TopologyProvider;
 import org.batfish.common.topology.TopologyUtil;
 import org.batfish.common.topology.TunnelTopology;
@@ -135,6 +138,21 @@ public final class TopologyProviderImpl implements TopologyProvider {
     } catch (IOException e) {
       throw new BatfishException("Could not load layer-3 topology", e);
     }
+  }
+
+  @Nonnull
+  @Override
+  public L3Adjacencies getL3Adjacencies(@Nonnull NetworkSnapshot snapshot) {
+    Optional<Layer2Topology> maybeL2 = getLayer2Topology(snapshot);
+    if (!maybeL2.isPresent()) {
+      // No L2 topology -> full broadcast domain, nothing p2p adjacent.
+      return GlobalBroadcastNoPointToPoint.instance();
+    }
+    return new LegacyL3Adjacencies(
+        getRawLayer1PhysicalTopology(snapshot).orElse(Layer1Topology.EMPTY),
+        getLayer1LogicalTopology(snapshot).orElse(Layer1Topology.EMPTY),
+        maybeL2.get(),
+        _storage.loadConfigurations(snapshot.getNetwork(), snapshot.getSnapshot()));
   }
 
   @Override
@@ -331,11 +349,13 @@ public final class TopologyProviderImpl implements TopologyProvider {
     try (Scope scope = GlobalTracer.get().scopeManager().activate(span)) {
       assert scope != null; // avoid unused warning
       Map<String, Configuration> configurations = _batfish.loadConfigurations(networkSnapshot);
-      return TopologyUtil.computeRawLayer3Topology(
-          getRawLayer1PhysicalTopology(networkSnapshot),
-          getLayer1LogicalTopology(networkSnapshot),
-          getInitialLayer2Topology(networkSnapshot),
-          configurations);
+      L3Adjacencies adjacencies =
+          new LegacyL3Adjacencies(
+              getRawLayer1PhysicalTopology(networkSnapshot).orElse(Layer1Topology.EMPTY),
+              getLayer1LogicalTopology(networkSnapshot).orElse(Layer1Topology.EMPTY),
+              getInitialLayer2Topology(networkSnapshot).orElse(Layer2Topology.EMPTY),
+              configurations);
+      return TopologyUtil.computeRawLayer3Topology(adjacencies, configurations);
     } finally {
       span.finish();
     }

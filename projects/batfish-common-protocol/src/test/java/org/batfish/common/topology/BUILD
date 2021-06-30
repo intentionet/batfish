@@ -10,17 +10,17 @@ junit_tests(
     srcs = glob([
         "**/*Test.java",
     ]),
-    resources = [
-        "//projects/batfish/src/test/resources:log4j_config",
-        "//projects/batfish/src/test/resources/org/batfish/main/annotate/testconfigs",
-    ],
-    tags = ["cpu:4"],
     deps = [
-        "//projects/batfish",
         "//projects/batfish-common-protocol:common",
+        "//projects/batfish-common-protocol/src/test/java/org/batfish/common/matchers",
+        "//projects/batfish-common-protocol/src/test/java/org/batfish/datamodel/matchers",
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
         "@maven//:com_google_code_findbugs_jsr305",
         "@maven//:com_google_guava_guava",
+        "@maven//:com_google_guava_guava_testlib",
         "@maven//:junit_junit",
+        "@maven//:org_apache_commons_commons_lang3",
         "@maven//:org_hamcrest_hamcrest",
     ],
 )

@@ -35,13 +35,14 @@ import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
+import javax.annotation.Nonnull;
 import org.batfish.common.NetworkSnapshot;
 import org.batfish.common.plugin.IBatfish;
 import org.batfish.common.plugin.IBatfishTestAdapter;
-import org.batfish.common.topology.Layer2Topology;
+import org.batfish.common.topology.GlobalBroadcastNoPointToPoint;
+import org.batfish.common.topology.L3Adjacencies;
 import org.batfish.common.topology.TopologyProvider;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.BgpPassivePeerConfig;
@@ -680,9 +681,10 @@ public class BgpSessionStatusAnswererTest {
         _bgpTopology = bgpTopology;
       }
 
+      @Nonnull
       @Override
-      public Optional<Layer2Topology> getLayer2Topology(NetworkSnapshot networkSnapshot) {
-        return Optional.empty();
+      public L3Adjacencies getL3Adjacencies(NetworkSnapshot snapshot) {
+        return GlobalBroadcastNoPointToPoint.instance();
       }
 
       @Override
