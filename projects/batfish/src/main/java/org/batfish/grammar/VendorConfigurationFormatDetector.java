@@ -5,9 +5,13 @@ import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.batfish.datamodel.ConfigurationFormat;
 
 public final class VendorConfigurationFormatDetector {
+  private static final Logger LOGGER =
+      LogManager.getLogger(VendorConfigurationFormatDetector.class);
 
   public static final String BATFISH_FLATTENED_JUNIPER_HEADER =
       "####BATFISH FLATTENED JUNIPER CONFIG####\n";
@@ -21,6 +25,9 @@ public final class VendorConfigurationFormatDetector {
   public static ConfigurationFormat identifyConfigurationFormat(String fileText) {
     return new VendorConfigurationFormatDetector(fileText).identifyConfigurationFormat();
   }
+
+  private static final Pattern BATFISH_CONFIG_FORMAT_PATTERN =
+      Pattern.compile("(?m)^[!#] *BATFISH[-_]FORMAT *: *([a-zA-Z0-9_-]+)");
 
   private static final Pattern BANNER_PATTERN = Pattern.compile("(?m)^banner ");
   private static final Pattern ALCATEL_AOS_PATTERN = Pattern.compile("(?m)^system name");
@@ -325,6 +332,22 @@ public final class VendorConfigurationFormatDetector {
   }
 
   @Nullable
+  private ConfigurationFormat checkBatfish() {
+    Matcher m = BATFISH_CONFIG_FORMAT_PATTERN.matcher(_fileText);
+    if (!m.find()) {
+      return null;
+    }
+    String format = m.group(1);
+    try {
+      return ConfigurationFormat.valueOf(format.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Unknown Batfish configuration format: {}", format);
+      // This is not a known enum value, force unknown.
+      return ConfigurationFormat.UNKNOWN;
+    }
+  }
+
+  @Nullable
   private ConfigurationFormat checkRancid() {
     Matcher m = RANCID_BASE_PATTERN.matcher(_fileText);
     if (!m.find()) {
@@ -404,6 +427,10 @@ public final class VendorConfigurationFormatDetector {
   private ConfigurationFormat identifyConfigurationFormat() {
     ConfigurationFormat format;
     format = checkEmpty();
+    if (format != null) {
+      return format;
+    }
+    format = checkBatfish();
     if (format != null) {
       return format;
     }
