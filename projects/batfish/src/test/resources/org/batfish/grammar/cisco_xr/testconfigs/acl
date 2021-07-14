@@ -11,6 +11,7 @@ ipv4 access-list acl
  60 deny tcp any 4.4.4.0/24 eq ssh
  70 deny udp 5.5.5.5/32 any eq domain
  80 permit udp 6.6.6.0/23 any eq 9999
+ 90 permit ipv4 any any fragments
 !
 ipv6 access-list aclv6
  10 remark Some remark

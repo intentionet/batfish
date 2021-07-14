@@ -1150,8 +1150,6 @@ COS_QUEUE_GROUP: 'cos-queue-group';
 
 COST: 'cost';
 
-COUNT: 'count';
-
 COUNTRY: 'country';
 
 COUNTRY_CODE: 'country-code';
@@ -1220,8 +1218,6 @@ CURRENT_CONFIGURATION
 CUSTOM: 'custom';
 
 CUSTOMER_ID: 'customer-id';
-
-CWR: 'cwr';
 
 DAEMON: 'daemon';
 
@@ -1664,8 +1660,6 @@ EBGP: 'ebgp';
 
 EBGP_MULTIHOP: 'ebgp-multihop';
 
-ECE: 'ece';
-
 ECHO: 'echo';
 
 ECHO_CANCEL: 'echo-cancel';
@@ -1679,8 +1673,6 @@ ECHO_RX_INTERVAL: 'echo-rx-interval';
 ECMP: 'ecmp';
 
 ECMP_GROUP: 'ecmp-group';
-
-ECN: 'ecn';
 
 EDCA_PARAMETERS_PROFILE: 'edca-parameters-profile';
 
@@ -3328,19 +3320,9 @@ MLAG: 'mlag';
 
 MLD: 'mld' { setAccessGroupContextTokenType(MLD); };
 
-MLD_QUERY: 'mld-query';
-
-MLD_REDUCTION: 'mld-reduction';
-
-MLD_REPORT: 'mld-report';
-
-MLDV2: 'mldv2';
-
 MLS: 'mls';
 
 MOBILE: 'mobile';
-
-MOBILE_HOST_REDIRECT: 'mobile-host-redirect';
 
 MOBILE_IP: 'mobile-ip';
 
@@ -3491,8 +3473,6 @@ ND: 'nd';
 ND_NA: 'nd-na';
 
 ND_NS: 'nd-ns';
-
-ND_TYPE: 'nd-type';
 
 NEGOTIATE: 'negotiate';
 

@@ -96,40 +96,23 @@ etype
 extended_access_list_additional_feature
 :
    ACK
-   | ADDRESS_UNREACHABLE
+   | ADDRESS_UNREACHABLE // ICMPV6
    | ADMINISTRATIVELY_PROHIBITED
    | ALTERNATE_ADDRESS
-   | BEYOND_SCOPE
-   | BFD_ECHO
+   | BEYOND_SCOPE // ICMPV6
    | CAPTURE
    | CONVERSION_ERROR
-   | COUNT
-   | CWR
-   | DESTINATION_UNREACHABLE
+   | DESTINATION_UNREACHABLE // ICMPV6
    | DOD_HOST_PROHIBITED
    | DOD_NET_PROHIBITED
-   |
-   (
-      DSCP dscp_type
-   )
-   |
-   (
-      icmp_message_type = uint_legacy icmp_message_code = uint_legacy?
-   )
-   | ECE
+   | DSCP dscp_type
+   | icmp_message_type = uint_legacy icmp_message_code = uint_legacy?
    | ECHO
    | ECHO_REPLY
-   | ECHO_REQUEST
-   |
-   (
-      ECN ecn = uint_legacy
-   )
    | ESTABLISHED
    | FIN
    | FRAGMENTS
    | GENERAL_PARAMETER_PROBLEM
-   | HOP_LIMIT
-   | HOPLIMIT
    | HOST_ISOLATED
    | HOST_PRECEDENCE_UNREACHABLE
    | HOST_REDIRECT
@@ -140,28 +123,13 @@ extended_access_list_additional_feature
    | ICMP_OFF
    | INFORMATION_REPLY
    | INFORMATION_REQUEST
-   |
-   (
-      LOG
-      (
-         DEFAULT
-         | DISABLE
-         | (level = uint_legacy (INTERVAL secs = uint_legacy)?)
-      )?
-   )
+   | LOG
    | LOG_INPUT
    | MASK_REPLY
    | MASK_REQUEST
-   | MLD_QUERY
-   | MLD_REDUCTION
-   | MLD_REPORT
-   | MLDV2
-   | MOBILE_HOST_REDIRECT
-   | ND
-   | ND_NA
-   | ND_NS
-   | ND_TYPE
-   | NEIGHBOR
+   | MOBILE_REDIRECT
+   | ND_NA // ICMPV6
+   | ND_NS // ICMPV6
    | NET_REDIRECT
    | NET_TOS_REDIRECT
    | NET_TOS_UNREACHABLE
@@ -177,7 +145,6 @@ extended_access_list_additional_feature
    | PSH
    | REASSEMBLY_TIMEOUT
    | REDIRECT
-   | ROUTER
    | ROUTER_ADVERTISEMENT
    | ROUTER_SOLICITATION
    | RST
@@ -188,12 +155,10 @@ extended_access_list_additional_feature
    | TIMESTAMP_REPLY
    | TIMESTAMP_REQUEST
    | TRACEROUTE
-   | TRACKED
    | TTL_EXCEEDED
-   | TTL EQ uint_legacy
+   | TTL EQ uint_legacy // TODO
    | eacl_feature_udf
    | UNREACHABLE
-   | URG
 ;
 
 eacl_feature_udf

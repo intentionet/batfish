@@ -2,6 +2,7 @@ package org.batfish.grammar.cisco_xr;
 
 import static com.google.common.collect.Iterables.getOnlyElement;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.batfish.common.bdd.BDDMatchers.isZero;
 import static org.batfish.common.matchers.ParseWarningMatchers.hasComment;
 import static org.batfish.common.matchers.ParseWarningMatchers.hasText;
 import static org.batfish.common.matchers.WarningsMatchers.hasParseWarnings;
@@ -153,10 +154,14 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.batfish.common.BatfishLogger;
 import org.batfish.common.Warnings;
 import org.batfish.common.WellKnownCommunity;
+import org.batfish.common.bdd.IpAccessListToBdd;
+import org.batfish.common.bdd.PermitAndDenyBdds;
 import org.batfish.config.Settings;
 import org.batfish.datamodel.AbstractRoute;
 import org.batfish.datamodel.AbstractRouteBuilder;
+import org.batfish.datamodel.AclLine;
 import org.batfish.datamodel.AsPath;
+import org.batfish.datamodel.BddTestbed;
 import org.batfish.datamodel.BgpActivePeerConfig;
 import org.batfish.datamodel.Bgpv4Route;
 import org.batfish.datamodel.Bgpv4Route.Builder;
@@ -167,6 +172,7 @@ import org.batfish.datamodel.ConnectedRoute;
 import org.batfish.datamodel.DataPlane;
 import org.batfish.datamodel.DscpType;
 import org.batfish.datamodel.Flow;
+import org.batfish.datamodel.HeaderSpace;
 import org.batfish.datamodel.Interface;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
@@ -288,6 +294,8 @@ import org.junit.rules.TemporaryFolder;
 
 /** Tests for {@link CiscoXrParser} and {@link CiscoXrControlPlaneExtractor}. */
 public final class XrGrammarTest {
+  private final BddTestbed _bddTestbed = new BddTestbed(ImmutableMap.of(), ImmutableMap.of());
+  private final IpAccessListToBdd _aclToBdd = _bddTestbed.getAclToBdd();
 
   static final String TESTCONFIGS_PREFIX = "org/batfish/grammar/cisco_xr/testconfigs/";
   static final String SNAPSHOTS_PREFIX = "org/batfish/grammar/cisco_xr/snapshots/";
@@ -380,7 +388,7 @@ public final class XrGrammarTest {
     assertThat(c.getIpv4Acls(), hasKeys("acl"));
     Ipv4AccessList acl = c.getIpv4Acls().get("acl");
     // TODO: get the remark line in there too.
-    assertThat(acl.getLines(), hasSize(7));
+    assertThat(acl.getLines(), hasSize(8));
 
     assertThat(c.getIpv6Acls(), hasKeys("aclv6"));
     Ipv6AccessList aclv6 = c.getIpv6Acls().get("aclv6");
@@ -394,7 +402,18 @@ public final class XrGrammarTest {
     assertThat(c.getIpAccessLists(), hasKeys("acl"));
     IpAccessList acl = c.getIpAccessLists().get("acl");
     // TODO: get the remark line in there too.
-    assertThat(acl.getLines(), hasSize(7));
+    assertThat(acl.getLines(), hasSize(8));
+    {
+      // Test fragments.
+      AclLine fragmentLine = acl.getLines().get(7);
+      PermitAndDenyBdds bdds = _aclToBdd.toPermitAndDenyBdds(fragmentLine);
+      HeaderSpace expected =
+          HeaderSpace.builder()
+              .setNotFragmentOffsets(ImmutableList.of(SubRange.singleton(0)))
+              .build();
+      assertThat(bdds.getPermitBdd(), equalTo(_aclToBdd.getHeaderSpaceToBDD().toBDD(expected)));
+      assertThat(bdds.getDenyBdd(), isZero());
+    }
 
     assertThat(c.getIp6AccessLists(), hasKeys("aclv6"));
     Ip6AccessList aclv6 = c.getIp6AccessLists().get("aclv6");

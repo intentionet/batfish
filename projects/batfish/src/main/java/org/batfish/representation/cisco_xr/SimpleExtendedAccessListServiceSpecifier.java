@@ -19,19 +19,12 @@ public class SimpleExtendedAccessListServiceSpecifier implements AccessListServi
   public static class Builder {
 
     @Nonnull private Set<Integer> _dscps = ImmutableSet.of();
-
     private List<SubRange> _dstPortRanges = ImmutableList.of();
-
-    private Set<Integer> _ecns = ImmutableSet.of();
-
+    private boolean _fragments;
     private Integer _icmpCode;
-
     private Integer _icmpType;
-
     private IpProtocol _protocol;
-
     private List<SubRange> _srcPortRanges = ImmutableList.of();
-
     private List<TcpFlagsMatchConditions> _tcpFlags = ImmutableList.of();
 
     public SimpleExtendedAccessListServiceSpecifier build() {
@@ -48,8 +41,8 @@ public class SimpleExtendedAccessListServiceSpecifier implements AccessListServi
       return this;
     }
 
-    public Builder setEcns(Iterable<Integer> ecns) {
-      _ecns = ImmutableSet.copyOf(ecns);
+    public Builder setFragments(boolean fragments) {
+      _fragments = fragments;
       return this;
     }
 
@@ -84,25 +77,18 @@ public class SimpleExtendedAccessListServiceSpecifier implements AccessListServi
   }
 
   @Nonnull private final Set<Integer> _dscps;
-
   private final List<SubRange> _dstPortRanges;
-
-  private final Set<Integer> _ecns;
-
+  private final boolean _fragments;
   private final Integer _icmpCode;
-
   private final Integer _icmpType;
-
   private final IpProtocol _protocol;
-
   private final List<SubRange> _srcPortRanges;
-
   private final List<TcpFlagsMatchConditions> _tcpFlags;
 
   private SimpleExtendedAccessListServiceSpecifier(Builder builder) {
     _dscps = builder._dscps;
     _dstPortRanges = builder._dstPortRanges;
-    _ecns = builder._ecns;
+    _fragments = builder._fragments;
     _icmpCode = builder._icmpCode;
     _icmpType = builder._icmpType;
     _protocol = builder._protocol;
@@ -122,7 +108,8 @@ public class SimpleExtendedAccessListServiceSpecifier implements AccessListServi
         HeaderSpace.builder()
             .setDscps(_dscps)
             .setDstPorts(_dstPortRanges)
-            .setEcns(_ecns)
+            .setNotFragmentOffsets(
+                _fragments ? ImmutableSet.of(SubRange.singleton(0)) : ImmutableSet.of())
             .setIcmpCodes(
                 _icmpCode != null ? ImmutableSet.of(new SubRange(_icmpCode)) : ImmutableSet.of())
             .setIcmpTypes(
@@ -138,7 +125,7 @@ public class SimpleExtendedAccessListServiceSpecifier implements AccessListServi
     return MoreObjects.toStringHelper(getClass())
         .add("dscps", _dscps)
         .add("dstPortRanges", _dstPortRanges)
-        .add("ecns", _ecns)
+        .add("fragments", _fragments)
         .add("icmpCode", _icmpCode)
         .add("icmpType", _icmpType)
         .add("protocol", _protocol)

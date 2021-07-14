@@ -3708,7 +3708,7 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
       Integer icmpCode = null;
       List<TcpFlagsMatchConditions> tcpFlags = new ArrayList<>();
       Set<Integer> dscps = new TreeSet<>();
-      Set<Integer> ecns = new TreeSet<>();
+      boolean fragments = false;
       for (Extended_access_list_additional_featureContext feature : ctx.features) {
         if (feature.ACK() != null) {
           tcpFlags.add(
@@ -3725,13 +3725,9 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
         } else if (feature.ALTERNATE_ADDRESS() != null) {
           icmpType = IcmpType.ALTERNATE_ADDRESS;
         } else if (feature.CAPTURE() != null) {
-          // Do nothing.
-        } else if (feature.CWR() != null) {
-          tcpFlags.add(
-              TcpFlagsMatchConditions.builder()
-                  .setTcpFlags(TcpFlags.builder().setCwr(true).build())
-                  .setUseCwr(true)
-                  .build());
+          // Captures matching traffic.
+        } else if (feature.CONVERSION_ERROR() != null) {
+          icmpType = IcmpType.CONVERSION_ERROR;
         } else if (feature.DOD_HOST_PROHIBITED() != null) {
           icmpType = IcmpType.DESTINATION_UNREACHABLE;
           icmpCode = IcmpCode.DESTINATION_HOST_PROHIBITED;
@@ -3740,19 +3736,10 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
           icmpCode = IcmpCode.DESTINATION_NETWORK_PROHIBITED;
         } else if (feature.DSCP() != null) {
           toDscpType(ctx, feature.dscp_type()).ifPresent(dscps::add);
-        } else if (feature.ECE() != null) {
-          tcpFlags.add(
-              TcpFlagsMatchConditions.builder()
-                  .setTcpFlags(TcpFlags.builder().setEce(true).build())
-                  .setUseEce(true)
-                  .build());
-        } else if (feature.ECHO_REPLY() != null) {
-          icmpType = IcmpType.ECHO_REPLY;
         } else if (feature.ECHO() != null) {
           icmpType = IcmpType.ECHO_REQUEST;
-        } else if (feature.ECN() != null) {
-          int ecn = toInteger(feature.ecn);
-          ecns.add(ecn);
+        } else if (feature.ECHO_REPLY() != null) {
+          icmpType = IcmpType.ECHO_REPLY;
         } else if (feature.ESTABLISHED() != null) {
           // must contain ACK or RST
           tcpFlags.add(
@@ -3771,6 +3758,8 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
                   .setTcpFlags(TcpFlags.builder().setFin(true).build())
                   .setUseFin(true)
                   .build());
+        } else if (feature.FRAGMENTS() != null) {
+          fragments = true;
         } else if (feature.GENERAL_PARAMETER_PROBLEM() != null) {
           icmpType = IcmpType.PARAMETER_PROBLEM;
           icmpCode = IcmpCode.INVALID_IP_HEADER;
@@ -3803,12 +3792,17 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
         } else if (feature.INFORMATION_REQUEST() != null) {
           icmpType = IcmpType.INFO_REQUEST;
         } else if (feature.LOG() != null) {
-          // Do nothing.
+          // (Optional) Causes an informational logging message about the packet that matches the
+          // entry to be sent to the console. (The level of messages logged to the console is
+          // controlled by the logging console command.)
+        } else if (feature.LOG_INPUT() != null) {
+          // (Optional) Provides the same function as the log keyword, except that the logging
+          // message also includes the input interface.
         } else if (feature.MASK_REPLY() != null) {
           icmpType = IcmpType.MASK_REPLY;
         } else if (feature.MASK_REQUEST() != null) {
           icmpType = IcmpType.MASK_REQUEST;
-        } else if (feature.MOBILE_HOST_REDIRECT() != null) {
+        } else if (feature.MOBILE_REDIRECT() != null) {
           icmpType = IcmpType.MOBILE_REDIRECT;
         } else if (feature.NET_REDIRECT() != null) {
           icmpType = IcmpType.REDIRECT_MESSAGE;
@@ -3839,6 +3833,12 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
         } else if (feature.PORT_UNREACHABLE() != null) {
           icmpType = IcmpType.DESTINATION_UNREACHABLE;
           icmpCode = IcmpCode.PORT_UNREACHABLE;
+        } else if (feature.PRECEDENCE_UNREACHABLE() != null) {
+          icmpType = IcmpType.DESTINATION_UNREACHABLE;
+          icmpCode = IcmpCode.PRECEDENCE_CUTOFF_IN_EFFECT;
+        } else if (feature.PROTOCOL_UNREACHABLE() != null) {
+          icmpType = IcmpType.DESTINATION_UNREACHABLE;
+          icmpCode = IcmpCode.PROTOCOL_UNREACHABLE;
         } else if (feature.PSH() != null) {
           tcpFlags.add(
               TcpFlagsMatchConditions.builder()
@@ -3881,12 +3881,6 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
           icmpCode = IcmpCode.TTL_EQ_ZERO_DURING_TRANSIT;
         } else if (feature.UNREACHABLE() != null) {
           icmpType = IcmpType.DESTINATION_UNREACHABLE;
-        } else if (feature.URG() != null) {
-          tcpFlags.add(
-              TcpFlagsMatchConditions.builder()
-                  .setTcpFlags(TcpFlags.builder().setUrg(true).build())
-                  .setUseUrg(true)
-                  .build());
         } else if (feature.icmp_message_type != null) {
           icmpType = toInteger(feature.icmp_message_type);
           if (feature.icmp_message_code != null) {
@@ -3900,7 +3894,7 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
       return SimpleExtendedAccessListServiceSpecifier.builder()
           .setDscps(dscps)
           .setDstPortRanges(dstPortRanges)
-          .setEcns(ecns)
+          .setFragments(fragments)
           .setIcmpCode(icmpCode)
           .setIcmpType(icmpType)
           .setProtocol(protocol)
@@ -3958,7 +3952,6 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
     Integer icmpCode = null;
     List<TcpFlagsMatchConditions> tcpFlags = new ArrayList<>();
     Set<Integer> dscps = new TreeSet<>();
-    Set<Integer> ecns = new TreeSet<>();
     for (Extended_access_list_additional_featureContext feature : ctx.features) {
       if (feature.ACK() != null) {
         tcpFlags.add(
@@ -3968,21 +3961,12 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
                 .build());
       } else if (feature.DSCP() != null) {
         toDscpType(ctx, feature.dscp_type()).ifPresent(dscps::add);
-      } else if (feature.ECE() != null) {
-        tcpFlags.add(
-            TcpFlagsMatchConditions.builder()
-                .setTcpFlags(TcpFlags.builder().setEce(true).build())
-                .setUseEce(true)
-                .build());
       } else if (feature.ECHO_REPLY() != null) {
         icmpType = IcmpType.ECHO_REPLY;
         icmpCode = 0; /* Forced to 0 by RFC-792. */
       } else if (feature.ECHO() != null) {
         icmpType = IcmpType.ECHO_REQUEST;
         icmpCode = 0; /* Forced to 0 by RFC-792. */
-      } else if (feature.ECN() != null) {
-        int ecn = toInteger(feature.ecn);
-        ecns.add(ecn);
       } else if (feature.ESTABLISHED() != null) {
         // must contain ACK or RST
         tcpFlags.add(
@@ -4051,12 +4035,6 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
         icmpType = IcmpType.TRACEROUTE;
       } else if (feature.UNREACHABLE() != null) {
         icmpType = IcmpType.DESTINATION_UNREACHABLE;
-      } else if (feature.URG() != null) {
-        tcpFlags.add(
-            TcpFlagsMatchConditions.builder()
-                .setTcpFlags(TcpFlags.builder().setUrg(true).build())
-                .setUseUrg(true)
-                .build());
       } else {
         // warn(ctx, "Unsupported clause in IPv6 extended access list: " + feature.getText());
       }
@@ -4074,7 +4052,6 @@ public class CiscoXrControlPlaneExtractor extends CiscoXrParserBaseListener
             .setDstAddressGroup(dstAddressGroup)
             .setDstPortRanges(dstPortRanges)
             .setDscps(dscps)
-            .setEcns(ecns)
             .setIcmpCode(icmpCode)
             .setIcmpType(icmpType)
             .setTcpFlags(tcpFlags)
