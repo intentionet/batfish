@@ -1164,8 +1164,6 @@ public class CiscoXrConversions {
       newLine.getTcpFlags().addAll(tcpFlags);
       Set<Integer> dscps = fromLine.getDscps();
       newLine.getDscps().addAll(dscps);
-      Set<Integer> ecns = fromLine.getEcns();
-      newLine.getEcns().addAll(ecns);
       lines.add(newLine);
     }
     return new Ip6AccessList(name, lines);
