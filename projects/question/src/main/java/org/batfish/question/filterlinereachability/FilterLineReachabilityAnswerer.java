@@ -64,24 +64,18 @@ public class FilterLineReachabilityAnswerer extends Answerer {
   @Override
   public TableAnswerElement answer(NetworkSnapshot snapshot) {
     FilterLineReachabilityQuestion question = (FilterLineReachabilityQuestion) _question;
+    FilterLineReachabilityRows answerRows = new FilterLineReachabilityRows();
+
     SpecifierContext ctxt = _batfish.specifierContext(snapshot);
+
     Map<String, Set<IpAccessList>> specifiedAcls = getSpecifiedFilters(question, ctxt);
+
     SortedMap<String, Configuration> configurations = _batfish.loadConfigurations(snapshot);
-
-    FilterLineReachabilityRows answerRows = computeAnswer(configurations, specifiedAcls);
-
+    List<AclSpecs> aclSpecs = getAclSpecs(configurations, specifiedAcls, answerRows);
+    answerAclReachability(aclSpecs, answerRows);
     TableAnswerElement answer = new TableAnswerElement(createMetadata(question));
     answer.postProcessAnswer(question, answerRows.getRows());
     return answer;
-  }
-
-  public static FilterLineReachabilityRows computeAnswer(
-      SortedMap<String, Configuration> configurations,
-      Map<String, Set<IpAccessList>> specifiedAcls) {
-    FilterLineReachabilityRows answerRows = new FilterLineReachabilityRows();
-    List<AclSpecs> aclSpecs = getAclSpecs(configurations, specifiedAcls, answerRows);
-    answerAclReachability(aclSpecs, answerRows);
-    return answerRows;
   }
 
   private static final class AclNode {
@@ -371,7 +365,7 @@ public class FilterLineReachabilityAnswerer extends Answerer {
    *     given specified nodes and ACL regex.
    */
   @VisibleForTesting
-  static List<AclSpecs> getAclSpecs(
+  public static List<AclSpecs> getAclSpecs(
       SortedMap<String, Configuration> configurations,
       Map<String, Set<IpAccessList>> specifiedAcls,
       FilterLineReachabilityRows answer) {
@@ -574,7 +568,7 @@ public class FilterLineReachabilityAnswerer extends Answerer {
     return new BlockingProperties(answerLines.build(), diffAction);
   }
 
-  private static void answerAclReachabilityLine(
+  public static void answerAclReachabilityLine(
       AclSpecs aclSpec, BDDPacket bddPacket, FilterLineReachabilityRows answerRows) {
     BDDFactory bddFactory = bddPacket.getFactory();
     BDDSourceManager sourceMgr =
