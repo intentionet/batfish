@@ -1846,6 +1846,60 @@
         }
       },
       {
+        "Structure_Type" : "ipv4 access-list",
+        "Structure_Name" : "ICMP",
+        "Source_Lines" : {
+          "filename" : "configs/ios_xr_acl",
+          "lines" : [
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56
+          ]
+        }
+      },
+      {
         "Structure_Type" : "bgp af-group",
         "Structure_Name" : "blabbety",
         "Source_Lines" : {
@@ -3628,10 +3682,10 @@
       }
     ],
     "summary" : {
-      "notes" : "Found 240 results",
+      "notes" : "Found 241 results",
       "numFailed" : 0,
       "numPassed" : 0,
-      "numResults" : 240
+      "numResults" : 241
     }
   }
 ]

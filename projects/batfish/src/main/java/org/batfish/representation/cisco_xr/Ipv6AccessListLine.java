@@ -32,8 +32,6 @@ public class Ipv6AccessListLine implements Serializable {
 
     @Nullable private List<SubRange> _dstPortRanges;
 
-    @Nullable private Set<Integer> _ecns;
-
     @Nullable private Integer _icmpCode;
 
     @Nullable private Integer _icmpType;
@@ -84,11 +82,6 @@ public class Ipv6AccessListLine implements Serializable {
 
     public Ipv6AccessListLine.Builder setDstPortRanges(List<SubRange> dstPortRanges) {
       _dstPortRanges = dstPortRanges;
-      return this;
-    }
-
-    public Ipv6AccessListLine.Builder setEcns(Set<Integer> ecns) {
-      _ecns = ecns;
       return this;
     }
 
@@ -162,8 +155,6 @@ public class Ipv6AccessListLine implements Serializable {
 
   @Nonnull private final List<SubRange> _dstPortRanges;
 
-  @Nonnull private final Set<Integer> _ecns;
-
   @Nullable private final Integer _icmpCode;
 
   @Nullable private final Integer _icmpType;
@@ -192,7 +183,6 @@ public class Ipv6AccessListLine implements Serializable {
     _dstAddressGroup = builder._dstAddressGroup;
     _dstIpWildcard = requireNonNull(builder._dstIpWildcard);
     _dstPortRanges = ImmutableList.copyOf(requireNonNull(builder._dstPortRanges));
-    _ecns = ImmutableSet.copyOf(requireNonNull(builder._ecns));
     _icmpCode = builder._icmpCode;
     _icmpType = builder._icmpType;
     _name = requireNonNull(builder._name);
@@ -229,11 +219,6 @@ public class Ipv6AccessListLine implements Serializable {
   @Nonnull
   public List<SubRange> getDstPorts() {
     return _dstPortRanges;
-  }
-
-  @Nonnull
-  public Set<Integer> getEcns() {
-    return _ecns;
   }
 
   @Nullable

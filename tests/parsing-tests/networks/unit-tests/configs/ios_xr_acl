@@ -9,3 +9,49 @@ ethernet-services access-list sc-coe
 ipv4 access-list DENY_ALL
  5 deny ipv4 any any icmp-off
 !
+ipv4 access-list ICMP
+  10 deny icmp any any administratively-prohibited
+  20 deny icmp any any alternate-address
+  30 deny icmp any any conversion-error
+  40 deny icmp any any dod-host-prohibited
+  50 deny icmp any any dod-net-prohibited
+  60 deny icmp any any echo
+  70 deny icmp any any echo-reply
+  80 deny icmp any any general-parameter-problem
+  90 deny icmp any any host-isolated
+ 100 deny icmp any any host-precedence-unreachable
+ 110 deny icmp any any host-redirect
+ 120 deny icmp any any host-tos-redirect
+ 130 deny icmp any any host-tos-unreachable
+ 140 deny icmp any any host-unknown
+ 150 deny icmp any any host-unreachable
+ 160 deny icmp any any information-reply
+ 170 deny icmp any any information-request
+ 180 deny icmp any any mask-reply
+ 190 deny icmp any any mask-request
+ 200 deny icmp any any mobile-redirect
+ 210 deny icmp any any net-redirect
+ 220 deny icmp any any net-tos-redirect
+ 230 deny icmp any any net-tos-unreachable
+ 240 deny icmp any any net-unreachable
+ 250 deny icmp any any network-unknown
+ 260 deny icmp any any no-room-for-option
+ 270 deny icmp any any option-missing
+ 280 deny icmp any any packet-too-big
+ 290 deny icmp any any parameter-problem
+ 300 deny icmp any any port-unreachable
+ 310 deny icmp any any precedence-unreachable
+ 320 deny icmp any any protocol-unreachable
+ 330 deny icmp any any reassembly-timeout
+ 340 deny icmp any any redirect
+ 350 deny icmp any any router-advertisement
+ 360 deny icmp any any router-solicitation
+ 370 deny icmp any any source-quench
+ 380 deny icmp any any source-route-failed
+ 390 deny icmp any any time-exceeded
+ 400 deny icmp any any timestamp-reply
+ 410 deny icmp any any timestamp-request
+ 420 deny icmp any any traceroute
+ 430 deny icmp any any ttl-exceeded
+ 440 deny icmp any any unreachable
+!
