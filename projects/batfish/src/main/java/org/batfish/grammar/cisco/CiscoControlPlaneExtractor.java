@@ -972,7 +972,6 @@ import org.batfish.grammar.cisco.CiscoParser.Switching_mode_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Switchport_trunk_encapsulationContext;
 import org.batfish.grammar.cisco.CiscoParser.T_serverContext;
 import org.batfish.grammar.cisco.CiscoParser.T_source_interfaceContext;
-import org.batfish.grammar.cisco.CiscoParser.Template_peer_address_familyContext;
 import org.batfish.grammar.cisco.CiscoParser.Template_peer_policy_rb_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Template_peer_session_rb_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Tl_objectContext;
@@ -998,7 +997,6 @@ import org.batfish.grammar.cisco.CiscoParser.Viafv_addressContext;
 import org.batfish.grammar.cisco.CiscoParser.Viafv_preemptContext;
 import org.batfish.grammar.cisco.CiscoParser.Viafv_priorityContext;
 import org.batfish.grammar.cisco.CiscoParser.Vlan_idContext;
-import org.batfish.grammar.cisco.CiscoParser.Vrf_block_rb_stanzaContext;
 import org.batfish.grammar.cisco.CiscoParser.Vrfd_address_familyContext;
 import org.batfish.grammar.cisco.CiscoParser.Vrfd_af_export_nonvpnContext;
 import org.batfish.grammar.cisco.CiscoParser.Vrfd_af_export_vpnContext;
@@ -3560,11 +3558,6 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void enterVrf_block_rb_stanza(Vrf_block_rb_stanzaContext ctx) {
-    enterBgpVrfAndPushNewPeer(ctx.name.getText());
-  }
-
-  @Override
   public void enterVrrp_interface(Vrrp_interfaceContext ctx) {
     _currentVrrpInterface = getCanonicalInterfaceName(ctx.iface.getText());
     _configuration.referenceStructure(
@@ -4223,7 +4216,8 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   @Override
   public void exitDefault_information_originate_rb_stanza(
       Default_information_originate_rb_stanzaContext ctx) {
-    _currentPeerGroup.setDefaultOriginate(true);
+    BgpProcess proc = currentVrf().getBgpProcess();
+    proc.setDefaultInformationOriginate(true);
   }
 
   @Override
@@ -9034,11 +9028,6 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   }
 
   @Override
-  public void exitTemplate_peer_address_family(Template_peer_address_familyContext ctx) {
-    popPeer();
-  }
-
-  @Override
   public void exitTemplate_peer_policy_rb_stanza(Template_peer_policy_rb_stanzaContext ctx) {
     _currentIpPeerGroup = null;
     _currentIpv6PeerGroup = null;
@@ -9162,12 +9151,6 @@ public class CiscoControlPlaneExtractor extends CiscoParserBaseListener
   public void exitViafv_priority(Viafv_priorityContext ctx) {
     int priority = toInteger(ctx.priority);
     _currentVrrpGroup.setPriority(priority);
-  }
-
-  @Override
-  public void exitVrf_block_rb_stanza(Vrf_block_rb_stanzaContext ctx) {
-    _currentVrf = Configuration.DEFAULT_VRF_NAME;
-    popPeer();
   }
 
   @Override

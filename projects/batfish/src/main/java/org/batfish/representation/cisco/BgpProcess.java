@@ -36,7 +36,8 @@ public class BgpProcess implements Serializable {
   private Ip _clusterId;
   private @Nullable Long _confederation;
   private final @Nonnull Set<Long> _confederationMembers;
-
+  // TODO Make default-information originate specific to address-family
+  private boolean _defaultInformationOriginate;
   private boolean _defaultIpv4Activate;
 
   private boolean _defaultIpv6Activate;
@@ -187,6 +188,14 @@ public class BgpProcess implements Serializable {
 
   public @Nonnull Set<Long> getConfederationMembers() {
     return _confederationMembers;
+  }
+
+  public boolean getDefaultInformationOriginate() {
+    return _defaultInformationOriginate;
+  }
+
+  public void setDefaultInformationOriginate(boolean defaultInformationOriginate) {
+    _defaultInformationOriginate = defaultInformationOriginate;
   }
 
   public int getDefaultMetric() {

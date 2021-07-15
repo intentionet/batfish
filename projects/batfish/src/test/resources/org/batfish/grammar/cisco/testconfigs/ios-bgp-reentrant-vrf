@@ -3,11 +3,13 @@ hostname ios-bgp-reentrant-vrf
 !
 router bgp 1
 !
-  vrf a
+  address-family ipv4 vrf a
     local-as 5
     router-id 1.2.3.4
+  exit-address-family
 !
 router bgp 1
-  vrf a
+  address-family ipv4 vrf a
     router-id 1.2.3.5
+  exit-address-family
 !

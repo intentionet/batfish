@@ -13,18 +13,15 @@ router ospf 1
 !
 router bgp 2
   router-id 10.1.1.2
-  vrf VRFNAME
-  address-family ipv4 unicast
-  default-originate route-map rm_bgp
   redistribute connected route-map rm_bgp
   redistribute ospf route-map rm_bgp
   redistribute ospf3 route-map rm_bgp
   redistribute rip route-map rm_bgp
   redistribute static route-map rm_bgp
   neighbor 1.2.3.4 remote-as 1234
-    address-family ipv4 unicast
-    route-map rm_bgp out
-    route-map rm_bgp in
+  neighbor 1.2.3.4 route-map rm_bgp out
+  neighbor 1.2.3.4 route-map rm_bgp in
+  neighbor 1.2.3.4 default-originate route-map rm_bgp
   network 10.1.1.3 route-map rm_bgp
 !
 route-map rm_ospf permit 10

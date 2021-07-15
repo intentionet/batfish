@@ -1281,10 +1281,14 @@ public final class CiscoConfiguration extends VendorConfiguration {
         throw new IllegalStateException(
             String.format("Unexpected protocol for BGP redistribution: %s", srcProtocol));
     }
-    BooleanExpr redistExpr = matchProtocol;
-    if (mapName != null) {
-      redistExpr = new Conjunction(ImmutableList.of(matchProtocol, new CallExpr(mapName)));
-    }
+    List<BooleanExpr> matchConjuncts =
+        Stream.of(
+                matchProtocol,
+                bgpProcess.getDefaultInformationOriginate() ? null : NOT_DEFAULT_ROUTE,
+                mapName == null ? null : new CallExpr(mapName))
+            .filter(Objects::nonNull)
+            .collect(ImmutableList.toImmutableList());
+    Conjunction redistExpr = new Conjunction(matchConjuncts);
     redistExpr.setComment(String.format("Redistribute %s routes into BGP", srcProtocol));
     return new If(redistExpr, ImmutableList.of(Statements.ExitAccept.toStaticStatement()));
   }

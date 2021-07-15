@@ -19,5 +19,6 @@ router bgp 1
   redistribute static
   neighbor 10.1.0.0 activate
   neighbor 10.1.0.0 update-source Loopback0
+ exit-address-family
  !
 !

@@ -22,4 +22,5 @@ router bgp 1
   redistribute static route-map pref
   neighbor 10.1.0.1 activate
   neighbor 10.1.0.1 update-source Loopback0
+ exit-address-family
 !

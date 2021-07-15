@@ -18,4 +18,5 @@ router bgp 45000
  address-family ipv4 vrf vrf-A
  import path selection all
  import path limit 3
+ exit-address-family
 !

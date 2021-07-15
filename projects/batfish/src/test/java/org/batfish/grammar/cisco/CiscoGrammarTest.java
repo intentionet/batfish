@@ -266,6 +266,7 @@ import org.batfish.common.util.CommonUtil;
 import org.batfish.common.util.IpsecUtil;
 import org.batfish.config.Settings;
 import org.batfish.datamodel.AbstractRoute;
+import org.batfish.datamodel.AbstractRouteDecorator;
 import org.batfish.datamodel.AnnotatedRoute;
 import org.batfish.datamodel.AsPath;
 import org.batfish.datamodel.AsSet;
@@ -878,6 +879,44 @@ public final class CiscoGrammarTest {
       assertThat(neighbor.getLocalAs(), equalTo(65112L));
       assertThat(neighbor.getRemoteAsns().enumerate(), contains(65134L));
     }
+  }
+
+  @Test
+  public void testBgpDefaultInformationOriginate() throws IOException {
+    /*
+     * Default-information originate is required for default routes to be redistributed into BGP via
+     * redistribute statements. It does not affect routes added to BGP via network statements.
+     *
+     * Config contains four VRFs, each of which contains a static default route.
+     * - VRF1 redistributes static and has default-information originate configured.
+     * - VRF2 redistributes static, but does not have default-information originate.
+     * - VRF3 has default-information originate, but does not redistribute static.
+     * - VRF4 has a network statement for 0.0.0.0/0 and does not have default-information originate.
+     *
+     * VRFs 1 and 4 should have a redistributed BGP default route.
+     */
+    String hostname = "bgp-default-information-originate";
+    Batfish batfish = getBatfishForConfigurationNames(hostname);
+    batfish.computeDataPlane(batfish.getSnapshot());
+    DataPlane dp = batfish.loadDataPlane(batfish.getSnapshot());
+
+    // Sanity check: All VRFs' main RIBs should contain static default routes
+    Matcher<Iterable<? extends AbstractRouteDecorator>> containsStaticDefaultRoute =
+        contains(allOf(hasPrefix(Prefix.ZERO), hasProtocol(RoutingProtocol.STATIC)));
+    assertThat(dp.getRibs().get(hostname).get("VRF1").getTypedRoutes(), containsStaticDefaultRoute);
+    assertThat(dp.getRibs().get(hostname).get("VRF2").getTypedRoutes(), containsStaticDefaultRoute);
+    assertThat(dp.getRibs().get(hostname).get("VRF3").getTypedRoutes(), containsStaticDefaultRoute);
+    assertThat(dp.getRibs().get(hostname).get("VRF4").getTypedRoutes(), containsStaticDefaultRoute);
+
+    // Only VRF1 and VRF4 should have default route in BGP
+    Set<Bgpv4Route> vrf1BgpRoutes = dp.getBgpRoutes().get(hostname, "VRF1");
+    Set<Bgpv4Route> vrf2BgpRoutes = dp.getBgpRoutes().get(hostname, "VRF2");
+    Set<Bgpv4Route> vrf3BgpRoutes = dp.getBgpRoutes().get(hostname, "VRF3");
+    Set<Bgpv4Route> vrf4BgpRoutes = dp.getBgpRoutes().get(hostname, "VRF4");
+    assertThat(vrf1BgpRoutes, hasItem(hasPrefix(Prefix.ZERO)));
+    assertThat(vrf2BgpRoutes, empty());
+    assertThat(vrf3BgpRoutes, empty());
+    assertThat(vrf4BgpRoutes, hasItem(hasPrefix(Prefix.ZERO)));
   }
 
   @Test
@@ -1637,18 +1676,14 @@ public final class CiscoGrammarTest {
      policies include the default route export policy, but we don't have to worry about the
      default-originate route overwriting other default routes in neighbors' RIBs.
 
-     The originator has a static default route and redistributes it to BGP on both peers with a
-     route-map that sets community 50, so we can be certain of the route's origin in neighbors.
+     The originator has a static default route which is added to BGP via a network statement with
+     a route-map that sets community 50, so we can be certain of the route's origin in neighbors.
 
      We should see the redistributed local route in the originator's BGP RIB.
 
      Peer 1 has no outbound route-map, so the static route should be redistributed to listener 1.
 
      Peer 2 has an outbound route-map that denies 0.0.0.0/0, so no default route on listener 2.
-
-     TODO The originator should probably need default-information originate configured in order
-      to redistribute default routes at all. We do not currently handle default-information
-      originate correctly.
     */
     String testrigName = "ios-default-originate";
     String originatorName = "originator-static-route";
@@ -1680,7 +1715,7 @@ public final class CiscoGrammarTest {
             .setAsPath(AsPath.empty())
             .setLocalPreference(100)
             .setOriginatorIp(originatorId)
-            .setOriginType(OriginType.INCOMPLETE)
+            .setOriginType(OriginType.IGP)
             .setProtocol(RoutingProtocol.BGP)
             .setSrcProtocol(RoutingProtocol.STATIC)
             .setReceivedFromIp(Ip.ZERO) // indicates local origination

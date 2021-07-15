@@ -1,0 +1,44 @@
+!
+hostname bgp-default-information-originate
+!
+vrf definition VRF1
+ rd 1:1
+ address-family ipv4
+ exit-address-family
+vrf definition VRF2
+ rd 1:2
+ address-family ipv4
+ exit-address-family
+vrf definition VRF3
+ rd 1:3
+ address-family ipv4
+ exit-address-family
+vrf definition VRF4
+ rd 1:4
+ address-family ipv4
+ exit-address-family
+!
+ip route vrf VRF1 0.0.0.0 0.0.0.0 Null0
+ip route vrf VRF2 0.0.0.0 0.0.0.0 Null0
+ip route vrf VRF3 0.0.0.0 0.0.0.0 Null0
+ip route vrf VRF4 0.0.0.0 0.0.0.0 Null0
+!
+router bgp 1
+ bgp router-id 1.1.1.1
+ !
+ address-family ipv4 vrf VRF1
+  default-information originate
+  redistribute static
+ exit-address-family
+ !
+ address-family ipv4 vrf VRF2
+  redistribute static
+ exit-address-family
+ !
+ address-family ipv4 vrf VRF3
+  default-information originate
+ exit-address-family
+ !
+ address-family ipv4 vrf VRF4
+  network 0.0.0.0/0
+ exit-address-family

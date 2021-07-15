@@ -15,7 +15,7 @@ interface Ethernet2
 !
 router bgp 1
  bgp router-id 1.1.1.1
- redistribute static route-map SET_COMMUNITY_50
+ network 0.0.0.0/0 route-map SET_COMMUNITY_50
  !
  ! Neither peer will generate default route because PERMIT_1234 will prevent generation.
  !

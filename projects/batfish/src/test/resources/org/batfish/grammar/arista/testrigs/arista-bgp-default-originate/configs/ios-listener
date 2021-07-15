@@ -22,12 +22,16 @@ interface FastEthernet0/3
 !
 router bgp 2
   bgp router-id 2.2.2.2
-  vrf VRF1
+  address-family ipv4 vrf VRF1
     neighbor 10.1.1.1 remote-as 1
-  vrf VRF2
+  exit-address-family
+  address-family ipv4 vrf VRF2
     neighbor 10.2.2.1 remote-as 1
-  vrf VRF3
+  exit-address-family
+  address-family ipv4 vrf VRF3
     neighbor 10.3.3.1 remote-as 1
-  vrf VRF4
+  exit-address-family
+  address-family ipv4 vrf VRF4
     neighbor 10.4.4.1 remote-as 1
+  exit-address-family
 !

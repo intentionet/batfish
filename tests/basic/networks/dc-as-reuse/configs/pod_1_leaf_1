@@ -81,6 +81,7 @@ router bgp 50001
   neighbor 1.1.1.2 activate
   neighbor 2.1.1.1 activate
   network 5.1.1.1 mask 255.255.255.255
+ exit-address-family
  !
 !
 no logging console

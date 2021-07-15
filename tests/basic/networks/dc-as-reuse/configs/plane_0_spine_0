@@ -70,6 +70,7 @@ router bgp 60000
   neighbor 2.0.0.0 activate
   neighbor 2.1.0.0 activate
   network 6.0.0.1 mask 255.255.255.255
+ exit-address-family
  !
 !
 no logging console

@@ -78,6 +78,7 @@ router bgp 10100
   neighbor 1.1.0.3 activate
   network 4.1.0.1 mask 255.255.255.255
   network 3.1.0.0 mask 255.255.255.254
+ exit-address-family
  !
 !
 no logging console
