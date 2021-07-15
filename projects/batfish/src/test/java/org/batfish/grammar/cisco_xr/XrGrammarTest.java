@@ -167,7 +167,9 @@ import org.batfish.datamodel.ConnectedRoute;
 import org.batfish.datamodel.DataPlane;
 import org.batfish.datamodel.DscpType;
 import org.batfish.datamodel.Flow;
+import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.Interface;
+import org.batfish.datamodel.InterfaceType;
 import org.batfish.datamodel.Ip;
 import org.batfish.datamodel.Ip6;
 import org.batfish.datamodel.Ip6AccessList;
@@ -181,6 +183,7 @@ import org.batfish.datamodel.Prefix6;
 import org.batfish.datamodel.RoutingProtocol;
 import org.batfish.datamodel.StaticRoute;
 import org.batfish.datamodel.SubRange;
+import org.batfish.datamodel.SwitchportMode;
 import org.batfish.datamodel.answers.ConvertConfigurationAnswerElement;
 import org.batfish.datamodel.answers.ParseVendorConfigurationAnswerElement;
 import org.batfish.datamodel.bgp.BgpAggregate;
@@ -3553,5 +3556,167 @@ public final class XrGrammarTest {
                         "Rewrite policy can only be configured on l2transport interfaces. Ignoring"
                             + " this line."),
                     hasText("rewrite ingress tag pop 1 symmetric")))));
+  }
+
+  @Test
+  public void testL2vpnConversion() {
+    // Trunk-like configuration is converted to trunk-like VI model representation
+    {
+      String hostname = "l2vpn_trunk";
+      Configuration c = parseConfig(hostname);
+
+      Map<String, Interface> ifaces = c.getAllInterfaces();
+      assertThat(
+          ifaces,
+          hasKeys(
+              containsInAnyOrder(
+                  "BVI123", "GigabitEthernet0/0/0/1.123", "GigabitEthernet0/0/0/2.123")));
+
+      Interface bvi = ifaces.get("BVI123");
+      assertThat(bvi.getInterfaceType(), equalTo(InterfaceType.VLAN));
+      assertThat(bvi.getVlan(), equalTo(123));
+
+      Interface ge1123 = ifaces.get("GigabitEthernet0/0/0/1.123");
+      assertTrue(ge1123.getActive());
+      assertTrue(ge1123.getSwitchport());
+      assertThat(ge1123.getSwitchportMode(), equalTo(SwitchportMode.TRUNK));
+      assertThat(ge1123.getAllowedVlans(), equalTo(IntegerSpace.of(123)));
+      assertNull(ge1123.getEncapsulationVlan());
+      assertNull(ge1123.getNativeVlan());
+
+      Interface ge2123 = ifaces.get("GigabitEthernet0/0/0/2.123");
+      assertTrue(ge2123.getActive());
+      assertTrue(ge2123.getSwitchport());
+      assertThat(ge2123.getSwitchportMode(), equalTo(SwitchportMode.TRUNK));
+      assertThat(ge2123.getAllowedVlans(), equalTo(IntegerSpace.of(123)));
+      assertNull(ge2123.getEncapsulationVlan());
+      assertNull(ge2123.getNativeVlan());
+    }
+
+    // Configuration that can't be successfully converted should have relevant ifaces deactivated
+    {
+      String hostname = "l2vpn_asymmetric_tagging";
+      Configuration c = parseConfig(hostname);
+
+      Map<String, Interface> ifaces = c.getAllInterfaces();
+      assertThat(ifaces, hasKeys(containsInAnyOrder("BVI1", "GigabitEthernet0/0/0/1.1")));
+
+      Interface bvi1 = ifaces.get("BVI1");
+      assertFalse(bvi1.getActive());
+
+      Interface ge11 = ifaces.get("GigabitEthernet0/0/0/1.1");
+      assertFalse(ge11.getActive());
+    }
+  }
+
+  /**
+   * Confirm violating any of the requirements for successfully converting L2vpn to VI model
+   * generates warnings
+   */
+  @Test
+  public void testL2vpnConversionWarning() {
+    {
+      String hostname = "l2vpn_trunk";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      // No warnings for good config
+      assertThat(ccae.getWarnings(), not(hasKey(equalTo(hostname))));
+    }
+    {
+      String hostname = "l2vpn_vlan_in_many_domains";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      assertThat(
+          ccae,
+          hasRedFlagWarning(
+              hostname,
+              containsString(
+                  "Batfish cannot yet model multiple bridge-domains that share the same VLAN, like"
+                      + " BD1 and BD2. This device's L2vpn will be ignored by Batfish.")));
+    }
+    {
+      String hostname = "l2vpn_many_vlans_in_domain";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      assertThat(
+          ccae,
+          hasRedFlagWarning(
+              hostname,
+              containsString(
+                  "Batfish cannot yet model bridge-domains with more than one VLAN, like BD1. This"
+                      + " device's L2vpn will be ignored by Batfish.")));
+    }
+    {
+      String hostname = "l2vpn_bvi_vlan_mismatch";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      assertThat(
+          ccae,
+          hasRedFlagWarning(
+              hostname,
+              containsString(
+                  "Batfish cannot yet model BVI whose number doesn't match their contained VLAN,"
+                      + " like BVI1 vs VLAN 234. This device's L2vpn will be ignored by"
+                      + " Batfish.")));
+    }
+    {
+      String hostname = "l2vpn_bvi_outside_domain";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      assertThat(
+          ccae,
+          hasRedFlagWarning(
+              hostname,
+              containsString(
+                  "Batfish cannot yet model BVI not associated with a bridge-domain, like BVI1."
+                      + " This device's L2vpn will be ignored by Batfish.")));
+    }
+    {
+      String hostname = "l2vpn_no_dot1q_encap";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      assertThat(
+          ccae,
+          hasRedFlagWarning(
+              hostname,
+              containsString(
+                  "Batfish cannot yet model L2 interfaces without dot1q encapsulation, like"
+                      + " GigabitEthernet0/0/0/1.1. This device's L2vpn will be ignored by"
+                      + " Batfish.")));
+    }
+    {
+      String hostname = "l2vpn_asymmetric_tagging";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      assertThat(
+          ccae,
+          hasRedFlagWarning(
+              hostname,
+              containsString(
+                  "Batfish cannot yet model L2 interfaces with rewrite policies like"
+                      + " GigabitEthernet0/0/0/1.1 (must be 'rewrite ingress tag pop 1 symmetric')."
+                      + " This device's L2vpn will be ignored by Batfish.")));
+    }
+    {
+      String hostname = "l2vpn_l2_outside_domain";
+      Batfish batfish = getBatfishForConfigurationNames(hostname);
+      ConvertConfigurationAnswerElement ccae =
+          batfish.loadConvertConfigurationAnswerElementOrReparse(batfish.getSnapshot());
+      assertThat(
+          ccae,
+          hasRedFlagWarning(
+              hostname,
+              containsString(
+                  "Batfish cannot yet model L2 interfaces that are not in bridge-domain, like"
+                      + " GigabitEthernet0/0/0/1.1. This device's L2vpn will be ignored by"
+                      + " Batfish.")));
+    }
   }
 }

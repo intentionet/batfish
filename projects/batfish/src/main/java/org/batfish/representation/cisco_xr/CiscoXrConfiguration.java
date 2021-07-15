@@ -1,6 +1,7 @@
 package org.batfish.representation.cisco_xr;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 import static org.batfish.common.util.CollectionUtil.toImmutableSortedMap;
 import static org.batfish.datamodel.Interface.UNSET_LOCAL_INTERFACE;
@@ -56,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +93,7 @@ import org.batfish.datamodel.GeneratedRoute6;
 import org.batfish.datamodel.IkePhase1Key;
 import org.batfish.datamodel.IkePhase1Policy;
 import org.batfish.datamodel.IkePhase1Proposal;
+import org.batfish.datamodel.IntegerSpace;
 import org.batfish.datamodel.Interface.Dependency;
 import org.batfish.datamodel.Interface.DependencyType;
 import org.batfish.datamodel.InterfaceAddress;
@@ -1111,8 +1114,21 @@ public final class CiscoXrConfiguration extends VendorConfiguration {
     return null;
   }
 
+  /**
+   * Convert the specified interface into VI model representation.
+   *
+   * <p>If {@code modelL2vpnAsTrunk} is {@code true}, then L2 interfaces are converted as switchport
+   * interfaces with switchport mode trunk.
+   *
+   * <p>If {@code modelL2vpnAsTrunk} is {@code false}, then any L2 or BVI interfaces are set
+   * inactive.
+   */
   private org.batfish.datamodel.Interface toInterface(
-      String ifaceName, Interface iface, Map<String, IpAccessList> ipAccessLists, Configuration c) {
+      String ifaceName,
+      Interface iface,
+      Map<String, IpAccessList> ipAccessLists,
+      Configuration c,
+      boolean modelL2vpnAsTrunk) {
     org.batfish.datamodel.Interface newIface =
         org.batfish.datamodel.Interface.builder()
             .setName(ifaceName)
@@ -1178,7 +1194,11 @@ public final class CiscoXrConfiguration extends VendorConfiguration {
     } else {
       newIface.setSwitchportMode(SwitchportMode.NONE);
       if (newIface.getInterfaceType() == InterfaceType.VLAN) {
-        newIface.setVlan(CommonUtil.getInterfaceVlanNumber(ifaceName));
+        if (ifaceName.startsWith("BVI")) {
+          newIface.setVlan(CommonUtil.getInterfaceNumber("BVI", ifaceName));
+        } else {
+          newIface.setVlan(CommonUtil.getInterfaceVlanNumber(ifaceName));
+        }
         newIface.setAutoState(iface.getAutoState());
       }
 
@@ -1193,6 +1213,28 @@ public final class CiscoXrConfiguration extends VendorConfiguration {
 
       // subinterface settings
       newIface.setEncapsulationVlan(iface.getEncapsulationVlan());
+    }
+
+    // Handle L2 interface config
+    if (iface.getL2transport() && modelL2vpnAsTrunk) {
+      // Guaranteed by canModelL2vpn
+      assert iface.getEncapsulationVlan() != null;
+
+      newIface.setSwitchport(true);
+      newIface.setSwitchportMode(SwitchportMode.TRUNK);
+      newIface.setAllowedVlans(IntegerSpace.of(iface.getEncapsulationVlan()));
+      newIface.setNativeVlan(null);
+      newIface.setEncapsulationVlan(null);
+    }
+    if (iface.getL2transport() || ifaceName.startsWith("BVI")) {
+      if (!modelL2vpnAsTrunk) {
+        _w.redFlag(
+            String.format(
+                "Batfish cannot yet model this device's l2vpn configuration, so disabling interface"
+                    + " %s",
+                ifaceName));
+        newIface.setActive(false);
+      }
     }
 
     EigrpProcess eigrpProcess = null;
@@ -1977,11 +2019,12 @@ public final class CiscoXrConfiguration extends VendorConfiguration {
       c.getRoutingPolicies().put(routingPolicy.getName(), routingPolicy);
     }
 
+    boolean modelL2vpn = canModelL2vpnAsTrunk();
     // convert interfaces
     _interfaces.forEach(
         (ifaceName, iface) -> {
           org.batfish.datamodel.Interface newInterface =
-              toInterface(ifaceName, iface, c.getIpAccessLists(), c);
+              toInterface(ifaceName, iface, c.getIpAccessLists(), c, modelL2vpn);
           String vrfName = iface.getVrf();
           if (vrfName == null) {
             throw new BatfishException("Missing vrf name for iface: '" + ifaceName + "'");
@@ -2254,6 +2297,163 @@ public final class CiscoXrConfiguration extends VendorConfiguration {
     CiscoXrStructureType.ABSTRACT_STRUCTURES.asMap().forEach(this::markAbstractStructureAllUsages);
 
     return ImmutableList.of(c);
+  }
+
+  /**
+   * Indicates if the L2vpn configured for this device can be modeled as VLAN interfaces and L2
+   * interfaces in switchport mode trunk. Adds a warning if not.
+   *
+   * <p>All of the following must be satisfied in order to represent the l2vpn / l2transport
+   * configuration with our simplified model:
+   *
+   * <ul>
+   *   <li>1. VLANs and bridge-domains must have a 1:1 relationship
+   *   <li>2. All BVIs must be:
+   *       <ul>
+   *         <li>2a. Numbered according to the VLAN for its bridge-domain
+   *         <li>2b. The routed interface for a bridge-domain
+   *       </ul>
+   *   <li>3. All L2 interfaces must:
+   *       <ul>
+   *         <li>3a. Have dot1q encapsulation
+   *         <li>3b. Have symmetric outer tagging (`rewrite ingress tag pop 1 symmetric`)
+   *         <li>3c. Be in a bridge-domain
+   *       </ul>
+   * </ul>
+   *
+   * <p>This is only needed while Batfish requires a simplified VI representation for L2 interfaces.
+   */
+  private boolean canModelL2vpnAsTrunk() {
+    Set<String> ifacesInBridgeDomain = new HashSet<>();
+    Set<String> routedIfaces = new HashSet<>();
+    Map<Integer, BridgeDomain> vlanToBridgeDomain = new HashMap<>();
+
+    for (BridgeGroup bg : _bridgeGroups.values()) {
+      for (BridgeDomain bd : bg.getBridgeDomains().values()) {
+        Set<String> interfaces = bd.getInterfaces();
+        ifacesInBridgeDomain.addAll(interfaces);
+
+        // VLANs <-> bridge-domains must be 1:1 (#1 above)
+        Set<Integer> vlans = getL2transportVlans(interfaces);
+        if (vlans.size() != 1) {
+          _w.redFlag(
+              String.format(
+                  "Batfish cannot yet model bridge-domains with more than one VLAN, like %s. This"
+                      + " device's L2vpn will be ignored by Batfish.",
+                  bd.getName()));
+          return false;
+        }
+        Integer vlan = getOnlyElement(vlans);
+        if (vlanToBridgeDomain.containsKey(vlan)) {
+          _w.redFlag(
+              String.format(
+                  "Batfish cannot yet model multiple bridge-domains that share the same VLAN, like"
+                      + " %s and %s. This device's L2vpn will be ignored by Batfish.",
+                  bd.getName(), vlanToBridgeDomain.get(vlan).getName()));
+          return false;
+        }
+        vlanToBridgeDomain.put(vlan, bd);
+
+        // Routed interface VLAN mismatch (#2a above)
+        String routedIfaceName = bd.getRoutedInterface();
+        if (routedIfaceName != null
+            && !vlan.equals(CommonUtil.getInterfaceNumber("BVI", routedIfaceName))) {
+          _w.redFlag(
+              String.format(
+                  "Batfish cannot yet model BVI whose number doesn't match their contained VLAN,"
+                      + " like %s vs VLAN %s. This device's L2vpn will be ignored by Batfish.",
+                  routedIfaceName, vlan));
+          return false;
+        }
+        routedIfaces.add(routedIfaceName);
+      }
+    }
+
+    for (Interface iface : _interfaces.values()) {
+      String ifaceName = iface.getName();
+      if (ifaceName.startsWith("BVI")) {
+        // BVIs must be routed interfaces (#2b above)
+        if (!routedIfaces.contains(ifaceName)) {
+          _w.redFlag(
+              String.format(
+                  "Batfish cannot yet model BVI not associated with a bridge-domain, like %s. This"
+                      + " device's L2vpn will be ignored by Batfish.",
+                  ifaceName));
+          return false;
+        }
+      } else {
+        if (!iface.getL2transport()) {
+          continue;
+        }
+
+        // Dot1q (#3a above)
+        if (iface.getEncapsulationVlan() == null) {
+          _w.redFlag(
+              String.format(
+                  "Batfish cannot yet model L2 interfaces without dot1q encapsulation, like %s."
+                      + " This device's L2vpn will be ignored by Batfish.",
+                  ifaceName));
+          return false;
+        }
+
+        // Symmetric outer tagging (#3b above)
+        if (!rewritePolicyIsPop1Symmetric(iface.getRewriteIngressTag())) {
+          _w.redFlag(
+              String.format(
+                  "Batfish cannot yet model L2 interfaces with rewrite policies like %s (must be"
+                      + " 'rewrite ingress tag pop 1 symmetric'). This device's L2vpn will be"
+                      + " ignored by Batfish.",
+                  ifaceName));
+          return false;
+        }
+
+        // In a bridge-domain (#3c above)
+        if (!ifacesInBridgeDomain.contains(ifaceName)) {
+          _w.redFlag(
+              String.format(
+                  "Batfish cannot yet model L2 interfaces that are not in bridge-domain, like %s."
+                      + " This device's L2vpn will be ignored by Batfish.",
+                  ifaceName));
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Returns a boolean indicating if specified {@link TagRewritePolicy} corresponds to `rewrite
+   * ingress tag pop 1 symmetric`, i.e. makes the associated interface behave like an interface in
+   * trunk mode with a single allowed VLAN.
+   */
+  private boolean rewritePolicyIsPop1Symmetric(@Nullable TagRewritePolicy rewritePolicy) {
+    if (!(rewritePolicy instanceof TagRewritePop)) {
+      return false;
+    }
+    TagRewritePop policy = (TagRewritePop) rewritePolicy;
+    return policy.getPopCount() == 1 && policy.getSymmetric();
+  }
+
+  /**
+   * Returns a set of all encapsulation VLANs for the supplied interface names. Ignores non-existent
+   * interfaces and interfaces without encapsulation VLAN set.
+   */
+  private Set<Integer> getL2transportVlans(Set<String> ifaceNames) {
+    ImmutableSet.Builder<Integer> vlans = ImmutableSet.builder();
+    for (String ifaceName : ifaceNames) {
+      Interface iface = _interfaces.get(ifaceName);
+      if (iface == null) {
+        continue;
+      }
+      Integer vlan = iface.getEncapsulationVlan();
+      if (vlan == null) {
+        continue;
+      }
+
+      vlans.add(vlan);
+    }
+    return vlans.build();
   }
 
   private void convertCommunitySets(Configuration c) {

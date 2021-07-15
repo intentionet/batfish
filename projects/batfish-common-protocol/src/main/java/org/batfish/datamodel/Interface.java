@@ -647,6 +647,8 @@ public final class Interface extends ComparableStructure<String> {
       } else {
         return InterfaceType.AGGREGATED;
       }
+    } else if (name.startsWith("BVI")) {
+      return InterfaceType.VLAN;
     } else if (name.startsWith("cmp-mgmt")) {
       return InterfaceType.PHYSICAL;
     } else if (name.startsWith("Crypto-Engine")) {

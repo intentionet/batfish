@@ -1,0 +1,20 @@
+!RANCID-CONTENT-TYPE: cisco-xr
+!
+hostname l2vpn_asymmetric_tagging
+!
+interface BVI1
+ ipv4 address 10.1.1.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0/1.1 l2transport
+ encapsulation dot1q 1
+ rewrite ingress tag pop 1
+!
+!
+l2vpn
+ bridge group BG1
+  bridge-domain BD1
+   interface GigabitEthernet0/0/0/1.1
+   !
+   routed interface BVI1
+  !
+!

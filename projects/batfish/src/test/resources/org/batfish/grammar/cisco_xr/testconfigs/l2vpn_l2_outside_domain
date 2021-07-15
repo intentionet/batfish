@@ -1,0 +1,8 @@
+!RANCID-CONTENT-TYPE: cisco-xr
+!
+hostname l2vpn_l2_outside_domain
+!
+interface GigabitEthernet0/0/0/1.1 l2transport
+ encapsulation dot1q 1
+ rewrite ingress tag pop 1 symmetric
+!

@@ -1,0 +1,21 @@
+!RANCID-CONTENT-TYPE: cisco-xr
+!
+hostname l2vpn_many_vlans_in_domain
+!
+interface GigabitEthernet0/0/0/1.1 l2transport
+ encapsulation dot1q 1
+ rewrite ingress tag pop 1
+!
+interface GigabitEthernet0/0/0/1.2 l2transport
+ encapsulation dot1q 2
+ rewrite ingress tag pop 1
+!
+!
+l2vpn
+ bridge group BG1
+  bridge-domain BD1
+   interface GigabitEthernet0/0/0/1.1
+   interface GigabitEthernet0/0/0/1.2
+   !
+  !
+!

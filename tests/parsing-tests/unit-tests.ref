@@ -70982,7 +70982,7 @@
         "juniper_tacplus" : "PASSED",
         "juniper_trailing_space" : "PASSED",
         "juniper_vlan" : "PASSED",
-        "l2vpn" : "PASSED",
+        "l2vpn" : "WARNINGS",
         "local_v6_addr" : "PASSED",
         "mac_access_list" : "PASSED",
         "mcastrouting" : "PASSED",
@@ -84660,6 +84660,14 @@
             {
               "tag" : "MISCELLANEOUS",
               "text" : "missing action in firewall filter: '~GLOBAL_SECURITY_POLICY~', term: 'p1'"
+            }
+          ]
+        },
+        "l2vpn" : {
+          "Red flags" : [
+            {
+              "tag" : "MISCELLANEOUS",
+              "text" : "Batfish cannot yet model bridge-domains with more than one VLAN, like TEST-DOMAIN-1. This device's L2vpn will be ignored by Batfish."
             }
           ]
         },

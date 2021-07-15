@@ -1,0 +1,7 @@
+!RANCID-CONTENT-TYPE: cisco-xr
+!
+hostname l2vpn_bvi_outside_domain
+!
+interface BVI1
+ ipv4 address 10.1.1.1 255.255.255.0
+!

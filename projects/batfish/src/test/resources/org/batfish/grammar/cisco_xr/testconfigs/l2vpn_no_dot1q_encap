@@ -1,0 +1,7 @@
+!RANCID-CONTENT-TYPE: cisco-xr
+!
+hostname l2vpn_no_dot1q_encap
+!
+interface GigabitEthernet0/0/0/1.1 l2transport
+ rewrite ingress tag pop 1 symmetric
+!

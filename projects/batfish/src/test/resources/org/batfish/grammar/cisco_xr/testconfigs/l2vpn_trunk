@@ -1,0 +1,25 @@
+!RANCID-CONTENT-TYPE: cisco-xr
+!
+hostname l2vpn_trunk
+!
+interface BVI123
+ ipv4 address 10.1.1.1 255.255.255.0
+!
+interface GigabitEthernet0/0/0/1.123 l2transport
+ encapsulation dot1q 123
+ rewrite ingress tag pop 1 symmetric
+!
+interface GigabitEthernet0/0/0/2.123 l2transport
+ encapsulation dot1q 123
+ rewrite ingress tag pop 1 symmetric
+!
+!
+l2vpn
+ bridge group BG1
+  bridge-domain BD1
+   interface GigabitEthernet0/0/0/1.123
+   interface GigabitEthernet0/0/0/2.123
+   !
+   routed interface BVI123
+  !
+!

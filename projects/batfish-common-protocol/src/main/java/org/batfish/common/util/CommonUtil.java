@@ -170,10 +170,14 @@ public class CommonUtil {
 
   @Nullable
   public static Integer getInterfaceVlanNumber(String ifaceName) {
-    String prefix = "vlan";
+    return getInterfaceNumber("vlan", ifaceName);
+  }
+
+  @Nullable
+  public static Integer getInterfaceNumber(String prefix, String ifaceName) {
     String ifaceNameLower = ifaceName.toLowerCase();
     String withoutDot = ifaceNameLower.replaceAll("\\.", "");
-    if (withoutDot.startsWith(prefix)) {
+    if (withoutDot.startsWith(prefix.toLowerCase())) {
       String vlanStr = withoutDot.substring(prefix.length());
       if (vlanStr.length() > 0) {
         return Integer.parseInt(vlanStr);
