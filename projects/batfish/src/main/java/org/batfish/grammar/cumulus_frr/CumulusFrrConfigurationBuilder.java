@@ -80,6 +80,7 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Cumulus_frr_configuratio
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Icl_expandedContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Icl_standardContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Interface_ospf_costContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Interface_ospf_intervalContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_addressContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_as_pathContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Ip_community_list_nameContext;
@@ -181,6 +182,8 @@ import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Siip_addressContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Siipo_areaContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Siipo_costContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Siipo_network_p2pContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Siipo_hello_intervalContext;
+import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Siipo_dead_intervalContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Snoip_forwardingContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Standard_communityContext;
 import org.batfish.grammar.cumulus_frr.CumulusFrrParser.Sv_routeContext;
@@ -434,6 +437,10 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   }
 
   private Integer toInteger(Interface_ospf_costContext ctx) {
+    return Integer.parseInt(ctx.getText());
+  }
+
+  private Integer toInteger(Interface_ospf_intervalContext ctx) {
     return Integer.parseInt(ctx.getText());
   }
 
@@ -1168,6 +1175,16 @@ public class CumulusFrrConfigurationBuilder extends CumulusFrrParserBaseListener
   @Override
   public void exitSiipo_cost(Siipo_costContext ctx) {
     _currentInterface.getOrCreateOspf().setCost(toInteger(ctx.interface_ospf_cost()));
+  }
+
+  @Override
+  public void exitSiipo_hello_interval(Siipo_hello_intervalContext ctx) {
+    _currentInterface.getOrCreateOspf().setHelloInterval(toInteger(ctx.interface_ospf_interval()));
+  }
+
+  @Override
+  public void exitSiipo_dead_interval(Siipo_dead_intervalContext ctx) {
+    _currentInterface.getOrCreateOspf().setDeadInterval(toInteger(ctx.interface_ospf_interval()));
   }
 
   @Override

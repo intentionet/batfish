@@ -69,6 +69,8 @@ siip_ospf
     | siipo_message_digest_key
     | siipo_network_p2p
     | siipo_cost
+    | siipo_hello_interval
+    | siipo_dead_interval
   )
   NEWLINE
 ;
@@ -98,7 +100,22 @@ siipo_cost
   COST interface_ospf_cost
 ;
 
+siipo_hello_interval
+:
+  HELLO_INTERVAL interface_ospf_interval
+;
+
+siipo_dead_interval
+:
+  DEAD_INTERVAL interface_ospf_interval
+;
+
 interface_ospf_cost
+:
+  uint16
+;
+
+interface_ospf_interval
 :
   uint16
 ;

@@ -2114,6 +2114,20 @@ public class CumulusFrrGrammarTest {
   }
 
   @Test
+  public void testOspfIntervals() {
+    parseLines("interface swp1", "ip ospf hello-interval 755", "ip ospf dead-interval 999");
+    assertThat(Objects.requireNonNull(_frr.getInterfaces().get("swp1").getOspf()).getHelloInterval(), equalTo(755));
+    assertThat(Objects.requireNonNull(_frr.getInterfaces().get("swp1").getOspf()).getDeadInterval(), equalTo(999));
+  }
+
+  @Test
+  public void testOspfIntervalsNoValue() {
+    parseLines("interface swp1", "ip ospf area 0.0.0.0");
+    assertThat(_frr.getInterfaces().get("swp1").getOspf().getHelloInterval(), equalTo(null));
+    assertThat(_frr.getInterfaces().get("swp1").getOspf().getDeadInterval(), equalTo(null));
+  }
+
+  @Test
   public void testOspfRedistributeBgpSetMetric_behavior() throws IOException {
     /*
       Three nodes in a line - frr-originator spawns a route into BGP, redistributor redistributes this route into OSPF and sets metric of 10k
