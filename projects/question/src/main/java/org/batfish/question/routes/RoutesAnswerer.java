@@ -179,6 +179,12 @@ public class RoutesAnswerer extends Answerer {
     Prefix network = question.getNetwork();
     RoutingProtocolSpecifier protocolSpec = question.getRoutingProtocolSpecifier();
     String vrfRegex = question.getVrfs();
+    Set<BgpRouteStatus> expandedBgpRouteStatuses =
+        SpecifierFactories.getEnumSetSpecifierOrDefault(
+                question.getBgpRouteStatus(),
+                Grammar.BGP_ROUTE_STATUS_SPECIFIER,
+                new ConstantEnumSetSpecifier<>(ImmutableSet.of(BgpRouteStatus.BEST)))
+            .resolve();
 
     Multiset<Row> rows;
     Map<RouteRowKey, Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>>>
@@ -194,11 +200,23 @@ public class RoutesAnswerer extends Answerer {
       case BGP:
         dp = _batfish.loadDataPlane(snapshot);
         routesGroupedByKeyInBase =
-            groupBgpRoutes(dp.getBgpRoutes(), matchingNodes, vrfRegex, network, protocolSpec);
+            groupBgpRoutes(
+                expandedBgpRouteStatuses.contains(BEST) ? dp.getBgpRoutes() : null,
+                expandedBgpRouteStatuses.contains(BACKUP) ? dp.getBgpBackupRoutes() : null,
+                matchingNodes,
+                vrfRegex,
+                network,
+                protocolSpec);
 
         dp = _batfish.loadDataPlane(reference);
         routesGroupedByKeyInDelta =
-            groupBgpRoutes(dp.getBgpRoutes(), matchingNodes, vrfRegex, network, protocolSpec);
+            groupBgpRoutes(
+                expandedBgpRouteStatuses.contains(BEST) ? dp.getBgpRoutes() : null,
+                expandedBgpRouteStatuses.contains(BACKUP) ? dp.getBgpBackupRoutes() : null,
+                matchingNodes,
+                vrfRegex,
+                network,
+                protocolSpec);
         routesDiffRaw = getRoutesDiff(routesGroupedByKeyInBase, routesGroupedByKeyInDelta);
         rows = getBgpRouteRowsDiff(routesDiffRaw, RibProtocol.BGP);
         break;
@@ -450,6 +468,20 @@ public class RoutesAnswerer extends Answerer {
             Boolean.TRUE));
     switch (rib) {
       case BGP:
+        columnBuilder.add(
+            new ColumnMetadata(
+                COL_BASE_PREFIX + COL_STATUS,
+                Schema.list(Schema.STRING),
+                "Route's statuses",
+                Boolean.FALSE,
+                Boolean.TRUE));
+        columnBuilder.add(
+            new ColumnMetadata(
+                COL_DELTA_PREFIX + COL_STATUS,
+                Schema.list(Schema.STRING),
+                "Route's statuses",
+                Boolean.FALSE,
+                Boolean.TRUE));
         columnBuilder.add(
             new ColumnMetadata(
                 COL_BASE_PREFIX + COL_NEXT_HOP_IP,

@@ -1,5 +1,6 @@
 package org.batfish.question.routes;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static org.batfish.datamodel.table.TableDiff.COL_BASE_PREFIX;
 import static org.batfish.datamodel.table.TableDiff.COL_DELTA_PREFIX;
@@ -38,6 +39,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Table;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -185,7 +187,7 @@ public class RoutesAnswererUtil {
    * @param network {@link Prefix} of the network used to filter the routes
    * @param protocolSpec {@link RoutingProtocolSpecifier} used to filter the {@link Bgpv4Route}s
    * @param vrfRegex Regex used to filter the routes based on {@link org.batfish.datamodel.Vrf}
-   * @param statuses BGP route statuses that correspond to routes in {code bgpRoutes}.
+   * @param statuses BGP route statuses that correspond to routes in {@code bgpRoutes}.
    * @return {@link Multiset} of {@link Row}s representing the routes
    */
   static Multiset<Row> getBgpRibRoutes(
@@ -495,30 +497,32 @@ public class RoutesAnswererUtil {
 
   private static void populateBgpRouteAttributes(
       RowBuilder rowBuilder, @Nullable RouteRowAttribute routeRowAttribute, boolean base) {
+    String prefix = base ? COL_BASE_PREFIX : COL_DELTA_PREFIX;
     rowBuilder
         .put(
-            (base ? COL_BASE_PREFIX : COL_DELTA_PREFIX) + COL_AS_PATH,
+            prefix + COL_AS_PATH,
             routeRowAttribute != null && routeRowAttribute.getAsPath() != null
                 ? routeRowAttribute.getAsPath().getAsPathString()
                 : null)
+        .put(prefix + COL_METRIC, routeRowAttribute != null ? routeRowAttribute.getMetric() : null)
         .put(
-            (base ? COL_BASE_PREFIX : COL_DELTA_PREFIX) + COL_METRIC,
-            routeRowAttribute != null ? routeRowAttribute.getMetric() : null)
-        .put(
-            (base ? COL_BASE_PREFIX : COL_DELTA_PREFIX) + COL_LOCAL_PREF,
+            prefix + COL_LOCAL_PREF,
             routeRowAttribute != null ? routeRowAttribute.getLocalPreference() : null)
         .put(
-            (base ? COL_BASE_PREFIX : COL_DELTA_PREFIX) + COL_COMMUNITIES,
+            prefix + COL_COMMUNITIES,
             routeRowAttribute != null ? routeRowAttribute.getCommunities() : null)
         .put(
-            (base ? COL_BASE_PREFIX : COL_DELTA_PREFIX) + COL_ORIGIN_PROTOCOL,
+            prefix + COL_ORIGIN_PROTOCOL,
             routeRowAttribute != null ? routeRowAttribute.getOriginProtocol() : null)
         .put(
-            (base ? COL_BASE_PREFIX : COL_DELTA_PREFIX) + COL_ORIGIN_TYPE,
+            prefix + COL_ORIGIN_TYPE,
             routeRowAttribute != null ? routeRowAttribute.getOriginType() : null)
+        .put(prefix + COL_TAG, routeRowAttribute != null ? routeRowAttribute.getTag() : null)
         .put(
-            (base ? COL_BASE_PREFIX : COL_DELTA_PREFIX) + COL_TAG,
-            routeRowAttribute != null ? routeRowAttribute.getTag() : null);
+            prefix + COL_STATUS,
+            routeRowAttribute != null && routeRowAttribute.getStatus() != null
+                ? ImmutableList.of(routeRowAttribute.getStatus())
+                : null);
   }
 
   /**
@@ -656,8 +660,9 @@ public class RoutesAnswererUtil {
    * RouteRowSecondaryKey} and for the routes in same sub-groups, sorts them according to {@link
    * RouteRowAttribute}
    *
-   * @param bgpRoutes {@link Table} of BGP routes with rows per node and columns per VRF * @param
-   *     ribs {@link Map} of the RIBs
+   * @param bgpBestRoutes {@link Table} of best BGP routes with rows per node and columns per VRF
+   * @param bgpBackupRoutes {@link Table} of backup BGP routes with rows per node and columns per
+   *     VRF
    * @param matchingNodes {@link Set} of nodes to be matched
    * @param vrfRegex Regex to filter the VRF
    * @param network {@link Prefix}
@@ -666,61 +671,85 @@ public class RoutesAnswererUtil {
    *     RouteRowSecondaryKey} to {@link SortedSet} of {@link RouteRowAttribute}s
    */
   static Map<RouteRowKey, Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>>> groupBgpRoutes(
-      Table<String, String, Set<Bgpv4Route>> bgpRoutes,
+      @Nullable Table<String, String, Set<Bgpv4Route>> bgpBestRoutes,
+      @Nullable Table<String, String, Set<Bgpv4Route>> bgpBackupRoutes,
       Set<String> matchingNodes,
       String vrfRegex,
       @Nullable Prefix network,
       RoutingProtocolSpecifier protocolSpec) {
+    checkArgument(
+        bgpBestRoutes != null || bgpBackupRoutes != null,
+        "At least one of best routes or backup routes is required.");
     Map<RouteRowKey, Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>>> routesGroups =
         new HashMap<>();
     Pattern compiledVrfRegex = Pattern.compile(vrfRegex);
+
+    Map<BgpRouteStatus, Table<String, String, Set<Bgpv4Route>>> routesByStatus =
+        new EnumMap<BgpRouteStatus, Table<String, String, Set<Bgpv4Route>>>(BgpRouteStatus.class);
+    if (bgpBestRoutes != null) {
+      routesByStatus.put(BgpRouteStatus.BEST, bgpBestRoutes);
+    }
+    if (bgpBackupRoutes != null) {
+      routesByStatus.put(BgpRouteStatus.BACKUP, bgpBackupRoutes);
+    }
+
     matchingNodes.forEach(
         hostname ->
-            bgpRoutes
-                .row(hostname)
-                .forEach(
-                    (vrfName, routes) -> {
-                      if (compiledVrfRegex.matcher(vrfName).matches()) {
-                        routes.stream()
-                            .filter(
-                                route ->
-                                    (network == null || network.equals(route.getNetwork()))
-                                        && protocolSpec
-                                            .getProtocols()
-                                            .contains(route.getProtocol()))
-                            .forEach(
-                                route ->
-                                    routesGroups
-                                        .computeIfAbsent(
-                                            new RouteRowKey(hostname, vrfName, route.getNetwork()),
-                                            k -> new HashMap<>())
-                                        .computeIfAbsent(
-                                            new RouteRowSecondaryKey(
-                                                route.getNextHopIp(),
-                                                route.getProtocol().protocolName()),
-                                            k -> new TreeSet<>())
-                                        .add(
-                                            RouteRowAttribute.builder()
-                                                .setOriginProtocol(
-                                                    route.getSrcProtocol() != null
-                                                        ? route.getSrcProtocol().protocolName()
-                                                        : null)
-                                                .setAdminDistance(route.getAdministrativeCost())
-                                                .setMetric(route.getMetric())
-                                                .setAsPath(route.getAsPath())
-                                                .setLocalPreference(route.getLocalPreference())
-                                                .setCommunities(
-                                                    route.getCommunities().getCommunities().stream()
-                                                        .map(Community::toString)
-                                                        .collect(toImmutableList()))
-                                                .setOriginType(route.getOriginType())
-                                                .setTag(
-                                                    route.getTag() == Route.UNSET_ROUTE_TAG
-                                                        ? null
-                                                        : route.getTag())
-                                                .build()));
-                      }
-                    }));
+            routesByStatus.forEach(
+                (status, statusRoutes) ->
+                    statusRoutes.row(hostname).entrySet().stream()
+                        .filter(vrfEntry -> compiledVrfRegex.matcher(vrfEntry.getKey()).matches())
+                        .forEach(
+                            vrfEntry ->
+                                vrfEntry.getValue().stream()
+                                    .filter(
+                                        route ->
+                                            (network == null || network.equals(route.getNetwork()))
+                                                && protocolSpec
+                                                    .getProtocols()
+                                                    .contains(route.getProtocol()))
+                                    .forEach(
+                                        route ->
+                                            routesGroups
+                                                .computeIfAbsent(
+                                                    new RouteRowKey(
+                                                        hostname,
+                                                        vrfEntry.getKey(),
+                                                        route.getNetwork()),
+                                                    k -> new HashMap<>())
+                                                .computeIfAbsent(
+                                                    new RouteRowSecondaryKey(
+                                                        route.getNextHopIp(),
+                                                        route.getProtocol().protocolName()),
+                                                    k -> new TreeSet<>())
+                                                .add(
+                                                    RouteRowAttribute.builder()
+                                                        .setOriginProtocol(
+                                                            route.getSrcProtocol() != null
+                                                                ? route
+                                                                    .getSrcProtocol()
+                                                                    .protocolName()
+                                                                : null)
+                                                        .setAdminDistance(
+                                                            route.getAdministrativeCost())
+                                                        .setMetric(route.getMetric())
+                                                        .setAsPath(route.getAsPath())
+                                                        .setLocalPreference(
+                                                            route.getLocalPreference())
+                                                        .setCommunities(
+                                                            route
+                                                                .getCommunities()
+                                                                .getCommunities()
+                                                                .stream()
+                                                                .map(Community::toString)
+                                                                .collect(toImmutableList()))
+                                                        .setOriginType(route.getOriginType())
+                                                        .setTag(
+                                                            route.getTag() == Route.UNSET_ROUTE_TAG
+                                                                ? null
+                                                                : route.getTag())
+                                                        .setStatus(status)
+                                                        .build())))));
 
     return routesGroups;
   }

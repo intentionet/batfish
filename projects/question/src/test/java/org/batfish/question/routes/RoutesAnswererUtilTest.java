@@ -1,6 +1,7 @@
 package org.batfish.question.routes;
 
 import static org.batfish.datamodel.matchers.RowMatchers.hasColumn;
+import static org.batfish.datamodel.questions.BgpRouteStatus.BACKUP;
 import static org.batfish.datamodel.questions.BgpRouteStatus.BEST;
 import static org.batfish.datamodel.table.TableDiff.COL_BASE_PREFIX;
 import static org.batfish.question.routes.RoutesAnswerer.COL_ADMIN_DISTANCE;
@@ -46,6 +47,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Table;
@@ -572,6 +574,7 @@ public class RoutesAnswererUtilTest {
     Map<RouteRowKey, Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>>> grouped =
         groupBgpRoutes(
             bgpTable,
+            ImmutableTable.of(),
             ImmutableSet.of("node"),
             ".*",
             null,
@@ -597,6 +600,7 @@ public class RoutesAnswererUtilTest {
                     .setLocalPreference(1L)
                     .setAsPath(AsPath.ofSingletonAsSets(ImmutableList.of(1L, 2L)))
                     .setOriginType(OriginType.IGP)
+                    .setStatus(BEST)
                     .build()));
     // matching the secondary key
     assertThat(innerGroup, equalTo(expectedInnerMap));
@@ -638,6 +642,7 @@ public class RoutesAnswererUtilTest {
     Map<RouteRowKey, Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>>> grouped =
         groupBgpRoutes(
             bgpTable,
+            ImmutableTable.of(),
             ImmutableSet.of("node"),
             ".*",
             null,
@@ -662,6 +667,7 @@ public class RoutesAnswererUtilTest {
                     .setAsPath(AsPath.ofSingletonAsSets(ImmutableList.of(1L, 2L)))
                     .setLocalPreference(1L)
                     .setOriginType(OriginType.IGP)
+                    .setStatus(BEST)
                     .build()),
             new RouteRowSecondaryKey(Ip.parse("1.1.1.3"), "bgp"),
             ImmutableSortedSet.of(
@@ -671,6 +677,60 @@ public class RoutesAnswererUtilTest {
                     .setLocalPreference(1L)
                     .setAsPath(AsPath.ofSingletonAsSets(ImmutableList.of(1L, 2L)))
                     .setOriginType(OriginType.IGP)
+                    .setStatus(BEST)
+                    .build()));
+    // matching the secondary key
+    assertThat(innerGroup, equalTo(expectedInnerMap));
+  }
+
+  /** Test that groupBgpRoutes produces a diff when a route goes from back to best. */
+  @Test
+  public void testGroupBgpRoutes_backup() {
+    Bgpv4Route route =
+        Bgpv4Route.testBuilder()
+            .setNetwork(Prefix.parse("1.1.1.0/24"))
+            .setNextHopIp(Ip.parse("1.1.1.2"))
+            .setOriginType(OriginType.IGP)
+            .setOriginatorIp(Ip.parse("1.1.1.2"))
+            .setProtocol(RoutingProtocol.BGP)
+            .setLocalPreference(1L)
+            .setAdmin(10)
+            .setMetric(30L)
+            .setAsPath(AsPath.ofSingletonAsSets(ImmutableList.of(1L, 2L)))
+            .build();
+
+    Table<String, String, Set<Bgpv4Route>> backupRoutes = HashBasedTable.create();
+    backupRoutes.row("node").put(Configuration.DEFAULT_VRF_NAME, ImmutableSet.of(route));
+
+    Map<RouteRowKey, Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>>> grouped =
+        groupBgpRoutes(
+            ImmutableTable.of(),
+            backupRoutes,
+            ImmutableSet.of("node"),
+            ".*",
+            null,
+            RoutingProtocolSpecifier.ALL_PROTOCOLS_SPECIFIER);
+
+    assertThat(grouped.keySet(), hasSize(1));
+
+    RouteRowKey expectedKey =
+        new RouteRowKey("node", Configuration.DEFAULT_VRF_NAME, Prefix.parse("1.1.1.0/24"));
+    assertThat(grouped.keySet().iterator().next(), equalTo(expectedKey));
+
+    Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>> innerGroup = grouped.get(expectedKey);
+
+    // checking equality of inner group
+    Map<RouteRowSecondaryKey, SortedSet<RouteRowAttribute>> expectedInnerMap =
+        ImmutableMap.of(
+            new RouteRowSecondaryKey(Ip.parse("1.1.1.2"), "bgp"),
+            ImmutableSortedSet.of(
+                RouteRowAttribute.builder()
+                    .setAdminDistance(10)
+                    .setMetric(30L)
+                    .setAsPath(AsPath.ofSingletonAsSets(ImmutableList.of(1L, 2L)))
+                    .setLocalPreference(1L)
+                    .setOriginType(OriginType.IGP)
+                    .setStatus(BACKUP)
                     .build()));
     // matching the secondary key
     assertThat(innerGroup, equalTo(expectedInnerMap));

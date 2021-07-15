@@ -16,6 +16,7 @@ import org.batfish.datamodel.AsPath;
 import org.batfish.datamodel.BgpRoute;
 import org.batfish.datamodel.OriginType;
 import org.batfish.datamodel.Route;
+import org.batfish.datamodel.questions.BgpRouteStatus;
 
 /**
  * Contains the non-key attributes of {@link BgpRoute}s and {@link AbstractRoute}s and defines a
@@ -43,6 +44,8 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
 
   @Nullable private final Long _tag;
 
+  @Nullable private final BgpRouteStatus _status;
+
   private RouteRowAttribute(
       String nextHop,
       String nextHopInterface,
@@ -53,7 +56,8 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
       List<String> communities,
       String originalProtocol,
       OriginType originType,
-      Long tag) {
+      Long tag,
+      BgpRouteStatus status) {
     _nextHop = nextHop;
     _nextHopInterface = nextHopInterface;
     _adminDistance = adminDistance;
@@ -64,6 +68,7 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
     _originProtocol = originalProtocol;
     _originType = originType;
     _tag = tag;
+    _status = status;
   }
 
   @Nullable
@@ -116,6 +121,11 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
     return _tag;
   }
 
+  @Nullable
+  public BgpRouteStatus getStatus() {
+    return _status;
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -130,6 +140,7 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
           .thenComparing(RouteRowAttribute::getOriginProtocol, nullsLast(String::compareTo))
           .thenComparing(RouteRowAttribute::getOriginType, nullsLast(OriginType::compareTo))
           .thenComparing(RouteRowAttribute::getTag, nullsLast(Long::compareTo))
+          .thenComparing(RouteRowAttribute::getStatus, nullsLast(BgpRouteStatus::compareTo))
           .thenComparing(
               routeRowAttribute -> routeRowAttribute.getCommunities().toString(),
               nullsLast(String::compareTo));
@@ -157,7 +168,8 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
         && Objects.equals(_communities, that._communities)
         && Objects.equals(_originProtocol, that._originProtocol)
         && Objects.equals(_originType, that._originType)
-        && Objects.equals(_tag, that._tag);
+        && Objects.equals(_tag, that._tag)
+        && Objects.equals(_status, that._status);
   }
 
   @Override
@@ -172,7 +184,8 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
         _communities,
         _originProtocol,
         _originType,
-        _tag);
+        _tag,
+        _status == null ? 0 : _status.ordinal());
   }
 
   /** Builder for {@link RouteRowAttribute} */
@@ -195,6 +208,7 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
     @Nullable private OriginType _originType;
 
     @Nullable private Long _tag;
+    @Nullable private BgpRouteStatus _status;
 
     public RouteRowAttribute build() {
       if (_tag != null && _tag == Route.UNSET_ROUTE_TAG) {
@@ -210,7 +224,8 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
           _communities,
           _originProtocol,
           _originType,
-          _tag);
+          _tag,
+          _status);
     }
 
     public Builder setAdminDistance(Integer adminDistance) {
@@ -260,6 +275,11 @@ public class RouteRowAttribute implements Comparable<RouteRowAttribute> {
 
     public Builder setTag(Long tag) {
       _tag = tag;
+      return this;
+    }
+
+    public Builder setStatus(BgpRouteStatus status) {
+      _status = status;
       return this;
     }
   }
